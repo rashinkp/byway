@@ -1,7 +1,8 @@
 import express, { Request, Response, NextFunction } from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
-import authRouter from "./modules/auth/auth.route";
+import { createAuthRouter } from "./modules/auth/auth.route";
+import { initializeDependencies } from "./core/dependency";
 import { StatusCodes } from "http-status-codes";
 
 const app = express();
@@ -15,8 +16,10 @@ app.use(
 app.use(express.json());
 app.use(cookieParser());
 
+
+const { authController } = initializeDependencies();
 // Routes
-app.use("/api/v1/auth", authRouter);
+app.use("/api/v1/auth", createAuthRouter(authController));
 
 // Error-handling middleware
 app.use((error: any, req: Request, res: Response, next: NextFunction): void => {

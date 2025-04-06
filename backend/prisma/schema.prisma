@@ -21,7 +21,7 @@ model User {
   password      String?  
   googleId      String?  @unique
   avatar        String?  
-  role          Role     @default(STUDENT)
+  role          Role     @default(USER)
   authProvider  AuthProvider @default(EMAIL_PASSWORD)
   isVerified    Boolean  @default(false)
   deletedAt     DateTime?  
@@ -30,7 +30,7 @@ model User {
 }
 
 enum Role {
-  STUDENT
+  USER
   INSTRUCTOR
   ADMIN
 }

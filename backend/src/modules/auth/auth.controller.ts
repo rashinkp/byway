@@ -3,66 +3,119 @@ import { AuthService } from "./auth.service";
 import { StatusCodes } from "http-status-codes";
 import { JwtUtil } from "../../utils/jwt.util";
 
+
+interface RegisterAdminInput {
+  name: string;
+  email: string;
+  password: string;
+}
+interface RegisterUserInput {
+  name: string;
+  email: string;
+  password: string;
+}
+
+interface LoginInput {
+  email: string;
+  password: string;
+}
+
+interface AuthResponse {
+  status: 'success' | 'error';
+  data?: {
+    id: string;
+    email: string;
+    role: string;
+  };
+  token?: string;
+  message?: string;
+  statusCode?: number;
+}
+
 export class AuthController {
   constructor(private authService: AuthService) {}
 
-  async registerAdmin(req: Request, res: Response) {
-    console.log("Registering admin with body:", req.body);
-    const { name, email, password } = req.body;
+  async registerAdmin(input: RegisterAdminInput): Promise<AuthResponse> {
 
+    const { name, email, password } = input;
     try {
-      const user = await this.authService.registerAdmin(name, email, password);
-      const token = JwtUtil.generateToken({
-        id: user.id,
-        email: user.email,
-        role: user.role,
-      });
-      JwtUtil.setTokenCookie(res, token);
 
-      res.status(StatusCodes.CREATED).json({
+      const { user, token } = await this.authService.registerAdmin(name, email, password);
+      
+      return {
         status: "success",
         data: { id: user.id, email: user.email, role: user.role },
-      });
+        token,
+        statusCode: StatusCodes.CREATED,
+      }
     } catch (error) {
-      res.status(StatusCodes.BAD_REQUEST).json({
+      console.log(error);
+      return {
         status: "error",
         message: error instanceof Error ? error.message : "Registration failed",
-      });
-      console.log(error);
+        statusCode: StatusCodes.BAD_REQUEST,
+      };
     }
   }
 
-  async login(req: Request, res: Response) {
-    const { email, password } = req.body;
+  async registerUser(input: RegisterUserInput): Promise<AuthResponse> {
+    const { name, email, password } = input;
+    try {
+      const { user, token } = await this.authService.registerUser(name, email, password);
+      return {
+        status: 'success',
+        data: { id: user.id, email: user.email, role: user.role },
+        token,
+        statusCode: StatusCodes.CREATED,
+      }
+    } catch (error) {
+      console.log(error);
+      return {
+        status: 'error',
+        message: error instanceof Error ? error.message : "Registration failed",
+        statusCode: StatusCodes.BAD_REQUEST,
+      }
 
+    }
+  }
+
+  async login(input: LoginInput): Promise<AuthResponse> {
+    const { email, password } = input;
     try {
       const { user, token } = await this.authService.login(email, password);
-      JwtUtil.setTokenCookie(res, token);
-
-      res.status(StatusCodes.OK).json({
+      // JwtUtil.setTokenCookie(token, res);
+      return {
         status: "success",
         data: { id: user.id, email: user.email, role: user.role },
-      });
+        token,
+        statusCode: StatusCodes.OK,
+      };
     } catch (error) {
-      res.status(StatusCodes.UNAUTHORIZED).json({
-        status: "error",
+      console.log(error);
+      return {
+        status: 'error',
         message: error instanceof Error ? error.message : "Login failed",
-      });
+        statusCode: StatusCodes.UNAUTHORIZED,
+      }
+
     }
   }
 
-  async logout(req: Request, res: Response) {
+  async logout(): Promise<AuthResponse> {
     try {
-      JwtUtil.clearTokenCookie(res);
-      res.status(StatusCodes.OK).json({
+      return {
         status: "success",
         message: "Logged out successfully",
-      });
+        statusCode: StatusCodes.OK,
+      }
     } catch (error) {
-      res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+      return {
         status: "error",
-        message: "Logout failed",
-      });
+        message: error instanceof Error ? error.message : "Logout failed",
+        statusCode: StatusCodes.INTERNAL_SERVER_ERROR,
+      }
     }
   }
+
+
 }

@@ -1,19 +1,17 @@
 import { Router } from "express";
 import { AuthController } from "./auth.controller";
-import { AuthService } from "./auth.service";
-import { AuthRepository } from "./auth.repository";
-import { PrismaClient } from "@prisma/client";
 import { authMiddleware } from "../../middlewares/authMiddleware";
+import { adaptAuthController } from "../../adapters/expressAuthAdapters";
 
-const prisma = new PrismaClient();
-const authRepository = new AuthRepository(prisma);
-const authService = new AuthService(authRepository);
-const authController = new AuthController(authService);
+export const createAuthRouter = (authController:AuthController): Router => {
+  const authRouter = Router();
+  const adapt = adaptAuthController(authController);
 
-const authRouter = Router();
+  authRouter.post('/registerAdmin', adapt.registerAdmin);
+  authRouter.post('/registerUser', adapt.registerUser);
+  authRouter.post('/login', adapt.login);
+  authRouter.post('/logout', authMiddleware('ADMIN'), adapt.logout);
+  
 
-authRouter.post("/registerAdmin", (req, res) => authController.registerAdmin(req, res));
-authRouter.post("/login", (req, res) => authController.login(req, res));
-authRouter.post("/logout", authMiddleware("ADMIN"), (req, res) => authController.logout(req, res));
-
-export default authRouter;
+  return authRouter;
+} 
