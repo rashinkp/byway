@@ -2,6 +2,9 @@ import { PrismaClient } from "@prisma/client";
 import { AuthController } from "../modules/auth/auth.controller";
 import { AuthService } from "../modules/auth/auth.service";
 import { AuthRepository } from "../modules/auth/auth.repository";
+import { InstructorController } from "../modules/instructor/instructor.controller";
+import { InstructorRepository } from "../modules/instructor/instructor.repository";
+import { InstructorService } from "../modules/instructor/instructor.service";
 
 
 export const initializeDependencies = () => {
@@ -9,6 +12,9 @@ export const initializeDependencies = () => {
   const authRepository = new AuthRepository(prisma);
   const authService = new AuthService(authRepository);
   const authController = new AuthController(authService);
-  return { authController };
+  const instructorRepository = new InstructorRepository(prisma); 
+  const instructorService = new InstructorService(instructorRepository);
+  const instructorController = new InstructorController(instructorService); 
+  return { authController , instructorController };
 }
 

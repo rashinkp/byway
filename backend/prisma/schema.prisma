@@ -1,9 +1,4 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
+// prisma/schema.prisma
 generator client {
   provider = "prisma-client-js"
 }
@@ -13,20 +8,20 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-
 model User {
-  id            String   @id @default(uuid())  
+  id            String         @id @default(uuid())  
   name          String   
-  email         String   @unique
+  email         String         @unique
   password      String?  
-  googleId      String?  @unique
+  googleId      String?        @unique
   avatar        String?  
-  role          Role     @default(USER)
-  authProvider  AuthProvider @default(EMAIL_PASSWORD)
-  isVerified    Boolean  @default(false)
+  role          Role           @default(USER)
+  authProvider  AuthProvider   @default(EMAIL_PASSWORD)
+  isVerified    Boolean        @default(false)
   deletedAt     DateTime?  
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  instructorDetails InstructorDetails?  @relation("UserToInstructorDetails") 
 }
 
 enum Role {
@@ -38,4 +33,18 @@ enum Role {
 enum AuthProvider {
   EMAIL_PASSWORD
   GOOGLE
+}
+
+model InstructorDetails {
+  id                     String   @id @default(uuid())
+  userId                 String   @unique
+  totalStudents          Int      @default(0)
+  areaOfExpertise        String
+  professionalExperience String
+  about                  String?
+  approved               Boolean  @default(false)
+  website                String?
+  createdAt              DateTime @default(now())
+  updatedAt              DateTime @updatedAt
+  user                   User     @relation("UserToInstructorDetails", fields: [userId], references: [id], onDelete: Cascade)
 }

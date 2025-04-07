@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import { StatusCodes } from "http-status-codes";
-import { JwtUtil } from "../utils/jwt.util"; // Adjust path
+import { JwtUtil } from "../utils/jwt.util"; 
 
 interface AuthenticatedRequest extends Request {
   user?: {
@@ -28,10 +28,14 @@ export const authMiddleware = (requiredRole: string) => {
     try {
       const decoded = JwtUtil.verifyToken(token);
 
-      if (decoded.role !== requiredRole) {
+      if (
+        requiredRole &&
+        decoded.role !== requiredRole &&
+        decoded.id !== req.body.userId
+      ) {
         return next({
           status: StatusCodes.FORBIDDEN,
-          message: `Forbidden access. ${requiredRole} role required.`,
+          message: `Forbidden access. ${requiredRole} role required or not matching.`,
         });
       }
 
