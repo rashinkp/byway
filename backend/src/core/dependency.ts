@@ -5,6 +5,9 @@ import { AuthRepository } from "../modules/auth/auth.repository";
 import { InstructorController } from "../modules/instructor/instructor.controller";
 import { InstructorRepository } from "../modules/instructor/instructor.repository";
 import { InstructorService } from "../modules/instructor/instructor.service";
+import { UserService } from "../modules/user/user.service";
+import { UserController } from "../modules/user/user.controller";
+import { UserRepository } from "../modules/user/user.repository";
 
 
 export const initializeDependencies = () => {
@@ -12,9 +15,18 @@ export const initializeDependencies = () => {
   const authRepository = new AuthRepository(prisma);
   const authService = new AuthService(authRepository);
   const authController = new AuthController(authService);
+
+
   const instructorRepository = new InstructorRepository(prisma); 
   const instructorService = new InstructorService(instructorRepository);
   const instructorController = new InstructorController(instructorService); 
-  return { authController , instructorController };
+
+  //user dependancy
+  const userRepository = new UserRepository(prisma);
+  const userService = new UserService(userRepository);
+  const userController = new UserController(userService); 
+
+
+  return { authController , instructorController , userController };
 }
 

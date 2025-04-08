@@ -1,5 +1,6 @@
 import { Request, Response , RequestHandler } from "express";
 import { InstructorController } from "../modules/instructor/instructor.controller";
+import { JwtUtil } from "../utils/jwt.util";
 
 interface AuthenticatedRequest extends Request {
   user?: {
@@ -32,6 +33,10 @@ export const adaptInstructorController = (
       userId,
       website,
     });
+
+    if (result.status === 'success' && result.token) {
+      JwtUtil.setTokenCookie(res, result.token);
+    }
 
     res.status(result.statusCode as number).json({
       status: result.status,

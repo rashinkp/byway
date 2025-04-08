@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import { AuthService } from "./auth.service";
 import { StatusCodes } from "http-status-codes";
 import { JwtUtil } from "../../utils/jwt.util";
+import { ApiResponse } from "../../types/response";
 
 
 interface RegisterAdminInput {
@@ -20,22 +21,12 @@ interface LoginInput {
   password: string;
 }
 
-interface AuthResponse {
-  status: 'success' | 'error';
-  data?: {
-    id: string;
-    email: string;
-    role: string;
-  };
-  token?: string;
-  message?: string;
-  statusCode?: number;
-}
+
 
 export class AuthController {
   constructor(private authService: AuthService) {}
 
-  async registerAdmin(input: RegisterAdminInput): Promise<AuthResponse> {
+  async registerAdmin(input: RegisterAdminInput): Promise<ApiResponse> {
 
     const { name, email, password } = input;
     try {
@@ -58,7 +49,7 @@ export class AuthController {
     }
   }
 
-  async registerUser(input: RegisterUserInput): Promise<AuthResponse> {
+  async registerUser(input: RegisterUserInput): Promise<ApiResponse> {
     const { name, email, password } = input;
     try {
       const { user, token } = await this.authService.registerUser(name, email, password);
@@ -79,7 +70,7 @@ export class AuthController {
     }
   }
 
-  async login(input: LoginInput): Promise<AuthResponse> {
+  async login(input: LoginInput): Promise<ApiResponse> {
     const { email, password } = input;
     try {
       const { user, token } = await this.authService.login(email, password);
@@ -101,7 +92,7 @@ export class AuthController {
     }
   }
 
-  async logout(): Promise<AuthResponse> {
+  async logout(): Promise<ApiResponse> {
     try {
       return {
         status: "success",
@@ -116,6 +107,5 @@ export class AuthController {
       }
     }
   }
-
 
 }

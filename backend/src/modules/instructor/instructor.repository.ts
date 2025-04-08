@@ -26,19 +26,16 @@ export class InstructorRepository implements IInstructorRepository {
       throw new Error("User not found");
     }
 
-
-    //implementing transaction to make sure things are happening atomicitly
     const result = await this.prisma.$transaction(async (tx) => {
-
-      //changing user role
-      if (user.role !== 'INSTRUCTOR') {
-        await tx.user.update({
+      
+      let updatedUser = user;
+      if (user.role !== "INSTRUCTOR") {
+        updatedUser = await tx.user.update({
           where: { id: userId },
-          data: { role: 'INSTRUCTOR' }
+          data: { role: "INSTRUCTOR" },
         });
       }
 
-      //create instructorDetails 
       const instructorDetails = await tx.instructorDetails.create({
         data: {
           areaOfExpertise,
@@ -47,21 +44,19 @@ export class InstructorRepository implements IInstructorRepository {
           userId,
           website,
         },
-      })
+      });
 
       return {
-        id: user.id,
-        email: user.email,
-        role: "INSTRUCTOR",
+        id: updatedUser.id,
+        email: updatedUser.email,
+        role: updatedUser.role, 
         areaOfExpertise: instructorDetails.areaOfExpertise,
         professionalExperience: instructorDetails.professionalExperience,
         about: instructorDetails.about as string,
         userId: instructorDetails.userId,
         website: instructorDetails.website as string,
       };
-
-
-    })
+    });
 
     return result;
   }

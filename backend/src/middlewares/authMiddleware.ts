@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import { StatusCodes } from "http-status-codes";
-import { JwtUtil } from "../utils/jwt.util"; 
+import { JwtUtil } from "../utils/jwt.util";
 
 interface AuthenticatedRequest extends Request {
   user?: {
@@ -27,21 +27,22 @@ export const authMiddleware = (requiredRole: string) => {
 
     try {
       const decoded = JwtUtil.verifyToken(token);
+      // console.log(decoded);
 
       if (
         requiredRole &&
-        decoded.role !== requiredRole &&
-        decoded.id !== req.body.userId
+        decoded.role !== requiredRole
       ) {
         return next({
           status: StatusCodes.FORBIDDEN,
           message: `Forbidden access. ${requiredRole} role required or not matching.`,
         });
       }
-
+      
       req.user = decoded;
       next();
     } catch (error) {
+      console.log(error);
       const message =
         error instanceof Error && error.message === "Invalid or expired token"
           ? "Invalid or expired token"
@@ -60,13 +61,12 @@ export const protect = (
   req: AuthenticatedRequest,
   res: Response,
   next: NextFunction
-) => {
+): void => {
   const token = req.cookies?.jwt;
 
   if (!token) {
-    // Fixed typo: ifbundled -> if
-    return res.status(StatusCodes.UNAUTHORIZED).json({
-      status: "error",
+    return next({
+      status: StatusCodes.UNAUTHORIZED,
       message: "Unauthorized access. No token provided.",
     });
   }
@@ -76,14 +76,13 @@ export const protect = (
     req.user = decoded;
     next();
   } catch (error) {
-    // Type the error as an unknown type and handle it
     const message =
       error instanceof Error && error.message === "Invalid or expired token"
         ? "Invalid or expired token"
         : "Authentication error";
 
-    return res.status(StatusCodes.UNAUTHORIZED).json({
-      status: "error",
+    return next({
+      status: StatusCodes.UNAUTHORIZED,
       message,
     });
   }
