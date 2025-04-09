@@ -8,11 +8,22 @@ import { InstructorService } from "../modules/instructor/instructor.service";
 import { UserService } from "../modules/user/user.service";
 import { UserController } from "../modules/user/user.controller";
 import { UserRepository } from "../modules/user/user.repository";
+import { OtpRepository } from "../modules/otp/otp.repository";
+import { OtpService } from "../modules/otp/otp.service";
+import { OtpController } from "../modules/otp/otp.controller";
 
 
 export const initializeDependencies = () => {
+  
   const prisma = new PrismaClient();
-  const authRepository = new AuthRepository(prisma);
+  
+  //otp related dependancies
+  const otpRepository = new OtpRepository(prisma);
+  const otpService = new OtpService(otpRepository);
+  const otpController = new OtpController(otpService);
+
+
+  const authRepository = new AuthRepository(prisma , otpService);
   const authService = new AuthService(authRepository);
   const authController = new AuthController(authService);
 
@@ -27,6 +38,7 @@ export const initializeDependencies = () => {
   const userController = new UserController(userService); 
 
 
-  return { authController , instructorController , userController };
+
+  return { authController , instructorController , userController, otpController };
 }
 

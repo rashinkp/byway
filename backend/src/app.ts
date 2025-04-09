@@ -1,4 +1,5 @@
 import express, { Request, Response, NextFunction } from "express";
+import * as dotenv from "dotenv";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import { createAuthRouter } from "./modules/auth/auth.route";
@@ -6,8 +7,13 @@ import { createInstructorRouter } from "./modules/instructor/instructor.route";
 import { initializeDependencies } from "./core/dependency";
 import { StatusCodes } from "http-status-codes";
 import { createUserRouter } from "./modules/user/user.route";
+import { createOtpRouter } from "./modules/otp/otp.route";
+
+
+dotenv.config();
 
 const app = express();
+
 
 app.use(
   cors({
@@ -19,11 +25,15 @@ app.use(express.json());
 app.use(cookieParser());
 
 
-const { authController,instructorController , userController } = initializeDependencies();
+const { authController, instructorController, userController, otpController } = initializeDependencies();
+
+
 // Routes
 app.use("/api/v1/auth", createAuthRouter(authController));
 app.use("/api/v1/instructor", createInstructorRouter(instructorController));
 app.use('/api/v1/user' ,createUserRouter(userController) )
+app.use('/api/v1/otp', createOtpRouter(otpController));
+
 
 // Error-handling middleware
 app.use((error: any, req: Request, res: Response, next: NextFunction): void => {

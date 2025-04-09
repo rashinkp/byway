@@ -32,3 +32,10 @@ export interface IUserWithProfile {
   user: IUser;
   profile?: IUserProfile; 
 }
+
+
+export interface IRegisterInput {
+  name: string;
+  email: string;
+  password: string;
+}

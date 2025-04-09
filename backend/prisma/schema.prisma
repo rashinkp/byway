@@ -23,6 +23,7 @@ model User {
   updatedAt         DateTime        @updatedAt
   instructorDetails InstructorDetails? @relation("UserToInstructorDetails") 
   userProfile       UserProfile?    @relation("UserToUserProfile") 
+  verifications     UserVerification[] @relation("UserToVerification")
 }
 
 model UserProfile {
@@ -40,6 +41,21 @@ model UserProfile {
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
   user          User      @relation("UserToUserProfile", fields: [userId], references: [id], onDelete: Cascade)
+}
+
+
+model UserVerification {
+  id           String   @id @default(uuid())
+  userId       String   @map("user_id")
+  email        String   @unique
+  otpCode      String   @map("otp_code") @db.VarChar(6)
+  expiresAt    DateTime @map("expires_at")
+  attemptCount Int      @default(0) @map("attempt_count")
+  isUsed       Boolean  @default(false) @map("is_used")
+  createdAt    DateTime @default(now()) @map("created_at")
+  user         User     @relation("UserToVerification", fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("user_verifications")
 }
 
 model InstructorDetails {

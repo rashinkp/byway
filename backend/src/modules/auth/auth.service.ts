@@ -1,6 +1,7 @@
 import { JwtUtil } from "../../utils/jwt.util";
 import { IAuthRepository } from "./auth.repository";
 import * as bcrypt from "bcrypt";
+import { IForgotPasswordInput, IResetPasswordInput } from "./types";
 
 export interface IAuthUser {
   id: string;
@@ -17,7 +18,7 @@ export class AuthService {
     name: string,
     email: string,
     password: string
-  ): Promise<{user:IAuthUser , token:string}> {
+  ): Promise<{ user: IAuthUser; token: string }> {
     if (!name || !email || !password) {
       throw new Error("All fields are required");
     }
@@ -28,28 +29,44 @@ export class AuthService {
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
-    const user = await this.authRepository.createAdmin(name, email, hashedPassword);
+    const user = await this.authRepository.createAdmin(
+      name,
+      email,
+      hashedPassword
+    );
     const token = this.generateToken(user.id, user.email, user.role);
     return { user, token };
   }
 
-  async registerUser(name: string, email: string, password: string): Promise<{ user: IAuthUser, token: string }> {
+  async registerUser(
+    name: string,
+    email: string,
+    password: string
+  ): Promise<IAuthUser> {
     if (!name || !email || !password) {
       throw new Error("All fields are required");
     }
 
     const existingUser = await this.authRepository.findUserByEmail(email);
     if (existingUser) {
-      throw new Error('User already exists');
+      throw new Error("User already exists");
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
-    const user = await this.authRepository.createUser(name, email, hashedPassword);
-    const token = this.generateToken(user.id, user.email, user.role);
-    return { user, token };
+    const user = await this.authRepository.createUser(
+      name,
+      email,
+      hashedPassword
+    );
+    return user;
   }
 
-  async login(email: string, password: string): Promise<{ user: IAuthUser; token: string }> {
+ 
+
+  async login(
+    email: string,
+    password: string
+  ): Promise<{ user: IAuthUser; token: string }> {
     const user = await this.authRepository.findUserByEmail(email);
 
     if (!user) {
@@ -61,14 +78,22 @@ export class AuthService {
     }
 
     const isPasswordValid = await bcrypt.compare(password, user.password);
-    if(!isPasswordValid) {
+    if (!isPasswordValid) {
       throw new Error("Invalid email or password");
     }
     return { user, token: this.generateToken(user.id, user.email, user.role) };
   }
 
-
   private generateToken(id: string, email: string, role: string): string {
     return JwtUtil.generateToken({ id, email, role });
+  }
+
+  async forgotPassword(input: IForgotPasswordInput) : Promise<void>  {
+    return this.authRepository.forgotPassword(input.email);
+  }
+
+  async resetPassword(input: IResetPasswordInput): Promise<void> {
+    const hashedPassword = await bcrypt.hash(input.newPassword, 10);
+    return this.authRepository.resetPassword(input.email, hashedPassword);
   }
 }

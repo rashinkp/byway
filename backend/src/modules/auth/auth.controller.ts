@@ -1,8 +1,7 @@
-import { Request, Response } from "express";
 import { AuthService } from "./auth.service";
 import { StatusCodes } from "http-status-codes";
-import { JwtUtil } from "../../utils/jwt.util";
 import { ApiResponse } from "../../types/response";
+import { IForgotPasswordInput, IResetPasswordInput } from "./types";
 
 
 interface RegisterAdminInput {
@@ -27,18 +26,20 @@ export class AuthController {
   constructor(private authService: AuthService) {}
 
   async registerAdmin(input: RegisterAdminInput): Promise<ApiResponse> {
-
     const { name, email, password } = input;
     try {
+      const { user, token } = await this.authService.registerAdmin(
+        name,
+        email,
+        password
+      );
 
-      const { user, token } = await this.authService.registerAdmin(name, email, password);
-      
       return {
         status: "success",
         data: { id: user.id, email: user.email, role: user.role },
         token,
         statusCode: StatusCodes.CREATED,
-      }
+      };
     } catch (error) {
       console.log(error);
       return {
@@ -52,24 +53,27 @@ export class AuthController {
   async registerUser(input: RegisterUserInput): Promise<ApiResponse> {
     const { name, email, password } = input;
     try {
-      const { user, token } = await this.authService.registerUser(name, email, password);
+      const  user  = await this.authService.registerUser(
+        name,
+        email,
+        password
+      );
       return {
-        status: 'success',
+        status: "success",
         data: { id: user.id, email: user.email, role: user.role },
-        token,
         statusCode: StatusCodes.CREATED,
-      }
+      };
     } catch (error) {
       console.log(error);
       return {
-        status: 'error',
+        status: "error",
         message: error instanceof Error ? error.message : "Registration failed",
         statusCode: StatusCodes.BAD_REQUEST,
-      }
-
+      };
     }
   }
 
+  
   async login(input: LoginInput): Promise<ApiResponse> {
     const { email, password } = input;
     try {
@@ -84,11 +88,10 @@ export class AuthController {
     } catch (error) {
       console.log(error);
       return {
-        status: 'error',
+        status: "error",
         message: error instanceof Error ? error.message : "Login failed",
         statusCode: StatusCodes.UNAUTHORIZED,
-      }
-
+      };
     }
   }
 
@@ -98,14 +101,53 @@ export class AuthController {
         status: "success",
         message: "Logged out successfully",
         statusCode: StatusCodes.OK,
-      }
+      };
     } catch (error) {
       return {
         status: "error",
         message: error instanceof Error ? error.message : "Logout failed",
         statusCode: StatusCodes.INTERNAL_SERVER_ERROR,
+      };
+    }
+  }
+
+
+  async forgotPassword(input: IForgotPasswordInput): Promise<ApiResponse> {
+    try {
+      await this.authService.forgotPassword(input);
+      return {
+        status: 'success',
+        data: null,
+        message: 'OTP sent to your email for password reset',
+        statusCode: StatusCodes.OK,
+      }
+    } catch (error) {
+      console.error(error);
+      return {
+        status: 'error',
+        message: error instanceof Error ? error.message : 'Forgot password failed'
+        , statusCode: StatusCodes.BAD_REQUEST,
       }
     }
   }
 
+  async resetPassword(input: IResetPasswordInput): Promise<ApiResponse> {
+    try {
+      await this.authService.resetPassword(input);
+      return {
+        status: "success",
+        data: null,
+        message: "Password reset successfully",
+        statusCode: StatusCodes.OK,
+      };
+    } catch (error) {
+      console.error(error);
+      return {
+        status: "error",
+        message:
+          error instanceof Error ? error.message : "Password reset failed",
+        statusCode: StatusCodes.BAD_REQUEST,
+      };
+    }
+  }
 }
