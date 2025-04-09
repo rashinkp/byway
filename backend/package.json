@@ -23,7 +23,6 @@
     "fs-extra": "^11.3.0",
     "http-status-codes": "^2.3.0",
     "jsonwebtoken": "^9.0.2",
-    "prisma": "^6.5.0",
     "zod": "^3.24.2"
   },
   "devDependencies": {
@@ -32,6 +31,7 @@
     "@types/express": "^5.0.1",
     "@types/node": "^22.13.17",
     "nodemon": "^3.1.9",
+    "prisma": "^6.5.0",
     "prisma-import": "^1.0.5",
     "ts-node": "^10.9.2",
     "tsx": "^4.19.3",

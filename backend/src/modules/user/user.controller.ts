@@ -1,24 +1,21 @@
 import { ApiResponse } from "../../types/response";
-import { IUser, UpdateUserInput } from "./types";
+import { IUserWithProfile, UpdateUserInput } from "./types";
 import { UserService } from "./user.service";
 
-
 export class UserController {
-  constructor(private userService: UserService) { }
+  constructor(private userService: UserService) {}
 
-  async updateUser(input: UpdateUserInput): Promise<ApiResponse<IUser>> {
+  async updateUser(
+    input: UpdateUserInput
+  ): Promise<ApiResponse<IUserWithProfile>> {
     try {
-      const updatedUser = await this.userService.updateUser(input);
-      return { 
-        status: 'success',
-        data: {
-          id: updatedUser.id,
-          email: updatedUser.email,
-          role: updatedUser.role
-        },
-        message: 'User updated successfully',
-        statusCode:200,
-      }
+      const updatedData = await this.userService.updateUser(input);
+      return {
+        status: "success",
+        data: updatedData, 
+        message: "User updated successfully",
+        statusCode: 200,
+      };
     } catch (error) {
       console.error(error);
       return {
@@ -28,6 +25,4 @@ export class UserController {
       };
     }
   }
-
-
 }

@@ -26,10 +26,17 @@ export const adaptUserController = (controller: UserController) => ({
           message: "Unauthorized: No user ID found in token",
           statusCode: 401,
         });
-        return; // Early return, no value
+        return;
       }
 
-      const result = await controller.updateUser({ ...req.body, userId });
+      const { name, password, avatar, ...profileFields } = req.body;
+      const result = await controller.updateUser({
+        userId,
+        user:
+          name || password || avatar ? { name, password, avatar } : undefined,
+        profile:
+          Object.keys(profileFields).length > 0 ? profileFields : undefined,
+      });
       res.status(result.statusCode).json({
         status: result.status,
         data: result.data,
