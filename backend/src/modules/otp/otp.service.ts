@@ -34,7 +34,8 @@ export class OtpService {
     });
   }
 
-  async verifyOtp(input: IVerifyOtpInput): Promise<{id:string , email:string , role:string}> {
+  async verifyOtp(input: IVerifyOtpInput): Promise<{ id: string, email: string, role: string }> {
+    console.log(input.email, input.otpCode);
     return this.otpRepository.verifyOtp(input.email, input.otpCode);
   }
 
@@ -43,6 +44,10 @@ export class OtpService {
   }
 
   async generateAndSendOtp(input: IGenerateAndSendOtpInput): Promise<void> {
-    return this.otpRepository.generateAndSendOtp(input.email, input.userId);
+
+    const otp = OtpService.generateOtp();
+    const expiresAt = new Date(Date.now() + 10 * 60 * 1000);
+
+    return this.otpRepository.generateAndSendOtp(input.email, input.userId , otp , expiresAt);
   }
 }

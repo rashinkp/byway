@@ -2,6 +2,7 @@ import { JwtUtil } from "../../utils/jwt.util";
 import { IAuthRepository } from "./auth.repository";
 import * as bcrypt from "bcrypt";
 import { IForgotPasswordInput, IResetPasswordInput } from "./types";
+import { OtpService } from "../otp/otp.service";
 
 export interface IAuthUser {
   id: string;
@@ -12,7 +13,7 @@ export interface IAuthUser {
 }
 
 export class AuthService {
-  constructor(private authRepository: IAuthRepository) {}
+  constructor(private authRepository: IAuthRepository , private otpService:OtpService) {}
 
   async registerAdmin(
     name: string,
@@ -88,12 +89,31 @@ export class AuthService {
     return JwtUtil.generateToken({ id, email, role });
   }
 
-  async forgotPassword(input: IForgotPasswordInput) : Promise<void>  {
-    return this.authRepository.forgotPassword(input.email);
+  async forgotPassword(input: IForgotPasswordInput): Promise<void>  {
+   const { email } = input;
+   const user = await this.authRepository.findUserByEmail(email);
+   if (!user) throw new Error("User not found");
+    await this.otpService.generateAndSendOtp({ email, userId: user.id });
+    
   }
 
   async resetPassword(input: IResetPasswordInput): Promise<void> {
-    const hashedPassword = await bcrypt.hash(input.newPassword, 10);
-    return this.authRepository.resetPassword(input.email, hashedPassword);
+    const { email, newPassword, otpCode } = input
+
+    console.log(otpCode);
+
+    const isVerified = await this.otpService.verifyOtp({ email, otpCode });
+
+    if (!isVerified) {
+      throw new Error('OTP verification failed')
+    }
+    
+    const user = await this.authRepository.findUserByEmail(email);
+
+    if (!user) throw new Error("User not found");
+
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+    return this.authRepository.resetPassword(email, hashedPassword);
   }
 }

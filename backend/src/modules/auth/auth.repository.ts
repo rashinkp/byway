@@ -11,12 +11,11 @@ export interface IAuthRepository {
   ): Promise<IAuthUser>;
   createUser(name: string, email: string, password: string): Promise<IAuthUser>;
   findUserByEmail(email: string): Promise<IAuthUser | null>;
-  forgotPassword(email: string): Promise<void>;
   resetPassword(email: string, hashedPassword: string): Promise<void>;
 }
 
 export class AuthRepository implements IAuthRepository {
-  constructor(private prisma: PrismaClient, private otpService: OtpService) {}
+  constructor(private prisma: PrismaClient) {}
 
   async createAdmin(
     name: string,
@@ -65,12 +64,6 @@ export class AuthRepository implements IAuthRepository {
     }) as Promise<IAuthUser | null>;
   }
 
-  async forgotPassword(email: string): Promise<void> {
-    const user = await this.prisma.user.findUnique({ where: { email } });
-    if (!user) throw new Error("User not found");
-
-    await this.otpService.generateAndSendOtp({email, userId:user.id});
-  }
 
   async resetPassword(
     email:string,

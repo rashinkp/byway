@@ -23,8 +23,8 @@ export const initializeDependencies = () => {
   const otpController = new OtpController(otpService);
 
 
-  const authRepository = new AuthRepository(prisma , otpService);
-  const authService = new AuthService(authRepository);
+  const authRepository = new AuthRepository(prisma);
+  const authService = new AuthService(authRepository , otpService);
   const authController = new AuthController(authService);
 
 

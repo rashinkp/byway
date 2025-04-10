@@ -8,7 +8,7 @@ export interface IOtpRepository {
     otpcode: string
   ): Promise<{ id: string; email: string; role: string }>;
   resendOtp(email: string): Promise<void>;
-  generateAndSendOtp(email: string, userId: string): Promise<void>;
+  generateAndSendOtp(email: string, userId: string , otp:string , expiresAt:Date): Promise<void>;
 }
 
 
@@ -92,12 +92,10 @@ export class OtpRepository implements IOtpRepository {
 
 
 
-  async generateAndSendOtp(email: string, userId: string ): Promise<void> {
-    
-    const otp = OtpService.generateOtp();
-    const expiresAt = new Date(Date.now() + 10 * 60 * 1000);
+  async generateAndSendOtp(email: string, userId: string, otp: string, expiresAt:Date): Promise<void> {
+  
 
-    this.prisma.userVerification.upsert({
+    await this.prisma.userVerification.upsert({
       where: { email },
       update: {
         otpCode: otp,
@@ -112,7 +110,6 @@ export class OtpRepository implements IOtpRepository {
         expiresAt,
       }
     });
-
 
     await OtpService.sendOtpEmail(email, otp);
   }
