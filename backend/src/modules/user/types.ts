@@ -1,3 +1,5 @@
+import { Role } from "@prisma/client";
+
 export interface IUser {
   id: string;
   email: string;
@@ -5,6 +7,8 @@ export interface IUser {
   name?: string;
   password?: string;
   avatar?: string;
+  isVerified?: boolean;
+  deletedAt?: Date | null;
 }
 
 export interface IUserProfile {
@@ -38,4 +42,24 @@ export interface IRegisterInput {
   name: string;
   email: string;
   password: string;
+}
+
+
+export interface IGetAllUsersInput {
+  page?: number; 
+  limit?: number; 
+  role?: Role;
+  includeDeleted?: boolean; 
+}
+
+export interface IGetAllUsersResponse {
+  users: IUser[];
+  total: number;
+  page: number;
+  limit: number;
+}
+
+export interface AdminUpdateUserInput {
+  userId: string;
+  deletedAt?: Date | null; 
 }

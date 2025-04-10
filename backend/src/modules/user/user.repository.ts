@@ -2,17 +2,34 @@ import {
   PrismaClient,
   User as PrismaUser,
   UserProfile as PrismaUserProfile,
+  Role,
 } from "@prisma/client";
 import {
   IUser,
   UpdateUserInput,
   IUserWithProfile,
   IUserProfile,
+  IGetAllUsersInput,
+  AdminUpdateUserInput,
 } from "./types";
+
+
+
+interface IGetAllUsersWithSkip extends IGetAllUsersInput {
+  skip: number;
+  role?:Role
+}
+
+
 
 export interface IUserRepository {
   updateUser(input: UpdateUserInput): Promise<IUserWithProfile>;
+  getAllUsers(
+    input: IGetAllUsersWithSkip
+  ): Promise<{ users: IUser[]; total: number }>;
 }
+
+
 
 export class UserRepository implements IUserRepository {
   constructor(private prisma: PrismaClient) {}
@@ -21,7 +38,7 @@ export class UserRepository implements IUserRepository {
     const { userId, user, profile } = input;
 
     return this.prisma.$transaction(async (tx) => {
-      let updatedUser: PrismaUser; 
+      let updatedUser: PrismaUser;
       if (user && Object.keys(user).length > 0) {
         updatedUser = await tx.user.update({
           where: { id: userId },
@@ -38,7 +55,7 @@ export class UserRepository implements IUserRepository {
         });
       }
 
-      let updatedProfile: PrismaUserProfile | null; 
+      let updatedProfile: PrismaUserProfile | null;
       if (profile && Object.keys(profile).length > 0) {
         updatedProfile = await tx.userProfile.upsert({
           where: { userId },
@@ -81,5 +98,48 @@ export class UserRepository implements IUserRepository {
           : undefined,
       };
     });
+  }
+
+  //get all users
+
+  async getAllUsers(
+    input: IGetAllUsersWithSkip
+  ): Promise<{ users: IUser[]; total: number }> {
+    const { page = 1, limit = 10, skip, role } = input;
+
+    const where = role ? { role } : { role: Role.USER };
+
+    const [users, total] = await Promise.all([
+      this.prisma.user.findMany({
+        where,
+        skip,
+        take: limit,
+        select: {
+          id: true,
+          name: true,
+          email: true,
+          role: true,
+          isVerified: true,
+          createdAt: true,
+          updatedAt: true,
+        },
+      }),
+      this.prisma.user.count({ where }),
+    ]);
+
+    return { users, total };
+  }
+
+  async updateUserByAdmin(input: AdminUpdateUserInput): Promise<void> {
+    const { userId, deletedAt } = input;
+
+      await this.prisma.user.update({
+        where: { id: userId },
+        data: {
+          deletedAt: deletedAt === undefined ? undefined : deletedAt,
+          updatedAt:new Date(),
+        }
+      })
+    
   }
 }

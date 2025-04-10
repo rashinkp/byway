@@ -1,5 +1,7 @@
 import { Request, Response, NextFunction, RequestHandler } from "express";
 import { UserController } from "../modules/user/user.controller";
+import { Role } from "@prisma/client";
+import { AdminUpdateUserInput } from "../modules/user/types";
 
 interface AuthenticatedRequest extends Request {
   user?: { id: string; email: string; role: string };
@@ -44,4 +46,26 @@ export const adaptUserController = (controller: UserController) => ({
       });
     }
   ),
+
+  getAllUsers: asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
+    const { page, limit , role } = req.query;
+    const input = {
+      page: page ? parseInt(page as string, 10) : undefined,
+      limit: limit ? parseInt(limit as string, 10) : undefined,
+      role: role? (role as string).toUpperCase() as Role : undefined, 
+    }
+
+    const result = await controller.getAllUsers(input);
+    res.status(result.statusCode).json(result);
+  }),
+
+  updateUserByAdmin: asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
+    const input: AdminUpdateUserInput = {
+      userId: req.params.userId,
+      ...req.body,
+      deletedAt: req.body.deletedAt === 'true' ? new Date() : req.body.deletedAt === 'false' ? null : undefined,
+    }
+    const result = await controller.updateUserByAdmin(input);
+    res.status(result.statusCode).json(result);
+  })
 });

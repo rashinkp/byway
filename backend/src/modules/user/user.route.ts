@@ -7,7 +7,9 @@ export const createUserRouter = (userController: UserController): Router => {
   const userRouter = Router();
   const adapt = adaptUserController(userController);
 
-  userRouter.put("/update", authMiddleware("USER"), adapt.updateUser);
-
+  userRouter.put("/users", authMiddleware("USER"), adapt.updateUser);
+  userRouter.get('/admin/users', authMiddleware('ADMIN'), adapt.getAllUsers);
+  userRouter.put('/admin/:userId', authMiddleware('ADMIN'), adapt.updateUserByAdmin)
+  
   return userRouter;
 };
