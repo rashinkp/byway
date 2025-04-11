@@ -25,6 +25,7 @@ model User {
   userProfile       UserProfile?    @relation("UserToUserProfile") 
   verifications     UserVerification[] @relation("UserToVerification")
   categories        Category[]         @relation("CategoryCreator")
+   coursesCreated    Course[]        @relation("CourseCreator")
 }
 
 model UserProfile {
@@ -71,6 +72,7 @@ model InstructorDetails {
   createdAt              DateTime @default(now())
   updatedAt              DateTime @updatedAt
   user                   User     @relation("UserToInstructorDetails", fields: [userId], references: [id], onDelete: Cascade)
+ 
 }
 
 
@@ -83,6 +85,7 @@ model Category {
   createdBy   String 
   deletedAt   DateTime?
   creator     User      @relation("CategoryCreator", fields: [createdBy], references: [id] , onDelete:Cascade)
+  courses     Course[]  @relation("CourseToCategory")
 }
 
 
@@ -102,4 +105,52 @@ enum Gender {
   MALE
   FEMALE
   OTHER
+}
+
+
+
+
+model Course {
+  id             String        @id @default(uuid())
+  title          String
+  description    String?     
+  level          CourseLevel   @default(MEDIUM) 
+  price          Decimal?      @default(0.00) 
+  thumbnail      String?     
+  duration       Int?          
+  offer          Decimal?      
+  status         CourseStatus  @default(DRAFT) 
+  categoryId     String
+  category       Category      @relation("CourseToCategory", fields: [categoryId], references: [id])
+  createdBy      String
+  creator        User          @relation("CourseCreator", fields: [createdBy], references: [id])
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+  deletedAt      DateTime?     
+  details        CourseDetails? @relation("CourseToDetails")
+}
+
+model CourseDetails {
+  id             String    @id @default(uuid())
+  courseId       String    @unique // One-to-one relation
+  course         Course    @relation("CourseToDetails", fields: [courseId], references: [id], onDelete: Cascade)
+  prerequisites  String?   // Text describing required prior knowledge
+  longDescription String?  // Extended course description
+  objectives     String?   // Learning goals or outcomes
+  targetAudience String?   // Who the course is for
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+}
+
+// Enums for Course
+enum CourseLevel {
+  BEGINNER
+  MEDIUM
+  ADVANCED
+}
+
+enum CourseStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
 }

@@ -9,6 +9,7 @@ import { StatusCodes } from "http-status-codes";
 import { createUserRouter } from "./modules/user/user.route";
 import { createOtpRouter } from "./modules/otp/otp.route";
 import { createCategoryRouter } from "./modules/category/category.route";
+import { createCourseRouter } from "./modules/course/course.route";
 
 
 dotenv.config();
@@ -26,7 +27,7 @@ app.use(express.json());
 app.use(cookieParser());
 
 
-const { authController, instructorController, userController, otpController , categoryController } = initializeDependencies();
+const { authController, instructorController, userController, otpController , categoryController,courseController } = initializeDependencies();
 
 
 // Routes
@@ -35,6 +36,7 @@ app.use("/api/v1/instructor", createInstructorRouter(instructorController));
 app.use('/api/v1/user' ,createUserRouter(userController) )
 app.use('/api/v1/otp', createOtpRouter(otpController));
 app.use('/api/v1/category', createCategoryRouter(categoryController));
+app.use("/api/v1/courses", createCourseRouter(courseController));
 
 
 

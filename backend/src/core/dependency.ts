@@ -14,6 +14,9 @@ import { OtpController } from "../modules/otp/otp.controller";
 import { CategoryRepository } from "../modules/category/category.repository";
 import { CategoryService } from "../modules/category/category.service";
 import { CategoryController } from "../modules/category/category.controller";
+import { CourseRepository } from "../modules/course/course.repository";
+import { CourseService } from "../modules/course/course.service";
+import { CourseController } from "../modules/course/course.controller";
 
 export const initializeDependencies = () => {
   const prisma = new PrismaClient();
@@ -42,11 +45,16 @@ export const initializeDependencies = () => {
   const categoryService = new CategoryService(categoryRepository);
   const categoryController = new CategoryController(categoryService);
 
+  const courseRepository = new CourseRepository(prisma);
+  const courseService = new CourseService(courseRepository, categoryRepository);
+  const courseController = new CourseController(courseService);
+
   return {
     authController,
     instructorController,
     userController,
     otpController,
     categoryController,
+    courseController
   };
 };
