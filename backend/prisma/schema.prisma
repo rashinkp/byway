@@ -24,6 +24,7 @@ model User {
   instructorDetails InstructorDetails? @relation("UserToInstructorDetails") 
   userProfile       UserProfile?    @relation("UserToUserProfile") 
   verifications     UserVerification[] @relation("UserToVerification")
+  categories        Category[]         @relation("CategoryCreator")
 }
 
 model UserProfile {
@@ -70,6 +71,18 @@ model InstructorDetails {
   createdAt              DateTime @default(now())
   updatedAt              DateTime @updatedAt
   user                   User     @relation("UserToInstructorDetails", fields: [userId], references: [id], onDelete: Cascade)
+}
+
+
+model Category {
+  id          String    @id @default(uuid())
+  name        String    @unique
+  description String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  createdBy   String 
+  deletedAt   DateTime?
+  creator     User      @relation("CategoryCreator", fields: [createdBy], references: [id] , onDelete:Cascade)
 }
 
 
