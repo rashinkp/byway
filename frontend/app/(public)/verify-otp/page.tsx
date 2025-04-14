@@ -34,9 +34,13 @@ export default function VerifyOtpPage() {
     return null;
   }
 
+
+  //todo resend button loading while clicked
+  
   return (
-    <div className="flex items-center justify-center min-h-[calc(100vh-4rem)]">
+    <div className="">
       <VerifyOtpForm />
+      
     </div>
   );
 }

@@ -120,3 +120,22 @@
     @apply bg-background text-foreground;
   }
 }
+
+@layer utilities {
+  .auth-container {
+    @apply flex-col items-center justify-center w-full lg:w-1/2 px-4 py-12 md:px-8 lg:px-16 xl:px-24 bg-card;
+  }
+
+  .auth-input {
+    @apply py-4 border-2 rounded-lg focus:border-primary focus:ring-1 focus:ring-primary text-base;
+  }
+  .auth-button {
+    @apply w-full py-4 bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg text-base;
+  }
+  .auth-error {
+    @apply text-destructive text-sm text-center mb-4;
+  }
+  .auth-text {
+    @apply text-sm text-center text-muted-foreground;
+  }
+}

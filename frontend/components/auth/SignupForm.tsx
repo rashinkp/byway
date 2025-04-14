@@ -2,9 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
 import { useAuthStore } from "@/lib/stores/authStore";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Form,
   FormControl,
@@ -18,6 +16,11 @@ import { Button } from "@/components/ui/button";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { Separator } from "@/components/ui/separator";
+import { SplitScreenLayout } from "@/components/ui/splitScreenLayout";
+import { GoogleAuthButton } from "@/components/ui/GoogleAuthButton";
+import { AuthFormWrapper } from "@/components/auth/parts/authFormWrapper";
+import { AuthLink } from "@/components/auth/parts/AuthLink";
 
 const signupSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters"),
@@ -51,12 +54,35 @@ export function SignupForm() {
     }
   };
 
+  const handleGoogleSignup = () => {
+    console.log("Google signup clicked");
+  };
+
   return (
-    <Card className="w-full max-w-md">
-      <CardHeader>
-        <CardTitle>Sign Up</CardTitle>
-      </CardHeader>
-      <CardContent>
+    <SplitScreenLayout
+      title="Start Your Journey"
+      description="Create an account today and gain access to our comprehensive learning platform with expert-led courses."
+      imageAlt="Learning platform signup illustration"
+    >
+      <AuthFormWrapper
+        title="Create account"
+        subtitle="Join our platform to start learning"
+        error={error}
+      >
+        <GoogleAuthButton
+          text="Sign up with Google"
+          onClick={handleGoogleSignup}
+        />
+        <div className="relative mb-6">
+          <div className="absolute inset-0 flex items-center">
+            <Separator className="w-full" />
+          </div>
+          <div className="relative flex justify-center text-xs uppercase">
+            <span className="bg-card px-2 text-muted-foreground">
+              Or sign up with email
+            </span>
+          </div>
+        </div>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
             <FormField
@@ -64,9 +90,14 @@ export function SignupForm() {
               name="name"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Name</FormLabel>
+                  <FormLabel className="text-foreground">Full Name</FormLabel>
                   <FormControl>
-                    <Input type="text" placeholder="John Doe" {...field} />
+                    <Input
+                      type="text"
+                      placeholder="John Doe"
+                      className="auth-input"
+                      {...field}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -77,11 +108,12 @@ export function SignupForm() {
               name="email"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Email</FormLabel>
+                  <FormLabel className="text-foreground">Email</FormLabel>
                   <FormControl>
                     <Input
                       type="email"
                       placeholder="user@example.com"
+                      className="auth-input"
                       {...field}
                     />
                   </FormControl>
@@ -94,31 +126,36 @@ export function SignupForm() {
               name="password"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Password</FormLabel>
+                  <FormLabel className="text-foreground">Password</FormLabel>
                   <FormControl>
-                    <Input type="password" placeholder="••••••" {...field} />
+                    <Input
+                      type="password"
+                      placeholder="••••••"
+                      className="auth-input"
+                      {...field}
+                    />
                   </FormControl>
-                  <FormMessage />
+                  <FormMessage className="text-xs" />
                 </FormItem>
               )}
             />
-            {error && <p className="text-red-500 text-sm">{error}</p>}
             <Button
               type="submit"
-              className="w-full"
+              className="auth-button"
               disabled={form.formState.isSubmitting}
             >
-              {form.formState.isSubmitting ? "Signing up..." : "Sign Up"}
+              {form.formState.isSubmitting
+                ? "Creating account..."
+                : "Create account"}
             </Button>
-            <p className="text-sm text-center">
-              Already have an account?{" "}
-              <Link href="/login" className="underline">
-                Login
-              </Link>
-            </p>
+            <AuthLink
+              text="Already have an account?"
+              linkText="Sign in"
+              href="/login"
+            />
           </form>
         </Form>
-      </CardContent>
-    </Card>
+      </AuthFormWrapper>
+    </SplitScreenLayout>
   );
 }

@@ -2,9 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
 import { useAuthStore } from "@/lib/stores/authStore";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Form,
   FormControl,
@@ -18,6 +16,11 @@ import { Button } from "@/components/ui/button";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { Separator } from "@/components/ui/separator";
+import { SplitScreenLayout } from "@/components/ui/splitScreenLayout";
+import { GoogleAuthButton } from "@/components/ui/GoogleAuthButton";
+import { AuthFormWrapper } from "@/components/auth/parts/authFormWrapper";
+import { AuthLink } from "@/components/auth/parts/AuthLink";
 
 const loginSchema = z.object({
   email: z.string().email("Invalid email address"),
@@ -56,24 +59,49 @@ export function LoginForm() {
     }
   };
 
+  const handleGoogleLogin = () => {
+    console.log("Google login clicked");
+  };
+
   return (
-    <Card className="w-full max-w-md">
-      <CardHeader>
-        <CardTitle>Login</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <Form {...form}>
+    <SplitScreenLayout
+      title="Learning Reimagined"
+      description="Join thousands of students and instructors on our platform to unlock your potential."
+      imageAlt="Learning platform illustration"
+    >
+      <AuthFormWrapper
+        title="Welcome back"
+        subtitle="Please enter your details to sign in"
+        error={error}
+      
+      >
+        <GoogleAuthButton
+          text="Continue with Google"
+          onClick={handleGoogleLogin}
+        />
+        <div className="relative mb-6">
+          <div className="absolute inset-0 flex items-center">
+            <Separator className="w-full" />
+          </div>
+          <div className="relative flex justify-center text-xs uppercase">
+            <span className="bg-card px-2 text-muted-foreground">
+              Or continue with
+            </span>
+          </div>
+        </div>
+        <Form {...form} >
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
             <FormField
               control={form.control}
               name="email"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Email</FormLabel>
+                  <FormLabel className="text-foreground">Email</FormLabel>
                   <FormControl>
                     <Input
                       type="email"
                       placeholder="user@example.com"
+                      className="auth-input"
                       {...field}
                     />
                   </FormControl>
@@ -86,31 +114,41 @@ export function LoginForm() {
               name="password"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Password</FormLabel>
+                  <div className="flex justify-between items-center">
+                    <FormLabel className="text-foreground">Password</FormLabel>
+                    <AuthLink
+                      text=""
+                      linkText="Forgot password?"
+                      href="/forgot-password"
+                    />
+                  </div>
                   <FormControl>
-                    <Input type="password" placeholder="••••••" {...field} />
+                    <Input
+                      type="password"
+                      placeholder="••••••"
+                      className="auth-input"
+                      {...field}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
-            {error && <p className="text-red-500 text-sm">{error}</p>}
             <Button
               type="submit"
-              className="w-full"
+              className="auth-button"
               disabled={form.formState.isSubmitting}
             >
-              {form.formState.isSubmitting ? "Logging in..." : "Login"}
+              {form.formState.isSubmitting ? "Signing in..." : "Sign in"}
             </Button>
-            <p className="text-sm text-center">
-              Don’t have an account?{" "}
-              <Link href="/signup" className="underline">
-                Sign up
-              </Link>
-            </p>
+            <AuthLink
+              text="Don't have an account?"
+              linkText="Create account"
+              href="/signup"
+            />
           </form>
         </Form>
-      </CardContent>
-    </Card>
+      </AuthFormWrapper>
+    </SplitScreenLayout>
   );
 }
