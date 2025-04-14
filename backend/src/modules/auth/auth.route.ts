@@ -9,7 +9,7 @@ export const createAuthRouter = (authController:AuthController ): Router => {
 
 
   authRouter.post("/registerAdmin", adapt.registerAdmin);
-  authRouter.post("/registerUser", adapt.registerUser);
+  authRouter.post("/signup", adapt.registerUser);
   authRouter.post("/login", adapt.login);
   authRouter.post("/logout", protect, adapt.logout);
   authRouter.post('/forgot-password' , adapt.forgotPassword)
