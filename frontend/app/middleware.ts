@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 
 export async function middleware(request: NextRequest) {
-  const { pathname } = request.nextUrl;
+  const { pathname, searchParams } = request.nextUrl;
 
   // Check for JWT cookie
   try {
@@ -10,10 +10,19 @@ export async function middleware(request: NextRequest) {
       credentials: "include",
     });
 
-    const { data } = await response.json();
+    let data;
+    if (response.ok) {
+      ({ data } = await response.json());
+    }
 
-    // If authenticated, redirect from /login and /signup
-    if (response.ok && (pathname === "/login" || pathname === "/signup")) {
+    // If fully authenticated, redirect from /login, /signup, /verify-otp
+    if (
+      response.ok &&
+      data.role &&
+      (pathname === "/login" ||
+        pathname === "/signup" ||
+        pathname === "/verify-otp")
+    ) {
       const role = data.role;
       if (role === "ADMIN") {
         return NextResponse.redirect(new URL("/admin/dashboard", request.url));
@@ -24,6 +33,15 @@ export async function middleware(request: NextRequest) {
       } else {
         return NextResponse.redirect(new URL("/dashboard", request.url));
       }
+    }
+
+    // Allow /verify-otp with valid temporary JWT or email query
+    if (pathname === "/verify-otp") {
+      const email = searchParams.get("email");
+      if (response.ok || email) {
+        return NextResponse.next();
+      }
+      return NextResponse.redirect(new URL("/signup", request.url));
     }
 
     // Protect role-based routes
@@ -61,8 +79,14 @@ export async function middleware(request: NextRequest) {
     if (
       pathname === "/login" ||
       pathname === "/signup" ||
-      pathname.startsWith("/courses")
+      pathname === "/verify-otp"
     ) {
+      if (pathname === "/verify-otp" && !searchParams.get("email")) {
+        return NextResponse.redirect(new URL("/signup", request.url));
+      }
+      return NextResponse.next();
+    }
+    if (pathname.startsWith("/courses")) {
       return NextResponse.next();
     }
     return NextResponse.redirect(new URL("/login", request.url));
@@ -73,6 +97,7 @@ export const config = {
   matcher: [
     "/login",
     "/signup",
+    "/verify-otp",
     "/admin/:path*",
     "/instructor/:path*",
     "/courses/:courseId/lessons/:path*",

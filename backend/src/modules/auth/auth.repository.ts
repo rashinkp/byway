@@ -45,7 +45,7 @@ export class AuthRepository implements IAuthRepository {
         data: {
           userId: user.id,
           email,
-          otpCode: otp,
+          otp: otp,
           expiresAt,
         },
       });

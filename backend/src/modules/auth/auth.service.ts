@@ -104,11 +104,10 @@ export class AuthService {
   }
 
   async resetPassword(input: IResetPasswordInput): Promise<void> {
-    const { email, newPassword, otpCode } = input
+    const { email, newPassword, otp } = input
 
-    console.log(otpCode);
 
-    const isVerified = await this.otpService.verifyOtp({ email, otpCode });
+    const isVerified = await this.otpService.verifyOtp({ email, otp:otp });
 
     if (!isVerified) {
       throw new Error('OTP verification failed')

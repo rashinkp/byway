@@ -35,8 +35,7 @@ export class OtpService {
   }
 
   async verifyOtp(input: IVerifyOtpInput): Promise<{ id: string, email: string, role: string }> {
-    console.log(input.email, input.otpCode);
-    return this.otpRepository.verifyOtp(input.email, input.otpCode);
+    return this.otpRepository.verifyOtp(input.email, input.otp);
   }
 
   async resendOtp(input: IResendOtpInput) {

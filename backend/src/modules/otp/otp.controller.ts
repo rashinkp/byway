@@ -21,7 +21,7 @@ export class OtpController {
         
         return {
           status: "success",
-          data: null,
+          data: {id:user.id , email:user.email , role:user.role},
           token,
           message: "Email verified successfully",
           statusCode: StatusCodes.OK,

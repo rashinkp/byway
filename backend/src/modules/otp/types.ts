@@ -1,6 +1,6 @@
 export interface IVerifyOtpInput {
   email: string;
-  otpCode: string;
+  otp: string;
 }
 
 export interface IResendOtpInput {

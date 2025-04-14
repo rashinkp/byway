@@ -1,6 +1,6 @@
 export interface IResetPasswordInput {
   email: string;
-  otpCode: string;
+  otp: string;
   newPassword: string;
 }
 

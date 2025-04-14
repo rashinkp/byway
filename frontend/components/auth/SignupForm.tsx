@@ -45,14 +45,7 @@ export function SignupForm() {
     try {
       setError(null);
       await signup(data.name, data.email, data.password);
-      const role = useAuthStore.getState().user?.role;
-      if (role === "ADMIN") {
-        router.push("/admin/dashboard");
-      } else if (role === "INSTRUCTOR") {
-        router.push("/instructor/dashboard");
-      } else {
-        router.push("/dashboard");
-      }
+      router.push(`/verify-otp?email=${encodeURIComponent(data.email)}`);
     } catch (err: any) {
       setError(err.message || "Signup failed");
     }

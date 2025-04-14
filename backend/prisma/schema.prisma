@@ -51,7 +51,7 @@ model UserVerification {
   id           String   @id @default(uuid())
   userId       String   @map("user_id")
   email        String   @unique
-  otpCode      String   @map("otp_code") @db.VarChar(6)
+  otp      String   @map("otp_code") @db.VarChar(6)
   expiresAt    DateTime @map("expires_at")
   attemptCount Int      @default(0) @map("attempt_count")
   isUsed       Boolean  @default(false) @map("is_used")
