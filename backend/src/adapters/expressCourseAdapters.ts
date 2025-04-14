@@ -7,6 +7,7 @@ import {
   ICreateCourseInput,
   IUpdateCourseInput,
   IGetAllCoursesInput,
+  ICreateEnrollmentInput,
 } from "../modules/course/types";
 
 interface AuthenticatedRequest extends Request {
@@ -76,4 +77,15 @@ export const adaptCourseController = (controller: CourseController) => ({
       res.status(result.statusCode).json(result);
     }
   ),
+
+  enrollCourse: asyncHandler(
+      async (req: AuthenticatedRequest, res: Response) => {
+        const input: ICreateEnrollmentInput = {
+          userId: req.user.id,
+          courseId: req.body.courseId,
+        };
+        const result = await controller.enrollCourse(input);
+        res.status(result.statusCode).json(result);
+      }
+    ),
 });

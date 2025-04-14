@@ -2,6 +2,8 @@ import { PrismaClient } from "@prisma/client";
 import {
   ICourse,
   ICreateCourseInput,
+  ICreateEnrollmentInput,
+  IEnrollment,
   IGetAllCoursesInput,
   IUpdateCourseInput,
 } from "./types";
@@ -15,6 +17,9 @@ export interface ICourseRepository {
   getCourseByName(title: string): Promise<ICourse | null>;
   updateCourse(input: IUpdateCourseInput): Promise<ICourse>;
   softDeleteCourse(id: string): Promise<ICourse>;
+
+  createEnrollment(input: ICreateEnrollmentInput): Promise<IEnrollment>;
+  getEnrollment(userId: string, courseId: string): Promise<IEnrollment | null>;
 }
 
 export class CourseRepository implements ICourseRepository {
@@ -273,4 +278,32 @@ export class CourseRepository implements ICourseRepository {
         : undefined,
     };
   }
+
+  async createEnrollment(input: ICreateEnrollmentInput): Promise<IEnrollment> {
+    const enrollment = await this.prisma.enrollment.create({
+      data: input,
+    });
+    return {
+      userId: enrollment.userId,
+      courseId: enrollment.courseId,
+      enrolledAt: enrollment.enrolledAt,
+    };
+  }
+
+  async getEnrollment(
+    userId: string,
+    courseId: string
+  ): Promise<IEnrollment | null> {
+    const enrollment = await this.prisma.enrollment.findUnique({
+      where: { userId_courseId: { userId, courseId } },
+    });
+    if (!enrollment) return null;
+    return {
+      userId: enrollment.userId,
+      courseId: enrollment.courseId,
+      enrolledAt: enrollment.enrolledAt,
+    };
+  }
+
+
 }

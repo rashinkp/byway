@@ -10,6 +10,8 @@ export interface IAuthUser {
   role: string;
   password?: string;
   authProvider?: string;
+  isVerified: boolean;
+  deletedAt: Date;
 }
 
 export class AuthService {
@@ -77,6 +79,10 @@ export class AuthService {
     if (user.authProvider !== "EMAIL_PASSWORD" || !user.password) {
       throw new Error("This account uses a different authentication method");
     }
+
+    if (!user.isVerified || user.deletedAt !== null) {
+      throw new Error('This account is not currently available')
+    } 
 
     const isPasswordValid = await bcrypt.compare(password, user.password);
     if (!isPasswordValid) {

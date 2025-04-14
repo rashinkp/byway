@@ -25,7 +25,8 @@ model User {
   userProfile       UserProfile?    @relation("UserToUserProfile") 
   verifications     UserVerification[] @relation("UserToVerification")
   categories        Category[]         @relation("CategoryCreator")
-   coursesCreated    Course[]        @relation("CourseCreator")
+  coursesCreated    Course[]        @relation("CourseCreator")
+  enrollments       Enrollment[]    @relation("UserEnrollments")
 }
 
 model UserProfile {
@@ -128,6 +129,8 @@ model Course {
   updatedAt      DateTime      @updatedAt
   deletedAt      DateTime?     
   details        CourseDetails? @relation("CourseToDetails")
+  lessons        Lesson[]      @relation("CourseLessons") 
+  enrollments    Enrollment[]  @relation("CourseEnrollments") 
 }
 
 model CourseDetails {
@@ -153,4 +156,71 @@ enum CourseStatus {
   DRAFT
   PUBLISHED
   ARCHIVED
+}
+
+
+model Lesson {
+  id          String      @id @default(uuid())
+  courseId    String
+  course      Course      @relation("CourseLessons", fields: [courseId], references: [id])
+  title       String
+  description String?     
+  order       Int         
+  thumbnail   String?     
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  deletedAt   DateTime?   
+  progress    UserLessonProgress[] @relation("LessonProgress")
+  contents    LessonContent[]    @relation("LessonToContent")
+  @@unique([courseId, order]) // Prevent duplicate orders in a course
+  @@index([order]) // Optimize sorting by order
+}
+
+model Enrollment {
+  userId     String
+  courseId   String
+  user       User       @relation("UserEnrollments", fields: [userId], references: [id])
+  course     Course     @relation("CourseEnrollments", fields: [courseId], references: [id])
+  enrolledAt DateTime   @default(now())
+  progress   UserLessonProgress[] @relation("EnrollmentProgress")
+  @@id([userId, courseId])
+}
+
+model UserLessonProgress {
+  userId     String
+  courseId   String
+  lessonId   String
+  enrollment Enrollment @relation("EnrollmentProgress", fields: [userId, courseId], references: [userId, courseId])
+  lesson     Lesson     @relation("LessonProgress", fields: [lessonId], references: [id])
+  completed  Boolean    @default(false)
+  completedAt DateTime?
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime   @updatedAt
+  @@id([userId, courseId, lessonId])
+}
+
+
+model LessonContent {
+  id          String           @id @default(uuid())
+  lessonId    String
+  lesson      Lesson           @relation("LessonToContent", fields: [lessonId], references: [id], onDelete: Cascade)
+  type        ContentType
+  status      ContentStatus    @default(DRAFT)
+  data        Json             @default("{}") // Store content-specific data (e.g., video URL, quiz questions)
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+  deletedAt   DateTime?
+}
+
+
+enum ContentType {
+  VIDEO
+  DOCUMENT
+  QUIZ
+}
+
+enum ContentStatus {
+  DRAFT
+  PROCESSING
+  PUBLISHED
 }

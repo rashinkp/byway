@@ -17,6 +17,9 @@ import { CategoryController } from "../modules/category/category.controller";
 import { CourseRepository } from "../modules/course/course.repository";
 import { CourseService } from "../modules/course/course.service";
 import { CourseController } from "../modules/course/course.controller";
+import { LessonRepository } from "../modules/lesson/lesson.repository";
+import { LessonService } from "../modules/lesson/lesson.service";
+import { LessonController } from "../modules/lesson/lesson.controller";
 
 export const initializeDependencies = () => {
   const prisma = new PrismaClient();
@@ -49,12 +52,22 @@ export const initializeDependencies = () => {
   const courseService = new CourseService(courseRepository, categoryRepository);
   const courseController = new CourseController(courseService);
 
+  //lesson based
+  const lessonRepository = new LessonRepository(prisma);
+  const lessonService = new LessonService(
+    lessonRepository,
+    courseRepository,
+    prisma
+  );
+  const lessonController = new LessonController(lessonService);
+
   return {
     authController,
     instructorController,
     userController,
     otpController,
     categoryController,
-    courseController
+    courseController,
+    lessonController,
   };
 };

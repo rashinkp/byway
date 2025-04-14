@@ -12,7 +12,7 @@
   "type": "commonjs",
   "description": "",
   "dependencies": {
-    "@prisma/client": "^6.5.0",
+    "@prisma/client": "^6.6.0",
     "@types/cookie-parser": "^1.4.8",
     "@types/jsonwebtoken": "^9.0.9",
     "@types/nodemailer": "^6.4.17",
@@ -34,7 +34,7 @@
     "@types/express": "^5.0.1",
     "@types/node": "^22.13.17",
     "nodemon": "^3.1.9",
-    "prisma": "^6.5.0",
+    "prisma": "^6.6.0",
     "prisma-import": "^1.0.5",
     "ts-node": "^10.9.2",
     "tsx": "^4.19.3",

@@ -74,3 +74,16 @@ export interface IGetAllCoursesInput {
   sortOrder?: "asc" | "desc";
   includeDeleted?: boolean;
 }
+
+
+
+export interface ICreateEnrollmentInput {
+  userId: string;
+  courseId: string;
+}
+
+export interface IEnrollment {
+  userId: string;
+  courseId: string;
+  enrolledAt: Date;
+}

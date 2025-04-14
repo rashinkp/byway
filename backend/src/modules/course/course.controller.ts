@@ -6,6 +6,7 @@ import {
   ICreateCourseInput,
   IUpdateCourseInput,
   IGetAllCoursesInput,
+  ICreateEnrollmentInput,
 } from "./types";
 
 export class CourseController {
@@ -79,7 +80,10 @@ export class CourseController {
     }
   }
 
-  async updateCourse(input: IUpdateCourseInput , userId:string): Promise<ApiResponse> {
+  async updateCourse(
+    input: IUpdateCourseInput,
+    userId: string
+  ): Promise<ApiResponse> {
     try {
       const course = await this.courseService.updateCourse({
         ...input,
@@ -102,9 +106,9 @@ export class CourseController {
     }
   }
 
-  async softDeleteCourse(id: string , userId:string): Promise<ApiResponse> {
+  async softDeleteCourse(id: string, userId: string): Promise<ApiResponse> {
     try {
-      const course = await this.courseService.softDeleteCourse(id , userId);
+      const course = await this.courseService.softDeleteCourse(id, userId);
       return {
         status: "success",
         data: course,
@@ -117,6 +121,28 @@ export class CourseController {
         message:
           error instanceof Error ? error.message : "Failed to delete course",
         statusCode: StatusCodes.INTERNAL_SERVER_ERROR,
+        data: null,
+      };
+    }
+  }
+
+  async enrollCourse(input: ICreateEnrollmentInput): Promise<ApiResponse> {
+    try {
+      const enrollment = await this.courseService.enrollCourse(input);
+      return {
+        status: "success",
+        data: enrollment,
+        message: "Enrolled successfully",
+        statusCode: StatusCodes.CREATED,
+      };
+    } catch (error) {
+      return {
+        status: "error",
+        message: error instanceof Error ? error.message : "Failed to enroll",
+        statusCode:
+          error instanceof Error && error.message.includes("already enrolled")
+            ? StatusCodes.CONFLICT
+            : StatusCodes.BAD_REQUEST,
         data: null,
       };
     }

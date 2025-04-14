@@ -5,6 +5,8 @@ import {
   ICreateCourseInput,
   IUpdateCourseInput,
   IGetAllCoursesInput,
+  ICreateEnrollmentInput,
+  IEnrollment,
 } from "./types";
 
 export class CourseService {
@@ -80,4 +82,22 @@ export class CourseService {
     }
     return this.courseRepository.softDeleteCourse(id);
   }
+
+  async enrollCourse(input: ICreateEnrollmentInput): Promise<IEnrollment> {
+    const { userId, courseId } = input;
+    const course = await this.courseRepository.getCourseById(courseId);
+    if (!course || course.deletedAt || course.status !== "PUBLISHED") {
+      throw new Error("Course not found, deleted, or not published");
+    }
+    const existingEnrollment = await this.courseRepository.getEnrollment(
+      userId,
+      courseId
+    );
+    if (existingEnrollment) {
+      throw new Error("You are already enrolled in this course");
+    }
+    return this.courseRepository.createEnrollment(input);
+  }
+
+
 }
