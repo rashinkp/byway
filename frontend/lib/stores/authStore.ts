@@ -7,6 +7,8 @@ import {
   resendOtp,
   logout,
   verifyAuth,
+  forgotPassword,
+  resetPassword,
 } from "@/lib/api";
 
 interface User {
@@ -25,6 +27,12 @@ interface AuthState {
   resendOtp: (email: string) => Promise<void>;
   logout: () => Promise<void>;
   verifyAuth: () => Promise<void>;
+  forgotPassword: (email: string) => Promise<void>;
+  resetPassword: (
+    email: string,
+    otp: string,
+    newPassword: string
+  ) => Promise<void>;
 }
 
 export const useAuthStore = create<AuthState>()(
@@ -53,6 +61,33 @@ export const useAuthStore = create<AuthState>()(
         await logout();
         set({ user: null, email: null });
       },
+
+      forgotPassword: async (email: string) => {
+        try {
+          await forgotPassword(email);
+          set({ email });
+        } catch (error: any) {
+          throw new Error(
+            error.response?.data?.message || "Failed to send reset OTP"
+          );
+        }
+      },
+
+      resetPassword: async (
+        email: string,
+        otp: string,
+        newPassword: string
+      ) => {
+        try {
+          await resetPassword(email , otp , newPassword);
+          set({ email: null });
+        } catch (error: any) {
+          throw new Error(
+            error.response?.data?.message || "Failed to reset password"
+          );
+        }
+      },
+
       verifyAuth: async () => {
         try {
           const data = await verifyAuth();

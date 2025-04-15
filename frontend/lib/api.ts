@@ -66,6 +66,28 @@ export async function verifyAuth() {
   }
 }
 
+export async function forgotPassword(email:string) {
+  try {
+    const response = await api.post('/auth/forgot-password', { email });
+    return response.data.data;
+  } catch (error) {
+    throw new Error('couldn\'t submit your email');
+  }
+}
+export async function resetPassword(email:string , otp:string , newPassword:string) {
+  try {
+    const response = await api.post("/auth/reset-password", {
+      email,
+      otp,
+      newPassword,
+    });
+    return response.data.data;
+  } catch (error) {
+    throw new Error('couldn\'t submit your email');
+  }
+}
+
+
 export async function logout() {
   await api.post("/auth/logout");
 }

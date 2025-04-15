@@ -1,17 +1,19 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useAuthStore } from "@/lib/stores/authStore";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { Clock, Loader2 } from "lucide-react";
-import { SplitScreenLayout } from "@/components/ui/splitScreenLayout";
-import { AuthFormWrapper } from "@/components/auth/parts/authFormWrapper";
+import { SplitScreenLayout } from "@/components/ui/SplitScreenLayout";
+import { AuthFormWrapper } from "@/components/auth/parts/AuthFormWrapper";
 import { AuthLink } from "@/components/auth/parts/AuthLink";
 
 export function VerifyOtpForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const type = searchParams.get("type") || "signup";
   const { email, verifyOtp, resendOtp } = useAuthStore();
   const [error, setError] = useState<string | null>(null);
   const [resendCooldown, setResendCooldown] = useState(30);
@@ -85,12 +87,18 @@ export function VerifyOtpForm() {
       await verifyOtp(email, otpValue);
       const role = useAuthStore.getState().user?.role;
 
-      if (role === "ADMIN") {
-        router.push("/admin/dashboard");
-      } else if (role === "INSTRUCTOR") {
-        router.push("/instructor/dashboard");
+      if (type === "forgot-password") {
+        router.push(
+          `/reset-password?email=${encodeURIComponent(email)}&otp=${otpValue}`
+        );
       } else {
-        router.push("/dashboard");
+        if (role === "ADMIN") {
+          router.push("/admin/dashboard");
+        } else if (role === "INSTRUCTOR") {
+          router.push("/instructor/dashboard");
+        } else {
+          router.push("/dashboard");
+        }
       }
       toast.success("Email Verified", {
         description: "Your email has been successfully verified.",
@@ -161,7 +169,15 @@ export function VerifyOtpForm() {
           error="No email provided"
         >
           <Button className="auth-button" asChild>
-            <AuthLink text="" linkText="Go back to signup" href="/signup" />
+            <AuthLink
+              text=""
+              linkText={
+                type === "forgot-password"
+                  ? "Back to forgot password"
+                  : "Go back to signup"
+              }
+              href={type === "forgot-password" ? "/forgot-password" : "/signup"}
+            />
           </Button>
         </AuthFormWrapper>
       </SplitScreenLayout>
@@ -170,8 +186,14 @@ export function VerifyOtpForm() {
 
   return (
     <SplitScreenLayout
-      title="Almost There!"
-      description="Complete the verification process to access your new account and start your learning journey."
+      title={
+        type === "forgot-password" ? "Reset Your Password" : "Almost There!"
+      }
+      description={
+        type === "forgot-password"
+          ? "Verify your email to proceed with resetting your password."
+          : "Complete the verification process to access your new account and start your learning journey."
+      }
       imageAlt="Verification illustration"
     >
       <AuthFormWrapper
@@ -234,7 +256,7 @@ export function VerifyOtpForm() {
           <Button
             type="button"
             variant="outline"
-            className="w-full"
+            className="w-full py-4 text-base"
             onClick={handleResend}
             disabled={resendCooldown > 0 || isSubmitting || isResending}
           >
@@ -249,8 +271,12 @@ export function VerifyOtpForm() {
           </Button>
           <AuthLink
             text="Wrong email?"
-            linkText="Go back to signup"
-            href="/signup"
+            linkText={
+              type === "forgot-password"
+                ? "Back to forgot password"
+                : "Go back to signup"
+            }
+            href={type === "forgot-password" ? "/forgot-password" : "/signup"}
           />
         </div>
       </AuthFormWrapper>

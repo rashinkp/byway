@@ -11,6 +11,7 @@ export interface IAuthRepository {
   ): Promise<IAuthUser>;
   createUser(name: string, email: string, password: string): Promise<IAuthUser>;
   findUserByEmail(email: string): Promise<IAuthUser | null>;
+  findUserById(id: string): Promise<IAuthUser | null>;
   resetPassword(email: string, hashedPassword: string): Promise<void>;
 }
 
@@ -64,17 +65,16 @@ export class AuthRepository implements IAuthRepository {
     }) as Promise<IAuthUser | null>;
   }
 
+  async findUserById(id: string): Promise<IAuthUser | null> {
+    return this.prisma.user.findUnique({
+      where: { id },
+    }) as Promise<IAuthUser | null>;
+  }
 
-  async resetPassword(
-    email:string,
-    hashedPassword: string
-  ): Promise<void> {
-
+  async resetPassword(email: string, hashedPassword: string): Promise<void> {
     await this.prisma.user.update({
       where: { email },
       data: { password: hashedPassword },
     });
-
-
   }
 }

@@ -53,11 +53,7 @@ export class AuthController {
   async registerUser(input: RegisterUserInput): Promise<ApiResponse> {
     const { name, email, password } = input;
     try {
-      const  user  = await this.authService.registerUser(
-        name,
-        email,
-        password
-      );
+      const user = await this.authService.registerUser(name, email, password);
       return {
         status: "success",
         data: { id: user.id, email: user.email, role: user.role },
@@ -73,7 +69,6 @@ export class AuthController {
     }
   }
 
-  
   async login(input: LoginInput): Promise<ApiResponse> {
     const { email, password } = input;
     try {
@@ -111,23 +106,23 @@ export class AuthController {
     }
   }
 
-
   async forgotPassword(input: IForgotPasswordInput): Promise<ApiResponse> {
     try {
       await this.authService.forgotPassword(input);
       return {
-        status: 'success',
+        status: "success",
         data: null,
-        message: 'OTP sent to your email for password reset',
+        message: "OTP sent to your email for password reset",
         statusCode: StatusCodes.OK,
-      }
+      };
     } catch (error) {
       console.error(error);
       return {
-        status: 'error',
-        message: error instanceof Error ? error.message : 'Forgot password failed'
-        , statusCode: StatusCodes.BAD_REQUEST,
-      }
+        status: "error",
+        message:
+          error instanceof Error ? error.message : "Forgot password failed",
+        statusCode: StatusCodes.BAD_REQUEST,
+      };
     }
   }
 
@@ -147,6 +142,28 @@ export class AuthController {
         message:
           error instanceof Error ? error.message : "Password reset failed",
         statusCode: StatusCodes.BAD_REQUEST,
+      };
+    }
+  }
+
+  async me(userId: string): Promise<ApiResponse> {
+    try {
+      const user = await this.authService.me(userId);
+      return {
+        status: "success",
+        data: { id: user.id, email: user.email, role: user.role },
+        statusCode: StatusCodes.OK,
+        message: "User details retrieved",
+      };
+    } catch (error) {
+      console.error(error);
+      return {
+        status: "error",
+        message:
+          error instanceof Error
+            ? error.message
+            : "Failed to retrieve user details",
+        statusCode: StatusCodes.UNAUTHORIZED,
       };
     }
   }

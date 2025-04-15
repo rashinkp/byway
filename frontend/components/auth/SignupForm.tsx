@@ -17,9 +17,9 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Separator } from "@/components/ui/separator";
-import { SplitScreenLayout } from "@/components/ui/splitScreenLayout";
+import { SplitScreenLayout } from "@/components/ui/SplitScreenLayout";
 import { GoogleAuthButton } from "@/components/ui/GoogleAuthButton";
-import { AuthFormWrapper } from "@/components/auth/parts/authFormWrapper";
+import { AuthFormWrapper } from "@/components/auth/parts/AuthFormWrapper";
 import { AuthLink } from "@/components/auth/parts/AuthLink";
 
 const signupSchema = z.object({

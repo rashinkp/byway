@@ -15,7 +15,10 @@ export interface IAuthUser {
 }
 
 export class AuthService {
-  constructor(private authRepository: IAuthRepository , private otpService:OtpService) {}
+  constructor(
+    private authRepository: IAuthRepository,
+    private otpService: OtpService
+  ) {}
 
   async registerAdmin(
     name: string,
@@ -68,8 +71,6 @@ export class AuthService {
     return user;
   }
 
- 
-
   async login(
     email: string,
     password: string
@@ -85,8 +86,8 @@ export class AuthService {
     }
 
     if (!user.isVerified || user.deletedAt !== null) {
-      throw new Error('This account is not currently available')
-    } 
+      throw new Error("This account is not currently available");
+    }
 
     const isPasswordValid = await bcrypt.compare(password, user.password);
     if (!isPasswordValid) {
@@ -99,24 +100,22 @@ export class AuthService {
     return JwtUtil.generateToken({ id, email, role });
   }
 
-  async forgotPassword(input: IForgotPasswordInput): Promise<void>  {
-   const { email } = input;
-   const user = await this.authRepository.findUserByEmail(email);
-   if (!user) throw new Error("User not found");
+  async forgotPassword(input: IForgotPasswordInput): Promise<void> {
+    const { email } = input;
+    const user = await this.authRepository.findUserByEmail(email);
+    if (!user) throw new Error("User not found");
     await this.otpService.generateAndSendOtp({ email, userId: user.id });
-    
   }
 
   async resetPassword(input: IResetPasswordInput): Promise<void> {
-    const { email, newPassword, otp } = input
+    const { email, newPassword, otp } = input;
 
+    // const isVerified = await this.otpService.verifyOtp({ email, otp:otp });
 
-    const isVerified = await this.otpService.verifyOtp({ email, otp:otp });
+    // if (!isVerified) {
+    //   throw new Error('OTP verification failed')
+    // }
 
-    if (!isVerified) {
-      throw new Error('OTP verification failed')
-    }
-    
     const user = await this.authRepository.findUserByEmail(email);
 
     if (!user) throw new Error("User not found");
@@ -125,4 +124,15 @@ export class AuthService {
 
     return this.authRepository.resetPassword(email, hashedPassword);
   }
+
+  async me(userId: string): Promise<IAuthUser> {
+    const user = await this.authRepository.findUserById(userId);
+    if (!user || user.deletedAt !== null) {
+      throw new Error("User not found or account is deactivated");
+    }
+    return user;
+  }
+
+
+  
 }

@@ -13,7 +13,9 @@ export const createAuthRouter = (authController:AuthController ): Router => {
   authRouter.post("/login", adapt.login);
   authRouter.post("/logout", protect, adapt.logout);
   authRouter.post('/forgot-password' , adapt.forgotPassword)
-  authRouter.post('/reset-password' , adapt.resetPassword)
+  authRouter.post('/reset-password', adapt.resetPassword)
+  authRouter.get("/me", protect, adapt.me);
+  
   
   return authRouter;
 } 

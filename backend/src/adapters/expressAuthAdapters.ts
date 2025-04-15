@@ -74,4 +74,18 @@ export const adaptAuthController = (controller: AuthController) => ({
     const result = await controller.resetPassword(req.body);
     res.status(result.statusCode).json(result);
   }),
+
+  me: asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
+    if (!req.user) {
+      throw new Error("Unauthorized");
+    }
+    const result = await controller.me(req.user.id);
+    res.status(result.statusCode).json({
+      status: result.status,
+      data: result.data,
+      message: result.message,
+    });
+  }),
+
+  
 });
