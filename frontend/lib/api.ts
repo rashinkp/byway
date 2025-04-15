@@ -91,3 +91,4 @@ export async function resetPassword(email:string , otp:string , newPassword:stri
 export async function logout() {
   await api.post("/auth/logout");
 }
+

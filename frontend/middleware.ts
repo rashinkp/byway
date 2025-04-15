@@ -10,6 +10,7 @@ export async function middleware(request: NextRequest) {
     "/verify-otp",
     "/forgot-password",
     "/reset-password",
+    "/dashboard"
   ];
 
   // Check for JWT cookie via /auth/me

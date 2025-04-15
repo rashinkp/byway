@@ -11,7 +11,7 @@ import { createOtpRouter } from "./modules/otp/otp.route";
 import { createCategoryRouter } from "./modules/category/category.route";
 import { createCourseRouter } from "./modules/course/course.route";
 import { createLessonRouter } from "./modules/lesson/lesson.route";
-
+import morgan from 'morgan'
 
 dotenv.config();
 
@@ -29,6 +29,8 @@ app.use(
 app.use(express.json());
 app.use(cookieParser());
 
+
+app.use(morgan("dev"));
 
 const { authController, instructorController, userController, otpController , categoryController,courseController,lessonController } = initializeDependencies();
 
