@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
-import {api} from "@/lib/api";
+import { api } from "@/lib/api";
 import { Category, CategoryFormData } from "@/types/category";
 
 // Fetch categories
@@ -63,7 +63,7 @@ export function useUpdateCategory() {
   const updateCategory = async (id: string, data: CategoryFormData) => {
     setLoading(true);
     try {
-      const response = await api.patch(`/categories/${id}`, data);
+      const response = await api.put(`/category/admin/categories/${id}`, data);
       toast.success("Category updated", {
         description: `${data.name} updated successfully`,
       });
@@ -88,9 +88,11 @@ export function useToggleDeleteCategory() {
   const toggleDeleteCategory = async (category: Category) => {
     setLoading(true);
     try {
-      const response = await api.delete(`/category/admin/categories/${category.id}`);
+      const response = await api.delete(
+        `/category/admin/categories/${category.id}`
+      );
       toast.success(
-        category.deletedAt !== null ? "Category deleted" : "Category restored",
+        !category.deletedAt ? "Category deleted" : "Category restored",
         {
           description: `${category.name} ${
             category.deletedAt !== null ? "deleted" : "restored"

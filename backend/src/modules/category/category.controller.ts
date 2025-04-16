@@ -107,10 +107,10 @@ export class CategoryController {
 
   async deleteCategory(id: string): Promise<ApiResponse> {
     try {
-      await this.categoryService.deleteCategory(id);
+      const category = await this.categoryService.deleteCategory(id);
       return {
         status: "success",
-        data: null,
+        data: category,
         message: "Category deleted successfully",
         statusCode: StatusCodes.OK,
       };

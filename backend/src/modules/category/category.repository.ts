@@ -6,6 +6,8 @@ import {
   IGetAllCategoriesInput,
 } from "./types";
 
+
+//todo separate all interface from repository layer
 export interface ICategoryRepository {
   createCategory(input: ICreateCategoryInput): Promise<ICategory>;
   getAllCategories(
@@ -15,6 +17,7 @@ export interface ICategoryRepository {
   updateCategory(input: IUpdateCategoryInput): Promise<ICategory>;
   deleteCategory(id: string): Promise<ICategory>;
   getCategoryByName(name: string): Promise<ICategory | null>;
+  recoverCategory(id: string): Promise<ICategory>;
 }
 
 export class CategoryRepository implements ICategoryRepository {
@@ -97,6 +100,7 @@ export class CategoryRepository implements ICategoryRepository {
         createdBy: true,
         createdAt: true,
         updatedAt: true,
+        deletedAt:true,
       },
     });
     return category
@@ -143,6 +147,27 @@ export class CategoryRepository implements ICategoryRepository {
       createdAt: updatedCategory.createdAt,
       updatedAt: updatedCategory.updatedAt,
       deletedAt: updatedCategory.deletedAt || undefined,
+    };
+  }
+
+  async recoverCategory(id: string): Promise<ICategory> {
+    
+    const updatedCategory = await this.prisma.category.update({
+      where: { id },
+      data: {
+        deletedAt: null,
+        updatedAt: new Date(),
+      },
+    });
+
+    return {
+      id: updatedCategory.id,
+      name: updatedCategory.name,
+      description: updatedCategory.description || undefined,
+      createdBy: updatedCategory.createdBy,
+      createdAt: updatedCategory.createdAt,
+      updatedAt: updatedCategory.updatedAt,
+      deletedAt: updatedCategory.deletedAt || null,
     };
   }
 

@@ -30,12 +30,13 @@ export class CategoryService {
   }
 
   async updateCategory(input: IUpdateCategoryInput): Promise<ICategory> {
-    const { name } = input;
+    const { id, name } = input;
+    if (!id) throw new Error("Category ID is required");
     if (name) {
       const existingCategory = await this.categoryRepository.getCategoryByName(
         name
       );
-      if (existingCategory) {
+      if (existingCategory && existingCategory.id !== id) {
         throw new Error("A category with this name already exists");
       }
     }
@@ -43,6 +44,19 @@ export class CategoryService {
   }
 
   async deleteCategory(id: string): Promise<ICategory> {
-    return this.categoryRepository.deleteCategory(id);
+    let category = await this.categoryRepository.getCategoryById(id);
+    if (!category) {
+      throw new Error("Category not found");
+    }
+    console.log(category);
+
+    if (category.deletedAt) {
+      console.log("reaching here recoer");
+      category = await this.categoryRepository.recoverCategory(id);
+    } else {
+      console.log("reaching here delete");
+      category = await this.categoryRepository.deleteCategory(id);
+    }
+    return category;
   }
 }
