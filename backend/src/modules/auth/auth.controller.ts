@@ -1,114 +1,119 @@
 import { AuthService } from "./auth.service";
 import { StatusCodes } from "http-status-codes";
 import { ApiResponse } from "../../types/response";
-import { IForgotPasswordInput, IResetPasswordInput } from "./types";
+import { z } from "zod";
+import { AppError } from "../../utils/appError";
+import { logger } from "../../utils/logger";
 
+const RegisterAdminSchema = z.object({
+  name: z.string().min(1, "Name is required"),
+  email: z.string().email("Invalid email"),
+  password: z.string().min(6, "Password must be at least 6 characters"),
+});
 
-interface RegisterAdminInput {
-  name: string;
-  email: string;
-  password: string;
-}
-interface RegisterUserInput {
-  name: string;
-  email: string;
-  password: string;
-}
+const RegisterUserSchema = z.object({
+  name: z.string().min(1, "Name is required"),
+  email: z.string().email("Invalid email"),
+  password: z.string().min(6, "Password must be at least 6 characters"),
+});
 
-interface LoginInput {
-  email: string;
-  password: string;
-}
+const LoginSchema = z.object({
+  email: z.string().email("Invalid email"),
+  password: z.string().min(1, "Password is required"),
+});
 
+const ForgotPasswordSchema = z.object({
+  email: z.string().email("Invalid email"),
+});
 
+const ResetPasswordSchema = z.object({
+  email: z.string().email("Invalid email"),
+  otp: z.string().min(6, "OTP must be 6 characters"),
+  newPassword: z.string().min(6, "New password must be at least 6 characters"),
+});
 
 export class AuthController {
   constructor(private authService: AuthService) {}
 
-  async registerAdmin(input: RegisterAdminInput): Promise<ApiResponse> {
-    const { name, email, password } = input;
+  async registerAdmin(input: unknown): Promise<ApiResponse> {
     try {
+      const validatedInput = RegisterAdminSchema.parse(input);
+      const { name, email, password } = validatedInput;
       const { user, token } = await this.authService.registerAdmin(
         name,
         email,
         password
       );
-
       return {
         status: "success",
         data: { id: user.id, email: user.email, role: user.role },
         token,
         statusCode: StatusCodes.CREATED,
+        message: "Admin registered successfully",
       };
     } catch (error) {
-      console.log(error);
-      return {
-        status: "error",
-        message: error instanceof Error ? error.message : "Registration failed",
-        statusCode: StatusCodes.BAD_REQUEST,
-      };
+      logger.error("Register admin error:", { error, input });
+      if (error instanceof z.ZodError) {
+        throw AppError.badRequest("Validation failed: " + error.message);
+      }
+      throw error;
     }
   }
 
-  async registerUser(input: RegisterUserInput): Promise<ApiResponse> {
-    const { name, email, password } = input;
+  async registerUser(input: unknown): Promise<ApiResponse> {
     try {
+      const validatedInput = RegisterUserSchema.parse(input);
+      const { name, email, password } = validatedInput;
       const user = await this.authService.registerUser(name, email, password);
       return {
         status: "success",
         data: { id: user.id, email: user.email, role: user.role },
         statusCode: StatusCodes.CREATED,
+        message:
+          "User registered successfully. Please verify your email with the OTP sent.",
       };
     } catch (error) {
-      console.log(error);
-      return {
-        status: "error",
-        message: error instanceof Error ? error.message : "Registration failed",
-        statusCode: StatusCodes.BAD_REQUEST,
-      };
+      logger.error("Register user error:", { error, input });
+      if (error instanceof z.ZodError) {
+        throw AppError.badRequest("Validation failed: " + error.message);
+      }
+      throw error;
     }
   }
 
-  async login(input: LoginInput): Promise<ApiResponse> {
-    const { email, password } = input;
+  async login(input: unknown): Promise<ApiResponse> {
     try {
+      const validatedInput = LoginSchema.parse(input);
+      const { email, password } = validatedInput;
       const { user, token } = await this.authService.login(email, password);
-      // JwtUtil.setTokenCookie(token, res);
       return {
         status: "success",
         data: { id: user.id, email: user.email, role: user.role },
         token,
         statusCode: StatusCodes.OK,
+        message: "Logged in successfully",
       };
     } catch (error) {
-      console.log(error);
-      return {
-        status: "error",
-        message: error instanceof Error ? error.message : "Login failed",
-        statusCode: StatusCodes.UNAUTHORIZED,
-      };
+      logger.error("Login error:", { error, input });
+      if (error instanceof z.ZodError) {
+        throw AppError.badRequest("Validation failed: " + error.message);
+      }
+      throw error;
     }
   }
 
   async logout(): Promise<ApiResponse> {
-    try {
-      return {
-        status: "success",
-        message: "Logged out successfully",
-        statusCode: StatusCodes.OK,
-      };
-    } catch (error) {
-      return {
-        status: "error",
-        message: error instanceof Error ? error.message : "Logout failed",
-        statusCode: StatusCodes.INTERNAL_SERVER_ERROR,
-      };
-    }
+    return {
+      status: "success",
+      message: "Logged out successfully",
+      statusCode: StatusCodes.OK,
+    };
   }
 
-  async forgotPassword(input: IForgotPasswordInput): Promise<ApiResponse> {
+  async forgotPassword(input: unknown): Promise<ApiResponse> {
     try {
-      await this.authService.forgotPassword(input);
+      const validatedInput = ForgotPasswordSchema.parse(input);
+      await this.authService.forgotPassword(validatedInput);
       return {
         status: "success",
         data: null,
@@ -116,19 +121,18 @@ export class AuthController {
         statusCode: StatusCodes.OK,
       };
     } catch (error) {
-      console.error(error);
-      return {
-        status: "error",
-        message:
-          error instanceof Error ? error.message : "Forgot password failed",
-        statusCode: StatusCodes.BAD_REQUEST,
-      };
+      logger.error("Forgot password error:", { error, input });
+      if (error instanceof z.ZodError) {
+        throw AppError.badRequest("Validation failed: " + error.message);
+      }
+      throw error;
     }
   }
 
-  async resetPassword(input: IResetPasswordInput): Promise<ApiResponse> {
+  async resetPassword(input: unknown): Promise<ApiResponse> {
     try {
-      await this.authService.resetPassword(input);
+      const validatedInput = ResetPasswordSchema.parse(input);
+      await this.authService.resetPassword(validatedInput);
       return {
         status: "success",
         data: null,
@@ -136,13 +140,11 @@ export class AuthController {
         statusCode: StatusCodes.OK,
       };
     } catch (error) {
-      console.error(error);
-      return {
-        status: "error",
-        message:
-          error instanceof Error ? error.message : "Password reset failed",
-        statusCode: StatusCodes.BAD_REQUEST,
-      };
+      logger.error("Reset password error:", { error, input });
+      if (error instanceof z.ZodError) {
+        throw AppError.badRequest("Validation failed: " + error.message);
+      }
+      throw error;
     }
   }
 
@@ -156,15 +158,8 @@ export class AuthController {
         message: "User details retrieved",
       };
     } catch (error) {
-      console.error(error);
-      return {
-        status: "error",
-        message:
-          error instanceof Error
-            ? error.message
-            : "Failed to retrieve user details",
-        statusCode: StatusCodes.UNAUTHORIZED,
-      };
+      logger.error("Get user details error:", { error, userId });
+      throw error;
     }
   }
 }

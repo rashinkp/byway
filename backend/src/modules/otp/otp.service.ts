@@ -6,47 +6,84 @@ import {
   IVerifyOtpInput,
 } from "./types";
 import { IOtpRepository } from "./otp.repository";
+import { AppError } from "../../utils/appError";
+import { StatusCodes } from "http-status-codes";
 
 export class OtpService {
-  constructor(private otpRepository: IOtpRepository) {}
+  constructor(
+    private otpRepository: IOtpRepository,
+    private emailUser: string,
+    private emailPass: string
+  ) {
+    if (!emailUser || !emailPass) {
+      throw new AppError(
+        "Email credentials not configured",
+        StatusCodes.INTERNAL_SERVER_ERROR,
+        "CONFIG_ERROR"
+      );
+    }
+  }
 
-  static generateOtp(): string {
+  private generateOtp(): string {
     return randomInt(100000, 999999).toString();
   }
 
-  static async sendOtpEmail(email: string, otp: string): Promise<void> {
-
-
-
+  private async sendOtpEmail(email: string, otp: string): Promise<void> {
     const transporter = nodemailer.createTransport({
       service: "gmail",
       auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS,
+        user: this.emailUser,
+        pass: this.emailPass,
       },
     });
 
     await transporter.sendMail({
-      from: process.env.EMAIL_USER,
+      from: this.emailUser,
       to: email,
       subject: "Verify Your Email",
       text: `Your OTP is ${otp}. It expires in 10 minutes`,
     });
   }
 
-  async verifyOtp(input: IVerifyOtpInput): Promise<{ id: string, email: string, role: string }> {
-    return this.otpRepository.verifyOtp(input.email, input.otp);
+  async verifyOtp(
+    input: IVerifyOtpInput
+  ): Promise<{ id: string; email: string; role: string }> {
+    try {
+      return await this.otpRepository.verifyOtp(input.email, input.otp);
+    } catch (error) {
+      throw error instanceof AppError
+        ? error
+        : AppError.badRequest(
+            error instanceof Error ? error.message : "Verification failed"
+          );
+    }
   }
 
-  async resendOtp(input: IResendOtpInput) {
-    return this.otpRepository.resendOtp(input.email);
+  async resendOtp(input: IResendOtpInput): Promise<void> {
+    try {
+      await this.otpRepository.resendOtp(input.email);
+    } catch (error) {
+      throw error instanceof AppError
+        ? error
+        : AppError.badRequest(
+            error instanceof Error ? error.message : "Resend OTP failed"
+          );
+    }
   }
 
   async generateAndSendOtp(input: IGenerateAndSendOtpInput): Promise<void> {
-
-    const otp = OtpService.generateOtp();
+    const otp = this.generateOtp();
     const expiresAt = new Date(Date.now() + 10 * 60 * 1000);
-
-    return this.otpRepository.generateAndSendOtp(input.email, input.userId , otp , expiresAt);
+    await this.otpRepository.generateAndSendOtp(
+      input.email,
+      input.userId,
+      otp,
+      expiresAt
+    );
+    try {
+      await this.sendOtpEmail(input.email, otp);
+    } catch (error) {
+      throw AppError.badRequest("Failed to send OTP email");
+    }
   }
 }

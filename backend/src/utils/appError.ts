@@ -30,4 +30,8 @@ export class AppError extends Error {
   static internal(message: string = "Internal server error") {
     return new AppError(message, StatusCodes.INTERNAL_SERVER_ERROR);
   }
+
+  static notFound(message: string = 'Not found error') {
+    return new AppError(message, StatusCodes.NOT_FOUND);
+  }
 }

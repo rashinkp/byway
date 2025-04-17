@@ -1,7 +1,5 @@
 import { PrismaClient } from "@prisma/client";
 import { IAuthUser } from "./auth.service";
-import { OtpService } from "../otp/otp.service";
-import { IResetPasswordInput } from "./types";
 
 export interface IAuthRepository {
   createAdmin(
@@ -33,30 +31,9 @@ export class AuthRepository implements IAuthRepository {
     email: string,
     password: string
   ): Promise<IAuthUser> {
-    const otp = OtpService.generateOtp();
-    const expiresAt = new Date(Date.now() + 10 * 60 * 1000);
-
-    const result = this.prisma.$transaction(async (tx) => {
-      const user = await tx.user.create({
-        data: { name, email, password, isVerified: false },
-      });
-
-      //stores otp and infos
-      await tx.userVerification.create({
-        data: {
-          userId: user.id,
-          email,
-          otp: otp,
-          expiresAt,
-        },
-      });
-
-      return user;
-    });
-
-    await OtpService.sendOtpEmail(email, otp);
-
-    return result as Promise<IAuthUser>;
+    return this.prisma.user.create({
+      data: { name, email, password, isVerified: false },
+    }) as Promise<IAuthUser>;
   }
 
   async findUserByEmail(email: string): Promise<IAuthUser | null> {

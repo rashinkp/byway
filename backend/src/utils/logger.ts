@@ -1,18 +1,33 @@
 import winston from "winston";
 
+const logLevel = process.env.LOG_LEVEL || "info";
+const logFilePath = process.env.LOG_FILE_PATH || "./logs/app.log";
+
 export const logger = winston.createLogger({
-  level: "info",
+  level: logLevel,
   format: winston.format.combine(
     winston.format.timestamp(),
     winston.format.json()
   ),
   transports: [
-    new winston.transports.File({ filename: "logs/error.log", level: "error" }),
-    new winston.transports.File({ filename: "logs/combined.log" }),
-    new winston.transports.Console({ format: winston.format.simple() }),
+    new winston.transports.File({ filename: logFilePath }),
+    new winston.transports.Console({
+      format: winston.format.combine(
+        winston.format.colorize(),
+        winston.format.simple()
+      ),
+    }),
   ],
 });
 
+// Silence console logging in test environment
+if (process.env.NODE_ENV === "test") {
+  logger.transports.forEach((transport) => {
+    if (transport instanceof winston.transports.Console) {
+      transport.silent = true;
+    }
+  });
+}
 
 /* Winston is a logging library for Node.js. It helps you:
 

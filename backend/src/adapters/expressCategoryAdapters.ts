@@ -1,13 +1,14 @@
-import { Request , Response , NextFunction } from "express";
+import { Request, Response, NextFunction } from "express";
 import { CategoryController } from "../modules/category/category.controller";
-import { ICreateCategoryInput, IGetAllCategoriesInput, IUpdateCategoryInput } from "../modules/category/types";
-
-
+import {
+  ICreateCategoryInput,
+  IGetAllCategoriesInput,
+  IUpdateCategoryInput,
+} from "../modules/category/types";
 
 interface AuthenticatedRequest extends Request {
   user: { id: string; email: string; role: string };
 }
-
 
 const asyncHandler = (
   fn: (
@@ -19,8 +20,6 @@ const asyncHandler = (
   return (req: Request, res: Response, next: NextFunction) =>
     Promise.resolve(fn(req as AuthenticatedRequest, res, next)).catch(next);
 };
-
-
 
 export const adaptCategoryController = (controller: CategoryController) => ({
   createCategory: asyncHandler(
@@ -51,9 +50,7 @@ export const adaptCategoryController = (controller: CategoryController) => ({
 
   getCategoryById: asyncHandler(
     async (req: AuthenticatedRequest, res: Response) => {
-      const result = await controller.getCategoryById(
-        req.params.id
-      );
+      const result = await controller.getCategoryById(req.params.id);
       res.status(result.statusCode).json(result);
     }
   ),
@@ -68,9 +65,7 @@ export const adaptCategoryController = (controller: CategoryController) => ({
 
   deleteCategory: asyncHandler(
     async (req: AuthenticatedRequest, res: Response) => {
-      const result = await controller.deleteCategory(
-        req.params.id
-      );
+      const result = await controller.deleteCategory(req.params.id);
       res.status(result.statusCode).json(result);
     }
   ),

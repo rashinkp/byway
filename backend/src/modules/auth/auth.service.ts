@@ -3,6 +3,8 @@ import { IAuthRepository } from "./auth.repository";
 import * as bcrypt from "bcrypt";
 import { IForgotPasswordInput, IResetPasswordInput } from "./types";
 import { OtpService } from "../otp/otp.service";
+import { AppError } from "../../utils/appError";
+import { StatusCodes } from "http-status-codes";
 
 export interface IAuthUser {
   id: string;
@@ -11,14 +13,23 @@ export interface IAuthUser {
   password?: string;
   authProvider?: string;
   isVerified: boolean;
-  deletedAt: Date;
+  deletedAt: Date | null;
 }
 
 export class AuthService {
   constructor(
     private authRepository: IAuthRepository,
-    private otpService: OtpService
-  ) {}
+    private otpService: OtpService,
+    private jwtSecret: string
+  ) {
+    if (!jwtSecret) {
+      throw new AppError(
+        "JWT_SECRET not configured",
+        StatusCodes.INTERNAL_SERVER_ERROR,
+        "CONFIG_ERROR"
+      );
+    }
+  }
 
   async registerAdmin(
     name: string,
@@ -26,12 +37,12 @@ export class AuthService {
     password: string
   ): Promise<{ user: IAuthUser; token: string }> {
     if (!name || !email || !password) {
-      throw new Error("All fields are required");
+      throw AppError.badRequest("Name, email, and password are required");
     }
 
     const existingUser = await this.authRepository.findUserByEmail(email);
     if (existingUser) {
-      throw new Error("User already exists");
+      throw AppError.badRequest("User already exists");
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -50,12 +61,12 @@ export class AuthService {
     password: string
   ): Promise<IAuthUser> {
     if (!name || !email || !password) {
-      throw new Error("All fields are required");
+      throw AppError.badRequest("Name, email, and password are required");
     }
 
     const existingUser = await this.authRepository.findUserByEmail(email);
     if (existingUser && existingUser.isVerified) {
-      throw new Error("User already exists");
+      throw AppError.badRequest("User already exists");
     }
 
     if (existingUser) {
@@ -68,6 +79,11 @@ export class AuthService {
       email,
       hashedPassword
     );
+    try {
+      await this.otpService.generateAndSendOtp({ email, userId: user.id });
+    } catch (error) {
+      console.error("Failed to send OTP during registration:", error);
+    }
     return user;
   }
 
@@ -78,59 +94,61 @@ export class AuthService {
     const user = await this.authRepository.findUserByEmail(email);
 
     if (!user) {
-      throw new Error("Invalid email or password");
+      throw AppError.unauthorized("Invalid email or password");
     }
 
     if (user.authProvider !== "EMAIL_PASSWORD" || !user.password) {
-      throw new Error("This account uses a different authentication method");
+      throw AppError.badRequest(
+        "This account uses a different authentication method"
+      );
     }
 
     if (!user.isVerified || user.deletedAt !== null) {
-      throw new Error("This account is not currently available");
+      throw AppError.forbidden("This account is not currently available");
     }
 
     const isPasswordValid = await bcrypt.compare(password, user.password);
     if (!isPasswordValid) {
-      throw new Error("Invalid email or password");
+      throw AppError.unauthorized("Invalid email or password");
     }
     return { user, token: this.generateToken(user.id, user.email, user.role) };
   }
 
   private generateToken(id: string, email: string, role: string): string {
-    return JwtUtil.generateToken({ id, email, role });
+    return JwtUtil.generateToken({ id, email, role }, this.jwtSecret);
   }
 
   async forgotPassword(input: IForgotPasswordInput): Promise<void> {
     const { email } = input;
     const user = await this.authRepository.findUserByEmail(email);
-    if (!user) throw new Error("User not found");
+    if (!user) {
+      throw AppError.notFound("User not found");
+    }
     await this.otpService.generateAndSendOtp({ email, userId: user.id });
   }
 
   async resetPassword(input: IResetPasswordInput): Promise<void> {
     const { email, newPassword, otp } = input;
 
-    // const isVerified = await this.otpService.verifyOtp({ email, otp:otp });
-
-    // if (!isVerified) {
-    //   throw new Error('OTP verification failed')
-    // }
+    const isVerified = await this.otpService.verifyOtp({ email, otp });
+    if (!isVerified) {
+      throw AppError.badRequest("Invalid or expired OTP");
+    }
 
     const user = await this.authRepository.findUserByEmail(email);
-
-    if (!user) throw new Error("User not found");
+    if (!user) {
+      throw AppError.notFound("User not found");
+    }
 
     const hashedPassword = await bcrypt.hash(newPassword, 10);
-
-    return this.authRepository.resetPassword(email, hashedPassword);
+    await this.authRepository.resetPassword(email, hashedPassword);
   }
 
   async me(userId: string): Promise<IAuthUser> {
     const user = await this.authRepository.findUserById(userId);
     if (!user || user.deletedAt !== null) {
-      throw new Error("User not found or account is deactivated");
+      throw AppError.notFound("User not found or account is deactivated");
     }
     return user;
   }
-  
 }

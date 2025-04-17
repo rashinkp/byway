@@ -2,6 +2,8 @@ import { IDatabaseProvider } from "../database";
 import { InstructorController } from "../../modules/instructor/instructor.controller";
 import { InstructorService } from "../../modules/instructor/instructor.service";
 import { InstructorRepository } from "../../modules/instructor/instructor.repository";
+import { AppError } from "../../utils/appError";
+import { StatusCodes } from "http-status-codes";
 
 export interface InstructorDependencies {
   instructorController: InstructorController;
@@ -10,9 +12,22 @@ export interface InstructorDependencies {
 export const initializeInstructorDependencies = (
   dbProvider: IDatabaseProvider
 ): InstructorDependencies => {
+
+  if (!process.env.JWT_SECRET) {
+      throw new AppError(
+        "JWT_SECRET environment variable is not set",
+        StatusCodes.INTERNAL_SERVER_ERROR,
+        "CONFIG_ERROR"
+      );
+  }
+  
+
   const prisma = dbProvider.getClient();
   const instructorRepository = new InstructorRepository(prisma);
-  const instructorService = new InstructorService(instructorRepository);
+  const instructorService = new InstructorService(
+    instructorRepository,
+    process.env.JWT_SECRET
+  );
   const instructorController = new InstructorController(instructorService);
 
   return { instructorController };

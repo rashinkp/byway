@@ -1,4 +1,7 @@
+import { StatusCodes } from "http-status-codes";
+import { AppError } from "../../utils/appError";
 import { IInstructorRepository } from "./instructor.repository";
+import { JwtUtil } from "../../utils/jwt.util";
 
 export interface IInstructor {
   id: string; 
@@ -11,8 +14,22 @@ export interface IInstructor {
   website: string;
 }
 
+type InstructorWithToken = IInstructor & { newToken: string };
+
+
 export class InstructorService {
-  constructor(private instructorRepository: IInstructorRepository) {}
+  constructor(
+    private instructorRepository: IInstructorRepository,
+    private jwtSecret: string
+  ) {
+    if (!jwtSecret) {
+      throw new AppError(
+        "JWT_SECRET not configured",
+        StatusCodes.INTERNAL_SERVER_ERROR,
+        "CONFIG_ERROR"
+      );
+    }
+  }
 
   async createInstructor(
     areaOfExpertise: string,
@@ -20,8 +37,7 @@ export class InstructorService {
     about: string,
     userId: string,
     website: string
-  ): Promise<IInstructor> {
-    
+  ): Promise<InstructorWithToken> {
     if (
       !areaOfExpertise ||
       !professionalExperience ||
@@ -32,12 +48,23 @@ export class InstructorService {
       throw new Error("All fields are required.");
     }
 
-    return await this.instructorRepository.createInstructor(
+    const instructor = await this.instructorRepository.createInstructor(
       areaOfExpertise,
       professionalExperience,
       about,
       userId,
       website
     );
+
+    const newToken = JwtUtil.generateToken(
+      {
+        id: instructor.id,
+        email: instructor.email,
+        role: instructor.role,
+      },
+      this.jwtSecret
+    );
+
+    return { ...instructor, newToken };
   }
 }

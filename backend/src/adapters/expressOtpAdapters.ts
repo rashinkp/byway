@@ -1,11 +1,16 @@
-import { Request, Response } from "express";
+import { Request, Response, NextFunction } from "express";
 import { OtpController } from "../modules/otp/otp.controller";
 import { JwtUtil } from "../utils/jwt.util";
 
+const asyncHandler = (
+  fn: (req: Request, res: Response, next: NextFunction) => Promise<void>
+) => {
+  return (req: Request, res: Response, next: NextFunction) =>
+    Promise.resolve(fn(req, res, next)).catch(next);
+};
 
 export const adaptOtpController = (controller: OtpController) => ({
-
-  verifyOtp: async (req: Request, res: Response) => {
+  verifyOtp: asyncHandler(async (req: Request, res: Response) => {
     const result = await controller.verifyOtp(req.body);
     if (result.token) {
       JwtUtil.setTokenCookie(res, result.token);
@@ -13,13 +18,16 @@ export const adaptOtpController = (controller: OtpController) => ({
     res.status(result.statusCode).json({
       status: result.status,
       data: result.data,
-      message:result.message,
+      message: result.message,
     });
-  },
+  }),
 
-  resendOtp: async (req: Request, res: Response) => {
+  resendOtp: asyncHandler(async (req: Request, res: Response) => {
     const result = await controller.resendOtp(req.body);
-    res.status(result.statusCode).json(result);
-  },
-    
-})
+    res.status(result.statusCode).json({
+      status: result.status,
+      data: result.data,
+      message: result.message,
+    });
+  }),
+});

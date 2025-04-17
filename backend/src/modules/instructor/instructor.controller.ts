@@ -1,6 +1,7 @@
 import { ApiResponse } from "../../types/response";
 import { InstructorService } from "./instructor.service";
 import { JwtUtil } from "../../utils/jwt.util";
+import { token } from "morgan";
 
 interface CreateInstructorInput {
   areaOfExpertise: string;
@@ -19,19 +20,16 @@ export class InstructorController {
     const { areaOfExpertise, professionalExperience, about, userId, website } =
       input;
     try {
-      const instructor = await this.instructorService.createInstructor(
-        areaOfExpertise,
-        professionalExperience,
-        about,
-        userId,
-        website
-      );
+      const { newToken, ...instructor } = await this.instructorService.createInstructor(
+  areaOfExpertise,
+  professionalExperience,
+  about,
+  userId,
+  website
+);
 
-      const newToken = JwtUtil.generateToken({
-        id: instructor.id,
-        email: instructor.email,
-        role: instructor.role, 
-      });
+
+      
 
       return {
         status: "success",
@@ -40,7 +38,7 @@ export class InstructorController {
           email: instructor.email,
           role: instructor.role,
         },
-        token: newToken, 
+        token:newToken, 
         message: "Instructor created successfully",
         statusCode: 201,
       };
