@@ -1,61 +1,36 @@
-import express, { Request, Response, NextFunction } from "express";
-import * as dotenv from "dotenv";
-import cors from "cors";
-import cookieParser from "cookie-parser";
-import { createAuthRouter } from "./modules/auth/auth.route";
-import { createInstructorRouter } from "./modules/instructor/instructor.route";
-import { initializeDependencies } from "./core/dependency";
+import express, { Express, Request, Response } from "express";
 import { StatusCodes } from "http-status-codes";
-import { createUserRouter } from "./modules/user/user.route";
-import { createOtpRouter } from "./modules/otp/otp.route";
-import { createCategoryRouter } from "./modules/category/category.route";
-import { createCourseRouter } from "./modules/course/course.route";
-import { createLessonRouter } from "./modules/lesson/lesson.route";
-import morgan from 'morgan'
+import { configureMiddleware } from "./config/middleware";
+import { configureRoutes } from "./routes";
+import { initializeAppDependencies } from "./core/dependacies/index";
+import { PrismaDatabaseProvider } from "./core/database";
+import { errorHandlingMiddleware } from "./middlewares/errorHandlingMiddleware";
+import dotenv from "dotenv";
+const app: Express = express();
 
 dotenv.config();
 
-const app = express();
+// Initialize dependencies
+const dbProvider = new PrismaDatabaseProvider();
+const dependencies = initializeAppDependencies(dbProvider);
 
+// Configure middleware
+configureMiddleware(app);
 
-
-
-app.use(
-  cors({
-    origin: process.env.CORS_ORIGIN || "http://localhost:3000",
-    credentials: true,
-  })
-);
-app.use(express.json());
-app.use(cookieParser());
-
-
-app.use(morgan("dev"));
-
-const { authController, instructorController, userController, otpController , categoryController,courseController,lessonController } = initializeDependencies();
-
-
-// Routes
-app.use("/api/v1/auth", createAuthRouter(authController));
-app.use("/api/v1/instructor", createInstructorRouter(instructorController));
-app.use('/api/v1/user' ,createUserRouter(userController) )
-app.use('/api/v1/otp', createOtpRouter(otpController));
-app.use('/api/v1/category', createCategoryRouter(categoryController));
-app.use("/api/v1/courses", createCourseRouter(courseController));
-app.use("/api/v1/lessons", createLessonRouter(lessonController));
-
-
-
-// Error-handling middleware
-app.use((error: any, req: Request, res: Response, next: NextFunction): void => {
-  const status: number =
-    typeof error.status === "number" ? error.status : StatusCodes.INTERNAL_SERVER_ERROR;
-  const message: string = error.message || "Something went wrong";
-
-  res.status(status).json({
-    status: "error",
-    message,
+// Health check endpoint
+app.get("/health", (req: Request, res: Response) => {
+  res.status(StatusCodes.OK).json({
+    status: "success",
+    message: "Server is healthy",
+    uptime: process.uptime(),
   });
 });
 
+// Configure routes
+configureRoutes(app, dependencies);
+
+// Error-handling middleware
+app.use(errorHandlingMiddleware);
+
 export default app;
+export { dbProvider };

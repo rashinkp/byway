@@ -1,17 +1,36 @@
 import { PrismaClient } from "@prisma/client";
 
-const prisma = new PrismaClient();
+export interface IDatabaseProvider {
+  connect(): Promise<void>;
+  disconnect(): Promise<void>;
+  getClient(): PrismaClient;
+}
 
-async function connectDB() {
-  try {
-    await prisma.$connect();
-    console.log("✅ Connected to the database successfully!");
-  } catch (error) {
-    console.error("❌ Failed to connect to the database:", error);
-    process.exit(1);
+export class PrismaDatabaseProvider implements IDatabaseProvider {
+  private client: PrismaClient;
+
+  constructor() {
+    this.client = new PrismaClient();
+  }
+
+  async connect(): Promise<void> {
+    try {
+      await this.client.$connect();
+      console.log("✅ Connected to the database successfully!");
+    } catch (error) {
+      console.error("❌ Failed to connect to the database:", error);
+      process.exit(1);
+    }
+  }
+
+  async disconnect(): Promise<void> {
+    await this.client.$disconnect();
+    console.log("🛑 Database disconnected");
+  }
+
+  getClient(): PrismaClient {
+    return this.client;
   }
 }
 
-connectDB();
-
-export default prisma;
+export const databaseProvider = new PrismaDatabaseProvider();

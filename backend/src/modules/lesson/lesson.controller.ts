@@ -8,11 +8,13 @@ import {
   IGetProgressInput,
 } from "./types";
 
+//todo joi implement to validation.
 export class LessonController {
   constructor(private lessonService: LessonService) {}
 
   async createLesson(
-    input: ICreateLessonInput , userId:string
+    input: ICreateLessonInput,
+    userId: string
   ): Promise<ApiResponse> {
     try {
       const lesson = await this.lessonService.createLesson(input, userId);
