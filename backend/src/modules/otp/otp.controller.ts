@@ -5,15 +5,9 @@ import { JwtUtil } from "../../utils/jwt.util";
 import { z } from "zod";
 import { AppError } from "../../utils/appError";
 import { logger } from "../../utils/logger";
+import { ResendOtpSchema, VerifyOtpSchema } from "./otp.validator";
 
-const VerifyOtpSchema = z.object({
-  email: z.string().email("Invalid email"),
-  otp: z.string().min(6, "OTP must be 6 characters"),
-});
 
-const ResendOtpSchema = z.object({
-  email: z.string().email("Invalid email"),
-});
 
 export class OtpController {
   constructor(private otpService: OtpService) {}

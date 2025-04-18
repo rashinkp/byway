@@ -1,7 +1,14 @@
 import { StatusCodes } from "http-status-codes";
 import { ApiResponse } from "../../types/response";
-import { AdminUpdateUserInput, IGetAllUsersInput, IUserWithProfile, UpdateUserInput } from "./types";
+import {
+  AdminUpdateUserInput,
+  IGetAllUsersInput,
+  IUserWithProfile,
+  UpdateUserInput,
+} from "./user.types";
 import { UserService } from "./user.service";
+import { AppError } from "../../utils/appError";
+import { logger } from "../../utils/logger";
 
 export class UserController {
   constructor(private userService: UserService) {}
@@ -15,15 +22,21 @@ export class UserController {
         status: "success",
         data: updatedData,
         message: "User updated successfully",
-        statusCode: 200,
+        statusCode: StatusCodes.OK,
       };
     } catch (error) {
-      console.error(error);
-      return {
-        status: "error",
-        message: error instanceof Error ? error.message : "User update failed",
-        statusCode: 400,
-      };
+      logger.error("User update error:", { error, input });
+      if (error instanceof AppError) {
+        throw error;
+      }
+      if (error instanceof Error) {
+        throw new AppError(
+          error.message,
+          StatusCodes.BAD_REQUEST,
+          "UPDATE_FAILED"
+        );
+      }
+      throw AppError.badRequest("User update failed");
     }
   }
 
@@ -37,19 +50,22 @@ export class UserController {
         statusCode: StatusCodes.OK,
       };
     } catch (error) {
-      console.error(error);
-      return {
-        status: "error",
-        message:
-          error instanceof Error ? error.message : "Failed to retrieve users",
-        statusCode: StatusCodes.INTERNAL_SERVER_ERROR,
-      };
+      logger.error("Get all users error:", { error, input });
+      if (error instanceof AppError) {
+        throw error;
+      }
+      if (error instanceof Error) {
+        throw new AppError(
+          error.message,
+          StatusCodes.INTERNAL_SERVER_ERROR,
+          "RETRIEVE_FAILED"
+        );
+      }
+      throw AppError.internal("Failed to retrieve users");
     }
   }
 
-  async updateUserByAdmin(
-    input: AdminUpdateUserInput
-  ): Promise<ApiResponse> {
+  async updateUserByAdmin(input: AdminUpdateUserInput): Promise<ApiResponse> {
     try {
       await this.userService.updateUserByAdmin(input);
       return {
@@ -59,13 +75,18 @@ export class UserController {
         statusCode: StatusCodes.OK,
       };
     } catch (error) {
-      return {
-        status: "error",
-        message:
-          error instanceof Error ? error.message : "Failed to update user",
-        statusCode: StatusCodes.INTERNAL_SERVER_ERROR,
-        data: null,
-      };
+      logger.error("Admin update user error:", { error, input });
+      if (error instanceof AppError) {
+        throw error;
+      }
+      if (error instanceof Error) {
+        throw new AppError(
+          error.message,
+          StatusCodes.INTERNAL_SERVER_ERROR,
+          "UPDATE_FAILED"
+        );
+      }
+      throw AppError.internal("Failed to update user");
     }
   }
 }

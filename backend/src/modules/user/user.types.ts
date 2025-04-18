@@ -28,15 +28,14 @@ export interface IUserProfile {
 
 export interface UpdateUserInput {
   userId: string;
-  user?: Partial<Pick<IUser, "name" | "password" | "avatar">>; 
-  profile?: Partial<Omit<IUserProfile, "id" | "userId">>; 
+  user?: Partial<Pick<IUser, "name" | "password" | "avatar">>;
+  profile?: Partial<Omit<IUserProfile, "id" | "userId">>;
 }
 
 export interface IUserWithProfile {
   user: IUser;
-  profile?: IUserProfile; 
+  profile?: IUserProfile;
 }
-
 
 export interface IRegisterInput {
   name: string;
@@ -44,12 +43,11 @@ export interface IRegisterInput {
   password: string;
 }
 
-
 export interface IGetAllUsersInput {
-  page?: number; 
-  limit?: number; 
+  page?: number;
+  limit?: number;
   role?: Role;
-  includeDeleted?: boolean; 
+  includeDeleted?: boolean;
 }
 
 export interface IGetAllUsersResponse {
@@ -61,5 +59,18 @@ export interface IGetAllUsersResponse {
 
 export interface AdminUpdateUserInput {
   userId: string;
-  deletedAt?: Date | null; 
+  deletedAt?: Date | null;
+}
+
+export interface IUserRepository {
+  updateUser(input: UpdateUserInput): Promise<IUserWithProfile>;
+  getAllUsers(
+    input: IGetAllUsersWithSkip
+  ): Promise<{ users: IUser[]; total: number }>;
+  updateUserByAdmin(input: AdminUpdateUserInput): Promise<void>;
+}
+
+export interface IGetAllUsersWithSkip extends IGetAllUsersInput {
+  skip: number;
+  role?: Role;
 }

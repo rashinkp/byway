@@ -2,12 +2,13 @@ import * as nodemailer from "nodemailer";
 import { randomInt } from "crypto";
 import {
   IGenerateAndSendOtpInput,
+  IOtpRepository,
   IResendOtpInput,
   IVerifyOtpInput,
-} from "./types";
-import { IOtpRepository } from "./otp.repository";
+} from "./otp.types";
 import { AppError } from "../../utils/appError";
 import { StatusCodes } from "http-status-codes";
+import { logger } from "../../utils/logger";
 
 export class OtpService {
   constructor(
@@ -29,61 +30,121 @@ export class OtpService {
   }
 
   private async sendOtpEmail(email: string, otp: string): Promise<void> {
-    const transporter = nodemailer.createTransport({
-      service: "gmail",
-      auth: {
-        user: this.emailUser,
-        pass: this.emailPass,
-      },
-    });
+    try {
+      const transporter = nodemailer.createTransport({
+        service: "gmail",
+        auth: {
+          user: this.emailUser,
+          pass: this.emailPass,
+        },
+      });
 
-    await transporter.sendMail({
-      from: this.emailUser,
-      to: email,
-      subject: "Verify Your Email",
-      text: `Your OTP is ${otp}. It expires in 10 minutes`,
-    });
+      await transporter.sendMail({
+        from: this.emailUser,
+        to: email,
+        subject: "Verify Your Email",
+        text: `Your OTP is ${otp}. It expires in 10 minutes`,
+      });
+    } catch (error) {
+      logger.error("Failed to send OTP email", { error, email });
+      throw new AppError(
+        "Failed to send OTP email",
+        StatusCodes.INTERNAL_SERVER_ERROR,
+        "EMAIL_ERROR"
+      );
+    }
   }
 
   async verifyOtp(
     input: IVerifyOtpInput
   ): Promise<{ id: string; email: string; role: string }> {
-    try {
-      return await this.otpRepository.verifyOtp(input.email, input.otp);
-    } catch (error) {
-      throw error instanceof AppError
-        ? error
-        : AppError.badRequest(
-            error instanceof Error ? error.message : "Verification failed"
-          );
+    const verification = await this.otpRepository.findVerificationByEmail(
+      input.email
+    );
+
+    if (
+      !verification ||
+      verification.isUsed ||
+      verification.expiresAt < new Date() ||
+      verification.attemptCount >= 10
+    ) {
+      logger.warn("Invalid or expired OTP", { email: input.email });
+      throw new AppError(
+        "Invalid or expired OTP",
+        StatusCodes.BAD_REQUEST,
+        "INVALID_OTP"
+      );
     }
+
+    if (verification.otp !== input.otp) {
+      await this.otpRepository.incrementAttemptCount(verification.id);
+      logger.warn("Incorrect OTP attempt", {
+        email: input.email,
+        attemptCount: verification.attemptCount + 1,
+      });
+      throw new AppError(
+        "Incorrect OTP",
+        StatusCodes.BAD_REQUEST,
+        "INCORRECT_OTP"
+      );
+    }
+
+    await this.otpRepository.updateVerificationStatus(
+      verification.id,
+      verification.userId,
+      true,
+      true
+    );
+
+    return {
+      id: verification.user.id,
+      email: verification.user.email,
+      role: verification.user.role,
+    };
   }
 
   async resendOtp(input: IResendOtpInput): Promise<void> {
-    try {
-      await this.otpRepository.resendOtp(input.email);
-    } catch (error) {
-      throw error instanceof AppError
-        ? error
-        : AppError.badRequest(
-            error instanceof Error ? error.message : "Resend OTP failed"
-          );
+    const verification = await this.otpRepository.findVerificationByEmail(
+      input.email
+    );
+
+    if (!verification || verification.isUsed) {
+      logger.warn("No pending verification found", { email: input.email });
+      throw new AppError(
+        "No pending verification found",
+        StatusCodes.BAD_REQUEST,
+        "NO_VERIFICATION"
+      );
     }
+
+    if (verification.expiresAt > new Date() && verification.attemptCount < 10) {
+      logger.warn("OTP still valid", { email: input.email });
+      throw new AppError(
+        "OTP still valid, try again later",
+        StatusCodes.BAD_REQUEST,
+        "OTP_VALID"
+      );
+    }
+
+    const newOtp = this.generateOtp();
+    const expiresAt = new Date(Date.now() + 10 * 60 * 1000);
+
+    await this.otpRepository.updateOtp(verification.id, newOtp, expiresAt, 0);
+
+    await this.sendOtpEmail(input.email, newOtp);
   }
 
   async generateAndSendOtp(input: IGenerateAndSendOtpInput): Promise<void> {
     const otp = this.generateOtp();
     const expiresAt = new Date(Date.now() + 10 * 60 * 1000);
-    await this.otpRepository.generateAndSendOtp(
-      input.email,
+
+    await this.otpRepository.upsertVerification(
       input.userId,
+      input.email,
       otp,
       expiresAt
     );
-    try {
-      await this.sendOtpEmail(input.email, otp);
-    } catch (error) {
-      throw AppError.badRequest("Failed to send OTP email");
-    }
+
+    await this.sendOtpEmail(input.email, otp);
   }
 }

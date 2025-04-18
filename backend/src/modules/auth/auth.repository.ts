@@ -1,17 +1,6 @@
 import { PrismaClient } from "@prisma/client";
-import { IAuthUser } from "./auth.service";
+import { IAuthRepository, IAuthUser } from "./auth.types";
 
-export interface IAuthRepository {
-  createAdmin(
-    name: string,
-    email: string,
-    password: string
-  ): Promise<IAuthUser>;
-  createUser(name: string, email: string, password: string): Promise<IAuthUser>;
-  findUserByEmail(email: string): Promise<IAuthUser | null>;
-  findUserById(id: string): Promise<IAuthUser | null>;
-  resetPassword(email: string, hashedPassword: string): Promise<void>;
-}
 
 export class AuthRepository implements IAuthRepository {
   constructor(private prisma: PrismaClient) {}

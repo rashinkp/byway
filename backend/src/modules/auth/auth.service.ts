@@ -1,20 +1,11 @@
 import { JwtUtil } from "../../utils/jwt.util";
-import { IAuthRepository } from "./auth.repository";
 import * as bcrypt from "bcrypt";
-import { IForgotPasswordInput, IResetPasswordInput } from "./types";
+import { IAuthRepository, IAuthUser, IForgotPasswordInput, IResetPasswordInput } from "./auth.types";
 import { OtpService } from "../otp/otp.service";
 import { AppError } from "../../utils/appError";
 import { StatusCodes } from "http-status-codes";
 
-export interface IAuthUser {
-  id: string;
-  email: string;
-  role: string;
-  password?: string;
-  authProvider?: string;
-  isVerified: boolean;
-  deletedAt: Date | null;
-}
+
 
 export class AuthService {
   constructor(

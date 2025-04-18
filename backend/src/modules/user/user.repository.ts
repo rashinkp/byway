@@ -8,26 +8,12 @@ import {
   IUser,
   UpdateUserInput,
   IUserWithProfile,
-  IUserProfile,
-  IGetAllUsersInput,
   AdminUpdateUserInput,
-} from "./types";
+  IGetAllUsersWithSkip,
+  IUserRepository,
+} from "./user.types";
 
 
-
-interface IGetAllUsersWithSkip extends IGetAllUsersInput {
-  skip: number;
-  role?:Role
-}
-
-
-
-export interface IUserRepository {
-  updateUser(input: UpdateUserInput): Promise<IUserWithProfile>;
-  getAllUsers(
-    input: IGetAllUsersWithSkip
-  ): Promise<{ users: IUser[]; total: number }>;
-}
 
 
 
@@ -80,6 +66,8 @@ export class UserRepository implements IUserRepository {
           name: updatedUser.name || undefined,
           password: updatedUser.password || undefined,
           avatar: updatedUser.avatar || undefined,
+          isVerified: updatedUser.isVerified,
+          deletedAt: updatedUser.deletedAt || undefined,
         },
         profile: updatedProfile
           ? {
@@ -100,14 +88,15 @@ export class UserRepository implements IUserRepository {
     });
   }
 
-  //get all users
-
   async getAllUsers(
     input: IGetAllUsersWithSkip
   ): Promise<{ users: IUser[]; total: number }> {
-    const { page = 1, limit = 10, skip, role } = input;
+    const { page = 1, limit = 10, skip, role, includeDeleted = false } = input;
 
-    const where = role ? { role } : { role: Role.USER };
+    const where = {
+      role: role ? role : Role.USER,
+      ...(includeDeleted ? {} : { deletedAt: null }),
+    };
 
     const [users, total] = await Promise.all([
       this.prisma.user.findMany({
@@ -122,24 +111,31 @@ export class UserRepository implements IUserRepository {
           isVerified: true,
           createdAt: true,
           updatedAt: true,
+          deletedAt: true,
         },
       }),
       this.prisma.user.count({ where }),
     ]);
 
-    return { users, total };
+    return {
+      users: users.map((user) => ({
+        ...user,
+        name: user.name || undefined,
+        deletedAt: user.deletedAt || undefined,
+      })),
+      total,
+    };
   }
 
   async updateUserByAdmin(input: AdminUpdateUserInput): Promise<void> {
     const { userId, deletedAt } = input;
 
-      await this.prisma.user.update({
-        where: { id: userId },
-        data: {
-          deletedAt: deletedAt === undefined ? undefined : deletedAt,
-          updatedAt:new Date(),
-        }
-      })
-    
+    await this.prisma.user.update({
+      where: { id: userId },
+      data: {
+        deletedAt: deletedAt === undefined ? undefined : deletedAt,
+        updatedAt: new Date(),
+      },
+    });
   }
 }
