@@ -1,13 +1,14 @@
-// src/modules/course/course.controller.ts
 import { StatusCodes } from "http-status-codes";
-import { ApiResponse } from "../../types/response";
+import { AppError } from "../../utils/appError";
+import { logger } from "../../utils/logger";
 import { CourseService } from "./course.service";
+import { ApiResponse } from "../../types/response";
 import {
   ICreateCourseInput,
   IUpdateCourseInput,
   IGetAllCoursesInput,
   ICreateEnrollmentInput,
-} from "./types";
+} from "./course.types";
 
 export class CourseController {
   constructor(private courseService: CourseService) {}
@@ -22,13 +23,14 @@ export class CourseController {
         statusCode: StatusCodes.CREATED,
       };
     } catch (error) {
-      return {
-        status: "error",
-        message:
-          error instanceof Error ? error.message : "Failed to create course",
-        statusCode: StatusCodes.INTERNAL_SERVER_ERROR,
-        data: null,
-      };
+      logger.error("Error creating course", { error });
+      throw error instanceof AppError
+        ? error
+        : new AppError(
+            error instanceof Error ? error.message : "Failed to create course",
+            StatusCodes.INTERNAL_SERVER_ERROR,
+            "INTERNAL_ERROR"
+          );
     }
   }
 
@@ -42,27 +44,22 @@ export class CourseController {
         statusCode: StatusCodes.OK,
       };
     } catch (error) {
-      return {
-        status: "error",
-        message:
-          error instanceof Error ? error.message : "Failed to retrieve courses",
-        statusCode: StatusCodes.INTERNAL_SERVER_ERROR,
-        data: null,
-      };
+      logger.error("Error retrieving courses", { error });
+      throw error instanceof AppError
+        ? error
+        : new AppError(
+            error instanceof Error
+              ? error.message
+              : "Failed to retrieve courses",
+            StatusCodes.INTERNAL_SERVER_ERROR,
+            "INTERNAL_ERROR"
+          );
     }
   }
 
   async getCourseById(id: string): Promise<ApiResponse> {
     try {
       const course = await this.courseService.getCourseById(id);
-      if (!course) {
-        return {
-          status: "error",
-          message: "Course not found",
-          statusCode: StatusCodes.NOT_FOUND,
-          data: null,
-        };
-      }
       return {
         status: "success",
         data: course,
@@ -70,13 +67,16 @@ export class CourseController {
         statusCode: StatusCodes.OK,
       };
     } catch (error) {
-      return {
-        status: "error",
-        message:
-          error instanceof Error ? error.message : "Failed to retrieve course",
-        statusCode: StatusCodes.INTERNAL_SERVER_ERROR,
-        data: null,
-      };
+      logger.error("Error retrieving course by ID", { error });
+      throw error instanceof AppError
+        ? error
+        : new AppError(
+            error instanceof Error
+              ? error.message
+              : "Failed to retrieve course",
+            StatusCodes.INTERNAL_SERVER_ERROR,
+            "INTERNAL_ERROR"
+          );
     }
   }
 
@@ -96,13 +96,14 @@ export class CourseController {
         statusCode: StatusCodes.OK,
       };
     } catch (error) {
-      return {
-        status: "error",
-        message:
-          error instanceof Error ? error.message : "Failed to update course",
-        statusCode: StatusCodes.INTERNAL_SERVER_ERROR,
-        data: null,
-      };
+      logger.error("Error updating course", { error });
+      throw error instanceof AppError
+        ? error
+        : new AppError(
+            error instanceof Error ? error.message : "Failed to update course",
+            StatusCodes.INTERNAL_SERVER_ERROR,
+            "INTERNAL_ERROR"
+          );
     }
   }
 
@@ -116,13 +117,14 @@ export class CourseController {
         statusCode: StatusCodes.OK,
       };
     } catch (error) {
-      return {
-        status: "error",
-        message:
-          error instanceof Error ? error.message : "Failed to delete course",
-        statusCode: StatusCodes.INTERNAL_SERVER_ERROR,
-        data: null,
-      };
+      logger.error("Error soft deleting course", { error });
+      throw error instanceof AppError
+        ? error
+        : new AppError(
+            error instanceof Error ? error.message : "Failed to delete course",
+            StatusCodes.INTERNAL_SERVER_ERROR,
+            "INTERNAL_ERROR"
+          );
     }
   }
 
@@ -136,15 +138,14 @@ export class CourseController {
         statusCode: StatusCodes.CREATED,
       };
     } catch (error) {
-      return {
-        status: "error",
-        message: error instanceof Error ? error.message : "Failed to enroll",
-        statusCode:
-          error instanceof Error && error.message.includes("already enrolled")
-            ? StatusCodes.CONFLICT
-            : StatusCodes.BAD_REQUEST,
-        data: null,
-      };
+      logger.error("Error enrolling course", { error });
+      throw error instanceof AppError
+        ? error
+        : new AppError(
+            error instanceof Error ? error.message : "Failed to enroll",
+            StatusCodes.INTERNAL_SERVER_ERROR,
+            "INTERNAL_ERROR"
+          );
     }
   }
 }

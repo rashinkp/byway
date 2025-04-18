@@ -1,26 +1,13 @@
 import { PrismaClient } from "@prisma/client";
 import {
   ICourse,
+  ICourseRepository,
   ICreateCourseInput,
   ICreateEnrollmentInput,
   IEnrollment,
   IGetAllCoursesInput,
   IUpdateCourseInput,
-} from "./types";
-
-export interface ICourseRepository {
-  createCourse(input: ICreateCourseInput): Promise<ICourse>;
-  getAllCourses(
-    input: IGetAllCoursesInput
-  ): Promise<{ courses: ICourse[]; total: number }>;
-  getCourseById(id: string): Promise<ICourse | null>;
-  getCourseByName(title: string): Promise<ICourse | null>;
-  updateCourse(input: IUpdateCourseInput): Promise<ICourse>;
-  softDeleteCourse(id: string): Promise<ICourse>;
-
-  createEnrollment(input: ICreateEnrollmentInput): Promise<IEnrollment>;
-  getEnrollment(userId: string, courseId: string): Promise<IEnrollment | null>;
-}
+} from "./course.types";
 
 export class CourseRepository implements ICourseRepository {
   constructor(private prisma: PrismaClient) {}
@@ -304,6 +291,4 @@ export class CourseRepository implements ICourseRepository {
       enrolledAt: enrollment.enrolledAt,
     };
   }
-
-
 }
