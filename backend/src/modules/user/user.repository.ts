@@ -11,6 +11,7 @@ import {
   AdminUpdateUserInput,
   IGetAllUsersWithSkip,
   IUserRepository,
+  UpdateUserRoleInput,
 } from "./user.types";
 
 
@@ -137,5 +138,32 @@ export class UserRepository implements IUserRepository {
         updatedAt: new Date(),
       },
     });
+  }
+
+  async findUserByEmail(email: string): Promise<IUser | null> {
+    return this.prisma.user.findUnique({
+      where: { email },
+    }) as Promise<IUser | null>;
+  }
+
+  async findUserById(id: string): Promise<IUser | null> {
+    return this.prisma.user.findUnique({
+      where: { id },
+    }) as Promise<IUser | null>;
+  }
+
+  async updateUserRole(input: UpdateUserRoleInput): Promise<IUser> {
+    const { userId, role } = input;
+      const user = await this.prisma.user.update({
+        where: { id: userId },
+        data: { role },
+      });
+
+      return {
+        id: user.id,
+        email: user.email,
+        role: user.role,
+        isVerified: user.isVerified,
+      };
   }
 }

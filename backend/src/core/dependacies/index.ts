@@ -35,10 +35,10 @@ export interface AppDependencies {
 export const initializeAppDependencies = (
   dbProvider: IDatabaseProvider
 ): AppDependencies => {
-  const otpDeps = initializeOtpDependencies(dbProvider);
-  const authDeps = initializeAuthDependencies(dbProvider, otpDeps.otpService);
   const userDeps = initializeUserDependencies(dbProvider);
-  const instructorDeps = initializeInstructorDependencies(dbProvider);
+  const otpDeps = initializeOtpDependencies(dbProvider);
+  const authDeps = initializeAuthDependencies(dbProvider, otpDeps.otpService , userDeps.userService);
+  const instructorDeps = initializeInstructorDependencies(dbProvider, userDeps.userService );
   const categoryDeps = initializeCategoryDependencies(dbProvider);
   const courseDeps = initializeCourseDependencies(
     dbProvider,

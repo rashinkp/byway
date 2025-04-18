@@ -2,6 +2,7 @@ import {
   AdminUpdateUserInput,
   IGetAllUsersInput,
   IGetAllUsersResponse,
+  IUser,
   IUserWithProfile,
   UpdateUserInput,
 } from "./user.types";
@@ -14,7 +15,11 @@ import {
   updateUserSchema,
   getAllUsersSchema,
   adminUpdateUserSchema,
+  findUserByIdSchema,
+  findUserByEmailSchema,
+  updateUserRoleSchema,
 } from "./user.validators";
+import { Role } from "@prisma/client";
 
 export class UserService {
   constructor(private userRepository: UserRepository) {}
@@ -97,5 +102,109 @@ export class UserService {
     }
 
     return this.userRepository.updateUserByAdmin(parsedInput.data);
+  }
+
+  async findUserByEmail(email: string): Promise<IUser | null> {
+    const parsedInput = findUserByEmailSchema.safeParse({ email });
+    if (!parsedInput.success) {
+      logger.warn("Invalid email for user lookup", {
+        errors: parsedInput.error.errors,
+      });
+      throw new AppError(
+        `Validation failed: ${parsedInput.error.message}`,
+        StatusCodes.BAD_REQUEST,
+        "VALIDATION_ERROR"
+      );
+    }
+
+    try {
+      const user = await this.userRepository.findUserByEmail(
+        parsedInput.data.email
+      );
+      if (!user) {
+        logger.warn("User not found by email", { email });
+        throw new AppError(
+          "User not found",
+          StatusCodes.NOT_FOUND,
+          "NOT_FOUND"
+        );
+      }
+      return user;
+    } catch (error) {
+      logger.error("Error finding user by email", { error, email });
+      throw error instanceof AppError
+        ? error
+        : new AppError(
+            "Failed to find user by email",
+            StatusCodes.INTERNAL_SERVER_ERROR,
+            "INTERNAL_ERROR"
+          );
+    }
+  }
+
+  async findUserById(id: string): Promise<IUser | null> {
+    const parsedInput = findUserByIdSchema.safeParse({ id });
+    if (!parsedInput.success) {
+      logger.warn("Invalid user ID for user lookup", {
+        errors: parsedInput.error.errors,
+      });
+      throw new AppError(
+        `Validation failed: ${parsedInput.error.message}`,
+        StatusCodes.BAD_REQUEST,
+        "VALIDATION_ERROR"
+      );
+    }
+
+    try {
+      const user = await this.userRepository.findUserById(parsedInput.data.id);
+      if (!user) {
+        logger.warn("User not found by ID", { id });
+        throw new AppError(
+          "User not found",
+          StatusCodes.NOT_FOUND,
+          "NOT_FOUND"
+        );
+      }
+      return user;
+    } catch (error) {
+      logger.error("Error finding user by ID", { error, id });
+      throw error instanceof AppError
+        ? error
+        : new AppError(
+            "Failed to find user by ID",
+            StatusCodes.INTERNAL_SERVER_ERROR,
+            "INTERNAL_ERROR"
+          );
+    }
+  }
+
+  async updateUserRole(userId: string, role: Role): Promise<IUser> {
+    const parsedInput = updateUserRoleSchema.safeParse({ userId, role });
+    if (!parsedInput.success) {
+      logger.warn("Validation failed for updateUserRole", {
+        errors: parsedInput.error.errors,
+      });
+      throw new AppError(
+        `Validation failed: ${parsedInput.error.message}`,
+        StatusCodes.BAD_REQUEST,
+        "VALIDATION_ERROR"
+      );
+    }
+
+    try {
+      const updatedUser = await this.userRepository.updateUserRole(
+        parsedInput.data
+      );
+      return updatedUser;
+    } catch (error) {
+      logger.error("Error updating user role", { error, userId, role });
+      throw error instanceof AppError
+        ? error
+        : new AppError(
+            "Failed to update user role",
+            StatusCodes.INTERNAL_SERVER_ERROR,
+            "INTERNAL_ERROR"
+          );
+    }
   }
 }

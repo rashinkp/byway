@@ -1,6 +1,9 @@
-import { Request, Response , RequestHandler } from "express";
-import { InstructorController } from "../modules/instructor/instructor.controller";
+import { Request, Response, RequestHandler } from "express";
+import { AppError } from "../utils/appError";
+import { StatusCodes } from "http-status-codes";
+import { logger } from "../utils/logger";
 import { JwtUtil } from "../utils/jwt.util";
+import { InstructorController } from "../modules/instructor/instructor.controller";
 
 interface AuthenticatedRequest extends Request {
   user?: {
@@ -13,28 +16,27 @@ interface AuthenticatedRequest extends Request {
 export const adaptInstructorController = (
   controller: InstructorController
 ) => ({
-
   createInstructor: (async (req: AuthenticatedRequest, res: Response) => {
-    const { areaOfExpertise, professionalExperience, about, website } =
-    req.body;
-    const userId = req.user?.id;
-
-    if (!userId) {
-      return res.status(401).json({
-        status: "error",
-        message: "Unauthorized: No user ID found in token",
+    if (!req.user?.id) {
+      logger.error("Unauthorized: No user ID found in token", {
+        request: req.body,
       });
+      throw new AppError(
+        "Unauthorized: No user ID found in token",
+        StatusCodes.UNAUTHORIZED,
+        "UNAUTHORIZED"
+      );
     }
 
     const result = await controller.createInstructor({
-      areaOfExpertise,
-      professionalExperience,
-      about,
-      userId,
-      website,
+      areaOfExpertise: req.body.areaOfExpertise,
+      professionalExperience: req.body.professionalExperience,
+      about: req.body.about,
+      userId: req.user.id,
+      website: req.body.website,
     });
 
-    if (result.status === 'success' && result.token) {
+    if (result.status === "success" && result.token) {
       JwtUtil.setTokenCookie(res, result.token);
     }
 
@@ -42,6 +44,6 @@ export const adaptInstructorController = (
       status: result.status,
       data: result.data,
       message: result.message,
-    }) 
+    });
   }) as RequestHandler,
 });

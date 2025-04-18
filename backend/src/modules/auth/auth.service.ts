@@ -4,6 +4,7 @@ import { IAuthRepository, IAuthUser, IForgotPasswordInput, IResetPasswordInput }
 import { OtpService } from "../otp/otp.service";
 import { AppError } from "../../utils/appError";
 import { StatusCodes } from "http-status-codes";
+import { UserService } from "../user/user.service";
 
 
 
@@ -11,7 +12,8 @@ export class AuthService {
   constructor(
     private authRepository: IAuthRepository,
     private otpService: OtpService,
-    private jwtSecret: string
+    private jwtSecret: string,
+    private userService: UserService
   ) {
     if (!jwtSecret) {
       throw new AppError(
@@ -31,7 +33,7 @@ export class AuthService {
       throw AppError.badRequest("Name, email, and password are required");
     }
 
-    const existingUser = await this.authRepository.findUserByEmail(email);
+    const existingUser = await this.userService.findUserByEmail(email);
     if (existingUser) {
       throw AppError.badRequest("User already exists");
     }
@@ -55,7 +57,7 @@ export class AuthService {
       throw AppError.badRequest("Name, email, and password are required");
     }
 
-    const existingUser = await this.authRepository.findUserByEmail(email);
+    const existingUser = await this.userService.findUserByEmail(email);
     if (existingUser && existingUser.isVerified) {
       throw AppError.badRequest("User already exists");
     }
@@ -82,7 +84,7 @@ export class AuthService {
     email: string,
     password: string
   ): Promise<{ user: IAuthUser; token: string }> {
-    const user = await this.authRepository.findUserByEmail(email);
+    const user = await this.userService.findUserByEmail(email);
 
     if (!user) {
       throw AppError.unauthorized("Invalid email or password");
@@ -111,7 +113,7 @@ export class AuthService {
 
   async forgotPassword(input: IForgotPasswordInput): Promise<void> {
     const { email } = input;
-    const user = await this.authRepository.findUserByEmail(email);
+    const user = await this.userService.findUserByEmail(email);
     if (!user) {
       throw AppError.notFound("User not found");
     }
@@ -126,7 +128,7 @@ export class AuthService {
       throw AppError.badRequest("Invalid or expired OTP");
     }
 
-    const user = await this.authRepository.findUserByEmail(email);
+    const user = await this.userService.findUserByEmail(email);
     if (!user) {
       throw AppError.notFound("User not found");
     }
@@ -136,7 +138,7 @@ export class AuthService {
   }
 
   async me(userId: string): Promise<IAuthUser> {
-    const user = await this.authRepository.findUserById(userId);
+    const user = await this.userService.findUserById(userId);
     if (!user || user.deletedAt !== null) {
       throw AppError.notFound("User not found or account is deactivated");
     }

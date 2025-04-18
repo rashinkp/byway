@@ -1,42 +1,24 @@
 import { PrismaClient } from "@prisma/client";
-import { IInstructor } from "./instructor.service";
-
-export interface IInstructorRepository {
-  createInstructor(
-    areaOfExpertise: string,
-    professionalExperience: string,
-    about: string,
-    userId: string,
-    website: string
-  ): Promise<IInstructor>;
-}
+import { AppError } from "../../utils/appError";
+import { StatusCodes } from "http-status-codes";
+import { logger } from "../../utils/logger";
+import {
+  CreateInstructorInput,
+  IInstructorDetails,
+  IInstructorRepository,
+} from "./instructor.types";
 
 export class InstructorRepository implements IInstructorRepository {
   constructor(private prisma: PrismaClient) {}
 
   async createInstructor(
-    areaOfExpertise: string,
-    professionalExperience: string,
-    about: string,
-    userId: string,
-    website: string
-  ): Promise<IInstructor> {
-    const user = await this.prisma.user.findUnique({ where: { id: userId } });
-    if (!user) {
-      throw new Error("User not found");
-    }
+    input: CreateInstructorInput
+  ): Promise<IInstructorDetails> {
+    const { areaOfExpertise, professionalExperience, about, userId, website } =
+      input;
 
-    const result = await this.prisma.$transaction(async (tx) => {
-      
-      let updatedUser = user;
-      if (user.role !== "INSTRUCTOR") {
-        updatedUser = await tx.user.update({
-          where: { id: userId },
-          data: { role: "INSTRUCTOR" },
-        });
-      }
-
-      const instructorDetails = await tx.instructorDetails.create({
+    try {
+      const instructorDetails = await this.prisma.instructorDetails.create({
         data: {
           areaOfExpertise,
           professionalExperience,
@@ -47,17 +29,22 @@ export class InstructorRepository implements IInstructorRepository {
       });
 
       return {
-        id: updatedUser.id,
-        email: updatedUser.email,
-        role: updatedUser.role, 
+        id: instructorDetails.id,
         areaOfExpertise: instructorDetails.areaOfExpertise,
         professionalExperience: instructorDetails.professionalExperience,
-        about: instructorDetails.about as string,
+        about: instructorDetails.about ?? null,
         userId: instructorDetails.userId,
-        website: instructorDetails.website as string,
+        website: instructorDetails.website ?? null,
       };
-    });
-
-    return result;
+    } catch (error) {
+      logger.error("Error creating instructor details", { error, input });
+      throw error instanceof AppError
+        ? error
+        : new AppError(
+            "Failed to create instructor details",
+            StatusCodes.INTERNAL_SERVER_ERROR,
+            "DATABASE_ERROR"
+          );
+    }
   }
 }

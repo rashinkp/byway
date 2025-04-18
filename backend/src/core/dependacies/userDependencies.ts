@@ -5,6 +5,7 @@ import { UserRepository } from "../../modules/user/user.repository";
 
 export interface UserDependencies {
   userController: UserController;
+  userService: UserService;
 }
 
 export const initializeUserDependencies = (
@@ -15,5 +16,5 @@ export const initializeUserDependencies = (
   const userService = new UserService(userRepository);
   const userController = new UserController(userService);
 
-  return { userController };
+  return { userController , userService};
 };

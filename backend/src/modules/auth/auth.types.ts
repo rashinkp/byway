@@ -17,10 +17,12 @@ export interface IAuthUser {
   id: string;
   email: string;
   role: string;
+  name?: string;
   password?: string;
+  avatar?: string;
+  isVerified?: boolean;
   authProvider?: string;
-  isVerified: boolean;
-  deletedAt: Date | null;
+  deletedAt?: Date | null;
 }
 
 
@@ -31,7 +33,5 @@ export interface IAuthRepository {
     password: string
   ): Promise<IAuthUser>;
   createUser(name: string, email: string, password: string): Promise<IAuthUser>;
-  findUserByEmail(email: string): Promise<IAuthUser | null>;
-  findUserById(id: string): Promise<IAuthUser | null>;
   resetPassword(email: string, hashedPassword: string): Promise<void>;
 }

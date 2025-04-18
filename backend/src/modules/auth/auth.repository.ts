@@ -25,17 +25,6 @@ export class AuthRepository implements IAuthRepository {
     }) as Promise<IAuthUser>;
   }
 
-  async findUserByEmail(email: string): Promise<IAuthUser | null> {
-    return this.prisma.user.findUnique({
-      where: { email },
-    }) as Promise<IAuthUser | null>;
-  }
-
-  async findUserById(id: string): Promise<IAuthUser | null> {
-    return this.prisma.user.findUnique({
-      where: { id },
-    }) as Promise<IAuthUser | null>;
-  }
 
   async resetPassword(email: string, hashedPassword: string): Promise<void> {
     await this.prisma.user.update({

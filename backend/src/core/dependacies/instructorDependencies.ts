@@ -4,13 +4,15 @@ import { InstructorService } from "../../modules/instructor/instructor.service";
 import { InstructorRepository } from "../../modules/instructor/instructor.repository";
 import { AppError } from "../../utils/appError";
 import { StatusCodes } from "http-status-codes";
+import { UserService } from "../../modules/user/user.service";
 
 export interface InstructorDependencies {
   instructorController: InstructorController;
 }
 
 export const initializeInstructorDependencies = (
-  dbProvider: IDatabaseProvider
+  dbProvider: IDatabaseProvider,
+  userService:UserService
 ): InstructorDependencies => {
 
   if (!process.env.JWT_SECRET) {
@@ -26,7 +28,8 @@ export const initializeInstructorDependencies = (
   const instructorRepository = new InstructorRepository(prisma);
   const instructorService = new InstructorService(
     instructorRepository,
-    process.env.JWT_SECRET
+    process.env.JWT_SECRET,
+    userService,
   );
   const instructorController = new InstructorController(instructorService);
 

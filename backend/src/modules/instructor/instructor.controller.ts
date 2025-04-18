@@ -1,36 +1,17 @@
+import { StatusCodes } from "http-status-codes";
+import { AppError } from "../../utils/appError";
+import { logger } from "../../utils/logger";
 import { ApiResponse } from "../../types/response";
 import { InstructorService } from "./instructor.service";
-import { JwtUtil } from "../../utils/jwt.util";
-import { token } from "morgan";
-
-interface CreateInstructorInput {
-  areaOfExpertise: string;
-  professionalExperience: string;
-  about: string;
-  userId: string;
-  website: string;
-}
+import { CreateInstructorInput } from "./instructor.types";
 
 export class InstructorController {
   constructor(private instructorService: InstructorService) {}
 
-  async createInstructor(
-    input: CreateInstructorInput
-  ): Promise<ApiResponse > {
-    const { areaOfExpertise, professionalExperience, about, userId, website } =
-      input;
+  async createInstructor(input: CreateInstructorInput): Promise<ApiResponse> {
     try {
-      const { newToken, ...instructor } = await this.instructorService.createInstructor(
-  areaOfExpertise,
-  professionalExperience,
-  about,
-  userId,
-  website
-);
-
-
-      
-
+      const { newToken, ...instructor } =
+        await this.instructorService.createInstructor(input);
       return {
         status: "success",
         data: {
@@ -38,18 +19,21 @@ export class InstructorController {
           email: instructor.email,
           role: instructor.role,
         },
-        token:newToken, 
+        token: newToken,
         message: "Instructor created successfully",
-        statusCode: 201,
+        statusCode: StatusCodes.CREATED,
       };
     } catch (error) {
-      console.error("Instructor creation error:", error);
-      return {
-        status: "error",
-        message:
-          error instanceof Error ? error.message : "Instructor creation failed",
-        statusCode: 400,
-      };
+      logger.error("Instructor creation error", { error });
+      throw error instanceof AppError
+        ? error
+        : new AppError(
+            error instanceof Error
+              ? error.message
+              : "Instructor creation failed",
+            StatusCodes.INTERNAL_SERVER_ERROR,
+            "INTERNAL_ERROR"
+          );
     }
   }
 }

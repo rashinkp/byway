@@ -8,6 +8,7 @@ export interface IUser {
   password?: string;
   avatar?: string;
   isVerified?: boolean;
+  authProvider?: string;
   deletedAt?: Date | null;
 }
 
@@ -30,6 +31,11 @@ export interface UpdateUserInput {
   userId: string;
   user?: Partial<Pick<IUser, "name" | "password" | "avatar">>;
   profile?: Partial<Omit<IUserProfile, "id" | "userId">>;
+}
+
+export interface UpdateUserRoleInput {
+  userId: string;
+  role: Role;
 }
 
 export interface IUserWithProfile {
@@ -68,6 +74,9 @@ export interface IUserRepository {
     input: IGetAllUsersWithSkip
   ): Promise<{ users: IUser[]; total: number }>;
   updateUserByAdmin(input: AdminUpdateUserInput): Promise<void>;
+  findUserByEmail(email: string): Promise<IUser | null>;
+  findUserById(id: string): Promise<IUser | null>;
+  updateUserRole(input: UpdateUserRoleInput): Promise<IUser>;
 }
 
 export interface IGetAllUsersWithSkip extends IGetAllUsersInput {

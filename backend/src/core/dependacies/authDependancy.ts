@@ -5,6 +5,7 @@ import { AuthRepository } from "../../modules/auth/auth.repository";
 import { OtpService } from "../../modules/otp/otp.service";
 import { AppError } from "../../utils/appError";
 import { StatusCodes } from "http-status-codes";
+import { UserService } from "../../modules/user/user.service";
 
 export interface AuthDependencies {
   authController: AuthController;
@@ -12,7 +13,8 @@ export interface AuthDependencies {
 
 export const initializeAuthDependencies = (
   dbProvider: IDatabaseProvider,
-  otpService: OtpService
+  otpService: OtpService,
+  userService:UserService,
 ): AuthDependencies => {
   if (!process.env.JWT_SECRET) {
     throw new AppError(
@@ -26,7 +28,8 @@ export const initializeAuthDependencies = (
   const authService = new AuthService(
     authRepository,
     otpService,
-    process.env.JWT_SECRET
+    process.env.JWT_SECRET,
+    userService,
   );
   const authController = new AuthController(authService);
   return { authController };

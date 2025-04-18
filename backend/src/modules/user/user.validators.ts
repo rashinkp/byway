@@ -50,3 +50,18 @@ export const adminUpdateUserSchema = z.object({
   userId: z.string().uuid(),
   deletedAt: z.date().nullable().optional(),
 });
+
+export const findUserByEmailSchema = z.object({
+  email: z.string().email("Invalid email format"),
+});
+
+export const findUserByIdSchema = z.object({
+  id: z.string().uuid("Invalid user ID"),
+});
+
+export const updateUserRoleSchema = z.object({
+  userId: z.string().uuid("Invalid user ID"),
+  role: z.enum([Role.USER, Role.INSTRUCTOR, Role.ADMIN], {
+    message: "Invalid role",
+  }),
+});
