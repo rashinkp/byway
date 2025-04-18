@@ -4,7 +4,7 @@ import {
   ICreateCategoryInput,
   IGetAllCategoriesInput,
   IUpdateCategoryInput,
-} from "../modules/category/types";
+} from "../modules/category/category.types";
 
 interface AuthenticatedRequest extends Request {
   user: { id: string; email: string; role: string };
@@ -63,10 +63,25 @@ export const adaptCategoryController = (controller: CategoryController) => ({
     }
   ),
 
-  deleteCategory: asyncHandler(
-    async (req: AuthenticatedRequest, res: Response) => {
-      const result = await controller.deleteCategory(req.params.id);
-      res.status(result.statusCode).json(result);
-    }
-  ),
+  deleteCategory: asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
+    const id = req.params.id;
+    const result = await controller.deleteCategory(id);
+
+    res.status(result.statusCode as number).json({
+      status: result.status,
+      data: result.data,
+      message: result.message,
+    });
+  }) ,
+
+  recoverCategory: asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
+    const input = { id: req.params.id };
+    const result = await controller.recoverCategory(input);
+
+    res.status(result.statusCode as number).json({
+      status: result.status,
+      data: result.data,
+      message: result.message,
+    });
+  }),
 });

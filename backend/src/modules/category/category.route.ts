@@ -14,16 +14,8 @@ export const createCategoryRouter = (
     authMiddleware("ADMIN"),
     adapt.createCategory
   );
-  router.get(
-    "/admin/categories",
-    protect,
-    adapt.getAllCategories
-  );
-  router.get(
-    "/admin/categories/:id",
-    protect,
-    adapt.getCategoryById
-  );
+  router.get("/admin/categories", protect, adapt.getAllCategories);
+  router.get("/admin/categories/:id", protect, adapt.getCategoryById);
   router.put(
     "/admin/categories/:id",
     authMiddleware("ADMIN"),
@@ -33,6 +25,11 @@ export const createCategoryRouter = (
     "/admin/categories/:id",
     authMiddleware("ADMIN"),
     adapt.deleteCategory
+  );
+  router.patch(
+    "/admin/categories/:id/recover",
+    authMiddleware("ADMIN"),
+    adapt.recoverCategory
   );
 
   return router;

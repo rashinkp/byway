@@ -4,21 +4,8 @@ import {
   ICreateCategoryInput,
   IUpdateCategoryInput,
   IGetAllCategoriesInput,
-} from "./types";
-
-
-//todo separate all interface from repository layer
-export interface ICategoryRepository {
-  createCategory(input: ICreateCategoryInput): Promise<ICategory>;
-  getAllCategories(
-    input: IGetAllCategoriesInput
-  ): Promise<{ categories: ICategory[]; total: number }>;
-  getCategoryById(id: string): Promise<ICategory | null>;
-  updateCategory(input: IUpdateCategoryInput): Promise<ICategory>;
-  deleteCategory(id: string): Promise<ICategory>;
-  getCategoryByName(name: string): Promise<ICategory | null>;
-  recoverCategory(id: string): Promise<ICategory>;
-}
+  ICategoryRepository,
+} from "./category.types";
 
 export class CategoryRepository implements ICategoryRepository {
   constructor(private prisma: PrismaClient) {}
@@ -100,7 +87,7 @@ export class CategoryRepository implements ICategoryRepository {
         createdBy: true,
         createdAt: true,
         updatedAt: true,
-        deletedAt:true,
+        deletedAt: true,
       },
     });
     return category
@@ -110,7 +97,6 @@ export class CategoryRepository implements ICategoryRepository {
 
   async updateCategory(input: IUpdateCategoryInput): Promise<ICategory> {
     const { id, name, description } = input;
-    console.log(id, name, description);
     const updatedCategory = await this.prisma.category.update({
       where: { id },
       data: {
@@ -130,7 +116,6 @@ export class CategoryRepository implements ICategoryRepository {
   }
 
   async deleteCategory(id: string): Promise<ICategory> {
-    //todo toggle delete
     const updatedCategory = await this.prisma.category.update({
       where: { id },
       data: {
@@ -151,7 +136,6 @@ export class CategoryRepository implements ICategoryRepository {
   }
 
   async recoverCategory(id: string): Promise<ICategory> {
-    
     const updatedCategory = await this.prisma.category.update({
       where: { id },
       data: {
