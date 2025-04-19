@@ -1,6 +1,6 @@
 "use client";
 import { ReactNode, useState, useEffect } from "react";
-import { useAuthStore } from "@/lib/stores/authStore";
+import { useAuthStore } from "@/stores/auth.store";
 import Link from "next/link";
 import { useRouter, usePathname } from "next/navigation";
 import { Button } from "@/components/ui/button";
@@ -47,7 +47,7 @@ interface NavItem {
 }
 
 export default function AdminLayout({ children }: AdminLayoutProps) {
-  const { user, logout } = useAuthStore();
+  const { user } = useAuthStore();
   const router = useRouter();
   const pathname = usePathname();
   const [collapsed, setCollapsed] = useState(false);
@@ -70,12 +70,12 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
   }, []);
 
   const handleLogout = async () => {
-    try {
-      await logout();
-      router.push("/login");
-    } catch (error) {
-      console.error("Logout failed:", error);
-    }
+    // try {
+    //   await logout();
+    //   router.push("/login");
+    // } catch (error) {
+    //   console.error("Logout failed:", error);
+    // }
   };
 
   const navItems: NavItem[] = [

@@ -6,18 +6,10 @@ import {
   IUserLessonProgress,
   IUpdateLessonProgressInput,
   IGetProgressInput,
-} from "./types";
+  ILessonRepository,
+} from "./lesson.types";
 
-export interface ILessonRepository {
-  createLesson(input: ICreateLessonInput): Promise<ILesson>;
-  getLessonById(id: string): Promise<ILesson | null>;
-  getLessonsByCourseId(courseId: string): Promise<ILesson[]>;
-  updateLessonProgress(
-    input: IUpdateLessonProgressInput
-  ): Promise<IUserLessonProgress>;
-  getCourseProgress(input: IGetProgressInput): Promise<IUserLessonProgress[]>;
 
-}
 
 export class LessonRepository implements ILessonRepository {
   constructor(private prisma: PrismaClient) {}
@@ -124,5 +116,6 @@ export class LessonRepository implements ILessonRepository {
     }));
   }
 
- 
+
+  
 }

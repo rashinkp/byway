@@ -1,11 +1,19 @@
+// src/components/Header.tsx
 "use client";
 
 import Link from "next/link";
-import { useAuthStore } from "@/lib/stores/authStore";
+import { useCurrentUser } from "@/hooks/auth/useCurrentUser";
+import { useLogout } from "@/hooks/auth/useLogout";
 import { Button } from "@/components/ui/button";
+import { Loader2 } from "lucide-react";
 
-export function Header() {
-  const { user, logout } = useAuthStore();
+interface HeaderProps {
+  client?: { id: string; name: string }; // Define expected props (if any)
+}
+
+export function Header({ client }: HeaderProps = {}) {
+  const { data: user, isLoading } = useCurrentUser();
+  const { mutate: logout, isPending: isLoggingOut } = useLogout();
 
   return (
     <header className="bg-white shadow-sm">
@@ -14,7 +22,9 @@ export function Header() {
           Byway
         </Link>
         <nav className="flex items-center gap-4">
-          {user ? (
+          {isLoading ? (
+            <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+          ) : user ? (
             <>
               {user.role === "ADMIN" && (
                 <Link href="/admin/dashboard">
@@ -31,8 +41,19 @@ export function Header() {
                   <Button variant="ghost">Dashboard</Button>
                 </Link>
               )}
-              <Button variant="outline" onClick={logout}>
-                Logout
+              <Button
+                variant="outline"
+                onClick={() => logout()}
+                disabled={isLoggingOut}
+              >
+                {isLoggingOut ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Logging out...
+                  </>
+                ) : (
+                  "Logout"
+                )}
               </Button>
             </>
           ) : (

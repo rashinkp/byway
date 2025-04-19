@@ -7,8 +7,8 @@ import {
   IUserLessonProgress,
   IUpdateLessonProgressInput,
   IGetProgressInput,
-} from "./types";
-import { ILessonRepository } from "./lesson.repository";
+  ILessonRepository,
+} from "./lesson.types";
 
 export class LessonService {
   constructor(
@@ -104,6 +104,4 @@ export class LessonService {
     }
     return this.lessonRepository.getCourseProgress(input);
   }
-
-  
 }

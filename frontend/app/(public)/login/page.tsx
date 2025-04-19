@@ -1,33 +1,37 @@
+// src/components/auth/LoginPage.tsx
 "use client";
 
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { useAuthStore } from "@/lib/stores/authStore";
-import { LoginForm } from "@/components/auth/LoginForm";
+import dynamic from "next/dynamic";
+import { useAuth } from "@/hooks/auth/useAuth";
+import { ROUTES } from "@/constants/routes";
+
+const LoginForm = dynamic(
+  () => import("@/components/auth/LoginForm").then((mod) => mod.LoginForm),
+  {
+    ssr: false,
+  }
+);
 
 export default function LoginPage() {
+  const { isAuthenticated, isLoading, user } = useAuth();
   const router = useRouter();
-  const { user } = useAuthStore();
 
   useEffect(() => {
-    if (user) {
-      if (user.role === "ADMIN") {
-        router.push("/admin/dashboard");
-      } else if (user.role === "INSTRUCTOR") {
-        router.push("/instructor/dashboard");
-      } else {
-        router.push("/dashboard");
-      }
+    if (!isLoading && isAuthenticated && user) {
+      const route = ROUTES[user.role as keyof typeof ROUTES] || ROUTES.DEFAULT;
+      router.push(route);
     }
-  }, [user, router]);
+  }, [isAuthenticated, isLoading, user, router]);
 
-  if (user) {
+  if (isLoading) {
+    return <p>Loading...</p>;
+  }
+
+  if (isAuthenticated) {
     return null;
   }
 
-  return (
-    <div className="">
-      <LoginForm />
-    </div>
-  );
+  return <LoginForm />;
 }

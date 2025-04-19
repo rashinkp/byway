@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { useAuthStore } from "@/lib/stores/authStore";
 import {
   Form,
   FormControl,
@@ -16,10 +15,10 @@ import { Button } from "@/components/ui/button";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { toast } from "sonner";
 import { SplitScreenLayout } from "@/components/ui/SplitScreenLayout";
 import { AuthFormWrapper } from "@/components/auth/parts/AuthFormWrapper";
 import { AuthLink } from "@/components/auth/parts/AuthLink";
+import { useForgotPassword } from "@/hooks/auth/useForgotPassword";
 
 const forgotPasswordSchema = z.object({
   email: z.string().email("Invalid email address"),
@@ -29,8 +28,8 @@ type ForgotPasswordFormData = z.infer<typeof forgotPasswordSchema>;
 
 export function ForgotPasswordForm() {
   const router = useRouter();
-  const { forgotPassword } = useAuthStore();
   const [error, setError] = useState<string | null>(null);
+  const { mutate: forgotPassword, isPending } = useForgotPassword();
 
   const form = useForm<ForgotPasswordFormData>({
     resolver: zodResolver(forgotPasswordSchema),
@@ -42,23 +41,21 @@ export function ForgotPasswordForm() {
   const onSubmit = async (data: ForgotPasswordFormData) => {
     try {
       setError(null);
-      await forgotPassword(data.email);
-      toast.success("Reset OTP Sent", {
-        description: "A verification code has been sent to your email.",
-        duration: 5000,
+      forgotPassword(data.email, {
+        onSuccess: () => {
+          router.push(
+            `/verify-otp?email=${encodeURIComponent(
+              data.email
+            )}&type=forgot-password`
+          );
+        },
+        onError: (err: any) => {
+          setError(err.message || "Failed to send reset OTP");
+        }
       });
-      router.push(
-        `/verify-otp?email=${encodeURIComponent(
-          data.email
-        )}&type=forgot-password`
-      );
     } catch (err: any) {
       const message = err.message || "Failed to send reset OTP";
       setError(message);
-      toast.error("Error", {
-        description: message,
-        duration: 5000,
-      });
     }
   };
 
@@ -95,10 +92,10 @@ export function ForgotPasswordForm() {
             />
             <Button
               type="submit"
-              className="auth-button"
-              disabled={form.formState.isSubmitting}
+              className="w-full"
+              disabled={isPending}
             >
-              {form.formState.isSubmitting ? "Sending..." : "Send Reset Code"}
+              {isPending ? "Sending..." : "Send Reset Code"}
             </Button>
             <div className="flex justify-between">
               <AuthLink text="" linkText="Back to login" href="/login" />

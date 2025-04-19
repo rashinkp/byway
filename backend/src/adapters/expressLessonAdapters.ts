@@ -5,7 +5,7 @@ import {
   ICreateLessonInput,
   IUpdateLessonProgressInput,
   IGetProgressInput,
-} from "../modules/lesson/types";
+} from "../modules/lesson/lesson.types";
 
 interface AuthenticatedRequest extends Request {
   user: { id: string; email: string; role: string };

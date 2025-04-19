@@ -6,9 +6,8 @@ import {
   ICreateLessonInput,
   IUpdateLessonProgressInput,
   IGetProgressInput,
-} from "./types";
+} from "./lesson.types";
 
-//todo joi implement to validation.
 export class LessonController {
   constructor(private lessonService: LessonService) {}
 

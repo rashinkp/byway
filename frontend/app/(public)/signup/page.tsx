@@ -1,33 +1,33 @@
 "use client";
 
-import { useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { useAuthStore } from "@/lib/stores/authStore";
 import { SignupForm } from "@/components/auth/SignupForm";
+import { useAuth } from "@/hooks/auth/useAuth";
+import { useEffect } from "react";
+import { ROUTES } from "@/constants/routes";
 
 export default function SignupPage() {
+
+  const { isAuthenticated, isLoading, user } = useAuth();
   const router = useRouter();
-  const { user } = useAuthStore();
 
-  // useEffect(() => {
-  //   if (user) {
-  //     if (user.role === "ADMIN") {
-  //       router.push("/admin/dashboard");
-  //     } else if (user.role === "INSTRUCTOR") {
-  //       router.push("/instructor/dashboard");
-  //     } else {
-  //       router.push("/dashboard");
-  //     }
-  //   }
-  // }, [user, router]);
+  useEffect(() => {
+      if (!isLoading && isAuthenticated && user) {
+        const route = ROUTES[user.role as keyof typeof ROUTES] || ROUTES.DEFAULT;
+        router.push(route);
+      }
+  }, [isAuthenticated, isLoading, user, router]);
+  
 
-  if (user) {
+  if (isLoading) {
+    return <p>Loading.......</p>;
+  }
+
+  if (isAuthenticated) {
     return null;
   }
 
   return (
-    <div className="">
       <SignupForm />
-    </div>
   );
 }

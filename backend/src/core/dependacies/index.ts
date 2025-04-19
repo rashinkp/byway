@@ -39,10 +39,11 @@ export const initializeAppDependencies = (
   const otpDeps = initializeOtpDependencies(dbProvider);
   const authDeps = initializeAuthDependencies(dbProvider, otpDeps.otpService , userDeps.userService);
   const instructorDeps = initializeInstructorDependencies(dbProvider, userDeps.userService );
-  const categoryDeps = initializeCategoryDependencies(dbProvider);
+  const categoryDeps = initializeCategoryDependencies(dbProvider , userDeps.userService);
   const courseDeps = initializeCourseDependencies(
     dbProvider,
-    categoryDeps.categoryRepository
+    categoryDeps.categoryService,
+    userDeps.userService
   );
   const lessonDeps = initializeLessonDependencies(
     dbProvider,

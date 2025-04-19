@@ -1,25 +1,16 @@
+// src/components/auth/ResetPasswordForm.tsx
 "use client";
 
-import { useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
-import { useAuthStore } from "@/lib/stores/authStore";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { toast } from "sonner";
+import { useRouter, useSearchParams } from "next/navigation";
 import { SplitScreenLayout } from "@/components/ui/SplitScreenLayout";
-import { AuthFormWrapper } from "@/components/auth/parts/AuthFormWrapper";
+import { AuthForm } from "@/components/auth/AuthForm";
+import { useResetPassword } from "@/hooks/auth/useResetPassword";
+import { Button } from "@/components/ui/button";
 import { AuthLink } from "@/components/auth/parts/AuthLink";
+import { AuthFormWrapper } from "./parts/AuthFormWrapper";
 
 const resetPasswordSchema = z
   .object({
@@ -40,8 +31,7 @@ export function ResetPasswordForm() {
   const searchParams = useSearchParams();
   const email = searchParams.get("email");
   const otp = searchParams.get("otp");
-  const { resetPassword } = useAuthStore();
-  const [error, setError] = useState<string | null>(null);
+  const { mutate: resetPassword, isPending, error } = useResetPassword();
 
   const form = useForm<ResetPasswordFormData>({
     resolver: zodResolver(resetPasswordSchema),
@@ -51,29 +41,16 @@ export function ResetPasswordForm() {
     },
   });
 
-  const onSubmit = async (data: ResetPasswordFormData) => {
-    if (!email || !otp) {
-      setError("Invalid reset link");
-      return;
-    }
-
-    try {
-      setError(null);
-      await resetPassword(email, otp, data.newPassword);
-      toast.success("Password Updated", {
-        description:
-          "Your password has been successfully updated. Please log in.",
-        duration: 5000,
-      });
-      router.push("/login");
-    } catch (err: any) {
-      const message = err.message || "Failed to reset password";
-      setError(message);
-      toast.error("Error", {
-        description: message,
-        duration: 5000,
-      });
-    }
+  const onSubmit = (data: ResetPasswordFormData) => {
+    if (!email || !otp) return;
+    resetPassword(
+      { email, otp, newPassword: data.newPassword },
+      {
+        onSuccess: () => {
+          router.push("/login");
+        },
+      }
+    );
   };
 
   if (!email || !otp) {
@@ -106,68 +83,36 @@ export function ResetPasswordForm() {
       description="Create a new password to secure your account and continue learning."
       imageAlt="Password reset illustration"
     >
-      <AuthFormWrapper
+      <AuthForm
+        form={form}
+        onSubmit={onSubmit}
+        fields={[
+          {
+            name: "newPassword",
+            label: "New Password",
+            type: "password",
+            placeholder: "••••••",
+          },
+          {
+            name: "confirmPassword",
+            label: "Confirm Password",
+            type: "password",
+            placeholder: "••••••",
+          },
+        ]}
         title="Reset Password"
         subtitle="Enter your new password below"
-        error={error}
-      >
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-            <FormField
-              control={form.control}
-              name="newPassword"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="text-foreground">
-                    New Password
-                  </FormLabel>
-                  <FormControl>
-                    <Input
-                      type="password"
-                      placeholder="••••••"
-                      className="auth-input"
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="confirmPassword"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="text-foreground">
-                    Confirm Password
-                  </FormLabel>
-                  <FormControl>
-                    <Input
-                      type="password"
-                      placeholder="••••••"
-                      className="auth-input"
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <Button
-              type="submit"
-              className="auth-button"
-              disabled={form.formState.isSubmitting}
-            >
-              {form.formState.isSubmitting ? "Resetting..." : "Reset Password"}
-            </Button>
-            <AuthLink
-              text="Remembered your password?"
-              linkText="Back to login"
-              href="/login"
-            />
-          </form>
-        </Form>
-      </AuthFormWrapper>
+        submitText="Reset Password"
+        isSubmitting={isPending}
+        error={error?.message}
+        googleAuthText=""
+        onGoogleAuth={() => {}}
+        authLink={{
+          text: "Remembered your password?",
+          linkText: "Back to login",
+          href: "/login",
+        }}
+      />
     </SplitScreenLayout>
   );
 }
