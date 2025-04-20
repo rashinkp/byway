@@ -39,3 +39,18 @@
 {"error":{"code":"INVALID_OTP","isOperational":true,"status":400,"statusCode":400},"input":{"email":"admin@gmail.com","otp":"568243"},"level":"error","message":"Verify OTP error:","timestamp":"2025-04-20T11:44:31.070Z"}
 {"email":"admin@gmail.com","level":"warn","message":"Invalid or expired OTP","timestamp":"2025-04-20T11:52:21.318Z"}
 {"error":{"code":"INVALID_OTP","isOperational":true,"status":400,"statusCode":400},"input":{"email":"admin@gmail.com","newPassword":"123123","otp":"814705"},"level":"error","message":"Reset password error:","timestamp":"2025-04-20T11:52:21.319Z"}
+{"error":{"isOperational":true,"status":401,"statusCode":401},"input":{"email":"admin@gmail.com","password":"123456"},"level":"error","message":"Login error:","timestamp":"2025-04-20T11:53:59.594Z"}
+{"errors":[{"code":"invalid_string","message":"Invalid category ID","path":["id"],"validation":"uuid"}],"level":"warn","message":"Validation failed for deleteCategory","timestamp":"2025-04-20T14:49:41.247Z"}
+{"error":{"code":"VALIDATION_ERROR","isOperational":true,"status":400,"statusCode":400},"level":"error","message":"Error deleting category","timestamp":"2025-04-20T14:49:41.253Z"}
+{"level":"warn","message":"Category already exists","name":"sample on","timestamp":"2025-04-20T14:50:10.844Z"}
+{"error":{"code":"ALREADY_EXISTS","isOperational":true,"status":400,"statusCode":400},"level":"error","message":"Error creating category","timestamp":"2025-04-20T14:50:10.844Z"}
+{"errors":[{"code":"invalid_string","message":"Invalid category ID","path":["id"],"validation":"uuid"}],"level":"warn","message":"Validation failed for updateCategory","timestamp":"2025-04-20T14:51:52.973Z"}
+{"error":{"code":"VALIDATION_ERROR","isOperational":true,"status":400,"statusCode":400},"level":"error","message":"Error updating category","timestamp":"2025-04-20T14:51:52.974Z"}
+{"errors":[{"code":"invalid_string","message":"Invalid category ID","path":["id"],"validation":"uuid"}],"level":"warn","message":"Validation failed for updateCategory","timestamp":"2025-04-20T14:52:03.111Z"}
+{"error":{"code":"VALIDATION_ERROR","isOperational":true,"status":400,"statusCode":400},"level":"error","message":"Error updating category","timestamp":"2025-04-20T14:52:03.112Z"}
+{"errors":[{"code":"invalid_string","message":"Invalid category ID","path":["id"],"validation":"uuid"}],"level":"warn","message":"Validation failed for deleteCategory","timestamp":"2025-04-20T14:56:06.974Z"}
+{"error":{"code":"VALIDATION_ERROR","isOperational":true,"status":400,"statusCode":400},"level":"error","message":"Error deleting category","timestamp":"2025-04-20T14:56:06.975Z"}
+{"errors":[{"code":"invalid_string","message":"Invalid category ID","path":["id"],"validation":"uuid"}],"level":"warn","message":"Validation failed for deleteCategory","timestamp":"2025-04-20T14:56:17.745Z"}
+{"error":{"code":"VALIDATION_ERROR","isOperational":true,"status":400,"statusCode":400},"level":"error","message":"Error deleting category","timestamp":"2025-04-20T14:56:17.746Z"}
+{"errors":[{"code":"invalid_string","message":"Invalid category ID","path":["id"],"validation":"uuid"}],"level":"warn","message":"Validation failed for deleteCategory","timestamp":"2025-04-20T14:56:17.972Z"}
+{"error":{"code":"VALIDATION_ERROR","isOperational":true,"status":400,"statusCode":400},"level":"error","message":"Error deleting category","timestamp":"2025-04-20T14:56:17.972Z"}

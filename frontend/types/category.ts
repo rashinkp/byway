@@ -2,10 +2,9 @@ export interface Category {
   id: string;
   name: string;
   description?: string;
-  createdAt: string;
-  creator: { email: string };
-  courseCount: number;
-  deletedAt: Date | null;
+  deletedAt?: Date;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export interface CategoryFormData {
