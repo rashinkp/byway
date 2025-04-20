@@ -12,12 +12,12 @@ export function useVerifyOtp() {
     mutationFn: ({ email, otp }: { email: string; otp: string }) =>
       verifyOtp(email, otp),
     onSuccess: (user) => {
-      setUser(user);
-      setEmail(null);
+      // setUser(user);
       queryClient.invalidateQueries({ queryKey: ["auth"] });
       toast.success("Email verified", {
         description: "Your email has been successfully verified.",
       });
+      setEmail(null);
     },
     onError: (error: any) => {
       toast.error("Invalid OTP", {

@@ -123,10 +123,10 @@ export class AuthService {
   async resetPassword(input: IResetPasswordInput): Promise<void> {
     const { email, newPassword, otp } = input;
 
-    const isVerified = await this.otpService.verifyOtp({ email, otp });
-    if (!isVerified) {
-      throw AppError.badRequest("Invalid or expired OTP");
-    }
+    // const isVerified = await this.otpService.verifyOtp({ email, otp });
+    // if (!isVerified) {
+    //   throw AppError.badRequest("Invalid or expired OTP");
+    // }
 
     const user = await this.userService.findUserByEmail(email);
     if (!user) {

@@ -12,22 +12,20 @@ export default function VerifyOtpPage() {
   const { isAuthenticated, isLoading, user } = useAuth();
   const email = searchParams.get("email");
 
- useEffect(() => {
-     if (!isLoading && isAuthenticated && user) {
-       const route = ROUTES[user.role as keyof typeof ROUTES] || ROUTES.DEFAULT;
-       router.push(route);
-     }
-   }, [isAuthenticated, isLoading, user, router]);
+  useEffect(() => {
+    if (!isLoading && isAuthenticated && user) {
+      const route = ROUTES[user.role as keyof typeof ROUTES] || ROUTES.DEFAULT;
+      router.push(route);
+    }
+  }, [isAuthenticated, isLoading, user, router]);
 
   if (user || !email) {
     return null;
   }
 
-  
   return (
     <div className="">
       <VerifyOtpForm />
-      
     </div>
   );
 }

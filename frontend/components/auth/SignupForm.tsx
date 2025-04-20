@@ -31,7 +31,6 @@ export function SignupForm() {
   });
 
   const onSubmit = (data: SignupFormData) => {
-    console.log(data);
     signup(
       { name: data.name, email: data.email, password: data.password },
       {

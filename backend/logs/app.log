@@ -18,3 +18,24 @@
 {"ip":"::1","level":"warn","message":"Invalid email in verify OTP request","timestamp":"2025-04-20T09:49:49.383Z"}
 {"error":{"issues":[{"code":"invalid_string","message":"Invalid email","path":["email"],"validation":"email"}],"name":"ZodError"},"input":{"email":"121111","otp":"sample@gmail.com"},"level":"error","message":"Verify OTP error:","timestamp":"2025-04-20T09:50:41.834Z"}
 {"error":{"issues":[{"code":"invalid_string","message":"Invalid email","path":["email"],"validation":"email"}],"name":"ZodError"},"input":{"email":"121111","otp":"sample@gmail.com"},"level":"error","message":"Verify OTP error:","timestamp":"2025-04-20T09:50:55.374Z"}
+{"attemptCount":1,"email":"sample@gmail.com","level":"warn","message":"Incorrect OTP attempt","timestamp":"2025-04-20T09:51:43.555Z"}
+{"error":{"code":"INCORRECT_OTP","isOperational":true,"status":400,"statusCode":400},"input":{"email":"sample@gmail.com","otp":"123123"},"level":"error","message":"Verify OTP error:","timestamp":"2025-04-20T09:51:43.557Z"}
+{"email":"adsfsdfsads@gmail.co","level":"warn","message":"User not found by email","timestamp":"2025-04-20T10:07:44.659Z"}
+{"email":"adsfsdfsads@gmail.co","level":"warn","message":"OTP still valid","timestamp":"2025-04-20T10:09:54.005Z"}
+{"error":{"code":"OTP_VALID","isOperational":true,"status":400,"statusCode":400},"input":{"email":"adsfsdfsads@gmail.co"},"level":"error","message":"Resend OTP error:","timestamp":"2025-04-20T10:09:54.007Z"}
+{"email":"adsfsdfsads@gmail.co","level":"warn","message":"OTP still valid","timestamp":"2025-04-20T10:10:14.948Z"}
+{"error":{"code":"OTP_VALID","isOperational":true,"status":400,"statusCode":400},"input":{"email":"adsfsdfsads@gmail.co"},"level":"error","message":"Resend OTP error:","timestamp":"2025-04-20T10:10:14.949Z"}
+{"attemptCount":1,"email":"adsfsdfsads@gmail.co","level":"warn","message":"Incorrect OTP attempt","timestamp":"2025-04-20T10:10:30.722Z"}
+{"error":{"code":"INCORRECT_OTP","isOperational":true,"status":400,"statusCode":400},"input":{"email":"adsfsdfsads@gmail.co","otp":"112333"},"level":"error","message":"Verify OTP error:","timestamp":"2025-04-20T10:10:30.724Z"}
+{"email":"adsfsdfsads@gmail.co","ip":"::1","level":"warn","message":"Rate limit exceeded for /resend","timestamp":"2025-04-20T10:10:55.325Z"}
+{"email":"adsfsdfsads@gmail.co","level":"warn","message":"OTP still valid","timestamp":"2025-04-20T10:12:22.527Z"}
+{"error":{"code":"OTP_VALID","isOperational":true,"status":400,"statusCode":400},"input":{"email":"adsfsdfsads@gmail.co"},"level":"error","message":"Resend OTP error:","timestamp":"2025-04-20T10:12:22.532Z"}
+{"email":"new@gmail.com","level":"warn","message":"User not found by email","timestamp":"2025-04-20T10:15:10.943Z"}
+{"email":"admin@gmail.com","level":"warn","message":"OTP still valid","timestamp":"2025-04-20T10:27:59.390Z"}
+{"error":{"code":"OTP_VALID","isOperational":true,"status":400,"statusCode":400},"input":{"email":"admin@gmail.com"},"level":"error","message":"Resend OTP error:","timestamp":"2025-04-20T10:27:59.391Z"}
+{"email":"admin@gmail.com","level":"warn","message":"Invalid or expired OTP","timestamp":"2025-04-20T11:44:14.944Z"}
+{"error":{"code":"INVALID_OTP","isOperational":true,"status":400,"statusCode":400},"input":{"email":"admin@gmail.com","otp":"568243"},"level":"error","message":"Verify OTP error:","timestamp":"2025-04-20T11:44:14.947Z"}
+{"email":"admin@gmail.com","level":"warn","message":"Invalid or expired OTP","timestamp":"2025-04-20T11:44:31.069Z"}
+{"error":{"code":"INVALID_OTP","isOperational":true,"status":400,"statusCode":400},"input":{"email":"admin@gmail.com","otp":"568243"},"level":"error","message":"Verify OTP error:","timestamp":"2025-04-20T11:44:31.070Z"}
+{"email":"admin@gmail.com","level":"warn","message":"Invalid or expired OTP","timestamp":"2025-04-20T11:52:21.318Z"}
+{"error":{"code":"INVALID_OTP","isOperational":true,"status":400,"statusCode":400},"input":{"email":"admin@gmail.com","newPassword":"123123","otp":"814705"},"level":"error","message":"Reset password error:","timestamp":"2025-04-20T11:52:21.319Z"}

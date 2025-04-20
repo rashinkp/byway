@@ -128,7 +128,7 @@ export class OtpService {
     }
 
     const newOtp = this.generateOtp();
-    const expiresAt = new Date(Date.now() + 10 * 60 * 1000);
+    const expiresAt = new Date(Date.now() + 1 * 60 * 1000);
 
     await this.otpRepository.updateOtp(verification.id, newOtp, expiresAt, 0);
 
@@ -137,7 +137,7 @@ export class OtpService {
 
   async generateAndSendOtp(input: IGenerateAndSendOtpInput): Promise<void> {
     const otp = this.generateOtp();
-    const expiresAt = new Date(Date.now() + 10 * 60 * 1000);
+    const expiresAt = new Date(Date.now() + 1 * 60 * 1000);
 
     await this.otpRepository.upsertVerification(
       input.userId,

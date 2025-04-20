@@ -76,7 +76,7 @@ export async function verifyOtp(email: string, otp: string): Promise<User> {
 
 export async function resendOtp(email: string): Promise<void> {
   try {
-    await api.post<IResendOtpResponse>("/auth/resend-otp", { email });
+    await api.post<IResendOtpResponse>("/otp/resend", { email });
   } catch (error: any) {
     throw new Error(error.response?.data?.message || "Resend OTP failed");
   }

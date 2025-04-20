@@ -22,7 +22,9 @@ export function VerifyOtpForm() {
   const { mutate: verifyOtp, isPending: isSubmitting, error } = useVerifyOtp();
   const { mutate: resendOtp, isPending: isResending } = useResendOtp();
   const { redirectByRole } = useRoleRedirect();
-  const [resendCooldown, setResendCooldown] = useState(30);
+  const [resendCooldown, setResendCooldown] = useState(60);
+  //persist time in while reloading;
+
 
   const handleSubmit = (otp: string) => {
     if (!email) return;
@@ -45,7 +47,7 @@ export function VerifyOtpForm() {
   const handleResend = () => {
     if (!email || resendCooldown > 0 || isResending) return;
     resendOtp(email, {
-      onSuccess: () => setResendCooldown(30),
+      onSuccess: () => setResendCooldown(60),
     });
   };
 
