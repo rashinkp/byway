@@ -25,8 +25,10 @@ export function useCreateCategory() {
         id: "temp-id",
         name: newCategory.name,
         description: newCategory.description,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
+        deletedAt: null,
+        createdBy:'',
+        createdAt: new Date(),
+        updatedAt: new Date(),
       };
       queryClient.setQueryData(["categories", 1, 10, ""], (old: any) => ({
         data: [...(old?.data || []), tempCategory],

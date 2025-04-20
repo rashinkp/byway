@@ -13,6 +13,7 @@ import { useCreateCategory } from "@/hooks/category/useCreateCategory";
 import { useUpdateCategory } from "@/hooks/category/useUpdateCategory";
 import { useToggleDeleteCategory } from "@/hooks/category/useToggleDeleteCategory";
 import CategoryFormModal from "@/components/admin/CategoryFormModal";
+import { StatusBadge } from "@/components/ui/StatusBadge";
 
 export default function CategoriesPage() {
   const [page, setPage] = useState(1);
@@ -22,6 +23,7 @@ export default function CategoriesPage() {
     limit: 10,
     search: searchTerm,
     includeDeleted: true,
+    
   });
   const { mutate: createCategory } = useCreateCategory();
   const { mutate: updateCategory } = useUpdateCategory();
@@ -65,9 +67,7 @@ export default function CategoriesPage() {
       header: "Status",
       accessor: "isDeleted" as keyof Category,
       render: (category: Category) => (
-        <Badge variant={category.deletedAt ? "destructive" : "default"}>
-          {category.deletedAt ? "Inactive" : "Active"}
-        </Badge>
+        <StatusBadge isActive={!category.deletedAt} />
       ),
     },
   ];

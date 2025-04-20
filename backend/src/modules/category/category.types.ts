@@ -30,6 +30,8 @@ export interface IGetAllCategoriesInput {
   sortBy?: "name" | "createdAt" | "updatedAt";
   sortOrder?: "asc" | "desc";
   includeDeleted?: boolean;
+  search?: string;
+  filterBy?: "All" | "Active" | "Inactive";
 }
 
 export interface ICategoryRepository {

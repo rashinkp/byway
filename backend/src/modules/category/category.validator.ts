@@ -36,6 +36,8 @@ export const getAllCategoriesSchema = z.object({
     .default("createdAt"),
   sortOrder: z.enum(["asc", "desc"]).optional().default("asc"),
   includeDeleted: z.boolean().optional().default(false),
+  search: z.string().optional().default(""),
+  filterBy: z.enum(["All", "Active", "Inactive"]).optional().default("All"),
 });
 
 export const categoryIdSchema = z.object({

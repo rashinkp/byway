@@ -1,15 +1,8 @@
 import { api } from "@/api/api";
 import { UseCategoriesProps } from "@/hooks/category/useCategories";
-import { Category, CategoryFormData } from "@/types/category";
+import { Category, CategoryFormData, ICategoryListOutput, IGetAllCategoryResponse } from "@/types/category";
 
-interface IGetAllCategoryResponse {
-  data: { categories: Category[]; total: number };
-}
 
-export interface ICategoryListOutput {
-  categories: Category[];
-  total: number;
-}
 
 
 export async function createCategory(
@@ -31,12 +24,32 @@ export async function getAllCategories({
   limit = 10,
   search = "",
   includeDeleted = false,
-  sortBy = "name",
-}: UseCategoriesProps): Promise<ICategoryListOutput> {
+  sortBy = "createdAt",
+  sortOrder = "asc",
+  filterBy = "All",
+}: {
+  page?: number;
+  limit?: number;
+  search?: string;
+  includeDeleted?: boolean;
+  sortBy?: string;
+  sortOrder?: string;
+  filterBy?: string;
+} = {}): Promise<ICategoryListOutput> {
   try {
     const response = await api.get<IGetAllCategoryResponse>(
       "/category/admin/categories",
-      { params: { page, limit, search, includeDeleted, sortBy } }
+      {
+        params: {
+          page,
+          limit,
+          search,
+          includeDeleted,
+          sortBy,
+          sortOrder,
+          filterBy,
+        },
+      }
     );
     return {
       categories: response.data.data.categories,
@@ -48,7 +61,6 @@ export async function getAllCategories({
     );
   }
 }
-
 export async function getCategoryById(id: string): Promise<Category> {
   try {
     const response = await api.get<Category>(

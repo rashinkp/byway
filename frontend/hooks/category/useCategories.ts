@@ -2,24 +2,19 @@
 "use client";
 
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { Category } from "@/types/category";
+import { Category, IGetAllCategoriesInput } from "@/types/category";
 import { getAllCategories } from "@/api/category";
 
-export interface UseCategoriesProps {
-  page?: number;
-  limit?: number;
-  search?: string;
-  includeDeleted?: boolean;
-  sortBy?: string;
-}
+
 
 export function useCategories({
   page = 1,
   limit = 10,
   search = "",
   includeDeleted = false,
-  sortBy = "name",
-}: UseCategoriesProps = {}) {
+  sortOrder = "asc",
+  filterBy = "All",
+}: IGetAllCategoriesInput = {}) {
   const queryClient = useQueryClient();
 
   const { data, isLoading, refetch } = useQuery({
@@ -30,7 +25,8 @@ export function useCategories({
         limit,
         search,
         includeDeleted,
-        sortBy,
+        sortOrder,
+        filterBy,
       });
 
       return {

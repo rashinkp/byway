@@ -37,44 +37,61 @@ export class CategoryRepository implements ICategoryRepository {
       limit = 10,
       sortBy = "createdAt",
       sortOrder = "asc",
-      includeDeleted,
+      includeDeleted = false,
+      search = "",
+      filterBy = "All",
     } = input;
     const skip = (page - 1) * limit;
 
-    const where = includeDeleted ? {} : { deletedAt: null };
+    // Build where clause
+    const where: any = {};
+    if (!includeDeleted && filterBy !== "Inactive") {
+      where.deletedAt = null; // Active categories
+    } else if (filterBy === "Inactive") {
+      where.deletedAt = { not: null }; // Inactive categories
+    }
+    // Search in name and description
+    if (search) {
+      where.OR = [
+        { name: { contains: search, mode: "insensitive" } },
+        { description: { contains: search, mode: "insensitive" } },
+      ];
+    }
+
     const orderBy = { [sortBy]: sortOrder };
 
-    const [categories, total] = await Promise.all([
-      this.prisma.category.findMany({
-        where,
-        skip,
-        take: limit,
-        orderBy,
-        select: {
-          id: true,
-          name: true,
-          description: true,
-          createdBy: true,
-          createdAt: true,
-          updatedAt: true,
-          deletedAt: true,
-        },
-      }),
-      this.prisma.category.count({ where }),
-    ]);
 
-    return {
-      categories: categories.map((cat) => ({
-        id: cat.id,
-        name: cat.name,
-        description: cat.description || undefined,
-        createdBy: cat.createdBy,
-        createdAt: cat.createdAt,
-        updatedAt: cat.updatedAt,
-        deletedAt: cat.deletedAt || undefined,
-      })),
-      total,
-    };
+      const [categories, total] = await Promise.all([
+        this.prisma.category.findMany({
+          where,
+          skip,
+          take: limit,
+          orderBy,
+          select: {
+            id: true,
+            name: true,
+            description: true,
+            createdBy: true,
+            createdAt: true,
+            updatedAt: true,
+            deletedAt: true,
+          },
+        }),
+        this.prisma.category.count({ where }),
+      ]);
+
+      return {
+        categories: categories.map((cat) => ({
+          id: cat.id,
+          name: cat.name,
+          description: cat.description || undefined,
+          createdBy: cat.createdBy,
+          createdAt: cat.createdAt,
+          updatedAt: cat.updatedAt,
+          deletedAt: cat.deletedAt ? cat.deletedAt : null,
+        })),
+        total,
+      };
   }
 
   async getCategoryById(id: string): Promise<ICategory | null> {

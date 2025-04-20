@@ -35,13 +35,32 @@ export const adaptCategoryController = (controller: CategoryController) => ({
 
   getAllCategories: asyncHandler(
     async (req: AuthenticatedRequest, res: Response) => {
-      const { page, limit, sortBy, sortOrder, includeDeleted } = req.query;
+      const {
+        page,
+        limit,
+        sortBy,
+        sortOrder,
+        includeDeleted,
+        search,
+        filterBy,
+      } = req.query;
+       const allowedFilters = ["All", "Active", "Inactive"] as const;
+       type FilterByType = (typeof allowedFilters)[number];
+
+       const filterByValidated: FilterByType = allowedFilters.includes(
+         filterBy as FilterByType
+       )
+         ? (filterBy as FilterByType)
+         : "All";
+
       const input: IGetAllCategoriesInput = {
         page: page ? parseInt(page as string, 10) : undefined,
         limit: limit ? parseInt(limit as string, 10) : undefined,
         sortBy: sortBy as "name" | "createdAt" | "updatedAt" | undefined,
         sortOrder: sortOrder as "asc" | "desc" | undefined,
         includeDeleted: includeDeleted === "true" ? true : undefined,
+        search: search ? (search as string) : "",
+        filterBy: filterByValidated,
       };
       const result = await controller.getAllCategories(input);
       res.status(result.statusCode).json(result);
@@ -63,25 +82,29 @@ export const adaptCategoryController = (controller: CategoryController) => ({
     }
   ),
 
-  deleteCategory: asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-    const id = req.params.id;
-    const result = await controller.deleteCategory(id);
+  deleteCategory: asyncHandler(
+    async (req: AuthenticatedRequest, res: Response) => {
+      const id = req.params.id;
+      const result = await controller.deleteCategory(id);
 
-    res.status(result.statusCode as number).json({
-      status: result.status,
-      data: result.data,
-      message: result.message,
-    });
-  }) ,
+      res.status(result.statusCode as number).json({
+        status: result.status,
+        data: result.data,
+        message: result.message,
+      });
+    }
+  ),
 
-  recoverCategory: asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-    const input = { id: req.params.id };
-    const result = await controller.recoverCategory(input);
+  recoverCategory: asyncHandler(
+    async (req: AuthenticatedRequest, res: Response) => {
+      const input = { id: req.params.id };
+      const result = await controller.recoverCategory(input);
 
-    res.status(result.statusCode as number).json({
-      status: result.status,
-      data: result.data,
-      message: result.message,
-    });
-  }),
+      res.status(result.statusCode as number).json({
+        status: result.status,
+        data: result.data,
+        message: result.message,
+      });
+    }
+  ),
 });
