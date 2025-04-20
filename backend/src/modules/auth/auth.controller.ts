@@ -39,7 +39,9 @@ export class AuthController {
   async registerUser(input: unknown): Promise<ApiResponse> {
     try {
       const validatedInput = RegisterUserSchema.parse(input);
+      console.log(validatedInput);
       const { name, email, password } = validatedInput;
+
       const user = await this.authService.registerUser(name, email, password);
       return {
         status: "success",

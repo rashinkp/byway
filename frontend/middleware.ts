@@ -13,7 +13,6 @@ export async function middleware(request: NextRequest) {
     "/reset-password",
   ];
 
-
   // For public routes, allow access
   if (publicRoutes.includes(pathname)) {
     if (pathname === "/verify-otp" && !searchParams.get("email")) {
@@ -34,10 +33,15 @@ export async function middleware(request: NextRequest) {
   }
 
   // Get user from auth store
-  const user = useAuthStore.getState().user;
+  const { user, isInitialized } = useAuthStore.getState();
+  
+  // If not initialized, allow the request to proceed
+  // The auth store will handle initialization
+  if (!isInitialized) {
+    return NextResponse.next();
+  }
 
-  
-  
+  // If initialized but no user, redirect to login
   if (!user) {
     return NextResponse.redirect(new URL("/login", request.url));
   }

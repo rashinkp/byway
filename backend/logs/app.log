@@ -1,2 +1,20 @@
 {"error":{"isOperational":true,"status":401,"statusCode":401},"input":{"email":"admin@gmail.com","password":"123123"},"level":"error","message":"Login error:","timestamp":"2025-04-17T16:51:52.217Z"}
 {"error":{"isOperational":true,"status":401,"statusCode":401},"input":{"email":"admin@gmail.com","password":"123123"},"level":"error","message":"Login error:","timestamp":"2025-04-19T14:55:20.160Z"}
+{"error":{"issues":[{"code":"invalid_string","message":"Invalid email","path":["email"],"validation":"email"}],"name":"ZodError"},"input":{"email":"sample","name":"123123","password":"sample@gmail.com"},"level":"error","message":"Register user error:","timestamp":"2025-04-20T09:18:13.877Z"}
+{"error":{"issues":[{"code":"invalid_string","message":"Invalid email","path":["email"],"validation":"email"}],"name":"ZodError"},"input":{"email":"sample","name":"123123","password":"sample@gmail.com"},"level":"error","message":"Register user error:","timestamp":"2025-04-20T09:20:09.329Z"}
+{"error":{"issues":[{"code":"invalid_string","message":"Invalid email","path":["email"],"validation":"email"}],"name":"ZodError"},"input":{"email":"sample","name":"123123","password":"sample@gmail.com"},"level":"error","message":"Register user error:","timestamp":"2025-04-20T09:24:20.743Z"}
+{"error":{"issues":[{"code":"invalid_string","message":"Invalid email","path":["email"],"validation":"email"}],"name":"ZodError"},"input":{"email":"sample","name":"123123","password":"sample@gmail.com"},"level":"error","message":"Register user error:","timestamp":"2025-04-20T09:32:18.372Z"}
+{"error":{"issues":[{"code":"invalid_string","message":"Invalid email","path":["email"],"validation":"email"}],"name":"ZodError"},"input":{"email":"Rashin","name":"123123","password":"sample@gmail.com"},"level":"error","message":"Register user error:","timestamp":"2025-04-20T09:32:38.512Z"}
+{"email":"sample@gmail.com","level":"warn","message":"User not found by email","timestamp":"2025-04-20T09:36:26.195Z"}
+{"email":"sample@gmail.com","error":{"code":"NOT_FOUND","isOperational":true,"status":404,"statusCode":404},"level":"error","message":"Error finding user by email","timestamp":"2025-04-20T09:36:26.204Z"}
+{"error":{"code":"NOT_FOUND","isOperational":true,"status":404,"statusCode":404},"input":{"email":"sample@gmail.com","name":"sample","password":"123123"},"level":"error","message":"Register user error:","timestamp":"2025-04-20T09:36:26.206Z"}
+{"email":"sample@gmail.com","level":"warn","message":"User not found by email","timestamp":"2025-04-20T09:42:27.042Z"}
+{"email":"sample@gmail.com","error":{"code":"NOT_FOUND","isOperational":true,"status":404,"statusCode":404},"level":"error","message":"Error finding user by email","timestamp":"2025-04-20T09:42:27.069Z"}
+{"error":{"code":"NOT_FOUND","isOperational":true,"status":404,"statusCode":404},"input":{"email":"sample@gmail.com","name":"sample","password":"123123"},"level":"error","message":"Register user error:","timestamp":"2025-04-20T09:42:27.073Z"}
+{"email":"sample@gmail.com","level":"warn","message":"User not found by email","timestamp":"2025-04-20T09:43:53.003Z"}
+{"ip":"::1","level":"warn","message":"Invalid email in verify OTP request","timestamp":"2025-04-20T09:45:57.397Z"}
+{"ip":"::1","level":"warn","message":"Invalid email in verify OTP request","timestamp":"2025-04-20T09:48:40.714Z"}
+{"ip":"::1","level":"warn","message":"Invalid email in verify OTP request","timestamp":"2025-04-20T09:49:20.680Z"}
+{"ip":"::1","level":"warn","message":"Invalid email in verify OTP request","timestamp":"2025-04-20T09:49:49.383Z"}
+{"error":{"issues":[{"code":"invalid_string","message":"Invalid email","path":["email"],"validation":"email"}],"name":"ZodError"},"input":{"email":"121111","otp":"sample@gmail.com"},"level":"error","message":"Verify OTP error:","timestamp":"2025-04-20T09:50:41.834Z"}
+{"error":{"issues":[{"code":"invalid_string","message":"Invalid email","path":["email"],"validation":"email"}],"name":"ZodError"},"input":{"email":"121111","otp":"sample@gmail.com"},"level":"error","message":"Verify OTP error:","timestamp":"2025-04-20T09:50:55.374Z"}

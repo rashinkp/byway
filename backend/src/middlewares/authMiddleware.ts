@@ -19,7 +19,7 @@ export const authMiddleware = (requiredRole: string) => {
   ): void => {
     const token = req.cookies?.jwt;
     const jwtSecret = process.env.JWT_SECRET;
-
+    
     if (!jwtSecret) {
       throw new AppError(
         "JWT_SECRET not configured",

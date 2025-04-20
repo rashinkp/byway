@@ -7,8 +7,6 @@ import { AppError } from "../../utils/appError";
 import { logger } from "../../utils/logger";
 import { ResendOtpSchema, VerifyOtpSchema } from "./otp.validator";
 
-
-
 export class OtpController {
   constructor(private otpService: OtpService) {}
 

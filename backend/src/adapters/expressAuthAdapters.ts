@@ -81,6 +81,7 @@ export const adaptAuthController = (controller: AuthController) => ({
   ),
 
   me: asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
+    
     if (!req.user) {
       throw new AppError(
         "Unauthorized",

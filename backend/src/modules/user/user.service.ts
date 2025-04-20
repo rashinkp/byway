@@ -123,11 +123,7 @@ export class UserService {
       );
       if (!user) {
         logger.warn("User not found by email", { email });
-        throw new AppError(
-          "User not found",
-          StatusCodes.NOT_FOUND,
-          "NOT_FOUND"
-        );
+        return null;
       }
       return user;
     } catch (error) {

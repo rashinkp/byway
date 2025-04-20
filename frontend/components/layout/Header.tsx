@@ -2,17 +2,17 @@
 "use client";
 
 import Link from "next/link";
-import { useCurrentUser } from "@/hooks/auth/useCurrentUser";
+import { useAuth } from "@/hooks/auth/useAuth";
 import { useLogout } from "@/hooks/auth/useLogout";
 import { Button } from "@/components/ui/button";
 import { Loader2 } from "lucide-react";
 
 interface HeaderProps {
-  client?: { id: string; name: string }; // Define expected props (if any)
+  client?: { id: string; name: string }; 
 }
 
 export function Header({ client }: HeaderProps = {}) {
-  const { data: user, isLoading } = useCurrentUser();
+  const { user, isLoading } = useAuth();
   const { mutate: logout, isPending: isLoggingOut } = useLogout();
 
   return (

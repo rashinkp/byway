@@ -9,7 +9,7 @@ export const createOtpRouter = (otpController: OtpController): Router => {
   const otpRouter = Router();
   const otpAdapt = adaptOtpController(otpController);
 
-  otpRouter.post("/verify",verifyOtpLimiter, otpAdapt.verifyOtp);
+  otpRouter.post("/verify", otpAdapt.verifyOtp);
   otpRouter.post("/resend",resendOtpLimiter, resendOtpLimiter, otpAdapt.resendOtp);
 
   return otpRouter;

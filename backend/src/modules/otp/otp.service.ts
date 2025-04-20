@@ -58,6 +58,7 @@ export class OtpService {
   async verifyOtp(
     input: IVerifyOtpInput
   ): Promise<{ id: string; email: string; role: string }> {
+    console.log(input);
     const verification = await this.otpRepository.findVerificationByEmail(
       input.email
     );

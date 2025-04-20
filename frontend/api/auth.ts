@@ -1,4 +1,4 @@
-import {api} from "@/api/api";
+import { api } from "@/api/api";
 import { User } from "@/types/user";
 
 interface IVerifyOtpResponse {
@@ -37,7 +37,7 @@ interface IForgotPasswordResponse {
   message?: string;
 }
 
-export async function signup(email: string, password: string, name: string) {
+export async function signup(name: string, email: string, password: string) {
   try {
     const response = await api.post<ISignupResponse>("/auth/signup", {
       email,
@@ -62,12 +62,12 @@ export async function login(email: string, password: string) {
   }
 }
 
-export async function verifyOtp(otp: string, email: string): Promise<User> {
+export async function verifyOtp(email: string, otp: string): Promise<User> {
   try {
-    const response = await api.post<IVerifyOtpResponse>(
-      "/auth/verify-otp",
-      { otp, email }
-    );
+    const response = await api.post<IVerifyOtpResponse>("/otp/verify", {
+      otp,
+      email,
+    });
     return response.data.data;
   } catch (error: any) {
     throw new Error(error.response?.data?.message || "OTP verification failed");
@@ -86,7 +86,9 @@ export async function forgotPassword(email: string): Promise<void> {
   try {
     await api.post<IForgotPasswordResponse>("/auth/forgot-password", { email });
   } catch (error: any) {
-    throw new Error(error.response?.data?.message || "Forgot password request failed");
+    throw new Error(
+      error.response?.data?.message || "Forgot password request failed"
+    );
   }
 }
 
@@ -121,7 +123,6 @@ export async function getCurrentUser(): Promise<User | null> {
 }
 
 export async function logout(): Promise<void> {
-  
   try {
     await api.post<ILogoutResponse>("/auth/logout");
   } catch (error: any) {

@@ -1,32 +1,21 @@
 "use client";
 
-import { useQuery } from "@tanstack/react-query";
-import { getCurrentUser } from "@/api/auth";
-import { useAuthStore } from "@/stores/auth.store";
 import { useEffect } from "react";
+import { useAuthStore } from "@/stores/auth.store";
 
 export function useAuth() {
-  const { user, setUser } = useAuthStore();
+  const { user, isLoading, isInitialized, initializeAuth } = useAuthStore();
 
-  const { data, isLoading, isFetching } = useQuery({
-    queryKey: ["auth"],
-    queryFn: getCurrentUser,
-    retry: 1,
-    staleTime: 5 * 60 * 1000, // 5 minutes
-    refetchOnWindowFocus: false,
-    refetchOnMount: false,
-    refetchOnReconnect: false,
-  });
-
+  // Initialize auth only once when the component mounts
   useEffect(() => {
-    if (data !== undefined) {
-      setUser(data);
+    if (!isInitialized) {
+      initializeAuth();
     }
-  }, [data, setUser]);
+  }, [isInitialized, initializeAuth]);
 
   return {
     user,
-    isLoading: isLoading || isFetching,
+    isLoading,
     isAuthenticated: !!user,
   };
 }
