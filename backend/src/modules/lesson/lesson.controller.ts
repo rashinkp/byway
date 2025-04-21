@@ -6,6 +6,7 @@ import {
   ICreateLessonInput,
   IUpdateLessonProgressInput,
   IGetProgressInput,
+  IGetAllLessonsInput,
 } from "./lesson.types";
 
 export class LessonController {
@@ -30,6 +31,32 @@ export class LessonController {
         ? StatusCodes.NOT_FOUND
         : message.includes("Unauthorized")
         ? StatusCodes.FORBIDDEN
+        : StatusCodes.BAD_REQUEST;
+      return {
+        status: "error",
+        message,
+        statusCode,
+        data: null,
+      };
+    }
+  }
+
+  async getAllLessons(input: IGetAllLessonsInput): Promise<ApiResponse> {
+    try {
+      const result = await this.lessonService.getAllLessons(input);
+      return {
+        status: "success",
+        data: result,
+        message: "Lessons retrieved successfully",
+        statusCode: StatusCodes.OK,
+      };
+    } catch (error) {
+      const message =
+        error instanceof Error ? error.message : "Failed to retrieve lessons";
+      const statusCode = message.includes("not enrolled")
+        ? StatusCodes.FORBIDDEN
+        : message.includes("not found")
+        ? StatusCodes.NOT_FOUND
         : StatusCodes.BAD_REQUEST;
       return {
         status: "error",

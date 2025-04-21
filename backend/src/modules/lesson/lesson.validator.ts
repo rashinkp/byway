@@ -42,3 +42,29 @@ export const createLessonContentSchema = z.object({
     .default("DRAFT"),
   data: z.record(z.any()).optional().default({}),
 });
+
+
+export const getAllLessonsSchema = z.object({
+  page: z
+    .string()
+    .optional()
+    .transform((val) => (val ? parseInt(val, 10) : 1))
+    .refine((val) => val > 0, { message: "Page must be a positive integer" }),
+  limit: z
+    .string()
+    .optional()
+    .transform((val) => (val ? parseInt(val, 10) : 10))
+    .refine((val) => val > 0, { message: "Limit must be a positive integer" }),
+  sortBy: z
+    .enum(["order", "title", "createdAt", "updatedAt"])
+    .optional()
+    .default("order"),
+  sortOrder: z.enum(["asc", "desc"]).optional().default("asc"),
+  search: z.string().optional().default(""),
+  filterBy: z.enum(["DRAFT", "PUBLISHED", "ALL"]).optional().default("ALL"),
+  includeDeleted: z
+    .string()
+    .optional()
+    .transform((val) => val === "true")
+    .default("false"),
+});

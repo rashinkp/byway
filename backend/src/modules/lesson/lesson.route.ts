@@ -17,6 +17,6 @@ export const createLessonRouter = (
     adapt.updateLessonProgress
   );
   router.get("/:courseId/progress", protect, adapt.getCourseProgress);
-
+  router.get("/:courseId/lessons", protect, adapt.getAllLessons);
   return router;
 };

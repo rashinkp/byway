@@ -5,7 +5,9 @@ import {
   ICreateLessonInput,
   IUpdateLessonProgressInput,
   IGetProgressInput,
+  IGetAllLessonsInput,
 } from "../modules/lesson/lesson.types";
+import { getAllLessonsSchema } from "../modules/lesson/lesson.validator";
 
 interface AuthenticatedRequest extends Request {
   user: { id: string; email: string; role: string };
@@ -29,6 +31,19 @@ export const adaptLessonController = (controller: LessonController) => ({
         ...req.body,
       };
       const result = await controller.createLesson(input, req.user.id);
+      res.status(result.statusCode).json(result);
+    }
+  ),
+
+  getAllLessons: asyncHandler(
+    async (req: AuthenticatedRequest, res: Response) => {
+      const validatedInput = getAllLessonsSchema.parse(req.query);
+      const input: IGetAllLessonsInput = {
+        ...validatedInput,
+        courseId: req.params.courseId,
+        userId: req.user.id,
+      };
+      const result = await controller.getAllLessons(input);
       res.status(result.statusCode).json(result);
     }
   ),

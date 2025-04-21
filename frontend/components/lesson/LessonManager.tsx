@@ -1,116 +1,138 @@
-import { useState } from "react";
+"use client";
+
+import { useState, Dispatch, SetStateAction, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { DataTable } from "@/components/ui/DataTable";
 import { TableControls } from "@/components/ui/TableControls";
 import { StatusBadge } from "@/components/ui/StatusBadge";
 import { Video, Trash2, Edit } from "lucide-react";
 import { LessonFormModal, LessonFormData } from "./LessonFormModal";
+import { useGetAllLessonsInCourse } from "@/hooks/lesson/useGetAllLesson";
+import { useCreateLesson } from "@/hooks/lesson/useCreateLesson";
+import { useUpdateLesson } from "@/hooks/lesson/useUpdateLesson";
+import { useDeleteLesson } from "@/hooks/lesson/useDeleteLesson";
+import { ILesson } from "@/types/lesson";
 
-// Dummy lesson type (replace with real type)
-interface Lesson {
-  id: string;
-  title: string;
-  description?: string;
-  duration: number;
-  videoUrl?: string;
-  order: number;
-  courseId: string;
-  createdAt: string;
-  updatedAt: string;
-  deletedAt?: string;
-}
+type SortBy = "createdAt"  | "updatedAt";
 
-// Dummy lesson data
-const dummyLessons: Lesson[] = [
-  {
-    id: "lesson-1",
-    title: "Getting Started with HTML",
-    description: "Learn the basics of HTML structure and tags.",
-    duration: 30,
-    videoUrl: "https://example.com/video1.mp4",
-    order: 1,
-    courseId: "course-1",
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-  },
-  {
-    id: "lesson-2",
-    title: "Styling with CSS",
-    description: "Explore CSS properties and layouts.",
-    duration: 45,
-    videoUrl: "https://example.com/video2.mp4",
-    order: 2,
-    courseId: "course-1",
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-  },
-];
 
 export function LessonManager({ courseId }: { courseId: string }) {
-  const [lessons, setLessons] = useState<Lesson[]>(dummyLessons);
   const [isLessonModalOpen, setIsLessonModalOpen] = useState(false);
-  const [editingLesson, setEditingLesson] = useState<Lesson | null>(null);
+  const [editingLesson, setEditingLesson] = useState<ILesson | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
-  const [sortBy, setSortBy] = useState<"title" | "order" | "createdAt">(
-    "order"
-  );
+   const [sortBy, setSortBy] = useState<SortBy>("createdAt");
+  const [page, setPage] = useState(1);
   const [filterStatus, setFilterStatus] = useState<
-    "All" | "Published" | "Draft"
-  >("All");
+    "ALL" | "PUBLISHED" | "DRAFT"
+  >("ALL");
+  const limit = 10;
 
-  // Mock API functions (replace with real API calls)
+  const { data, isLoading, error, refetch } = useGetAllLessonsInCourse({
+    courseId,
+    page,
+    limit,
+    sortBy,
+    sortOrder: "asc",
+    search: searchTerm,
+    filterBy: filterStatus,
+    includeDeleted: true,
+  });
+
+  const { mutate: createLesson, isPending: isCreating } = useCreateLesson();
+  const { mutate: updateLesson, isPending: isUpdating } = useUpdateLesson();
+  const { mutate: deleteLesson, isPending: isDeleting } =
+    useDeleteLesson(courseId);
+
   const handleAddLesson = async (data: LessonFormData) => {
-    const newLesson: Lesson = {
-      id: `lesson-${lessons.length + 1}`,
-      ...data,
-      courseId,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-    };
-    setLessons((prev) => [...prev, newLesson]);
+    // createLesson(
+    //   {
+    //     courseId,
+    //     title: data.title,
+    //     description: data.description,
+    //     order: data.order,
+    //     thumbnail: data.thumbnail,
+    //     duration: data.duration,
+    //   },
+    //   {
+    //     onSuccess: () => {
+    //       setIsLessonModalOpen(false);
+    //     },
+    //     onError: (err) => {
+    //       console.error("Failed to create lesson:", err);
+    //     },
+    //   }
+    // );
   };
 
   const handleEditLesson = async (data: LessonFormData) => {
-    if (!editingLesson) return;
-    setLessons((prev) =>
-      prev.map((lesson) =>
-        lesson.id === editingLesson.id
-          ? { ...lesson, ...data, updatedAt: new Date().toISOString() }
-          : lesson
-      )
-    );
+    // if (!editingLesson) return;
+    // updateLesson(
+    //   {
+    //     lessonId: editingLesson.id,
+    //     title: data.title,
+    //     description: data.description,
+    //     order: data.order,
+    //     thumbnail: data.thumbnail,
+    //     duration: data.duration,
+    //   },
+    //   {
+    //     onSuccess: () => {
+    //       setIsLessonModalOpen(false);
+    //       setEditingLesson(null);
+    //     },
+    //     onError: (err) => {
+    //       console.error("Failed to update lesson:", err);
+    //     },
+    //   }
+    // );
   };
 
-  const handleDeleteLesson = async (lesson: Lesson) => {
-    setLessons((prev) =>
-      prev.map((l) =>
-        l.id === lesson.id ? { ...l, deletedAt: new Date().toISOString() } : l
-      )
-    );
+  const handleDeleteLesson = async (lesson: ILesson) => {
+    deleteLesson(lesson.id, {
+      onError: (err) => {
+        console.error("Failed to delete lesson:", err);
+      },
+    });
   };
+
+  // Wrapper for setFilterStatus to match TableControls' expected type
+  const handleSetFilterStatus = (status: string) => {
+    if (["DRAFT", "PUBLISHED", "ALL"].includes(status)) {
+      setFilterStatus(status as "DRAFT" | "PUBLISHED" | "ALL");
+    }
+  };
+
+   const handleSetSortBy = useCallback((sort: string) => {
+      const validSorts: SortBy[] = ["createdAt", "updatedAt"];
+      const newSort = validSorts.includes(sort as SortBy)
+        ? (sort as SortBy)
+        : "createdAt"; // Fallback to "createdAt" if invalid
+      setSortBy(newSort);
+    }, []);
 
   // Table columns
   const columns = [
     {
       header: "Title",
-      accessor: "title" as keyof Lesson,
-      render: (lesson: Lesson) =>
+      accessor: "title" as keyof ILesson,
+      render: (lesson: ILesson) =>
         lesson.title || <span className="text-gray-400">N/A</span>,
     },
     {
       header: "Duration",
-      accessor: "duration" as keyof Lesson,
-      render: (lesson: Lesson) => `${lesson.duration} min`,
+      accessor: "duration" as keyof ILesson,
+      render: (lesson: ILesson) =>
+        lesson.duration ? `${lesson.duration} min` : "N/A",
     },
     {
       header: "Order",
-      accessor: "order" as keyof Lesson,
-      render: (lesson: Lesson) => lesson.order,
+      accessor: "order" as keyof ILesson,
+      render: (lesson: ILesson) => lesson.order,
     },
     {
       header: "Status",
-      accessor: "status" as keyof Lesson,
-      render: (lesson: Lesson) => <StatusBadge isActive={!lesson.deletedAt} />,
+      accessor: "deletedAt" as keyof ILesson,
+      render: (lesson: ILesson) => <StatusBadge isActive={!lesson.deletedAt} />,
     },
   ];
 
@@ -118,7 +140,7 @@ export function LessonManager({ courseId }: { courseId: string }) {
   const actions = [
     {
       label: () => "Edit",
-      onClick: (lesson: Lesson) => {
+      onClick: (lesson: ILesson) => {
         setEditingLesson(lesson);
         setIsLessonModalOpen(true);
       },
@@ -127,23 +149,20 @@ export function LessonManager({ courseId }: { courseId: string }) {
     },
     {
       label: () => "Delete",
-      onClick: (lesson: Lesson) => handleDeleteLesson(lesson),
+      onClick: (lesson: ILesson) => handleDeleteLesson(lesson),
       variant: () => "destructive" as const,
       icon: <Trash2 className="h-4 w-4" />,
+      disabled: (lesson: ILesson) => !!lesson.deletedAt,
     },
   ];
 
-  // Filter and sort lessons
-  const filteredLessons = lessons
-    .filter((lesson) => !lesson.deletedAt)
-    .filter((lesson) =>
-      lesson.title.toLowerCase().includes(searchTerm.toLowerCase())
-    )
-    .sort((a, b) => {
-      if (sortBy === "order") return a.order - b.order;
-      if (sortBy === "title") return a.title.localeCompare(b.title);
-      return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
-    });
+  if (error) {
+    return (
+      <div className="container mx-auto py-4">
+        <p className="text-red-500">Error: {error.message}</p>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -155,6 +174,7 @@ export function LessonManager({ courseId }: { courseId: string }) {
             setIsLessonModalOpen(true);
           }}
           className="bg-blue-600 hover:bg-blue-700 text-white"
+          disabled={isCreating}
         >
           <Video className="mr-2 h-4 w-4" />
           Add Lesson
@@ -165,43 +185,49 @@ export function LessonManager({ courseId }: { courseId: string }) {
         searchTerm={searchTerm}
         setSearchTerm={setSearchTerm}
         filterStatus={filterStatus}
-        setFilterStatus={(status: string) =>
-          setFilterStatus(status as "All" | "Published" | "Draft")
-        }
+        setFilterStatus={handleSetFilterStatus} // Use wrapper
         sortBy={sortBy}
-        setSortBy={(sort: string) =>
-          setSortBy(sort as "title" | "order" | "createdAt")
-        }
+        setSortBy={handleSetSortBy}
         sortOptions={[
           { value: "title", label: "Title (A-Z)" },
           { value: "order", label: "Order" },
           { value: "createdAt", label: "Created At" },
         ]}
-        onRefresh={() => console.log("Refresh lessons")} // Replace with API refetch
+        onRefresh={refetch}
         filterTabs={[
-          { value: "All", label: "All" },
-          { value: "Published", label: "Published" },
-          { value: "Draft", label: "Draft" },
+          { value: "ALL", label: "All" },
+          { value: "PUBLISHED", label: "Published" },
+          { value: "DRAFT", label: "Draft" },
         ]}
       />
 
-      <DataTable<Lesson>
-        data={filteredLessons}
+      <DataTable<ILesson>
+        data={data?.lessons || []}
         columns={columns}
-        isLoading={false}
+        isLoading={isLoading}
         actions={actions}
-        itemsPerPage={10}
-        totalItems={filteredLessons.length}
-        currentPage={1}
-        setCurrentPage={() => {}} // Add pagination if needed
+        itemsPerPage={limit}
+        totalItems={data?.total || 0}
+        currentPage={page}
+        setCurrentPage={setPage}
       />
 
       <LessonFormModal
         open={isLessonModalOpen}
         onOpenChange={setIsLessonModalOpen}
         onSubmit={editingLesson ? handleEditLesson : handleAddLesson}
-        initialData={editingLesson || undefined}
-        isSubmitting={false} // Add loading state for API calls
+        initialData={
+          editingLesson
+            ? {
+                title: editingLesson.title,
+                description: editingLesson.description || "",
+                order: editingLesson.order,
+                // thumbnail: editingLesson.thumbnail || "",
+                duration: editingLesson.duration,
+              }
+            : undefined
+        }
+        isSubmitting={isCreating || isUpdating}
       />
     </div>
   );

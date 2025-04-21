@@ -8,6 +8,8 @@ import {
   IUpdateLessonProgressInput,
   IGetProgressInput,
   ILessonRepository,
+  IGetAllLessonsInput,
+  IGetAllLessonsResponse,
 } from "./lesson.types";
 
 export class LessonService {
@@ -49,6 +51,30 @@ export class LessonService {
       throw new Error("A lesson with this order already exists in the course");
     }
     return this.lessonRepository.createLesson(input);
+  }
+
+  async getAllLessons(
+    input: IGetAllLessonsInput
+  ): Promise<IGetAllLessonsResponse> {
+    const { courseId, userId } = input;
+
+    // Check if user is enrolled or the course creator
+    const course = await this.courseRepository.getCourseById(courseId);
+    if (!course || (course.deletedAt && !input.includeDeleted)) {
+      throw new Error("Course not found or deleted");
+    }
+
+    const isCreator = course.createdBy === userId;
+    const enrollment = await this.courseRepository.getEnrollment(
+      userId,
+      courseId
+    );
+
+    if (!isCreator && !enrollment) {
+      throw new Error("You are not enrolled in this course or not the creator");
+    }
+
+    return this.lessonRepository.getAllLessons(input);
   }
 
   async updateLessonProgress(

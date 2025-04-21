@@ -7,6 +7,8 @@ import {
   IUpdateLessonProgressInput,
   IGetProgressInput,
   ILessonRepository,
+  IGetAllLessonsInput,
+  IGetAllLessonsResponse,
 } from "./lesson.types";
 
 
@@ -28,6 +30,65 @@ export class LessonRepository implements ILessonRepository {
       createdAt: lesson.createdAt,
       updatedAt: lesson.updatedAt,
       deletedAt: lesson.deletedAt || undefined,
+    };
+  }
+
+  async getAllLessons(
+    input: IGetAllLessonsInput
+  ): Promise<IGetAllLessonsResponse> {
+    const {
+      courseId,
+      page = 1,
+      limit = 10,
+      sortBy = "order",
+      sortOrder = "asc",
+      search = "",
+      filterBy = "ALL",
+      includeDeleted = false,
+    } = input;
+
+    // Build where clause
+    const where: any = {
+      courseId,
+      ...(filterBy !== "ALL" ? { status: filterBy } : {}),
+      ...(search
+        ? {
+            OR: [
+              { title: { contains: search, mode: "insensitive" } },
+              { description: { contains: search, mode: "insensitive" } },
+            ],
+          }
+        : {}),
+      ...(includeDeleted ? {} : { deletedAt: null }),
+    };
+
+    // Fetch lessons with pagination
+    const [lessons, total] = await Promise.all([
+      this.prisma.lesson.findMany({
+        where,
+        orderBy: { [sortBy]: sortOrder },
+        skip: (page - 1) * limit,
+        take: limit,
+      }),
+      this.prisma.lesson.count({ where }),
+    ]);
+
+    return {
+      lessons: lessons.map((lesson) => ({
+        id: lesson.id,
+        courseId: lesson.courseId,
+        title: lesson.title,
+        description: lesson.description || undefined,
+        order: lesson.order,
+        thumbnail: lesson.thumbnail || undefined,
+        createdAt: lesson.createdAt,
+        updatedAt: lesson.updatedAt,
+        deletedAt: lesson.deletedAt || undefined,
+      })),
+      total,
+      page,
+      limit,
+      totalPages: Math.ceil(total / limit),
     };
   }
 
@@ -115,7 +176,4 @@ export class LessonRepository implements ILessonRepository {
       updatedAt: p.updatedAt,
     }));
   }
-
-
-  
 }
