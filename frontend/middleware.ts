@@ -13,7 +13,6 @@ export async function middleware(request: NextRequest) {
     "/reset-password",
   ];
 
-  // For public routes, allow access
   if (publicRoutes.includes(pathname)) {
     if (pathname === "/verify-otp" && !searchParams.get("email")) {
       return NextResponse.redirect(new URL("/signup", request.url));
@@ -27,37 +26,34 @@ export async function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
-  // For course listing pages, allow access
   if (pathname.startsWith("/courses") && !pathname.includes("/lessons")) {
     return NextResponse.next();
   }
 
-  // Get user from auth store
   const { user, isInitialized } = useAuthStore.getState();
   
-  // If not initialized, allow the request to proceed
-  // The auth store will handle initialization
   if (!isInitialized) {
     return NextResponse.next();
   }
 
-  // If initialized but no user, redirect to login
   if (!user) {
     return NextResponse.redirect(new URL("/login", request.url));
   }
 
-  // If authenticated and trying to access auth pages, redirect to appropriate dashboard
+
+  //todo: update to protect routes;
+
+ 
   if (publicRoutes.includes(pathname)) {
     const roleRedirects: Record<string, string> = {
       ADMIN: "/admin/dashboard",
       INSTRUCTOR: "/instructor/dashboard",
-      USER: "/dashboard",
+      USER: "/",
     };
-    const redirectPath = roleRedirects[user.role] || "/dashboard";
+    const redirectPath = roleRedirects[user.role] || "/";
     return NextResponse.redirect(new URL(redirectPath, request.url));
   }
 
-  // Check role-based access
   const role = user.role;
   if (pathname.startsWith("/admin") && role !== "ADMIN") {
     return NextResponse.redirect(new URL("/login", request.url));
@@ -82,6 +78,6 @@ export const config = {
     "/admin/:path*",
     "/instructor/:path*",
     "/courses/:courseId/lessons/:path*",
-    "/dashboard",
+    "/",
   ],
 };

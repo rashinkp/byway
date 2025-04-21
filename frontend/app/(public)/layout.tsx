@@ -1,5 +1,7 @@
 // import { Header } from "@/components/layout/Header";
 
+import { Header } from "@/components/layout/Header";
+
 export default function PublicLayout({
   children,
 }: {
@@ -7,7 +9,7 @@ export default function PublicLayout({
 }) {
   return (
     <div className="">
-      {/* <Header /> */}
+      <Header />
       <main className="flex-grow container">{children}</main>
     </div>
   );
