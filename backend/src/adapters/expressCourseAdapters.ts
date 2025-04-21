@@ -46,15 +46,34 @@ export const adaptCourseController = (controller: CourseController) => ({
 
   getAllCourses: asyncHandler(
     async (req: AuthenticatedRequest, res: Response) => {
-      const { page, limit, sortBy, sortOrder, includeDeleted } = req.query;
+      const {
+        page,
+        limit,
+        sortBy,
+        sortOrder,
+        includeDeleted,
+        search,
+        filterBy,
+      } = req.query;
+
+      const userId = req.user?.id;
+      if (!userId) {
+        throw new AppError(
+          "User not authenticated",
+          StatusCodes.UNAUTHORIZED,
+          "AUTH_ERROR"
+        );
+      }
+
       const input: IGetAllCoursesInput = {
         page: page ? parseInt(page as string, 10) : undefined,
-        limit: limit ? parseInt(limit as string, 10) : undefined,
-        sortBy: sortBy
-          ? (sortBy as "title" | "createdAt" | "updatedAt")
-          : undefined,
-        sortOrder: sortOrder ? (sortOrder as "asc" | "desc") : undefined,
-        includeDeleted: includeDeleted === "true" ? true : undefined,
+      limit: limit ? parseInt(limit as string, 10) : undefined,
+      sortBy: sortBy as "name" | "createdAt" | "updatedAt",
+      sortOrder: sortOrder as "asc" | "desc" | undefined,
+      includeDeleted: includeDeleted === "true" ? true : false,
+      search: search ? (search as string) : "",
+      filterBy: filterBy as "All" | "Active" | "Draft" | undefined,
+      userId,
       };
       const result = await controller.getAllCourses(input);
       res.status(result.statusCode).json(result);

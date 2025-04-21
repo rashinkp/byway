@@ -51,7 +51,7 @@ export const fields: FormFieldConfig<CourseFormData>[] = [
     name: "duration",
     label: "Duration",
     type: "input",
-    fieldType: "text",
+    fieldType: "number",
     placeholder: "e.g., 15 hours",
     description: "Specify the total duration of the course.",
     maxLength: 50,

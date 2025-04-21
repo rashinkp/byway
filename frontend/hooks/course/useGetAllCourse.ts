@@ -3,13 +3,15 @@ import { getAllCourses } from "@/api/course";
 import { CourseApiResponse } from "@/types/course";
 import { useAuthStore } from "@/stores/auth.store";
 
-interface UseGetAllCoursesParams {
+export interface UseGetAllCoursesParams {
   page?: number;
   limit?: number;
-  sortBy?: string;
+  sortBy?: "createdAt" | "name" | "updatedAt";
   sortOrder?: "asc" | "desc";
   search?: string;
   filterBy?: "All" | "Active" | "Draft";
+  includeDeleted?: boolean;
+  createdBy?:string,
 }
 
 export function useGetAllCourses({
@@ -19,6 +21,7 @@ export function useGetAllCourses({
   sortOrder = "desc",
   search = "",
   filterBy = "All",
+  includeDeleted = false,
 }: UseGetAllCoursesParams) {
   const { user } = useAuthStore();
 
@@ -32,7 +35,8 @@ export function useGetAllCourses({
         sortOrder,
         search,
         filterBy,
-        instructorId: user?.id,
+        createdBy: user?.id,
+        includeDeleted,
       },
     ],
     queryFn: () =>
@@ -43,7 +47,8 @@ export function useGetAllCourses({
         sortOrder,
         search,
         filterBy,
-        instructorId: user?.id || "",
+        includeDeleted,
+        createdBy: user?.id || "",
       }),
     enabled: !!user?.id,
     retry: 1,

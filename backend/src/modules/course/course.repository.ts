@@ -53,16 +53,40 @@ export class CourseRepository implements ICourseRepository {
 
   async getAllCourses(
     input: IGetAllCoursesInput
-  ): Promise<{ courses: ICourse[]; total: number }> {
+  ): Promise<{ courses: ICourse[]; total: number; totalPage: number }> {
     const {
       page = 1,
       limit = 10,
       sortBy = "createdAt",
       sortOrder = "desc",
       includeDeleted = false,
+      search = "",
+      filterBy = "All",
+      userId,
     } = input;
+
+    // Build where clause
+    const where: any = {
+      createdBy: userId,
+      ...(includeDeleted ? {} : { deletedAt: null }), // Include or exclude deleted courses
+    };
+
+    // Apply filterBy for status
+    if (filterBy === "Active") {
+      where.status = "PUBLISHED";
+    } else if (filterBy === "Draft") {
+      where.status = "DRAFT";
+    }
+
+    // Apply search filter (title or description)
+    if (search) {
+      where.OR = [
+        { title: { contains: search, mode: "insensitive" } },
+        { description: { contains: search, mode: "insensitive" } },
+      ];
+    }
+
     const skip = (page - 1) * limit;
-    const where = includeDeleted ? {} : { deletedAt: null };
     const orderBy = { [sortBy]: sortOrder };
 
     const [courses, total] = await Promise.all([
@@ -75,6 +99,8 @@ export class CourseRepository implements ICourseRepository {
       }),
       this.prisma.course.count({ where }),
     ]);
+
+    const totalPage = Math.ceil(total / limit);
 
     return {
       courses: courses.map((course) => ({
@@ -106,6 +132,7 @@ export class CourseRepository implements ICourseRepository {
           : undefined,
       })),
       total,
+      totalPage,
     };
   }
 
@@ -230,10 +257,10 @@ export class CourseRepository implements ICourseRepository {
     };
   }
 
-  async softDeleteCourse(id: string): Promise<ICourse> {
+  async softDeleteCourse(id: string, deletedAt: Date | null): Promise<ICourse> {
     const course = await this.prisma.course.update({
       where: { id },
-      data: { deletedAt: new Date(), updatedAt: new Date() },
+      data: { deletedAt, updatedAt: new Date() },
       include: { details: true },
     });
     return {

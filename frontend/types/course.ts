@@ -1,3 +1,5 @@
+export type SortByType = "createdAt" | "name" | "updatedAt";
+
 export interface Course {
   id: string;
   title: string;

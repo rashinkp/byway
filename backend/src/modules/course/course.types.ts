@@ -69,9 +69,12 @@ export interface IUpdateCourseInput {
 export interface IGetAllCoursesInput {
   page?: number;
   limit?: number;
-  sortBy?: "title" | "createdAt" | "updatedAt";
+  sortBy?: "name" | "createdAt" | "updatedAt" | undefined;
   sortOrder?: "asc" | "desc";
   includeDeleted?: boolean;
+  search?: string;
+  filterBy?: "All" | "Active" | "Draft";
+  userId: string;
 }
 
 export interface ICreateEnrollmentInput {
@@ -93,7 +96,7 @@ export interface ICourseRepository {
   getCourseById(id: string): Promise<ICourse | null>;
   getCourseByName(title: string): Promise<ICourse | null>;
   updateCourse(input: IUpdateCourseInput): Promise<ICourse>;
-  softDeleteCourse(id: string): Promise<ICourse>;
+  softDeleteCourse(id: string, deletedAt: Date | null): Promise<ICourse>;
   createEnrollment(input: ICreateEnrollmentInput): Promise<IEnrollment>;
   getEnrollment(userId: string, courseId: string): Promise<IEnrollment | null>;
 }

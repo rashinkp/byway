@@ -254,7 +254,7 @@ export class CourseService {
 
     try {
       const course = await this.courseRepository.getCourseById(id);
-      if (!course || course.deletedAt) {
+      if (!course) {
         logger.warn("Course not found or already deleted", { id });
         throw new AppError(
           "Course not found or already deleted",
@@ -270,7 +270,9 @@ export class CourseService {
           "FORBIDDEN"
         );
       }
-      return await this.courseRepository.softDeleteCourse(id);
+
+      const deletedAt = course.deletedAt ? null : new Date();
+      return await this.courseRepository.softDeleteCourse(id, deletedAt);
     } catch (error) {
       logger.error("Error soft deleting course", { error, id, userId });
       throw error instanceof AppError

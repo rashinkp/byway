@@ -1,14 +1,8 @@
+import { UseGetAllCoursesParams } from "@/hooks/course/useGetAllCourse";
 import { api } from "./api";
 import { CourseApiResponse, Course } from "@/types/course";
 
-interface GetAllCoursesParams {
-  page?: number;
-  limit?: number;
-  sortBy?: "title" | "createdAt" | "updatedAt";
-  sortOrder?: "asc" | "desc";
-  includeDeleted?: boolean;
-  createdBy: string; 
-}
+
 
 export async function getAllCourses({
   page = 1,
@@ -17,7 +11,7 @@ export async function getAllCourses({
   sortOrder = "desc",
   includeDeleted = false,
   createdBy,
-}: GetAllCoursesParams): Promise<CourseApiResponse> {
+}: UseGetAllCoursesParams): Promise<CourseApiResponse> {
   try {
     const response = await api.get<{ data: CourseApiResponse }>("/courses/", {
       params: {
@@ -63,5 +57,15 @@ export async function createCourse(
   } catch (error) {
     console.error("Failed to create course:", error);
     throw new Error("Failed to create course");
+  }
+}
+
+
+
+export async function deleteCourse(id: string): Promise<void> {
+  try {
+    await api.delete(`/courses/${id}`);
+  } catch (error: any) {
+    throw new Error(error.response?.data?.message || "Delete category failed");
   }
 }

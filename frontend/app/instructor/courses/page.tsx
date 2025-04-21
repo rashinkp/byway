@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { Course } from "@/types/course";
 import { useGetAllCourses } from "@/hooks/course/useGetAllCourse";
 import { StatusBadge } from "@/components/ui/StatusBadge";
@@ -13,12 +13,11 @@ import { TableControls } from "@/components/ui/TableControls";
 import { Pagination } from "@/components/ui/Pagination";
 import { CourseFormModal } from "@/components/course/CourseFormModal";
 import { DataTable } from "@/components/ui/DataTable";
+import { useSoftDelete } from "@/hooks/course/useSoftDeleteCourse";
 
-type Action<T> = {
-  label: () => string;
-  onClick: (item: T) => void;
-  variant: () => "default" | "destructive";
-};
+// Define types for sortBy and filterBy based on UseGetAllCoursesParams
+type SortBy = "createdAt" | "name" | "updatedAt";
+type FilterBy = "All" | "Active" | "Draft";
 
 export const courseSchema = z.object({
   title: z.string().min(1, "Title is required").max(100, "Title is too long"),
@@ -28,7 +27,7 @@ export const courseSchema = z.object({
     .number()
     .min(0, "Price must be a positive number")
     .max(9999.99, "Price is too high"),
-  duration:z.number(),
+  duration: z.number(),
   level: z.enum(["BEGINNER", "MEDIUM", "ADVANCED"], {
     errorMap: () => ({ message: "Level is required" }),
   }),
@@ -53,12 +52,12 @@ interface CourseFormModalProps {
 export default function CoursesPage() {
   const [page, setPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
-  const [sortBy, setSortBy] = useState("createdAt");
+  const [sortBy, setSortBy] = useState<SortBy>("createdAt");
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
-  const [filterStatus, setFilterStatus] = useState<"All" | "Active" | "Draft">(
-    "All"
-  );
+  const [filterStatus, setFilterStatus] = useState<FilterBy>("All");
   const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const { mutate: toggleDeleteCourse } = useSoftDelete();
 
   const { data, isLoading, refetch } = useGetAllCourses({
     page,
@@ -67,13 +66,13 @@ export default function CoursesPage() {
     sortOrder,
     search: searchTerm,
     filterBy: filterStatus,
+    includeDeleted: true,
   });
 
   const courses = data?.courses || [];
   const total = data?.total || 0;
   const totalPages = data?.totalPage || 0;
 
-  console.log(data);
 
   const router = useRouter();
 
@@ -117,24 +116,48 @@ export default function CoursesPage() {
   ];
 
   // Actions
-  const actions: Action<Course>[] = [
+  const actions = [
     {
-      label: () => "Edit",
+      label: () => "View",
       onClick: (course: Course) => {
         console.log("Edit course:", course);
-        router.push(`/instructor/courses/edit/${course.id}`);
+        router.push(`/instructor/courses/${course.id}`);
       },
       variant: () => "default" as const,
     },
     {
-      label: () => "Delete",
-      onClick: (course: Course) => {
-        console.log("Delete course:", course);
-        // Placeholder: Implement delete logic (e.g., useDeleteCourse hook)
-      },
-      variant: () => "destructive" as const,
+      label: (course: Course) => (course.deletedAt ? "Restore" : "Delete"),
+      onClick: (course: Course) => handleToggleDelete(course),
+      variant: (course: Course) =>
+        course.deletedAt ? "default" : "destructive",
     },
   ];
+
+  const handleToggleDelete = async (course: Course) => {
+    try {
+      await toggleDeleteCourse(course);
+    } catch (error) {
+      console.error("Failed to toggle delete:", error);
+      // Optionally, show a notification to the user
+    }
+  };
+
+  // Wrapper functions to adapt TableControls string inputs to typed state
+  const handleSetFilterStatus = useCallback((status: string) => {
+    const validStatuses: FilterBy[] = ["All", "Active", "Draft"];
+    const newStatus = validStatuses.includes(status as FilterBy)
+      ? (status as FilterBy)
+      : "All"; // Fallback to "All" if invalid
+    setFilterStatus(newStatus);
+  }, []);
+
+  const handleSetSortBy = useCallback((sort: string) => {
+    const validSorts: SortBy[] = ["createdAt", "name", "updatedAt"];
+    const newSort = validSorts.includes(sort as SortBy)
+      ? (sort as SortBy)
+      : "createdAt"; // Fallback to "createdAt" if invalid
+    setSortBy(newSort);
+  }, []);
 
   return (
     <div className="space-y-6">
@@ -162,17 +185,20 @@ export default function CoursesPage() {
         searchTerm={searchTerm}
         setSearchTerm={setSearchTerm}
         filterStatus={filterStatus}
-        setFilterStatus={(status: string) =>
-          setFilterStatus(status as "All" | "Active" | "Draft")
-        }
+        setFilterStatus={handleSetFilterStatus} // Use wrapper function
         sortBy={sortBy}
-        setSortBy={setSortBy}
+        setSortBy={handleSetSortBy} // Use wrapper function
         sortOptions={[
-          { value: "title", label: "Title (A-Z)" },
+          { value: "name", label: "Title (A-Z)" },
           { value: "createdAt", label: "Newest first" },
           { value: "updatedAt", label: "Last updated" },
         ]}
         onRefresh={refetch}
+        filterTabs={[
+          { value: "All", label: "All" },
+          { value: "Active", label: "Active" },
+          { value: "Draft", label: "Draft" },
+        ]}
       />
 
       <DataTable<Course>
