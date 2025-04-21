@@ -23,6 +23,25 @@ export interface Course {
   } | null;
 }
 
+export interface AddCourseParams {
+  title: string;
+  description?: string | null;
+  categoryId: string;
+  price?: number | null;
+  duration?: number | null;
+  level?: "BEGINNER" | "MEDIUM" | "ADVANCED";
+  thumbnail?: string | null;
+  offer?: number | null;
+  status?: "DRAFT" | "PUBLISHED" | "ARCHIVED";
+  details?: {
+    prerequisites?: string | null;
+    longDescription?: string | null;
+    objectives?: string | null;
+    targetAudience?: string | null;
+  } | null;
+}
+
+
 export interface CourseApiResponse {
   courses: Course[];
   total: number;

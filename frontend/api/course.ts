@@ -1,6 +1,6 @@
 import { UseGetAllCoursesParams } from "@/hooks/course/useGetAllCourse";
 import { api } from "./api";
-import { CourseApiResponse, Course } from "@/types/course";
+import { CourseApiResponse, Course, AddCourseParams } from "@/types/course";
 
 
 
@@ -30,23 +30,6 @@ export async function getAllCourses({
   }
 }
 
-interface AddCourseParams {
-  title: string;
-  description?: string | null;
-  categoryId: string;
-  price?: number | null;
-  duration?: number | null;
-  level?: "BEGINNER" | "MEDIUM" | "ADVANCED";
-  thumbnail?: string | null;
-  offer?: number | null;
-  status?: "DRAFT" | "PUBLISHED" | "ARCHIVED";
-  details?: {
-    prerequisites?: string | null;
-    longDescription?: string | null;
-    objectives?: string | null;
-    targetAudience?: string | null;
-  } | null;
-}
 
 export async function createCourse(
   courseData: AddCourseParams
@@ -66,6 +49,16 @@ export async function deleteCourse(id: string): Promise<void> {
   try {
     await api.delete(`/courses/${id}`);
   } catch (error: any) {
+    throw new Error(error.response?.data?.message || "Delete category failed");
+  }
+}
+
+
+export async function getCourseById(id: string): Promise < Course > {
+  try {
+    const result = await api.get(`/courses/${id}`);
+    return result.data.data;
+  } catch (error:any) {
     throw new Error(error.response?.data?.message || "Delete category failed");
   }
 }
