@@ -1,5 +1,4 @@
 import { api } from "@/api/api";
-import { UseCategoriesProps } from "@/hooks/category/useCategories";
 import { Category, CategoryFormData, ICategoryListOutput, IGetAllCategoryResponse } from "@/types/category";
 
 
