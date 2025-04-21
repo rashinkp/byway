@@ -17,14 +17,19 @@ export function useCategories({
 }: IGetAllCategoriesInput = {}) {
   const queryClient = useQueryClient();
 
+  // Adjust includeDeleted based on filterBy
+  const shouldIncludeDeleted = filterBy === "Inactive" ? true : 
+                             filterBy === "Active" ? false : 
+                             includeDeleted;
+
   const { data, isLoading, refetch } = useQuery({
-    queryKey: ["categories", page, limit, search],
+    queryKey: ["categories", page, limit, search, filterBy],
     queryFn: async () => {
       const { categories, total } = await getAllCategories({
         page,
         limit,
         search,
-        includeDeleted,
+        includeDeleted: shouldIncludeDeleted,
         sortOrder,
         filterBy,
       });
@@ -40,7 +45,7 @@ export function useCategories({
 
   // Local state management for optimistic updates
   const setCategories = (newCategories: Category[]) => {
-    queryClient.setQueryData(["categories", page, limit, search], {
+    queryClient.setQueryData(["categories", page, limit, search, filterBy], {
       data: newCategories,
       total: newCategories.length,
       page,

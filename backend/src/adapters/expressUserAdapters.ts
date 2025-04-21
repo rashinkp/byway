@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction, RequestHandler } from "express";
 import { UserController } from "../modules/user/user.controller";
 import { Role } from "@prisma/client";
-import { AdminUpdateUserInput } from "../modules/user/user.types";
+import { AdminUpdateUserInput, IGetAllUsersInput } from "../modules/user/user.types";
 import { AppError } from "../utils/appError";
 import { StatusCodes } from "http-status-codes";
 
@@ -50,12 +50,34 @@ export const adaptUserController = (controller: UserController) => ({
 
   getAllUsers: asyncHandler(
     async (req: AuthenticatedRequest, res: Response) => {
-      const { page, limit, role, includeDeleted } = req.query;
-      const input = {
+      const {
+        page,
+        limit,
+        sortBy,
+        sortOrder,
+        includeDeleted,
+        search,
+        filterBy,
+        role,
+      } = req.query;
+      const allowedFilters = ["All", "Active", "Inactive"] as const;
+      type FilterByType = (typeof allowedFilters)[number];
+      
+      const filterByValidated: FilterByType = allowedFilters.includes(
+        filterBy as FilterByType
+      )
+        ? (filterBy as FilterByType)
+        : "All";
+      
+      const input: IGetAllUsersInput = {
         page: page ? parseInt(page as string, 10) : undefined,
         limit: limit ? parseInt(limit as string, 10) : undefined,
-        role: role ? ((role as string).toUpperCase() as Role) : undefined,
-        includeDeleted: includeDeleted === "true",
+        sortBy: sortBy as "name" | "createdAt" | "updatedAt" | undefined,
+        sortOrder: sortOrder as "asc" | "desc" | undefined,
+        includeDeleted: includeDeleted === "true" ? true : undefined,
+        search: search ? (search as string) : "",
+        filterBy: filterByValidated,
+        role: role as "USER" | "INSTRUCTOR" | "ADMIN" | undefined,
       };
 
       const result = await controller.getAllUsers(input);

@@ -84,7 +84,6 @@ export class CategoryService {
   async getAllCategories(
     input: IGetAllCategoriesInput
   ): Promise<{ categories: ICategory[]; total: number }> {
-    console.log(input);
     const parsedInput = getAllCategoriesSchema.safeParse(input);
     if (!parsedInput.success) {
       logger.warn("Validation failed for getAllCategories", {

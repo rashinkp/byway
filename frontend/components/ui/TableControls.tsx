@@ -40,9 +40,9 @@ export function TableControls({
   sortOptions,
   onRefresh,
   filterTabs = [
-    { value: "all", label: "All" },
-    { value: "active", label: "Active" },
-    { value: "inactive", label: "Inactive" },
+    { value: "All", label: "All" },
+    { value: "Active", label: "Active" },
+    { value: "Inactive", label: "Inactive" },
   ],
 }: TableControlsProps) {
   return (

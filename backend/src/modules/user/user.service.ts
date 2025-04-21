@@ -5,6 +5,7 @@ import {
   IUser,
   IUserWithProfile,
   UpdateUserInput,
+  IGetAllUsersWithSkip,
 } from "./user.types";
 import { UserRepository } from "./user.repository";
 import * as bcrypt from "bcrypt";
@@ -20,6 +21,7 @@ import {
   updateUserRoleSchema,
 } from "./user.validators";
 import { Role } from "@prisma/client";
+import { ApiResponse, IPaginatedResponse } from "../../types/apiResponse";
 
 export class UserService {
   constructor(private userRepository: UserRepository) {}
@@ -56,36 +58,51 @@ export class UserService {
     });
   }
 
-  async getAllUsers(input: IGetAllUsersInput): Promise<IGetAllUsersResponse> {
-    const parsedInput = getAllUsersSchema.safeParse(input);
-    if (!parsedInput.success) {
-      logger.warn("Validation failed for getAllUsers", {
-        errors: parsedInput.error.errors,
+  async getAllUsers(input: IGetAllUsersInput): Promise<ApiResponse<IPaginatedResponse<IUser>>> {
+    try {
+      const { page = 1, limit = 10, sortBy, sortOrder, includeDeleted, search, filterBy, role } = input;
+      
+      // Calculate skip for pagination
+      const skip = (page - 1) * limit;
+      
+      // Call repository with the input including skip
+      const result = await this.userRepository.getAllUsers({
+        page,
+        limit,
+        sortBy,
+        sortOrder,
+        includeDeleted,
+        search,
+        filterBy,
+        role,
+        skip
       });
-      throw new AppError(
-        `Validation failed: ${parsedInput.error.message}`,
-        StatusCodes.BAD_REQUEST,
-        "VALIDATION_ERROR"
-      );
+      
+      // Transform the repository result into IPaginatedResponse
+      const totalPages = Math.ceil(result.total / limit);
+      const paginatedResponse: IPaginatedResponse<IUser> = {
+        items: result.users,
+        total: result.total,
+        page,
+        limit,
+        totalPages
+      };
+      
+      return {
+        statusCode: 200,
+        success: true,
+        message: "Users retrieved successfully",
+        data: paginatedResponse
+      };
+    } catch (error) {
+      console.error("Error in getAllUsers:", error);
+      return {
+        statusCode: 500,
+        success: false,
+        message: "Failed to retrieve users",
+        error: error instanceof Error ? error.message : "Unknown error"
+      };
     }
-
-    const { page = 1, limit = 10, role, includeDeleted } = parsedInput.data;
-    const skip = (page - 1) * limit;
-
-    const { users, total } = await this.userRepository.getAllUsers({
-      page,
-      limit,
-      skip,
-      role,
-      includeDeleted,
-    });
-
-    return {
-      users,
-      total,
-      page,
-      limit,
-    };
   }
 
   async updateUserByAdmin(input: AdminUpdateUserInput): Promise<void> {

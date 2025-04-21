@@ -12,11 +12,8 @@ import {
   IGetAllUsersWithSkip,
   IUserRepository,
   UpdateUserRoleInput,
+  IGetAllUsersInput,
 } from "./user.types";
-
-
-
-
 
 export class UserRepository implements IUserRepository {
   constructor(private prisma: PrismaClient) {}
@@ -92,18 +89,53 @@ export class UserRepository implements IUserRepository {
   async getAllUsers(
     input: IGetAllUsersWithSkip
   ): Promise<{ users: IUser[]; total: number }> {
-    const { page = 1, limit = 10, skip, role, includeDeleted = false } = input;
+    const {
+      page = 1,
+      limit = 10,
+      sortBy = "createdAt",
+      sortOrder = "asc",
+      includeDeleted = false,
+      search = "",
+      filterBy = "All",
+      role,
+      skip,
+    } = input;
 
-    const where = {
-      role: role ? role : Role.USER,
-      ...(includeDeleted ? {} : { deletedAt: null }),
-    };
+    const where: any = {};
+    
+    // Add role filter if provided
+    if (role) {
+      where.role = role;
+    }
+    
+    // Handle filtering based on filterBy parameter
+    if (filterBy === "Active") {
+      where.deletedAt = null; // Only active users
+    } else if (filterBy === "Inactive") {
+      where.deletedAt = { not: null }; // Only inactive users
+    } else if (filterBy === "All" && !includeDeleted) {
+      where.deletedAt = null; // All active users when includeDeleted is false
+    }
+    
+    // Only include verified users
+    where.isVerified = true;
+    
+    // Search in name and email
+    if (search) {
+      where.OR = [
+        { name: { contains: search, mode: "insensitive" } },
+        { email: { contains: search, mode: "insensitive" } },
+      ];
+    }
+
+    const orderBy = { [sortBy]: sortOrder };
 
     const [users, total] = await Promise.all([
       this.prisma.user.findMany({
         where,
         skip,
         take: limit,
+        orderBy,
         select: {
           id: true,
           name: true,
@@ -113,16 +145,18 @@ export class UserRepository implements IUserRepository {
           createdAt: true,
           updatedAt: true,
           deletedAt: true,
+          avatar: true,
         },
       }),
-      this.prisma.user.count({ where }),
+      this.prisma.user.count({where}),
     ]);
 
     return {
       users: users.map((user) => ({
         ...user,
         name: user.name || undefined,
-        deletedAt: user.deletedAt || undefined,
+        deletedAt: user.deletedAt || null,
+        avatar: user.avatar || undefined,
       })),
       total,
     };
@@ -154,16 +188,16 @@ export class UserRepository implements IUserRepository {
 
   async updateUserRole(input: UpdateUserRoleInput): Promise<IUser> {
     const { userId, role } = input;
-      const user = await this.prisma.user.update({
-        where: { id: userId },
-        data: { role },
-      });
+    const user = await this.prisma.user.update({
+      where: { id: userId },
+      data: { role },
+    });
 
-      return {
-        id: user.id,
-        email: user.email,
-        role: user.role,
-        isVerified: user.isVerified,
-      };
+    return {
+      id: user.id,
+      email: user.email,
+      role: user.role,
+      isVerified: user.isVerified,
+    };
   }
 }

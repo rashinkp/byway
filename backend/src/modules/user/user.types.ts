@@ -52,8 +52,12 @@ export interface IRegisterInput {
 export interface IGetAllUsersInput {
   page?: number;
   limit?: number;
-  role?: Role;
+  sortBy?: string;
+  sortOrder?: string;
   includeDeleted?: boolean;
+  search?: string;
+  filterBy?: string;
+  role?: "USER" | "INSTRUCTOR" | "ADMIN";
 }
 
 export interface IGetAllUsersResponse {
@@ -81,5 +85,4 @@ export interface IUserRepository {
 
 export interface IGetAllUsersWithSkip extends IGetAllUsersInput {
   skip: number;
-  role?: Role;
 }

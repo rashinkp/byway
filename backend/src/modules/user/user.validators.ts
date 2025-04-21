@@ -40,10 +40,16 @@ export const updateUserSchema = z.object({
 });
 
 export const getAllUsersSchema = z.object({
-  page: z.number().int().positive().optional(),
-  limit: z.number().int().positive().optional(),
-  role: z.enum([Role.USER, Role.INSTRUCTOR, Role.ADMIN]).optional(),
-  includeDeleted: z.boolean().optional(),
+  page: z.number().int().positive().optional().default(1),
+  limit: z.number().int().positive().optional().default(10),
+  sortBy: z
+    .enum(["name", "createdAt", "updatedAt"])
+    .optional()
+    .default("createdAt"),
+  sortOrder: z.enum(["asc", "desc"]).optional().default("asc"),
+  includeDeleted: z.boolean().optional().default(false),
+  search: z.string().optional().default(""),
+  filterBy: z.enum(["All", "Active", "Inactive"]).optional().default("All"),
 });
 
 export const adminUpdateUserSchema = z.object({

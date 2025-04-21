@@ -14,34 +14,33 @@ import { useUpdateCategory } from "@/hooks/category/useUpdateCategory";
 import { useToggleDeleteCategory } from "@/hooks/category/useToggleDeleteCategory";
 import CategoryFormModal from "@/components/admin/CategoryFormModal";
 import { StatusBadge } from "@/components/ui/StatusBadge";
+import { Pagination } from "@/components/ui/Pagination";
 
 export default function CategoriesPage() {
   const [page, setPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
+  const [filterStatus, setFilterStatus] = useState<"All" | "Active" | "Inactive">("All");
+  const [sortBy, setSortBy] = useState("name");
+  const [isAddOpen, setIsAddOpen] = useState(false);
+  const [isEditOpen, setIsEditOpen] = useState(false);
+  const [editCategory, setEditCategory] = useState<Category | undefined>(undefined);
+
   const { categories, total, loading, refetch, setCategories } = useCategories({
     page,
     limit: 10,
     search: searchTerm,
     includeDeleted: true,
-    
+    filterBy: filterStatus,
   });
   const { mutate: createCategory } = useCreateCategory();
   const { mutate: updateCategory } = useUpdateCategory();
   const { mutate: toggleDeleteCategory } = useToggleDeleteCategory();
 
-  const [isAddOpen, setIsAddOpen] = useState(false);
-  const [isEditOpen, setIsEditOpen] = useState(false);
-  const [editCategory, setEditCategory] = useState<Category | undefined>(
-    undefined
-  );
-  const [filterStatus, setFilterStatus] = useState("all");
-  const [sortBy, setSortBy] = useState("name");
-
   const stats = [
     { title: "Total Categories", value: total },
     {
       title: "Active Categories",
-      value: categories.filter((cat) => cat.deletedAt).length,
+      value: categories.filter((cat) => !cat.deletedAt).length,
       color: "text-green-600",
     },
     {
@@ -50,6 +49,9 @@ export default function CategoriesPage() {
       color: "text-red-600",
     },
   ];
+
+  // Calculate total pages
+  const totalPages = Math.ceil(total / 10);
 
   // Table columns
   const columns = [
@@ -140,14 +142,13 @@ export default function CategoriesPage() {
         searchTerm={searchTerm}
         setSearchTerm={setSearchTerm}
         filterStatus={filterStatus}
-        setFilterStatus={setFilterStatus}
+        setFilterStatus={(status: string) => setFilterStatus(status as "All" | "Active" | "Inactive")}
         sortBy={sortBy}
         setSortBy={setSortBy}
         sortOptions={[
           { value: "name", label: "Name (A-Z)" },
           { value: "newest", label: "Newest first" },
           { value: "oldest", label: "Oldest first" },
-          // Remove courses if backend doesn't support courseCount
           { value: "courses", label: "Most courses" },
         ]}
         onRefresh={refetch}
@@ -163,6 +164,16 @@ export default function CategoriesPage() {
         currentPage={page}
         setCurrentPage={setPage}
       />
+      
+      {totalPages > 1 && (
+        <div className="mt-4">
+          <Pagination
+            currentPage={page}
+            totalPages={totalPages}
+            onPageChange={setPage}
+          />
+        </div>
+      )}
 
       <CategoryFormModal
         open={isAddOpen}
