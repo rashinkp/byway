@@ -17,7 +17,7 @@ export function useSignup() {
       name: string;
       email: string;
       password: string;
-    }) => signup(name, email, password),
+    }) => signup({name, email, password}),
     onSuccess: (data) => {
       setEmail(data?.data?.email);
       queryClient.invalidateQueries({ queryKey: ["auth"] });

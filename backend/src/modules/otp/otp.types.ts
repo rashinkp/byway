@@ -1,6 +1,7 @@
 export interface IVerifyOtpInput {
   email: string;
   otp: string;
+  type?: "signup" | "password-reset";
 }
 
 export interface IResendOtpInput {

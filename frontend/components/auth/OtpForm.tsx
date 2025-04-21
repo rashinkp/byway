@@ -28,8 +28,12 @@ export function VerifyOtpForm() {
 
   const handleSubmit = (otp: string) => {
     if (!email) return;
+    
+    // Map frontend type to backend type
+    const verificationType = type === "forgot-password" ? "password-reset" : "signup";
+    
     verifyOtp(
-      { email, otp },
+      { email, otp, type: verificationType },
       {
         onSuccess: (user) => {
           if (type === "forgot-password") {

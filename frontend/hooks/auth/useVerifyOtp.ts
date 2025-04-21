@@ -1,3 +1,4 @@
+"use client";
 
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
@@ -9,10 +10,14 @@ export function useVerifyOtp() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ email, otp }: { email: string; otp: string }) =>
-      verifyOtp(email, otp),
-    onSuccess: (user) => {
-      // setUser(user);
+    mutationFn: ({ email, otp, type = "signup" }: { email: string; otp: string; type?: "signup" | "password-reset" }) =>
+      verifyOtp(otp, email, type),
+    onSuccess: (user, variables) => {
+      // Only set user for signup verification
+      if (variables.type !== "password-reset") {
+        setUser(user);
+      }
+      
       queryClient.invalidateQueries({ queryKey: ["auth"] });
       toast.success("Email verified", {
         description: "Your email has been successfully verified.",

@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useMutation } from "@tanstack/react-query";
@@ -19,11 +18,10 @@ export function useForgotPassword() {
         description: "A verification code has been sent to your email.",
         duration: 5000,
       });
-      // router.push("/reset-password"); 
     },
     onError: (error: any) => {
       toast.error("Error", {
-        description: error.message || "Failed to send reset OTP",
+        description: error.message || "Failed to send reset OTP. Please check if the email exists.",
         duration: 5000,
       });
     },

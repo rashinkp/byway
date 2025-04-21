@@ -14,10 +14,15 @@ export class OtpController {
     try {
       const validatedInput = VerifyOtpSchema.parse(input);
       const user = await this.otpService.verifyOtp(validatedInput);
-      const token = JwtUtil.generateToken(
-        { id: user.id, email: user.email, role: user.role },
-        process.env.JWT_SECRET!
-      );
+      
+      let token = null;
+      if (validatedInput.type !== "password-reset") {
+        token = JwtUtil.generateToken(
+          { id: user.id, email: user.email, role: user.role },
+          process.env.JWT_SECRET!
+        );
+      }
+      
       return {
         status: "success",
         data: { id: user.id, email: user.email, role: user.role },

@@ -3,7 +3,7 @@ export interface ApiResponse<T = any> {
   data?: T; 
   message?: string;
   statusCode: number; 
-  token?: string; 
+  token?: string | null; 
 }
 
 export interface AuthResponse

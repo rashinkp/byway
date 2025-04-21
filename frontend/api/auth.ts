@@ -1,4 +1,4 @@
-import { api } from "@/api/api";
+import {api} from "@/api/api";
 import { User } from "@/types/user";
 
 interface IVerifyOtpResponse {
@@ -37,13 +37,15 @@ interface IForgotPasswordResponse {
   message?: string;
 }
 
-export async function signup(name: string, email: string, password: string) {
+interface SignupData {
+  email: string;
+  password: string;
+  name: string;
+}
+
+export async function signup(data: SignupData) {
   try {
-    const response = await api.post<ISignupResponse>("/auth/signup", {
-      email,
-      password,
-      name,
-    });
+    const response = await api.post<ISignupResponse>("/auth/signup", data);
     return response.data;
   } catch (error: any) {
     throw new Error(error.response?.data?.message || "Signup failed");
@@ -62,12 +64,12 @@ export async function login(email: string, password: string) {
   }
 }
 
-export async function verifyOtp(email: string, otp: string): Promise<User> {
+export async function verifyOtp(otp: string, email: string, type: "signup" | "password-reset" = "signup"): Promise<User> {
   try {
-    const response = await api.post<IVerifyOtpResponse>("/otp/verify", {
-      otp,
-      email,
-    });
+    const response = await api.post<IVerifyOtpResponse>(
+      "/otp/verify",
+      { otp, email, type }
+    );
     return response.data.data;
   } catch (error: any) {
     throw new Error(error.response?.data?.message || "OTP verification failed");
@@ -86,9 +88,12 @@ export async function forgotPassword(email: string): Promise<void> {
   try {
     await api.post<IForgotPasswordResponse>("/auth/forgot-password", { email });
   } catch (error: any) {
-    throw new Error(
-      error.response?.data?.message || "Forgot password request failed"
-    );
+    // Check if the error is from our backend AppError
+    if (error.response?.data?.status === "error") {
+      throw new Error(error.response.data.message || "Forgot password request failed");
+    }
+    // For other errors
+    throw new Error(error.response?.data?.message || "Forgot password request failed");
   }
 }
 
@@ -123,6 +128,7 @@ export async function getCurrentUser(): Promise<User | null> {
 }
 
 export async function logout(): Promise<void> {
+  
   try {
     await api.post<ILogoutResponse>("/auth/logout");
   } catch (error: any) {
