@@ -1,9 +1,13 @@
 // middleware.ts
 import { NextRequest, NextResponse } from "next/server";
-import { useAuthStore } from "@/stores/auth.store";
+import { getCurrentUserServer } from "@/api/auth";
 
 export async function middleware(request: NextRequest) {
   const { pathname, searchParams } = request.nextUrl;
+
+  // Get cookies as a string (includes securecookie)
+  const cookies = request.headers.get("cookie") || "";
+  const user = await getCurrentUserServer(cookies);
 
   const publicRoutes = [
     "/login",
@@ -13,7 +17,9 @@ export async function middleware(request: NextRequest) {
     "/reset-password",
   ];
 
+  // Handle public routes
   if (publicRoutes.includes(pathname)) {
+    // Validate query params
     if (pathname === "/verify-otp" && !searchParams.get("email")) {
       return NextResponse.redirect(new URL("/signup", request.url));
     }
@@ -23,45 +29,44 @@ export async function middleware(request: NextRequest) {
     ) {
       return NextResponse.redirect(new URL("/forgot-password", request.url));
     }
+
+    // Redirect authenticated users to role-specific dashboards
+    if (user) {
+      const roleRedirects: Record<string, string> = {
+        ADMIN: "/admin/dashboard",
+        INSTRUCTOR: "/instructor/dashboard",
+        USER: "/",
+      };
+      const redirectPath = roleRedirects[user.role] || "/";
+      return NextResponse.redirect(new URL(redirectPath, request.url));
+    }
+
     return NextResponse.next();
   }
 
+  // Allow public access to course pages (excluding lessons)
   if (pathname.startsWith("/courses") && !pathname.includes("/lessons")) {
     return NextResponse.next();
   }
 
-  const { user, isInitialized } = useAuthStore.getState();
-  
-  if (!isInitialized) {
-    return NextResponse.next();
-  }
-
+  // Require authentication for protected routes
   if (!user) {
     return NextResponse.redirect(new URL("/login", request.url));
   }
 
-
-  //todo: update to protect routes;
-
- 
-  if (publicRoutes.includes(pathname)) {
-    const roleRedirects: Record<string, string> = {
-      ADMIN: "/admin/dashboard",
-      INSTRUCTOR: "/instructor/dashboard",
-      USER: "/",
-    };
-    const redirectPath = roleRedirects[user.role] || "/";
-    return NextResponse.redirect(new URL(redirectPath, request.url));
-  }
-
+  // Role-based route protection
   const role = user.role;
+
   if (pathname.startsWith("/admin") && role !== "ADMIN") {
     return NextResponse.redirect(new URL("/login", request.url));
   }
+
   if (pathname.startsWith("/instructor") && role !== "INSTRUCTOR") {
     return NextResponse.redirect(new URL("/login", request.url));
   }
-  if (pathname.includes("/lessons") && role !== "USER") {
+
+  // Allow USER and INSTRUCTOR to access lesson routes
+  if (pathname.includes("/lessons") && !["USER", "INSTRUCTOR"].includes(role)) {
     return NextResponse.redirect(new URL("/login", request.url));
   }
 

@@ -135,3 +135,24 @@ export async function logout(): Promise<void> {
     throw new Error(error.response?.data?.message || "Logout failed");
   }
 }
+
+
+
+export async function getCurrentUserServer(
+  cookies: string
+): Promise<User | null> {
+  try {
+    const response = await api.get<IGetCurrentUserResponse>("/auth/me", {
+      headers: {
+        Cookie: cookies, // Forward the securecookie
+      },
+    });
+    return response.data.data;
+  } catch (error: any) {
+    if (error.response?.status === 401) {
+      return null;
+    }
+    console.error("Error fetching current user server-side:", error);
+    return null;
+  }
+}
