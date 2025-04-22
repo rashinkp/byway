@@ -5,8 +5,9 @@ import { TopNavbar } from "@/components/admin/TopNavbar/TopNavbar";
 import { Button } from "@/components/ui/button";
 import { useLogout } from "@/hooks/auth/useLogout";
 import { useAuthStore } from "@/stores/auth.store";
+import { SkeletonLayout } from "@/components/admin/SkeletonLayout";
 import { Menu, X } from "lucide-react";
-import { usePathname, useRouter } from "next/navigation"; // Fix: Use next/navigation
+import { usePathname, useRouter } from "next/navigation";
 import { ReactNode, useEffect, useState } from "react";
 
 interface AdminLayoutProps {
@@ -14,27 +15,27 @@ interface AdminLayoutProps {
 }
 
 export default function AdminLayout({ children }: AdminLayoutProps) {
-  const { user } = useAuthStore();
+  const { user, isLoading, isInitialized, initializeAuth } = useAuthStore();
   const { mutate: logout } = useLogout();
   const router = useRouter();
   const pathname = usePathname();
-  // Initialize collapsed to a default value (e.g., false) to avoid SSR mismatch
   const [collapsed, setCollapsed] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  // Track if the component is mounted to avoid SSR/client mismatch
-  const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
-    // Set isMounted to true after the component mounts on the client
-    setIsMounted(true);
+    // Initialize auth if not already done
+    if (!isInitialized) {
+      initializeAuth();
+    }
 
+    // Handle responsive sidebar collapse
     const checkScreenSize = () => {
       setCollapsed(window.innerWidth < 1024);
     };
     checkScreenSize();
     window.addEventListener("resize", checkScreenSize);
     return () => window.removeEventListener("resize", checkScreenSize);
-  }, []);
+  }, [isInitialized, initializeAuth]);
 
   const handleLogout = async () => {
     try {
@@ -49,14 +50,15 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
     ? user.email.substring(0, 2).toUpperCase()
     : "AD";
 
-  if (!isMounted) {
-    return (
-      <div className="flex min-h-screen bg-gray-50">
-        <main className="flex-1 p-4 lg:p-6">
-          <div className="max-w-7xl mx-auto">{children}</div>
-        </main>
-      </div>
-    );
+  // Show skeleton while auth is loading or not initialized
+  if (isLoading || !isInitialized) {
+    return <SkeletonLayout />;
+  }
+
+  // Redirect to login if user is not authenticated or not an admin
+  if (!user || user.role !== "ADMIN") {
+    router.push("/login");
+    return null;
   }
 
   return (
@@ -96,8 +98,6 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
       >
         <TopNavbar
           pathname={pathname}
-          userInitials={userInitials}
-          handleLogout={handleLogout}
         />
         <div className="p-4 lg:p-6">
           <div className="max-w-7xl mx-auto">{children}</div>
