@@ -180,9 +180,9 @@ export class UserRepository implements IUserRepository {
     }) as Promise<IUser | null>;
   }
 
-  async findUserById(id: string): Promise<IUser | null> {
+  async findUserById(userId: string): Promise<IUser | null> {
     return this.prisma.user.findUnique({
-      where: { id },
+      where: { id:userId },
     }) as Promise<IUser | null>;
   }
 

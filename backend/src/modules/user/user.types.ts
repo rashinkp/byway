@@ -79,7 +79,7 @@ export interface IUserRepository {
   ): Promise<{ users: IUser[]; total: number }>;
   updateUserByAdmin(input: AdminUpdateUserInput): Promise<void>;
   findUserByEmail(email: string): Promise<IUser | null>;
-  findUserById(id: string): Promise<IUser | null>;
+  findUserById(userId: string): Promise<IUser | null>;
   updateUserRole(input: UpdateUserRoleInput): Promise<IUser>;
 }
 

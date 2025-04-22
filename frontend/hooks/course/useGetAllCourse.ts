@@ -9,9 +9,8 @@ export interface UseGetAllCoursesParams {
   sortBy?: "createdAt" | "name" | "updatedAt";
   sortOrder?: "asc" | "desc";
   search?: string;
-  filterBy?: "All" | "Active" | "Draft";
+  filterBy?: "All" | "Active" | "Draft" | "Inactive";
   includeDeleted?: boolean;
-  createdBy?:string,
 }
 
 export function useGetAllCourses({
@@ -35,7 +34,6 @@ export function useGetAllCourses({
         sortOrder,
         search,
         filterBy,
-        createdBy: user?.id,
         includeDeleted,
       },
     ],
@@ -48,7 +46,6 @@ export function useGetAllCourses({
         search,
         filterBy,
         includeDeleted,
-        createdBy: user?.id || "",
       }),
     enabled: !!user?.id,
     retry: 1,

@@ -94,9 +94,9 @@ export class CategoryRepository implements ICategoryRepository {
       };
   }
 
-  async getCategoryById(id: string): Promise<ICategory | null> {
+  async getCategoryById(categoryId: string): Promise<ICategory | null> {
     const category = await this.prisma.category.findUnique({
-      where: { id },
+      where: { id: categoryId },
       select: {
         id: true,
         name: true,
@@ -132,9 +132,9 @@ export class CategoryRepository implements ICategoryRepository {
     };
   }
 
-  async deleteCategory(id: string): Promise<ICategory> {
+  async deleteCategory(categoryId: string): Promise<ICategory> {
     const updatedCategory = await this.prisma.category.update({
-      where: { id },
+      where: { id: categoryId },
       data: {
         deletedAt: new Date(),
         updatedAt: new Date(),
@@ -152,9 +152,9 @@ export class CategoryRepository implements ICategoryRepository {
     };
   }
 
-  async recoverCategory(id: string): Promise<ICategory> {
+  async recoverCategory(categoryId: string): Promise<ICategory> {
     const updatedCategory = await this.prisma.category.update({
-      where: { id },
+      where: { id: categoryId },
       data: {
         deletedAt: null,
         updatedAt: new Date(),

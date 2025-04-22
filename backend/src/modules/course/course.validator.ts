@@ -135,7 +135,7 @@ export const getAllCoursesSchema = z.object({
   includeDeleted: z.boolean().optional().default(false),
   search: z.string().optional().default(""),
   filterBy: z.enum(["All", "Active", "Draft"]).optional().default("All"),
-  userId: z.string().uuid("Invalid user ID"),
+  userId: z.string().uuid("Invalid user ID").optional(),
 });
 
 

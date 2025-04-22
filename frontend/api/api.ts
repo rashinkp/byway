@@ -6,7 +6,7 @@ export const api = axios.create({
     process.env.NEXT_PUBLIC_AUTH_API_URL || "http://localhost:5001/api/v1",
   withCredentials: true,
   headers: {
-    "Cache-Control": "no-cache", 
+    "Cache-Control": "no-cache",
   },
 });
 

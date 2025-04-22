@@ -39,9 +39,9 @@ export interface ICategoryRepository {
   getAllCategories(
     input: IGetAllCategoriesInput
   ): Promise<{ categories: ICategory[]; total: number }>;
-  getCategoryById(id: string): Promise<ICategory | null>;
+  getCategoryById(categoryId: string): Promise<ICategory | null>;
   updateCategory(input: IUpdateCategoryInput): Promise<ICategory>;
-  deleteCategory(id: string): Promise<ICategory>;
+  deleteCategory(categoryId: string): Promise<ICategory>;
   getCategoryByName(name: string): Promise<ICategory | null>;
-  recoverCategory(id: string): Promise<ICategory>;
+  recoverCategory(categoryId: string): Promise<ICategory>;
 }

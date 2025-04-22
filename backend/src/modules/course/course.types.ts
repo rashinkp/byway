@@ -74,7 +74,7 @@ export interface IGetAllCoursesInput {
   includeDeleted?: boolean;
   search?: string;
   filterBy?: "All" | "Active" | "Draft";
-  userId: string;
+  userId?: string | undefined;
 }
 
 export interface ICreateEnrollmentInput {
@@ -93,10 +93,10 @@ export interface ICourseRepository {
   getAllCourses(
     input: IGetAllCoursesInput
   ): Promise<{ courses: ICourse[]; total: number }>;
-  getCourseById(id: string): Promise<ICourse | null>;
+  getCourseById(courseId: string): Promise<ICourse | null>;
   getCourseByName(title: string): Promise<ICourse | null>;
   updateCourse(input: IUpdateCourseInput): Promise<ICourse>;
-  softDeleteCourse(id: string, deletedAt: Date | null): Promise<ICourse>;
+  softDeleteCourse(courseId: string, deletedAt: Date | null): Promise<ICourse>;
   createEnrollment(input: ICreateEnrollmentInput): Promise<IEnrollment>;
   getEnrollment(userId: string, courseId: string): Promise<IEnrollment | null>;
 }

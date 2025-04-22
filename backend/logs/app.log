@@ -126,3 +126,38 @@
 {"id":"fba220f6-4ee0-4a51-8128-7e2235117431","level":"warn","message":"Unauthorized course delete attempt","timestamp":"2025-04-21T18:57:59.419Z","userId":"2b5c2261-5cfc-4320-b4cc-2409ae2516e5"}
 {"error":{"code":"FORBIDDEN","isOperational":true,"status":403,"statusCode":403},"id":"fba220f6-4ee0-4a51-8128-7e2235117431","level":"error","message":"Error soft deleting course","timestamp":"2025-04-21T18:57:59.421Z","userId":"2b5c2261-5cfc-4320-b4cc-2409ae2516e5"}
 {"error":{"code":"FORBIDDEN","isOperational":true,"status":403,"statusCode":403},"level":"error","message":"Error soft deleting course","timestamp":"2025-04-21T18:57:59.422Z"}
+{"errors":[{"code":"invalid_type","expected":"string","message":"Required","path":["userId"],"received":"undefined"}],"level":"warn","message":"Validation failed for getAllCourses","timestamp":"2025-04-22T07:22:39.534Z"}
+{"error":{"code":"VALIDATION_ERROR","isOperational":true,"status":400,"statusCode":400},"level":"error","message":"Error retrieving courses","timestamp":"2025-04-22T07:22:39.551Z"}
+{"errors":[{"code":"invalid_type","expected":"string","message":"Required","path":["userId"],"received":"undefined"}],"level":"warn","message":"Validation failed for getAllCourses","timestamp":"2025-04-22T07:22:40.587Z"}
+{"error":{"code":"VALIDATION_ERROR","isOperational":true,"status":400,"statusCode":400},"level":"error","message":"Error retrieving courses","timestamp":"2025-04-22T07:22:40.588Z"}
+{"errors":[{"code":"invalid_type","expected":"string","message":"Required","path":["userId"],"received":"undefined"}],"level":"warn","message":"Validation failed for getAllCourses","timestamp":"2025-04-22T07:22:56.532Z"}
+{"error":{"code":"VALIDATION_ERROR","isOperational":true,"status":400,"statusCode":400},"level":"error","message":"Error retrieving courses","timestamp":"2025-04-22T07:22:56.533Z"}
+{"errors":[{"code":"invalid_type","expected":"string","message":"Required","path":["userId"],"received":"undefined"}],"level":"warn","message":"Validation failed for getAllCourses","timestamp":"2025-04-22T07:22:57.572Z"}
+{"error":{"code":"VALIDATION_ERROR","isOperational":true,"status":400,"statusCode":400},"level":"error","message":"Error retrieving courses","timestamp":"2025-04-22T07:22:57.574Z"}
+{"error":{"clientVersion":"6.6.0","name":"PrismaClientValidationError"},"input":{"includeDeleted":true,"limit":10,"page":1,"search":"","sortBy":"name","sortOrder":"asc"},"level":"error","message":"Error retrieving courses","timestamp":"2025-04-22T07:24:18.017Z"}
+{"error":{"code":"INTERNAL_ERROR","isOperational":true,"status":500,"statusCode":500},"level":"error","message":"Error retrieving courses","timestamp":"2025-04-22T07:24:18.033Z"}
+{"error":{"clientVersion":"6.6.0","name":"PrismaClientValidationError"},"input":{"includeDeleted":true,"limit":10,"page":1,"search":"","sortBy":"name","sortOrder":"asc"},"level":"error","message":"Error retrieving courses","timestamp":"2025-04-22T07:24:19.078Z"}
+{"error":{"code":"INTERNAL_ERROR","isOperational":true,"status":500,"statusCode":500},"level":"error","message":"Error retrieving courses","timestamp":"2025-04-22T07:24:19.079Z"}
+{"error":{"clientVersion":"6.6.0","name":"PrismaClientValidationError"},"input":{"includeDeleted":true,"limit":10,"page":1,"search":"","sortBy":"name","sortOrder":"asc"},"level":"error","message":"Error retrieving courses","timestamp":"2025-04-22T07:25:45.682Z"}
+{"error":{"code":"INTERNAL_ERROR","isOperational":true,"status":500,"statusCode":500},"level":"error","message":"Error retrieving courses","timestamp":"2025-04-22T07:25:45.684Z"}
+{"error":{"clientVersion":"6.6.0","name":"PrismaClientValidationError"},"input":{"includeDeleted":true,"limit":10,"page":1,"search":"","sortBy":"name","sortOrder":"asc"},"level":"error","message":"Error retrieving courses","timestamp":"2025-04-22T07:25:46.735Z"}
+{"error":{"code":"INTERNAL_ERROR","isOperational":true,"status":500,"statusCode":500},"level":"error","message":"Error retrieving courses","timestamp":"2025-04-22T07:25:46.736Z"}
+{"error":{"clientVersion":"6.6.0","name":"PrismaClientValidationError"},"input":{"includeDeleted":true,"limit":10,"page":1,"search":"","sortBy":"name","sortOrder":"asc"},"level":"error","message":"Error retrieving courses","timestamp":"2025-04-22T07:30:37.086Z"}
+{"error":{"code":"INTERNAL_ERROR","isOperational":true,"status":500,"statusCode":500},"level":"error","message":"Error retrieving courses","timestamp":"2025-04-22T07:30:37.101Z"}
+{"error":{"clientVersion":"6.6.0","name":"PrismaClientValidationError"},"input":{"includeDeleted":true,"limit":10,"page":1,"search":"","sortBy":"name","sortOrder":"asc"},"level":"error","message":"Error retrieving courses","timestamp":"2025-04-22T07:30:38.189Z"}
+{"error":{"code":"INTERNAL_ERROR","isOperational":true,"status":500,"statusCode":500},"level":"error","message":"Error retrieving courses","timestamp":"2025-04-22T07:30:38.190Z"}
+{"level":"warn","message":"Category already exists","name":"Data Science","timestamp":"2025-04-22T08:18:11.365Z"}
+{"error":{"code":"ALREADY_EXISTS","isOperational":true,"status":400,"statusCode":400},"level":"error","message":"Error updating category","timestamp":"2025-04-22T08:18:11.369Z"}
+{"error":{"isOperational":true,"status":403,"statusCode":403},"input":{"email":"faseelaop@gmail.com","password":"123123"},"level":"error","message":"Login error:","timestamp":"2025-04-22T08:19:16.601Z"}
+{"email":"faseela@gmail.com","level":"warn","message":"User not found by email","timestamp":"2025-04-22T08:20:57.247Z"}
+{"error":{"isOperational":true,"status":401,"statusCode":401},"input":{"email":"faseela@gmail.com","password":"123123"},"level":"error","message":"Login error:","timestamp":"2025-04-22T08:20:57.248Z"}
+{"error":{"isOperational":true,"status":404,"statusCode":404},"level":"error","message":"Get user details error:","timestamp":"2025-04-22T08:21:21.944Z","userId":"80252264-28da-4453-9e1c-1796ade5d2ff"}
+{"error":{"isOperational":true,"status":404,"statusCode":404},"level":"error","message":"Get user details error:","timestamp":"2025-04-22T08:21:22.100Z","userId":"80252264-28da-4453-9e1c-1796ade5d2ff"}
+{"error":{"isOperational":true,"status":404,"statusCode":404},"level":"error","message":"Get user details error:","timestamp":"2025-04-22T08:21:24.132Z","userId":"80252264-28da-4453-9e1c-1796ade5d2ff"}
+{"error":{"isOperational":true,"status":404,"statusCode":404},"level":"error","message":"Get user details error:","timestamp":"2025-04-22T08:21:24.232Z","userId":"80252264-28da-4453-9e1c-1796ade5d2ff"}
+{"error":{},"level":"error","message":"Error retrieving courses","timestamp":"2025-04-22T08:22:02.596Z"}
+{"error":{},"level":"error","message":"Error retrieving courses","timestamp":"2025-04-22T08:22:03.611Z"}
+{"errors":[{"code":"invalid_string","message":"Invalid URL","path":["thumbnail"],"validation":"url"}],"level":"warn","message":"Validation failed for createCourse","timestamp":"2025-04-22T08:22:45.730Z"}
+{"error":{"code":"VALIDATION_ERROR","isOperational":true,"status":400,"statusCode":400},"level":"error","message":"Error creating course","timestamp":"2025-04-22T08:22:45.732Z"}
+{"error":{},"level":"error","message":"Error retrieving courses","timestamp":"2025-04-22T08:23:21.270Z"}
+{"error":{},"level":"error","message":"Error retrieving courses","timestamp":"2025-04-22T08:23:22.423Z"}

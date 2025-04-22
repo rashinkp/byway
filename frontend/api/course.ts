@@ -10,7 +10,6 @@ export async function getAllCourses({
   sortBy = "createdAt",
   sortOrder = "desc",
   includeDeleted = false,
-  createdBy,
 }: UseGetAllCoursesParams): Promise<CourseApiResponse> {
   try {
     const response = await api.get<{ data: CourseApiResponse }>("/courses/", {
@@ -20,7 +19,6 @@ export async function getAllCourses({
         sortBy,
         sortOrder,
         includeDeleted,
-        createdBy,
       },
     });
     return response.data.data;

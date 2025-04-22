@@ -92,9 +92,9 @@ export class LessonRepository implements ILessonRepository {
     };
   }
 
-  async getLessonById(id: string): Promise<ILesson | null> {
+  async getLessonById(courseId: string): Promise<ILesson | null> {
     const lesson = await this.prisma.lesson.findUnique({
-      where: { id },
+      where: { id:courseId },
     });
     if (!lesson) return null;
     return {

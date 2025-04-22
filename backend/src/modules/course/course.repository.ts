@@ -65,20 +65,24 @@ export class CourseRepository implements ICourseRepository {
       userId,
     } = input;
 
-    // Build where clause
+    // ✅ Allow only valid fields for sorting
+    const allowedSortFields = ["title", "createdAt", "updatedAt"];
+    const safeSortBy = allowedSortFields.includes(sortBy)
+      ? sortBy
+      : "createdAt";
+
+    // ✅ Build where clause safely
     const where: any = {
-      createdBy: userId,
-      ...(includeDeleted ? {} : { deletedAt: null }), // Include or exclude deleted courses
+      ...(userId ? { createdBy: userId } : {}),
+      ...(includeDeleted ? {} : { deletedAt: null }),
     };
 
-    // Apply filterBy for status
     if (filterBy === "Active") {
       where.status = "PUBLISHED";
     } else if (filterBy === "Draft") {
       where.status = "DRAFT";
     }
 
-    // Apply search filter (title or description)
     if (search) {
       where.OR = [
         { title: { contains: search, mode: "insensitive" } },
@@ -87,7 +91,7 @@ export class CourseRepository implements ICourseRepository {
     }
 
     const skip = (page - 1) * limit;
-    const orderBy = { [sortBy]: sortOrder };
+    const orderBy = { [safeSortBy]: sortOrder };
 
     const [courses, total] = await Promise.all([
       this.prisma.course.findMany({
@@ -136,9 +140,9 @@ export class CourseRepository implements ICourseRepository {
     };
   }
 
-  async getCourseById(id: string): Promise<ICourse | null> {
+  async getCourseById(courseId: string): Promise<ICourse | null> {
     const course = await this.prisma.course.findUnique({
-      where: { id },
+      where: { id:courseId },
       include: { details: true },
     });
     if (!course) return null;
@@ -257,9 +261,9 @@ export class CourseRepository implements ICourseRepository {
     };
   }
 
-  async softDeleteCourse(id: string, deletedAt: Date | null): Promise<ICourse> {
+  async softDeleteCourse(courseId: string, deletedAt: Date | null): Promise<ICourse> {
     const course = await this.prisma.course.update({
-      where: { id },
+      where: { id:courseId },
       data: { deletedAt, updatedAt: new Date() },
       include: { details: true },
     });

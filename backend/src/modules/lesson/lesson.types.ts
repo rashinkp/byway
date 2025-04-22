@@ -92,7 +92,7 @@ export interface ICreateLessonContentInput {
 
 export interface ILessonRepository {
   createLesson(input: ICreateLessonInput): Promise<ILesson>;
-  getLessonById(id: string): Promise<ILesson | null>;
+  getLessonById(lessonId: string): Promise<ILesson | null>;
   getLessonsByCourseId(courseId: string): Promise<ILesson[]>;
   updateLessonProgress(
     input: IUpdateLessonProgressInput

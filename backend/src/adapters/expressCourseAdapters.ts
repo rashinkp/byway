@@ -56,13 +56,16 @@ export const adaptCourseController = (controller: CourseController) => ({
         filterBy,
       } = req.query;
 
-      const userId = req.user?.id;
+      let userId = req.user?.id;
       if (!userId) {
         throw new AppError(
           "User not authenticated",
           StatusCodes.UNAUTHORIZED,
           "AUTH_ERROR"
         );
+      }
+      if(req.user?.role === "ADMIN") {
+        userId = undefined; 
       }
 
       const input: IGetAllCoursesInput = {
