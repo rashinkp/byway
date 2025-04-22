@@ -94,7 +94,7 @@ export class LessonRepository implements ILessonRepository {
 
   async getLessonById(id: string): Promise<ILesson | null> {
     const lesson = await this.prisma.lesson.findUnique({
-      where: { id, deletedAt: null },
+      where: { id },
     });
     if (!lesson) return null;
     return {
@@ -174,6 +174,24 @@ export class LessonRepository implements ILessonRepository {
       completedAt: p.completedAt || undefined,
       createdAt: p.createdAt,
       updatedAt: p.updatedAt,
+    }));
+  }
+
+
+  async updateLesson(lessonId: string, input: Partial<ICreateLessonInput>): Promise<ILesson> {
+    return this.prisma.lesson.update({
+      where: { id: lessonId },
+      data: input,
+    }).then((lesson) => ({
+      id: lesson.id,
+      courseId: lesson.courseId,
+      title: lesson.title,
+      description: lesson.description || undefined,
+      order: lesson.order,
+      thumbnail: lesson.thumbnail || undefined,
+      createdAt: lesson.createdAt,
+      updatedAt: lesson.updatedAt,
+      deletedAt: lesson.deletedAt || undefined,
     }));
   }
 }

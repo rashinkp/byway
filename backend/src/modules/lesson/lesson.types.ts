@@ -16,6 +16,7 @@ export interface ICreateLessonInput {
   description?: string | null;
   order: number;
   thumbnail?: string | null;
+  deletedAt?: Date | null;
 }
 
 export interface IUserLessonProgress {
@@ -98,4 +99,8 @@ export interface ILessonRepository {
   ): Promise<IUserLessonProgress>;
   getCourseProgress(input: IGetProgressInput): Promise<IUserLessonProgress[]>;
   getAllLessons(input: IGetAllLessonsInput): Promise<IGetAllLessonsResponse>;
+  updateLesson(
+    lessonId: string, 
+    input: Partial<ICreateLessonInput>
+  ): Promise<ILesson>;
 }

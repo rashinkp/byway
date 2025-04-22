@@ -120,4 +120,31 @@ export class LessonController {
       };
     }
   }
+
+
+  async deleteLesson(lessonId: string): Promise<ApiResponse> {
+    try {
+      const progress = await this.lessonService.deleteLesson(lessonId);
+      return {
+        status: "success",
+        data: progress,
+        message: "Lesson deleted successfully",
+        statusCode: StatusCodes.OK,
+      };
+    } catch (error) {
+      const message =
+        error instanceof Error ? error.message : "Failed to delete lesson";
+      const statusCode = message.includes("not found")
+        ? StatusCodes.NOT_FOUND
+        : message.includes("Unauthorized")
+        ? StatusCodes.FORBIDDEN
+        : StatusCodes.BAD_REQUEST;
+      return {
+        status: "error",
+        message,
+        statusCode,
+        data: null,
+      };
+    }
+  }
 }

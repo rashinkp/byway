@@ -130,4 +130,47 @@ export class LessonService {
     }
     return this.lessonRepository.getCourseProgress(input);
   }
+
+  async getLessonById(lessonId: string): Promise<ILesson | null> {
+    return this.lessonRepository.getLessonById(lessonId);
+  }
+
+
+  async deleteLesson(lessonId: string): Promise<ILesson> {
+    const lesson = await this.lessonRepository.getLessonById(lessonId);
+    if (!lesson) {
+      throw new Error("Lesson not found");
+    }
+    let deletedAt = null; 
+    if (!lesson.deletedAt) {
+      deletedAt = new Date(); 
+    }
+    const updatedLesson = await this.lessonRepository.updateLesson(lessonId, {
+      deletedAt,
+    });
+    if (!updatedLesson) {
+      throw new Error("Failed to delete lesson");
+    }
+    return updatedLesson;
+  }
+
+
+  async updateLesson(
+    lessonId: string,
+    input: Partial<ICreateLessonInput>
+  ): Promise<ILesson> {
+    const lesson = await this.lessonRepository.getLessonById(lessonId);
+    if (!lesson) {
+      throw new Error("Lesson not found");
+    }
+    const updatedLesson = await this.lessonRepository.updateLesson(
+      lessonId,
+      input
+    );
+    if (!updatedLesson) {
+      throw new Error("Failed to update lesson");
+    }
+    return updatedLesson;
+  }
+
 }

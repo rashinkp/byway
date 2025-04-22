@@ -1,16 +1,13 @@
-import { useState } from "react";
+// src/components/lesson/LessonFormModal.tsx
+"use client";
+
+import { useCreateLesson } from "@/hooks/lesson/useCreateLesson";
+import { toast } from "sonner";
+import { FormModal, FormFieldConfig } from "../ui/FormModal";
 import { z } from "zod";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogFooter,
-} from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
+import next from "next";
+
+
 
 export const lessonSchema = z.object({
   title: z.string().min(1, "Title is required").max(100, "Title is too long"),
@@ -19,171 +16,128 @@ export const lessonSchema = z.object({
     .max(1000, "Description is too long")
     .optional()
     .or(z.literal("")),
-  duration: z
-    .number()
-    .int()
-    .positive("Duration must be positive")
-    .max(360, "Duration too long"),
-  videoUrl: z.string().url("Invalid URL format").optional().or(z.literal("")),
   order: z.number().int().positive("Order must be positive"),
+  thumbnail: z.string().url("Invalid URL format").optional().or(z.literal("")),
+  courseId: z.string().optional(),
 });
 
 export type LessonFormData = z.infer<typeof lessonSchema>;
 
+export const fields: FormFieldConfig<LessonFormData>[] = [
+  {
+    name: "title",
+    label: "Title",
+    type: "input",
+    fieldType: "text",
+    placeholder: "e.g., Introduction to React",
+    description: "Enter the title of your lesson.",
+    maxLength: 100,
+    column: "left",
+  },
+  {
+    name: "description",
+    label: "Description",
+    type: "textarea",
+    placeholder: "e.g., Learn the basics of React components",
+    description: "Provide a brief description of the lesson (optional).",
+    maxLength: 1000,
+    column: "right",
+  },
+  {
+    name: "order",
+    label: "Order",
+    type: "input",
+    fieldType: "number",
+    placeholder: "e.g., 1",
+    description: "Specify the order of the lesson in the course.",
+    maxLength: 10,
+    column: "left",
+  },
+  {
+    name: "thumbnail",
+    label: "Thumbnail URL",
+    type: "input",
+    fieldType: "text",
+    placeholder: "e.g., https://example.com/thumbnail.jpg",
+    description: "Provide a URL for the lesson thumbnail (optional).",
+    maxLength: 200,
+    column: "right",
+  },
+];
+
 interface LessonFormModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onSubmit: (data: LessonFormData) => Promise<void>;
+  onSubmit?: (data: LessonFormData & { courseId?: string }) => Promise<void>;
   initialData?: Partial<LessonFormData>;
   isSubmitting?: boolean;
+  courseId?: string; 
+  nextOrder?: number; 
 }
 
 export function LessonFormModal({
   open,
   onOpenChange,
-  onSubmit,
+  onSubmit: externalOnSubmit,
   initialData,
   isSubmitting,
+  courseId,
+  nextOrder,
 }: LessonFormModalProps) {
-  const [formData, setFormData] = useState<LessonFormData>({
-    title: initialData?.title || "",
-    description: initialData?.description || "",
-    duration: initialData?.duration || 0,
-    videoUrl: initialData?.videoUrl || "",
-    order: initialData?.order || 1,
-  });
-  const [errors, setErrors] = useState<
-    Partial<Record<keyof LessonFormData, string>>
-  >({});
+  const { mutate: createLesson, isPending } = useCreateLesson();
 
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]:
-        name === "duration" || name === "order" ? parseInt(value) || 0 : value,
-    }));
-  };
+  const handleSubmit = async (data: LessonFormData) => {
+     if (nextOrder !== data.order) {
+       toast.error(
+         `Order must be ${nextOrder} for the new lesson. Please adjust the order.`
+       );
+       return;
+     }
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setErrors({});
+    const submitData = courseId ? { ...data, courseId } : data;
 
-    const result = lessonSchema.safeParse(formData);
-    if (!result.success) {
-      const fieldErrors = result.error.flatten().fieldErrors;
-      setErrors(
-        Object.fromEntries(
-          Object.entries(fieldErrors).map(([key, value]) => [key, value?.[0]])
-        )
+    console.log(submitData);
+
+    if (externalOnSubmit) {
+      await externalOnSubmit(submitData);
+    } else {
+      createLesson(
+        {
+          courseId: courseId!,
+          title: data.title,
+          description: data.description,
+          order: data.order,
+          thumbnail: data.thumbnail,
+        },
+        {
+          onSuccess: () => {
+            onOpenChange(false);
+            toast.success("Lesson created successfully");
+          },
+          onError: (err) => {
+            toast.error(err.message || "Failed to create lesson");
+          },
+        }
       );
-      return;
-    }
-
-    try {
-      await onSubmit(result.data);
-      onOpenChange(false);
-    } catch (error) {
-      console.error("Failed to save lesson:", error);
-      // setErrors({ general: "Failed to save lesson" });
     }
   };
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[600px]">
-        <DialogHeader>
-          <DialogTitle>
-            {initialData ? "Edit Lesson" : "Add Lesson"}
-          </DialogTitle>
-        </DialogHeader>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <Label htmlFor="title">Title</Label>
-            <Input
-              id="title"
-              name="title"
-              value={formData.title}
-              onChange={handleChange}
-              placeholder="Lesson title"
-            />
-            {errors.title && (
-              <p className="text-red-500 text-sm">{errors.title}</p>
-            )}
-          </div>
-          <div>
-            <Label htmlFor="description">Description</Label>
-            <Textarea
-              id="description"
-              name="description"
-              value={formData.description}
-              onChange={handleChange}
-              placeholder="Lesson description"
-            />
-            {errors.description && (
-              <p className="text-red-500 text-sm">{errors.description}</p>
-            )}
-          </div>
-          <div>
-            <Label htmlFor="duration">Duration (minutes)</Label>
-            <Input
-              id="duration"
-              name="duration"
-              type="number"
-              value={formData.duration}
-              onChange={handleChange}
-              placeholder="Duration in minutes"
-            />
-            {errors.duration && (
-              <p className="text-red-500 text-sm">{errors.duration}</p>
-            )}
-          </div>
-          <div>
-            <Label htmlFor="videoUrl">Video URL</Label>
-            <Input
-              id="videoUrl"
-              name="videoUrl"
-              value={formData.videoUrl}
-              onChange={handleChange}
-              placeholder="https://example.com/video.mp4"
-            />
-            {errors.videoUrl && (
-              <p className="text-red-500 text-sm">{errors.videoUrl}</p>
-            )}
-          </div>
-          <div>
-            <Label htmlFor="order">Order</Label>
-            <Input
-              id="order"
-              name="order"
-              type="number"
-              value={formData.order}
-              onChange={handleChange}
-              placeholder="Lesson order"
-            />
-            {errors.order && (
-              <p className="text-red-500 text-sm">{errors.order}</p>
-            )}
-          </div>
-          {/* {errors.general && (
-            <p className="text-red-500 text-sm">{errors.general}</p>
-          )} */}
-          <DialogFooter>
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => onOpenChange(false)}
-            >
-              Cancel
-            </Button>
-            <Button type="submit" disabled={isSubmitting}>
-              {isSubmitting ? "Saving..." : "Save"}
-            </Button>
-          </DialogFooter>
-        </form>
-      </DialogContent>
-    </Dialog>
+    <FormModal
+      open={open}
+      onOpenChange={onOpenChange}
+      onSubmit={handleSubmit}
+      schema={lessonSchema}
+      initialData={initialData}
+      title={initialData ? "Edit Lesson" : "Create New Lesson"}
+      submitText="Save"
+      fields={fields}
+      description={
+        initialData
+          ? "Update your lesson details."
+          : "Create a new lesson by filling out the details."
+      }
+      isSubmitting={isSubmitting || isPending}
+    />
   );
 }

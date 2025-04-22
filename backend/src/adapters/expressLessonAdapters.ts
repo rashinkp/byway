@@ -73,4 +73,12 @@ export const adaptLessonController = (controller: LessonController) => ({
       res.status(result.statusCode).json(result);
     }
   ),
+
+  deleteLesson: asyncHandler(
+    async (req: AuthenticatedRequest, res: Response) => {
+      const lessonId = req.params.lessonId;
+      const result = await controller.deleteLesson(lessonId);
+      res.status(result.statusCode).json(result);
+    }
+  ),
 });

@@ -42,3 +42,19 @@ export interface UseGetAllLessonsInCourseParams {
   filterBy?: "DRAFT" | "PUBLISHED" | "ALL";
   includeDeleted?: boolean;
 }
+
+export interface ICreateLessonInput {
+  courseId: string;
+  title: string;
+  description?: string | null;
+  order: number;
+  thumbnail?: string | null;
+}
+
+
+export interface IUpdateLessonInput {
+  title?: string;
+  description?: string | null;
+  order?: number;
+  thumbnail?: string | null;
+}

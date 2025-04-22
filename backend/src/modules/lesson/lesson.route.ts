@@ -18,5 +18,6 @@ export const createLessonRouter = (
   );
   router.get("/:courseId/progress", protect, adapt.getCourseProgress);
   router.get("/:courseId/lessons", protect, adapt.getAllLessons);
+  router.delete('/:lessonId', authMiddleware("INSTRUCTOR"), adapt.deleteLesson);
   return router;
 };

@@ -12,6 +12,7 @@ import { useCreateLesson } from "@/hooks/lesson/useCreateLesson";
 import { useUpdateLesson } from "@/hooks/lesson/useUpdateLesson";
 import { useDeleteLesson } from "@/hooks/lesson/useDeleteLesson";
 import { ILesson } from "@/types/lesson";
+import { toast } from "sonner";
 
 type SortBy = "createdAt"  | "updatedAt";
 
@@ -42,27 +43,10 @@ export function LessonManager({ courseId }: { courseId: string }) {
   const { mutate: updateLesson, isPending: isUpdating } = useUpdateLesson();
   const { mutate: deleteLesson, isPending: isDeleting } =
     useDeleteLesson(courseId);
-
-  const handleAddLesson = async (data: LessonFormData) => {
-    // createLesson(
-    //   {
-    //     courseId,
-    //     title: data.title,
-    //     description: data.description,
-    //     order: data.order,
-    //     thumbnail: data.thumbnail,
-    //     duration: data.duration,
-    //   },
-    //   {
-    //     onSuccess: () => {
-    //       setIsLessonModalOpen(false);
-    //     },
-    //     onError: (err) => {
-    //       console.error("Failed to create lesson:", err);
-    //     },
-    //   }
-    // );
-  };
+  
+  const nextOrder = data?.lessons.length
+    ? Math.max(...data.lessons.map((l) => l.order)) + 1
+    : 1;
 
   const handleEditLesson = async (data: LessonFormData) => {
     // if (!editingLesson) return;
@@ -119,10 +103,10 @@ export function LessonManager({ courseId }: { courseId: string }) {
         lesson.title || <span className="text-gray-400">N/A</span>,
     },
     {
-      header: "Duration",
-      accessor: "duration" as keyof ILesson,
+      header: "Description",
+      accessor: "description" as keyof ILesson,
       render: (lesson: ILesson) =>
-        lesson.duration ? `${lesson.duration} min` : "N/A",
+        lesson.description ? `${lesson.description}` : "N/A",
     },
     {
       header: "Order",
@@ -148,10 +132,10 @@ export function LessonManager({ courseId }: { courseId: string }) {
       icon: <Edit className="h-4 w-4" />,
     },
     {
-      label: () => "Delete",
+      label: (lesson: ILesson) => (lesson.deletedAt ? "Restore" : "Delete"),
       onClick: (lesson: ILesson) => handleDeleteLesson(lesson),
-      variant: () => "destructive" as const,
-      icon: <Trash2 className="h-4 w-4" />,
+      variant: (lesson: ILesson) =>
+              lesson.deletedAt ? "default" : "destructive",
       disabled: (lesson: ILesson) => !!lesson.deletedAt,
     },
   ];
@@ -215,19 +199,19 @@ export function LessonManager({ courseId }: { courseId: string }) {
       <LessonFormModal
         open={isLessonModalOpen}
         onOpenChange={setIsLessonModalOpen}
-        onSubmit={editingLesson ? handleEditLesson : handleAddLesson}
         initialData={
           editingLesson
             ? {
                 title: editingLesson.title,
                 description: editingLesson.description || "",
                 order: editingLesson.order,
-                // thumbnail: editingLesson.thumbnail || "",
-                duration: editingLesson.duration,
+                thumbnail: editingLesson.thumbnail || "",
               }
             : undefined
         }
         isSubmitting={isCreating || isUpdating}
+        nextOrder={nextOrder}
+        courseId={courseId}
       />
     </div>
   );
