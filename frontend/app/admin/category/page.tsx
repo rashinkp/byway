@@ -15,6 +15,7 @@ import { useToggleDeleteCategory } from "@/hooks/category/useToggleDeleteCategor
 import CategoryFormModal from "@/components/admin/CategoryFormModal";
 import { StatusBadge } from "@/components/ui/StatusBadge";
 import { Pagination } from "@/components/ui/Pagination";
+import { PageSkeleton } from "@/components/skeleton/ListingPageSkeleton";
 
 export default function CategoriesPage() {
   const [page, setPage] = useState(1);
@@ -25,7 +26,7 @@ export default function CategoriesPage() {
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [editCategory, setEditCategory] = useState<Category | undefined>(undefined);
 
-  const { categories, total, loading, refetch, setCategories } = useCategories({
+  const { categories, total, loading:isLoading, refetch,error  } = useCategories({
     page,
     limit: 10,
     search: searchTerm,
@@ -116,6 +117,23 @@ export default function CategoriesPage() {
     toggleDeleteCategory(category);
   };
 
+   if (isLoading) {
+      return <PageSkeleton tableColumns={3} />;
+    }
+  
+    if (error) {
+      return (
+        <div className="space-y-6">
+          <div className="text-red-600">
+            <p>Error: {error.message}</p>
+            <Button onClick={() => refetch()} className="mt-4">
+              Retry
+            </Button>
+          </div>
+        </div>
+      );
+    }
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -157,7 +175,7 @@ export default function CategoriesPage() {
       <DataTable<Category>
         data={categories}
         columns={columns}
-        isLoading={loading}
+        isLoading={isLoading}
         actions={actions}
         itemsPerPage={10}
         totalItems={total}

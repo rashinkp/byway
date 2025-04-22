@@ -22,7 +22,7 @@ export function useCategories({
                              filterBy === "Active" ? false : 
                              includeDeleted;
 
-  const { data, isLoading, refetch } = useQuery({
+  const { data, isLoading, refetch ,error } = useQuery({
     queryKey: ["categories", page, limit, search, filterBy],
     queryFn: async () => {
       const { categories, total } = await getAllCategories({
@@ -59,5 +59,6 @@ export function useCategories({
     loading: isLoading,
     refetch,
     setCategories,
+    error
   };
 }

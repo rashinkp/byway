@@ -10,6 +10,7 @@ import { useGetAllCourses } from "@/hooks/course/useGetAllCourse";
 import { StatusBadge } from "@/components/ui/StatusBadge";
 import { Pagination } from "@/components/ui/Pagination";
 import { BookOpen } from "lucide-react";
+import { PageSkeleton } from "@/components/skeleton/ListingPageSkeleton";
 
 export default function CoursesPage() {
   const [page, setPage] = useState(1);
@@ -22,7 +23,7 @@ export default function CoursesPage() {
     "All" | "Active" | "Draft" | "Inactive" | undefined
   >("All");
 
-  const { data, isLoading, refetch } = useGetAllCourses({
+  const { data, isLoading, refetch , error } = useGetAllCourses({
     page,
     limit: 10,
     sortBy,
@@ -86,6 +87,24 @@ export default function CoursesPage() {
     console.log("View course creation requests clicked");
     // Example: router.push("/admin/course-requests");
   };
+
+
+   if (isLoading) {
+      return <PageSkeleton tableColumns={3} />;
+    }
+  
+    if (error) {
+      return (
+        <div className="space-y-6">
+          <div className="text-red-600">
+            <p>Error: {error.message}</p>
+            <Button onClick={() => refetch()} className="mt-4">
+              Retry
+            </Button>
+          </div>
+        </div>
+      );
+    }
 
   return (
     <div className="space-y-6">

@@ -11,6 +11,7 @@ import { StatusBadge } from "@/components/ui/StatusBadge";
 import { useToggleDeleteUser } from "@/hooks/user/useToggleDeleteUser";
 import { Pagination } from "@/components/ui/Pagination";
 import { Users } from "lucide-react";
+import { PageSkeleton } from "@/components/skeleton/ListingPageSkeleton";
 
 export default function InstructorsPage() {
   const [page, setPage] = useState(1);
@@ -21,7 +22,7 @@ export default function InstructorsPage() {
     "All" | "Active" | "Inactive"
   >("All");
 
-  const { data, isLoading, refetch } = useGetAllUsers({
+  const { data, isLoading, refetch ,error } = useGetAllUsers({
     page,
     limit: 10,
     sortBy,
@@ -95,6 +96,23 @@ export default function InstructorsPage() {
     console.log("View instructor requests clicked");
     // Example: router.push("/admin/instructor-requests");
   };
+
+   if (isLoading) {
+      return <PageSkeleton tableColumns={3} />;
+    }
+  
+    if (error) {
+      return (
+        <div className="space-y-6">
+          <div className="text-red-600">
+            <p>Error: {error.message}</p>
+            <Button onClick={() => refetch()} className="mt-4">
+              Retry
+            </Button>
+          </div>
+        </div>
+      );
+    }
 
   return (
     <div className="space-y-6">
