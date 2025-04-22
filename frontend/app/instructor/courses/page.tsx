@@ -120,7 +120,7 @@ export default function CoursesPage() {
     {
       label: () => "View",
       onClick: (course: Course) => {
-        console.log("Edit course:", course);
+        console.log("View course:", course);
         router.push(`/instructor/courses/${course.id}`);
       },
       variant: () => "default" as const,

@@ -25,4 +25,5 @@ export const configureRoutes = (
   );
   app.use("/api/v1/courses", createCourseRouter(dependencies.courseController));
   app.use("/api/v1/lessons", createLessonRouter(dependencies.lessonController));
+  
 };

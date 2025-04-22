@@ -79,3 +79,13 @@ export async function deleteLesson(lessonId: string): Promise<void> {
     throw new Error(error.response?.data?.message || "Failed to delete lesson");
   }
 }
+
+
+export async function getLessonById(lessonId: string): Promise<ILesson> {
+  try {
+    const response = await api.get<{ data: ILesson }>(`/lessons/${lessonId}`);
+    return response.data.data;
+  } catch (error: any) {
+    throw new Error(error.response?.data?.message || "Failed to fetch lesson");
+  }
+}

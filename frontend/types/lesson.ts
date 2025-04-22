@@ -52,11 +52,14 @@ export interface ICreateLessonInput {
 }
 
 
-export interface IUpdateLessonInput {
+// src/types/lesson.ts
+export interface UpdateLessonInput {
+  lessonId: string;
   title?: string;
-  description?: string | null;
+  description?: string;
   order?: number;
-  thumbnail?: string | null;
+  thumbnail?: string;
+  duration?: number;
 }
 
 // src/types/lessonContent.ts

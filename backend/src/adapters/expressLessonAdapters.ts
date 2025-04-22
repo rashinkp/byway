@@ -8,6 +8,7 @@ import {
   IGetAllLessonsInput,
 } from "../modules/lesson/lesson.types";
 import { getAllLessonsSchema } from "../modules/lesson/lesson.validator";
+import { get } from "http";
 
 interface AuthenticatedRequest extends Request {
   user: { id: string; email: string; role: string };
@@ -48,6 +49,14 @@ export const adaptLessonController = (controller: LessonController) => ({
     }
   ),
 
+  getLessonById: asyncHandler(
+    async (req: AuthenticatedRequest, res: Response) => {
+      const lessonId = req.params.lessonId;
+      const result = await controller.getLessonById(lessonId);
+      res.status(result.statusCode).json(result);
+    }
+  ),
+
   updateLessonProgress: asyncHandler(
     async (req: AuthenticatedRequest, res: Response) => {
       //todo: validate if user already done old lesson
@@ -78,6 +87,15 @@ export const adaptLessonController = (controller: LessonController) => ({
     async (req: AuthenticatedRequest, res: Response) => {
       const lessonId = req.params.lessonId;
       const result = await controller.deleteLesson(lessonId);
+      res.status(result.statusCode).json(result);
+    }
+  ),
+
+  updateLesson: asyncHandler(
+    async (req: AuthenticatedRequest, res: Response) => {
+      const lessonId = req.params.lessonId;
+      const input = req.body;
+      const result = await controller.updateLesson(lessonId, input);
       res.status(result.statusCode).json(result);
     }
   ),

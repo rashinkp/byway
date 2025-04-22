@@ -17,6 +17,9 @@ interface LessonDetailSectionProps {
   courseId: string;
   nextOrder: number;
   onUpdateLesson: (data: LessonFormData) => void;
+  isLoading: boolean;
+  error: Error | null;
+  onRetry?: () => void; // Optional retry callback for error state
 }
 
 export function LessonDetailSection({
@@ -24,14 +27,60 @@ export function LessonDetailSection({
   courseId,
   nextOrder,
   onUpdateLesson,
+  isLoading,
+  error,
+  onRetry,
 }: LessonDetailSectionProps) {
   const [isLessonModalOpen, setIsLessonModalOpen] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleEditLesson = async (data: LessonFormData) => {
-    onUpdateLesson(data);
-    setIsLessonModalOpen(false);
-    toast.success("Lesson updated successfully");
+    setIsSubmitting(true);
+    try {
+      await onUpdateLesson(data);
+      setIsLessonModalOpen(false);
+      toast.success("Lesson updated successfully");
+    } catch (err) {
+      toast.error("Failed to update lesson");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
+
+  if (error) {
+    return (
+      <div className="bg-white shadow rounded-lg p-6">
+        <div className="text-red-600">
+          <p>Error loading lesson: {error.message}</p>
+          {onRetry && (
+            <Button
+              onClick={onRetry}
+              className="mt-4 bg-blue-600 hover:bg-blue-700 text-white"
+            >
+              Retry
+            </Button>
+          )}
+        </div>
+      </div>
+    );
+  }
+
+  if (isLoading) {
+    return (
+      <div className="bg-white shadow rounded-lg p-6">
+        <div className="flex justify-between items-center">
+          <div className="h-8 w-1/2 bg-gray-200 rounded animate-pulse" />
+          <div className="h-10 w-32 bg-gray-200 rounded animate-pulse" />
+        </div>
+        <div className="mt-4 space-y-2">
+          <div className="h-4 w-3/4 bg-gray-200 rounded animate-pulse" />
+          <div className="h-4 w-1/4 bg-gray-200 rounded animate-pulse" />
+          <div className="h-4 w-1/2 bg-gray-200 rounded animate-pulse" />
+          <div className="h-4 w-1/3 bg-gray-200 rounded animate-pulse" />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="bg-white shadow rounded-lg p-6">
@@ -40,6 +89,7 @@ export function LessonDetailSection({
         <Button
           onClick={() => setIsLessonModalOpen(true)}
           className="bg-blue-600 hover:bg-blue-700 text-white"
+          disabled={isLoading || isSubmitting}
         >
           <Edit className="mr-2 h-4 w-4" />
           Edit Lesson
@@ -85,6 +135,7 @@ export function LessonDetailSection({
         }}
         courseId={courseId}
         nextOrder={nextOrder}
+        isSubmitting={isSubmitting}
       />
     </div>
   );

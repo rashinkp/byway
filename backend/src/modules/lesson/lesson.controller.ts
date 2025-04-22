@@ -122,6 +122,32 @@ export class LessonController {
   }
 
 
+  getLessonById = async (lessonId: string): Promise<ApiResponse> => {
+    try {
+      const lesson = await this.lessonService.getLessonById(lessonId);
+      return {
+        status: "success",
+        data: lesson,
+        message: "Lesson retrieved successfully",
+        statusCode: StatusCodes.OK,
+      };
+    } catch (error) {
+      const message =
+        error instanceof Error ? error.message : "Failed to retrieve lesson";
+      const statusCode = message.includes("not found")
+        ? StatusCodes.NOT_FOUND
+        : message.includes("Unauthorized")
+        ? StatusCodes.FORBIDDEN
+        : StatusCodes.BAD_REQUEST;
+      return {
+        status: "error",
+        message,
+        statusCode,
+        data: null,
+      };
+    }
+  }
+
   async deleteLesson(lessonId: string): Promise<ApiResponse> {
     try {
       const progress = await this.lessonService.deleteLesson(lessonId);
@@ -134,6 +160,36 @@ export class LessonController {
     } catch (error) {
       const message =
         error instanceof Error ? error.message : "Failed to delete lesson";
+      const statusCode = message.includes("not found")
+        ? StatusCodes.NOT_FOUND
+        : message.includes("Unauthorized")
+        ? StatusCodes.FORBIDDEN
+        : StatusCodes.BAD_REQUEST;
+      return {
+        status: "error",
+        message,
+        statusCode,
+        data: null,
+      };
+    }
+  }
+
+
+  updateLesson = async(
+    lessonId: string,
+    input: Partial<ICreateLessonInput>
+  ): Promise<ApiResponse> => {
+    try {
+      const lesson = await this.lessonService.updateLesson(lessonId, input);
+      return {
+        status: "success",
+        data: lesson,
+        message: "Lesson updated successfully",
+        statusCode: StatusCodes.OK,
+      };
+    } catch (error) {
+      const message =
+        error instanceof Error ? error.message : "Failed to update lesson";
       const statusCode = message.includes("not found")
         ? StatusCodes.NOT_FOUND
         : message.includes("Unauthorized")
