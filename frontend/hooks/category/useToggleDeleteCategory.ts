@@ -13,54 +13,77 @@ export function useToggleDeleteCategory() {
     mutationFn: async (category: Category) => {
       if (category.deletedAt) {
         const result = await recoverCategory(category.id);
-        return result;
+        return result; 
       } else {
         await deleteCategory(category.id);
-        return category; // Return the original category for consistency
+        return { ...category, deletedAt: new Date().toISOString() }; // Simulate deleted state
       }
     },
     onMutate: async (category) => {
+      // Cancel queries for all category pages
       await queryClient.cancelQueries({ queryKey: ["categories"] });
-      const previousCategories = queryClient.getQueryData<{
+
+      // Snapshot previous state for all matching queries
+      const previousQueries = new Map();
+      const queries = queryClient.getQueriesData<{
         data: Category[];
         total: number;
-      }>(["categories", 1, 10, ""]);
+        page: number;
+        limit: number;
+      }>({ queryKey: ["categories"] });
 
-      queryClient.setQueryData(["categories", 1, 10, ""], (old: any) => ({
-        data: old?.data.map((cat: Category) =>
-          cat.id === category.id
-            ? {
-                ...cat,
-                isDeleted: !cat.deletedAt,
-                updatedAt: new Date().toISOString(),
-              }
-            : cat
-        ),
-        total: old?.total || 0,
-        page: old?.page || 1,
-        limit: old?.limit || 10,
-      }));
+      queries.forEach(([queryKey, data]) => {
+        if (data) {
+          previousQueries.set(queryKey, data);
+          queryClient.setQueryData(queryKey, {
+            ...data,
+            data: data.data.map((cat: Category) =>
+              cat.id === category.id
+                ? {
+                    ...cat,
+                    deletedAt: category.deletedAt
+                      ? null
+                      : new Date().toISOString(),
+                    updatedAt: new Date().toISOString(),
+                  }
+                : cat
+            ),
+          });
+        }
+      });
 
-      return { previousCategories };
+      return { previousQueries };
     },
     onSuccess: (updatedCategory, category) => {
-      queryClient.setQueryData(["categories", 1, 10, ""], (old: any) => ({
-        data: old?.data.map((cat: Category) =>
-          cat.id === category.id ? updatedCategory : cat
-        ),
-        total: old?.total || 0,
-        page: old?.page || 1,
-        limit: old?.limit || 10,
-      }));
+      // Update all matching queries
+      queryClient
+        .getQueriesData<{
+          data: Category[];
+          total: number;
+          page: number;
+          limit: number;
+        }>({ queryKey: ["categories"] })
+        .forEach(([queryKey, data]) => {
+          if (data) {
+            queryClient.setQueryData(queryKey, {
+              ...data,
+              data: data.data.map((cat: Category) =>
+                cat.id === category.id ? updatedCategory : cat
+              ),
+            });
+          }
+        });
+
       toast.success(
         category.deletedAt ? "Category restored" : "Category deleted"
       );
     },
     onError: (error: any, category, context: any) => {
-      queryClient.setQueryData(
-        ["categories", 1, 10, ""],
-        context?.previousCategories
-      );
+      // Revert all queries to previous state
+      context?.previousQueries?.forEach((data: any, queryKey: any) => {
+        queryClient.setQueryData(queryKey, data);
+      });
+
       toast.error(
         `Failed to ${category.deletedAt ? "restore" : "delete"} category`,
         {
@@ -69,6 +92,7 @@ export function useToggleDeleteCategory() {
       );
     },
     onSettled: () => {
+      // Invalidate all category queries
       queryClient.invalidateQueries({ queryKey: ["categories"] });
     },
   });
