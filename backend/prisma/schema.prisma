@@ -206,7 +206,7 @@ model LessonContent {
   lesson      Lesson           @relation("LessonToContent", fields: [lessonId], references: [id], onDelete: Cascade)
   type        ContentType
   status      ContentStatus    @default(DRAFT)
-  data        Json             @default("{}") // Store content-specific data (e.g., video URL, quiz questions)
+  data        Json             @default("{}") 
   createdAt   DateTime         @default(now())
   updatedAt   DateTime         @updatedAt
   deletedAt   DateTime?

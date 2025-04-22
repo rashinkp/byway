@@ -58,3 +58,30 @@ export interface IUpdateLessonInput {
   order?: number;
   thumbnail?: string | null;
 }
+
+// src/types/lessonContent.ts
+export type ContentType = "VIDEO" | "QUIZ" | "DOC";
+export type ContentStatus = "DRAFT" | "PUBLISHED";
+
+export interface LessonContent {
+  id: string;
+  lessonId: string;
+  type: ContentType;
+  status: ContentStatus;
+  data: {
+    fileUrl?: string; // For VIDEO and DOC
+    questions?: { question: string; options: string[]; answer: string }[]; // For QUIZ
+  };
+  createdAt: string;
+  updatedAt: string;
+  deletedAt?: string | null;
+}
+
+export interface LessonContentFormData {
+  type: ContentType;
+  status: ContentStatus;
+  data: {
+    fileUrl?: string;
+    questions?: { question: string; options: string[]; answer: string }[];
+  };
+}

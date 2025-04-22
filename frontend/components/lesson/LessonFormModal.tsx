@@ -87,20 +87,20 @@ export function LessonFormModal({
   const { mutate: createLesson, isPending } = useCreateLesson();
 
   const handleSubmit = async (data: LessonFormData) => {
-     if (nextOrder !== data.order) {
-       toast.error(
-         `Order must be ${nextOrder} for the new lesson. Please adjust the order.`
-       );
-       return;
-     }
-
+   
     const submitData = courseId ? { ...data, courseId } : data;
-
-    console.log(submitData);
 
     if (externalOnSubmit) {
       await externalOnSubmit(submitData);
     } else {
+
+        if (nextOrder !== data.order) {
+          toast.error(
+            `Order must be ${nextOrder} for the new lesson. Please adjust the order.`
+          );
+          return;
+        }
+
       createLesson(
         {
           courseId: courseId!,

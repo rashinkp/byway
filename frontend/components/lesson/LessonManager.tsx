@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, Dispatch, SetStateAction, useCallback } from "react";
+import { useState, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { DataTable } from "@/components/ui/DataTable";
 import { TableControls } from "@/components/ui/TableControls";
@@ -12,7 +12,7 @@ import { useCreateLesson } from "@/hooks/lesson/useCreateLesson";
 import { useUpdateLesson } from "@/hooks/lesson/useUpdateLesson";
 import { useDeleteLesson } from "@/hooks/lesson/useDeleteLesson";
 import { ILesson } from "@/types/lesson";
-import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 type SortBy = "createdAt"  | "updatedAt";
 
@@ -39,37 +39,14 @@ export function LessonManager({ courseId }: { courseId: string }) {
     includeDeleted: true,
   });
 
-  const { mutate: createLesson, isPending: isCreating } = useCreateLesson();
-  const { mutate: updateLesson, isPending: isUpdating } = useUpdateLesson();
   const { mutate: deleteLesson, isPending: isDeleting } =
     useDeleteLesson(courseId);
   
   const nextOrder = data?.lessons.length
     ? Math.max(...data.lessons.map((l) => l.order)) + 1
     : 1;
-
-  const handleEditLesson = async (data: LessonFormData) => {
-    // if (!editingLesson) return;
-    // updateLesson(
-    //   {
-    //     lessonId: editingLesson.id,
-    //     title: data.title,
-    //     description: data.description,
-    //     order: data.order,
-    //     thumbnail: data.thumbnail,
-    //     duration: data.duration,
-    //   },
-    //   {
-    //     onSuccess: () => {
-    //       setIsLessonModalOpen(false);
-    //       setEditingLesson(null);
-    //     },
-    //     onError: (err) => {
-    //       console.error("Failed to update lesson:", err);
-    //     },
-    //   }
-    // );
-  };
+  
+   const router = useRouter();
 
   const handleDeleteLesson = async (lesson: ILesson) => {
     deleteLesson(lesson.id, {
@@ -123,14 +100,13 @@ export function LessonManager({ courseId }: { courseId: string }) {
   // Table actions
   const actions = [
     {
-      label: () => "Edit",
-      onClick: (lesson: ILesson) => {
-        setEditingLesson(lesson);
-        setIsLessonModalOpen(true);
+        label: () => "View",
+        onClick: (lesson: ILesson ) => {
+          console.log("view lesson:", lesson);
+          router.push(`/instructor/courses/${lesson.courseId}/lessons/${lesson.id}`);
+        },
+        variant: () => "default" as const,
       },
-      variant: () => "default" as const,
-      icon: <Edit className="h-4 w-4" />,
-    },
     {
       label: (lesson: ILesson) => (lesson.deletedAt ? "Restore" : "Delete"),
       onClick: (lesson: ILesson) => handleDeleteLesson(lesson),
@@ -158,7 +134,6 @@ export function LessonManager({ courseId }: { courseId: string }) {
             setIsLessonModalOpen(true);
           }}
           className="bg-blue-600 hover:bg-blue-700 text-white"
-          disabled={isCreating}
         >
           <Video className="mr-2 h-4 w-4" />
           Add Lesson
@@ -209,7 +184,6 @@ export function LessonManager({ courseId }: { courseId: string }) {
               }
             : undefined
         }
-        isSubmitting={isCreating || isUpdating}
         nextOrder={nextOrder}
         courseId={courseId}
       />
