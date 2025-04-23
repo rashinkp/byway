@@ -2,10 +2,9 @@ export interface Category {
   id: string;
   name: string;
   description?: string;
-  createdBy: string;
-  createdAt: Date;
-  updatedAt: Date;
-  deletedAt?: Date | null;
+  createdAt: string;
+  updatedAt: string;
+  deletedAt?: string | null;
 }
 
 export interface CategoryFormData {
@@ -18,15 +17,14 @@ export interface ICategoryListOutput {
   total: number;
 }
 
-
 export interface IGetAllCategoryResponse {
-  data: { categories: Category[]; total: number };
+  data: ICategoryListOutput;
 }
 
 export interface IGetAllCategoriesInput {
   page?: number;
   limit?: number;
-  sortBy?: "name" | "createdAt" | "updatedAt";
+  sortBy?: "name" | "createdAt" | "updatedAt" | "courses";
   sortOrder?: "asc" | "desc";
   includeDeleted?: boolean;
   search?: string;

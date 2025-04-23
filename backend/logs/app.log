@@ -161,3 +161,7 @@
 {"error":{"code":"VALIDATION_ERROR","isOperational":true,"status":400,"statusCode":400},"level":"error","message":"Error creating course","timestamp":"2025-04-22T08:22:45.732Z"}
 {"error":{},"level":"error","message":"Error retrieving courses","timestamp":"2025-04-22T08:23:21.270Z"}
 {"error":{},"level":"error","message":"Error retrieving courses","timestamp":"2025-04-22T08:23:22.423Z"}
+{"errors":[{"code":"invalid_enum_value","message":"Invalid enum value. Expected 'name' | 'createdAt' | 'updatedAt', received 'courses'","options":["name","createdAt","updatedAt"],"path":["sortBy"],"received":"courses"}],"level":"warn","message":"Validation failed for getAllCategories","timestamp":"2025-04-23T09:09:00.941Z"}
+{"error":{"code":"VALIDATION_ERROR","isOperational":true,"status":400,"statusCode":400},"level":"error","message":"Error retrieving categories","timestamp":"2025-04-23T09:09:00.947Z"}
+{"errors":[{"code":"invalid_enum_value","message":"Invalid enum value. Expected 'name' | 'createdAt' | 'updatedAt', received 'courses'","options":["name","createdAt","updatedAt"],"path":["sortBy"],"received":"courses"}],"level":"warn","message":"Validation failed for getAllCategories","timestamp":"2025-04-23T09:09:01.965Z"}
+{"error":{"code":"VALIDATION_ERROR","isOperational":true,"status":400,"statusCode":400},"level":"error","message":"Error retrieving categories","timestamp":"2025-04-23T09:09:01.966Z"}
