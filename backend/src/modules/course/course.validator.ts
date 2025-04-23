@@ -128,13 +128,13 @@ export const getAllCoursesSchema = z.object({
   page: z.number().int().positive().optional().default(1),
   limit: z.number().int().positive().optional().default(10),
   sortBy: z
-    .enum(["name", "createdAt", "updatedAt"])
+    .enum(["title", "createdAt", "updatedAt"])
     .optional()
     .default("createdAt"),
   sortOrder: z.enum(["asc", "desc"]).optional().default("desc"),
   includeDeleted: z.boolean().optional().default(false),
   search: z.string().optional().default(""),
-  filterBy: z.enum(["All", "Active", "Draft"]).optional().default("All"),
+  filterBy: z.enum(["All", "Active", "Draft" , "Inactive"]).optional().default("All"),
   userId: z.string().uuid("Invalid user ID").optional(),
 });
 
@@ -145,5 +145,5 @@ export const createEnrollmentSchema = z.object({
 });
 
 export const courseIdSchema = z.object({
-  id: z.string().uuid("Invalid course ID"),
+  courseId: z.string().uuid("Invalid course ID"),
 });

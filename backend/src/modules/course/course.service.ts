@@ -125,8 +125,8 @@ export class CourseService {
     }
   }
 
-  async getCourseById(id: string): Promise<ICourse | null> {
-    const parsedInput = courseIdSchema.safeParse({ id });
+  async getCourseById(courseId: string): Promise<ICourse | null> {
+    const parsedInput = courseIdSchema.safeParse({ courseId });
     if (!parsedInput.success) {
       logger.warn("Validation failed for getCourseById", {
         errors: parsedInput.error.errors,
@@ -140,10 +140,10 @@ export class CourseService {
 
     try {
       const course = await this.courseRepository.getCourseById(
-        parsedInput.data.id
+        parsedInput.data.courseId
       );
       if (!course) {
-        logger.warn("Course not found", { id });
+        logger.warn("Course not found", { courseId });
         throw new AppError(
           "Course not found",
           StatusCodes.NOT_FOUND,
@@ -152,7 +152,7 @@ export class CourseService {
       }
       return course;
     } catch (error) {
-      logger.error("Error retrieving course by ID", { error, id });
+      logger.error("Error retrieving course by ID", { error, courseId });
       throw error instanceof AppError
         ? error
         : new AppError(
@@ -176,12 +176,12 @@ export class CourseService {
       );
     }
 
-    const { id, categoryId, title, createdBy } = parsedInput.data;
+    const { id:courseId, categoryId, title, createdBy } = parsedInput.data;
 
     // Validate course
-    const course = await this.courseRepository.getCourseById(id);
+    const course = await this.courseRepository.getCourseById(courseId);
     if (!course || course.deletedAt) {
-      logger.warn("Course not found or deleted", { id });
+      logger.warn("Course not found or deleted", { courseId });
       throw new AppError(
         "Course not found or deleted",
         StatusCodes.NOT_FOUND,
@@ -191,7 +191,7 @@ export class CourseService {
 
     // Validate ownership
     if (course.createdBy !== createdBy) {
-      logger.warn("Unauthorized course update attempt", { id, createdBy });
+      logger.warn("Unauthorized course update attempt", { courseId, createdBy });
       throw new AppError(
         "Unauthorized: You can only update your own courses",
         StatusCodes.FORBIDDEN,
@@ -239,8 +239,8 @@ export class CourseService {
     }
   }
 
-  async softDeleteCourse(id: string, userId: string): Promise<ICourse> {
-    const parsedInput = courseIdSchema.safeParse({ id });
+  async softDeleteCourse(courseId: string, userId: string , role:'ADMIN'|'INSTRUCTOR' | 'USER'): Promise<ICourse> {
+    const parsedInput = courseIdSchema.safeParse({ courseId });
     if (!parsedInput.success) {
       logger.warn("Validation failed for softDeleteCourse", {
         errors: parsedInput.error.errors,
@@ -253,17 +253,18 @@ export class CourseService {
     }
 
     try {
-      const course = await this.courseRepository.getCourseById(id);
+      const course = await this.courseRepository.getCourseById(courseId);
       if (!course) {
-        logger.warn("Course not found or already deleted", { id });
+        logger.warn("Course not found or already deleted", { courseId });
         throw new AppError(
           "Course not found or already deleted",
           StatusCodes.NOT_FOUND,
           "NOT_FOUND"
         );
       }
-      if (course.createdBy !== userId) {
-        logger.warn("Unauthorized course delete attempt", { id, userId });
+      console.log(role);
+      if (course.createdBy !== userId && role !== 'ADMIN') {
+        logger.warn("Unauthorized course delete attempt", { courseId, userId });
         throw new AppError(
           "Unauthorized: You can only delete your own courses",
           StatusCodes.FORBIDDEN,
@@ -272,9 +273,9 @@ export class CourseService {
       }
 
       const deletedAt = course.deletedAt ? null : new Date();
-      return await this.courseRepository.softDeleteCourse(id, deletedAt);
+      return await this.courseRepository.softDeleteCourse(courseId, deletedAt);
     } catch (error) {
-      logger.error("Error soft deleting course", { error, id, userId });
+      logger.error("Error soft deleting course", { error, courseId, userId });
       throw error instanceof AppError
         ? error
         : new AppError(

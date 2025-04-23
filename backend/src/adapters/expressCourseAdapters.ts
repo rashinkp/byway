@@ -71,7 +71,7 @@ export const adaptCourseController = (controller: CourseController) => ({
       const input: IGetAllCoursesInput = {
         page: page ? parseInt(page as string, 10) : undefined,
       limit: limit ? parseInt(limit as string, 10) : undefined,
-      sortBy: sortBy as "name" | "createdAt" | "updatedAt",
+      sortBy: sortBy as "title" | "createdAt" | "updatedAt",
       sortOrder: sortOrder as "asc" | "desc" | undefined,
       includeDeleted: includeDeleted === "true" ? true : false,
       search: search ? (search as string) : "",
@@ -126,7 +126,8 @@ export const adaptCourseController = (controller: CourseController) => ({
       }
       const result = await controller.softDeleteCourse(
         req.params.id,
-        req.user.id
+        req.user.id,
+        req.user.role as "ADMIN" | "USER" | "INSTRUCTOR"
       );
       res.status(result.statusCode).json(result);
     }

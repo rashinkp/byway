@@ -11,7 +11,7 @@ interface AuthenticatedRequest extends Request {
   };
 }
 
-export const authMiddleware = (requiredRole: string) => {
+export const authMiddleware = (...requiredRoles: string[]) => {
   return (
     req: AuthenticatedRequest,
     res: Response,
@@ -35,10 +35,12 @@ export const authMiddleware = (requiredRole: string) => {
     try {
       const decoded = JwtUtil.verifyToken(token, jwtSecret);
 
-      console.log(decoded.role, requiredRole);
-      if (requiredRole && decoded.role !== requiredRole) {
-        throw AppError.forbidden(`${requiredRole} role required`);
+      if (requiredRoles.length > 0 && requiredRoles.includes(decoded.role)) {
+        throw AppError.forbidden(
+          `One of the following roles required: ${requiredRoles.join(", ")}`
+        );
       }
+
 
       req.user = decoded;
       next();

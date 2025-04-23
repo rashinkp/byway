@@ -65,13 +65,11 @@ export class CourseRepository implements ICourseRepository {
       userId,
     } = input;
 
-    // ✅ Allow only valid fields for sorting
     const allowedSortFields = ["title", "createdAt", "updatedAt"];
     const safeSortBy = allowedSortFields.includes(sortBy)
       ? sortBy
       : "createdAt";
 
-    // ✅ Build where clause safely
     const where: any = {
       ...(userId ? { createdBy: userId } : {}),
       ...(includeDeleted ? {} : { deletedAt: null }),
@@ -81,6 +79,8 @@ export class CourseRepository implements ICourseRepository {
       where.status = "PUBLISHED";
     } else if (filterBy === "Draft") {
       where.status = "DRAFT";
+    } else if (filterBy === "Inactive") {
+      where.deletedAt = { not: null };
     }
 
     if (search) {

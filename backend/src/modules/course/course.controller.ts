@@ -57,9 +57,9 @@ export class CourseController {
     }
   }
 
-  async getCourseById(id: string): Promise<ApiResponse> {
+  async getCourseById(courseId: string): Promise<ApiResponse> {
     try {
-      const course = await this.courseService.getCourseById(id);
+      const course = await this.courseService.getCourseById(courseId);
       return {
         status: "success",
         data: course,
@@ -107,9 +107,9 @@ export class CourseController {
     }
   }
 
-  async softDeleteCourse(id: string, userId: string): Promise<ApiResponse> {
+  async softDeleteCourse(courseId: string, userId: string , role:'ADMIN'|'USER'|'INSTRUCTOR'): Promise<ApiResponse> {
     try {
-      const course = await this.courseService.softDeleteCourse(id, userId);
+      const course = await this.courseService.softDeleteCourse(courseId, userId , role);
       return {
         status: "success",
         data: course,

@@ -69,11 +69,11 @@ export interface IUpdateCourseInput {
 export interface IGetAllCoursesInput {
   page?: number;
   limit?: number;
-  sortBy?: "name" | "createdAt" | "updatedAt" | undefined;
+  sortBy?: "title" | "createdAt" | "updatedAt" | undefined;
   sortOrder?: "asc" | "desc";
   includeDeleted?: boolean;
   search?: string;
-  filterBy?: "All" | "Active" | "Draft";
+  filterBy?: "All" | "Active" | "Draft" | "Inactive" | undefined;
   userId?: string | undefined;
 }
 

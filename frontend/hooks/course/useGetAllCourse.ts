@@ -6,7 +6,7 @@ import { useAuthStore } from "@/stores/auth.store";
 export interface UseGetAllCoursesParams {
   page?: number;
   limit?: number;
-  sortBy?: "createdAt" | "name" | "updatedAt";
+  sortBy?: "createdAt" | "name" | "updatedAt" | 'title';
   sortOrder?: "asc" | "desc";
   search?: string;
   filterBy?: "All" | "Active" | "Draft" | "Inactive";
