@@ -1,4 +1,5 @@
 import { JwtUtil } from "../../utils/jwt.util";
+import { OAuth2Client } from "google-auth-library";
 import * as bcrypt from "bcrypt";
 import { IAuthRepository, IAuthUser, IForgotPasswordInput, IResetPasswordInput } from "./auth.types";
 import { OtpService } from "../otp/otp.service";
@@ -9,11 +10,13 @@ import { UserService } from "../user/user.service";
 
 
 export class AuthService {
+  private googleClient: OAuth2Client;
   constructor(
     private authRepository: IAuthRepository,
     private otpService: OtpService,
     private jwtSecret: string,
-    private userService: UserService
+    private userService: UserService,
+    googleClientId: string
   ) {
     if (!jwtSecret) {
       throw new AppError(
@@ -22,6 +25,15 @@ export class AuthService {
         "CONFIG_ERROR"
       );
     }
+
+    if (!googleClientId) {
+      throw new AppError(
+        "GOOGLE_CLIENT_ID not configured",
+        StatusCodes.INTERNAL_SERVER_ERROR,
+        "CONFIG_ERROR"
+      );
+    }
+    this.googleClient = new OAuth2Client(googleClientId);
   }
 
   async registerAdmin(
@@ -105,6 +117,40 @@ export class AuthService {
       throw AppError.unauthorized("Invalid email or password");
     }
     return { user, token: this.generateToken(user.id, user.email, user.role) };
+  }
+
+  async googleAuth(
+    idToken: string
+  ): Promise<{ user: IAuthUser; token: string }> {
+    // Verify Google ID token
+    const ticket = await this.googleClient.verifyIdToken({
+      idToken,
+      audience: process.env.GOOGLE_CLIENT_ID,
+    });
+    const payload = ticket.getPayload();
+    if (!payload || !payload.email || !payload.sub) {
+      throw AppError.badRequest("Invalid Google ID token");
+    }
+
+    const { email, name, sub: googleId } = payload;
+    let user = await this.userService.findUserByEmail(email);
+
+    if (!user) {
+      user = await this.authRepository.createGoogleUser(
+        name || "Google User",
+        email,
+        googleId
+      );
+    } else if (user.authProvider !== "GOOGLE") {
+      throw AppError.badRequest(
+        "This email is registered with a different authentication method"
+      );
+    } else if (user.deletedAt !== null) {
+      throw AppError.forbidden("This account is deactivated");
+    }
+
+    const token = this.generateToken(user.id, user.email, user.role);
+    return { user, token };
   }
 
   private generateToken(id: string, email: string, role: string): string {

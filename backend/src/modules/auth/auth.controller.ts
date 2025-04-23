@@ -4,7 +4,7 @@ import { ApiResponse } from "../../types/response";
 import { z } from "zod";
 import { AppError } from "../../utils/appError";
 import { logger } from "../../utils/logger";
-import { ForgotPasswordSchema, LoginSchema, RegisterAdminSchema, RegisterUserSchema, ResetPasswordSchema } from "./auth.validator";
+import { ForgotPasswordSchema, GoogleAuthSchema, LoginSchema, RegisterAdminSchema, RegisterUserSchema, ResetPasswordSchema } from "./auth.validator";
 
 
 
@@ -73,6 +73,29 @@ export class AuthController {
       };
     } catch (error) {
       logger.error("Login error:", { error, input });
+      if (error instanceof z.ZodError) {
+        throw AppError.badRequest("Validation failed: " + error.message);
+      }
+      throw error;
+    }
+  }
+
+  async googleAuth(input: unknown): Promise<ApiResponse> {
+    try {
+      const validatedInput = GoogleAuthSchema.parse(input);
+      const { idToken } = validatedInput;
+      const { user, token } = await this.authService.googleAuth(idToken);
+      return {
+        status: "success",
+        data: { id: user.id, email: user.email, role: user.role },
+        token,
+        statusCode: user.isVerified ? StatusCodes.OK : StatusCodes.CREATED,
+        message: user.isVerified
+          ? "Logged in successfully"
+          : "User registered successfully",
+      };
+    } catch (error) {
+      logger.error("Google auth error:", { error, input });
       if (error instanceof z.ZodError) {
         throw AppError.badRequest("Validation failed: " + error.message);
       }

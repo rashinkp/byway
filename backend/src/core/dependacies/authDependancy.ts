@@ -30,6 +30,7 @@ export const initializeAuthDependencies = (
     otpService,
     process.env.JWT_SECRET,
     userService,
+    process.env.GOOGLE_CLIENT_ID || ""
   );
   const authController = new AuthController(authService);
   return { authController };

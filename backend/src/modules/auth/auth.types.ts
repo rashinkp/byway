@@ -34,4 +34,9 @@ export interface IAuthRepository {
   ): Promise<IAuthUser>;
   createUser(name: string, email: string, password: string): Promise<IAuthUser>;
   resetPassword(email: string, hashedPassword: string): Promise<void>;
+  createGoogleUser(
+    name: string,
+    email: string,
+    googleId: string
+  ): Promise<IAuthUser>;
 }

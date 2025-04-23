@@ -25,6 +25,22 @@ export class AuthRepository implements IAuthRepository {
     }) as Promise<IAuthUser>;
   }
 
+  async createGoogleUser(
+    name: string,
+    email: string,
+    googleId: string
+  ): Promise<IAuthUser> {
+    return this.prisma.user.create({
+      data: {
+        name,
+        email,
+        role: "USER",
+        isVerified: true, 
+        authProvider: "GOOGLE",
+        googleId, 
+      },
+    }) as Promise<IAuthUser>;
+  }
 
   async resetPassword(email: string, hashedPassword: string): Promise<void> {
     await this.prisma.user.update({

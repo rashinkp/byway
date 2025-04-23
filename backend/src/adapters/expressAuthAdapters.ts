@@ -57,6 +57,18 @@ export const adaptAuthController = (controller: AuthController) => ({
     });
   }),
 
+  googleAuth: asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
+    const result = await controller.googleAuth(req.body);
+    if (result.token) {
+      JwtUtil.setTokenCookie(res, result.token);
+    }
+    res.status(result.statusCode).json({
+      status: result.status,
+      data: result.data,
+      message: result.message,
+    });
+  }),
+
   logout: asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
     const result = await controller.logout();
     if (result.status === "success") JwtUtil.clearTokenCookie(res);
@@ -81,7 +93,6 @@ export const adaptAuthController = (controller: AuthController) => ({
   ),
 
   me: asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-    
     if (!req.user) {
       throw new AppError(
         "Unauthorized",

@@ -10,7 +10,8 @@ export const createAuthRouter = (authController: AuthController): Router => {
 
   authRouter.post("/registerAdmin", adapt.registerAdmin);
   authRouter.post("/signup", adapt.registerUser);
-  authRouter.post("/login",loginLimiter, adapt.login);
+  authRouter.post("/login", loginLimiter, adapt.login);
+  authRouter.post("/google-auth", adapt.googleAuth);
   authRouter.post("/logout", protect, adapt.logout);
   authRouter.post("/forgot-password", adapt.forgotPassword);
   authRouter.post("/reset-password", adapt.resetPassword);
