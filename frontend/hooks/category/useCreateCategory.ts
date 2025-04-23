@@ -26,9 +26,8 @@ export function useCreateCategory() {
         name: newCategory.name,
         description: newCategory.description,
         deletedAt: null,
-        createdBy:'',
-        createdAt: new Date(),
-        updatedAt: new Date(),
+        createdAt: new Date().toLocaleDateString(),
+        updatedAt: new Date().toLocaleDateString(),
       };
       queryClient.setQueryData(["categories", 1, 10, ""], (old: any) => ({
         data: [...(old?.data || []), tempCategory],
@@ -49,7 +48,10 @@ export function useCreateCategory() {
         page: old?.page || 1,
         limit: old?.limit || 10,
       }));
-      toast.success("Category created successfully");
+      toast.success("Category Created", {
+        description: "The category has been created successfully.",
+      }
+      );
     },
     onError: (error: any, newCategory, context) => {
       // Revert on error

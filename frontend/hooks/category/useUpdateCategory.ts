@@ -41,7 +41,9 @@ export function useUpdateCategory() {
         page: old?.page || 1,
         limit: old?.limit || 10,
       }));
-      toast.success("Category updated successfully");
+      toast.success("Category Updated", {
+        description: "The category has been updated successfully.",
+      });
     },
     onError: (error: any, variables, context) => {
       queryClient.setQueryData(
