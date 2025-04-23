@@ -21,7 +21,9 @@ export default function CoursesPage() {
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
   const [filterStatus, setFilterStatus] = useState<
     "All" | "Active" | "Draft" | "Inactive" | undefined
-  >("All");
+    >("All");
+  
+  console.log(searchTerm);
 
   const { data, isLoading, refetch , error } = useGetAllCourses({
     page,

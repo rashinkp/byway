@@ -8,6 +8,8 @@ interface PageSkeletonProps {
   showHeader?: boolean; // Show header skeleton (default: true)
 }
 
+//todo: loading entire page skeleton make few bugs
+
 export function PageSkeleton({
   statsCount = 3,
   tableColumns = 3,
