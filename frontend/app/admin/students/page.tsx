@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState } from "react";
@@ -11,11 +12,14 @@ import { StatusBadge } from "@/components/ui/StatusBadge";
 import { useToggleDeleteUser } from "@/hooks/user/useToggleDeleteUser";
 import { Pagination } from "@/components/ui/Pagination";
 import { PageSkeleton } from "@/components/skeleton/ListingPageSkeleton";
+import { StatsSkeleton } from "@/components/skeleton/StatsSkeleton";
+import { TableSkeleton } from "@/components/skeleton/DataTableSkeleton";
+import { PaginationSkeleton } from "@/components/skeleton/PaginationSkeleton";
 
 export default function StudentsPage() {
   const [page, setPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
-  const [sortBy, setSortBy] = useState("name");
+  const [sortBy, setSortBy] = useState<"name" | "email" | "createdAt" | "-createdAt">("name");
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
   const [filterStatus, setFilterStatus] = useState<"All" | "Active" | "Inactive">("All");
 
@@ -74,16 +78,28 @@ export default function StudentsPage() {
         toggleDeleteUser(user);
       },
       variant: (user: User) => (user.deletedAt ? "default" : "destructive"),
+      confirmationMessage: (user: User) =>
+        user.deletedAt
+          ? `Are you sure you want to unblock the student "${user.name || user.email}"?`
+          : `Are you sure you want to block the student "${user.name || user.email}"?`,
     },
   ];
 
-  if (isLoading) {
-    return <PageSkeleton tableColumns={3} />;
-  }
+  
 
   if (error) {
     return (
       <div className="space-y-6">
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-800">
+              Student Management
+            </h1>
+            <p className="text-gray-500 mt-1">
+              Manage Student and their settings
+            </p>
+          </div>
+        </div>
         <div className="text-red-600">
           <p>Error: {error.message}</p>
           <Button onClick={() => refetch()} className="mt-4">
@@ -94,6 +110,8 @@ export default function StudentsPage() {
     );
   }
 
+  
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -103,9 +121,9 @@ export default function StudentsPage() {
         </div>
       </div>
 
-      <StatsCards stats={stats} />
+      {isLoading ? <StatsSkeleton count={3} /> : <StatsCards stats={stats} />}
 
-      <TableControls
+      <TableControls<"name" | "email" | "createdAt" | "-createdAt">
         searchTerm={searchTerm}
         setSearchTerm={setSearchTerm}
         filterStatus={filterStatus}
@@ -114,35 +132,40 @@ export default function StudentsPage() {
         }
         sortBy={sortBy}
         setSortBy={setSortBy}
+        sortOrder={sortOrder}
+        setSortOrder={setSortOrder}
         sortOptions={[
           { value: "name", label: "Name (A-Z)" },
           { value: "email", label: "Email (A-Z)" },
           { value: "createdAt", label: "Newest first" },
-          { value: "-createdAt", label: "Oldest first" },
         ]}
         onRefresh={refetch}
       />
 
-      <DataTable<User>
-        data={students}
-        columns={columns}
-        isLoading={isLoading}
-        actions={actions}
-        itemsPerPage={10}
-        totalItems={total}
-        currentPage={page}
-        setCurrentPage={setPage}
-      />
+      {isLoading ? (
+              <TableSkeleton columns={3} hasActions={true} />
+            ) : (
+              <DataTable<User>
+                data={students}
+                columns={columns}
+                isLoading={isLoading}
+                actions={actions}
+                itemsPerPage={10}
+                totalItems={total}
+                currentPage={page}
+                setCurrentPage={setPage}
+              />
+            )}
 
-      {totalPages > 1 && (
-        <div className="mt-4">
-          <Pagination
-            currentPage={page}
-            totalPages={totalPages}
-            onPageChange={setPage}
-          />
-        </div>
-      )}
+      {isLoading ? (
+              <PaginationSkeleton />
+            ) : totalPages > 1 ? (
+              <Pagination
+                currentPage={page}
+                totalPages={totalPages}
+                onPageChange={setPage}
+              />
+            ) : null}
     </div>
   );
 }

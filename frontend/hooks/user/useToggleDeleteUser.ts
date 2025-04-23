@@ -70,7 +70,11 @@ export function useToggleDeleteUser() {
       });
       
       toast.success(
-        user.deletedAt ? "User restored successfully" : "User deleted successfully"
+        user.deletedAt ? "User unblocked successfully" : "User blocked successfully", {
+          description: user.deletedAt
+            ? "The user has been unblocked successfully."
+            : "The user has been blocked successfully.",
+        }
       );
     },
     onError: (error: any, user, context: any) => {
