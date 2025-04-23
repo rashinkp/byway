@@ -35,12 +35,11 @@ export const authMiddleware = (...requiredRoles: string[]) => {
     try {
       const decoded = JwtUtil.verifyToken(token, jwtSecret);
 
-      if (requiredRoles.length > 0 && requiredRoles.includes(decoded.role)) {
+      if (requiredRoles.length > 0 && !requiredRoles.includes(decoded.role)) {
         throw AppError.forbidden(
           `One of the following roles required: ${requiredRoles.join(", ")}`
         );
       }
-
 
       req.user = decoded;
       next();
