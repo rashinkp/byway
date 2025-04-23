@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
+import { Plus, Users } from "lucide-react";
 import { User } from "@/types/user";
 import { DataTable } from "@/components/ui/DataTable";
 import { StatsCards } from "@/components/ui/StatsCard";
@@ -10,19 +11,28 @@ import { useGetAllUsers } from "@/hooks/user/useGetAllUsers";
 import { StatusBadge } from "@/components/ui/StatusBadge";
 import { useToggleDeleteUser } from "@/hooks/user/useToggleDeleteUser";
 import { Pagination } from "@/components/ui/Pagination";
-import { Users } from "lucide-react";
-import { PageSkeleton } from "@/components/skeleton/ListingPageSkeleton";
+import { StatsSkeleton } from "@/components/skeleton/StatsSkeleton";
+import { TableSkeleton } from "@/components/skeleton/DataTableSkeleton";
+import { PaginationSkeleton } from "@/components/skeleton/PaginationSkeleton";
+
+interface InstructorFormData {
+  name: string;
+  email: string;
+  role: "INSTRUCTOR";
+}
 
 export default function InstructorsPage() {
   const [page, setPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
-  const [sortBy, setSortBy] = useState("name");
+  const [filterStatus, setFilterStatus] = useState<"All" | "Active" | "Inactive">("All");
+  const [sortBy, setSortBy] = useState<"name" | "email" | "createdAt" | "-createdAt">("name");
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
-  const [filterStatus, setFilterStatus] = useState<
-    "All" | "Active" | "Inactive"
-  >("All");
+  const [isAddOpen, setIsAddOpen] = useState(false);
+  const [isEditOpen, setIsEditOpen] = useState(false);
+  const [editInstructor, setEditInstructor] = useState<User | undefined>(undefined);
 
-  const { data, isLoading, refetch ,error } = useGetAllUsers({
+
+  const { data, isLoading, error, refetch } = useGetAllUsers({
     page,
     limit: 10,
     sortBy,
@@ -30,16 +40,14 @@ export default function InstructorsPage() {
     includeDeleted: true,
     search: searchTerm,
     filterBy: filterStatus,
-    role: "INSTRUCTOR", // Filter for instructors
+    role: "INSTRUCTOR",
   });
 
-  // Access the correct data structure
   const instructors = data?.data?.items || [];
   const total = data?.data?.total || 0;
   const totalPages = data?.data?.totalPages || 0;
 
-  console.log(data);
-
+  
   const { mutate: toggleDeleteUser } = useToggleDeleteUser();
 
   const stats = [
@@ -56,13 +64,11 @@ export default function InstructorsPage() {
     },
   ];
 
-  // Table columns
   const columns = [
     {
       header: "Name",
       accessor: "name" as keyof User,
-      render: (user: User) =>
-        user.name || <span className="text-gray-400">N/A</span>,
+      render: (user: User) => user.name || <span className="text-gray-400">N/A</span>,
     },
     {
       header: "Email",
@@ -75,68 +81,82 @@ export default function InstructorsPage() {
     },
   ];
 
-  // Actions
   const actions = [
     {
-      label: (user: User) => (user.deletedAt ? "Restore" : "Delete"),
-      onClick: (user: User) => {
-        handleToggleDelete(user);
-        console.log("Toggle delete instructor:", user);
+      label: "Edit",
+      onClick: (instructor: User) => {
+        setEditInstructor(instructor);
+        setIsEditOpen(true);
       },
-      variant: (user: User) => (user.deletedAt ? "default" : "destructive"),
+    },
+    {
+      label: (instructor: User) => (instructor.deletedAt ? "Enable" : "Disable"),
+      onClick: (instructor: User) => toggleDeleteUser(instructor),
+      variant: (instructor: User) => (instructor.deletedAt ? "default" : "destructive"),
+      confirmationMessage: (instructor: User) =>
+        instructor.deletedAt
+          ? `Are you sure you want to enable the instructor "${instructor.name || instructor.email}"?`
+          : `Are you sure you want to disable the instructor "${instructor.name || instructor.email}"?`,
     },
   ];
 
-  const handleToggleDelete = async (user: User) => {
-    toggleDeleteUser(user);
-  };
+  
 
   const handleViewRequests = () => {
-    // Placeholder: Navigate to requests page or open modal
     console.log("View instructor requests clicked");
-    // Example: router.push("/admin/instructor-requests");
   };
 
-   if (isLoading) {
-      return <PageSkeleton tableColumns={3} />;
-    }
-  
-    if (error) {
-      return (
-        <div className="space-y-6">
-          <div className="text-red-600">
-            <p>Error: {error.message}</p>
-            <Button onClick={() => refetch()} className="mt-4">
-              Retry
-            </Button>
+  if (error) {
+    return (
+      <div className="space-y-6">
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-800">Instructor Management</h1>
+            <p className="text-gray-500 mt-1">Manage instructor accounts and their access</p>
+          </div>
+          <div className="flex space-x-2">
+            {/* <Button
+              className="bg-blue-600 hover:bg-blue-700 text-white"
+              onClick={handleViewRequests}
+            >
+              <Users className="mr-2 h-4 w-4" />
+              Requests
+            </Button> */}
+           
           </div>
         </div>
-      );
-    }
+        <div className="text-red-600">
+          <p>Error: {error.message}</p>
+          <Button onClick={() => refetch()} className="mt-4">
+            Retry
+          </Button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-gray-800">
-            Instructor Management
-          </h1>
-          <p className="text-gray-500 mt-1">
-            Manage instructor accounts and their access
-          </p>
+          <h1 className="text-3xl font-bold text-gray-800">Instructor Management</h1>
+          <p className="text-gray-500 mt-1">Manage instructor accounts and their access</p>
         </div>
-        <Button
-          onClick={handleViewRequests}
-          className="bg-blue-600 hover:bg-blue-700 text-white"
-        >
-          <Users className="mr-2 h-4 w-4" />
-          Requests
-        </Button>
+        <div className="flex space-x-2">
+          {/* <Button
+            className="bg-blue-600 hover:bg-blue-700 text-white"
+            onClick={handleViewRequests}
+          >
+            <Users className="mr-2 h-4 w-4" />
+            Requests
+          </Button> */}
+         
+        </div>
       </div>
 
-      <StatsCards stats={stats} />
+      {isLoading ? <StatsSkeleton count={3} /> : <StatsCards stats={stats} />}
 
-      <TableControls
+      <TableControls<"name" | "email" | "createdAt" | "-createdAt">
         searchTerm={searchTerm}
         setSearchTerm={setSearchTerm}
         filterStatus={filterStatus}
@@ -145,35 +165,41 @@ export default function InstructorsPage() {
         }
         sortBy={sortBy}
         setSortBy={setSortBy}
+        sortOrder={sortOrder}
+        setSortOrder={setSortOrder}
         sortOptions={[
-          { value: "name", label: "Name (A-Z)" },
-          { value: "email", label: "Email (A-Z)" },
-          { value: "newest", label: "Newest first" },
-          { value: "oldest", label: "Oldest first" },
+          { value: "name", label: "Name" },
+          { value: "email", label: "Email" },
+          { value: "createdAt", label: "Newest first" },
         ]}
         onRefresh={refetch}
       />
 
-      <DataTable<User>
-        data={instructors}
-        columns={columns}
-        isLoading={isLoading}
-        actions={actions}
-        itemsPerPage={10}
-        totalItems={total}
-        currentPage={page}
-        setCurrentPage={setPage}
-      />
-
-      {totalPages > 1 && (
-        <div className="mt-4">
-          <Pagination
-            currentPage={page}
-            totalPages={totalPages}
-            onPageChange={setPage}
-          />
-        </div>
+      {isLoading ? (
+        <TableSkeleton columns={3} hasActions={true} />
+      ) : (
+        <DataTable<User>
+          data={instructors}
+          columns={columns}
+          isLoading={isLoading}
+          actions={actions}
+          itemsPerPage={10}
+          totalItems={total}
+          currentPage={page}
+          setCurrentPage={setPage}
+        />
       )}
+
+      {isLoading ? (
+        <PaginationSkeleton />
+      ) : totalPages > 1 ? (
+        <Pagination
+          currentPage={page}
+          totalPages={totalPages}
+          onPageChange={setPage}
+        />
+      ) : null}
+
     </div>
   );
 }
