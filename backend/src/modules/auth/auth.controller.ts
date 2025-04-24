@@ -83,8 +83,8 @@ export class AuthController {
   async googleAuth(input: unknown): Promise<ApiResponse> {
     try {
       const validatedInput = GoogleAuthSchema.parse(input);
-      const { idToken } = validatedInput;
-      const { user, token } = await this.authService.googleAuth(idToken);
+      const { access_token } = validatedInput;
+      const { user, token } = await this.authService.googleAuth(access_token);
       return {
         status: "success",
         data: { id: user.id, email: user.email, role: user.role },

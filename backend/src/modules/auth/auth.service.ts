@@ -6,7 +6,7 @@ import { OtpService } from "../otp/otp.service";
 import { AppError } from "../../utils/appError";
 import { StatusCodes } from "http-status-codes";
 import { UserService } from "../user/user.service";
-
+import axios from "axios";
 
 
 export class AuthService {
@@ -120,37 +120,57 @@ export class AuthService {
   }
 
   async googleAuth(
-    idToken: string
+    accessToken: string
   ): Promise<{ user: IAuthUser; token: string }> {
-    // Verify Google ID token
-    const ticket = await this.googleClient.verifyIdToken({
-      idToken,
-      audience: process.env.GOOGLE_CLIENT_ID,
-    });
-    const payload = ticket.getPayload();
-    if (!payload || !payload.email || !payload.sub) {
-      throw AppError.badRequest("Invalid Google ID token");
-    }
-
-    const { email, name, sub: googleId } = payload;
-    let user = await this.userService.findUserByEmail(email);
-
-    if (!user) {
-      user = await this.authRepository.createGoogleUser(
-        name || "Google User",
-        email,
-        googleId
+    try {
+      // Fetch user info using access_token
+      const userInfoResponse = await axios.get(
+        "https://www.googleapis.com/oauth2/v3/userinfo",
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        }
       );
-    } else if (user.authProvider !== "GOOGLE") {
+      const payload = userInfoResponse.data;
+      console.log("Google userinfo payload:", payload); 
+
+      if (!payload || !payload.email || !payload.sub) {
+        throw AppError.badRequest("Invalid Google access token");
+      }
+
+      const { email, name, sub: googleId } = payload;
+      let user = await this.userService.findUserByEmail(email);
+
+      if (!user) {
+        user = await this.authRepository.createGoogleUser(
+          name || "Google User",
+          email,
+          googleId
+        );
+      } else if (user.authProvider !== "GOOGLE") {
+        const updatedUser = await this.userService.updateUser({ userId: user.id, googleId });
+        user = { ...user, ...updatedUser };
+        if (!user) {
+          throw AppError.badRequest(
+            "This email is registered with a different authentication method"
+          );
+        }
+      } else if (user.deletedAt !== null) {
+        throw AppError.forbidden("This account is deactivated");
+      }
+
+      const token = this.generateToken(user.id, user.email, user.role);
+      return { user, token };
+    } catch (error: any) {
+      console.error("Google auth error:", error.message, error.response?.data); // Debug log
+      if (error.response?.status === 401) {
+        throw AppError.badRequest("Invalid Google access token");
+      }
       throw AppError.badRequest(
-        "This email is registered with a different authentication method"
+        error.message || "Google authentication failed"
       );
-    } else if (user.deletedAt !== null) {
-      throw AppError.forbidden("This account is deactivated");
     }
-
-    const token = this.generateToken(user.id, user.email, user.role);
-    return { user, token };
   }
 
   private generateToken(id: string, email: string, role: string): string {

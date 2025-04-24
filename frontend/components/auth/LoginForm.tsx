@@ -8,6 +8,7 @@ import { SplitScreenLayout } from "@/components/ui/SplitScreenLayout";
 import { AuthForm } from "@/components/auth/AuthForm";
 import { useLogin } from "@/hooks/auth/useLogin";
 import { useRoleRedirect } from "@/hooks/useRoleRedirects";
+import { useGoogleAuth } from "@/hooks/auth/useGoogleAuth";
 
 const loginSchema = z.object({
   email: z.string().email("Invalid email address"),
@@ -18,6 +19,7 @@ type LoginFormData = z.infer<typeof loginSchema>;
 
 export function LoginForm() {
   const { mutate: login, isPending, error } = useLogin();
+  const { handleGoogleAuth , isSubmitting , error:googleAuthError} = useGoogleAuth()
   const { redirectByRole } = useRoleRedirect();
 
   const form = useForm<LoginFormData>({
@@ -39,9 +41,6 @@ export function LoginForm() {
     );
   };
 
-  const handleGoogleLogin = () => {
-    console.log("Google login clicked");
-  };
 
   return (
     <SplitScreenLayout
@@ -69,10 +68,10 @@ export function LoginForm() {
         title="Welcome back"
         subtitle="Please enter your details to sign in"
         submitText="Sign in"
-        isSubmitting={isPending}
-        error={error?.message}
+        isSubmitting={isPending || isSubmitting}
+        error={googleAuthError|| error?.message}
         googleAuthText="Continue with Google"
-        onGoogleAuth={handleGoogleLogin}
+        onGoogleAuth={handleGoogleAuth}
         authLink={{
           text: "Don't have an account?",
           linkText: "Create account",

@@ -15,6 +15,7 @@ export const updateUserSchema = z.object({
         })
         .optional(),
       avatar: z.string().url().max(500).optional(),
+      googleId: z.string().optional(),
     })
     .optional(),
   profile: z
@@ -37,6 +38,7 @@ export const updateUserSchema = z.object({
       gender: z.enum(["MALE", "FEMALE", "OTHER"]).optional(),
     })
     .optional(),
+  
 });
 
 export const getAllUsersSchema = z.object({
