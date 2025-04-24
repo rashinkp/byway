@@ -133,7 +133,6 @@ export class AuthService {
         }
       );
       const payload = userInfoResponse.data;
-      console.log("Google userinfo payload:", payload); 
 
       if (!payload || !payload.email || !payload.sub) {
         throw AppError.badRequest("Invalid Google access token");
