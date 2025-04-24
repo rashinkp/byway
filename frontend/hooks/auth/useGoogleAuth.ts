@@ -1,9 +1,9 @@
 import { useState } from "react";
 import { useGoogleLogin } from "@react-oauth/google";
-import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { googleAuth } from "@/api/auth";
 import { useRoleRedirect } from "../useRoleRedirects";
+import { useAuthStore } from "@/stores/auth.store";
 
 interface UseGoogleAuthResult {
   handleGoogleAuth: () => void;
@@ -12,10 +12,10 @@ interface UseGoogleAuthResult {
 }
 
 export function useGoogleAuth(redirectPath: string = "/"): UseGoogleAuthResult {
-  const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const { redirectByRole } = useRoleRedirect();
+  const { setUser} = useAuthStore();
 
   const handleGoogleAuth = useGoogleLogin({
     onSuccess: async (tokenResponse) => {
@@ -30,6 +30,7 @@ export function useGoogleAuth(redirectPath: string = "/"): UseGoogleAuthResult {
         toast.success("Google authentication successful", {
           description: "You are now logged in.",
         });
+        setUser(response.data); // Set user in the store
         redirectByRole(response.data.role || '/')
       } catch (err: any) {
         const errorMessages: Record<string, string> = {
