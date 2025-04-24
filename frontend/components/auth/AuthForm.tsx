@@ -56,7 +56,7 @@ export function AuthForm<T extends FieldValues>({
   return (
     <AuthFormWrapper title={title} subtitle={subtitle} error={error}>
       {googleAuthText && (
-        <GoogleAuthButton text={googleAuthText} onClick={onGoogleAuth} />
+        <GoogleAuthButton text={googleAuthText} onClick={onGoogleAuth} isSubmitting={isSubmitting} />
       )}
       <div className="relative mb-6">
         <div className="absolute inset-0 flex items-center">
