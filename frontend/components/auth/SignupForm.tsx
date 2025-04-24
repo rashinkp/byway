@@ -8,6 +8,7 @@ import { useRouter } from "next/navigation";
 import { SplitScreenLayout } from "@/components/ui/SplitScreenLayout";
 import { AuthForm } from "@/components/auth/AuthForm";
 import { useSignup } from "@/hooks/auth/useSignup";
+import { useGoogleAuth } from "@/hooks/auth/useGoogleAuth";
 
 const signupSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters"),
@@ -20,6 +21,8 @@ type SignupFormData = z.infer<typeof signupSchema>;
 export function SignupForm() {
   const router = useRouter();
   const { mutate: signup, isPending, error } = useSignup();
+  const {error:googelAuthError ,isSubmitting , handleGoogleAuth } = useGoogleAuth()
+
 
   const form = useForm<SignupFormData>({
     resolver: zodResolver(signupSchema),
@@ -42,9 +45,6 @@ export function SignupForm() {
     );
   };
 
-  const handleGoogleSignup = () => {
-    console.log("Google signup clicked");
-  };
 
   return (
     <SplitScreenLayout
@@ -78,10 +78,10 @@ export function SignupForm() {
         title="Create account"
         subtitle="Join our platform to start learning"
         submitText="Create account"
-        isSubmitting={isPending}
-        error={error?.message}
+        isSubmitting={isPending || isSubmitting}
+        error={error?.message || googelAuthError}
         googleAuthText="Sign up with Google"
-        onGoogleAuth={handleGoogleSignup}
+        onGoogleAuth={handleGoogleAuth}
         authLink={{
           text: "Already have an account?",
           linkText: "Sign in",

@@ -64,6 +64,21 @@ export async function login(email: string, password: string) {
   }
 }
 
+export async function googleAuth(
+  access_token: string
+): Promise<IVerifyAuthResponse> {
+  try {
+    const response = await api.post<IVerifyAuthResponse>("/auth/google", {
+      access_token,
+    });
+    return response.data;
+  } catch (error: any) {
+    throw new Error(
+      error.response?.data?.message || "Google authentication failed"
+    );
+  }
+}
+
 export async function verifyOtp(otp: string, email: string, type: "signup" | "password-reset" = "signup"): Promise<User> {
   try {
     const response = await api.post<IVerifyOtpResponse>(

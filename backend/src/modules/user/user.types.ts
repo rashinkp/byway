@@ -31,6 +31,7 @@ export interface UpdateUserInput {
   userId: string;
   user?: Partial<Pick<IUser, "name" | "password" | "avatar">>;
   profile?: Partial<Omit<IUserProfile, "id" | "userId">>;
+  googleId?: string;
 }
 
 export interface UpdateUserRoleInput {

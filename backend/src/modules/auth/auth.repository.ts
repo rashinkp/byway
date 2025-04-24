@@ -48,4 +48,6 @@ export class AuthRepository implements IAuthRepository {
       data: { password: hashedPassword },
     });
   }
+
+  
 }

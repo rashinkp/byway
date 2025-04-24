@@ -29,5 +29,5 @@ export const ResetPasswordSchema = z.object({
 
 
 export const GoogleAuthSchema = z.object({
-  idToken: z.string().min(1, "Google ID token is required"),
+  access_token: z.string().min(1, "Google ID token is required"),
 });
