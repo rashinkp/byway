@@ -26,7 +26,6 @@ export function useGoogleAuth(redirectPath: string = "/"): UseGoogleAuthResult {
           throw new Error("No ID token received from Google");
         }
         const response = await googleAuth(tokenResponse.access_token);
-        console.log("Google auth response:", response);
         toast.success("Google authentication successful", {
           description: "You are now logged in.",
         });
