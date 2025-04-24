@@ -125,7 +125,7 @@ export class AuthService {
     try {
       // Fetch user info using access_token
       const userInfoResponse = await axios.get(
-        "https://www.googleapis.com/oauth2/v3/userinfo",
+        process.env.GOOGLE_AUTH_VERIFY_URL as string,
         {
           headers: {
             Authorization: `Bearer ${accessToken}`,
