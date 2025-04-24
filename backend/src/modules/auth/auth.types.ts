@@ -40,3 +40,14 @@ export interface IAuthRepository {
     googleId: string
   ): Promise<IAuthUser>;
 }
+
+
+
+export interface IGoogleAuthGateway {
+  getUserInfo(accessToken: string): Promise<{
+    email: string;
+    name?: string;
+    sub: string;
+    [key: string]: any;
+  }>;
+}

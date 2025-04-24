@@ -1,7 +1,7 @@
 import { JwtUtil } from "../../utils/jwt.util";
 import { OAuth2Client } from "google-auth-library";
 import * as bcrypt from "bcrypt";
-import { IAuthRepository, IAuthUser, IForgotPasswordInput, IResetPasswordInput } from "./auth.types";
+import { IAuthRepository, IAuthUser, IForgotPasswordInput, IGoogleAuthGateway, IResetPasswordInput } from "./auth.types";
 import { OtpService } from "../otp/otp.service";
 import { AppError } from "../../utils/appError";
 import { StatusCodes } from "http-status-codes";
@@ -16,7 +16,8 @@ export class AuthService {
     private otpService: OtpService,
     private jwtSecret: string,
     private userService: UserService,
-    googleClientId: string
+    googleClientId: string,
+    private googleAuthGateway: IGoogleAuthGateway
   ) {
     if (!jwtSecret) {
       throw new AppError(
@@ -123,20 +124,8 @@ export class AuthService {
     accessToken: string
   ): Promise<{ user: IAuthUser; token: string }> {
     try {
-      // Fetch user info using access_token
-      const userInfoResponse = await axios.get(
-        process.env.GOOGLE_AUTH_VERIFY_URL as string,
-        {
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-          },
-        }
-      );
-      const payload = userInfoResponse.data;
-
-      if (!payload || !payload.email || !payload.sub) {
-        throw AppError.badRequest("Invalid Google access token");
-      }
+      // Use the gateway to fetch user info
+      const payload = await this.googleAuthGateway.getUserInfo(accessToken);
 
       const { email, name, sub: googleId } = payload;
       let user = await this.userService.findUserByEmail(email);
@@ -148,7 +137,10 @@ export class AuthService {
           googleId
         );
       } else if (user.authProvider !== "GOOGLE") {
-        const updatedUser = await this.userService.updateUser({ userId: user.id, googleId });
+        const updatedUser = await this.userService.updateUser({
+          userId: user.id,
+          googleId,
+        });
         user = { ...user, ...updatedUser };
         if (!user) {
           throw AppError.badRequest(
@@ -162,13 +154,8 @@ export class AuthService {
       const token = this.generateToken(user.id, user.email, user.role);
       return { user, token };
     } catch (error: any) {
-      console.error("Google auth error:", error.message, error.response?.data); // Debug log
-      if (error.response?.status === 401) {
-        throw AppError.badRequest("Invalid Google access token");
-      }
-      throw AppError.badRequest(
-        error.message || "Google authentication failed"
-      );
+      console.error("Google auth error:", error.message); // Debug log
+      throw error; // Let the gateway handle specific error types
     }
   }
 
