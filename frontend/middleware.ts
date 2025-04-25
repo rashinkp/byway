@@ -51,7 +51,20 @@ export async function middleware(request: NextRequest) {
 
   // Require authentication for protected routes
   if (!user) {
-    return NextResponse.redirect(new URL("/login", request.url));
+    //remove token from secure cookie and from local storage
+
+    const response = NextResponse.redirect(new URL("/login?clearAuth=true", request.url));
+
+    response.cookies.set("jwt", "", {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
+      expires: new Date(0), // Expire immediately to delete the cookie
+      path: "/",
+    });
+
+    response.headers.set("x-clear-auth", "true");
+    return response;
   }
 
   // Role-based route protection

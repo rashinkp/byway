@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import dynamic from "next/dynamic";
 import { useAuth } from "@/hooks/auth/useAuth";
 import { ROUTES } from "@/constants/routes";
+import { useAuthStore } from "@/stores/auth.store";
 
 const LoginForm = dynamic(
   () => import("@/components/auth/LoginForm").then((mod) => mod.LoginForm),
@@ -17,6 +18,17 @@ const LoginForm = dynamic(
 export default function LoginPage() {
   const { isAuthenticated, isLoading, user } = useAuth();
   const router = useRouter();
+  const { clearAuth, isInitialized } = useAuthStore();
+
+
+  useEffect(() => {
+    const clearAuthSignal = new URLSearchParams(window.location.search).get(
+      "clearAuth"
+    );
+    if (isInitialized && clearAuthSignal === "true") {
+      clearAuth();
+    }
+  }, [isInitialized, clearAuth]);
 
   useEffect(() => {
     if (!isLoading && isAuthenticated && user) {

@@ -191,9 +191,14 @@ export class AuthService {
 
   async me(userId: string): Promise<IAuthUser> {
     const user = await this.userService.findUserById(userId);
-    if (!user || user.deletedAt !== null) {
+    if (!user  ) {
       throw AppError.notFound("User not found or account is deactivated");
     }
+
+    if (user.deletedAt !== null) {
+      throw AppError.forbidden("This account is deactivated");
+    }
+    
     return user;
   }
 }
