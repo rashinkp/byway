@@ -17,28 +17,11 @@ import { useSoftDeleteCourse } from "@/hooks/course/useSoftDeleteCourse";
 import { TableSkeleton } from "@/components/skeleton/DataTableSkeleton";
 import { PaginationSkeleton } from "@/components/skeleton/PaginationSkeleton";
 import { StatsSkeleton } from "@/components/skeleton/StatsSkeleton";
+import { courseSchema } from "@/lib/validations/course";
 
 
 
-export const courseSchema = z.object({
-  title: z.string().min(1, "Title is required").max(100, "Title is too long"),
-  description: z.string().max(1000, "Description is too long").optional(),
-  categoryId: z.string().min(1, "Category is required"),
-  price: z
-    .number()
-    .min(0, "Price must be a positive number")
-    .max(9999.99, "Price is too high"),
-  duration: z.number(),
-  level: z.enum(["BEGINNER", "MEDIUM", "ADVANCED"], {
-    errorMap: () => ({ message: "Level is required" }),
-  }),
-  thumbnail: z
-    .string()
-    .url("Invalid URL format")
-    .max(200, "Thumbnail URL is too long")
-    .optional()
-    .or(z.literal("")),
-});
+
 
 export type CourseFormData = z.infer<typeof courseSchema>;
 

@@ -23,3 +23,24 @@ export const courseEditSchema = z
   );
 
 
+export const courseSchema = z.object({
+  title: z.string().min(1, "Title is required").max(100, "Title is too long"),
+  description: z
+    .string()
+    .min(1, "Description is required")
+    .max(1000, "Description is too long"),
+  categoryId: z.string().min(1, "Category is required"),
+  price: z
+    .number()
+    .min(0, "Price must be a positive number")
+    .max(9999.99, "Price is too high"),
+  duration: z.number().min(1, "Duration must be at least 1 minute"),
+  level: z.enum(["BEGINNER", "MEDIUM", "ADVANCED"], {
+    errorMap: () => ({ message: "Level is required" }),
+  }),
+  thumbnail: z
+    .string()
+    .url("Invalid URL format")
+    .min(1, "Thumbnail URL is required")
+    .max(200, "Thumbnail URL is too long"),
+});

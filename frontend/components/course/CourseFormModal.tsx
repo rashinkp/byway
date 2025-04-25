@@ -1,12 +1,13 @@
 "use client";
 
-import { CourseFormData, courseSchema } from "@/app/instructor/courses/page";
+import { CourseFormData } from "@/app/instructor/courses/page";
 import { useCreateCourse } from "@/hooks/course/useCreateCourse";
 import { useAuthStore } from "@/stores/auth.store";
 import { toast } from "sonner";
 import { FormModal, FormFieldConfig } from "../ui/FormModal";
 import { useCategories } from "@/hooks/category/useCategories";
 import { useMemo } from "react";
+import { courseSchema } from "@/lib/validations/course";
 
 export const fields: FormFieldConfig<CourseFormData>[] = [
   {
@@ -24,7 +25,7 @@ export const fields: FormFieldConfig<CourseFormData>[] = [
     label: "Description",
     type: "textarea",
     placeholder: "e.g., Learn the basics of HTML, CSS, and JavaScript",
-    description: "Provide a brief description of the course (optional).",
+    description: "Provide a brief description of the course .",
     maxLength: 1000,
     column: "right",
   },
@@ -76,7 +77,7 @@ export const fields: FormFieldConfig<CourseFormData>[] = [
     type: "input",
     fieldType: "text",
     placeholder: "e.g., https://example.com/thumbnail.jpg",
-    description: "Provide a URL for the course thumbnail (optional).",
+    description: "Provide a URL for the course thumbnail .",
     maxLength: 200,
     column: "left",
   },
@@ -137,7 +138,7 @@ export function CourseFormModal({
       });
     }
   };
-
+  //todo: price validtion is not working while submitting the form
   return (
     <FormModal
       open={open}
