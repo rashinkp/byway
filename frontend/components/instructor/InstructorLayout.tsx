@@ -34,7 +34,7 @@ export default function InstructorLayout({ children }: InstructorLayoutProps) {
     : "IN";
 
   return (
-    <div className="flex min-h-screen bg-gray-50">
+    <div className="flex min-h-screen">
       <div className="lg:hidden fixed top-4 left-4 z-50">
         <Button
           variant="outline"

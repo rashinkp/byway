@@ -77,7 +77,7 @@ export function CourseDetails({
   }
 
   return (
-    <div className="p-6 rounded-xl shadow-sm border border-gray-100 space-y-8">
+    <div className="p-6 space-y-8">
       <ImageSection
         src={src}
         alt={alt}

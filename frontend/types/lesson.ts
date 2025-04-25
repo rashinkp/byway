@@ -28,7 +28,7 @@ export interface GetAllLessonsParams {
   sortBy?: "order" | "title" | "createdAt" | "updatedAt";
   sortOrder?: "asc" | "desc";
   search?: string;
-  filterBy?: "DRAFT" | "PUBLISHED" | "ALL";
+  filterBy?: "DRAFT" | "PUBLISHED" | "ALL" | "INACTIVE";
   includeDeleted?: boolean;
 }
 
@@ -39,7 +39,7 @@ export interface UseGetAllLessonsInCourseParams {
   sortBy?: "order" | "title" | "createdAt" | "updatedAt";
   sortOrder?: "asc" | "desc";
   search?: string;
-  filterBy?: "DRAFT" | "PUBLISHED" | "ALL";
+  filterBy?: "DRAFT" | "PUBLISHED" | "ALL" | "INACTIVE";
   includeDeleted?: boolean;
 }
 

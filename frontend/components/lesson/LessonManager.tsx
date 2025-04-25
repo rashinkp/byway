@@ -8,24 +8,26 @@ import { StatusBadge } from "@/components/ui/StatusBadge";
 import { Video, Trash2, Edit } from "lucide-react";
 import { LessonFormModal, LessonFormData } from "./LessonFormModal";
 import { useGetAllLessonsInCourse } from "@/hooks/lesson/useGetAllLesson";
-import { useCreateLesson } from "@/hooks/lesson/useCreateLesson";
-import { useUpdateLesson } from "@/hooks/lesson/useUpdateLesson";
 import { useDeleteLesson } from "@/hooks/lesson/useDeleteLesson";
 import { ILesson } from "@/types/lesson";
 import { useRouter } from "next/navigation";
 import { TableSkeleton } from "../skeleton/DataTableSkeleton";
+import { PaginationSkeleton } from "../skeleton/PaginationSkeleton";
+import { Pagination } from "../ui/Pagination";
+import { set } from "zod";
 
-type SortBy = "createdAt" | "updatedAt";
+
 
 export function LessonManager({ courseId }: { courseId: string }) {
   const [isLessonModalOpen, setIsLessonModalOpen] = useState(false);
   const [editingLesson, setEditingLesson] = useState<ILesson | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
-  const [sortBy, setSortBy] = useState<SortBy>("createdAt");
+  const [sortBy, setSortBy] = useState<'title'|'createdAt'|'order'>("order");
   const [page, setPage] = useState(1);
   const [filterStatus, setFilterStatus] = useState<
-    "ALL" | "PUBLISHED" | "DRAFT"
-  >("ALL");
+    "ALL" | "PUBLISHED" | "DRAFT" | 'INACTIVE'
+    >("ALL");
+  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
   const limit = 10;
 
   const { data, isLoading, error, refetch } = useGetAllLessonsInCourse({
@@ -33,7 +35,7 @@ export function LessonManager({ courseId }: { courseId: string }) {
     page,
     limit,
     sortBy,
-    sortOrder: "asc",
+    sortOrder: sortOrder || 'asc',
     search: searchTerm,
     filterBy: filterStatus,
     includeDeleted: true,
@@ -45,6 +47,8 @@ export function LessonManager({ courseId }: { courseId: string }) {
   const nextOrder = data?.lessons.length
     ? Math.max(...data.lessons.map((l) => l.order)) + 1
     : 1;
+  
+  const totalPages = data?.totalPages || 1;
 
   const router = useRouter();
 
@@ -56,20 +60,7 @@ export function LessonManager({ courseId }: { courseId: string }) {
     });
   };
 
-  // Wrapper for setFilterStatus to match TableControls' expected type
-  const handleSetFilterStatus = (status: string) => {
-    if (["DRAFT", "PUBLISHED", "ALL"].includes(status)) {
-      setFilterStatus(status as "DRAFT" | "PUBLISHED" | "ALL");
-    }
-  };
 
-  const handleSetSortBy = useCallback((sort: string) => {
-    const validSorts: SortBy[] = ["createdAt", "updatedAt"];
-    const newSort = validSorts.includes(sort as SortBy)
-      ? (sort as SortBy)
-      : "createdAt"; // Fallback to "createdAt" if invalid
-    setSortBy(newSort);
-  }, []);
 
   // Table columns
   const columns = [
@@ -110,7 +101,7 @@ export function LessonManager({ courseId }: { courseId: string }) {
       variant: () => "default" as const,
     },
     {
-      label: (lesson: ILesson) => (lesson.deletedAt ? "Restore" : "Delete"),
+      label: (lesson: ILesson) => (lesson.deletedAt ? "Enable" : "Disable"),
       onClick: (lesson: ILesson) => handleDeleteLesson(lesson),
       variant: (lesson: ILesson) =>
         lesson.deletedAt ? "default" : "destructive",
@@ -146,11 +137,14 @@ export function LessonManager({ courseId }: { courseId: string }) {
         searchTerm={searchTerm}
         setSearchTerm={setSearchTerm}
         filterStatus={filterStatus}
-        setFilterStatus={handleSetFilterStatus} // Use wrapper
+        setFilterStatus={(status:string) => {
+          setFilterStatus(status as "ALL" | "PUBLISHED" | "DRAFT" | 'INACTIVE');
+          setPage(1);
+       }} 
         sortBy={sortBy}
-        setSortBy={handleSetSortBy}
-        sortOrder="asc"
-        setSortOrder={() => {}}
+        setSortBy={(sort: "order" | "title" | "createdAt") => setSortBy(sort as 'title'|'createdAt')}
+        sortOrder={sortOrder}
+        setSortOrder={setSortOrder}
         sortOptions={[
           { value: "title", label: "Title (A-Z)" },
           { value: "order", label: "Order" },
@@ -178,6 +172,17 @@ export function LessonManager({ courseId }: { courseId: string }) {
           setCurrentPage={setPage}
         />
       )}
+
+
+      {isLoading ? (
+              <PaginationSkeleton />
+            ) : totalPages > 1 ? (
+              <Pagination
+                currentPage={page}
+                totalPages={totalPages}
+                onPageChange={setPage}
+              />
+            ) : null}
 
       <LessonFormModal
         open={isLessonModalOpen}
