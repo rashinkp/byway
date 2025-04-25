@@ -1,3 +1,6 @@
+import { courseEditSchema } from "@/lib/validations/course";
+import { z } from "zod";
+
 export type SortByType = "createdAt" | "name" | "updatedAt";
 
 export interface Course {
@@ -49,3 +52,6 @@ export interface CourseApiResponse {
   limit: number;
   totalPage: number;
 }
+
+
+export type CourseEditFormData = z.infer<typeof courseEditSchema>;

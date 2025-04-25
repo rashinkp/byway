@@ -26,6 +26,19 @@ export const DetailsSection = ({
       {/* Left Column */}
       <div className="space-y-6">
         <div>
+          <h3 className="text-sm font-medium text-gray-700">Title</h3>
+          {isEditing ? (
+            <Input
+              {...register("title")}
+              className="mt-1"
+              placeholder="Course title"
+              disabled={form.formState.isSubmitting}
+            />
+          ) : (
+            <p className="mt-1 text-gray-900 font-medium">{course.title}</p>
+          )}
+        </div>
+        <div>
           <h3 className="text-sm font-medium text-gray-700">Id</h3>
           {isEditing ? (
             <Input

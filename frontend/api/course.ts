@@ -1,6 +1,6 @@
 import { UseGetAllCoursesParams } from "@/hooks/course/useGetAllCourse";
 import { api } from "./api";
-import { CourseApiResponse, Course, AddCourseParams } from "@/types/course";
+import { CourseApiResponse, Course, AddCourseParams, CourseEditFormData } from "@/types/course";
 
 
 
@@ -62,5 +62,20 @@ export async function getCourseById(id: string): Promise < Course > {
     return result.data.data;
   } catch (error:any) {
     throw new Error(error.response?.data?.message || "Delete category failed");
+  }
+}
+
+
+
+export async function updateCourse(
+  id: string,
+  courseData: CourseEditFormData,
+): Promise<Course> {
+  try {
+    const response = await api.put(`/courses/${id}`, courseData);
+    return response.data.data;
+  } catch (error) {
+    console.error("Failed to update course:", error);
+    throw new Error("Failed to update course");
   }
 }
