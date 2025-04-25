@@ -7,26 +7,20 @@ import {
   X,
   Loader2,
 } from "lucide-react";
-import { StatusBadge } from "../ui/StatusBadge";
 import { Button } from "../ui/button";
 import { StaticImageData } from "next/image";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from "zod";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { ImageSection } from "./CourseDetailsImageSection";
 import { DetailsSection } from "./CourseDetailsSection";
+import { DetailsSectionSkeleton } from "../skeleton/CourseDetailSectionSkeleton";
 import { OverviewSection } from "./CourseOverviewSection";
 import { ObjectivesSection } from "./CourseObjectiveSection";
 import { ActionSection } from "./CourseActionSection";
 import { useSoftDeleteCourse } from "@/hooks/course/useSoftDeleteCourse";
 import { courseEditSchema } from "@/lib/validations/course";
 import { useUpdateCourse } from "@/hooks/course/useUpdateCourse";
-
-// Schema for editing
-
-
 
 export function CourseDetails({
   course,
@@ -35,44 +29,52 @@ export function CourseDetails({
   alt,
   onImageChange,
   isUploading,
+  isLoading,
 }: {
-  course: Course;
+  course?: Course; // Make course optional
   onPublish: () => void;
   src: string | StaticImageData;
   alt: string;
   onImageChange: () => void;
   isUploading: boolean;
+  isLoading: boolean;
 }) {
   const [isEditing, setIsEditing] = useState(false);
-  const {mutate:toggleDeleteCourse } = useSoftDeleteCourse();
+  const { mutate: toggleDeleteCourse } = useSoftDeleteCourse();
 
-
-  const { mutate:updateCourse , isPending:isUpdating} = useUpdateCourse();
+  const { mutate: updateCourse, isPending: isUpdating } = useUpdateCourse();
 
   const form = useForm<CourseEditFormData>({
     resolver: zodResolver(courseEditSchema),
     defaultValues: {
-      title: course.title,
-      description: course.description || "",
-      level: course.level as "BEGINNER" | "INTERMEDIATE" | "ADVANCED",
-      price: course.price || 0,
-      duration: course.duration ?? 0,
-      offer: course.offer || undefined,
+      title: course?.title || "",
+      description: course?.description || "",
+      level: (course?.level as "BEGINNER" | "INTERMEDIATE" | "ADVANCED") || "BEGINNER",
+      price: course?.price || 0,
+      duration: course?.duration ?? 0,
+      offer: course?.offer || undefined,
     },
   });
 
   const onSubmit = (data: CourseEditFormData) => {
+    if (!course) return; // Prevent submission if course is undefined
+    console.log("Form data:", data);
     updateCourse({ data, id: course.id });
     setIsEditing(false);
   };
 
   const onToggleDelete = () => {
+    if (!course) return;
     try {
       toggleDeleteCourse(course);
     } catch (error) {
       console.error("Failed to toggle delete course:", error);
     }
   };
+
+  if (isLoading) {
+    return <DetailsSectionSkeleton />;
+  }
 
   return (
     <div className="p-6 rounded-xl shadow-sm border border-gray-100 space-y-8">
@@ -89,6 +91,7 @@ export function CourseDetails({
             onClick={() => setIsEditing(true)}
             aria-label="Edit course details"
             className="text-primary hover:bg-primary/10"
+            disabled={!course} // Disable edit button if course is undefined
           >
             <Edit className="mr-2 h-4 w-4" />
             Edit Details
@@ -102,7 +105,7 @@ export function CourseDetails({
           <div className="flex justify-end gap-3">
             <Button
               type="submit"
-              disabled={isUpdating}
+              disabled={isUpdating || !course}
               className="bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary text-white"
             >
               {isUpdating ? (
@@ -119,7 +122,7 @@ export function CourseDetails({
                 form.reset();
                 setIsEditing(false);
               }}
-              disabled={isUpdating}
+              disabled={isUpdating || !course}
               className="text-gray-700"
             >
               <X className="mr-2 h-4 w-4" />
@@ -129,16 +132,19 @@ export function CourseDetails({
         </form>
       ) : (
         <>
-          <DetailsSection course={course} isEditing={isEditing} form={form} />
-          <OverviewSection course={course} isEditing={isEditing} form={form} />
-          <ObjectivesSection />
-          <ActionSection
-            course={course}
-            isEditing={isEditing}
-            isUpdating={isUpdating}
-            onPublish={onPublish}
-            onToggleDelete={onToggleDelete}
-          />
+          
+              <DetailsSection course={course} isEditing={isEditing} form={form} />
+              <OverviewSection course={course} isEditing={isEditing} form={form} />
+              <ObjectivesSection />
+          {course && (
+            <ActionSection
+              course={course}
+              isEditing={isEditing}
+              isUpdating={isUpdating}
+              onPublish={onPublish}
+              onToggleDelete={onToggleDelete}
+            />
+          )}
         </>
       )}
     </div>

@@ -1,6 +1,5 @@
 import { Course } from "@/types/course";
 import { Button } from "../ui/button";
-import { Recycle } from "lucide-react";
 import { AlertComponent } from "../ui/AlertComponent";
 import { useState } from "react";
 
@@ -50,7 +49,6 @@ export const ActionSection = ({
             : "bg-emerald-600 hover:bg-emerald-700"
         }
       >
-        <Recycle className="mr-2 h-4 w-4" />
         {!course.deletedAt ? "Disable" : "Enable"}
       </Button>
       <Button

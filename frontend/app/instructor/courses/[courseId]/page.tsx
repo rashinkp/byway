@@ -1,15 +1,14 @@
 "use client";
-
 import { useRouter, useParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { LessonManager } from "@/components/lesson/LessonManager";
 import { useGetCourseById } from "@/hooks/course/useGetCourseById";
 import PlaceHolderImage from "@/public/placeHolder.jpg";
 import { CourseDetails } from "@/components/course/CourseDetails";
-import { useState, useRef } from "react";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import {  useRef } from "react";
+import { useMutation } from "@tanstack/react-query";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { BookOpen, ListChecks, FileEdit, Loader2, Users, Star, FileText, TrendingUp } from "lucide-react";
+import {  FileEdit, Loader2, Users,  TrendingUp } from "lucide-react";
 
 export default function CourseDetailPage() {
   const { courseId } = useParams();
@@ -19,10 +18,12 @@ export default function CourseDetailPage() {
     isLoading,
     error,
   } = useGetCourseById(courseId as string);
+  
 
-  const queryClient = useQueryClient();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+
+  //todo: implement thumbnail upload and course status update
   const { mutate: updateThumbnail, isPending: isUploading } = useMutation({
     // mutationFn: async (file: File) => {
     //   const formData = new FormData();
@@ -66,22 +67,7 @@ export default function CourseDetailPage() {
     // });
   };
 
-  if (isLoading) {
-    return (
-      <div className="container mx-auto py-12 px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-center h-64">
-          <div className="flex flex-col items-center">
-            <Loader2 className="h-10 w-10 text-primary animate-spin mb-4" />
-            <p className="text-gray-500 font-medium">
-              Loading course details...
-            </p>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  if (error || !course) {
+  if (error) {
     return (
       <div className="container mx-auto py-12 px-4 sm:px-6 lg:px-8">
         <div className="bg-red-50 border border-red-200 rounded-lg p-6 text-center max-w-2xl mx-auto">
@@ -175,9 +161,10 @@ export default function CourseDetailPage() {
 
           <CourseDetails
             course={course}
+            isLoading={isLoading}
             onPublish={handlePublish}
             src={PlaceHolderImage}
-            alt={course.title}
+            alt={course?.title || "Course Thumbnail"}
             onImageChange={() => fileInputRef.current?.click()}
             isUploading={isUploading}
           />

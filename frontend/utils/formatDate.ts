@@ -1,5 +1,5 @@
-export function formatDate(dateString:Date) {
-  if (!dateString) return null;
+export function formatDate(dateString:Date | null) {
+  if (!dateString) return 'Not available';
 
   const date = new Date(dateString);
 

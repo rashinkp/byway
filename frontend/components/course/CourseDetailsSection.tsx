@@ -15,7 +15,7 @@ export const DetailsSection = ({
   isEditing,
   form,
 }: {
-  course: Course;
+  course?: Course;
   isEditing: boolean;
   form: any;
 }) => {
@@ -35,7 +35,7 @@ export const DetailsSection = ({
               disabled={form.formState.isSubmitting}
             />
           ) : (
-            <p className="mt-1 text-gray-900 font-medium">{course.title}</p>
+            <p className="mt-1 text-gray-900 font-medium">{course?.title}</p>
           )}
         </div>
         <div>
@@ -46,10 +46,10 @@ export const DetailsSection = ({
               className="mt-1"
               placeholder="Course ID"
               disabled
-              value={course.id}
+              value={course?.id}
             />
           ) : (
-            <p className="mt-1 text-gray-900 font-medium">{course.id}</p>
+            <p className="mt-1 text-gray-900 font-medium">{course?.id}</p>
           )}
         </div>
         <div>
@@ -59,10 +59,10 @@ export const DetailsSection = ({
               onValueChange={(value) =>
                 form.setValue(
                   "level",
-                  value as "BEGINNER" | "INTERMEDIATE" | "ADVANCED"
+                  value as "BEGINNER" | "MEDIUM" | "ADVANCED"
                 )
               }
-              defaultValue={course.level}
+              defaultValue={course?.level}
               disabled={form.formState.isSubmitting}
             >
               <SelectTrigger className="mt-1">
@@ -70,13 +70,13 @@ export const DetailsSection = ({
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="BEGINNER">Beginner</SelectItem>
-                <SelectItem value="INTERMEDIATE">Intermediate</SelectItem>
+                <SelectItem value="MEDIUM">Medium</SelectItem>
                 <SelectItem value="ADVANCED">Advanced</SelectItem>
               </SelectContent>
             </Select>
           ) : (
             <p className="mt-1 text-gray-900 font-medium">
-              {course.level.charAt(0) + course.level.slice(1).toLowerCase()}
+              {(course?.level?.charAt(0) ?? "") + (course?.level?.slice(1).toLowerCase() ?? "")}
             </p>
           )}
         </div>
@@ -160,8 +160,8 @@ export const DetailsSection = ({
                   value === "true" ? new Date().toISOString() : null
                 )
               }
-              defaultValue={course.deletedAt ? "true" : "false"}
-              disabled={form.formState.isSubmitting}
+              defaultValue={course?.deletedAt ? "true" : "false"}
+              disabled={true}
             >
               <SelectTrigger className="mt-1">
                 <SelectValue placeholder="Select status" />
@@ -172,7 +172,7 @@ export const DetailsSection = ({
               </SelectContent>
             </Select>
           ) : (
-            <StatusBadge isActive={!course.deletedAt} className="mt-1" />
+            <StatusBadge isActive={!course?.deletedAt} className="mt-1" />
           )}
         </div>
         <div>
@@ -180,7 +180,7 @@ export const DetailsSection = ({
           {isEditing ? (
             <Select
               onValueChange={(value) => form.setValue("status", value)}
-              defaultValue={course.status}
+              defaultValue={course?.status}
               disabled={form.formState.isSubmitting}
             >
               <SelectTrigger className="mt-1">
@@ -192,11 +192,11 @@ export const DetailsSection = ({
                 <SelectItem value="ARCHIVED">Archived</SelectItem>
               </SelectContent>
             </Select>
-          ) : course.status === "DRAFT" ? (
+          ) : course?.status === "DRAFT" ? (
             <p className="mt-1 text-gray-900 font-medium">Draft</p>
-          ) : course.status === "PUBLISHED" ? (
+          ) : course?.status === "PUBLISHED" ? (
             <p className="mt-1 text-green-600 font-medium">Published</p>
-          ) : course.status === "ARCHIVED" ? (
+          ) : course?.status === "ARCHIVED" ? (
             <p className="mt-1 text-red-600 font-medium">Archived</p>
           ) : null}
         </div>
@@ -209,11 +209,11 @@ export const DetailsSection = ({
               className="mt-1"
               placeholder="Created At"
               disabled
-              value={formatDate(course?.createdAt) || "Not available"}
+              value={formatDate(course?.createdAt || null) || "Not available"}
             />
           ) : (
             <p className="mt-1 text-gray-900 font-medium">
-              {formatDate(course?.createdAt) || "Not available"}
+              {formatDate(course?.createdAt || null) || "Not available"}
             </p>
           )}
         </div>
@@ -226,11 +226,11 @@ export const DetailsSection = ({
               className="mt-1"
               placeholder="Updated At"
               disabled
-              value={formatDate(course?.updatedAt) || "Not Updated yet"}
+              value={formatDate(course?.updatedAt || null) || "Not Updated yet"}
             />
           ) : (
             <p className="mt-1 text-gray-900 font-medium">
-              {formatDate(course?.updatedAt) || "Not Updated yet"}
+              {formatDate(course?.updatedAt || null) || "Not Updated yet"}
             </p>
           )}
         </div>

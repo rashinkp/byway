@@ -6,7 +6,7 @@ export const OverviewSection = ({
   isEditing,
   form,
 }: {
-  course: Course;
+  course?: Course;
   isEditing: boolean;
   form: any;
 }) => (
@@ -21,7 +21,7 @@ export const OverviewSection = ({
       />
     ) : (
       <p className="text-gray-600 leading-relaxed">
-        {course.description || "No description available."}
+        {course?.description || "No description available."}
       </p>
     )}
   </div>
