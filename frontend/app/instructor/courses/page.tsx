@@ -134,6 +134,10 @@ export default function CoursesPage() {
       onClick: (course: Course) => handleToggleDelete(course),
       variant: (course: Course) =>
         course.deletedAt ? "default" : "destructive",
+      confirmationMessage: (course: Course) =>
+        course.deletedAt
+          ? `Are you sure you want to enable the course "${course.title}"?`
+          : `Are you sure you want to disable the course "${course.title}"?`,
     },
   ];
 
