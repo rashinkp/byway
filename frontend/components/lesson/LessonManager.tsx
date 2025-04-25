@@ -106,6 +106,10 @@ export function LessonManager({ courseId }: { courseId: string }) {
       variant: (lesson: ILesson) =>
         lesson.deletedAt ? "default" : "destructive",
       disabled: (lesson: ILesson) => !!lesson.deletedAt,
+      confirmationMessage: (lesson: ILesson) =>
+              lesson.deletedAt
+                ? `Are you sure you want to enable the lesson "${lesson.title}"?`
+                : `Are you sure you want to disable the lesson "${lesson.title}"?`,
     },
   ];
 

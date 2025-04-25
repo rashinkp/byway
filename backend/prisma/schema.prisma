@@ -166,6 +166,7 @@ model Lesson {
   title       String
   description String?     
   order       Int         
+  status      LessonStatus @default(DRAFT)
   thumbnail   String?     
   createdAt   DateTime    @default(now())
   updatedAt   DateTime    @updatedAt
@@ -222,5 +223,10 @@ enum ContentType {
 enum ContentStatus {
   DRAFT
   PROCESSING
+  PUBLISHED
+}
+
+enum LessonStatus {
+  DRAFT
   PUBLISHED
 }
