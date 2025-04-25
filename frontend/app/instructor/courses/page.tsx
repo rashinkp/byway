@@ -13,7 +13,7 @@ import { TableControls } from "@/components/ui/TableControls";
 import { Pagination } from "@/components/ui/Pagination";
 import { CourseFormModal } from "@/components/course/CourseFormModal";
 import { DataTable } from "@/components/ui/DataTable";
-import { useSoftDelete } from "@/hooks/course/useSoftDeleteCourse";
+import { useSoftDeleteCourse } from "@/hooks/course/useSoftDeleteCourse";
 import { TableSkeleton } from "@/components/skeleton/DataTableSkeleton";
 import { PaginationSkeleton } from "@/components/skeleton/PaginationSkeleton";
 import { StatsSkeleton } from "@/components/skeleton/StatsSkeleton";
@@ -53,7 +53,7 @@ export default function CoursesPage() {
   >("All");
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const { mutate: toggleDeleteCourse } = useSoftDelete();
+  const { mutate: toggleDeleteCourse } = useSoftDeleteCourse();
 
   const { data, refetch , isLoading } = useGetAllCourses({
     page,
@@ -139,7 +139,7 @@ export default function CoursesPage() {
 
   const handleToggleDelete = async (course: Course) => {
     try {
-      await toggleDeleteCourse(course);
+      toggleDeleteCourse(course);
     } catch (error) {
       console.error("Failed to toggle delete:", error);
       // Optionally, show a notification to the user

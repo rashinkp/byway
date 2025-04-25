@@ -13,7 +13,7 @@ import { Pagination } from "@/components/ui/Pagination";
 import { StatsSkeleton } from "@/components/skeleton/StatsSkeleton";
 import { TableSkeleton } from "@/components/skeleton/DataTableSkeleton";
 import { PaginationSkeleton } from "@/components/skeleton/PaginationSkeleton";
-import { useSoftDelete } from "@/hooks/course/useSoftDeleteCourse";
+import { useSoftDeleteCourse } from "@/hooks/course/useSoftDeleteCourse";
 
 
 export default function CoursesPage() {
@@ -40,7 +40,7 @@ export default function CoursesPage() {
   const totalPages = data?.totalPage || 0;
 
   
-  const { mutate: toggleDeleteCourse } = useSoftDelete();
+  const { mutate: toggleDeleteCourse } = useSoftDeleteCourse();
 
   const stats = [
     { title: "Total Courses", value: total },

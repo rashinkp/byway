@@ -33,6 +33,7 @@ import { DetailsSection } from "./CourseDetailsSection";
 import { OverviewSection } from "./CourseOverviewSection";
 import { ObjectivesSection } from "./CourseObjectiveSection";
 import { ActionSection } from "./CourseActionSection";
+import { useSoftDeleteCourse } from "@/hooks/course/useSoftDeleteCourse";
 
 // Schema for editing
 const courseEditSchema = z.object({
@@ -76,6 +77,7 @@ export function CourseDetails({
   isUploading: boolean;
 }) {
   const [isEditing, setIsEditing] = useState(false);
+  const {mutate:toggleDeleteCourse } = useSoftDeleteCourse();
 
   const queryClient = useQueryClient();
 
@@ -116,7 +118,11 @@ export function CourseDetails({
   };
 
   const onToggleDelete = () => {
-    // Implement toggleDeleteCourse logic here
+    try {
+      toggleDeleteCourse(course);
+    } catch (error) {
+      console.error("Failed to toggle delete course:", error);
+    }
   };
 
   return (
