@@ -2,118 +2,15 @@
 
 import { useRouter, useParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { StatusBadge } from "@/components/ui/StatusBadge";
-import { BookOpen, CheckCircle, XCircle } from "lucide-react";
 import { LessonManager } from "@/components/lesson/LessonManager";
-import { Course } from "@/types/course";
 import { useGetCourseById } from "@/hooks/course/useGetCourseById";
-// import { useUpdateCourseStatus } from "@/hooks/course/useUpdateCourseStatus";
-import CourseHeader from "@/components/course/CourseHeader";
 import PlaceHolderImage from "@/public/placeHolder.jpg";
-import { StaticImageData } from "next/image";
+import { CourseDetails } from "@/components/course/CourseDetails";
+import { useState, useRef } from "react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { BookOpen, ListChecks, FileEdit, Loader2, Users, Star, FileText, TrendingUp } from "lucide-react";
 
-// Course Thumbnail Component
-function CourseThumbnail({
-  src,
-  alt,
-}: {
-  src: string | StaticImageData;
-  alt: string;
-}) {
-  // Convert src to string if it's a StaticImageData object
-  const srcString = typeof src === "string" ? src : src.src;
-
-  return (
-    <div className="lg:col-span-1">
-      <img
-        src={srcString}
-        alt={alt}
-        className="w-full h-48 object-cover rounded-lg shadow-sm border border-gray-200"
-      />
-    </div>
-  );
-}
-
-// Course Details Component
-function CourseDetails({
-  course,
-  onPublish,
-}: {
-  course: Course;
-  onPublish: () => void;
-}) {
-  return (
-    <div className="lg:col-span-2">
-      <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
-        <div className="space-y-6">
-          {/* Description */}
-          <div>
-            <h2 className="text-lg font-semibold text-gray-700 flex items-center gap-2">
-              <BookOpen className="h-5 w-5 text-blue-500" />
-              Description
-            </h2>
-            <p className="text-gray-600 mt-2 text-sm leading-relaxed">
-              {course.description || "No description available."}
-            </p>
-          </div>
-          {/* Details Grid */}
-          <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
-            <div>
-              <h3 className="text-xs font-medium text-gray-500 uppercase tracking-wide">
-                Level
-              </h3>
-              <p className="text-gray-800 text-sm font-medium">
-                {course.level}
-              </p>
-            </div>
-            <div>
-              <h3 className="text-xs font-medium text-gray-500 uppercase tracking-wide">
-                Status
-              </h3>
-              <StatusBadge isActive={course.status === "PUBLISHED"} />
-            </div>
-            <div>
-              <h3 className="text-xs font-medium text-gray-500 uppercase tracking-wide">
-                Price
-              </h3>
-              <p className="text-gray-800 text-sm font-medium">
-                ${course?.price?.toFixed(2) || 0}
-              </p>
-            </div>
-            <div>
-              <h3 className="text-xs font-medium text-gray-500 uppercase tracking-wide">
-                Duration
-              </h3>
-              <p className="text-gray-800 text-sm font-medium">
-                {course.duration} min
-              </p>
-            </div>
-          </div>
-          {/* Publish Button */}
-          <div className="flex justify-end">
-            <Button
-              onClick={onPublish}
-              className={
-                course.status === "PUBLISHED"
-                  ? "bg-red-600 hover:bg-red-700"
-                  : "bg-green-600 hover:bg-green-700"
-              }
-            >
-              {course.status === "PUBLISHED" ? (
-                <XCircle className="mr-2 h-4 w-4" />
-              ) : (
-                <CheckCircle className="mr-2 h-4 w-4" />
-              )}
-              {course.status === "PUBLISHED" ? "Unpublish" : "Publish"}
-            </Button>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-// Main Course Detail Page
 export default function CourseDetailPage() {
   const { courseId } = useParams();
   const router = useRouter();
@@ -122,17 +19,62 @@ export default function CourseDetailPage() {
     isLoading,
     error,
   } = useGetCourseById(courseId as string);
-  // const { mutate: updateCourseStatus, isPending: isPublishing } =
-  //   useUpdateCourseStatus();
+
+  const queryClient = useQueryClient();
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const { mutate: updateThumbnail, isPending: isUploading } = useMutation({
+    // mutationFn: async (file: File) => {
+    //   const formData = new FormData();
+    //   formData.append("thumbnail", file);
+    //   const response = await api.post(`/courses/${courseId}/thumbnail`, formData, {
+    //     headers: { "Content-Type": "multipart/form-data" },
+    //   });
+    //   return response.data;
+    // },
+    // onSuccess: () => {
+    //   queryClient.invalidateQueries({ queryKey: ["course", courseId] });
+    // },
+    // onError: (err) => {
+    //   console.error("Failed to upload thumbnail:", err);
+    // },
+  });
+
+  const { mutate: updateCourseStatus, isPending: isPublishing } = useMutation({
+    // mutationFn: async ({ courseId, status }: { courseId: string; status: "PUBLISHED" | "DRAFT" }) => {
+    //   const response = await api.patch(`/courses/${courseId}`, { status });
+    //   return response.data;
+    // },
+    // onSuccess: () => {
+    //   queryClient.invalidateQueries({ queryKey: ["course", courseId] });
+    // },
+    // onError: (err) => {
+    //   console.error("Failed to update course status:", err);
+    // },
+  });
+
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    // if (e.target.files && e.target.files[0]) {
+    //   updateThumbnail(e.target.files[0]);
+    // }
+  };
+
+  const handlePublish = () => {
+    // updateCourseStatus({
+    //   courseId: courseId as string,
+    //   status: course?.status === "PUBLISHED" ? "DRAFT" : "PUBLISHED",
+    // });
+  };
 
   if (isLoading) {
     return (
-      <div className="container mx-auto py-8 px-4">
-        <div className="animate-pulse">
-          <div className="h-8 w-1/2 bg-gray-200 rounded mb-6"></div>
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <div className="h-48 bg-gray-200 rounded-lg"></div>
-            <div className="lg:col-span-2 bg-gray-200 p-6 rounded-lg"></div>
+      <div className="container mx-auto py-12 px-4 sm:px-6 lg:px-8">
+        <div className="flex items-center justify-center h-64">
+          <div className="flex flex-col items-center">
+            <Loader2 className="h-10 w-10 text-primary animate-spin mb-4" />
+            <p className="text-gray-500 font-medium">
+              Loading course details...
+            </p>
           </div>
         </div>
       </div>
@@ -141,51 +83,141 @@ export default function CourseDetailPage() {
 
   if (error || !course) {
     return (
-      <div className="container mx-auto py-8 px-4">
-        <p className="text-red-500">
-          Error: {error?.message || "Course not found"}
-        </p>
-        <Button
-          variant="outline"
-          onClick={() => router.push("/instructor/courses")}
-          className="mt-4"
-        >
-          Back to Courses
-        </Button>
+      <div className="container mx-auto py-12 px-4 sm:px-6 lg:px-8">
+        <div className="bg-red-50 border border-red-200 rounded-lg p-6 text-center max-w-2xl mx-auto">
+          <p className="text-red-500 font-medium text-lg mb-4">
+            {error?.message || "Course not found"}
+          </p>
+          <Button
+            variant="outline"
+            onClick={() => router.push("/instructor/courses")}
+            className="inline-flex items-center"
+          >
+            <FileEdit className="h-4 w-4 mr-2" />
+            Back to Courses
+          </Button>
+        </div>
       </div>
     );
   }
 
-  const handlePublish = () => {
-    // updateCourseStatus(
-    //   {
-    //     courseId: course.id,
-    //     status: course.status === "PUBLISHED" ? "DRAFT" : "PUBLISHED",
-    //   },
-    //   {
-    //     onSuccess: () => {
-    //       console.log("Course status updated successfully");
-    //     },
-    //     onError: (err:any) => {
-    //       console.error("Failed to update course status:", err);
-    //     },
-    //   }
-    // );
-  };
-
   return (
-    <div className="container mx-auto py-8 px-4 sm:px-6 lg:px-8">
-      <CourseHeader
-        title={course.title}
-      />
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-12">
-        <CourseThumbnail
-          src={PlaceHolderImage}
-          alt={course.title}
-        />
-        <CourseDetails course={course} onPublish={handlePublish} />
-      </div>
-      <LessonManager courseId={courseId as string} />
+    <div className="container mx-auto py-4 px-4 sm:px-6 lg:px-8">
+      {/* Tabs */}
+      <Tabs defaultValue="overview" className="w-full">
+        <div className="border-b mb-6">
+          <TabsList className="w-full justify-start bg-transparent">
+            <TabsTrigger
+              value="overview"
+              className="data-[state=active]:border-b-2 data-[state=active]:border-primary data-[state=active]:text-primary rounded-none"
+            >
+              Overview
+            </TabsTrigger>
+            <TabsTrigger
+              value="review"
+              className="data-[state=active]:border-b-2 data-[state=active]:border-primary data-[state=active]:text-primary rounded-none"
+            >
+              Review
+            </TabsTrigger>
+            <TabsTrigger
+              value="customer"
+              className="data-[state=active]:border-b-2 data-[state=active]:border-primary data-[state=active]:text-primary rounded-none"
+            >
+              Customer
+            </TabsTrigger>
+            <TabsTrigger
+              value="lessons"
+              className="data-[state=active]:border-b-2 data-[state=active]:border-primary data-[state=active]:text-primary rounded-none"
+            >
+              Lessons
+            </TabsTrigger>
+            <TabsTrigger
+              value="details"
+              className="data-[state=active]:border-b-2 data-[state=active]:border-primary data-[state=active]:text-primary rounded-none"
+            >
+              Detail
+            </TabsTrigger>
+          </TabsList>
+        </div>
+
+        <TabsContent value="overview" className="mt-0">
+          {/* Metrics */}
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+            <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-100">
+              <div className="flex items-center gap-2">
+                <TrendingUp className="h-5 w-5 text-green-500" />
+                <h3 className="text-lg font-bold text-gray-900">$1K</h3>
+              </div>
+              <p className="text-sm text-gray-500 mt-1">Lifetime Courses Commission</p>
+            </div>
+            <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-100">
+              <div className="flex items-center gap-2">
+                <Users className="h-5 w-5 text-green-500" />
+                <h3 className="text-lg font-bold text-gray-900">1K</h3>
+              </div>
+              <p className="text-sm text-gray-500 mt-1">Students</p>
+            </div>
+            <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-100">
+              <div className="flex items-center gap-2">
+                <TrendingUp className="h-5 w-5 text-green-500" />
+                <h3 className="text-lg font-bold text-gray-900">$800.0</h3>
+              </div>
+              <p className="text-sm text-gray-500 mt-1">Lifetime Received Commission</p>
+            </div>
+            <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-100">
+              <div className="flex items-center gap-2">
+                <TrendingUp className="h-5 w-5 text-green-500" />
+                <h3 className="text-lg font-bold text-gray-900">$200.00</h3>
+              </div>
+              <p className="text-sm text-gray-500 mt-1">Lifetime Pending Commission</p>
+            </div>
+          </div>
+
+          <CourseDetails
+            course={course}
+            onPublish={handlePublish}
+            src={PlaceHolderImage}
+            alt={course.title}
+            onImageChange={() => fileInputRef.current?.click()}
+            isUploading={isUploading}
+          />
+          <input
+            type="file"
+            ref={fileInputRef}
+            accept="image/*"
+            className="hidden"
+            onChange={handleImageChange}
+            aria-label="Upload course thumbnail"
+          />
+        </TabsContent>
+
+        <TabsContent value="review" className="mt-0">
+          <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+            <h2 className="text-xl font-bold text-gray-900 mb-4">Reviews</h2>
+            <p className="text-gray-600">No reviews available yet.</p>
+          </div>
+        </TabsContent>
+
+        <TabsContent value="customer" className="mt-0">
+          <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+            <h2 className="text-xl font-bold text-gray-900 mb-4">Customers</h2>
+            <p className="text-gray-600">No customer data available yet.</p>
+          </div>
+        </TabsContent>
+
+        <TabsContent value="lessons" className="mt-0">
+          <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+            <LessonManager courseId={courseId as string} />
+          </div>
+        </TabsContent>
+
+        <TabsContent value="details" className="mt-0">
+          <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+            <h2 className="text-xl font-bold text-gray-900 mb-4">Details</h2>
+            <p className="text-gray-600">No additional details available yet.</p>
+          </div>
+        </TabsContent>
+      </Tabs>
     </div>
   );
 }

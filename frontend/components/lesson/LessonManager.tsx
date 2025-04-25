@@ -13,15 +13,15 @@ import { useUpdateLesson } from "@/hooks/lesson/useUpdateLesson";
 import { useDeleteLesson } from "@/hooks/lesson/useDeleteLesson";
 import { ILesson } from "@/types/lesson";
 import { useRouter } from "next/navigation";
+import { TableSkeleton } from "../skeleton/DataTableSkeleton";
 
-type SortBy = "createdAt"  | "updatedAt";
-
+type SortBy = "createdAt" | "updatedAt";
 
 export function LessonManager({ courseId }: { courseId: string }) {
   const [isLessonModalOpen, setIsLessonModalOpen] = useState(false);
   const [editingLesson, setEditingLesson] = useState<ILesson | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
-   const [sortBy, setSortBy] = useState<SortBy>("createdAt");
+  const [sortBy, setSortBy] = useState<SortBy>("createdAt");
   const [page, setPage] = useState(1);
   const [filterStatus, setFilterStatus] = useState<
     "ALL" | "PUBLISHED" | "DRAFT"
@@ -41,12 +41,12 @@ export function LessonManager({ courseId }: { courseId: string }) {
 
   const { mutate: deleteLesson, isPending: isDeleting } =
     useDeleteLesson(courseId);
-  
+
   const nextOrder = data?.lessons.length
     ? Math.max(...data.lessons.map((l) => l.order)) + 1
     : 1;
-  
-   const router = useRouter();
+
+  const router = useRouter();
 
   const handleDeleteLesson = async (lesson: ILesson) => {
     deleteLesson(lesson.id, {
@@ -63,13 +63,13 @@ export function LessonManager({ courseId }: { courseId: string }) {
     }
   };
 
-   const handleSetSortBy = useCallback((sort: string) => {
-      const validSorts: SortBy[] = ["createdAt", "updatedAt"];
-      const newSort = validSorts.includes(sort as SortBy)
-        ? (sort as SortBy)
-        : "createdAt"; // Fallback to "createdAt" if invalid
-      setSortBy(newSort);
-    }, []);
+  const handleSetSortBy = useCallback((sort: string) => {
+    const validSorts: SortBy[] = ["createdAt", "updatedAt"];
+    const newSort = validSorts.includes(sort as SortBy)
+      ? (sort as SortBy)
+      : "createdAt"; // Fallback to "createdAt" if invalid
+    setSortBy(newSort);
+  }, []);
 
   // Table columns
   const columns = [
@@ -100,18 +100,20 @@ export function LessonManager({ courseId }: { courseId: string }) {
   // Table actions
   const actions = [
     {
-        label: () => "View",
-        onClick: (lesson: ILesson ) => {
-          console.log("view lesson:", lesson);
-          router.push(`/instructor/courses/${lesson.courseId}/lessons/${lesson.id}`);
-        },
-        variant: () => "default" as const,
+      label: () => "View",
+      onClick: (lesson: ILesson) => {
+        console.log("view lesson:", lesson);
+        router.push(
+          `/instructor/courses/${lesson.courseId}/lessons/${lesson.id}`
+        );
       },
+      variant: () => "default" as const,
+    },
     {
       label: (lesson: ILesson) => (lesson.deletedAt ? "Restore" : "Delete"),
       onClick: (lesson: ILesson) => handleDeleteLesson(lesson),
       variant: (lesson: ILesson) =>
-              lesson.deletedAt ? "default" : "destructive",
+        lesson.deletedAt ? "default" : "destructive",
       disabled: (lesson: ILesson) => !!lesson.deletedAt,
     },
   ];
@@ -147,6 +149,8 @@ export function LessonManager({ courseId }: { courseId: string }) {
         setFilterStatus={handleSetFilterStatus} // Use wrapper
         sortBy={sortBy}
         setSortBy={handleSetSortBy}
+        sortOrder="asc"
+        setSortOrder={() => {}}
         sortOptions={[
           { value: "title", label: "Title (A-Z)" },
           { value: "order", label: "Order" },
@@ -160,16 +164,20 @@ export function LessonManager({ courseId }: { courseId: string }) {
         ]}
       />
 
-      <DataTable<ILesson>
-        data={data?.lessons || []}
-        columns={columns}
-        isLoading={isLoading}
-        actions={actions}
-        itemsPerPage={limit}
-        totalItems={data?.total || 0}
-        currentPage={page}
-        setCurrentPage={setPage}
-      />
+      {isLoading ? (
+        <TableSkeleton columns={3} hasActions={true} />
+      ) : (
+        <DataTable<ILesson>
+          data={data?.lessons || []}
+          columns={columns}
+          isLoading={isLoading}
+          actions={actions}
+          itemsPerPage={limit}
+          totalItems={data?.total || 0}
+          currentPage={page}
+          setCurrentPage={setPage}
+        />
+      )}
 
       <LessonFormModal
         open={isLessonModalOpen}
