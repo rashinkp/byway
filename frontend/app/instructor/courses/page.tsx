@@ -14,10 +14,11 @@ import { Pagination } from "@/components/ui/Pagination";
 import { CourseFormModal } from "@/components/course/CourseFormModal";
 import { DataTable } from "@/components/ui/DataTable";
 import { useSoftDelete } from "@/hooks/course/useSoftDeleteCourse";
+import { TableSkeleton } from "@/components/skeleton/DataTableSkeleton";
+import { PaginationSkeleton } from "@/components/skeleton/PaginationSkeleton";
+import { StatsSkeleton } from "@/components/skeleton/StatsSkeleton";
 
-// Define types for sortBy and filterBy based on UseGetAllCoursesParams
-type SortBy = "createdAt" | "name" | "updatedAt";
-type FilterBy = "All" | "Active" | "Draft";
+
 
 export const courseSchema = z.object({
   title: z.string().min(1, "Title is required").max(100, "Title is too long"),
@@ -41,25 +42,20 @@ export const courseSchema = z.object({
 
 export type CourseFormData = z.infer<typeof courseSchema>;
 
-interface CourseFormModalProps {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-  onSubmit?: (data: CourseFormData) => Promise<void>;
-  initialData?: Partial<CourseFormData>;
-  isSubmitting?: boolean;
-}
 
 export default function CoursesPage() {
   const [page, setPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
-  const [sortBy, setSortBy] = useState<SortBy>("createdAt");
-  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
-  const [filterStatus, setFilterStatus] = useState<FilterBy>("All");
+  const [sortBy, setSortBy] = useState<"title" | "createdAt">("title");
+  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
+  const [filterStatus, setFilterStatus] = useState<
+    "All" | "Active" | "Inactive"
+  >("All");
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const { mutate: toggleDeleteCourse } = useSoftDelete();
 
-  const { data, isLoading, refetch } = useGetAllCourses({
+  const { data, refetch , isLoading } = useGetAllCourses({
     page,
     limit: 10,
     sortBy,
@@ -68,6 +64,7 @@ export default function CoursesPage() {
     filterBy: filterStatus,
     includeDeleted: true,
   });
+
 
   const courses = data?.courses || [];
   const total = data?.total || 0;
@@ -104,7 +101,14 @@ export default function CoursesPage() {
       header: "Status",
       accessor: "status" as keyof Course,
       render: (course: Course) => (
-        <StatusBadge isActive={course.status === "PUBLISHED"} />
+        <StatusBadge isActive={!course.deletedAt} />
+      ),
+    },
+    {
+      header: "Stage",
+      accessor: "stage" as keyof Course,
+      render: (course: Course) => (
+        <StatusBadge isActive={course.status === 'PUBLISHED'} />
       ),
     },
     {
@@ -126,7 +130,7 @@ export default function CoursesPage() {
       variant: () => "default" as const,
     },
     {
-      label: (course: Course) => (course.deletedAt ? "Restore" : "Delete"),
+      label: (course: Course) => (course.deletedAt ? "Enable" : "Disable"),
       onClick: (course: Course) => handleToggleDelete(course),
       variant: (course: Course) =>
         course.deletedAt ? "default" : "destructive",
@@ -141,23 +145,6 @@ export default function CoursesPage() {
       // Optionally, show a notification to the user
     }
   };
-
-  // Wrapper functions to adapt TableControls string inputs to typed state
-  const handleSetFilterStatus = useCallback((status: string) => {
-    const validStatuses: FilterBy[] = ["All", "Active", "Draft"];
-    const newStatus = validStatuses.includes(status as FilterBy)
-      ? (status as FilterBy)
-      : "All"; // Fallback to "All" if invalid
-    setFilterStatus(newStatus);
-  }, []);
-
-  const handleSetSortBy = useCallback((sort: string) => {
-    const validSorts: SortBy[] = ["createdAt", "name", "updatedAt"];
-    const newSort = validSorts.includes(sort as SortBy)
-      ? (sort as SortBy)
-      : "createdAt"; // Fallback to "createdAt" if invalid
-    setSortBy(newSort);
-  }, []);
 
   return (
     <div className="space-y-6">
@@ -179,48 +166,50 @@ export default function CoursesPage() {
         </Button>
       </div>
 
-      <StatsCards stats={stats} />
+      {isLoading ? <StatsSkeleton count={3} /> : <StatsCards stats={stats} />}
 
-      <TableControls
+      <TableControls<"title" | "createdAt">
         searchTerm={searchTerm}
         setSearchTerm={setSearchTerm}
         filterStatus={filterStatus}
-        setFilterStatus={handleSetFilterStatus} // Use wrapper function
+        setFilterStatus={(status: string) =>
+          setFilterStatus(status as "All" | "Active" | "Inactive")
+        }
         sortBy={sortBy}
-        setSortBy={handleSetSortBy} // Use wrapper function
+        setSortBy={setSortBy}
+        sortOrder={sortOrder}
+        setSortOrder={setSortOrder}
         sortOptions={[
-          { value: "name", label: "Title (A-Z)" },
+          { value: "title", label: "Title" },
           { value: "createdAt", label: "Newest first" },
-          { value: "updatedAt", label: "Last updated" },
         ]}
         onRefresh={refetch}
-        filterTabs={[
-          { value: "All", label: "All" },
-          { value: "Active", label: "Active" },
-          { value: "Draft", label: "Draft" },
-        ]}
       />
 
-      <DataTable<Course>
-        data={courses}
-        columns={columns}
-        isLoading={isLoading}
-        actions={actions}
-        itemsPerPage={10}
-        totalItems={total}
-        currentPage={page}
-        setCurrentPage={setPage}
-      />
+      {isLoading ? (
+              <TableSkeleton columns={3} hasActions={true} />
+            ) : (
+              <DataTable<Course>
+                data={courses}
+                columns={columns}
+                isLoading={isLoading}
+                actions={actions}
+                itemsPerPage={10}
+                totalItems={total}
+                currentPage={page}
+                setCurrentPage={setPage}
+              />
+            )}
 
-      {totalPages > 1 && (
-        <div className="mt-4">
-          <Pagination
-            currentPage={page}
-            totalPages={totalPages}
-            onPageChange={setPage}
-          />
-        </div>
-      )}
+      {isLoading ? (
+              <PaginationSkeleton />
+            ) : totalPages > 1 ? (
+              <Pagination
+                currentPage={page}
+                totalPages={totalPages}
+                onPageChange={setPage}
+              />
+            ) : null}
 
       <CourseFormModal open={isModalOpen} onOpenChange={setIsModalOpen} />
     </div>

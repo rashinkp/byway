@@ -34,9 +34,12 @@ export function useSoftDelete() {
     },
     onSuccess: (deletedCourse: Course) => {
       toast.success(
-        `Course "${deletedCourse.title}" ${
-          !deletedCourse.deletedAt ? "Deleted" : "Recovered"
-        } successfully`
+        `Successfully ${!deletedCourse.deletedAt ? "Disabled" : "Enabled"} course "`,
+        {
+          description: `Course "${deletedCourse.title}" ${
+            !deletedCourse.deletedAt ? "Disabled" : "Enabled"
+          } successfully`,
+        }
       );
     },
     onError: (error: any, course: Course, context: any) => {

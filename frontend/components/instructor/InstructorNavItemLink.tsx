@@ -4,15 +4,9 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@radix-ui/react-tooltip";
-import {
-  BarChart,
-  BookOpen,
-  LayoutDashboard,
-  Settings,
-  Users,
-} from "lucide-react";
 import { ReactNode } from "react";
 import Link from "next/link";
+import { BarChart, BookOpen, LayoutDashboard, Settings, Users } from "lucide-react";
 
 interface NavItem {
   href: string;
@@ -55,12 +49,10 @@ export const INSTRUCTOR_NAV_ITEMS: NavItem[] = [
 
 export function InstructorNavItemLink({
   item,
-  collapsed,
   isActive,
   onClick,
 }: {
   item: NavItem;
-  collapsed: boolean;
   isActive: boolean;
   onClick: () => void;
 }) {
@@ -70,9 +62,7 @@ export function InstructorNavItemLink({
         <Link href={item.href} onClick={onClick}>
           <Button
             variant="ghost"
-            className={`w-full ${
-              collapsed ? "justify-center" : "justify-start"
-            } 
+            className={`w-full justify-start lg:justify-center xl:justify-start 
               ${
                 isActive
                   ? "bg-blue-50 text-blue-600 hover:bg-blue-100 hover:text-blue-700"
@@ -81,11 +71,13 @@ export function InstructorNavItemLink({
               transition-colors`}
           >
             {item.icon}
-            {!collapsed && <span className="ml-3">{item.label}</span>}
+            <span className="ml-3 hidden xl:inline">{item.label}</span>
           </Button>
         </Link>
       </TooltipTrigger>
-      {collapsed && <TooltipContent side="right">{item.label}</TooltipContent>}
+      <TooltipContent side="right" className="lg:block xl:hidden">
+        {item.label}
+      </TooltipContent>
     </Tooltip>
   );
 }

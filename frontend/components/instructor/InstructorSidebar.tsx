@@ -1,3 +1,5 @@
+"use client";
+
 import {
   Tooltip,
   TooltipContent,
@@ -13,15 +15,11 @@ import { Button } from "@/components/ui/button";
 import { LogOut } from "lucide-react";
 
 export function InstructorSidebar({
-  collapsed,
-  toggleCollapse,
   mobileMenuOpen,
   setMobileMenuOpen,
   pathname,
   handleLogout,
 }: {
-  collapsed: boolean;
-  toggleCollapse: () => void;
   mobileMenuOpen: boolean;
   setMobileMenuOpen: (open: boolean) => void;
   pathname: string;
@@ -29,11 +27,11 @@ export function InstructorSidebar({
 }) {
   return (
     <aside
-      className={`fixed top-0 left-0 z-40 h-screen bg-white shadow-lg transition-all duration-300 ease-in-out 
+      className={`fixed top-0 left-0 z-40 h-screen bg-white shadow-lg transition-transform duration-300 ease-in-out 
         ${mobileMenuOpen ? "translate-x-0" : "-translate-x-full"} 
-        lg:translate-x-0 ${collapsed ? "w-20" : "w-64"}`}
+        lg:translate-x-0 w-64 lg:w-[80px] xl:w-64`}
     >
-      <SidebarHeader collapsed={collapsed} toggleCollapse={toggleCollapse} />
+      <SidebarHeader />
       <div className="px-3 py-4">
         <TooltipProvider delayDuration={0}>
           <nav className="space-y-1">
@@ -41,7 +39,6 @@ export function InstructorSidebar({
               <InstructorNavItemLink
                 key={item.href}
                 item={item}
-                collapsed={collapsed}
                 isActive={pathname === item.href}
                 onClick={() => setMobileMenuOpen(false)}
               />
@@ -49,37 +46,25 @@ export function InstructorSidebar({
           </nav>
         </TooltipProvider>
       </div>
-      <div
-        className={`absolute bottom-0 left-0 right-0 p-4 border-t ${
-          collapsed ? "flex justify-center" : ""
-        }`}
-      >
-        {collapsed ? (
-          <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="text-red-600 hover:bg-red-50 hover:text-red-700"
-                  onClick={handleLogout}
-                >
-                  <LogOut className="h-5 w-5" />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent side="right">Logout</TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
-        ) : (
-          <Button
-            variant="ghost"
-            className="w-full justify-start text-red-600 hover:bg-red-50 hover:text-red-700"
-            onClick={handleLogout}
-          >
-            <LogOut className="mr-2 h-5 w-5" />
-            Logout
-          </Button>
-        )}
+      <div className="absolute bottom-0 left-0 right-0 p-4 border-t flex justify-center lg:justify-start">
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="text-red-600 hover:bg-red-50 hover:text-red-700 w-full lg:w-auto"
+                onClick={handleLogout}
+              >
+                <LogOut className="h-5 w-5" />
+                <span className="ml-2 hidden xl:inline">Logout</span>
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent side="right" className="lg:block xl:hidden">
+              Logout
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
       </div>
     </aside>
   );
