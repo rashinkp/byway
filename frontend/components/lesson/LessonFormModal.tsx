@@ -17,7 +17,6 @@ export const lessonSchema = z.object({
     .optional()
     .or(z.literal("")),
   order: z.number().int().positive("Order must be positive"),
-  thumbnail: z.string().url("Invalid URL format").optional().or(z.literal("")),
   courseId: z.string().optional(),
 });
 
@@ -52,16 +51,6 @@ export const fields: FormFieldConfig<LessonFormData>[] = [
     description: "Specify the order of the lesson in the course.",
     maxLength: 10,
     column: "left",
-  },
-  {
-    name: "thumbnail",
-    label: "Thumbnail URL",
-    type: "input",
-    fieldType: "text",
-    placeholder: "e.g., https://example.com/thumbnail.jpg",
-    description: "Provide a URL for the lesson thumbnail (optional).",
-    maxLength: 200,
-    column: "right",
   },
 ];
 
@@ -107,7 +96,6 @@ export function LessonFormModal({
           title: data.title,
           description: data.description,
           order: data.order,
-          thumbnail: data.thumbnail,
         },
         {
           onSuccess: () => {

@@ -12,7 +12,6 @@ export const createLessonSchema = z.object({
     .optional()
     .nullable(),
   order: z.number().int().positive("Order must be a positive integer"),
-  thumbnail: z.string().url("Invalid URL").optional().nullable(),
 });
 
 export const updateLessonProgressSchema = z.object({

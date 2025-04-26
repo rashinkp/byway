@@ -4,7 +4,6 @@ export interface ILesson {
   title: string;
   description?: string | null;
   order: number;
-  thumbnail?: string | null;
   createdAt: Date;
   updatedAt: Date;
   deletedAt?: Date | null;
@@ -15,7 +14,6 @@ export interface ICreateLessonInput {
   title: string;
   description?: string | null;
   order: number;
-  thumbnail?: string | null;
   deletedAt?: Date | null;
 }
 

@@ -86,6 +86,11 @@ export function LessonManager({ courseId }: { courseId: string }) {
       accessor: "deletedAt" as keyof ILesson,
       render: (lesson: ILesson) => <StatusBadge isActive={!lesson.deletedAt} />,
     },
+    {
+      header: "Stage",
+      accessor: "status" as keyof ILesson,
+      render: (lesson: ILesson) => <StatusBadge isActive={lesson.status ==='PUBLISHED'} />,
+    },
   ];
 
   // Table actions
@@ -197,7 +202,6 @@ export function LessonManager({ courseId }: { courseId: string }) {
                 title: editingLesson.title,
                 description: editingLesson.description || "",
                 order: editingLesson.order,
-                thumbnail: editingLesson.thumbnail || "",
               }
             : undefined
         }

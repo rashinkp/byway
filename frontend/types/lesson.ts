@@ -5,7 +5,7 @@ export interface ILesson {
   title: string;
   description?: string | null;
   order: number;
-  thumbnail?: string | null;
+  status: "DRAFT" | "PUBLISHED" ;
   createdAt: string; // ISO string
   updatedAt: string; // ISO string
   deletedAt?: string | null; // ISO string
@@ -48,7 +48,6 @@ export interface ICreateLessonInput {
   title: string;
   description?: string | null;
   order: number;
-  thumbnail?: string | null;
 }
 
 
@@ -58,7 +57,6 @@ export interface UpdateLessonInput {
   title?: string;
   description?: string;
   order?: number;
-  thumbnail?: string;
   duration?: number;
 }
 

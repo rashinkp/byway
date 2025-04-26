@@ -18,7 +18,7 @@ export const courseEditSchema = z
     },
     {
       message: "Offer price must be less than or equal to actual price",
-      path: ["offer"], // 👈 target field for the error
+      path: ["offer"], 
     }
   );
 

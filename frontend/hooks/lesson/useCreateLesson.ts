@@ -14,7 +14,6 @@ export const useCreateLesson = () => {
       title: string;
       description?: string;
       order: number;
-      thumbnail?: string;
       duration?: number;
     }
   >({

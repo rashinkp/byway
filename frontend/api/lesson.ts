@@ -38,7 +38,6 @@ export async function createLesson(data: {
   title: string;
   description?: string;
   order: number;
-  thumbnail?: string;
   duration?: number;
 }): Promise<ILesson> {
   try {

@@ -14,7 +14,6 @@ export const useUpdateLesson = () => {
       title?: string;
       description?: string;
       order?: number;
-      thumbnail?: string;
       duration?: number;
     }
   >({

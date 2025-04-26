@@ -166,8 +166,7 @@ model Lesson {
   title       String
   description String?     
   order       Int         
-  status      LessonStatus @default(DRAFT)
-  thumbnail   String?     
+  status      LessonStatus @default(DRAFT) 
   createdAt   DateTime    @default(now())
   updatedAt   DateTime    @updatedAt
   deletedAt   DateTime?   
