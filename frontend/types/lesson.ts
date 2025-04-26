@@ -67,21 +67,25 @@ export type ContentStatus = "DRAFT" | "PUBLISHED";
 export interface LessonContent {
   id: string;
   lessonId: string;
-  type: ContentType;
-  status: ContentStatus;
+  type: "VIDEO" | "DOC" | "QUIZ";
+  status: "DRAFT" | "PUBLISHED";
   data: {
-    fileUrl?: string; // For VIDEO and DOC
-    questions?: { question: string; options: string[]; answer: string }[]; // For QUIZ
+    title?: string;
+    description?: string;
+    fileUrl?: string;
+    questions?: { question: string; options: string[]; answer: string }[];
   };
   createdAt: string;
   updatedAt: string;
-  deletedAt?: string | null;
+  deletedAt: string | null;
 }
 
 export interface LessonContentFormData {
-  type: ContentType;
-  status: ContentStatus;
+  type: "VIDEO" | "DOC" | "QUIZ";
+  status: "DRAFT" | "PUBLISHED";
   data: {
+    title?: string;
+    description?: string;
     fileUrl?: string;
     questions?: { question: string; options: string[]; answer: string }[];
   };

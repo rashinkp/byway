@@ -1,4 +1,3 @@
-// src/pages/instructor/courses/[courseId]/lessons/[lessonId].tsx
 "use client";
 
 import { useState } from "react";
@@ -31,8 +30,9 @@ export default function LessonDetailPage() {
     isPending: isUpdating,
     error: updateError,
   } = useUpdateLesson();
-  const [contents, setContents] =
-    useState<LessonContent[]>(dummyLessonContents);
+  const [content, setContent] = useState<LessonContent | undefined>(
+    dummyLessonContents
+  );
 
   const nextOrder = 2;
 
@@ -69,7 +69,7 @@ export default function LessonDetailPage() {
       return;
     }
     const newContent: LessonContent = {
-      id: `content-${contents.length + 1}`,
+      id: `content-1`,
       lessonId: lesson.id,
       type: data.type,
       status: data.status,
@@ -78,7 +78,7 @@ export default function LessonDetailPage() {
       updatedAt: new Date().toISOString(),
       deletedAt: null,
     };
-    setContents((prev) => [...prev, newContent]);
+    setContent(newContent);
     toast.success("Content created successfully");
   };
 
@@ -86,32 +86,21 @@ export default function LessonDetailPage() {
     data: LessonContentFormData,
     contentId: string
   ) => {
-    setContents((prev) =>
-      prev.map((content) =>
-        content.id === contentId
-          ? { ...content, ...data, updatedAt: new Date().toISOString() }
-          : content
-      )
-    );
+    if (!content || content.id !== contentId) return;
+    setContent({
+      ...content,
+      type: data.type,
+      status: data.status,
+      data: data.data,
+      updatedAt: new Date().toISOString(),
+    });
     toast.success("Content updated successfully");
   };
 
-  const handleDeleteContent = (content: LessonContent) => {
-    setContents((prev) =>
-      prev.map((c) =>
-        c.id === content.id
-          ? {
-              ...c,
-              deletedAt: c.deletedAt ? null : new Date().toISOString(),
-            }
-          : c
-      )
-    );
-    toast.success(
-      content.deletedAt
-        ? "Content restored successfully"
-        : "Content deleted successfully"
-    );
+  const handleDeleteContent = (contentToDelete: LessonContent) => {
+    if (!content || content.id !== contentToDelete.id) return;
+    setContent(undefined);
+    toast.success("Content deleted successfully");
   };
 
   if (isLoading) {
@@ -166,11 +155,10 @@ export default function LessonDetailPage() {
         onRetry={() => refetch()}
       />
       <ContentSection
-        contents={contents}
+        content={content}
         lessonId={lessonId as string}
         onAddContent={handleAddContent}
         onEditContent={handleEditContent}
-        onDeleteContent={handleDeleteContent}
       />
     </div>
   );

@@ -1,9 +1,5 @@
-// src/components/lesson/ContentList.tsx
-"use client";
-
-import { Button } from "@/components/ui/button";
-import { StatusBadge } from "@/components/ui/StatusBadge";
 import { LessonContent } from "@/types/lesson";
+import { Button } from "@/components/ui/button";
 
 interface ContentListProps {
   contents: LessonContent[];
@@ -13,47 +9,55 @@ interface ContentListProps {
 
 export function ContentList({ contents, onEdit, onDelete }: ContentListProps) {
   return (
-    <div className="mt-4">
-      <h3 className="text-lg font-semibold mb-2">Content</h3>
+    <div className="mt-6">
       {contents.length === 0 ? (
-        <p className="text-gray-500">No content available.</p>
+        <p className="text-gray-500 text-center">No content available.</p>
       ) : (
-        <ul className="space-y-2">
+        <ul className="space-y-4">
           {contents.map((content) => (
             <li
               key={content.id}
-              className="flex justify-between items-center border p-4 rounded-lg"
+              className="p-4 bg-gray-50 rounded-lg shadow-sm flex justify-between items-start"
             >
               <div>
-                <p>
-                  <span className="font-semibold">Type:</span> {content.type}
+                <h4 className="text-lg font-semibold text-gray-800">
+                  {content.data.title || `${content.type} Content`}
+                </h4>
+                <p className="text-gray-600">
+                  {content.data.description || "No description"}
                 </p>
-                <p>
-                  <span className="font-semibold">Data:</span>{" "}
-                  {content.type === "VIDEO" || content.type === "DOC"
-                    ? content.data.fileUrl || "N/A"
-                    : `${content.data.questions?.length || 0} questions`}
+                <p className="text-sm text-gray-500">Type: {content.type}</p>
+                <p className="text-sm text-gray-500">
+                  Status: {content.status}
                 </p>
-                <p>
-                  <span className="font-semibold">Status:</span>{" "}
-                  <StatusBadge isActive={content.status === "PUBLISHED"} />
-                </p>
+                {content.type === "VIDEO" || content.type === "DOC" ? (
+                  <p className="text-sm text-blue-600">
+                    <a
+                      href={content.data.fileUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      {content.data.fileUrl}
+                    </a>
+                  </p>
+                ) : (
+                  <p className="text-sm text-gray-500">
+                    Questions: {content.data.questions?.length || 0}
+                  </p>
+                )}
               </div>
-              <div className="flex space-x-2">
+              <div className="flex gap-2">
                 <Button
-                  variant="outline"
-                  size="sm"
                   onClick={() => onEdit(content)}
+                  className="bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1"
                 >
                   Edit
                 </Button>
                 <Button
-                  variant={content.deletedAt ? "default" : "destructive"}
-                  size="sm"
                   onClick={() => onDelete(content)}
-                  disabled={!!content.deletedAt}
+                  className="bg-red-500 hover:bg-red-600 text-white px-3 py-1"
                 >
-                  {content.deletedAt ? "Restore" : "Delete"}
+                  Delete
                 </Button>
               </div>
             </li>
