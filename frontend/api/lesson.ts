@@ -70,15 +70,18 @@ export async function updateLesson(
   }
 }
 
-// Delete a lesson (soft delete)
-export async function deleteLesson(lessonId: string): Promise<void> {
+export async function toggleLessonStatus(
+  lessonId: string,
+): Promise<ILesson> {
   try {
-    await api.delete(`/lessons/${lessonId}`);
+    const response = await api.delete(`/lessons/${lessonId}`);
+    return response.data; 
   } catch (error: any) {
-    throw new Error(error.response?.data?.message || "Failed to delete lesson");
+    throw new Error(
+      error.response?.data?.message || "Failed to toggle lesson status"
+    );
   }
 }
-
 
 export async function getLessonById(lessonId: string): Promise<ILesson> {
   try {

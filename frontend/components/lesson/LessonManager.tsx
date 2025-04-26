@@ -1,32 +1,31 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { DataTable } from "@/components/ui/DataTable";
 import { TableControls } from "@/components/ui/TableControls";
 import { StatusBadge } from "@/components/ui/StatusBadge";
-import { Video, Trash2, Edit } from "lucide-react";
-import { LessonFormModal, LessonFormData } from "./LessonFormModal";
+import { Video } from "lucide-react";
+import { LessonFormModal } from "./LessonFormModal";
 import { useGetAllLessonsInCourse } from "@/hooks/lesson/useGetAllLesson";
-import { useDeleteLesson } from "@/hooks/lesson/useDeleteLesson";
+import { useToggleLessonStatus } from "@/hooks/lesson/useToggleLessonStatus";
 import { ILesson } from "@/types/lesson";
 import { useRouter } from "next/navigation";
 import { TableSkeleton } from "../skeleton/DataTableSkeleton";
 import { PaginationSkeleton } from "../skeleton/PaginationSkeleton";
 import { Pagination } from "../ui/Pagination";
-import { set } from "zod";
-
-
 
 export function LessonManager({ courseId }: { courseId: string }) {
   const [isLessonModalOpen, setIsLessonModalOpen] = useState(false);
   const [editingLesson, setEditingLesson] = useState<ILesson | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
-  const [sortBy, setSortBy] = useState<'title'|'createdAt'|'order'>("order");
+  const [sortBy, setSortBy] = useState<"title" | "createdAt" | "order">(
+    "order"
+  );
   const [page, setPage] = useState(1);
   const [filterStatus, setFilterStatus] = useState<
-    "ALL" | "PUBLISHED" | "DRAFT" | 'INACTIVE'
-    >("ALL");
+    "ALL" | "PUBLISHED" | "DRAFT" | "INACTIVE"
+  >("ALL");
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
   const limit = 10;
 
@@ -35,34 +34,32 @@ export function LessonManager({ courseId }: { courseId: string }) {
     page,
     limit,
     sortBy,
-    sortOrder: sortOrder || 'asc',
+    sortOrder: sortOrder || "asc",
     search: searchTerm,
     filterBy: filterStatus,
     includeDeleted: true,
   });
 
-  const { mutate: deleteLesson, isPending: isDeleting } =
-    useDeleteLesson(courseId);
+  const { mutate: toggleLessonStatus, isPending: isToggling } =
+    useToggleLessonStatus();
 
   const nextOrder = data?.lessons.length
     ? Math.max(...data.lessons.map((l) => l.order)) + 1
     : 1;
-  
+
   const totalPages = data?.totalPages || 1;
 
   const router = useRouter();
 
   const handleDeleteLesson = async (lesson: ILesson) => {
-    deleteLesson(lesson.id, {
-      onError: (err) => {
-        console.error("Failed to delete lesson:", err);
-      },
-    });
+    toggleLessonStatus(
+      { lessonId: lesson.id, enable: !!lesson.deletedAt },
+      {
+        onSuccess: () => refetch(),
+      }
+    );
   };
 
-
-
-  // Table columns
   const columns = [
     {
       header: "Title",
@@ -89,20 +86,19 @@ export function LessonManager({ courseId }: { courseId: string }) {
     {
       header: "Stage",
       accessor: "status" as keyof ILesson,
-      render: (lesson: ILesson) => <StatusBadge isActive={lesson.status ==='PUBLISHED'} />,
+      render: (lesson: ILesson) => (
+        <StatusBadge isActive={lesson.status === "PUBLISHED"} />
+      ),
     },
   ];
 
-  // Table actions
   const actions = [
     {
       label: () => "View",
-      onClick: (lesson: ILesson) => {
-        console.log("view lesson:", lesson);
+      onClick: (lesson: ILesson) =>
         router.push(
           `/instructor/courses/${lesson.courseId}/lessons/${lesson.id}`
-        );
-      },
+        ),
       variant: () => "default" as const,
     },
     {
@@ -110,11 +106,11 @@ export function LessonManager({ courseId }: { courseId: string }) {
       onClick: (lesson: ILesson) => handleDeleteLesson(lesson),
       variant: (lesson: ILesson) =>
         lesson.deletedAt ? "default" : "destructive",
-      disabled: (lesson: ILesson) => !!lesson.deletedAt,
+      disabled: isToggling,
       confirmationMessage: (lesson: ILesson) =>
-              lesson.deletedAt
-                ? `Are you sure you want to enable the lesson "${lesson.title}"?`
-                : `Are you sure you want to disable the lesson "${lesson.title}"?`,
+        lesson.deletedAt
+          ? `Are you sure you want to enable the lesson "${lesson.title}"?`
+          : `Are you sure you want to disable the lesson "${lesson.title}"?`,
     },
   ];
 
@@ -146,12 +142,14 @@ export function LessonManager({ courseId }: { courseId: string }) {
         searchTerm={searchTerm}
         setSearchTerm={setSearchTerm}
         filterStatus={filterStatus}
-        setFilterStatus={(status:string) => {
-          setFilterStatus(status as "ALL" | "PUBLISHED" | "DRAFT" | 'INACTIVE');
+        setFilterStatus={(status: string) => {
+          setFilterStatus(status as "ALL" | "PUBLISHED" | "DRAFT" | "INACTIVE");
           setPage(1);
-       }} 
+        }}
         sortBy={sortBy}
-        setSortBy={(sort: "order" | "title" | "createdAt") => setSortBy(sort as 'title'|'createdAt')}
+        setSortBy={(sort: "order" | "title" | "createdAt") =>
+          setSortBy(sort as "title" | "createdAt" | "order")
+        }
         sortOrder={sortOrder}
         setSortOrder={setSortOrder}
         sortOptions={[
@@ -168,7 +166,7 @@ export function LessonManager({ courseId }: { courseId: string }) {
       />
 
       {isLoading ? (
-        <TableSkeleton columns={3} hasActions={true} />
+        <TableSkeleton columns={5} hasActions={true} />
       ) : (
         <DataTable<ILesson>
           data={data?.lessons || []}
@@ -182,16 +180,15 @@ export function LessonManager({ courseId }: { courseId: string }) {
         />
       )}
 
-
       {isLoading ? (
-              <PaginationSkeleton />
-            ) : totalPages > 1 ? (
-              <Pagination
-                currentPage={page}
-                totalPages={totalPages}
-                onPageChange={setPage}
-              />
-            ) : null}
+        <PaginationSkeleton />
+      ) : totalPages > 1 ? (
+        <Pagination
+          currentPage={page}
+          totalPages={totalPages}
+          onPageChange={setPage}
+        />
+      ) : null}
 
       <LessonFormModal
         open={isLessonModalOpen}

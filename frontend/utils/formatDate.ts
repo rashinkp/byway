@@ -1,4 +1,4 @@
-export function formatDate(dateString:Date | null) {
+export function formatDate(dateString:Date | null | string | undefined) {
   if (!dateString) return 'Not available';
 
   const date = new Date(dateString);

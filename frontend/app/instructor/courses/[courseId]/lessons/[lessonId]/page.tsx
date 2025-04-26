@@ -47,16 +47,18 @@ export default function LessonDetailPage() {
       title: data.title,
       description: data.description || undefined,
       order: data.order,
-      thumbnail: data.thumbnail || undefined,
-      duration: lesson.duration,
     };
 
     updateLesson(updateData, {
       onSuccess: () => {
-        toast.success("Lesson updated successfully");
+        toast.success("Lesson updated", {
+          description: "Lesson details have been updated.",
+        });
       },
       onError: (err) => {
-        toast.error(`Failed to update lesson: ${err.message}`);
+        toast.error(`Failed to update lesson: ${err.message}`, {
+          description: "Please try again later.",
+        });
       },
     });
   };

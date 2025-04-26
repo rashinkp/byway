@@ -138,6 +138,7 @@ export class LessonService {
 
   async deleteLesson(lessonId: string): Promise<ILesson> {
     const lesson = await this.lessonRepository.getLessonById(lessonId);
+    console.log("lesson", lesson , lessonId);
     if (!lesson) {
       throw new Error("Lesson not found");
     }

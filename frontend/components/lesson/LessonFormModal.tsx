@@ -42,16 +42,6 @@ export const fields: FormFieldConfig<LessonFormData>[] = [
     maxLength: 1000,
     column: "right",
   },
-  {
-    name: "order",
-    label: "Order",
-    type: "input",
-    fieldType: "number",
-    placeholder: "e.g., 1",
-    description: "Specify the order of the lesson in the course.",
-    maxLength: 10,
-    column: "left",
-  },
 ];
 
 interface LessonFormModalProps {
