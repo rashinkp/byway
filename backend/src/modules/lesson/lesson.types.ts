@@ -1,12 +1,16 @@
+import { LessonContent } from "@prisma/client";
+
 export interface ILesson {
   id: string;
   courseId: string;
   title: string;
   description?: string | null;
   order: number;
-  createdAt: Date;
-  updatedAt: Date;
-  deletedAt?: Date | null;
+  status: "DRAFT" | "PUBLISHED";
+  content?: LessonContent | null;
+  createdAt: string;
+  updatedAt: string;
+  deletedAt?: string | null;
 }
 
 export interface ICreateLessonInput {
@@ -68,17 +72,7 @@ export enum ContentStatus {
   DRAFT = "DRAFT",
   PROCESSING = "PROCESSING",
   PUBLISHED = "PUBLISHED",
-}
-
-export interface ILessonContent {
-  id: string;
-  lessonId: string;
-  type: ContentType;
-  status: ContentStatus;
-  data: Record<string, any>;
-  createdAt: Date;
-  updatedAt: Date;
-  deletedAt?: Date | null;
+  ERROR = "ERROR",
 }
 
 export interface ICreateLessonContentInput {
@@ -98,7 +92,7 @@ export interface ILessonRepository {
   getCourseProgress(input: IGetProgressInput): Promise<IUserLessonProgress[]>;
   getAllLessons(input: IGetAllLessonsInput): Promise<IGetAllLessonsResponse>;
   updateLesson(
-    lessonId: string, 
+    lessonId: string,
     input: Partial<ICreateLessonInput>
   ): Promise<ILesson>;
 }

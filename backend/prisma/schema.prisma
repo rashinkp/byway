@@ -171,7 +171,7 @@ model Lesson {
   updatedAt   DateTime    @updatedAt
   deletedAt   DateTime?   
   progress    UserLessonProgress[] @relation("LessonProgress")
-  contents    LessonContent[]    @relation("LessonToContent")
+  content     LessonContent?       @relation("LessonToContent")
   @@unique([courseId, order]) // Prevent duplicate orders in a course
   @@index([order]) // Optimize sorting by order
 }
@@ -202,7 +202,7 @@ model UserLessonProgress {
 
 model LessonContent {
   id          String           @id @default(uuid())
-  lessonId    String
+  lessonId    String           @unique // Ensure one content per lesson
   lesson      Lesson           @relation("LessonToContent", fields: [lessonId], references: [id], onDelete: Cascade)
   type        ContentType
   status      ContentStatus    @default(DRAFT)
@@ -223,6 +223,7 @@ enum ContentStatus {
   DRAFT
   PROCESSING
   PUBLISHED
+  ERROR 
 }
 
 enum LessonStatus {

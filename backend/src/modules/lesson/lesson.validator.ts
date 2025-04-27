@@ -30,18 +30,6 @@ export const lessonIdSchema = z.object({
   id: z.string().uuid("Invalid lesson ID"),
 });
 
-export const createLessonContentSchema = z.object({
-  lessonId: z.string().uuid("Invalid lesson ID"),
-  type: z.enum(["VIDEO", "DOCUMENT", "QUIZ"], {
-    message: "Invalid content type",
-  }),
-  status: z
-    .enum(["DRAFT", "PROCESSING", "PUBLISHED"])
-    .optional()
-    .default("DRAFT"),
-  data: z.record(z.any()).optional().default({}),
-});
-
 
 export const getAllLessonsSchema = z.object({
   page: z

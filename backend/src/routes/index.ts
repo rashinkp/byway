@@ -7,6 +7,7 @@ import { createCategoryRouter } from "../modules/category/category.route";
 import { createCourseRouter } from "../modules/course/course.route";
 import { createLessonRouter } from "../modules/lesson/lesson.route";
 import { AppDependencies } from "../core/dependacies/index";
+import { createContentRouter } from "../modules/content/content.routes";
 
 export const configureRoutes = (
   app: Express,
@@ -25,5 +26,6 @@ export const configureRoutes = (
   );
   app.use("/api/v1/courses", createCourseRouter(dependencies.courseController));
   app.use("/api/v1/lessons", createLessonRouter(dependencies.lessonController));
+  app.use('api/v1/content', createContentRouter(dependencies.contentController));
   
 };

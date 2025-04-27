@@ -15,7 +15,8 @@ export function useGoogleAuth(redirectPath: string = "/"): UseGoogleAuthResult {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const { redirectByRole } = useRoleRedirect();
-  const { setUser} = useAuthStore();
+  const { setUser } = useAuthStore();
+  
 
   const handleGoogleAuth = useGoogleLogin({
     onSuccess: async (tokenResponse) => {

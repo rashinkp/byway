@@ -21,6 +21,7 @@ import {
   initializeLessonDependencies,
   LessonDependencies,
 } from "./lessonDependencies";
+import { ContentDependencies, initializeContentDependencies } from "./contentDependancy";
 
 export interface AppDependencies {
   authController: AuthDependencies["authController"];
@@ -30,6 +31,7 @@ export interface AppDependencies {
   categoryController: CategoryDependencies["categoryController"];
   courseController: CourseDependencies["courseController"];
   lessonController: LessonDependencies["lessonController"];
+  contentController: ContentDependencies["contentController"];
 }
 
 export const initializeAppDependencies = (
@@ -50,6 +52,11 @@ export const initializeAppDependencies = (
     courseDeps.courseRepository
   );
 
+  const contentDeps = initializeContentDependencies(
+    dbProvider,
+    lessonDeps.lessonRepository
+  );
+
   return {
     authController: authDeps.authController,
     userController: userDeps.userController,
@@ -58,5 +65,6 @@ export const initializeAppDependencies = (
     categoryController: categoryDeps.categoryController,
     courseController: courseDeps.courseController,
     lessonController: lessonDeps.lessonController,
+    contentController: contentDeps.contentController,
   };
 };

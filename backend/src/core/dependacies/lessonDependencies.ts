@@ -6,6 +6,7 @@ import { CourseRepository } from "../../modules/course/course.repository";
 
 export interface LessonDependencies {
   lessonController: LessonController;
+  lessonRepository: LessonRepository;
 }
 
 export const initializeLessonDependencies = (
@@ -21,5 +22,5 @@ export const initializeLessonDependencies = (
   );
   const lessonController = new LessonController(lessonService);
 
-  return { lessonController };
+  return { lessonController , lessonRepository };
 };
