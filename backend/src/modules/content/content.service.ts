@@ -52,6 +52,7 @@ export class ContentService {
   ): Promise<ILessonContent | null> {
     const lesson = await this.lessonRepository.getLessonById(lessonId);
     if (!lesson || lesson.deletedAt) {
+      console.log("Lesson not found or deleted", lessonId, lesson);
       throw new Error("Lesson not found or deleted");
     }
 
