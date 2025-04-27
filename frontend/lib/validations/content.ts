@@ -1,16 +1,25 @@
 import { z } from "zod";
+import { ContentType, ContentStatus } from "@/types/content";
 
-export const createLessonContentSchema = z.object({
+export const createContentSchema = z.object({
   lessonId: z.string().uuid("Invalid lesson ID"),
-  type: z.enum(["VIDEO", "DOCUMENT", "QUIZ"], {
+  type: z.enum([ContentType.VIDEO, ContentType.DOCUMENT, ContentType.QUIZ], {
     message: "Invalid content type",
   }),
   status: z
-    .enum(["DRAFT", "PROCESSING", "PUBLISHED", "ERROR"])
+    .enum([
+      ContentStatus.DRAFT,
+      ContentStatus.PROCESSING,
+      ContentStatus.PUBLISHED,
+      ContentStatus.ERROR,
+    ])
     .optional()
-    .default("PUBLISHED"),
+    .default(ContentStatus.PUBLISHED),
   data: z
     .object({
+      type: z.enum([ContentType.VIDEO, ContentType.DOCUMENT, ContentType.QUIZ], {
+        message: "Invalid content type",
+      }),
       title: z
         .string()
         .min(1, "Title is required")
@@ -46,30 +55,28 @@ export const createLessonContentSchema = z.object({
         )
         .optional(),
     })
+    .refine(
+      (data) => {
+        if ([ContentType.VIDEO, ContentType.DOCUMENT].includes(data.type)) {
+          return !!data.fileUrl;
+        }
+        if (data.type === ContentType.QUIZ) {
+          return !!data.questions && data.questions.length > 0;
+        }
+        return true;
+      },
+      { message: "fileUrl is required for VIDEO/DOCUMENT, questions for QUIZ" }
+    ),
 });
 
-export const updateLessonContentSchema = createLessonContentSchema
-  .partial()
-  .extend({
-    id: z.string().uuid("Invalid content ID"),
-  });
-
-export const getLessonContentSchema = z.object({
-  lessonId: z.string().uuid("Invalid lesson ID"),
-});
-
-export const deleteLessonContentSchema = z.object({
+export const updateContentSchema = createContentSchema.partial().extend({
   id: z.string().uuid("Invalid content ID"),
 });
 
-// Infer types from schemas
-export type CreateLessonContentInput = z.infer<
-  typeof createLessonContentSchema
->;
-export type UpdateLessonContentInput = z.infer<
-  typeof updateLessonContentSchema
->;
-export type GetLessonContentInput = z.infer<typeof getLessonContentSchema>;
-export type DeleteLessonContentInput = z.infer<
-  typeof deleteLessonContentSchema
->;
+export const getContentSchema = z.object({
+  lessonId: z.string().uuid("Invalid lesson ID"),
+});
+
+export const deleteContentSchema = z.object({
+  id: z.string().uuid("Invalid content ID"),
+});

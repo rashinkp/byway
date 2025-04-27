@@ -1,20 +1,13 @@
 "use client";
 
-import { useState } from "react";
 import { useParams } from "next/navigation";
-import { dummyLessonContents } from "../dummyData";
-import {
-  ILesson,
-  LessonContent,
-  LessonContentFormData,
-  UpdateLessonInput,
-} from "@/types/lesson";
+import { ILesson, UpdateLessonInput } from "@/types/lesson";
 import { LessonFormData } from "@/components/lesson/LessonFormModal";
 import { LessonDetailSection } from "@/components/lesson/LessonDetailSection";
-import { ContentSection } from "@/components/lesson/LessonContentSection";
+import { toast } from "sonner";
 import { useGetLessonById } from "@/hooks/lesson/useGetLessonById";
 import { useUpdateLesson } from "@/hooks/lesson/useUpdateLesson";
-import { toast } from "sonner";
+import { ContentSection } from "@/components/content/ContentSection";
 
 export default function LessonDetailPage() {
   const { courseId, lessonId } = useParams();
@@ -30,11 +23,8 @@ export default function LessonDetailPage() {
     isPending: isUpdating,
     error: updateError,
   } = useUpdateLesson();
-  const [content, setContent] = useState<LessonContent | undefined>(
-    dummyLessonContents
-  );
 
-  const nextOrder = 2;
+  const nextOrder = 2; // Adjust based on your logic
 
   const handleEditLesson = (data: LessonFormData) => {
     if (!lesson?.id) {
@@ -61,46 +51,6 @@ export default function LessonDetailPage() {
         });
       },
     });
-  };
-
-  const handleAddContent = (data: LessonContentFormData) => {
-    if (!lesson?.id) {
-      toast.error("Lesson ID is required");
-      return;
-    }
-    const newContent: LessonContent = {
-      id: `content-1`,
-      lessonId: lesson.id,
-      type: data.type,
-      status: data.status,
-      data: data.data,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-      deletedAt: null,
-    };
-    setContent(newContent);
-    toast.success("Content created successfully");
-  };
-
-  const handleEditContent = (
-    data: LessonContentFormData,
-    contentId: string
-  ) => {
-    if (!content || content.id !== contentId) return;
-    setContent({
-      ...content,
-      type: data.type,
-      status: data.status,
-      data: data.data,
-      updatedAt: new Date().toISOString(),
-    });
-    toast.success("Content updated successfully");
-  };
-
-  const handleDeleteContent = (contentToDelete: LessonContent) => {
-    if (!content || content.id !== contentToDelete.id) return;
-    setContent(undefined);
-    toast.success("Content deleted successfully");
   };
 
   if (isLoading) {
@@ -143,10 +93,20 @@ export default function LessonDetailPage() {
     );
   }
 
+  if (!lesson) {
+    return (
+      <div className="container mx-auto py-6 space-y-8">
+        <div className="bg-white shadow rounded-lg p-6">
+          <p>No lesson found</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="container mx-auto py-6 space-y-8">
       <LessonDetailSection
-        lesson={lesson as ILesson}
+        lesson={lesson}
         isLoading={isLoading || isUpdating}
         error={error || updateError}
         courseId={courseId as string}
@@ -154,12 +114,7 @@ export default function LessonDetailPage() {
         onUpdateLesson={handleEditLesson}
         onRetry={() => refetch()}
       />
-      <ContentSection
-        content={content}
-        lessonId={lessonId as string}
-        onAddContent={handleAddContent}
-        onEditContent={handleEditContent}
-      />
+      <ContentSection lessonId={lesson.id} />
     </div>
   );
 }

@@ -8,9 +8,9 @@ export interface ILesson {
   order: number;
   status: "DRAFT" | "PUBLISHED";
   content?: LessonContent | null;
-  createdAt: string;
-  updatedAt: string;
-  deletedAt?: string | null;
+  createdAt: Date;
+  updatedAt: Date;
+  deletedAt?: Date | null;
 }
 
 export interface ICreateLessonInput {
