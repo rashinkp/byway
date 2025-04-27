@@ -202,15 +202,17 @@ model UserLessonProgress {
 
 model LessonContent {
   id          String           @id @default(uuid())
-  lessonId    String           @unique // Ensure one content per lesson
+  lessonId    String           @unique
   lesson      Lesson           @relation("LessonToContent", fields: [lessonId], references: [id], onDelete: Cascade)
   type        ContentType
   status      ContentStatus    @default(DRAFT)
   data        Json             @default("{}") 
+  thumbnailUrl String?         // <- ADD THIS LINE
   createdAt   DateTime         @default(now())
   updatedAt   DateTime         @updatedAt
   deletedAt   DateTime?
 }
+
 
 
 enum ContentType {

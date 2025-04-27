@@ -15,7 +15,7 @@ export const ContentSection = ({ lessonId }: ContentSectionProps) => {
   const { data: content, isLoading } = useGetContentByLessonId(lessonId);
   const { mutate: deleteContent, isPending: isDeleting } =
     useDeleteContent(lessonId);
-  const [isEditing, setIsEditing] = useState(!content);
+  const [isEditing, setIsEditing] = useState(false);
 
   const handleDelete = (contentId: string) => {
     deleteContent(contentId, {
@@ -39,6 +39,7 @@ export const ContentSection = ({ lessonId }: ContentSectionProps) => {
     );
   }
 
+  console.log(content);
   return (
     <div className="bg-white shadow rounded-lg p-6">
       <h2 className="text-xl font-semibold mb-4">Lesson Content</h2>

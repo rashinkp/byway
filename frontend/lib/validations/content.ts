@@ -17,9 +17,6 @@ export const createContentSchema = z.object({
     .default(ContentStatus.PUBLISHED),
   data: z
     .object({
-      type: z.enum([ContentType.VIDEO, ContentType.DOCUMENT, ContentType.QUIZ], {
-        message: "Invalid content type",
-      }),
       title: z
         .string()
         .min(1, "Title is required")
@@ -54,19 +51,7 @@ export const createContentSchema = z.object({
           })
         )
         .optional(),
-    })
-    .refine(
-      (data) => {
-        if ([ContentType.VIDEO, ContentType.DOCUMENT].includes(data.type)) {
-          return !!data.fileUrl;
-        }
-        if (data.type === ContentType.QUIZ) {
-          return !!data.questions && data.questions.length > 0;
-        }
-        return true;
-      },
-      { message: "fileUrl is required for VIDEO/DOCUMENT, questions for QUIZ" }
-    ),
+    }),
 });
 
 export const updateContentSchema = createContentSchema.partial().extend({

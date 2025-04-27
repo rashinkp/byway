@@ -194,6 +194,8 @@ export const ContentInputForm = ({
       }
     }
 
+    // console.log("type before submitting", type);
+
     const data: CreateLessonContentInput = {
       lessonId,
       type,
@@ -206,6 +208,8 @@ export const ContentInputForm = ({
           : { questions }),
       },
     };
+
+    // console.log("data after selected", data);
 
     if (initialData?.lessonId) {
       const updateData: UpdateLessonContentInput = {
