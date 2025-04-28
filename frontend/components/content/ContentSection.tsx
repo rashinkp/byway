@@ -39,9 +39,8 @@ export const ContentSection = ({ lessonId }: ContentSectionProps) => {
     );
   }
 
-  console.log(content);
   return (
-    <div className="bg-white shadow rounded-lg p-6">
+    <div className="p-6">
       <h2 className="text-xl font-semibold mb-4">Lesson Content</h2>
       {isEditing ? (
         <ContentInputForm
