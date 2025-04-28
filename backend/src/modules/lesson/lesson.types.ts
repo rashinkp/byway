@@ -95,4 +95,5 @@ export interface ILessonRepository {
     lessonId: string,
     input: Partial<ICreateLessonInput>
   ): Promise<ILesson>;
+  deleteLesson(lessonId: string): Promise<void>;
 }

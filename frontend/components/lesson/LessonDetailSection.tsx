@@ -1,8 +1,7 @@
 "use client";
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Edit} from "lucide-react";
+import { Edit } from "lucide-react";
 import {
   LessonFormModal,
   LessonFormData,
@@ -11,8 +10,10 @@ import { ILesson } from "@/types/lesson";
 import { StatusBadge } from "@/components/ui/StatusBadge";
 import {  toast } from "sonner";
 import { formatDate } from "@/utils/formatDate";
-import { useToggleLessonStatus } from "@/hooks/lesson/useToggleLessonStatus";
-import { LessonDetailSectionSkeleton } from "../skeleton/LessonDetailSection";
+import { AlertComponent } from "../ui/AlertComponent";
+import { DetailsSectionSkeleton } from "../skeleton/CourseDetailSectionSkeleton";
+import { deleteLesson } from "@/api/lesson";
+import { useRouter } from "next/navigation";
 
 interface LessonDetailSectionProps {
   lesson: ILesson;
@@ -37,10 +38,11 @@ export function LessonDetailSection({
   onRetry,
 }: LessonDetailSectionProps) {
 
-  const { mutate:toggleDeleteLesson} = useToggleLessonStatus();
   const [isLessonModalOpen, setIsLessonModalOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [confirmOpen, setConfirmOpen] = useState(false);
+
+  const router = useRouter();
 
   const handleEditLesson = async (data: LessonFormData) => {
     setIsSubmitting(true);
@@ -57,14 +59,21 @@ export function LessonDetailSection({
   };
 
 
-  
+  const handleTogglePublish = () => {
+  }
 
 
-  const handleTogglePublish = async () => {
-   
+    const handleOpenConfirm = () => {
+      setConfirmOpen(true);
+    };
+
+  const handleConfirmDelete = () => {
+    if (lesson.id) {
+      deleteLesson(lesson.id);
+      router.replace(`/instructor/courses/${courseId}`);
+    }
   };
-
-
+  
 
    interface Action {
       confirmationMessage: (item: ILesson) => string;
@@ -100,7 +109,7 @@ export function LessonDetailSection({
 
   if (isLoading) {
     return (
-      <LessonDetailSectionSkeleton />
+      <DetailsSectionSkeleton />
     );
   }
 
@@ -117,7 +126,12 @@ export function LessonDetailSection({
             <Edit className="mr-2 h-4 w-4" />
             Edit Lesson
           </Button>
-         
+          <Button
+            onClick={handleOpenConfirm}
+            className="bg-red-600 hover:bg-red-700 text-white"
+          >
+            Delete
+          </Button>
           <Button
             onClick={handleTogglePublish}
             className={`${
@@ -173,6 +187,16 @@ export function LessonDetailSection({
         courseId={courseId}
         nextOrder={nextOrder}
         isSubmitting={isSubmitting}
+      />
+
+      <AlertComponent
+        open={confirmOpen}
+        onOpenChange={setConfirmOpen}
+        title="Are you sure?"
+        description="Are you sure you want to delete this lesson? This action cannot be undone."
+        confirmText="Delete"
+        cancelText="Cancel"
+        onConfirm={handleConfirmDelete}
       />
     </div>
   );

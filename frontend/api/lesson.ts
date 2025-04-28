@@ -70,7 +70,7 @@ export async function updateLesson(
   }
 }
 
-export async function toggleLessonStatus(
+export async function deleteLesson(
   lessonId: string,
 ): Promise<ILesson> {
   try {

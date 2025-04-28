@@ -194,4 +194,11 @@ export class LessonRepository implements ILessonRepository {
       deletedAt: lesson.deletedAt || undefined,
     }));
   }
+
+  async deleteLesson(lessonId: string): Promise<void> {
+    await this.prisma.lesson.delete({
+      where:{id:lessonId}
+    })
+  }
+
 }

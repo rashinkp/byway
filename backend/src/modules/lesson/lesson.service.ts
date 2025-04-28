@@ -136,23 +136,13 @@ export class LessonService {
   }
 
 
-  async deleteLesson(lessonId: string): Promise<ILesson> {
+  async deleteLesson(lessonId: string): Promise<void> {
     const lesson = await this.lessonRepository.getLessonById(lessonId);
-    console.log("lesson", lesson , lessonId);
     if (!lesson) {
       throw new Error("Lesson not found");
     }
-    let deletedAt = null; 
-    if (!lesson.deletedAt) {
-      deletedAt = new Date(); 
-    }
-    const updatedLesson = await this.lessonRepository.updateLesson(lessonId, {
-      deletedAt,
-    });
-    if (!updatedLesson) {
-      throw new Error("Failed to delete lesson");
-    }
-    return updatedLesson;
+   
+    await this.lessonRepository.deleteLesson(lessonId);
   }
 
 

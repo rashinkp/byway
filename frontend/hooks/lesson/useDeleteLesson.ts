@@ -1,13 +1,13 @@
+import { deleteLesson } from "@/api/lesson";
 import { ILesson } from "@/types/lesson";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { toggleLessonStatus } from "@/api/lesson";
 
-export const useToggleLessonStatus = () => {
+export const useDeleteLesson = () => {
   const queryClient = useQueryClient();
 
   return useMutation<ILesson, Error, { lessonId: string; enable: boolean }>({
-    mutationFn: ({ lessonId }) => toggleLessonStatus(lessonId),
+    mutationFn: ({ lessonId }) => deleteLesson(lessonId),
     onSuccess: (updatedLesson, { lessonId }) => {
       queryClient.invalidateQueries({ queryKey: ["lesson", lessonId] });
       queryClient.invalidateQueries({ queryKey: ["lessons"] });

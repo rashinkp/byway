@@ -190,7 +190,7 @@ model UserLessonProgress {
   courseId    String
   lessonId    String
   enrollment  Enrollment @relation("EnrollmentProgress", fields: [userId, courseId], references: [userId, courseId])
-  lesson      Lesson     @relation("LessonProgress", fields: [lessonId], references: [id])
+  lesson      Lesson     @relation("LessonProgress", fields: [lessonId], references: [id], onDelete: Cascade)
   completed   Boolean    @default(false)
   completedAt DateTime?
   createdAt   DateTime   @default(now())

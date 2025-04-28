@@ -150,10 +150,10 @@ export class LessonController {
 
   async deleteLesson(lessonId: string): Promise<ApiResponse> {
     try {
-      const progress = await this.lessonService.deleteLesson(lessonId);
+      await this.lessonService.deleteLesson(lessonId);
       return {
         status: "success",
-        data: progress,
+        data: null,
         message: "Lesson deleted successfully",
         statusCode: StatusCodes.OK,
       };
