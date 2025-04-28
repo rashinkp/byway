@@ -1,6 +1,6 @@
 import { getAllLessonsInCourse } from "@/api/lesson";
 import { useAuthStore } from "@/stores/auth.store";
-import { GetAllLessonsResponse, UseGetAllLessonsInCourseParams } from "@/types/lesson";
+import { GetAllLessonsParams, GetAllLessonsResponse } from "@/types/lesson";
 import { useQuery } from "@tanstack/react-query";
 
 export const useGetAllLessonsInCourse = ({
@@ -12,7 +12,7 @@ export const useGetAllLessonsInCourse = ({
   search = "",
   filterBy = "ALL",
   includeDeleted = false,
-}: UseGetAllLessonsInCourseParams) => {
+}: GetAllLessonsParams) => {
   const { user } = useAuthStore();
 
   return useQuery<GetAllLessonsResponse, Error>({

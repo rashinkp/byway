@@ -40,9 +40,7 @@ export function LessonManager({ courseId }: { courseId: string }) {
   });
 
 
-  const nextOrder = data?.lessons.length
-    ? Math.max(...data.lessons.map((l) => l.order)) + 1
-    : 1;
+ 
 
   const totalPages = data?.totalPages || 1;
 
@@ -180,7 +178,6 @@ export function LessonManager({ courseId }: { courseId: string }) {
               }
             : undefined
         }
-        nextOrder={nextOrder}
         courseId={courseId}
       />
     </div>

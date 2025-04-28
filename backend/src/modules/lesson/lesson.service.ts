@@ -154,6 +154,20 @@ export class LessonService {
     if (!lesson) {
       throw new Error("Lesson not found");
     }
+
+    if (input.order) {
+      const existingLesson = await this.prisma.lesson.findFirst({
+        where: {
+          courseId: lesson.courseId,
+          order: input.order,
+          deletedAt: null,
+          id: { not: lessonId },
+        },
+      });
+      if (existingLesson) {
+        throw new Error("A lesson with this order already exists in the course");
+      }
+    }
     const updatedLesson = await this.lessonRepository.updateLesson(
       lessonId,
       input

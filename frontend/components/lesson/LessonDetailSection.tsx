@@ -49,10 +49,8 @@ export function LessonDetailSection({
     try {
       onUpdateLesson(data);
       setIsLessonModalOpen(false);
-      toast.success("Lesson updated successfully");
     } catch (err) {
       console.error(err);
-      toast.error("Failed to update lesson");
     } finally {
       setIsSubmitting(false);
     }
@@ -185,7 +183,6 @@ export function LessonDetailSection({
           order: lesson.order,
         }}
         courseId={courseId}
-        nextOrder={nextOrder}
         isSubmitting={isSubmitting}
       />
 

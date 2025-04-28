@@ -42,6 +42,15 @@ export const fields: FormFieldConfig<LessonFormData>[] = [
     maxLength: 1000,
     column: "right",
   },
+  {
+    name: "order",
+    label: "Order",
+    type: "input",
+    fieldType: "number",
+    placeholder: "e.g., 1",
+    description: "Enter the order of the lesson.",
+    column: "left",
+  }
 ];
 
 interface LessonFormModalProps {
@@ -51,7 +60,6 @@ interface LessonFormModalProps {
   initialData?: Partial<LessonFormData>;
   isSubmitting?: boolean;
   courseId?: string; 
-  nextOrder?: number; 
 }
 
 export function LessonFormModal({
@@ -61,7 +69,6 @@ export function LessonFormModal({
   initialData,
   isSubmitting,
   courseId,
-  nextOrder,
 }: LessonFormModalProps) {
   const { mutate: createLesson, isPending } = useCreateLesson();
 
@@ -72,14 +79,6 @@ export function LessonFormModal({
     if (externalOnSubmit) {
       await externalOnSubmit(submitData);
     } else {
-
-        if (nextOrder !== data.order) {
-          toast.error(
-            `Order must be ${nextOrder} for the new lesson. Please adjust the order.`
-          );
-          return;
-        }
-
       createLesson(
         {
           courseId: courseId!,

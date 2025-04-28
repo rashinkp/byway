@@ -64,7 +64,7 @@ export default function LessonDetailPage() {
     );
   }
 
-  if (error || updateError) {
+  if (error) {
     return (
       <div className="container mx-auto py-6 space-y-8">
         <div className="bg-white shadow rounded-lg p-6">
@@ -97,7 +97,7 @@ export default function LessonDetailPage() {
       <LessonDetailSection
         lesson={lesson}
         isLoading={isLoading || isUpdating}
-        error={error || updateError}
+        error={error}
         courseId={courseId as string}
         nextOrder={nextOrder}
         onUpdateLesson={handleEditLesson}
