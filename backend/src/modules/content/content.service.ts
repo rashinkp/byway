@@ -109,8 +109,9 @@ export class ContentService {
   async deleteContent(id: string, userId: string): Promise<void> {
     const content = await this.contentRepository.getContentById(id);
 
+    console.log("Content to delete:", content);
     
-    if (!content || content.deletedAt) {
+    if (!content) {
       throw new Error("Content not found or already deleted");
     }
 

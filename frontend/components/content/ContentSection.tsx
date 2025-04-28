@@ -7,6 +7,8 @@ import { toast } from "sonner";
 import { useGetContentByLessonId } from "@/hooks/content/useGetContentByLessonId";
 import { useDeleteContent } from "@/hooks/content/useDeleteContent";
 import { ContentSectionSkeleton } from "../skeleton/LessonContentSectionSkeleton";
+import { AlertComponent } from "../ui/AlertComponent";
+
 
 interface ContentSectionProps {
   lessonId: string;
@@ -17,9 +19,24 @@ export const ContentSection = ({ lessonId }: ContentSectionProps) => {
   const { mutate: deleteContent, isPending: isDeleting } =
     useDeleteContent(lessonId);
   const [isEditing, setIsEditing] = useState(false);
+  const [isAlertOpen, setIsAlertOpen] = useState(false);
+  const [deleteContentId, setDeleteContentId] = useState<string | null>(null);
 
   const handleDelete = (contentId: string) => {
-    deleteContent(contentId);
+    setDeleteContentId(contentId);
+    setIsAlertOpen(true);
+  };
+
+  const handleConfirmDelete = () => {
+    if (deleteContentId) {
+      deleteContent(deleteContentId, {
+        onSuccess: () => {
+          toast.success("Content deleted successfully");
+          setIsEditing(false);
+        },
+        onError: (error: Error) => toast.error(error.message),
+      });
+    }
   };
 
   const handleFormSuccess = () => {
@@ -27,9 +44,7 @@ export const ContentSection = ({ lessonId }: ContentSectionProps) => {
   };
 
   if (isLoading) {
-    return (
-      <ContentSectionSkeleton />
-    );
+    return <ContentSectionSkeleton />;
   }
 
   return (
@@ -109,6 +124,15 @@ export const ContentSection = ({ lessonId }: ContentSectionProps) => {
           Add Content
         </button>
       )}
+      <AlertComponent
+        open={isAlertOpen}
+        onOpenChange={setIsAlertOpen}
+        title="Are you sure?"
+        description="Are you sure you want to delete this content? This action cannot be undone."
+        confirmText="Delete"
+        cancelText="Cancel"
+        onConfirm={handleConfirmDelete}
+      />
     </div>
   );
 };
