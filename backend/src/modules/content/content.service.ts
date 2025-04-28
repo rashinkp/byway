@@ -3,6 +3,7 @@ import { LessonRepository } from "../lesson/lesson.repository";
 import {
   IContentRepository,
   ICreateLessonContentInput,
+  IUpdateLessonContentInput,
   ILessonContent,
 } from "./content.types";
 
@@ -52,7 +53,6 @@ export class ContentService {
   ): Promise<ILessonContent | null> {
     const lesson = await this.lessonRepository.getLessonById(lessonId);
     if (!lesson || lesson.deletedAt) {
-      console.log("Lesson not found or deleted", lessonId, lesson);
       throw new Error("Lesson not found or deleted");
     }
 
@@ -76,11 +76,11 @@ export class ContentService {
 
   async updateContent(
     id: string,
-    input: Partial<ICreateLessonContentInput>,
+    input: IUpdateLessonContentInput,
     userId: string
   ): Promise<ILessonContent> {
     const content = await this.contentRepository.getContentByLessonId(
-      input.lessonId || ""
+      input.id || ""
     );
     if (!content || content.deletedAt) {
       throw new Error("Content not found or deleted");
@@ -100,7 +100,7 @@ export class ContentService {
       );
     }
 
-    return this.contentRepository.updateContent(id, input);
+    return this.contentRepository.updateContent({...input });
   }
 
   async deleteContent(id: string, userId: string): Promise<ILessonContent> {

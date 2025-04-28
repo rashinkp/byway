@@ -74,6 +74,6 @@ export const validateQuestion = (
   if (newOptions.some((opt) => !opt))
     newErrors.newOptions = "All options are required";
   if (!newAnswer) newErrors.newAnswer = "Answer is required";
-  setErrors((prev) => ({ ...prev, ...newErrors }));
+  // setErrors((prev) => ({ ...prev, ...newErrors }));
   return Object.keys(newErrors).length === 0;
 };

@@ -158,22 +158,21 @@ enum CourseStatus {
   ARCHIVED
 }
 
-
 model Lesson {
   id          String      @id @default(uuid())
   courseId    String
   course      Course      @relation("CourseLessons", fields: [courseId], references: [id])
   title       String
-  description String?     
-  order       Int         
-  status      LessonStatus @default(DRAFT) 
+  description String?
+  order       Int
+  status      LessonStatus @default(DRAFT)
   createdAt   DateTime    @default(now())
   updatedAt   DateTime    @updatedAt
-  deletedAt   DateTime?   
+  deletedAt   DateTime?
   progress    UserLessonProgress[] @relation("LessonProgress")
   content     LessonContent?       @relation("LessonToContent")
-  @@unique([courseId, order]) // Prevent duplicate orders in a course
-  @@index([order]) // Optimize sorting by order
+  @@unique([courseId, order])
+  @@index([order])
 }
 
 model Enrollment {
@@ -187,33 +186,44 @@ model Enrollment {
 }
 
 model UserLessonProgress {
-  userId     String
-  courseId   String
-  lessonId   String
-  enrollment Enrollment @relation("EnrollmentProgress", fields: [userId, courseId], references: [userId, courseId])
-  lesson     Lesson     @relation("LessonProgress", fields: [lessonId], references: [id])
-  completed  Boolean    @default(false)
+  userId      String
+  courseId    String
+  lessonId    String
+  enrollment  Enrollment @relation("EnrollmentProgress", fields: [userId, courseId], references: [userId, courseId])
+  lesson      Lesson     @relation("LessonProgress", fields: [lessonId], references: [id])
+  completed   Boolean    @default(false)
   completedAt DateTime?
-  createdAt  DateTime   @default(now())
-  updatedAt  DateTime   @updatedAt
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
   @@id([userId, courseId, lessonId])
 }
 
-
 model LessonContent {
-  id          String           @id @default(uuid())
-  lessonId    String           @unique
-  lesson      Lesson           @relation("LessonToContent", fields: [lessonId], references: [id], onDelete: Cascade)
-  type        ContentType
-  status      ContentStatus    @default(DRAFT)
-  data        Json             @default("{}") 
-  thumbnailUrl String?         // <- ADD THIS LINE
-  createdAt   DateTime         @default(now())
-  updatedAt   DateTime         @updatedAt
-  deletedAt   DateTime?
+  id            String           @id @default(uuid())
+  lessonId      String           @unique
+  lesson        Lesson           @relation("LessonToContent", fields: [lessonId], references: [id], onDelete: Cascade)
+  type          ContentType
+  status        ContentStatus    @default(DRAFT)
+  title         String?          // Made optional for migration
+  description   String?          // Already optional
+  fileUrl       String?          // Made optional for migration
+  thumbnailUrl  String?          // Already optional
+  quizQuestions QuizQuestion[]   @relation("LessonContentToQuizQuestions")
+  createdAt     DateTime         @default(now())
+  updatedAt     DateTime         @updatedAt
+  deletedAt     DateTime?
 }
 
-
+model QuizQuestion {
+  id             String        @id @default(uuid())
+  lessonContentId String
+  lessonContent  LessonContent @relation("LessonContentToQuizQuestions", fields: [lessonContentId], references: [id], onDelete: Cascade)
+  question       String
+  options        String[]
+  correctAnswer  String
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+}
 
 enum ContentType {
   VIDEO
@@ -225,7 +235,7 @@ enum ContentStatus {
   DRAFT
   PROCESSING
   PUBLISHED
-  ERROR 
+  ERROR
 }
 
 enum LessonStatus {

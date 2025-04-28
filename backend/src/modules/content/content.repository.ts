@@ -3,6 +3,7 @@ import {
   IContentRepository,
   ILessonContent,
   ICreateLessonContentInput,
+  IUpdateLessonContentInput,
 } from "./content.types";
 
 export class ContentRepository implements IContentRepository {
@@ -11,20 +12,46 @@ export class ContentRepository implements IContentRepository {
   async createContent(
     input: ICreateLessonContentInput
   ): Promise<ILessonContent> {
+    const { quizQuestions, ...contentData } = input;
+
     const content = await this.prisma.lessonContent.create({
       data: {
-        lessonId: input.lessonId,
-        type: input.type,
-        status: input.status || "PUBLISHED",
-        data: input.data,
+        ...contentData,
+        status: input.status || "DRAFT",
+        quizQuestions:
+          input.type === "QUIZ" && quizQuestions
+            ? {
+                create: quizQuestions.map((q) => ({
+                  question: q.question,
+                  options: q.options,
+                  correctAnswer: q.correctAnswer,
+                })),
+              }
+            : undefined,
+      },
+      include: {
+        quizQuestions: true,
       },
     });
+
     return {
       id: content.id,
       lessonId: content.lessonId,
       type: content.type,
       status: content.status,
-      data: content.data as any,
+      title: content.title,
+      description: content.description,
+      fileUrl: content.fileUrl,
+      thumbnailUrl: content.thumbnailUrl,
+      quizQuestions: content.quizQuestions.map((q) => ({
+        id: q.id,
+        lessonContentId: q.lessonContentId,
+        question: q.question,
+        options: q.options,
+        correctAnswer: q.correctAnswer,
+        createdAt: q.createdAt,
+        updatedAt: q.updatedAt,
+      })),
       createdAt: content.createdAt,
       updatedAt: content.updatedAt,
       deletedAt: content.deletedAt || undefined,
@@ -34,14 +61,31 @@ export class ContentRepository implements IContentRepository {
   async getContentByLessonId(lessonId: string): Promise<ILessonContent | null> {
     const content = await this.prisma.lessonContent.findUnique({
       where: { lessonId },
+      include: {
+        quizQuestions: true,
+      },
     });
+
     if (!content) return null;
+
     return {
       id: content.id,
       lessonId: content.lessonId,
       type: content.type,
       status: content.status,
-      data: content.data as any,
+      title: content.title,
+      description: content.description,
+      fileUrl: content.fileUrl,
+      thumbnailUrl: content.thumbnailUrl,
+      quizQuestions: content.quizQuestions.map((q) => ({
+        id: q.id,
+        lessonContentId: q.lessonContentId,
+        question: q.question,
+        options: q.options,
+        correctAnswer: q.correctAnswer,
+        createdAt: q.createdAt,
+        updatedAt: q.updatedAt,
+      })),
       createdAt: content.createdAt,
       updatedAt: content.updatedAt,
       deletedAt: content.deletedAt || undefined,
@@ -49,25 +93,50 @@ export class ContentRepository implements IContentRepository {
   }
 
   async updateContent(
-    id: string,
-    input: Partial<ICreateLessonContentInput>
+    input: IUpdateLessonContentInput
   ): Promise<ILessonContent> {
+    const { id, quizQuestions, ...contentData } = input;
+
     const content = await this.prisma.lessonContent.update({
       where: { id },
       data: {
-        lessonId: input.lessonId,
-        type: input.type,
-        status: input.status,
-        data: input.data,
+        ...contentData,
         updatedAt: new Date(),
+        quizQuestions:
+          input.type === "QUIZ" && quizQuestions
+            ? {
+                deleteMany: {}, // Delete existing questions
+                create: quizQuestions.map((q) => ({
+                  question: q.question,
+                  options: q.options,
+                  correctAnswer: q.correctAnswer,
+                })),
+              }
+            : undefined,
+      },
+      include: {
+        quizQuestions: true,
       },
     });
+
     return {
       id: content.id,
       lessonId: content.lessonId,
       type: content.type,
       status: content.status,
-      data: content.data as any,
+      title: content.title,
+      description: content.description,
+      fileUrl: content.fileUrl,
+      thumbnailUrl: content.thumbnailUrl,
+      quizQuestions: content.quizQuestions.map((q) => ({
+        id: q.id,
+        lessonContentId: q.lessonContentId,
+        question: q.question,
+        options: q.options,
+        correctAnswer: q.correctAnswer,
+        createdAt: q.createdAt,
+        updatedAt: q.updatedAt,
+      })),
       createdAt: content.createdAt,
       updatedAt: content.updatedAt,
       deletedAt: content.deletedAt || undefined,
@@ -78,13 +147,29 @@ export class ContentRepository implements IContentRepository {
     const content = await this.prisma.lessonContent.update({
       where: { id },
       data: { deletedAt: new Date() },
+      include: {
+        quizQuestions: true,
+      },
     });
+
     return {
       id: content.id,
       lessonId: content.lessonId,
       type: content.type,
       status: content.status,
-      data: content.data as any,
+      title: content.title,
+      description: content.description,
+      fileUrl: content.fileUrl,
+      thumbnailUrl: content.thumbnailUrl,
+      quizQuestions: content.quizQuestions.map((q) => ({
+        id: q.id,
+        lessonContentId: q.lessonContentId,
+        question: q.question,
+        options: q.options,
+        correctAnswer: q.correctAnswer,
+        createdAt: q.createdAt,
+        updatedAt: q.updatedAt,
+      })),
       createdAt: content.createdAt,
       updatedAt: content.updatedAt,
       deletedAt: content.deletedAt || undefined,

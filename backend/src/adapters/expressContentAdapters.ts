@@ -42,8 +42,8 @@ export const adaptContentController = (controller: ContentController) => ({
   updateContent: asyncHandler(
     async (req: AuthenticatedRequest, res: Response) => {
       const input = updateLessonContentSchema.parse({
-        ...req.body,
         id: req.params.id,
+        ...req.body,
       });
       const result = await controller.updateContent(
         input.id,

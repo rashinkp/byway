@@ -78,7 +78,7 @@ export class ContentController {
     try {
       const content = await this.contentService.updateContent(
         id,
-        input,
+        { ...input, id },
         userId
       );
       return {

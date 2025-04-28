@@ -1,28 +1,63 @@
+import { z } from "zod";
 import { ContentStatus, ContentType } from "@prisma/client";
+import {
+  createLessonContentSchema,
+  deleteLessonContentSchema,
+  getLessonContentSchema,
+  updateLessonContentSchema,
+} from "./content.validators";
+
+// Infer types from schemas
+export type CreateLessonContentInput = z.infer<
+  typeof createLessonContentSchema
+>;
+export type UpdateLessonContentInput = z.infer<
+  typeof updateLessonContentSchema
+>;
+export type GetLessonContentInput = z.infer<typeof getLessonContentSchema>;
+export type DeleteLessonContentInput = z.infer<
+  typeof deleteLessonContentSchema
+>;
+
+// TypeScript Interfaces
+export interface IQuizQuestion {
+  id: string;
+  lessonContentId: string;
+  question: string;
+  options: string[];
+  correctAnswer: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
 
 export interface ICreateLessonContentInput {
   lessonId: string;
   type: ContentType;
   status?: ContentStatus;
-  data: {
-    title: string;
-    description?: string | null;
-    fileUrl?: string;
-    questions?: { question: string; options: string[]; answer: string }[];
-  };
+  title: string;
+  description?: string | null;
+  fileUrl?: string;
+  thumbnailUrl?: string;
+  quizQuestions?: {
+    question: string;
+    options: string[];
+    correctAnswer: string;
+  }[];
 }
 
 export interface IUpdateLessonContentInput {
   id: string;
-  lessonId?: string;
   type?: ContentType;
   status?: ContentStatus;
-  data?: {
-    title?: string;
-    description?: string | null;
-    fileUrl?: string;
-    questions?: { question: string; options: string[]; answer: string }[];
-  };
+  title?: string;
+  description?: string | null;
+  fileUrl?: string;
+  thumbnailUrl?: string;
+  quizQuestions?: {
+    question: string;
+    options: string[];
+    correctAnswer: string;
+  }[];
 }
 
 export interface ILessonContent {
@@ -30,12 +65,11 @@ export interface ILessonContent {
   lessonId: string;
   type: ContentType;
   status: ContentStatus;
-  data: {
-    title: string;
-    description?: string | null;
-    fileUrl?: string;
-    questions?: { question: string; options: string[]; answer: string }[];
-  };
+  title: string | null;
+  description: string | null;
+  fileUrl: string | null;
+  thumbnailUrl: string | null;
+  quizQuestions: IQuizQuestion[];
   createdAt: Date;
   updatedAt: Date;
   deletedAt?: Date | null;
@@ -44,9 +78,6 @@ export interface ILessonContent {
 export interface IContentRepository {
   createContent(input: ICreateLessonContentInput): Promise<ILessonContent>;
   getContentByLessonId(lessonId: string): Promise<ILessonContent | null>;
-  updateContent(
-    id: string,
-    input: Partial<ICreateLessonContentInput>
-  ): Promise<ILessonContent>;
+  updateContent(input: IUpdateLessonContentInput): Promise<ILessonContent>;
   deleteContent(id: string): Promise<ILessonContent>;
 }
