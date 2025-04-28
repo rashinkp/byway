@@ -17,6 +17,8 @@ import { TitleInput } from "./ContentTitleInput";
 import { DescriptionInput } from "./ContentDescriptionInput";
 import { QuizInput } from "./ContentQuizInput";
 import { ThumbnailUploadInput } from "./ContentThumbnailInputSection";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { AlertTriangle } from "lucide-react";
 
 interface ContentInputFormProps {
   lessonId: string;
@@ -65,6 +67,38 @@ export const ContentInputForm = ({
 
   const { mutate: createContent, isPending: isCreating } = useCreateContent();
   const { mutate: updateContent, isPending: isUpdating } = useUpdateContent();
+
+  const isUploading =
+    uploadStatus === "uploading" || thumbnailUploadStatus === "uploading";
+  const isSubmitting = isCreating || isUpdating || isUploading;
+
+  const isEditing = !!initialData?.id;
+  const isTypeChanged = isEditing && type !== initialData?.type;
+  const isFileChanged =
+    isEditing &&
+    file !== null &&
+    (type === ContentType.VIDEO || type === ContentType.DOCUMENT);
+  const showAlert = isEditing && (isTypeChanged || isFileChanged);
+
+  const handleCancel = () => {
+    // Reset form fields to initial state
+    setType(initialData?.type || ContentType.VIDEO);
+    setTitle(initialData?.title || "");
+    setDescription(initialData?.description || "");
+    setFile(null);
+    setFileUrl(initialData?.fileUrl || "");
+    setThumbnail(null);
+    setThumbnailUrl(initialData?.thumbnailUrl || "");
+    setQuestions(initialData?.quizQuestions || []);
+    setUploadStatus("idle");
+    setUploadProgress(0);
+    setThumbnailUploadStatus("idle");
+    setThumbnailUploadProgress(0);
+    setErrors({});
+
+    // Trigger onSuccess to exit editing mode
+    onSuccess?.();
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -206,13 +240,36 @@ export const ContentInputForm = ({
           }
         />
       )}
-      <button
-        type="submit"
-        disabled={isCreating || isUpdating}
-        className="w-full px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
-      >
-        {isCreating || isUpdating ? "Submitting..." : "Submit"}
-      </button>
+      {showAlert && (
+        <Alert variant="destructive">
+          <AlertTriangle className="h-4 w-4" />
+          <AlertTitle>Warning: Potential Data Loss</AlertTitle>
+          <AlertDescription>
+            {isTypeChanged && isFileChanged
+              ? "Changing the content type or updating the file may cause data loss (e.g., existing files or quiz questions). You will need to re-upload any new files."
+              : isTypeChanged
+              ? "Changing the content type may cause data loss (e.g., existing files or quiz questions). You will need to re-upload any new files."
+              : "Updating the file will replace the existing file. You will need to re-upload the new file."}
+          </AlertDescription>
+        </Alert>
+      )}
+      <div className="flex space-x-4">
+        <button
+          type="submit"
+          disabled={isSubmitting}
+          className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
+        >
+          {isSubmitting ? "Submitting..." : "Submit"}
+        </button>
+        <button
+          type="button"
+          onClick={handleCancel}
+          disabled={isSubmitting}
+          className="flex-1 px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
+        >
+          Cancel
+        </button>
+      </div>
     </form>
   );
 };
