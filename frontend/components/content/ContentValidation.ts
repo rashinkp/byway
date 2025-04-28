@@ -88,9 +88,16 @@ export const validateQuestion = (
     newAnswer?: string;
   } = {};
   if (!newQuestion) newErrors.newQuestion = "Question is required";
-  if (newOptions.some((opt) => !opt))
+  if (newOptions.some((opt) => !opt)) {
     newErrors.newOptions = "All options are required";
-  if (!newAnswer) newErrors.newAnswer = "Answer is required";
+  } else if (new Set(newOptions).size !== newOptions.length) {
+    newErrors.newOptions = "Options must be unique";
+  }
+  if (!newAnswer) {
+    newErrors.newAnswer = "Answer is required";
+  } else if (!newOptions.includes(newAnswer)) {
+    newErrors.newAnswer = "Answer must be one of the provided options";
+  }
   setErrors(newErrors);
   return Object.keys(newErrors).length === 0;
 };
