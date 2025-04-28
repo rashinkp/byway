@@ -29,9 +29,7 @@ export const ActionSection = ({
     },
   ];
 
-  const handleOpenConfirm = () => {
-    setConfirmOpen(true);
-  };
+ 
 
   const handleConfirm = () => {
     onToggleDelete();
@@ -40,17 +38,7 @@ export const ActionSection = ({
 
   return (
     <div className="flex justify-end gap-2 mt-6">
-      <Button
-        onClick={handleOpenConfirm} // Open the dialog instead of directly calling onToggleDelete
-        disabled={isEditing || isUpdating}
-        className={
-          !course.deletedAt
-            ? "bg-red-600 hover:bg-red-700"
-            : "bg-emerald-600 hover:bg-emerald-700"
-        }
-      >
-        {!course.deletedAt ? "Disable" : "Enable"}
-      </Button>
+      
       <Button
         onClick={onPublish}
         disabled={isEditing || isUpdating}

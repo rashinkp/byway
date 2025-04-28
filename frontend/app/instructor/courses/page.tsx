@@ -112,26 +112,9 @@ export default function CoursesPage() {
       },
       variant: () => "default" as const,
     },
-    {
-      label: (course: Course) => (course.deletedAt ? "Enable" : "Disable"),
-      onClick: (course: Course) => handleToggleDelete(course),
-      variant: (course: Course) =>
-        course.deletedAt ? "default" : "destructive",
-      confirmationMessage: (course: Course) =>
-        course.deletedAt
-          ? `Are you sure you want to enable the course "${course.title}"?`
-          : `Are you sure you want to disable the course "${course.title}"?`,
-    },
+    
   ];
 
-  const handleToggleDelete = async (course: Course) => {
-    try {
-      toggleDeleteCourse(course);
-    } catch (error) {
-      console.error("Failed to toggle delete:", error);
-      // Optionally, show a notification to the user
-    }
-  };
 
   return (
     <div className="space-y-6">

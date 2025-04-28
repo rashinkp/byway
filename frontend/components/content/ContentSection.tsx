@@ -6,6 +6,7 @@ import { ContentInputForm } from "./ContentInputForm";
 import { toast } from "sonner";
 import { useGetContentByLessonId } from "@/hooks/content/useGetContentByLessonId";
 import { useDeleteContent } from "@/hooks/content/useDeleteContent";
+import { ContentSectionSkeleton } from "../skeleton/LessonContentSectionSkeleton";
 
 interface ContentSectionProps {
   lessonId: string;
@@ -33,9 +34,7 @@ export const ContentSection = ({ lessonId }: ContentSectionProps) => {
 
   if (isLoading) {
     return (
-      <div className="bg-white shadow rounded-lg p-6">
-        <p className="text-gray-500">Loading content...</p>
-      </div>
+      <ContentSectionSkeleton />
     );
   }
 

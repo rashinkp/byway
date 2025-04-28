@@ -8,7 +8,6 @@ import { StatusBadge } from "@/components/ui/StatusBadge";
 import { Video } from "lucide-react";
 import { LessonFormModal } from "./LessonFormModal";
 import { useGetAllLessonsInCourse } from "@/hooks/lesson/useGetAllLesson";
-import { useToggleLessonStatus } from "@/hooks/lesson/useToggleLessonStatus";
 import { ILesson } from "@/types/lesson";
 import { useRouter } from "next/navigation";
 import { TableSkeleton } from "../skeleton/DataTableSkeleton";
@@ -40,8 +39,6 @@ export function LessonManager({ courseId }: { courseId: string }) {
     includeDeleted: true,
   });
 
-  const { mutate: toggleLessonStatus, isPending: isToggling } =
-    useToggleLessonStatus();
 
   const nextOrder = data?.lessons.length
     ? Math.max(...data.lessons.map((l) => l.order)) + 1
@@ -51,14 +48,6 @@ export function LessonManager({ courseId }: { courseId: string }) {
 
   const router = useRouter();
 
-  const handleDeleteLesson = async (lesson: ILesson) => {
-    toggleLessonStatus(
-      { lessonId: lesson.id, enable: !!lesson.deletedAt },
-      {
-        onSuccess: () => refetch(),
-      }
-    );
-  };
 
   const columns = [
     {
@@ -100,17 +89,6 @@ export function LessonManager({ courseId }: { courseId: string }) {
           `/instructor/courses/${lesson.courseId}/lessons/${lesson.id}`
         ),
       variant: () => "default" as const,
-    },
-    {
-      label: (lesson: ILesson) => (lesson.deletedAt ? "Enable" : "Disable"),
-      onClick: (lesson: ILesson) => handleDeleteLesson(lesson),
-      variant: (lesson: ILesson) =>
-        lesson.deletedAt ? "default" : "destructive",
-      disabled: isToggling,
-      confirmationMessage: (lesson: ILesson) =>
-        lesson.deletedAt
-          ? `Are you sure you want to enable the lesson "${lesson.title}"?`
-          : `Are you sure you want to disable the lesson "${lesson.title}"?`,
     },
   ];
 

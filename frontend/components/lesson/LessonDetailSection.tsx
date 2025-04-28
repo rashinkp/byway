@@ -2,17 +2,17 @@
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Edit, Power, BookOpen } from "lucide-react";
+import { Edit} from "lucide-react";
 import {
   LessonFormModal,
   LessonFormData,
 } from "@/components/lesson/LessonFormModal";
 import { ILesson } from "@/types/lesson";
 import { StatusBadge } from "@/components/ui/StatusBadge";
-import { Action, toast } from "sonner";
+import {  toast } from "sonner";
 import { formatDate } from "@/utils/formatDate";
-import { AlertComponent } from "../ui/AlertComponent";
 import { useToggleLessonStatus } from "@/hooks/lesson/useToggleLessonStatus";
+import { LessonDetailSectionSkeleton } from "../skeleton/LessonDetailSection";
 
 interface LessonDetailSectionProps {
   lesson: ILesson;
@@ -59,32 +59,12 @@ export function LessonDetailSection({
 
   
 
-  const handleToggleEnable = async () => {
-    if (!lesson) {
-      toast.error("Lesson not found");
-      return;
-    }
-    try {
-      toggleDeleteLesson({ lessonId: lesson.id, enable: !lesson.deletedAt });
-    } catch (error) {
-      console.error("Error toggling lesson enable/disable:", error);
-    }
-   }
 
   const handleTogglePublish = async () => {
    
   };
 
 
-    const handleOpenConfirm = () => {
-      setConfirmOpen(true);
-    };
-
-    const handleConfirm = () => {
-      handleToggleEnable();
-      setConfirmOpen(false);
-  };
-  
 
    interface Action {
       confirmationMessage: (item: ILesson) => string;
@@ -120,18 +100,7 @@ export function LessonDetailSection({
 
   if (isLoading) {
     return (
-      <div className="bg-white shadow rounded-lg p-6">
-        <div className="flex justify-between items-center">
-          <div className="h-8 w-1/2 bg-gray-200 rounded animate-pulse" />
-          <div className="h-10 w-32 bg-gray-200 rounded animate-pulse" />
-        </div>
-        <div className="mt-4 space-y-2">
-          <div className="h-4 w-3/4 bg-gray-200 rounded animate-pulse" />
-          <div className="h-4 w-1/4 bg-gray-200 rounded animate-pulse" />
-          <div className="h-4 w-1/2 bg-gray-200 rounded animate-pulse" />
-          <div className="h-4 w-1/3 bg-gray-200 rounded animate-pulse" />
-        </div>
-      </div>
+      <LessonDetailSectionSkeleton />
     );
   }
 
@@ -148,17 +117,7 @@ export function LessonDetailSection({
             <Edit className="mr-2 h-4 w-4" />
             Edit Lesson
           </Button>
-          <Button
-            onClick={handleOpenConfirm}
-            className={`${
-              lesson.deletedAt
-                ? "bg-green-600 hover:bg-green-700"
-                : "bg-red-600 hover:bg-red-700"
-            } text-white`}
-            disabled={isLoading || isSubmitting}
-          >
-            {lesson.deletedAt ? "Enable" : "Disable"}
-          </Button>
+         
           <Button
             onClick={handleTogglePublish}
             className={`${
@@ -215,22 +174,6 @@ export function LessonDetailSection({
         nextOrder={nextOrder}
         isSubmitting={isSubmitting}
       />
-
-
-      <AlertComponent
-              open={confirmOpen}
-              onOpenChange={setConfirmOpen}
-              title={!lesson.deletedAt ? "Confirm Disable" : "Confirm Enable"}
-              description={(item) =>
-                `Are you sure you want to ${!item.deletedAt ? "disable" : "enable"} "${item.title}"?`
-              }
-              confirmText={!lesson.deletedAt ? "Disable" : "Enable"}
-              cancelText="Cancel"
-              onConfirm={handleConfirm}
-              item={lesson} 
-              actions={actions}
-              actionIndex={0}
-            />
     </div>
   );
 }
