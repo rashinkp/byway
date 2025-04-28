@@ -143,36 +143,19 @@ export class ContentRepository implements IContentRepository {
     };
   }
 
-  async deleteContent(id: string): Promise<ILessonContent> {
-    const content = await this.prisma.lessonContent.update({
+  async deleteContent(id: string): Promise<void> {
+    await this.prisma.lessonContent.delete({
+      where: { id }
+    })
+  }
+
+
+  getContentById(id: string): Promise<ILessonContent | null> {
+    return this.prisma.lessonContent.findUnique({
       where: { id },
-      data: { deletedAt: new Date() },
       include: {
         quizQuestions: true,
       },
     });
-
-    return {
-      id: content.id,
-      lessonId: content.lessonId,
-      type: content.type,
-      status: content.status,
-      title: content.title,
-      description: content.description,
-      fileUrl: content.fileUrl,
-      thumbnailUrl: content.thumbnailUrl,
-      quizQuestions: content.quizQuestions.map((q) => ({
-        id: q.id,
-        lessonContentId: q.lessonContentId,
-        question: q.question,
-        options: q.options,
-        correctAnswer: q.correctAnswer,
-        createdAt: q.createdAt,
-        updatedAt: q.updatedAt,
-      })),
-      createdAt: content.createdAt,
-      updatedAt: content.updatedAt,
-      deletedAt: content.deletedAt || undefined,
-    };
   }
 }

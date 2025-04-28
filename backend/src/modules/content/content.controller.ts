@@ -106,10 +106,10 @@ export class ContentController {
 
   async deleteContent(id: string, userId: string): Promise<ApiResponse> {
     try {
-      const content = await this.contentService.deleteContent(id, userId);
+      await this.contentService.deleteContent(id, userId);
       return {
         status: "success",
-        data: content,
+        data: null,
         message: "Content deleted successfully",
         statusCode: StatusCodes.OK,
       };

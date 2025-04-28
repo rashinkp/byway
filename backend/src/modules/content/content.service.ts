@@ -106,8 +106,10 @@ export class ContentService {
     return this.contentRepository.updateContent({...input });
   }
 
-  async deleteContent(id: string, userId: string): Promise<ILessonContent> {
-    const content = await this.contentRepository.getContentByLessonId(id);
+  async deleteContent(id: string, userId: string): Promise<void> {
+    const content = await this.contentRepository.getContentById(id);
+
+    
     if (!content || content.deletedAt) {
       throw new Error("Content not found or already deleted");
     }
@@ -126,6 +128,15 @@ export class ContentService {
       );
     }
 
-    return this.contentRepository.deleteContent(id);
+    await this.contentRepository.deleteContent(id);
+    
+
+
+  }
+
+  async getContentById(id: string): Promise<ILessonContent | null> {
+    return this.contentRepository.getContentByLessonId(id);
   }
 }
+
+

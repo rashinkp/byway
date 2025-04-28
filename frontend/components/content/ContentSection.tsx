@@ -19,13 +19,7 @@ export const ContentSection = ({ lessonId }: ContentSectionProps) => {
   const [isEditing, setIsEditing] = useState(false);
 
   const handleDelete = (contentId: string) => {
-    deleteContent(contentId, {
-      onSuccess: () => {
-        toast.success("Content deleted successfully");
-        setIsEditing(true);
-      },
-      onError: (error: Error) => toast.error(error.message),
-    });
+    deleteContent(contentId);
   };
 
   const handleFormSuccess = () => {
