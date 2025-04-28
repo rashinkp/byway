@@ -47,6 +47,7 @@ export interface ICreateLessonContentInput {
 
 export interface IUpdateLessonContentInput {
   id: string;
+  lessonId: string;
   type?: ContentType;
   status?: ContentStatus;
   title?: string;

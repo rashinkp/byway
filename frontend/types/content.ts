@@ -53,6 +53,7 @@ export interface CreateLessonContentInput {
 
 export interface UpdateLessonContentInput {
   id: string;
+  lessonId: string;
   type?: ContentType;
   status?: ContentStatus;
   title?: string;

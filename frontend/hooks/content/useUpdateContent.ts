@@ -10,7 +10,10 @@ export const useUpdateContent = () => {
   return useMutation<LessonContent, Error, UpdateLessonContentInput>({
     mutationFn: async (data) => {
       const validatedData = updateContentSchema.parse(data);
-      return updateContent(validatedData);
+      if (!validatedData.lessonId) {
+        throw new Error("Lesson ID is required");
+      }
+      return updateContent(validatedData as UpdateLessonContentInput);
     },
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ["content", data.lessonId] });

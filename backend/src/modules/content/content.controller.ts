@@ -72,7 +72,7 @@ export class ContentController {
 
   async updateContent(
     id: string,
-    input: Partial<ICreateLessonContentInput>,
+    input: IUpdateLessonContentInput,
     userId: string
   ): Promise<ApiResponse> {
     try {

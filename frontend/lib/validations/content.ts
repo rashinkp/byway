@@ -96,7 +96,6 @@ export const createContentSchema = baseContentSchema
   );
 
 export const updateContentSchema = baseContentSchema
-  .omit({ lessonId: true })
   .partial()
   .extend({
     id: z.string().uuid("Invalid content ID"),

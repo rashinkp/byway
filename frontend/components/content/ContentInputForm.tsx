@@ -133,6 +133,7 @@ export const ContentInputForm = ({
     if (initialData?.id) {
       const updateData: UpdateLessonContentInput = {
         id: initialData.id,
+        lessonId,
         type: data.type,
         status: data.status,
         title: data.title,

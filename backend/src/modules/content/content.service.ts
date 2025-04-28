@@ -20,6 +20,8 @@ export class ContentService {
   ): Promise<ILessonContent> {
     const { lessonId } = input;
 
+    
+
     // Validate lesson exists and isn't deleted
     const lesson = await this.lessonRepository.getLessonById(lessonId);
     if (!lesson || lesson.deletedAt) {
@@ -80,8 +82,9 @@ export class ContentService {
     userId: string
   ): Promise<ILessonContent> {
     const content = await this.contentRepository.getContentByLessonId(
-      input.id || ""
+      input.lessonId || ""
     );
+
     if (!content || content.deletedAt) {
       throw new Error("Content not found or deleted");
     }
