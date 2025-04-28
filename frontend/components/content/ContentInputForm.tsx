@@ -6,6 +6,7 @@ import {
   ContentStatus,
   CreateLessonContentInput,
   UpdateLessonContentInput,
+  LessonContent,
 } from "@/types/content";
 import { useCreateContent } from "@/hooks/content/useCreateContent";
 import { useUpdateContent } from "@/hooks/content/useUpdateContent";
@@ -15,10 +16,11 @@ import { ContentTypeSelector } from "./ContentTypeSelector";
 import { TitleInput } from "./ContentTitleInput";
 import { DescriptionInput } from "./ContentDescriptionInput";
 import { QuizInput } from "./ContentQuizInput";
+import { ThumbnailUploadInput } from "./ContentThumbnailInputSection";
 
 interface ContentInputFormProps {
   lessonId: string;
-  initialData?: CreateLessonContentInput | null;
+  initialData?: LessonContent | null;
   onSuccess?: () => void;
 }
 
@@ -30,22 +32,31 @@ export const ContentInputForm = ({
   const [type, setType] = useState<ContentType>(
     initialData?.type || ContentType.VIDEO
   );
-  const [title, setTitle] = useState(initialData?.data.title || "");
+  const [title, setTitle] = useState(initialData?.title || "");
   const [description, setDescription] = useState(
-    initialData?.data.description || ""
+    initialData?.description || ""
   );
   const [file, setFile] = useState<File | null>(null);
-  const [fileUrl, setFileUrl] = useState(initialData?.data.fileUrl || "");
+  const [fileUrl, setFileUrl] = useState(initialData?.fileUrl || "");
+  const [thumbnail, setThumbnail] = useState<File | null>(null);
+  const [thumbnailUrl, setThumbnailUrl] = useState(
+    initialData?.thumbnailUrl || ""
+  );
   const [questions, setQuestions] = useState<
-    { question: string; options: string[]; answer: string }[]
-  >(initialData?.data.questions || []);
+    { question: string; options: string[]; correctAnswer: string }[]
+  >(initialData?.quizQuestions || []);
   const [uploadStatus, setUploadStatus] = useState<
     "idle" | "uploading" | "success" | "error"
   >("idle");
   const [uploadProgress, setUploadProgress] = useState(0);
+  const [thumbnailUploadStatus, setThumbnailUploadStatus] = useState<
+    "idle" | "uploading" | "success" | "error"
+  >("idle");
+  const [thumbnailUploadProgress, setThumbnailUploadProgress] = useState(0);
   const [errors, setErrors] = useState<{
     title?: string;
     file?: string;
+    thumbnail?: string;
     questions?: string;
     newQuestion?: string;
     newOptions?: string;
@@ -57,9 +68,22 @@ export const ContentInputForm = ({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!validateForm(type, title, file, fileUrl, questions, setErrors)) return;
+    if (
+      !validateForm(
+        type,
+        title,
+        file,
+        fileUrl,
+        thumbnail,
+        thumbnailUrl,
+        questions,
+        setErrors
+      )
+    )
+      return;
 
     let finalFileUrl = fileUrl;
+    let finalThumbnailUrl = thumbnailUrl;
     if (file) {
       try {
         finalFileUrl = await FileUploadInput.uploadToCloudinary(
@@ -76,26 +100,46 @@ export const ContentInputForm = ({
         return;
       }
     }
+    if (thumbnail && type === ContentType.VIDEO) {
+      try {
+        finalThumbnailUrl = await ThumbnailUploadInput.uploadToCloudinary(
+          thumbnail,
+          setThumbnailUploadStatus,
+          setThumbnailUploadProgress
+        );
+      } catch (error) {
+        setErrors((prev) => ({
+          ...prev,
+          thumbnail: "Failed to upload thumbnail",
+        }));
+        return;
+      }
+    }
 
     const data: CreateLessonContentInput = {
       lessonId,
       type,
-      status: finalFileUrl ? ContentStatus.PUBLISHED : ContentStatus.DRAFT,
-      data: {
-        title,
-        description: description || undefined,
-        ...(type === ContentType.VIDEO || type === ContentType.DOCUMENT
-          ? { fileUrl: finalFileUrl }
-          : { questions }),
-      },
+      status:
+        finalFileUrl || questions.length > 0
+          ? ContentStatus.PUBLISHED
+          : ContentStatus.DRAFT,
+      title,
+      description: description || undefined,
+      fileUrl: type !== ContentType.QUIZ ? finalFileUrl : undefined,
+      thumbnailUrl: type === ContentType.VIDEO ? finalThumbnailUrl : undefined,
+      quizQuestions: type === ContentType.QUIZ ? questions : undefined,
     };
 
-    if (initialData?.lessonId) {
+    if (initialData?.id) {
       const updateData: UpdateLessonContentInput = {
-        id: initialData.lessonId,
+        id: initialData.id,
         type: data.type,
         status: data.status,
-        data: data.data,
+        title: data.title,
+        description: data.description,
+        fileUrl: data.fileUrl,
+        thumbnailUrl: data.thumbnailUrl,
+        quizQuestions: data.quizQuestions,
       };
       updateContent(updateData, {
         onSuccess: () => {
@@ -131,9 +175,24 @@ export const ContentInputForm = ({
           setFile={setFile}
           fileUrl={fileUrl}
           setFileUrl={setFileUrl}
+          setUploadStatus={setUploadStatus}
+          setUploadProgress={setUploadProgress}
           uploadStatus={uploadStatus}
           uploadProgress={uploadProgress}
           errors={errors}
+        />
+      )}
+      {type === ContentType.VIDEO && (
+        <ThumbnailUploadInput
+          file={thumbnail}
+          setFile={setThumbnail}
+          fileUrl={thumbnailUrl}
+          setFileUrl={setThumbnailUrl}
+          uploadStatus={thumbnailUploadStatus}
+          uploadProgress={thumbnailUploadProgress}
+          errors={errors}
+          setUploadProgress={setThumbnailUploadProgress}
+          setUploadStatus={setThumbnailUploadStatus}
         />
       )}
       {type === ContentType.QUIZ && (
@@ -141,7 +200,9 @@ export const ContentInputForm = ({
           questions={questions}
           setQuestions={setQuestions}
           errors={errors}
-          setErrors={(quizErrors) => setErrors(prev => ({ ...prev, ...quizErrors }))}
+          setErrors={(quizErrors) =>
+            setErrors((prev) => ({ ...prev, ...quizErrors }))
+          }
         />
       )}
       <button

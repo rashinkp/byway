@@ -4,7 +4,7 @@ import { validateQuestion } from "./ContentValidation";
 interface Question {
   question: string;
   options: string[];
-  answer: string;
+  correctAnswer: string;
 }
 
 interface QuizErrors {
@@ -32,10 +32,11 @@ export const QuizInput = ({
   const [newAnswer, setNewAnswer] = useState("");
 
   const handleAddQuestion = () => {
-    if (!validateQuestion(newQuestion, newOptions, newAnswer, setErrors)) return;
+    if (!validateQuestion(newQuestion, newOptions, newAnswer, setErrors))
+      return;
     setQuestions([
       ...questions,
-      { question: newQuestion, options: newOptions, answer: newAnswer },
+      { question: newQuestion, options: newOptions, correctAnswer: newAnswer },
     ]);
     setNewQuestion("");
     setNewOptions(["", "", "", ""]);
@@ -65,7 +66,7 @@ export const QuizInput = ({
             ))}
           </ul>
           <p className="mt-2 text-sm text-gray-700">
-            Answer: <span className="font-medium">{q.answer}</span>
+            Answer: <span className="font-medium">{q.correctAnswer}</span>
           </p>
         </div>
       ))}

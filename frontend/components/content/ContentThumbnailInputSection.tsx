@@ -1,8 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
-import { ContentType } from "@/types/content";
 
-interface FileUploadInputProps {
-  type: ContentType;
+interface ThumbnailUploadInputProps {
   file: File | null;
   setFile: (file: File | null) => void;
   fileUrl: string;
@@ -11,11 +9,10 @@ interface FileUploadInputProps {
   uploadProgress: number;
   setUploadStatus: (status: "idle" | "uploading" | "success" | "error") => void;
   setUploadProgress: (progress: number) => void;
-  errors: { file?: string };
+  errors: { thumbnail?: string };
 }
 
-export const FileUploadInput = ({
-  type,
+export const ThumbnailUploadInput = ({
   file,
   setFile,
   fileUrl,
@@ -25,14 +22,14 @@ export const FileUploadInput = ({
   setUploadStatus,
   setUploadProgress,
   errors,
-}: FileUploadInputProps) => {
+}: ThumbnailUploadInputProps) => {
   const [isScriptLoaded, setIsScriptLoaded] = useState(false);
 
   useEffect(() => {
     const script = document.createElement("script");
     script.src =
-      process.env.NEXT_PUBLIC_CLOUDINARY_WIDGET_URL ||
-      "https://widget.cloudinary.com/v2.0/global/all.js";
+      process.env.NEXT_PUBLIC_CLOUDINARY_WIDGET_URL 
+      || "https://widget.cloudinary.com/v2.0/global/all.js";
     script.async = true;
     script.onload = () => setIsScriptLoaded(true);
     script.onerror = () => setIsScriptLoaded(false);
@@ -48,7 +45,7 @@ export const FileUploadInput = ({
   }, []);
 
   const uploadToCloudinary = useCallback(
-    async (file: File, contentType: ContentType): Promise<string> => {
+    async (file: File): Promise<string> => {
       if (!isScriptLoaded || !window.cloudinary) {
         throw new Error("Cloudinary widget not loaded");
       }
@@ -69,13 +66,7 @@ export const FileUploadInput = ({
         formData.append("cloud_name", cloudName);
 
         const xhr = new XMLHttpRequest();
-        xhr.open(
-          "POST",
-          `${apiBaseUrl}/${cloudName}/${
-            contentType === ContentType.VIDEO ? "video" : "auto"
-          }/upload`,
-          true
-        );
+        xhr.open("POST", `${apiBaseUrl}/${cloudName}/image/upload`, true);
 
         xhr.upload.onprogress = (event) => {
           if (event.lengthComputable) {
@@ -108,30 +99,26 @@ export const FileUploadInput = ({
   return (
     <div>
       <label className="block text-sm font-semibold text-gray-700 mb-1">
-        File or URL
+        Thumbnail Image or URL
       </label>
       <div className="flex flex-col space-y-2">
         <input
           type="file"
           onChange={(e) => setFile(e.target.files?.[0] || null)}
           className="w-full p-2 border border-gray-300 rounded-md"
-          accept={
-            type === ContentType.VIDEO
-              ? "video/mp4,video/webm,video/ogg"
-              : "application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-          }
+          accept="image/jpeg,image/png,image/webp"
         />
         <input
           type="text"
           value={fileUrl}
           onChange={(e) => setFileUrl(e.target.value)}
           className={`w-full p-2 border rounded-md focus:ring-2 focus:ring-blue-500 ${
-            errors.file ? "border-red-500" : "border-gray-300"
+            errors.thumbnail ? "border-red-500" : "border-gray-300"
           }`}
-          placeholder="Or enter file URL"
+          placeholder="Or enter thumbnail URL"
         />
-        {errors.file && (
-          <p className="mt-1 text-sm text-red-500">{errors.file}</p>
+        {errors.thumbnail && (
+          <p className="mt-1 text-sm text-red-500">{errors.thumbnail}</p>
         )}
         {uploadStatus === "uploading" && (
           <div className="mt-2">
@@ -157,10 +144,9 @@ export const FileUploadInput = ({
   );
 };
 
-// Expose uploadToCloudinary as a static method for use in ContentInputForm
-FileUploadInput.uploadToCloudinary = async (
+
+ThumbnailUploadInput.uploadToCloudinary = async (
   file: File,
-  contentType: ContentType,
   setUploadStatus: (status: "idle" | "uploading" | "success" | "error") => void,
   setUploadProgress: (progress: number) => void
 ): Promise<string> => {
@@ -180,13 +166,7 @@ FileUploadInput.uploadToCloudinary = async (
     formData.append("cloud_name", cloudName);
 
     const xhr = new XMLHttpRequest();
-    xhr.open(
-      "POST",
-      `${apiBaseUrl}/${cloudName}/${
-        contentType === ContentType.VIDEO ? "video" : "auto"
-      }/upload`,
-      true
-    );
+    xhr.open("POST", `${apiBaseUrl}/${cloudName}/image/upload`, true);
 
     xhr.upload.onprogress = (event) => {
       if (event.lengthComputable) {

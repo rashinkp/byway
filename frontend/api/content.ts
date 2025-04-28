@@ -19,12 +19,11 @@ export async function createContent(
 }
 
 export async function updateContent(
-  contentId: string,
   data: UpdateLessonContentInput
 ): Promise<LessonContent> {
   try {
     const response = await api.patch<{ data: LessonContent }>(
-      `/content/${contentId}`,
+      `/content/${data.id}`,
       data
     );
     return response.data.data;

@@ -11,17 +11,26 @@ export enum ContentStatus {
   ERROR = "ERROR",
 }
 
+export interface QuizQuestion {
+  id: string;
+  lessonContentId: string;
+  question: string;
+  options: string[];
+  correctAnswer: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export interface LessonContent {
   id: string;
   lessonId: string;
   type: ContentType;
   status: ContentStatus;
-  data: {
-    title: string;
-    description?: string | null;
-    fileUrl?: string;
-    questions?: { question: string; options: string[]; answer: string }[];
-  };
+  title: string | null;
+  description: string | null;
+  fileUrl: string | null;
+  thumbnailUrl: string | null;
+  quizQuestions: QuizQuestion[];
   createdAt: string;
   updatedAt: string;
   deletedAt?: string | null;
@@ -31,22 +40,28 @@ export interface CreateLessonContentInput {
   lessonId: string;
   type: ContentType;
   status?: ContentStatus;
-  data: {
-    title: string;
-    description?: string | null;
-    fileUrl?: string;
-    questions?: { question: string; options: string[]; answer: string }[];
-  };
+  title: string;
+  description?: string | null;
+  fileUrl?: string;
+  thumbnailUrl?: string;
+  quizQuestions?: {
+    question: string;
+    options: string[];
+    correctAnswer: string;
+  }[];
 }
 
 export interface UpdateLessonContentInput {
   id: string;
   type?: ContentType;
   status?: ContentStatus;
-  data?: {
-    title?: string;
-    description?: string | null;
-    fileUrl?: string;
-    questions?: { question: string; options: string[]; answer: string }[];
-  };
+  title?: string;
+  description?: string | null;
+  fileUrl?: string;
+  thumbnailUrl?: string;
+  quizQuestions?: {
+    question: string;
+    options: string[];
+    correctAnswer: string;
+  }[];
 }

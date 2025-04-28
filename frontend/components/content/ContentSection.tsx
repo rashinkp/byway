@@ -50,20 +50,23 @@ export const ContentSection = ({ lessonId }: ContentSectionProps) => {
         />
       ) : content ? (
         <div className="space-y-4">
-          <h3 className="text-lg font-medium">{content.data.title}</h3>
-          {content.data.description && (
-            <p className="text-gray-700">{content.data.description}</p>
+          <h3 className="text-lg font-medium">{content.title}</h3>
+          {content.description && (
+            <p className="text-gray-700">{content.description}</p>
           )}
-          {content.type === ContentType.VIDEO && content.data.fileUrl && (
-            <video
-              src={content.data.fileUrl}
-              controls
-              className="w-full rounded-lg"
-            />
+          {content.type === ContentType.VIDEO && content.fileUrl && (
+            <div>
+              <video
+                src={content.fileUrl}
+                controls
+                className="w-full rounded-lg"
+                poster={content.thumbnailUrl || undefined}
+              />
+            </div>
           )}
-          {content.type === ContentType.DOCUMENT && content.data.fileUrl && (
+          {content.type === ContentType.DOCUMENT && content.fileUrl && (
             <a
-              href={content.data.fileUrl}
+              href={content.fileUrl}
               target="_blank"
               rel="noopener noreferrer"
               className="text-blue-600 hover:underline"
@@ -71,9 +74,9 @@ export const ContentSection = ({ lessonId }: ContentSectionProps) => {
               View Document
             </a>
           )}
-          {content.type === ContentType.QUIZ && content.data.questions && (
+          {content.type === ContentType.QUIZ && content.quizQuestions && (
             <div className="space-y-4">
-              {content.data.questions.map((q, index) => (
+              {content.quizQuestions.map((q, index) => (
                 <div key={index} className="mb-4">
                   <p className="font-medium">{q.question}</p>
                   <ul className="list-disc pl-5 text-gray-700">
@@ -82,7 +85,7 @@ export const ContentSection = ({ lessonId }: ContentSectionProps) => {
                     ))}
                   </ul>
                   <p className="text-green-600 font-semibold">
-                    Answer: {q.answer}
+                    Answer: {q.correctAnswer}
                   </p>
                 </div>
               ))}

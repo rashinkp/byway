@@ -9,7 +9,6 @@ export const useCreateContent = () => {
 
   return useMutation<LessonContent, Error, CreateLessonContentInput>({
     mutationFn: async (data) => {
-      console.log(data);
       const validatedData = createContentSchema.parse(data);
       return createContent(validatedData);
     },

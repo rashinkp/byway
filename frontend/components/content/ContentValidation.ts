@@ -5,16 +5,20 @@ export const validateForm = (
   title: string,
   file: File | null,
   fileUrl: string,
-  questions: { question: string; options: string[]; answer: string }[],
+  thumbnail: File | null,
+  thumbnailUrl: string,
+  questions: { question: string; options: string[]; correctAnswer: string }[],
   setErrors: (errors: {
     title?: string;
     file?: string;
+    thumbnail?: string;
     questions?: string;
   }) => void
 ): boolean => {
   const newErrors: {
     title?: string;
     file?: string;
+    thumbnail?: string;
     questions?: string;
   } = {};
   if (!title) newErrors.title = "Title is required";
@@ -32,6 +36,19 @@ export const validateForm = (
     }
     if (file.size > 50 * 1024 * 1024) {
       newErrors.file = "Video file size must be less than 50MB";
+    }
+  }
+  if (type === ContentType.VIDEO && !thumbnail && !thumbnailUrl) {
+    newErrors.thumbnail = "Please select a thumbnail or provide a URL";
+  }
+  if (type === ContentType.VIDEO && thumbnail) {
+    const validImageTypes = ["image/jpeg", "image/png", "image/webp"];
+    if (!validImageTypes.includes(thumbnail.type)) {
+      newErrors.thumbnail =
+        "Please select a valid image file (JPEG, PNG, or WebP)";
+    }
+    if (thumbnail.size > 5 * 1024 * 1024) {
+      newErrors.thumbnail = "Thumbnail file size must be less than 5MB";
     }
   }
   if (type === ContentType.DOCUMENT && file) {
@@ -74,6 +91,6 @@ export const validateQuestion = (
   if (newOptions.some((opt) => !opt))
     newErrors.newOptions = "All options are required";
   if (!newAnswer) newErrors.newAnswer = "Answer is required";
-  // setErrors((prev) => ({ ...prev, ...newErrors }));
+  setErrors(newErrors);
   return Object.keys(newErrors).length === 0;
 };
