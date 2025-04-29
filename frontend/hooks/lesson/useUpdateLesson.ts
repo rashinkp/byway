@@ -2,6 +2,7 @@
 import { updateLesson } from "@/api/lesson";
 import { ILesson } from "@/types/lesson";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
 
 export const useUpdateLesson = () => {
   const queryClient = useQueryClient();
@@ -27,8 +28,14 @@ export const useUpdateLesson = () => {
       });
       // Optionally, update the cache directly to avoid refetching
       queryClient.setQueryData(["lesson", variables.lessonId], data);
+      toast.success("Lesson Updated", {
+        description: "The lesson has been updated successfully.",
+      });
     },
     onError: (error) => {
+       toast.error("Failed to update lesson", {
+         description: error.message || "Please try again",
+       });
       console.error("Failed to update lesson:", error);
     },
   });

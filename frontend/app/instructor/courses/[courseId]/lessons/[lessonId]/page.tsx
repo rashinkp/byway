@@ -1,15 +1,17 @@
 "use client";
 
 import { useParams } from "next/navigation";
-import { ILesson, UpdateLessonInput } from "@/types/lesson";
-import { LessonFormData } from "@/components/lesson/LessonFormModal";
+import { ILesson, LessonStatus, UpdateLessonInput} from "@/types/lesson";
 import { LessonDetailSection } from "@/components/lesson/LessonDetailSection";
 import { toast } from "sonner";
 import { useGetLessonById } from "@/hooks/lesson/useGetLessonById";
 import { useUpdateLesson } from "@/hooks/lesson/useUpdateLesson";
 import { ContentSection } from "@/components/content/ContentSection";
-import { LessonDetailSectionSkeleton } from "@/components/skeleton/LessonDetailSection";
+
 import { ContentSectionSkeleton } from "@/components/skeleton/LessonContentSectionSkeleton";
+import { z } from "zod";
+import { LessonFormData, lessonSchema } from "@/lib/validations/lesson";
+import { LessonDetailSectionSkeleton } from "@/components/skeleton/LessonDetailSection";
 
 export default function LessonDetailPage() {
   const { courseId, lessonId } = useParams();
@@ -26,33 +28,35 @@ export default function LessonDetailPage() {
     error: updateError,
   } = useUpdateLesson();
 
-  const nextOrder = 2; // Adjust based on your logic
+
+ 
 
   const handleEditLesson = (data: LessonFormData) => {
-    if (!lesson?.id) {
-      toast.error("Lesson ID is required");
+    if (!lesson) {
+      toast.error("Lesson data is not available");
       return;
     }
 
-    const updateData: UpdateLessonInput = {
-      lessonId: lesson.id,
-      title: data.title,
-      description: data.description || undefined,
-      order: data.order,
-    };
+    try {
+      // Validate data
+      lessonSchema.parse(data);
 
-    updateLesson(updateData, {
-      onSuccess: () => {
-        toast.success("Lesson updated", {
-          description: "Lesson details have been updated.",
-        });
-      },
-      onError: (err) => {
-        toast.error(`Failed to update lesson: ${err.message}`, {
-          description: "Please try again later.",
-        });
-      },
-    });
+      const updateData: UpdateLessonInput = {
+        lessonId: lesson.id,
+        title: data.title,
+        description: data.description || undefined,
+        order: data.order,
+        status: (data.status || lesson.status) as LessonStatus,
+      };
+
+      updateLesson(updateData);
+    } catch (err) {
+      const errorMessage =
+        err instanceof z.ZodError
+          ? err.errors.map((e) => e.message).join(", ")
+          : "Invalid lesson data";
+      toast.error(errorMessage);
+    }
   };
 
   if (isLoading) {
@@ -64,12 +68,14 @@ export default function LessonDetailPage() {
     );
   }
 
-  if (error) {
+  if (error ) {
     return (
       <div className="container mx-auto py-6 space-y-8">
         <div className="bg-white shadow rounded-lg p-6">
           <div className="text-red-600">
-            <p>Error: {(error || updateError)?.message}</p>
+            <p>
+              Error: {error?.message || updateError?.message || "Unknown error"}
+            </p>
             <button
               onClick={() => refetch()}
               className="mt-4 bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded"
@@ -99,7 +105,6 @@ export default function LessonDetailPage() {
         isLoading={isLoading || isUpdating}
         error={error}
         courseId={courseId as string}
-        nextOrder={nextOrder}
         onUpdateLesson={handleEditLesson}
         onRetry={() => refetch()}
       />

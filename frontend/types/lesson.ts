@@ -49,4 +49,5 @@ export interface UpdateLessonInput {
   title?: string;
   description?: string;
   order?: number;
+  status?: LessonStatus; 
 }

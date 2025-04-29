@@ -1,4 +1,3 @@
-// src/modules/lesson/lesson.service.ts
 import { PrismaClient } from "@prisma/client";
 import { CourseRepository } from "../course/course.repository";
 import {
@@ -11,11 +10,12 @@ import {
   IGetAllLessonsResponse,
 } from "./lesson.types";
 import { ILessonRepository } from "./lesson.repository.types";
+import { AppError } from "../../utils/appError";
 
 export class LessonService {
   constructor(
     private lessonRepository: ILessonRepository,
-    private courseRepository: CourseRepository,
+    private courseRepository: CourseRepository
   ) {}
 
   async createLesson(
@@ -28,18 +28,17 @@ export class LessonService {
       typeof input.order !== "number" ||
       input.order < 1
     ) {
-      throw new Error("Course ID, title, and positive order are required");
+      throw AppError.badRequest(
+        "Course ID, title, and positive order are required"
+      );
     }
-
-    // console.log(input , userId)
 
     const course = await this.courseRepository.getCourseById(input.courseId);
     if (!course || course.deletedAt) {
-      throw new Error("Course not found or deleted");
+      throw AppError.badRequest("Course not found or deleted");
     }
     if (course.createdBy !== userId) {
-      // Check role instead of ID
-      throw new Error(
+      throw AppError.badRequest(
         "Unauthorized: You can only add lessons to your own courses"
       );
     }
@@ -51,7 +50,9 @@ export class LessonService {
     };
     const existingLesson = await this.lessonRepository.findLessonByWhere(where);
     if (existingLesson) {
-      throw new Error("A lesson with this order already exists in the course");
+      throw AppError.badRequest(
+        "A lesson with this order already exists in the course"
+      );
     }
     return this.lessonRepository.createLesson(input);
   }
@@ -61,10 +62,9 @@ export class LessonService {
   ): Promise<IGetAllLessonsResponse> {
     const { courseId, userId } = input;
 
-    // Check if user is enrolled or the course creator
     const course = await this.courseRepository.getCourseById(courseId);
     if (!course || (course.deletedAt && !input.includeDeleted)) {
-      throw new Error("Course not found or deleted");
+      throw AppError.badRequest("Course not found or deleted");
     }
 
     const isCreator = course.createdBy === userId;
@@ -74,7 +74,9 @@ export class LessonService {
     );
 
     if (!isCreator && !enrollment) {
-      throw new Error("You are not enrolled in this course or not the creator");
+      throw AppError.badRequest(
+        "You are not enrolled in this course or not the creator"
+      );
     }
 
     return this.lessonRepository.getAllLessons(input);
@@ -85,9 +87,8 @@ export class LessonService {
   ): Promise<IUserLessonProgress> {
     const { userId, courseId, lessonId, completed } = input;
 
-    // Validate input
     if (typeof completed !== "boolean") {
-      throw new Error("Completed must be a boolean");
+      throw AppError.badRequest("Completed must be a boolean");
     }
 
     const enrollment = await this.courseRepository.getEnrollment(
@@ -95,15 +96,16 @@ export class LessonService {
       courseId
     );
     if (!enrollment) {
-      throw new Error("You are not enrolled in this course");
+      throw AppError.badRequest("You are not enrolled in this course");
     }
 
     const lesson = await this.lessonRepository.getLessonById(lessonId);
     if (!lesson || lesson.courseId !== courseId || lesson.deletedAt) {
-      throw new Error("Lesson not found, deleted, or not part of this course");
+      throw AppError.badRequest(
+        "Lesson not found, deleted, or not part of this course"
+      );
     }
 
-    // Check prerequisite using repository
     if (completed && lesson.order > 1) {
       const previousProgress =
         await this.lessonRepository.getPreviousLessonProgress(
@@ -112,7 +114,9 @@ export class LessonService {
           lesson.order
         );
       if (!previousProgress || !previousProgress.completed) {
-        throw new Error("You must complete the previous lesson first");
+        throw AppError.badRequest(
+          "You must complete the previous lesson first"
+        );
       }
     }
 
@@ -128,7 +132,7 @@ export class LessonService {
       courseId
     );
     if (!enrollment) {
-      throw new Error("You are not enrolled in this course");
+      throw AppError.badRequest("You are not enrolled in this course");
     }
     return this.lessonRepository.getCourseProgress(input);
   }
@@ -140,7 +144,7 @@ export class LessonService {
   async deleteLesson(lessonId: string): Promise<void> {
     const lesson = await this.lessonRepository.getLessonById(lessonId);
     if (!lesson) {
-      throw new Error("Lesson not found");
+      throw AppError.badRequest("Lesson not found");
     }
 
     await this.lessonRepository.deleteLesson(lessonId);
@@ -152,7 +156,13 @@ export class LessonService {
   ): Promise<ILesson> {
     const lesson = await this.lessonRepository.getLessonById(lessonId);
     if (!lesson) {
-      throw new Error("Lesson not found");
+      throw AppError.badRequest("Lesson not found");
+    }
+
+    if (input.status === "PUBLISHED" && !lesson.content) {
+      throw AppError.badRequest(
+        "Lesson content is required to publish the lesson"
+      );
     }
 
     let courseId = lesson.courseId;
@@ -167,7 +177,9 @@ export class LessonService {
     const existingLesson = await this.lessonRepository.findLessonByWhere(where);
 
     if (existingLesson) {
-      throw new Error("A lesson with this order already exists in the course");
+      throw AppError.badRequest(
+        "A lesson with this order already exists in the course"
+      );
     }
 
     const updatedLesson = await this.lessonRepository.updateLesson(
@@ -175,7 +187,7 @@ export class LessonService {
       input
     );
     if (!updatedLesson) {
-      throw new Error("Failed to update lesson");
+      throw AppError.badRequest("Failed to update lesson");
     }
     return updatedLesson;
   }

@@ -90,4 +90,7 @@ export async function getLessonById(lessonId: string): Promise<ILesson> {
   } catch (error: any) {
     throw new Error(error.response?.data?.message || "Failed to fetch lesson");
   }
+
+
 }
+

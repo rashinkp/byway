@@ -5,22 +5,11 @@ import { useCreateLesson } from "@/hooks/lesson/useCreateLesson";
 import { toast } from "sonner";
 import { FormModal, FormFieldConfig } from "../ui/FormModal";
 import { z } from "zod";
-import next from "next";
+import { LessonFormData, lessonSchema } from "@/lib/validations/lesson";
 
 
 
-export const lessonSchema = z.object({
-  title: z.string().min(1, "Title is required").max(100, "Title is too long"),
-  description: z
-    .string()
-    .max(1000, "Description is too long")
-    .optional()
-    .or(z.literal("")),
-  order: z.number().int().positive("Order must be positive"),
-  courseId: z.string().optional(),
-});
 
-export type LessonFormData = z.infer<typeof lessonSchema>;
 
 export const fields: FormFieldConfig<LessonFormData>[] = [
   {

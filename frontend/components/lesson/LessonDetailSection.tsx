@@ -4,40 +4,35 @@ import { Button } from "@/components/ui/button";
 import { Edit } from "lucide-react";
 import {
   LessonFormModal,
-  LessonFormData,
 } from "@/components/lesson/LessonFormModal";
 import { ILesson } from "@/types/lesson";
 import { StatusBadge } from "@/components/ui/StatusBadge";
-import {  toast } from "sonner";
+import { toast } from "sonner";
 import { formatDate } from "@/utils/formatDate";
 import { AlertComponent } from "../ui/AlertComponent";
 import { DetailsSectionSkeleton } from "../skeleton/CourseDetailSectionSkeleton";
 import { deleteLesson } from "@/api/lesson";
 import { useRouter } from "next/navigation";
+import { z } from "zod";
+import { LessonFormData, lessonSchema } from "@/lib/validations/lesson";
 
 interface LessonDetailSectionProps {
   lesson: ILesson;
   courseId: string;
-  nextOrder: number;
   onUpdateLesson: (data: LessonFormData) => void;
   isLoading: boolean;
   error: Error | null;
-  onRetry?: () => void; 
+  onRetry?: () => void;
 }
-
-
-//todo: implement lesson publish and unpublish functionality
 
 export function LessonDetailSection({
   lesson,
   courseId,
-  nextOrder,
   onUpdateLesson,
   isLoading,
   error,
   onRetry,
 }: LessonDetailSectionProps) {
-
   const [isLessonModalOpen, setIsLessonModalOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [confirmOpen, setConfirmOpen] = useState(false);
@@ -47,7 +42,8 @@ export function LessonDetailSection({
   const handleEditLesson = async (data: LessonFormData) => {
     setIsSubmitting(true);
     try {
-      onUpdateLesson(data);
+      lessonSchema.parse(data);
+       onUpdateLesson(data);
       setIsLessonModalOpen(false);
     } catch (err) {
       console.error(err);
@@ -56,42 +52,55 @@ export function LessonDetailSection({
     }
   };
 
-
-  const handleTogglePublish = () => {
-  }
-
-
-    const handleOpenConfirm = () => {
-      setConfirmOpen(true);
-    };
-
-  const handleConfirmDelete = () => {
-    if (lesson.id) {
-      deleteLesson(lesson.id);
-      router.replace(`/instructor/courses/${courseId}`);
+  const handleTogglePublish = async () => {
+    setIsSubmitting(true);
+    try {
+      const updatedStatus =
+        lesson.status === "PUBLISHED" ? "DRAFT" : "PUBLISHED";
+      const data: LessonFormData = {
+        title: lesson.title,
+        order: lesson.order,
+        status: updatedStatus,
+        description: lesson.description || "",
+      };
+      // Validate data
+      lessonSchema.parse(data);
+      onUpdateLesson(data);
+    } catch (err) {
+      console.error("Error updating lesson status:", err);
+    } finally {
+      setIsSubmitting(false);
     }
   };
-  
 
-   interface Action {
-      confirmationMessage: (item: ILesson) => string;
-  }
-  
-   const actions: Action[] = [
-     {
-       confirmationMessage: (item) =>
-         `Are you sure you want to ${!item.deletedAt ? "disable" : "enable"} "${
-           item.title
-         }"?`,
-     },
-   ];
+  const handleOpenConfirm = () => {
+    setConfirmOpen(true);
+  };
 
+  const handleConfirmDelete = async () => {
+    if (!lesson.id) {
+      toast.error("Lesson ID is missing");
+      return;
+    }
+    setIsSubmitting(true);
+    try {
+      await deleteLesson(lesson.id);
+      toast.success("Lesson deleted successfully");
+      router.replace(`/instructor/courses/${courseId}`);
+    } catch (err) {
+      toast.error("Failed to delete lesson");
+      console.error("Error deleting lesson:", err);
+    } finally {
+      setIsSubmitting(false);
+      setConfirmOpen(false);
+    }
+  };
 
   if (error) {
     return (
       <div className="bg-white shadow rounded-lg p-6">
         <div className="text-red-600">
-          <p>Error loading lesson: {error.message}</p>
+          <p>Error loading lesson: {error.message || "Unknown error"}</p>
           {onRetry && (
             <Button
               onClick={onRetry}
@@ -106,9 +115,7 @@ export function LessonDetailSection({
   }
 
   if (isLoading) {
-    return (
-      <DetailsSectionSkeleton />
-    );
+    return <DetailsSectionSkeleton />;
   }
 
   return (
@@ -127,6 +134,7 @@ export function LessonDetailSection({
           <Button
             onClick={handleOpenConfirm}
             className="bg-red-600 hover:bg-red-700 text-white"
+            disabled={isLoading || isSubmitting}
           >
             Delete
           </Button>
@@ -181,6 +189,7 @@ export function LessonDetailSection({
           title: lesson.title,
           description: lesson.description || "",
           order: lesson.order,
+          status: lesson.status,
         }}
         courseId={courseId}
         isSubmitting={isSubmitting}
