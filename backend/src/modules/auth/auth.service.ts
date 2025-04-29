@@ -137,6 +137,10 @@ export class AuthService {
           googleId
         );
       } else if (user.authProvider !== "GOOGLE") {
+
+        if (user.deletedAt !== null) {
+          throw AppError.forbidden("This account is deactivated");
+        };
         const updatedUser = await this.userService.updateUser({
           userId: user.id,
           googleId,
