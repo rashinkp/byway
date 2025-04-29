@@ -19,6 +19,7 @@ export interface ICreateLessonInput {
   description?: string | null;
   order: number;
   deletedAt?: Date | null;
+  status?: "DRAFT" | "PUBLISHED";
 }
 
 export interface IUserLessonProgress {
@@ -82,18 +83,3 @@ export interface ICreateLessonContentInput {
   data: Record<string, any>;
 }
 
-export interface ILessonRepository {
-  createLesson(input: ICreateLessonInput): Promise<ILesson>;
-  getLessonById(lessonId: string): Promise<ILesson | null>;
-  getLessonsByCourseId(courseId: string): Promise<ILesson[]>;
-  updateLessonProgress(
-    input: IUpdateLessonProgressInput
-  ): Promise<IUserLessonProgress>;
-  getCourseProgress(input: IGetProgressInput): Promise<IUserLessonProgress[]>;
-  getAllLessons(input: IGetAllLessonsInput): Promise<IGetAllLessonsResponse>;
-  updateLesson(
-    lessonId: string,
-    input: Partial<ICreateLessonInput>
-  ): Promise<ILesson>;
-  deleteLesson(lessonId: string): Promise<void>;
-}

@@ -6,10 +6,10 @@ import {
   IUserLessonProgress,
   IUpdateLessonProgressInput,
   IGetProgressInput,
-  ILessonRepository,
   IGetAllLessonsInput,
   IGetAllLessonsResponse,
 } from "./lesson.types";
+import { ILessonRepository } from "./lesson.repository.types";
 
 
 
@@ -80,7 +80,7 @@ export class LessonRepository implements ILessonRepository {
         title: lesson.title,
         description: lesson.description || undefined,
         order: lesson.order,
-        status:lesson.status,
+        status: lesson.status,
         createdAt: lesson.createdAt,
         updatedAt: lesson.updatedAt,
         deletedAt: lesson.deletedAt || undefined,
@@ -94,7 +94,7 @@ export class LessonRepository implements ILessonRepository {
 
   async getLessonById(courseId: string): Promise<ILesson | null> {
     const lesson = await this.prisma.lesson.findUnique({
-      where: { id:courseId },
+      where: { id: courseId },
     });
     if (!lesson) return null;
     return {
@@ -103,7 +103,7 @@ export class LessonRepository implements ILessonRepository {
       title: lesson.title,
       description: lesson.description || undefined,
       order: lesson.order,
-      status:lesson.status,
+      status: lesson.status,
       createdAt: lesson.createdAt,
       updatedAt: lesson.updatedAt,
       deletedAt: lesson.deletedAt || undefined,
@@ -119,7 +119,7 @@ export class LessonRepository implements ILessonRepository {
       id: lesson.id,
       courseId: lesson.courseId,
       title: lesson.title,
-      status:lesson.status,
+      status: lesson.status,
       description: lesson.description || undefined,
       order: lesson.order,
       createdAt: lesson.createdAt,
@@ -177,28 +177,77 @@ export class LessonRepository implements ILessonRepository {
     }));
   }
 
+  async updateLesson(
+    lessonId: string,
+    input: Partial<ICreateLessonInput>
+  ): Promise<ILesson> {
+    return this.prisma.lesson
+      .update({
+        where: { id: lessonId },
+        data: input,
+      })
+      .then((lesson) => ({
+        id: lesson.id,
+        courseId: lesson.courseId,
+        title: lesson.title,
+        description: lesson.description || undefined,
+        order: lesson.order,
+        status: lesson.status,
+        createdAt: lesson.createdAt,
+        updatedAt: lesson.updatedAt,
+        deletedAt: lesson.deletedAt || undefined,
+      }));
+  }
 
-  async updateLesson(lessonId: string, input: Partial<ICreateLessonInput>): Promise<ILesson> {
-    return this.prisma.lesson.update({
+  async deleteLesson(lessonId: string): Promise<void> {
+    await this.prisma.lesson.delete({
       where: { id: lessonId },
-      data: input,
-    }).then((lesson) => ({
+    });
+  }
+
+  async findLessonByWhere(where: any): Promise<ILesson | null> {
+    const lesson = await this.prisma.lesson.findFirst({
+      where: {
+        ...where,
+      },
+    });
+    if (!lesson) return null;
+    return {
       id: lesson.id,
       courseId: lesson.courseId,
       title: lesson.title,
       description: lesson.description || undefined,
       order: lesson.order,
-      status:lesson.status,
+      status: lesson.status,
       createdAt: lesson.createdAt,
       updatedAt: lesson.updatedAt,
       deletedAt: lesson.deletedAt || undefined,
-    }));
+    };
   }
 
-  async deleteLesson(lessonId: string): Promise<void> {
-    await this.prisma.lesson.delete({
-      where:{id:lessonId}
-    })
-  }
+  async getPreviousLessonProgress(
+    userId: string,
+    courseId: string,
+    lessonOrder: number
+  ): Promise<IUserLessonProgress | null> {
+    const previousProgress = await this.prisma.userLessonProgress.findFirst({
+      where: {
+        userId,
+        courseId,
+        lesson: { order: lessonOrder - 1, deletedAt: null },
+      },
+    });
 
+    if (!previousProgress) return null;
+
+    return {
+      userId: previousProgress.userId,
+      courseId: previousProgress.courseId,
+      lessonId: previousProgress.lessonId,
+      completed: previousProgress.completed,
+      completedAt: previousProgress.completedAt || undefined,
+      createdAt: previousProgress.createdAt,
+      updatedAt: previousProgress.updatedAt,
+    };
+  }
 }

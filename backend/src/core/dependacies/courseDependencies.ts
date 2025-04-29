@@ -8,6 +8,7 @@ import { CategoryService } from "../../modules/category/category.service";
 export interface CourseDependencies {
   courseController: CourseController;
   courseRepository: CourseRepository;
+  courseService: CourseService;
 }
 
 export const initializeCourseDependencies = (
@@ -24,5 +25,5 @@ export const initializeCourseDependencies = (
   );
   const courseController = new CourseController(courseService);
 
-  return { courseController, courseRepository };
+  return { courseController, courseRepository , courseService };
 };

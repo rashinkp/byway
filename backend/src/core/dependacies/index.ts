@@ -51,11 +51,12 @@ export const initializeAppDependencies = (
     dbProvider,
     courseDeps.courseRepository
   );
-
   const contentDeps = initializeContentDependencies(
     dbProvider,
-    lessonDeps.lessonRepository
+    lessonDeps.lessonService,
+    courseDeps.courseService,
   );
+
 
   return {
     authController: authDeps.authController,

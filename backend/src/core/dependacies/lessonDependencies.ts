@@ -7,6 +7,7 @@ import { CourseRepository } from "../../modules/course/course.repository";
 export interface LessonDependencies {
   lessonController: LessonController;
   lessonRepository: LessonRepository;
+  lessonService: LessonService;
 }
 
 export const initializeLessonDependencies = (
@@ -18,9 +19,8 @@ export const initializeLessonDependencies = (
   const lessonService = new LessonService(
     lessonRepository,
     courseRepository,
-    prisma
   );
   const lessonController = new LessonController(lessonService);
 
-  return { lessonController , lessonRepository };
+  return { lessonController , lessonRepository, lessonService  };
 };

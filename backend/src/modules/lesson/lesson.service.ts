@@ -7,16 +7,15 @@ import {
   IUserLessonProgress,
   IUpdateLessonProgressInput,
   IGetProgressInput,
-  ILessonRepository,
   IGetAllLessonsInput,
   IGetAllLessonsResponse,
 } from "./lesson.types";
+import { ILessonRepository } from "./lesson.repository.types";
 
 export class LessonService {
   constructor(
     private lessonRepository: ILessonRepository,
     private courseRepository: CourseRepository,
-    private prisma: PrismaClient
   ) {}
 
   async createLesson(
@@ -44,9 +43,13 @@ export class LessonService {
         "Unauthorized: You can only add lessons to your own courses"
       );
     }
-    const existingLesson = await this.prisma.lesson.findFirst({
-      where: { courseId: input.courseId, order: input.order, deletedAt: null },
-    });
+
+    const where = {
+      courseId: input.courseId,
+      order: input.order,
+      deletedAt: null,
+    };
+    const existingLesson = await this.lessonRepository.findLessonByWhere(where);
     if (existingLesson) {
       throw new Error("A lesson with this order already exists in the course");
     }
@@ -100,15 +103,14 @@ export class LessonService {
       throw new Error("Lesson not found, deleted, or not part of this course");
     }
 
-    // Optimize prerequisite check
+    // Check prerequisite using repository
     if (completed && lesson.order > 1) {
-      const previousProgress = await this.prisma.userLessonProgress.findFirst({
-        where: {
+      const previousProgress =
+        await this.lessonRepository.getPreviousLessonProgress(
           userId,
           courseId,
-          lesson: { order: lesson.order - 1, deletedAt: null },
-        },
-      });
+          lesson.order
+        );
       if (!previousProgress || !previousProgress.completed) {
         throw new Error("You must complete the previous lesson first");
       }
@@ -135,16 +137,14 @@ export class LessonService {
     return this.lessonRepository.getLessonById(lessonId);
   }
 
-
   async deleteLesson(lessonId: string): Promise<void> {
     const lesson = await this.lessonRepository.getLessonById(lessonId);
     if (!lesson) {
       throw new Error("Lesson not found");
     }
-   
+
     await this.lessonRepository.deleteLesson(lessonId);
   }
-
 
   async updateLesson(
     lessonId: string,
@@ -155,19 +155,21 @@ export class LessonService {
       throw new Error("Lesson not found");
     }
 
-    if (input.order) {
-      const existingLesson = await this.prisma.lesson.findFirst({
-        where: {
-          courseId: lesson.courseId,
-          order: input.order,
-          deletedAt: null,
-          id: { not: lessonId },
-        },
-      });
-      if (existingLesson) {
-        throw new Error("A lesson with this order already exists in the course");
-      }
+    let courseId = lesson.courseId;
+    let inputOrder = input.order;
+
+    const where = {
+      courseId,
+      order: inputOrder,
+      id: { not: lessonId },
+    };
+
+    const existingLesson = await this.lessonRepository.findLessonByWhere(where);
+
+    if (existingLesson) {
+      throw new Error("A lesson with this order already exists in the course");
     }
+
     const updatedLesson = await this.lessonRepository.updateLesson(
       lessonId,
       input
@@ -177,5 +179,4 @@ export class LessonService {
     }
     return updatedLesson;
   }
-
 }

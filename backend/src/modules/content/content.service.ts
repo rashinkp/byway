@@ -1,5 +1,5 @@
-import { PrismaClient } from "@prisma/client";
-import { LessonRepository } from "../lesson/lesson.repository";
+import { CourseService } from "../course/course.service";
+import { LessonService } from "../lesson/lesson.service";
 import {
   IContentRepository,
   ICreateLessonContentInput,
@@ -10,29 +10,33 @@ import {
 export class ContentService {
   constructor(
     private contentRepository: IContentRepository,
-    private lessonRepository: LessonRepository,
-    private prisma: PrismaClient
+    private lessonService: LessonService,
+    private courseService: CourseService
   ) {}
 
   async createContent(
     input: ICreateLessonContentInput,
     userId: string
   ): Promise<ILessonContent> {
-    const { lessonId } = input;
+    const { lessonId, type, title } = input;
 
-    
+    // Validate input
+    if (!lessonId || !type || !title) {
+      throw new Error("Lesson ID, type, and title are required");
+    }
 
     // Validate lesson exists and isn't deleted
-    const lesson = await this.lessonRepository.getLessonById(lessonId);
+    const lesson = await this.lessonService.getLessonById(lessonId);
     if (!lesson || lesson.deletedAt) {
       throw new Error("Lesson not found or deleted");
     }
 
     // Check if user is the course creator
-    const course = await this.prisma.course.findUnique({
-      where: { id: lesson.courseId },
-    });
-    if (!course || course.createdBy !== userId) {
+    const course = await this.courseService.getCourseById(lesson.courseId);
+    if (!course) {
+      throw new Error("Course not found");
+    }
+    if (course.createdBy !== userId) {
       throw new Error(
         "Unauthorized: You can only add content to your own courses"
       );
@@ -53,23 +57,23 @@ export class ContentService {
     lessonId: string,
     userId: string
   ): Promise<ILessonContent | null> {
-    const lesson = await this.lessonRepository.getLessonById(lessonId);
+    // Validate lesson exists and isn't deleted
+    const lesson = await this.lessonService.getLessonById(lessonId);
     if (!lesson || lesson.deletedAt) {
       throw new Error("Lesson not found or deleted");
     }
 
     // Check if user is enrolled or the course creator
-    const course = await this.prisma.course.findUnique({
-      where: { id: lesson.courseId },
-    });
+    const course = await this.courseService.getCourseById(lesson.courseId);
     if (!course) {
       throw new Error("Course not found");
     }
     const isCreator = course.createdBy === userId;
-    const enrollment = await this.prisma.enrollment.findUnique({
-      where: { userId_courseId: { userId, courseId: lesson.courseId } },
-    });
-    if (!isCreator && !enrollment) {
+    // const enrollment = await this.courseService.getEnrollment(
+    //   userId,
+    //   lesson.courseId
+    // );
+    if (!isCreator) {
       throw new Error("You are not enrolled in this course or not the creator");
     }
 
@@ -81,63 +85,63 @@ export class ContentService {
     input: IUpdateLessonContentInput,
     userId: string
   ): Promise<ILessonContent> {
-    const content = await this.contentRepository.getContentByLessonId(
-      input.lessonId || ""
-    );
+    // Validate input
+    if (!input.lessonId) {
+      throw new Error("Lesson ID is required");
+    }
 
+    // Fetch content by ID
+    const content = await this.contentRepository.getContentById(id);
     if (!content || content.deletedAt) {
       throw new Error("Content not found or deleted");
     }
 
-    const lesson = await this.lessonRepository.getLessonById(content.lessonId);
-    if (!lesson) {
-      throw new Error("Lesson not found");
+    // Validate lesson consistency
+    if (content.lessonId !== input.lessonId) {
+      throw new Error("Lesson ID cannot be changed");
     }
 
-    const course = await this.prisma.course.findUnique({
-      where: { id: lesson.courseId },
-    });
+    // Validate lesson exists
+    const lesson = await this.lessonService.getLessonById(content.lessonId);
+    if (!lesson || lesson.deletedAt) {
+      throw new Error("Lesson not found or deleted");
+    }
+
+    // Check if user is the course creator
+    const course = await this.courseService.getCourseById(lesson.courseId);
     if (!course || course.createdBy !== userId) {
       throw new Error(
         "Unauthorized: You can only update content for your own courses"
       );
     }
 
-    return this.contentRepository.updateContent({...input });
+    return this.contentRepository.updateContent({...input ,id });
   }
 
   async deleteContent(id: string, userId: string): Promise<void> {
     const content = await this.contentRepository.getContentById(id);
-
-    console.log("Content to delete:", content);
-    
     if (!content) {
       throw new Error("Content not found or already deleted");
     }
 
-    const lesson = await this.lessonRepository.getLessonById(content.lessonId);
-    if (!lesson) {
-      throw new Error("Lesson not found");
+    const lesson = await this.lessonService.getLessonById(content.lessonId);
+    if (!lesson || lesson.deletedAt) {
+      throw new Error("Lesson not found or deleted");
     }
 
-    const course = await this.prisma.course.findUnique({
-      where: { id: lesson.courseId },
-    });
+    const course = await this.courseService.getCourseById(lesson.courseId);
     if (!course || course.createdBy !== userId) {
       throw new Error(
         "Unauthorized: You can only delete content for your own courses"
       );
     }
 
+
+
     await this.contentRepository.deleteContent(id);
-    
-
-
   }
 
   async getContentById(id: string): Promise<ILessonContent | null> {
-    return this.contentRepository.getContentByLessonId(id);
+    return this.contentRepository.getContentById(id);
   }
 }
-
-
