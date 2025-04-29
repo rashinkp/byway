@@ -8,6 +8,8 @@ import {
   IGetAllCoursesInput,
   IUpdateCourseInput,
 } from "./course.types";
+import { AppError } from "../../utils/appError";
+import { StatusCodes } from "http-status-codes";
 
 export class CourseRepository implements ICourseRepository {
   constructor(private prisma: PrismaClient) {}
@@ -142,7 +144,7 @@ export class CourseRepository implements ICourseRepository {
 
   async getCourseById(courseId: string): Promise<ICourse | null> {
     const course = await this.prisma.course.findUnique({
-      where: { id:courseId },
+      where: { id: courseId },
       include: { details: true },
     });
     if (!course) return null;
@@ -218,12 +220,34 @@ export class CourseRepository implements ICourseRepository {
   }
 
   async updateCourse(input: IUpdateCourseInput): Promise<ICourse> {
-    const { id, details, ...courseData } = input;
-    // console.log(id, details, courseData);
+    const { id, details, status, ...courseData } = input;
+
+    // If the status is being updated to "PUBLISHED", validate lessons
+    if (status === "PUBLISHED") {
+      // Query lessons for the course
+      const lessons = await this.prisma.lesson.findMany({
+        where: {
+          courseId: id,
+          status: "PUBLISHED", // Assuming "PUBLISHED" is the status for published lessons
+        },
+      });
+
+      // Check if at least one lesson is published
+      if (lessons.length === 0) {
+        throw new AppError(
+          "Cannot publish course: At least one lesson must be published.",
+          StatusCodes.BAD_REQUEST,
+          "VALIDATION_ERROR"
+        );
+      }
+    }
+
+    // Proceed with the course update
     const course = await this.prisma.course.update({
       where: { id },
       data: {
         ...courseData,
+        status, // Include status in the update
         updatedAt: new Date(),
         details: details
           ? { upsert: { create: details, update: details } }
@@ -231,6 +255,8 @@ export class CourseRepository implements ICourseRepository {
       },
       include: { details: true },
     });
+
+    // Transform the response to match ICourse interface
     return {
       id: course.id,
       title: course.title,
@@ -261,9 +287,12 @@ export class CourseRepository implements ICourseRepository {
     };
   }
 
-  async softDeleteCourse(courseId: string, deletedAt: Date | null): Promise<ICourse> {
+  async softDeleteCourse(
+    courseId: string,
+    deletedAt: Date | null
+  ): Promise<ICourse> {
     const course = await this.prisma.course.update({
-      where: { id:courseId },
+      where: { id: courseId },
       data: { deletedAt, updatedAt: new Date() },
       include: { details: true },
     });

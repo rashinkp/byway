@@ -8,6 +8,9 @@ export const courseEditSchema = z
     price: z.number().min(0, "Price cannot be negative"),
     duration: z.number().min(1, "Duration must be at least 1 minute"),
     offer: z.number().min(0, "Offer price cannot be negative").optional(),
+    status: z.enum(["DRAFT", "PUBLISHED", "ARCHIVED"], {
+      errorMap: () => ({ message: "Status is required" }),
+    }),
   })
   .refine(
     (data) => {
@@ -18,7 +21,7 @@ export const courseEditSchema = z
     },
     {
       message: "Offer price must be less than or equal to actual price",
-      path: ["offer"], 
+      path: ["offer"],
     }
   );
 

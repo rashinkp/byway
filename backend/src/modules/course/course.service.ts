@@ -225,6 +225,7 @@ export class CourseService {
       }
     }
 
+
     try {
       return await this.courseRepository.updateCourse(parsedInput.data);
     } catch (error) {

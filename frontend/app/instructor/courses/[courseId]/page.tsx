@@ -162,7 +162,6 @@ export default function CourseDetailPage() {
           <CourseDetails
             course={course}
             isLoading={isLoading}
-            onPublish={handlePublish}
             src={PlaceHolderImage}
             alt={course?.title || "Course Thumbnail"}
             onImageChange={() => fileInputRef.current?.click()}

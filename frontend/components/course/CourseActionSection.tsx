@@ -1,6 +1,7 @@
 import { Course } from "@/types/course";
 import { Button } from "../ui/button";
 import { AlertComponent } from "../ui/AlertComponent";
+import { Loader2 } from "lucide-react";
 import { useState } from "react";
 
 export const ActionSection = ({
@@ -18,19 +19,6 @@ export const ActionSection = ({
 }) => {
   const [confirmOpen, setConfirmOpen] = useState(false);
 
-  interface Action {
-    confirmationMessage: (item: Course) => string;
-  }
-
-  const actions: Action[] = [
-    {
-      confirmationMessage: (item) =>
-        `Are you sure you want to ${!item.deletedAt ? "disable" : "enable"} "${item.title}"?`,
-    },
-  ];
-
- 
-
   const handleConfirm = () => {
     onToggleDelete();
     setConfirmOpen(false);
@@ -38,7 +26,6 @@ export const ActionSection = ({
 
   return (
     <div className="flex justify-end gap-2 mt-6">
-      
       <Button
         onClick={onPublish}
         disabled={isEditing || isUpdating}
@@ -48,22 +35,24 @@ export const ActionSection = ({
             : "bg-emerald-600 hover:bg-emerald-700"
         }
       >
+        {isUpdating ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
         {course.status === "PUBLISHED" ? "Unpublish" : "Publish"}
       </Button>
+
 
       <AlertComponent
         open={confirmOpen}
         onOpenChange={setConfirmOpen}
-        title={!course.deletedAt ? "Confirm Disable" : "Confirm Enable"}
-        description={(item) =>
-          `Are you sure you want to ${!item.deletedAt ? "disable" : "enable"} "${item.title}"?`
+        title={course.deletedAt ? "Confirm Enable" : "Confirm Disable"}
+        description={() =>
+          `Are you sure you want to ${
+            course.deletedAt ? "enable" : "disable"
+          } "${course.title}"?`
         }
-        confirmText={!course.deletedAt ? "Disable" : "Enable"}
+        confirmText={course.deletedAt ? "Enable" : "Disable"}
         cancelText="Cancel"
         onConfirm={handleConfirm}
-        item={course} // Use the actual course instead of a hardcoded item
-        actions={actions}
-        actionIndex={0}
+        item={course}
       />
     </div>
   );

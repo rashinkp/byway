@@ -1,15 +1,10 @@
 "use client";
 
 import { Course, CourseEditFormData } from "@/types/course";
-import {
-  Edit,
-  Check,
-  X,
-  Loader2,
-} from "lucide-react";
+import { Edit, Check, X, Loader2 } from "lucide-react";
 import { Button } from "../ui/button";
 import { StaticImageData } from "next/image";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ImageSection } from "./CourseDetailsImageSection";
@@ -24,15 +19,13 @@ import { useUpdateCourse } from "@/hooks/course/useUpdateCourse";
 
 export function CourseDetails({
   course,
-  onPublish,
   src,
   alt,
   onImageChange,
   isUploading,
   isLoading,
 }: {
-  course?: Course; // Make course optional
-  onPublish: () => void;
+  course?: Course;
   src: string | StaticImageData;
   alt: string;
   onImageChange: () => void;
@@ -41,7 +34,6 @@ export function CourseDetails({
 }) {
   const [isEditing, setIsEditing] = useState(false);
   const { mutate: toggleDeleteCourse } = useSoftDeleteCourse();
-
   const { mutate: updateCourse, isPending: isUpdating } = useUpdateCourse();
 
   const form = useForm<CourseEditFormData>({
@@ -49,18 +41,50 @@ export function CourseDetails({
     defaultValues: {
       title: course?.title || "",
       description: course?.description || "",
-      level: (course?.level as "BEGINNER" | "INTERMEDIATE" | "ADVANCED") || "BEGINNER",
+      level:
+        (course?.level as "BEGINNER" | "INTERMEDIATE" | "ADVANCED") ||
+        "BEGINNER",
       price: course?.price || 0,
       duration: course?.duration ?? 0,
       offer: course?.offer || undefined,
+      status: course?.status || "DRAFT",
     },
   });
 
+  // Update defaultValues when course changes
+  useEffect(() => {
+    if (course) {
+      form.reset({
+        title: course.title || "",
+        description: course.description || "",
+        level: (course.level === "MEDIUM" ? "INTERMEDIATE" : course.level) as
+          | "BEGINNER"
+          | "INTERMEDIATE"
+          | "ADVANCED",
+        price: course.price || 0,
+        duration: course.duration || 0,
+        offer: course.offer || undefined,
+        status: course.status || "DRAFT",
+      });
+    }
+  }, [course, form]);
+
   const onSubmit = (data: CourseEditFormData) => {
-    if (!course) return; // Prevent submission if course is undefined
+    if (!course) return;
     console.log("Form data:", data);
-    updateCourse({ data, id: course.id });
-    setIsEditing(false);
+    updateCourse(
+      { data, id: course.id },
+      {
+        onSuccess: () => {
+          form.reset(data); // Reset to submitted values
+          setIsEditing(false);
+        },
+        onError: (error) => {
+          console.error("Failed to update course:", error);
+          // Optionally show a toast or alert
+        },
+      }
+    );
   };
 
   const onToggleDelete = () => {
@@ -70,6 +94,13 @@ export function CourseDetails({
     } catch (error) {
       console.error("Failed to toggle delete course:", error);
     }
+  };
+
+  const onPublish = () => {
+    if (!course) return;
+    const newStatus = course.status === "DRAFT" ? "PUBLISHED" : "DRAFT";
+    form.setValue("status", newStatus);
+    form.handleSubmit(onSubmit)();
   };
 
   if (isLoading) {
@@ -91,7 +122,7 @@ export function CourseDetails({
             onClick={() => setIsEditing(true)}
             aria-label="Edit course details"
             className="text-primary hover:bg-primary/10"
-            disabled={!course} // Disable edit button if course is undefined
+            disabled={!course}
           >
             <Edit className="mr-2 h-4 w-4" />
             Edit Details
@@ -119,7 +150,7 @@ export function CourseDetails({
               type="button"
               variant="outline"
               onClick={() => {
-                form.reset();
+                form.reset(); // Reset to current course values
                 setIsEditing(false);
               }}
               disabled={isUpdating || !course}
@@ -132,10 +163,9 @@ export function CourseDetails({
         </form>
       ) : (
         <>
-          
-              <DetailsSection course={course} isEditing={isEditing} form={form} />
-              <OverviewSection course={course} isEditing={isEditing} form={form} />
-              <ObjectivesSection />
+          <DetailsSection course={course} isEditing={isEditing} form={form} />
+          <OverviewSection course={course} isEditing={isEditing} form={form} />
+          <ObjectivesSection />
           {course && (
             <ActionSection
               course={course}

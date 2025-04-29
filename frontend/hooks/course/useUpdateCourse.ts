@@ -80,6 +80,10 @@ export const useUpdateCourse = () => {
         ["course", variables.id],
         context?.previousCourse
       );
+
+      toast.error("Course updation failed!", {
+        description: error.message ||  "The course updation failed try again later.",
+      });
     },
     onSettled: (
       data: Course | undefined,

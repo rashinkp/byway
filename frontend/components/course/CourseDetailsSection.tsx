@@ -19,7 +19,7 @@ export const DetailsSection = ({
   isEditing: boolean;
   form: any;
 }) => {
-  const { register, formState } = form;
+  const { register, formState, control } = form;
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -32,25 +32,24 @@ export const DetailsSection = ({
               {...register("title")}
               className="mt-1"
               placeholder="Course title"
-              disabled={form.formState.isSubmitting}
+              disabled={formState.isSubmitting}
             />
           ) : (
-            <p className="mt-1 text-gray-900 font-medium">{course?.title}</p>
+            <p className="mt-1 text-gray-900 font-medium">
+              {course?.title || "Not available"}
+            </p>
+          )}
+          {formState.errors.title && (
+            <p className="text-red-500 text-sm mt-1">
+              {formState.errors.title.message}
+            </p>
           )}
         </div>
         <div>
           <h3 className="text-sm font-medium text-gray-700">Id</h3>
-          {isEditing ? (
-            <Input
-              {...register("id")}
-              className="mt-1"
-              placeholder="Course ID"
-              disabled
-              value={course?.id}
-            />
-          ) : (
-            <p className="mt-1 text-gray-900 font-medium">{course?.id}</p>
-          )}
+          <p className="mt-1 text-gray-900 font-medium">
+            {course?.id || "Not available"}
+          </p>
         </div>
         <div>
           <h3 className="text-sm font-medium text-gray-700">Level</h3>
@@ -59,24 +58,38 @@ export const DetailsSection = ({
               onValueChange={(value) =>
                 form.setValue(
                   "level",
-                  value as "BEGINNER" | "MEDIUM" | "ADVANCED"
+                  value as "BEGINNER" | "INTERMEDIATE" | "ADVANCED"
                 )
               }
-              defaultValue={course?.level}
-              disabled={form.formState.isSubmitting}
+              defaultValue={
+                course?.level === "MEDIUM" ? "INTERMEDIATE" : course?.level
+              }
+              disabled={formState.isSubmitting}
             >
               <SelectTrigger className="mt-1">
                 <SelectValue placeholder="Select level" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="BEGINNER">Beginner</SelectItem>
-                <SelectItem value="MEDIUM">Medium</SelectItem>
+                <SelectItem value="INTERMEDIATE">Intermediate</SelectItem>
                 <SelectItem value="ADVANCED">Advanced</SelectItem>
               </SelectContent>
             </Select>
           ) : (
             <p className="mt-1 text-gray-900 font-medium">
-              {(course?.level?.charAt(0) ?? "") + (course?.level?.slice(1).toLowerCase() ?? "")}
+              {course?.level
+                ? (course.level === "MEDIUM" ? "INTERMEDIATE" : course.level)
+                    .charAt(0)
+                    .toUpperCase() +
+                  (course.level === "MEDIUM" ? "INTERMEDIATE" : course.level)
+                    .slice(1)
+                    .toLowerCase()
+                : "Not available"}
+            </p>
+          )}
+          {formState.errors.level && (
+            <p className="text-red-500 text-sm mt-1">
+              {formState.errors.level.message}
             </p>
           )}
         </div>
@@ -89,7 +102,7 @@ export const DetailsSection = ({
               {...register("price", { valueAsNumber: true })}
               className="mt-1 w-32"
               placeholder="Price"
-              disabled={form.formState.isSubmitting}
+              disabled={formState.isSubmitting}
             />
           ) : (
             <p className="mt-1 text-gray-900 font-medium">
@@ -111,7 +124,7 @@ export const DetailsSection = ({
               {...register("offer", { valueAsNumber: true })}
               className="mt-1 w-32"
               placeholder="Offer Price"
-              disabled={form.formState.isSubmitting}
+              disabled={formState.isSubmitting}
             />
           ) : (
             <p className="mt-1 text-gray-900 font-medium">
@@ -137,11 +150,13 @@ export const DetailsSection = ({
               {...register("duration", { valueAsNumber: true })}
               className="mt-1 w-32"
               placeholder="Duration (minutes)"
-              disabled={form.formState.isSubmitting}
+              disabled={formState.isSubmitting}
             />
           ) : (
             <p className="mt-1 text-gray-900 font-medium">
-              {course?.duration || "Not available"} minutes
+              {course?.duration
+                ? `${course.duration} minutes`
+                : "Not available"}
             </p>
           )}
           {formState.errors.duration && (
@@ -154,37 +169,12 @@ export const DetailsSection = ({
           <h3 className="text-sm font-medium text-gray-700">Status</h3>
           {isEditing ? (
             <Select
-              onValueChange={(value) =>
-                form.setValue(
-                  "deletedAt",
-                  value === "true" ? new Date().toISOString() : null
-                )
-              }
-              defaultValue={course?.deletedAt ? "true" : "false"}
-              disabled={true}
+              onValueChange={(value) => form.setValue("status", value)}
+              defaultValue={course?.status}
+              disabled={formState.isSubmitting}
             >
               <SelectTrigger className="mt-1">
                 <SelectValue placeholder="Select status" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="false">Active</SelectItem>
-                <SelectItem value="true">Disabled</SelectItem>
-              </SelectContent>
-            </Select>
-          ) : (
-            <StatusBadge isActive={!course?.deletedAt} className="mt-1" />
-          )}
-        </div>
-        <div>
-          <h3 className="text-sm font-medium text-gray-700">Stage</h3>
-          {isEditing ? (
-            <Select
-              onValueChange={(value) => form.setValue("status", value)}
-              defaultValue={course?.status}
-              disabled={form.formState.isSubmitting}
-            >
-              <SelectTrigger className="mt-1">
-                <SelectValue placeholder="Select stage" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="DRAFT">Draft</SelectItem>
@@ -192,47 +182,40 @@ export const DetailsSection = ({
                 <SelectItem value="ARCHIVED">Archived</SelectItem>
               </SelectContent>
             </Select>
-          ) : course?.status === "DRAFT" ? (
-            <p className="mt-1 text-gray-900 font-medium">Draft</p>
-          ) : course?.status === "PUBLISHED" ? (
-            <p className="mt-1 text-green-600 font-medium">Published</p>
-          ) : course?.status === "ARCHIVED" ? (
-            <p className="mt-1 text-red-600 font-medium">Archived</p>
-          ) : null}
+          ) : (
+            <p className="mt-1 font-medium">
+              {course?.status === "DRAFT" ? (
+                <span className="text-gray-900">Draft</span>
+              ) : course?.status === "PUBLISHED" ? (
+                <span className="text-green-600">Published</span>
+              ) : course?.status === "ARCHIVED" ? (
+                <span className="text-red-600">Archived</span>
+              ) : (
+                "Not available"
+              )}
+            </p>
+          )}
+          {formState.errors.status && (
+            <p className="text-red-500 text-sm mt-1">
+              {formState.errors.status.message}
+            </p>
+          )}
+        </div>
+        <div>
+          <h3 className="text-sm font-medium text-gray-700">Active</h3>
+          <StatusBadge isActive={!course?.deletedAt} className="mt-1" />
         </div>
         <div>
           <h3 className="text-sm font-medium text-gray-700">Created At</h3>
-          {isEditing ? (
-            <Input
-              type="text"
-              {...register("createdAt")}
-              className="mt-1"
-              placeholder="Created At"
-              disabled
-              value={formatDate(course?.createdAt || null) || "Not available"}
-            />
-          ) : (
-            <p className="mt-1 text-gray-900 font-medium">
-              {formatDate(course?.createdAt || null) || "Not available"}
-            </p>
-          )}
+          <p className="mt-1 text-gray-900 font-medium">
+            {formatDate(course?.createdAt || null) || "Not available"}
+          </p>
         </div>
         <div>
           <h3 className="text-sm font-medium text-gray-700">Updated At</h3>
-          {isEditing ? (
-            <Input
-              type="text"
-              {...register("updatedAt")}
-              className="mt-1"
-              placeholder="Updated At"
-              disabled
-              value={formatDate(course?.updatedAt || null) || "Not Updated yet"}
-            />
-          ) : (
-            <p className="mt-1 text-gray-900 font-medium">
-              {formatDate(course?.updatedAt || null) || "Not Updated yet"}
-            </p>
-          )}
+          <p className="mt-1 text-gray-900 font-medium">
+            {formatDate(course?.updatedAt || null) || "Not updated yet"}
+          </p>
         </div>
       </div>
     </div>
