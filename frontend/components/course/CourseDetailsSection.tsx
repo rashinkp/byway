@@ -1,3 +1,4 @@
+// components/CourseDetailsSection.tsx
 import { formatDate } from "@/utils/formatDate";
 import { Input } from "../ui/input";
 import {
@@ -9,17 +10,22 @@ import {
 } from "@/components/ui/select";
 import { Course } from "@/types/course";
 import { StatusBadge } from "../ui/StatusBadge";
+import { Progress } from "../ui/progress"; // Assuming you have a Progress component (e.g., from shadcn/ui)
 
 export const DetailsSection = ({
   course,
   isEditing,
   form,
+  onImageUpload,
+  uploadProgress,
 }: {
   course?: Course;
   isEditing: boolean;
   form: any;
+  onImageUpload?: (file: File) => void;
+  uploadProgress: number | null;
 }) => {
-  const { register, formState, control } = form;
+  const { register, formState } = form;
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -198,6 +204,47 @@ export const DetailsSection = ({
           {formState.errors.status && (
             <p className="text-red-500 text-sm mt-1">
               {formState.errors.status.message}
+            </p>
+          )}
+        </div>
+        <div>
+          <h3 className="text-sm font-medium text-gray-700">Thumbnail</h3>
+          {isEditing ? (
+            <div className="space-y-2">
+              <Input
+                type="file"
+                accept="image/*"
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  if (file && onImageUpload) {
+                    onImageUpload(file);
+                  }
+                }}
+                disabled={formState.isSubmitting || uploadProgress !== null}
+                className="mt-1"
+              />
+              {uploadProgress !== null && (
+                <div className="space-y-1">
+                  <Progress value={uploadProgress} className="w-full" />
+                  <p className="text-sm text-gray-600">
+                    Uploading: {uploadProgress}%
+                  </p>
+                </div>
+              )}
+              {form.watch("thumbnail") && (
+                <p className="text-sm text-gray-600 break-all">
+                  Current: {form.watch("thumbnail")}
+                </p>
+              )}
+              {formState.errors.thumbnail && (
+                <p className="text-red-500 text-sm mt-1">
+                  {formState.errors.thumbnail.message}
+                </p>
+              )}
+            </div>
+          ) : (
+            <p className="mt-1 text-gray-900 font-medium break-all">
+              {course?.thumbnail || "Not available"}
             </p>
           )}
         </div>

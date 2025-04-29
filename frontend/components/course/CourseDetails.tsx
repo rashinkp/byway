@@ -4,7 +4,7 @@ import { Course, CourseEditFormData } from "@/types/course";
 import { Edit, Check, X, Loader2 } from "lucide-react";
 import { Button } from "../ui/button";
 import { StaticImageData } from "next/image";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ImageSection } from "./CourseDetailsImageSection";
@@ -16,6 +16,8 @@ import { ActionSection } from "./CourseActionSection";
 import { useSoftDeleteCourse } from "@/hooks/course/useSoftDeleteCourse";
 import { courseEditSchema } from "@/lib/validations/course";
 import { useUpdateCourse } from "@/hooks/course/useUpdateCourse";
+import { uploadToCloudinary } from "@/lib/cloudinary";
+import { toast } from "sonner";
 
 export function CourseDetails({
   course,
@@ -33,8 +35,12 @@ export function CourseDetails({
   isLoading: boolean;
 }) {
   const [isEditing, setIsEditing] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState<number | null>(null);
+  const [uploadError, setUploadError] = useState<string | null>(null);
   const { mutate: toggleDeleteCourse } = useSoftDeleteCourse();
   const { mutate: updateCourse, isPending: isUpdating } = useUpdateCourse();
+
+  const xhrRef = useRef<XMLHttpRequest | null>(null);
 
   const form = useForm<CourseEditFormData>({
     resolver: zodResolver(courseEditSchema),
@@ -48,10 +54,11 @@ export function CourseDetails({
       duration: course?.duration ?? 0,
       offer: course?.offer || undefined,
       status: course?.status || "DRAFT",
+      thumbnail: course?.thumbnail || undefined,
     },
   });
 
-  // Update defaultValues when course changes
+  // Sync form with course changes
   useEffect(() => {
     if (course) {
       form.reset({
@@ -65,23 +72,66 @@ export function CourseDetails({
         duration: course.duration || 0,
         offer: course.offer || undefined,
         status: course.status || "DRAFT",
+        thumbnail: course.thumbnail || undefined,
       });
     }
   }, [course, form]);
 
+  const handleImageUpload = async (file: File | null) => {
+    if (!file) {
+      // Cancel upload
+      if (xhrRef.current) {
+        xhrRef.current.abort();
+        xhrRef.current = null;
+      }
+      setUploadProgress(null);
+      setUploadError(null);
+      form.setValue("thumbnail", course?.thumbnail || undefined);
+      return;
+    }
+
+    try {
+      setUploadProgress(0);
+      setUploadError(null);
+      const result = await uploadToCloudinary(file, {
+        folder: "courses",
+        onProgress: ({ percent }) => setUploadProgress(percent),
+      });
+      xhrRef.current = result.xhr;
+      setUploadProgress(null);
+      form.setValue("thumbnail", result.secure_url);
+
+      // Automatically submit the form to update the course
+      const formData = form.getValues();
+      onSubmit(formData);
+    } catch (error: any) {
+      setUploadProgress(null);
+      let errorMessage = error.message || "Failed to upload image.";
+      if (error.message.includes("Upload preset not found")) {
+        errorMessage =
+          "Image upload failed: Invalid Cloudinary configuration. Please contact support.";
+      }
+      setUploadError(errorMessage);
+      toast.error(errorMessage);
+    }
+  };
+
   const onSubmit = (data: CourseEditFormData) => {
     if (!course) return;
-    console.log("Form data:", data);
+    console.log("Submitting form data:", data);
     updateCourse(
       { data, id: course.id },
       {
         onSuccess: () => {
-          form.reset(data); // Reset to submitted values
+          form.reset(data);
           setIsEditing(false);
         },
-        onError: (error) => {
-          console.error("Failed to update course:", error);
-          // Optionally show a toast or alert
+        onError: (error: any) => {
+          console.error("Error updating course:", error);
+          toast.error(
+            error?.response?.data?.message ||
+              "Failed to update course. Please try again."
+          );
         },
       }
     );
@@ -90,7 +140,20 @@ export function CourseDetails({
   const onToggleDelete = () => {
     if (!course) return;
     try {
-      toggleDeleteCourse(course);
+      toggleDeleteCourse(course, {
+        onSuccess: () => {
+          toast.success(
+            `Course ${course.deletedAt ? "restored" : "disabled"} successfully.`
+          );
+        },
+        onError: (error: any) => {
+          console.error("Error toggling course delete:", error);
+          toast.error(
+            error?.response?.data?.message ||
+              "Failed to toggle course status. Please try again."
+          );
+        },
+      });
     } catch (error) {
       console.error("Failed to toggle delete course:", error);
     }
@@ -112,8 +175,10 @@ export function CourseDetails({
       <ImageSection
         src={src}
         alt={alt}
-        onImageChange={onImageChange}
-        isUploading={isUploading}
+        onImageChange={handleImageUpload}
+        isUploading={isUploading || uploadProgress !== null}
+        uploadProgress={uploadProgress}
+        uploadError={uploadError}
       />
       {!isEditing && (
         <div className="flex justify-end mb-4">
@@ -131,12 +196,18 @@ export function CourseDetails({
       )}
       {isEditing ? (
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-          <DetailsSection course={course} isEditing={isEditing} form={form} />
+          <DetailsSection
+            course={course}
+            isEditing={isEditing}
+            form={form}
+            onImageUpload={handleImageUpload}
+            uploadProgress={uploadProgress}
+          />
           <OverviewSection course={course} isEditing={isEditing} form={form} />
           <div className="flex justify-end gap-3">
             <Button
               type="submit"
-              disabled={isUpdating || !course}
+              disabled={isUpdating || !course || uploadProgress !== null}
               className="bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary text-white"
             >
               {isUpdating ? (
@@ -150,8 +221,9 @@ export function CourseDetails({
               type="button"
               variant="outline"
               onClick={() => {
-                form.reset(); // Reset to current course values
+                form.reset();
                 setIsEditing(false);
+                setUploadProgress(null);
               }}
               disabled={isUpdating || !course}
               className="text-gray-700"
@@ -163,7 +235,13 @@ export function CourseDetails({
         </form>
       ) : (
         <>
-          <DetailsSection course={course} isEditing={isEditing} form={form} />
+          <DetailsSection
+            course={course}
+            isEditing={isEditing}
+            form={form}
+            onImageUpload={handleImageUpload}
+            uploadProgress={uploadProgress}
+          />
           <OverviewSection course={course} isEditing={isEditing} form={form} />
           <ObjectivesSection />
           {course && (

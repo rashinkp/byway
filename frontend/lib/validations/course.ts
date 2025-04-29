@@ -1,3 +1,4 @@
+// lib/validations/course.ts
 import { z } from "zod";
 
 export const courseEditSchema = z
@@ -11,6 +12,7 @@ export const courseEditSchema = z
     status: z.enum(["DRAFT", "PUBLISHED", "ARCHIVED"], {
       errorMap: () => ({ message: "Status is required" }),
     }),
+    thumbnail: z.string().url("Invalid URL format").optional(),
   })
   .refine(
     (data) => {
@@ -24,7 +26,6 @@ export const courseEditSchema = z
       path: ["offer"],
     }
   );
-
 
 export const courseSchema = z.object({
   title: z.string().min(1, "Title is required").max(100, "Title is too long"),

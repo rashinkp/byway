@@ -23,48 +23,16 @@ export default function CourseDetailPage() {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
 
-  //todo: implement thumbnail upload and course status update
   const { mutate: updateThumbnail, isPending: isUploading } = useMutation({
-    // mutationFn: async (file: File) => {
-    //   const formData = new FormData();
-    //   formData.append("thumbnail", file);
-    //   const response = await api.post(`/courses/${courseId}/thumbnail`, formData, {
-    //     headers: { "Content-Type": "multipart/form-data" },
-    //   });
-    //   return response.data;
-    // },
-    // onSuccess: () => {
-    //   queryClient.invalidateQueries({ queryKey: ["course", courseId] });
-    // },
-    // onError: (err) => {
-    //   console.error("Failed to upload thumbnail:", err);
-    // },
+   
   });
 
-  const { mutate: updateCourseStatus, isPending: isPublishing } = useMutation({
-    // mutationFn: async ({ courseId, status }: { courseId: string; status: "PUBLISHED" | "DRAFT" }) => {
-    //   const response = await api.patch(`/courses/${courseId}`, { status });
-    //   return response.data;
-    // },
-    // onSuccess: () => {
-    //   queryClient.invalidateQueries({ queryKey: ["course", courseId] });
-    // },
-    // onError: (err) => {
-    //   console.error("Failed to update course status:", err);
-    // },
-  });
+  
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     // if (e.target.files && e.target.files[0]) {
     //   updateThumbnail(e.target.files[0]);
     // }
-  };
-
-  const handlePublish = () => {
-    // updateCourseStatus({
-    //   courseId: courseId as string,
-    //   status: course?.status === "PUBLISHED" ? "DRAFT" : "PUBLISHED",
-    // });
   };
 
   if (error) {
@@ -162,7 +130,7 @@ export default function CourseDetailPage() {
           <CourseDetails
             course={course}
             isLoading={isLoading}
-            src={PlaceHolderImage}
+            src={course?.thumbnail||PlaceHolderImage}
             alt={course?.title || "Course Thumbnail"}
             onImageChange={() => fileInputRef.current?.click()}
             isUploading={isUploading}
