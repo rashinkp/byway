@@ -2,13 +2,13 @@ import * as nodemailer from "nodemailer";
 import { randomInt } from "crypto";
 import {
   IGenerateAndSendOtpInput,
-  IOtpRepository,
   IResendOtpInput,
   IVerifyOtpInput,
 } from "./otp.types";
 import { AppError } from "../../utils/appError";
 import { StatusCodes } from "http-status-codes";
 import { logger } from "../../utils/logger";
+import { IOtpRepository } from "./otp.repository.interface";
 
 export class OtpService {
   constructor(

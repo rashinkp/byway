@@ -88,15 +88,3 @@ export interface IEnrollment {
   enrolledAt: Date;
 }
 
-export interface ICourseRepository {
-  createCourse(input: ICreateCourseInput): Promise<ICourse>;
-  getAllCourses(
-    input: IGetAllCoursesInput
-  ): Promise<{ courses: ICourse[]; total: number }>;
-  getCourseById(courseId: string): Promise<ICourse | null>;
-  getCourseByName(title: string): Promise<ICourse | null>;
-  updateCourse(input: IUpdateCourseInput): Promise<ICourse>;
-  softDeleteCourse(courseId: string, deletedAt: Date | null): Promise<ICourse>;
-  createEnrollment(input: ICreateEnrollmentInput): Promise<IEnrollment>;
-  getEnrollment(userId: string, courseId: string): Promise<IEnrollment | null>;
-}

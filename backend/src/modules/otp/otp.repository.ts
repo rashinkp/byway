@@ -1,5 +1,6 @@
 import { PrismaClient } from "@prisma/client";
-import { IOtpRepository, IUserVerification } from "./otp.types";
+import { IUserVerification } from "./otp.types";
+import { IOtpRepository } from "./otp.repository.interface";
 
 export class OtpRepository implements IOtpRepository {
   constructor(private prisma: PrismaClient) {}

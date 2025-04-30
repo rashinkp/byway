@@ -9,9 +9,7 @@ import {
   IGetAllLessonsInput,
   IGetAllLessonsResponse,
 } from "./lesson.types";
-import { ILessonRepository } from "./lesson.repository.types";
-
-
+import { ILessonRepository } from "./lesson.repository.interface";
 
 export class LessonRepository implements ILessonRepository {
   constructor(private prisma: PrismaClient) {}
@@ -96,7 +94,7 @@ export class LessonRepository implements ILessonRepository {
     const lesson = await this.prisma.lesson.findUnique({
       where: { id: lessonId },
       include: {
-        content: true, 
+        content: true,
       },
     });
     if (!lesson) return null;

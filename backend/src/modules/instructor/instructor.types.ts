@@ -21,6 +21,3 @@ export interface IInstructor extends IInstructorDetails {
 
 export type InstructorWithToken = IInstructor & { newToken: string };
 
-export interface IInstructorRepository {
-  createInstructor(input: CreateInstructorInput): Promise<IInstructorDetails>;
-}

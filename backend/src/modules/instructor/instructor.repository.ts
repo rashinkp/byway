@@ -5,8 +5,8 @@ import { logger } from "../../utils/logger";
 import {
   CreateInstructorInput,
   IInstructorDetails,
-  IInstructorRepository,
 } from "./instructor.types";
+import { IInstructorRepository } from "./instructor.repository.interface";
 
 export class InstructorRepository implements IInstructorRepository {
   constructor(private prisma: PrismaClient) {}

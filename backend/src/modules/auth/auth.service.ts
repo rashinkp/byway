@@ -1,12 +1,13 @@
 import { JwtUtil } from "../../utils/jwt.util";
 import { OAuth2Client } from "google-auth-library";
 import * as bcrypt from "bcrypt";
-import { FacebookAuthData, IAuthRepository, IAuthUser, IForgotPasswordInput, IGoogleAuthGateway, IResetPasswordInput } from "./auth.types";
+import { FacebookAuthData,  IAuthUser, IForgotPasswordInput, IGoogleAuthGateway, IResetPasswordInput } from "./auth.types";
 import { OtpService } from "../otp/otp.service";
 import { AppError } from "../../utils/appError";
 import { StatusCodes } from "http-status-codes";
 import { UserService } from "../user/user.service";
 import axios from "axios";
+import { IAuthRepository } from "./auth.repository.interface";
 
 
 export class AuthService {

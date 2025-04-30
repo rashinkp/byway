@@ -5,11 +5,11 @@ import { logger } from "../../utils/logger";
 import { createInstructorSchema } from "./instructor.validators";
 import {
   CreateInstructorInput,
-  IInstructorRepository,
   InstructorWithToken,
 } from "./instructor.types";
 import { UserService } from "../user/user.service";
 import { Role } from "@prisma/client";
+import { IInstructorRepository } from "./instructor.repository.interface";
 
 export class InstructorService {
   constructor(

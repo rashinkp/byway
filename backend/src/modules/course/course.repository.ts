@@ -1,7 +1,6 @@
 import { PrismaClient } from "@prisma/client";
 import {
   ICourse,
-  ICourseRepository,
   ICreateCourseInput,
   ICreateEnrollmentInput,
   IEnrollment,
@@ -10,6 +9,7 @@ import {
 } from "./course.types";
 import { AppError } from "../../utils/appError";
 import { StatusCodes } from "http-status-codes";
+import { ICourseRepository } from "./course.repository.interface";
 
 export class CourseRepository implements ICourseRepository {
   constructor(private prisma: PrismaClient) {}

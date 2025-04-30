@@ -1,7 +1,7 @@
 import { CourseService } from "../course/course.service";
 import { LessonService } from "../lesson/lesson.service";
+import { IContentRepository } from "./content.repository.interface";
 import {
-  IContentRepository,
   ICreateLessonContentInput,
   IUpdateLessonContentInput,
   ILessonContent,

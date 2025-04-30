@@ -4,8 +4,8 @@ import {
   ICreateCategoryInput,
   IUpdateCategoryInput,
   IGetAllCategoriesInput,
-  ICategoryRepository,
 } from "./category.types";
+import { ICategoryRepository } from "./category.repository.interface";
 
 export class CategoryRepository implements ICategoryRepository {
   constructor(private prisma: PrismaClient) {}

@@ -1,10 +1,10 @@
 import { PrismaClient } from "@prisma/client";
 import {
-  IContentRepository,
   ILessonContent,
   ICreateLessonContentInput,
   IUpdateLessonContentInput,
 } from "./content.types";
+import { IContentRepository } from "./content.repository.interface";
 
 export class ContentRepository implements IContentRepository {
   constructor(private prisma: PrismaClient) {}

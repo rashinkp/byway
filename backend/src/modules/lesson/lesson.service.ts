@@ -9,7 +9,7 @@ import {
   IGetAllLessonsInput,
   IGetAllLessonsResponse,
 } from "./lesson.types";
-import { ILessonRepository } from "./lesson.repository.types";
+import { ILessonRepository } from "./lesson.repository.interface";
 import { AppError } from "../../utils/appError";
 
 export class LessonService {

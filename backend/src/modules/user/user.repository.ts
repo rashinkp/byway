@@ -10,10 +10,10 @@ import {
   IUserWithProfile,
   AdminUpdateUserInput,
   IGetAllUsersWithSkip,
-  IUserRepository,
   UpdateUserRoleInput,
   IGetAllUsersInput,
 } from "./user.types";
+import { IUserRepository } from "./user.repository.interface";
 
 export class UserRepository implements IUserRepository {
   constructor(private prisma: PrismaClient) {}

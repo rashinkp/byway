@@ -1,5 +1,6 @@
 import { PrismaClient } from "@prisma/client";
-import { IAuthRepository, IAuthUser } from "./auth.types";
+import { IAuthRepository } from "./auth.repository.interface";
+import { IAuthUser } from "./auth.types";
 
 
 export class AuthRepository implements IAuthRepository {
