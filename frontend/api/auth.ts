@@ -1,4 +1,5 @@
 import {api} from "@/api/api";
+import { ApiResponse } from "@/types/apiResponse";
 import { User } from "@/types/user";
 
 interface IVerifyOtpResponse {
@@ -53,15 +54,7 @@ interface FacebookAuthRequest {
   picture?: string;
 }
 
-interface FacebookAuthResponse {
-  token: string;
-  user: {
-    id: string;
-    name: string;
-    email?: string;
-    picture?: string;
-  };
-}
+
 
 export async function signup(data: SignupData) {
   try {
@@ -195,9 +188,9 @@ export async function getCurrentUserServer(
 
 export async function facebookAuth(
   data: FacebookAuthRequest
-): Promise<FacebookAuthResponse> {
+): Promise<ApiResponse> {
   try {
-    const response = await api.post<FacebookAuthResponse>(
+    const response = await api.post<ApiResponse>(
       "/auth/facebook",
       data
     );

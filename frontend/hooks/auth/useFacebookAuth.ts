@@ -1,5 +1,6 @@
 import { facebookAuth } from "@/api/auth";
 import { useState, useEffect } from "react";
+import { useRoleRedirect } from "../useRoleRedirects";
 
 declare global {
   interface Window {
@@ -43,6 +44,7 @@ export function useFacebookAuth(): UseFacebookAuthResult {
   const [user, setUser] = useState<FacebookUserData | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
 
+  const { redirectByRole } = useRoleRedirect();
 
   // Initialize Facebook SDK
   useEffect(() => {
@@ -80,18 +82,18 @@ export function useFacebookAuth(): UseFacebookAuthResult {
 
       const loginResponse = await new Promise<AuthResponse>(
         (resolve, reject) => {
-            window.FB.login(
+          window.FB.login(
             (response: { authResponse: AuthResponse | undefined }) => {
               if (response.authResponse) {
-              resolve(response.authResponse);
+                resolve(response.authResponse);
               } else {
-              reject(
-                new Error("User cancelled login or did not fully authorize.")
-              );
+                reject(
+                  new Error("User cancelled login or did not fully authorize.")
+                );
               }
             },
             { scope: "public_profile,email" }
-            );
+          );
         }
       );
 
@@ -122,10 +124,7 @@ export function useFacebookAuth(): UseFacebookAuthResult {
       setUser(userData);
       setIsAuthenticated(true);
       setIsLoading(false);
-
-      if (backendResponse.token) {
-        localStorage.setItem("authToken", backendResponse.token);
-      }
+      redirectByRole(backendResponse.data.role || "/");
     } catch (err: any) {
       setError(
         err.message || "An error occurred during Facebook authentication"
