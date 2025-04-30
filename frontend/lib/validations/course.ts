@@ -46,5 +46,6 @@ export const courseSchema = z.object({
     .string()
     .url("Invalid URL format")
     .min(1, "Thumbnail URL is required")
-    .max(200, "Thumbnail URL is too long"),
+    .max(200, "Thumbnail URL is too long")
+    .optional(),
 });

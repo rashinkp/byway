@@ -3,9 +3,6 @@ import { Course, CourseEditFormData } from "@/types/course";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 
-
-
-
 export const useUpdateCourse = () => {
   const queryClient = useQueryClient();
 
@@ -50,7 +47,6 @@ export const useUpdateCourse = () => {
         };
       });
 
-      // Optimistically update the single course data
       const previousCourse = queryClient.getQueryData<Course>(["course", id]);
       queryClient.setQueryData(["course", id], (old: Course | undefined) => {
         if (!old) return old;
@@ -80,6 +76,7 @@ export const useUpdateCourse = () => {
         ["course", variables.id],
         context?.previousCourse
       );
+      console.log('error',error);
 
       toast.error("Course updation failed!", {
         description: error.message ||  "The course updation failed try again later.",

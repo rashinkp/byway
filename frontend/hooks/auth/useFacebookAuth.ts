@@ -1,6 +1,7 @@
 import { facebookAuth } from "@/api/auth";
 import { useState, useEffect } from "react";
 import { useRoleRedirect } from "../useRoleRedirects";
+import { useAuthStore } from "@/stores/auth.store";
 
 declare global {
   interface Window {
@@ -34,14 +35,13 @@ interface UseFacebookAuthResult {
   login: () => void;
   isLoading: boolean;
   error: string | null;
-  user: FacebookUserData | null;
   isAuthenticated: boolean;
 }
 
 export function useFacebookAuth(): UseFacebookAuthResult {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
-  const [user, setUser] = useState<FacebookUserData | null>(null);
+  const { setUser } = useAuthStore();
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
 
   const { redirectByRole } = useRoleRedirect();
@@ -121,7 +121,8 @@ export function useFacebookAuth(): UseFacebookAuthResult {
         picture: userData.picture?.data.url,
       });
 
-      setUser(userData);
+      console.log(backendResponse.data);
+      setUser(backendResponse.data);
       setIsAuthenticated(true);
       setIsLoading(false);
       redirectByRole(backendResponse.data.role || "/");
@@ -137,7 +138,6 @@ export function useFacebookAuth(): UseFacebookAuthResult {
     login,
     isLoading,
     error,
-    user,
     isAuthenticated,
   };
 }

@@ -165,6 +165,7 @@ export class CourseService {
 
   async updateCourse(input: IUpdateCourseInput): Promise<ICourse> {
     const parsedInput = updateCourseSchema.safeParse(input);
+    console.log(parsedInput)
     if (!parsedInput.success) {
       logger.warn("Validation failed for updateCourse", {
         errors: parsedInput.error.errors,
@@ -263,7 +264,6 @@ export class CourseService {
           "NOT_FOUND"
         );
       }
-      console.log(role);
       if (course.createdBy !== userId && role !== 'ADMIN') {
         logger.warn("Unauthorized course delete attempt", { courseId, userId });
         throw new AppError(

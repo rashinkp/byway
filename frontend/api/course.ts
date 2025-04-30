@@ -74,8 +74,9 @@ export async function updateCourse(
   try {
     const response = await api.put(`/courses/${id}`, courseData);
     return response.data.data;
-  } catch (error) {
-    console.error("Failed to update course:", error);
-    throw new Error("Failed to update course");
+  } catch (error:any) {
+     const errorMessage =
+       error.response?.data?.message || "Failed to update course";
+     throw new Error(`${errorMessage}`);
   }
 }

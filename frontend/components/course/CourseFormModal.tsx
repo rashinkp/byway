@@ -71,16 +71,6 @@ export const fields: FormFieldConfig<CourseFormData>[] = [
     ],
     column: "right",
   },
-  {
-    name: "thumbnail",
-    label: "Thumbnail URL",
-    type: "input",
-    fieldType: "text",
-    placeholder: "e.g., https://example.com/thumbnail.jpg",
-    description: "Provide a URL for the course thumbnail .",
-    maxLength: 200,
-    column: "left",
-  },
 ];
 
 interface CourseFormModalProps {
@@ -102,6 +92,8 @@ export function CourseFormModal({
   const { mutate: createCourse, isPending } = useCreateCourse();
   const { categories, loading: categoriesLoading } = useCategories();
 
+  console.log(user);
+
   const dynamicFields = useMemo(() => {
     return fields.map((field) =>
       field.name === "categoryId"
@@ -118,6 +110,7 @@ export function CourseFormModal({
   }, [categories]);
 
   const handleSubmit = async (data: CourseFormData) => {
+
     if (!user?.id) {
       toast.error("Instructor ID not found");
       return;

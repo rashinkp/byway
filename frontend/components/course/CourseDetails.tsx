@@ -128,10 +128,6 @@ export function CourseDetails({
         },
         onError: (error: any) => {
           console.error("Error updating course:", error);
-          toast.error(
-            error?.response?.data?.message ||
-              "Failed to update course. Please try again."
-          );
         },
       }
     );
