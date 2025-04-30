@@ -1,4 +1,3 @@
-// src/components/auth/VerifyOtpForm.tsx
 "use client";
 
 import { useState, useEffect } from "react";
@@ -23,15 +22,15 @@ export function VerifyOtpForm() {
   const { mutate: resendOtp, isPending: isResending } = useResendOtp();
   const { redirectByRole } = useRoleRedirect();
   const [resendCooldown, setResendCooldown] = useState(60);
-  //persist time in while reloading;
 
-
+  // Handle OTP submission
   const handleSubmit = (otp: string) => {
     if (!email) return;
-    
+
     // Map frontend type to backend type
-    const verificationType = type === "forgot-password" ? "password-reset" : "signup";
-    
+    const verificationType =
+      type === "forgot-password" ? "password-reset" : "signup";
+
     verifyOtp(
       { email, otp, type: verificationType },
       {
@@ -48,6 +47,7 @@ export function VerifyOtpForm() {
     );
   };
 
+  // Handle OTP resend
   const handleResend = () => {
     if (!email || resendCooldown > 0 || isResending) return;
     resendOtp(email, {
@@ -55,6 +55,7 @@ export function VerifyOtpForm() {
     });
   };
 
+  // Cooldown timer for resend
   useEffect(() => {
     if (resendCooldown > 0) {
       const timer = setTimeout(
@@ -65,6 +66,7 @@ export function VerifyOtpForm() {
     }
   }, [resendCooldown]);
 
+  // Format cooldown time
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
@@ -73,6 +75,34 @@ export function VerifyOtpForm() {
       .padStart(2, "0")}`;
   };
 
+  // Show loading state during submission or resend
+  if (isSubmitting || isResending) {
+    return (
+      <SplitScreenLayout
+        title={
+          type === "forgot-password" ? "Reset Your Password" : "Almost There!"
+        }
+        description={
+          type === "forgot-password"
+            ? "Verifying your OTP..."
+            : "Verifying your account..."
+        }
+        imageAlt="Verification illustration"
+      >
+        <AuthFormWrapper
+          title="Processing..."
+          subtitle="Please wait while we verify your OTP."
+          noCard
+        >
+          <div className="flex justify-center items-center py-8">
+            <Loader2 className="h-8 w-8 animate-spin text-primary" />
+          </div>
+        </AuthFormWrapper>
+      </SplitScreenLayout>
+    );
+  }
+
+  // Show error if no email is provided (only when not loading)
   if (!email) {
     return (
       <SplitScreenLayout
@@ -101,6 +131,7 @@ export function VerifyOtpForm() {
     );
   }
 
+  // Main OTP input form
   return (
     <SplitScreenLayout
       title={

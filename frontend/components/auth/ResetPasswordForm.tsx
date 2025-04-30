@@ -1,4 +1,3 @@
-// src/components/auth/ResetPasswordForm.tsx
 "use client";
 
 import { useForm } from "react-hook-form";
@@ -7,10 +6,11 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter, useSearchParams } from "next/navigation";
 import { SplitScreenLayout } from "@/components/ui/SplitScreenLayout";
 import { AuthForm } from "@/components/auth/AuthForm";
-import { useResetPassword } from "@/hooks/auth/useResetPassword";
 import { Button } from "@/components/ui/button";
 import { AuthLink } from "@/components/auth/parts/AuthLink";
 import { AuthFormWrapper } from "./parts/AuthFormWrapper";
+import { Loader2 } from "lucide-react";
+import { useResetPassword } from "@/hooks/auth/useResetPassword";
 
 const resetPasswordSchema = z
   .object({
@@ -53,6 +53,28 @@ export function ResetPasswordForm() {
     );
   };
 
+  // Show loading state during submission
+  if (isPending) {
+    return (
+      <SplitScreenLayout
+        title="Set New Password"
+        description="Processing your password reset..."
+        imageAlt="Password reset illustration"
+      >
+        <AuthFormWrapper
+          title="Processing..."
+          subtitle="Please wait while we reset your password."
+          noCard
+        >
+          <div className="flex justify-center items-center py-8">
+            <Loader2 className="h-8 w-8 animate-spin text-primary" />
+          </div>
+        </AuthFormWrapper>
+      </SplitScreenLayout>
+    );
+  }
+
+  // Show error if email or OTP is missing
   if (!email || !otp) {
     return (
       <SplitScreenLayout
@@ -77,6 +99,7 @@ export function ResetPasswordForm() {
     );
   }
 
+  // Show password reset form
   return (
     <SplitScreenLayout
       title="Set New Password"
@@ -107,6 +130,8 @@ export function ResetPasswordForm() {
         error={error?.message}
         googleAuthText=""
         onGoogleAuth={() => {}}
+        facebookAuthText=""
+        onFacebookAuth={() => {}}
         authLink={{
           text: "Remembered your password?",
           linkText: "Back to login",
