@@ -4,7 +4,7 @@ import { ApiResponse } from "../../types/response";
 import { z } from "zod";
 import { AppError } from "../../utils/appError";
 import { logger } from "../../utils/logger";
-import { ForgotPasswordSchema, GoogleAuthSchema, LoginSchema, RegisterAdminSchema, RegisterUserSchema, ResetPasswordSchema } from "./auth.validator";
+import { FacebookAuthSchema, ForgotPasswordSchema, GoogleAuthSchema, LoginSchema, RegisterAdminSchema, RegisterUserSchema, ResetPasswordSchema } from "./auth.validator";
 
 
 
@@ -96,6 +96,37 @@ export class AuthController {
       };
     } catch (error) {
       logger.error("Google auth error:", { error, input });
+      if (error instanceof z.ZodError) {
+        throw AppError.badRequest("Validation failed: " + error.message);
+      }
+      throw error;
+    }
+  }
+
+  async facebookAuth(input: unknown): Promise<ApiResponse> {
+    try {
+      const validatedInput = FacebookAuthSchema.parse(input);
+      const { accessToken, userId, name, email, picture } = validatedInput;
+
+      const { user, token } = await this.authService.facebookAuth({
+        accessToken,
+        userId,
+        name,
+        email,
+        picture,
+      });
+
+      return {
+        status: "success",
+        data: { id: user.id, email: user.email, role: user.role },
+        token,
+        statusCode: user.isVerified ? StatusCodes.OK : StatusCodes.CREATED,
+        message: user.isVerified
+          ? "Logged in successfully"
+          : "User registered successfully",
+      };
+    } catch (error) {
+      logger.error("Facebook auth error:", { error, input });
       if (error instanceof z.ZodError) {
         throw AppError.badRequest("Validation failed: " + error.message);
       }

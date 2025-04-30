@@ -1,7 +1,7 @@
 import { JwtUtil } from "../../utils/jwt.util";
 import { OAuth2Client } from "google-auth-library";
 import * as bcrypt from "bcrypt";
-import { IAuthRepository, IAuthUser, IForgotPasswordInput, IGoogleAuthGateway, IResetPasswordInput } from "./auth.types";
+import { FacebookAuthData, IAuthRepository, IAuthUser, IForgotPasswordInput, IGoogleAuthGateway, IResetPasswordInput } from "./auth.types";
 import { OtpService } from "../otp/otp.service";
 import { AppError } from "../../utils/appError";
 import { StatusCodes } from "http-status-codes";
@@ -137,10 +137,9 @@ export class AuthService {
           googleId
         );
       } else if (user.authProvider !== "GOOGLE") {
-
         if (user.deletedAt !== null) {
           throw AppError.forbidden("This account is deactivated");
-        };
+        }
         const updatedUser = await this.userService.updateUser({
           userId: user.id,
           googleId,
@@ -160,6 +159,64 @@ export class AuthService {
     } catch (error: any) {
       console.error("Google auth error:", error.message); // Debug log
       throw error; // Let the gateway handle specific error types
+    }
+  }
+
+  async facebookAuth(
+    data: FacebookAuthData
+  ): Promise<{ user: IAuthUser; token: string }> {
+    try {
+      const { accessToken, userId, name, email, picture } = data;
+
+      // // Verify the access token with Facebook
+      // const fbResponse = await axios.get(
+      //   `https://graph.facebook.com/debug_token?input_token=${accessToken}&access_token=${process.env.FACEBOOK_APP_ID}|${process.env.FACEBOOK_APP_SECRET}`
+      // );
+      // const fbData = fbResponse.data;
+
+      // if (!fbData.data.is_valid || fbData.data.user_id !== userId) {
+      //   throw AppError.unauthorized(
+      //     "Invalid or mismatched Facebook access token"
+      //   );
+      // }
+
+      let user = await this.userService.findUserByEmail(email || "");
+
+      
+
+      if (!user) {
+        // Create new user if not found
+        user = await this.authRepository.createFacebookUser(
+          name || "Facebook User",
+          email || `${userId}@facebook.com`, 
+          userId,
+          picture || '',
+        );
+      } else if (user.authProvider !== "FACEBOOK") {
+        if (user.deletedAt !== null) {
+          throw AppError.forbidden("This account is deactivated");
+        }
+        // Update existing user with Facebook ID if they used a different auth method
+        const updatedUser = await this.userService.updateUser({
+          userId: user.id,
+          facebookId: userId,
+          avatar: picture,
+        });
+        user = { ...user, ...updatedUser };
+        if (!user) {
+          throw AppError.badRequest(
+            "This email is registered with a different authentication method"
+          );
+        }
+      } else if (user.deletedAt !== null) {
+        throw AppError.forbidden("This account is deactivated");
+      }
+
+      const token = this.generateToken(user.id, user.email, user.role);
+      return { user, token };
+    } catch (error: any) {
+      console.error("Facebook auth error:", error.message);
+      throw error;
     }
   }
 
@@ -195,14 +252,14 @@ export class AuthService {
 
   async me(userId: string): Promise<IAuthUser> {
     const user = await this.userService.findUserById(userId);
-    if (!user  ) {
+    if (!user) {
       throw AppError.notFound("User not found or account is deactivated");
     }
 
     if (user.deletedAt !== null) {
       throw AppError.forbidden("This account is deactivated");
     }
-    
+
     return user;
   }
 }

@@ -43,6 +43,26 @@ interface SignupData {
   name: string;
 }
 
+
+
+interface FacebookAuthRequest {
+  accessToken: string;
+  userId: string;
+  name: string;
+  email?: string;
+  picture?: string;
+}
+
+interface FacebookAuthResponse {
+  token: string;
+  user: {
+    id: string;
+    name: string;
+    email?: string;
+    picture?: string;
+  };
+}
+
 export async function signup(data: SignupData) {
   try {
     const response = await api.post<ISignupResponse>("/auth/signup", data);
@@ -169,5 +189,21 @@ export async function getCurrentUserServer(
     }
     console.error("Error fetching current user server-side:", error);
     return null;
+  }
+}
+
+
+export async function facebookAuth(
+  data: FacebookAuthRequest
+): Promise<FacebookAuthResponse> {
+  try {
+    const response = await api.post<FacebookAuthResponse>(
+      "/auth/facebook",
+      data
+    );
+    return response.data;
+  } catch (error: any) {
+    console.error("Error during Facebook authentication:", error);
+    throw error.response?.data?.error || "Failed to authenticate with Facebook";
   }
 }

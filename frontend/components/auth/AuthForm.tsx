@@ -1,4 +1,3 @@
-// src/components/auth/AuthForm.tsx
 "use client";
 
 import {
@@ -12,13 +11,13 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import { GoogleAuthButton } from "@/components/ui/GoogleAuthButton";
+import { SocialAuthButton } from "@/components/ui/SocialAuthButton";
 import { AuthFormWrapper } from "@/components/auth/parts/AuthFormWrapper";
 import { AuthLink } from "@/components/auth/parts/AuthLink";
 import { UseFormReturn, FieldValues, Path } from "react-hook-form";
 
 interface FieldConfig<T extends FieldValues> {
-  name: Path<T>; // Use Path<T> instead of string
+  name: Path<T>;
   label: string;
   type: "text" | "email" | "password";
   placeholder: string;
@@ -27,14 +26,16 @@ interface FieldConfig<T extends FieldValues> {
 interface AuthFormProps<T extends FieldValues> {
   form: UseFormReturn<T>;
   onSubmit: (data: T) => void;
-  fields: FieldConfig<T>[]; // Update to use FieldConfig<T>
+  fields: FieldConfig<T>[];
   title: string;
   subtitle: string;
   submitText: string;
   isSubmitting: boolean;
   error?: string | null;
   googleAuthText: string;
+  facebookAuthText: string;
   onGoogleAuth: () => void;
+  onFacebookAuth: () => void;
   authLink: { text: string; linkText: string; href: string };
   extraLink?: { text: string; linkText: string; href: string };
 }
@@ -49,16 +50,35 @@ export function AuthForm<T extends FieldValues>({
   isSubmitting,
   error,
   googleAuthText,
+  facebookAuthText,
   onGoogleAuth,
+  onFacebookAuth,
   authLink,
   extraLink,
 }: AuthFormProps<T>) {
   return (
     <AuthFormWrapper title={title} subtitle={subtitle} error={error}>
-      {googleAuthText && (
-        <GoogleAuthButton text={googleAuthText} onClick={onGoogleAuth} isSubmitting={isSubmitting} />
+      {(googleAuthText || facebookAuthText) && (
+        <div className="space-y-4">
+          {googleAuthText && (
+            <SocialAuthButton
+              provider="google"
+              text={googleAuthText}
+              onClick={onGoogleAuth}
+              isSubmitting={isSubmitting}
+            />
+          )}
+          {facebookAuthText && (
+            <SocialAuthButton
+              provider="facebook"
+              text={facebookAuthText}
+              onClick={onFacebookAuth}
+              isSubmitting={isSubmitting}
+            />
+          )}
+        </div>
       )}
-      <div className="relative mb-6">
+      <div className="relative my-6">
         <div className="absolute inset-0 flex items-center">
           <Separator className="w-full" />
         </div>
@@ -102,11 +122,7 @@ export function AuthForm<T extends FieldValues>({
               />
             </div>
           )}
-          <Button
-            type="submit"
-            className="w-full"
-            disabled={isSubmitting}
-          >
+          <Button type="submit" className="w-full" disabled={isSubmitting}>
             {isSubmitting ? "Signing in..." : submitText}
           </Button>
           <div className="text-center">

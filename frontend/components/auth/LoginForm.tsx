@@ -9,6 +9,7 @@ import { AuthForm } from "@/components/auth/AuthForm";
 import { useLogin } from "@/hooks/auth/useLogin";
 import { useRoleRedirect } from "@/hooks/useRoleRedirects";
 import { useGoogleAuth } from "@/hooks/auth/useGoogleAuth";
+import { useFacebookAuth } from "@/hooks/auth/useFacebookAuth";
 
 const loginSchema = z.object({
   email: z.string().email("Invalid email address"),
@@ -19,7 +20,12 @@ type LoginFormData = z.infer<typeof loginSchema>;
 
 export function LoginForm() {
   const { mutate: login, isPending, error } = useLogin();
-  const { handleGoogleAuth , isSubmitting , error:googleAuthError} = useGoogleAuth()
+  const { handleGoogleAuth, isSubmitting, error: googleAuthError } = useGoogleAuth()
+  const {
+    login: facebookLogin,
+    isLoading: facebookLoading,
+    error: facebookError,
+  } = useFacebookAuth();
   const { redirectByRole } = useRoleRedirect();
 
   const form = useForm<LoginFormData>({
@@ -68,9 +74,11 @@ export function LoginForm() {
         title="Welcome back"
         subtitle="Please enter your details to sign in"
         submitText="Sign in"
-        isSubmitting={isPending || isSubmitting}
-        error={googleAuthError|| error?.message}
+        isSubmitting={isPending || isSubmitting || facebookLoading}
+        error={googleAuthError|| error?.message || facebookError}
         googleAuthText="Continue with Google"
+        facebookAuthText="Go with Facebook"
+        onFacebookAuth={facebookLogin}
         onGoogleAuth={handleGoogleAuth}
         authLink={{
           text: "Don't have an account?",

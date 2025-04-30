@@ -42,6 +42,21 @@ export class AuthRepository implements IAuthRepository {
     }) as Promise<IAuthUser>;
   }
 
+
+  async createFacebookUser(name:string , email:string , picture:string , userId:string): Promise<IAuthUser> {
+    return this.prisma.user.create({
+      data: {
+        name,
+        email,
+        role: 'USER',
+        isVerified: true,
+        authProvider: 'FACEBOOK',
+        avatar:picture,
+        facebookId:userId
+      },
+    }) as Promise<IAuthUser>
+  }
+
   async resetPassword(email: string, hashedPassword: string): Promise<void> {
     await this.prisma.user.update({
       where: { email },

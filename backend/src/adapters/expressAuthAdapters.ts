@@ -69,6 +69,20 @@ export const adaptAuthController = (controller: AuthController) => ({
     });
   }),
 
+  facebookAuth: asyncHandler(
+    async (req: AuthenticatedRequest, res: Response) => {
+      const result = await controller.facebookAuth(req.body);
+      if (result.token) {
+        JwtUtil.setTokenCookie(res, result.token);
+      }
+      res.status(result.statusCode).json({
+        status: result.status,
+        data: result.data,
+        message: result.message,
+      });
+    }
+  ),
+
   logout: asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
     const result = await controller.logout();
     if (result.status === "success") JwtUtil.clearTokenCookie(res);
@@ -100,6 +114,8 @@ export const adaptAuthController = (controller: AuthController) => ({
         "UNAUTHORIZED"
       );
     }
+
+    
     const result = await controller.me(req.user.id);
     res.status(result.statusCode).json({
       status: result.status,

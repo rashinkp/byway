@@ -39,6 +39,12 @@ export interface IAuthRepository {
     email: string,
     googleId: string
   ): Promise<IAuthUser>;
+  createFacebookUser(
+    name: string,
+    email: string,
+    picture: string,
+    userId: string
+  ): Promise<IAuthUser>
 }
 
 
@@ -50,4 +56,13 @@ export interface IGoogleAuthGateway {
     sub: string;
     [key: string]: any;
   }>;
+}
+
+
+export interface FacebookAuthData {
+  accessToken: string;
+  userId: string;
+  name?: string;
+  email?: string;
+  picture?: string;
 }
