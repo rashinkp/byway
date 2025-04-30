@@ -9,6 +9,8 @@ import { SplitScreenLayout } from "@/components/ui/SplitScreenLayout";
 import { AuthForm } from "@/components/auth/AuthForm";
 import { useSignup } from "@/hooks/auth/useSignup";
 import { useGoogleAuth } from "@/hooks/auth/useGoogleAuth";
+import { useRoleRedirect } from "@/hooks/useRoleRedirects";
+import { useFacebookAuth } from "@/hooks/auth/useFacebookAuth";
 
 const signupSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters"),
@@ -23,6 +25,14 @@ export function SignupForm() {
   const { mutate: signup, isPending, error } = useSignup();
   const {error:googelAuthError ,isSubmitting , handleGoogleAuth } = useGoogleAuth()
 
+
+   const {
+      login: facebookLogin,
+      isLoading: facebookLoading,
+      error: facebookError,
+    } = useFacebookAuth();
+  const { redirectByRole } = useRoleRedirect();
+  
 
   const form = useForm<SignupFormData>({
     resolver: zodResolver(signupSchema),
@@ -78,10 +88,12 @@ export function SignupForm() {
         title="Create account"
         subtitle="Join our platform to start learning"
         submitText="Create account"
-        isSubmitting={isPending || isSubmitting}
-        error={error?.message || googelAuthError}
+        isSubmitting={isPending || isSubmitting || facebookLoading}
+        error={error?.message || googelAuthError || facebookError}
         googleAuthText="Sign up with Google"
         onGoogleAuth={handleGoogleAuth}
+        onFacebookAuth={facebookLogin}
+        facebookAuthText="Create account with facebook"
         authLink={{
           text: "Already have an account?",
           linkText: "Sign in",
