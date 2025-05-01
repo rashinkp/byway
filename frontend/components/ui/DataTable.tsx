@@ -23,19 +23,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { TableSkeleton } from "@/components/skeleton/DataTableSkeleton";
-
-interface Column<T> {
-  header: string;
-  accessor: keyof T | ((item: T) => string | number | React.ReactNode);
-  render?: (item: T) => React.ReactNode;
-}
-
-interface Action<T> {
-  label: string | ((item: T) => string);
-  onClick: (item: T) => void;
-  variant?: "default" | "outline" | "destructive" | ((item: T) => "default" | "outline" | "destructive");
-  confirmationMessage?: (item: T) => string;
-}
+import { Column, Action } from "@/types/common";
 
 interface DataTableProps<T> {
   data: T[];
@@ -44,7 +32,6 @@ interface DataTableProps<T> {
   onRowClick?: (item: T) => void;
   actions?: Action<T>[];
   itemsPerPage?: number;
-  completeData?: T[];
   totalItems?: number;
   currentPage?: number;
   setCurrentPage?: (page: number) => void;
@@ -65,7 +52,9 @@ export function DataTable<T>({
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [confirmItem, setConfirmItem] = useState<T | null>(null);
   const [confirmAction, setConfirmAction] = useState<(() => void) | null>(null);
-  const [confirmActionIndex, setConfirmActionIndex] = useState<number | null>(null);
+  const [confirmActionIndex, setConfirmActionIndex] = useState<number | null>(
+    null
+  );
 
   const currentPage = externalCurrentPage ?? internalCurrentPage;
   const setCurrentPage = externalSetCurrentPage ?? setInternalCurrentPage;
@@ -81,7 +70,11 @@ export function DataTable<T>({
     if (currentPage < totalPages) setCurrentPage(currentPage + 1);
   };
 
-  const handleActionClick = (item: T, action: Action<T>, actionIndex: number) => {
+  const handleActionClick = (
+    item: T,
+    action: Action<T>,
+    actionIndex: number
+  ) => {
     if (action.confirmationMessage) {
       setConfirmItem(item);
       setConfirmAction(() => () => action.onClick(item));
@@ -112,7 +105,10 @@ export function DataTable<T>({
     <div className="space-y-4">
       <div className="bg-white/10 backdrop-blur-md rounded-lg shadow-lg overflow-hidden border border-gray-200/20">
         {isLoading ? (
-          <TableSkeleton columns={columns.length} hasActions={actions.length > 0} />
+          <TableSkeleton
+            columns={columns.length}
+            hasActions={actions.length > 0}
+          />
         ) : (
           <Table>
             <TableHeader>
@@ -166,9 +162,9 @@ export function DataTable<T>({
                         >
                           {column.render
                             ? column.render(item)
-                            : typeof column.accessor === "function"
-                            ? column.accessor(item)
-                            : (item[column.accessor as keyof T] as React.ReactNode)}
+                            : (item[
+                                column.accessor as keyof T
+                              ] as React.ReactNode)}
                         </TableCell>
                       ))}
                       {actions.length > 0 && (
@@ -205,9 +201,16 @@ export function DataTable<T>({
                                   `}
                                   onClick={(e) => {
                                     e.stopPropagation();
-                                    handleActionClick(item, action, actionIndex);
+                                    handleActionClick(
+                                      item,
+                                      action,
+                                      actionIndex
+                                    );
                                   }}
                                 >
+                                  {action.Icon && (
+                                    <action.Icon className="h-4 w-4 mr-1" />
+                                  )}
                                   {label}
                                 </Button>
                               );
@@ -272,14 +275,17 @@ export function DataTable<T>({
             <AlertDialogTitle>Are you sure?</AlertDialogTitle>
             <AlertDialogDescription>
               {confirmItem && confirmActionIndex !== null
-                ? actions[confirmActionIndex]?.confirmationMessage?.(confirmItem) ||
-                  "Are you sure you want to perform this action?"
+                ? actions[confirmActionIndex]?.confirmationMessage?.(
+                    confirmItem
+                  ) || "Are you sure you want to perform this action?"
                 : "Are you sure you want to perform this action?"}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={handleConfirm}>Confirm</AlertDialogAction>
+            <AlertDialogAction onClick={handleConfirm}>
+              Confirm
+            </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>

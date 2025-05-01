@@ -1,19 +1,14 @@
-
 "use client";
 
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { Category, IGetAllCategoriesInput } from "@/types/category";
 import { getAllCategories } from "@/api/category";
 
-// Define the return type for useCategories
 interface UseCategoriesReturn {
-  categories: Category[];
-  total: number;
-  totalPages: number;
-  loading: boolean;
-  error: Error | null;
+  data: { items: Category[]; total: number; totalPages: number } | undefined;
+  isLoading: boolean;
+  error: { message: string } | null;
   refetch: () => void;
-  setCategories: (newCategories: Category[]) => void;
 }
 
 export function useCategories({
@@ -25,11 +20,22 @@ export function useCategories({
   sortBy = "name",
   filterBy = "All",
 }: IGetAllCategoriesInput = {}): UseCategoriesReturn {
-  const queryClient = useQueryClient();
+  // Handle negative sort orders
+  let adjustedSortBy: IGetAllCategoriesInput["sortBy"] = sortBy;
+  let adjustedSortOrder: IGetAllCategoriesInput["sortOrder"] = sortOrder;
+
+  if (sortBy?.startsWith("-")) {
+    adjustedSortBy = sortBy.slice(1) as IGetAllCategoriesInput["sortBy"];
+    adjustedSortOrder = sortOrder === "asc" ? "desc" : "asc";
+  }
 
   // Adjust includeDeleted based on filterBy
   const shouldIncludeDeleted =
-    filterBy === "Inactive" ? true : filterBy === "Active" ? false : includeDeleted;
+    filterBy === "Inactive"
+      ? true
+      : filterBy === "Active"
+      ? false
+      : includeDeleted;
 
   const { data, isLoading, error, refetch } = useQuery<{
     data: Category[];
@@ -44,8 +50,8 @@ export function useCategories({
         limit,
         search,
         includeDeleted: shouldIncludeDeleted,
-        sortOrder,
-        sortBy,
+        sortOrder: adjustedSortOrder,
+        sortBy: adjustedSortBy,
         filterBy,
       });
 
@@ -58,23 +64,26 @@ export function useCategories({
     },
   });
 
-  // Local state management for optimistic updates
-  const setCategories = (newCategories: Category[]) => {
-    queryClient.setQueryData(["categories", page, limit, search, sortBy, sortOrder, filterBy], {
-      data: newCategories,
-      total: newCategories.length,
-      page,
-      limit,
-    });
-  };
+  // Map error to ensure it has a message property
+  const mappedError = error
+    ? {
+        message:
+          error instanceof Error
+            ? error.message
+            : "An unexpected error occurred",
+      }
+    : null;
 
   return {
-    categories: data?.data || [],
-    total: data?.total || 0,
-    totalPages: data ? Math.ceil(data.total / limit) : 0,
-    loading: isLoading,
-    error,
+    data: data
+      ? {
+          items: data.data,
+          total: data.total,
+          totalPages: Math.ceil(data.total / limit),
+        }
+      : undefined,
+    isLoading,
+    error: mappedError,
     refetch,
-    setCategories,
   };
 }

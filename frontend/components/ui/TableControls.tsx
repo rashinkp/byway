@@ -15,27 +15,23 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Search, RefreshCcw, Filter, ArrowUp, ArrowDown } from "lucide-react";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { SortOption } from "@/types/common";
 
-interface SortOption<T extends string> {
-  value: T;
-  label: string;
-}
-
-interface TableControlsProps<T extends string> {
+interface TableControlsProps {
   searchTerm: string;
   setSearchTerm: (term: string) => void;
   filterStatus: string;
   setFilterStatus: (status: string) => void;
-  sortBy: T;
-  setSortBy: (sort: T) => void;
+  sortBy: string;
+  setSortBy: (sort: string) => void;
   sortOrder: "asc" | "desc";
   setSortOrder: (order: "asc" | "desc") => void;
-  sortOptions: SortOption<T>[];
+  sortOptions: SortOption<any>[];
   onRefresh: () => void;
   filterTabs?: { value: string; label: string }[];
 }
 
-export function TableControls<T extends string>({
+export function TableControls({
   searchTerm,
   setSearchTerm,
   filterStatus,
@@ -51,7 +47,7 @@ export function TableControls<T extends string>({
     { value: "Active", label: "Active" },
     { value: "Inactive", label: "Inactive" },
   ],
-}: TableControlsProps<T>) {
+}: TableControlsProps) {
   const [inputSearchTerm, setInputSearchTerm] = useState(searchTerm);
   const [debouncedSearchTerm] = useDebounce(inputSearchTerm, 300);
 
@@ -59,9 +55,8 @@ export function TableControls<T extends string>({
     setSearchTerm(debouncedSearchTerm);
   }, [debouncedSearchTerm, setSearchTerm]);
 
-  // Contextual labels for sort order based on sortBy
   const getOrderLabel = () => {
-    if (sortBy === "name" || sortBy === "title") {
+    if (sortBy === "name" || sortBy === "title" || sortBy === "email") {
       return sortOrder === "asc" ? "A-Z" : "Z-A";
     }
     if (sortBy === "createdAt" || sortBy === "updatedAt") {
@@ -69,9 +64,6 @@ export function TableControls<T extends string>({
     }
     if (sortBy === "courses") {
       return sortOrder === "desc" ? "Most" : "Fewest";
-    }
-    if (sortBy === "email") {
-      return sortOrder === "asc" ? "A-Z" : "Z-A";
     }
     return sortOrder === "asc" ? "Ascending" : "Descending";
   };
@@ -119,15 +111,20 @@ export function TableControls<T extends string>({
                 className="flex items-center gap-1"
               >
                 <Filter className="h-4 w-4" />
-                Sort: {sortOptions.find((opt) => opt.value === sortBy)?.label || "Select"}
+                Sort:{" "}
+                {sortOptions.find((opt) => opt.value === sortBy)?.label ||
+                  "Select"}
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-48">
               <DropdownMenuLabel>Sort by</DropdownMenuLabel>
               <DropdownMenuSeparator />
-              <DropdownMenuRadioGroup value={sortBy} onValueChange={(value) => setSortBy(value as T)}>
+              <DropdownMenuRadioGroup value={sortBy} onValueChange={setSortBy}>
                 {sortOptions.map((option) => (
-                  <DropdownMenuRadioItem key={option.value} value={option.value}>
+                  <DropdownMenuRadioItem
+                    key={option.value}
+                    value={option.value}
+                  >
                     {option.label}
                   </DropdownMenuRadioItem>
                 ))}

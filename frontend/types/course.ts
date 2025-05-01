@@ -55,3 +55,16 @@ export interface CourseApiResponse {
 
 
 export type CourseEditFormData = z.infer<typeof courseEditSchema>;
+
+export type SortByField = "title" | "createdAt";
+export type NegativeSortByField = `-${SortByField}`;
+
+export interface IGetAllCoursesInput {
+  page?: number;
+  limit?: number;
+  search?: string;
+  includeDeleted?: boolean;
+  sortOrder?: "asc" | "desc";
+  sortBy?: SortByField | NegativeSortByField | undefined;
+  filterBy?: "All" | "Active" | "Inactive";
+}

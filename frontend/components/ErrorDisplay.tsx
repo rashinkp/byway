@@ -1,7 +1,7 @@
 import React, { FC } from "react";
 
 interface ErrorDisplayProps {
-  error: { message: string };
+  error: unknown;
   onRetry?: () => void;
   title?: string;
   description?: string;
@@ -13,6 +13,13 @@ const ErrorDisplay: FC<ErrorDisplayProps> = ({
   title,
   description,
 }) => {
+  const errorMessage =
+    error instanceof Error
+      ? error.message
+      : typeof error === "string"
+      ? error
+      : "An unexpected error occurred";
+
   return (
     <div className="space-y-6">
       {(title || description) && (
@@ -26,7 +33,7 @@ const ErrorDisplay: FC<ErrorDisplayProps> = ({
         </div>
       )}
       <div className="text-red-600">
-        <p>Error: {error.message}</p>
+        <p>Error: {errorMessage}</p>
         {onRetry && (
           <button
             onClick={onRetry}

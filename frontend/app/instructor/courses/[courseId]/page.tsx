@@ -1,14 +1,12 @@
 "use client";
 import { useRouter, useParams } from "next/navigation";
-import { Button } from "@/components/ui/button";
 import { LessonManager } from "@/components/lesson/LessonManager";
 import { useGetCourseById } from "@/hooks/course/useGetCourseById";
 import PlaceHolderImage from "@/public/placeHolder.jpg";
 import { CourseDetails } from "@/components/course/CourseDetails";
 import {  useRef } from "react";
-import { useMutation } from "@tanstack/react-query";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import {  FileEdit, Loader2, Users,  TrendingUp } from "lucide-react";
+import {  Users,  TrendingUp } from "lucide-react";
 import ErrorDisplay from "@/components/ErrorDisplay";
 
 export default function CourseDetailPage() {
@@ -24,10 +22,6 @@ export default function CourseDetailPage() {
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-
- 
-
- 
 
   if (error) {
     return (

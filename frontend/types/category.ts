@@ -21,12 +21,15 @@ export interface IGetAllCategoryResponse {
   data: ICategoryListOutput;
 }
 
+export type SortByField = "name" | "createdAt" | "updatedAt" | "courses";
+export type NegativeSortByField = `-${SortByField}`;
+
 export interface IGetAllCategoriesInput {
   page?: number;
   limit?: number;
-  sortBy?: "name" | "createdAt" | "updatedAt" | "courses";
-  sortOrder?: "asc" | "desc";
-  includeDeleted?: boolean;
   search?: string;
+  includeDeleted?: boolean;
+  sortOrder?: "asc" | "desc";
+  sortBy?: SortByField | NegativeSortByField | undefined;
   filterBy?: "All" | "Active" | "Inactive";
 }

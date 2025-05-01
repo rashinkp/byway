@@ -16,9 +16,16 @@ export interface IGetAllUsersResponse {
   limit: number;
 }
 
+export type SortByField = "name" | "email" | "createdAt";
+export type NegativeSortByField = `-${SortByField}`;
+
 export interface IGetAllUsersInput {
   page?: number;
   limit?: number;
-  role?: "USER" | "INSTRUCTOR" | "ADMIN";
+  search?: string;
   includeDeleted?: boolean;
+  sortOrder?: "asc" | "desc";
+  sortBy?: SortByField | NegativeSortByField | undefined;
+  filterBy?: "All" | "Active" | "Inactive";
+  role?: "USER" | "INSTRUCTOR" | "ADMIN";
 }
