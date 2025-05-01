@@ -19,8 +19,8 @@ export function SidebarHeader({
   toggleCollapse?: () => void;
   title: string;
   subtitle: string;
-}) {
-  const initials = title.substring(0, 2).toUpperCase();
+  }) {
+  
 
   return (
     <div

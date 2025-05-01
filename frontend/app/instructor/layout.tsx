@@ -1,5 +1,6 @@
 "use client";
 
+import { SkeletonLayout } from "@/components/admin/SkeletonLayout";
 import CommonLayout from "@/components/common/layout/CommonLayout";
 import { INSTRUCTOR_NAV_ITEMS } from "@/types/nav";
 import { ReactNode } from "react";
@@ -15,7 +16,8 @@ export default function InstructorLayout({ children }: InstructorLayoutProps) {
       sidebarHeaderSubtitle="Teaching Console"
       navItems={INSTRUCTOR_NAV_ITEMS}
       role="INSTRUCTOR"
-      isCollapsible={false}
+      isCollapsible={true}
+      skeleton={<SkeletonLayout />}
     >
       {children}
     </CommonLayout>

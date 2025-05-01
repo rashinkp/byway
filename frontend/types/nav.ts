@@ -64,4 +64,19 @@ export const INSTRUCTOR_NAV_ITEMS: NavItem[] = [
     label: "Courses",
     icon: BookOpen,
   },
+  {
+    href: "/instructor/students",
+    label: "Students",
+    icon: Users,
+  },
+  {
+    href: "/instructor/analytics",
+    label: "Analytics",
+    icon: BarChart,
+  },
+  {
+    href: "/instructor/settings",
+    label: "Settings",
+    icon: Settings,
+  },
 ];
