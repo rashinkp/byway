@@ -23,15 +23,11 @@ export function CourseDetails({
   course,
   src,
   alt,
-  onImageChange,
-  isUploading,
   isLoading,
 }: {
   course?: Course;
   src: string | StaticImageData;
   alt: string;
-  onImageChange: () => void;
-  isUploading: boolean;
   isLoading: boolean;
 }) {
   const [isEditing, setIsEditing] = useState(false);
@@ -48,8 +44,7 @@ export function CourseDetails({
       title: course?.title || "",
       description: course?.description || "",
       level:
-        (course?.level as "BEGINNER" | "INTERMEDIATE" | "ADVANCED") ||
-        "BEGINNER",
+        (course?.level as "BEGINNER" | "MEDIUM" | "ADVANCED") || "BEGINNER",
       price: course?.price || 0,
       duration: course?.duration ?? 0,
       offer: course?.offer || undefined,
@@ -64,9 +59,9 @@ export function CourseDetails({
       form.reset({
         title: course.title || "",
         description: course.description || "",
-        level: (course.level === "MEDIUM" ? "INTERMEDIATE" : course.level) as
+        level: (course.level === "MEDIUM" ? "MEDIUM" : course.level) as
           | "BEGINNER"
-          | "INTERMEDIATE"
+          | "MEDIUM"
           | "ADVANCED",
         price: course.price || 0,
         duration: course.duration || 0,
@@ -172,7 +167,7 @@ export function CourseDetails({
         src={src}
         alt={alt}
         onImageChange={handleImageUpload}
-        isUploading={isUploading || uploadProgress !== null}
+        isUploading={uploadProgress !== null}
         uploadProgress={uploadProgress}
         uploadError={uploadError}
       />

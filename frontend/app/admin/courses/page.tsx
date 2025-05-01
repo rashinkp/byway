@@ -14,6 +14,7 @@ import { StatsSkeleton } from "@/components/skeleton/StatsSkeleton";
 import { TableSkeleton } from "@/components/skeleton/DataTableSkeleton";
 import { PaginationSkeleton } from "@/components/skeleton/PaginationSkeleton";
 import { useSoftDeleteCourse } from "@/hooks/course/useSoftDeleteCourse";
+import ErrorDisplay from "@/components/ErrorDisplay";
 
 
 export default function CoursesPage() {
@@ -100,29 +101,12 @@ export default function CoursesPage() {
 
   if (error) {
     return (
-      <div className="space-y-6">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-800">Course Management</h1>
-            <p className="text-gray-500 mt-1">Manage courses and their visibility</p>
-          </div>
-          <div className="flex space-x-2">
-            {/* <Button
-              className="bg-blue-600 hover:bg-blue-700 text-white"
-              onClick={handleViewRequests}
-            >
-              <BookOpen className="mr-2 h-4 w-4" />
-              Course Requests
-            </Button> */}
-          </div>
-        </div>
-        <div className="text-red-600">
-          <p>Error: {error.message}</p>
-          <Button onClick={() => refetch()} className="mt-4">
-            Retry
-          </Button>
-        </div>
-      </div>
+      <ErrorDisplay
+        title="Course Error"
+        description="Course error occured. Please try again"
+        error={error}
+        onRetry={() => refetch()}
+      />
     );
   }
 
@@ -134,14 +118,6 @@ export default function CoursesPage() {
           <p className="text-gray-500 mt-1">Manage courses and their visibility</p>
         </div>
         <div className="flex space-x-2">
-          {/* <Button
-            className="bg-blue-600 hover:bg-blue-700 text-white"
-            onClick={handleViewRequests}
-          >
-            <BookOpen className="mr-2 h-4 w-4" />
-            Course Requests
-          </Button> */}
-          
         </div>
       </div>
 

@@ -17,6 +17,7 @@ import { StatsSkeleton } from "@/components/skeleton/StatsSkeleton";
 import { TableSkeleton } from "@/components/skeleton/DataTableSkeleton";
 import { DataTable } from "@/components/ui/DataTable";
 import { PaginationSkeleton } from "@/components/skeleton/PaginationSkeleton";
+import ErrorDisplay from "@/components/ErrorDisplay";
 
 export default function CategoriesPage() {
   const [page, setPage] = useState(1);
@@ -114,27 +115,12 @@ export default function CategoriesPage() {
 
   if (error) {
     return (
-      <div className="space-y-6">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-800">Category Management</h1>
-            <p className="text-gray-500 mt-1">Manage course categories and their settings</p>
-          </div>
-          <Button
-            className="bg-black hover:bg-black-700 text-white"
-            onClick={() => setIsAddOpen(true)}
-          >
-            <Plus className="mr-2 h-5 w-5" />
-            Add Category
-          </Button>
-        </div>
-        <div className="text-red-600">
-          <p>Error: {error.message}</p>
-          <Button onClick={() => refetch()} className="mt-4">
-            Retry
-          </Button>
-        </div>
-      </div>
+      <ErrorDisplay
+        title="Category Error"
+        description="Error occured while working with category"
+        error={error}
+        onRetry={() => refetch()}
+      />
     );
   }
 

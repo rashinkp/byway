@@ -65,9 +65,9 @@ export const fields: FormFieldConfig<CourseFormData>[] = [
     placeholder: "Select a level",
     description: "Choose the difficulty level of the course.",
     options: [
-      { value: "BEGINNER", label: "Beginner" },
-      { value: "MEDIUM", label: "Intermediate" },
-      { value: "ADVANCED", label: "Advanced" },
+      { value: "BEGINNER", label: "BEGINNER" },
+      { value: "MEDIUM", label: "MEDIUM" },
+      { value: "ADVANCED", label: "ADVANCED" },
     ],
     column: "right",
   },

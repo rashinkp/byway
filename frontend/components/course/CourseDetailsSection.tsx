@@ -64,11 +64,11 @@ export const DetailsSection = ({
               onValueChange={(value) =>
                 form.setValue(
                   "level",
-                  value as "BEGINNER" | "INTERMEDIATE" | "ADVANCED"
+                  value as "BEGINNER" | "MEDIUM" | "ADVANCED"
                 )
               }
               defaultValue={
-                course?.level === "MEDIUM" ? "INTERMEDIATE" : course?.level
+                course?.level
               }
               disabled={formState.isSubmitting}
             >
@@ -76,18 +76,18 @@ export const DetailsSection = ({
                 <SelectValue placeholder="Select level" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="BEGINNER">Beginner</SelectItem>
-                <SelectItem value="INTERMEDIATE">Intermediate</SelectItem>
-                <SelectItem value="ADVANCED">Advanced</SelectItem>
+                <SelectItem value="BEGINNER">BEGINNER</SelectItem>
+                <SelectItem value="MEDIUM">MEDIUM</SelectItem>
+                <SelectItem value="ADVANCED">ADVANCED</SelectItem>
               </SelectContent>
             </Select>
           ) : (
             <p className="mt-1 text-gray-900 font-medium">
               {course?.level
-                ? (course.level === "MEDIUM" ? "INTERMEDIATE" : course.level)
+                ? (course.level)
                     .charAt(0)
                     .toUpperCase() +
-                  (course.level === "MEDIUM" ? "INTERMEDIATE" : course.level)
+                  (course.level)
                     .slice(1)
                     .toLowerCase()
                 : "Not available"}

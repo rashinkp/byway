@@ -14,6 +14,7 @@ import { Pagination } from "@/components/ui/Pagination";
 import { StatsSkeleton } from "@/components/skeleton/StatsSkeleton";
 import { TableSkeleton } from "@/components/skeleton/DataTableSkeleton";
 import { PaginationSkeleton } from "@/components/skeleton/PaginationSkeleton";
+import ErrorDisplay from "@/components/ErrorDisplay";
 
 interface InstructorFormData {
   name: string;
@@ -102,36 +103,15 @@ export default function InstructorsPage() {
 
   
 
-  const handleViewRequests = () => {
-    console.log("View instructor requests clicked");
-  };
 
   if (error) {
     return (
-      <div className="space-y-6">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-800">Instructor Management</h1>
-            <p className="text-gray-500 mt-1">Manage instructor accounts and their access</p>
-          </div>
-          <div className="flex space-x-2">
-            {/* <Button
-              className="bg-blue-600 hover:bg-blue-700 text-white"
-              onClick={handleViewRequests}
-            >
-              <Users className="mr-2 h-4 w-4" />
-              Requests
-            </Button> */}
-           
-          </div>
-        </div>
-        <div className="text-red-600">
-          <p>Error: {error.message}</p>
-          <Button onClick={() => refetch()} className="mt-4">
-            Retry
-          </Button>
-        </div>
-      </div>
+      <ErrorDisplay
+        title="Instructor Page Error"
+        description="Instructor page error occured. Please try again"
+        error={error}
+        onRetry={() => refetch()}
+      />
     );
   }
 

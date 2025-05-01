@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState } from "react";
 import { Course } from "@/types/course";
 import { useGetAllCourses } from "@/hooks/course/useGetAllCourse";
 import { StatusBadge } from "@/components/ui/StatusBadge";
@@ -18,6 +18,8 @@ import { TableSkeleton } from "@/components/skeleton/DataTableSkeleton";
 import { PaginationSkeleton } from "@/components/skeleton/PaginationSkeleton";
 import { StatsSkeleton } from "@/components/skeleton/StatsSkeleton";
 import { courseSchema } from "@/lib/validations/course";
+import { error } from "console";
+import ErrorDisplay from "@/components/ErrorDisplay";
 
 
 
@@ -38,7 +40,7 @@ export default function CoursesPage() {
 
   const { mutate: toggleDeleteCourse } = useSoftDeleteCourse();
 
-  const { data, refetch , isLoading } = useGetAllCourses({
+  const { data, refetch , isLoading , error } = useGetAllCourses({
     page,
     limit: 10,
     sortBy,
@@ -114,6 +116,18 @@ export default function CoursesPage() {
     },
     
   ];
+
+
+  if (error) {
+    return (
+      <ErrorDisplay
+        title="Course Error"
+        description="Course error occured. Please try again"
+        error={error}
+        onRetry={() => refetch()}
+      />
+    );
+  }
 
 
   return (

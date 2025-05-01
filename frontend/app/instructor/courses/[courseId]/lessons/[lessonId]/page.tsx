@@ -1,7 +1,7 @@
 "use client";
 
 import { useParams } from "next/navigation";
-import { ILesson, LessonStatus, UpdateLessonInput} from "@/types/lesson";
+import {  LessonStatus, UpdateLessonInput} from "@/types/lesson";
 import { LessonDetailSection } from "@/components/lesson/LessonDetailSection";
 import { toast } from "sonner";
 import { useGetLessonById } from "@/hooks/lesson/useGetLessonById";
@@ -12,6 +12,7 @@ import { ContentSectionSkeleton } from "@/components/skeleton/LessonContentSecti
 import { z } from "zod";
 import { LessonFormData, lessonSchema } from "@/lib/validations/lesson";
 import { LessonDetailSectionSkeleton } from "@/components/skeleton/LessonDetailSection";
+import ErrorDisplay from "@/components/ErrorDisplay";
 
 export default function LessonDetailPage() {
   const { courseId, lessonId } = useParams();
@@ -36,11 +37,8 @@ export default function LessonDetailPage() {
       toast.error("Lesson data is not available");
       return;
     }
-
     try {
-      // Validate data
       lessonSchema.parse(data);
-
       const updateData: UpdateLessonInput = {
         lessonId: lesson.id,
         title: data.title,
@@ -68,23 +66,14 @@ export default function LessonDetailPage() {
     );
   }
 
-  if (error ) {
+  if (error) {
     return (
-      <div className="container mx-auto py-6 space-y-8">
-        <div className="bg-white shadow rounded-lg p-6">
-          <div className="text-red-600">
-            <p>
-              Error: {error?.message || updateError?.message || "Unknown error"}
-            </p>
-            <button
-              onClick={() => refetch()}
-              className="mt-4 bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded"
-            >
-              Retry
-            </button>
-          </div>
-        </div>
-      </div>
+      <ErrorDisplay
+        title="Lesson Page Error"
+        description="Lesson page error occured. Please try again"
+        error={error}
+        onRetry={() => refetch()}
+      />
     );
   }
 

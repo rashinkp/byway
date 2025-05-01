@@ -9,6 +9,7 @@ import {  useRef } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import {  FileEdit, Loader2, Users,  TrendingUp } from "lucide-react";
+import ErrorDisplay from "@/components/ErrorDisplay";
 
 export default function CourseDetailPage() {
   const { courseId } = useParams();
@@ -17,41 +18,25 @@ export default function CourseDetailPage() {
     data: course,
     isLoading,
     error,
+    refetch
   } = useGetCourseById(courseId as string);
   
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
 
-  const { mutate: updateThumbnail, isPending: isUploading } = useMutation({
-   
-  });
+ 
 
-  
-
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    // if (e.target.files && e.target.files[0]) {
-    //   updateThumbnail(e.target.files[0]);
-    // }
-  };
+ 
 
   if (error) {
     return (
-      <div className="container mx-auto py-12 px-4 sm:px-6 lg:px-8">
-        <div className="bg-red-50 border border-red-200 rounded-lg p-6 text-center max-w-2xl mx-auto">
-          <p className="text-red-500 font-medium text-lg mb-4">
-            {error?.message || "Course not found"}
-          </p>
-          <Button
-            variant="outline"
-            onClick={() => router.push("/instructor/courses")}
-            className="inline-flex items-center"
-          >
-            <FileEdit className="h-4 w-4 mr-2" />
-            Back to Courses
-          </Button>
-        </div>
-      </div>
+      <ErrorDisplay
+        title="Course Error"
+        description="Course error occured. Please try again"
+        error={error}
+        onRetry={() => refetch()}
+      />
     );
   }
 
@@ -132,15 +117,12 @@ export default function CourseDetailPage() {
             isLoading={isLoading}
             src={course?.thumbnail||PlaceHolderImage}
             alt={course?.title || "Course Thumbnail"}
-            onImageChange={() => fileInputRef.current?.click()}
-            isUploading={isUploading}
           />
           <input
             type="file"
             ref={fileInputRef}
             accept="image/*"
             className="hidden"
-            onChange={handleImageChange}
             aria-label="Upload course thumbnail"
           />
         </TabsContent>

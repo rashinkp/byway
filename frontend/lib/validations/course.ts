@@ -5,7 +5,7 @@ export const courseEditSchema = z
   .object({
     title: z.string().min(1, "Title is required"),
     description: z.string().optional(),
-    level: z.enum(["BEGINNER", "INTERMEDIATE", "ADVANCED"]),
+    level: z.enum(["BEGINNER", "MEDIUM", "ADVANCED"]),
     price: z.number().min(0, "Price cannot be negative"),
     duration: z.number().min(1, "Duration must be at least 1 minute"),
     offer: z.number().min(0, "Offer price cannot be negative").optional(),

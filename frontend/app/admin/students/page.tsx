@@ -15,6 +15,7 @@ import { PageSkeleton } from "@/components/skeleton/ListingPageSkeleton";
 import { StatsSkeleton } from "@/components/skeleton/StatsSkeleton";
 import { TableSkeleton } from "@/components/skeleton/DataTableSkeleton";
 import { PaginationSkeleton } from "@/components/skeleton/PaginationSkeleton";
+import ErrorDisplay from "@/components/ErrorDisplay";
 
 export default function StudentsPage() {
   const [page, setPage] = useState(1);
@@ -89,24 +90,12 @@ export default function StudentsPage() {
 
   if (error) {
     return (
-      <div className="space-y-6">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-800">
-              Student Management
-            </h1>
-            <p className="text-gray-500 mt-1">
-              Manage Student and their settings
-            </p>
-          </div>
-        </div>
-        <div className="text-red-600">
-          <p>Error: {error.message}</p>
-          <Button onClick={() => refetch()} className="mt-4">
-            Retry
-          </Button>
-        </div>
-      </div>
+      <ErrorDisplay
+        title="Student page Error"
+        description="Student page error occured. Please try again"
+        error={error}
+        onRetry={() => refetch()}
+      />
     );
   }
 
