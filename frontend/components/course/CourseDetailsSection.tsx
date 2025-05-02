@@ -1,4 +1,3 @@
-// components/CourseDetailsSection.tsx
 import { formatDate } from "@/utils/formatDate";
 import { Input } from "../ui/input";
 import {
@@ -10,7 +9,6 @@ import {
 } from "@/components/ui/select";
 import { Course } from "@/types/course";
 import { StatusBadge } from "../ui/StatusBadge";
-import { Progress } from "../ui/progress"; // Assuming you have a Progress component (e.g., from shadcn/ui)
 
 export const DetailsSection = ({
   course,
@@ -29,10 +27,9 @@ export const DetailsSection = ({
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-      {/* Left Column */}
-      <div className="space-y-6">
+      <div className="space-y-4">
         <div>
-          <h3 className="text-sm font-medium text-gray-700">Title</h3>
+          <h3 className="text-sm font-medium text-gray-600">Title</h3>
           {isEditing ? (
             <Input
               {...register("title")}
@@ -41,24 +38,18 @@ export const DetailsSection = ({
               disabled={formState.isSubmitting}
             />
           ) : (
-            <p className="mt-1 text-gray-900 font-medium">
+            <p className="mt-1 text-gray-900">
               {course?.title || "Not available"}
             </p>
           )}
           {formState.errors.title && (
-            <p className="text-red-500 text-sm mt-1">
+            <p className="text-red-500 text-xs mt-1">
               {formState.errors.title.message}
             </p>
           )}
         </div>
         <div>
-          <h3 className="text-sm font-medium text-gray-700">Id</h3>
-          <p className="mt-1 text-gray-900 font-medium">
-            {course?.id || "Not available"}
-          </p>
-        </div>
-        <div>
-          <h3 className="text-sm font-medium text-gray-700">Level</h3>
+          <h3 className="text-sm font-medium text-gray-600">Level</h3>
           {isEditing ? (
             <Select
               onValueChange={(value) =>
@@ -67,112 +58,65 @@ export const DetailsSection = ({
                   value as "BEGINNER" | "MEDIUM" | "ADVANCED"
                 )
               }
-              defaultValue={
-                course?.level
-              }
+              defaultValue={course?.level}
               disabled={formState.isSubmitting}
             >
               <SelectTrigger className="mt-1">
                 <SelectValue placeholder="Select level" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="BEGINNER">BEGINNER</SelectItem>
-                <SelectItem value="MEDIUM">MEDIUM</SelectItem>
-                <SelectItem value="ADVANCED">ADVANCED</SelectItem>
+                <SelectItem value="BEGINNER">Beginner</SelectItem>
+                <SelectItem value="MEDIUM">Medium</SelectItem>
+                <SelectItem value="ADVANCED">Advanced</SelectItem>
               </SelectContent>
             </Select>
           ) : (
-            <p className="mt-1 text-gray-900 font-medium">
+            <p className="mt-1 text-gray-900">
               {course?.level
-                ? (course.level)
-                    .charAt(0)
-                    .toUpperCase() +
-                  (course.level)
-                    .slice(1)
-                    .toLowerCase()
+                ? course.level.charAt(0) + course.level.slice(1).toLowerCase()
                 : "Not available"}
-            </p>
-          )}
-          {formState.errors.level && (
-            <p className="text-red-500 text-sm mt-1">
-              {formState.errors.level.message}
             </p>
           )}
         </div>
         <div>
-          <h3 className="text-sm font-medium text-gray-700">Price</h3>
+          <h3 className="text-sm font-medium text-gray-600">Price</h3>
           {isEditing ? (
             <Input
               type="number"
               step="0.01"
               {...register("price", { valueAsNumber: true })}
-              className="mt-1 w-32"
+              className="mt-1 w-24"
               placeholder="Price"
               disabled={formState.isSubmitting}
             />
           ) : (
-            <p className="mt-1 text-gray-900 font-medium">
+            <p className="mt-1 text-gray-900">
               ${course?.price?.toFixed(2) || "0.00"}
-            </p>
-          )}
-          {formState.errors.price && (
-            <p className="text-red-500 text-sm mt-1">
-              {formState.errors.price.message}
-            </p>
-          )}
-        </div>
-        <div>
-          <h3 className="text-sm font-medium text-gray-700">Offer Price</h3>
-          {isEditing ? (
-            <Input
-              type="number"
-              step="0.01"
-              {...register("offer", { valueAsNumber: true })}
-              className="mt-1 w-32"
-              placeholder="Offer Price"
-              disabled={formState.isSubmitting}
-            />
-          ) : (
-            <p className="mt-1 text-gray-900 font-medium">
-              $
-              {course?.offer?.toFixed(2) || course?.price?.toFixed(2) || "0.00"}
-            </p>
-          )}
-          {formState.errors.offer && (
-            <p className="text-red-500 text-sm mt-1">
-              {formState.errors.offer.message}
             </p>
           )}
         </div>
       </div>
-
-      {/* Right Column */}
-      <div className="space-y-6">
+      <div className="space-y-4">
         <div>
-          <h3 className="text-sm font-medium text-gray-700">Duration</h3>
+          <h3 className="text-sm font-medium text-gray-600">Duration</h3>
           {isEditing ? (
             <Input
               type="number"
               {...register("duration", { valueAsNumber: true })}
-              className="mt-1 w-32"
-              placeholder="Duration (minutes)"
+              className="mt-1 w-24"
+              placeholder="Minutes"
               disabled={formState.isSubmitting}
             />
           ) : (
-            <p className="mt-1 text-gray-900 font-medium">
+            <p className="mt-1 text-gray-900">
               {course?.duration
                 ? `${course.duration} minutes`
                 : "Not available"}
             </p>
           )}
-          {formState.errors.duration && (
-            <p className="text-red-500 text-sm mt-1">
-              {formState.errors.duration.message}
-            </p>
-          )}
         </div>
         <div>
-          <h3 className="text-sm font-medium text-gray-700">Status</h3>
+          <h3 className="text-sm font-medium text-gray-600">Status</h3>
           {isEditing ? (
             <Select
               onValueChange={(value) => form.setValue("status", value)}
@@ -189,79 +133,17 @@ export const DetailsSection = ({
               </SelectContent>
             </Select>
           ) : (
-            <p className="mt-1 font-medium">
-              {course?.status === "DRAFT" ? (
-                <span className="text-gray-900">Draft</span>
-              ) : course?.status === "PUBLISHED" ? (
-                <span className="text-green-600">Published</span>
-              ) : course?.status === "ARCHIVED" ? (
-                <span className="text-red-600">Archived</span>
-              ) : (
-                "Not available"
-              )}
-            </p>
-          )}
-          {formState.errors.status && (
-            <p className="text-red-500 text-sm mt-1">
-              {formState.errors.status.message}
+            <p className="mt-1 text-gray-900">
+              {course?.status
+                ? course.status.charAt(0) + course.status.slice(1).toLowerCase()
+                : "Not available"}
             </p>
           )}
         </div>
         <div>
-          <h3 className="text-sm font-medium text-gray-700">Thumbnail</h3>
-          {isEditing ? (
-            <div className="space-y-2">
-              <Input
-                type="file"
-                accept="image/*"
-                onChange={(e) => {
-                  const file = e.target.files?.[0];
-                  if (file && onImageUpload) {
-                    onImageUpload(file);
-                  }
-                }}
-                disabled={formState.isSubmitting || uploadProgress !== null}
-                className="mt-1"
-              />
-              {uploadProgress !== null && (
-                <div className="space-y-1">
-                  <Progress value={uploadProgress} className="w-full" />
-                  <p className="text-sm text-gray-600">
-                    Uploading: {uploadProgress}%
-                  </p>
-                </div>
-              )}
-              {form.watch("thumbnail") && (
-                <p className="text-sm text-gray-600 break-all">
-                  Current: {form.watch("thumbnail")}
-                </p>
-              )}
-              {formState.errors.thumbnail && (
-                <p className="text-red-500 text-sm mt-1">
-                  {formState.errors.thumbnail.message}
-                </p>
-              )}
-            </div>
-          ) : (
-            <p className="mt-1 text-gray-900 font-medium break-all">
-              {course?.thumbnail || "Not available"}
-            </p>
-          )}
-        </div>
-        <div>
-          <h3 className="text-sm font-medium text-gray-700">Active</h3>
-          <StatusBadge isActive={!course?.deletedAt} className="mt-1" />
-        </div>
-        <div>
-          <h3 className="text-sm font-medium text-gray-700">Created At</h3>
-          <p className="mt-1 text-gray-900 font-medium">
+          <h3 className="text-sm font-medium text-gray-600">Created At</h3>
+          <p className="mt-1 text-gray-900">
             {formatDate(course?.createdAt || null) || "Not available"}
-          </p>
-        </div>
-        <div>
-          <h3 className="text-sm font-medium text-gray-700">Updated At</h3>
-          <p className="mt-1 text-gray-900 font-medium">
-            {formatDate(course?.updatedAt || null) || "Not updated yet"}
           </p>
         </div>
       </div>

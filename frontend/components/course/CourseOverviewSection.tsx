@@ -11,7 +11,7 @@ export const OverviewSection = ({
   form: any;
 }) => (
   <div className="space-y-4">
-    <h2 className="text-xl font-bold text-gray-900">Course Overview</h2>
+    <h2 className="text-xl font-semibold text-gray-900">Overview</h2>
     {isEditing ? (
       <Textarea
         {...form.register("description")}
@@ -20,7 +20,7 @@ export const OverviewSection = ({
         disabled={form.formState.isSubmitting}
       />
     ) : (
-      <p className="text-gray-600 leading-relaxed">
+      <p className="text-gray-600">
         {course?.description || "No description available."}
       </p>
     )}

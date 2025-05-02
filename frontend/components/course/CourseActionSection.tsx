@@ -19,11 +19,6 @@ export const ActionSection = ({
 }) => {
   const [confirmOpen, setConfirmOpen] = useState(false);
 
-  const handleConfirm = () => {
-    onToggleDelete();
-    setConfirmOpen(false);
-  };
-
   return (
     <div className="flex justify-end gap-2 mt-6">
       <Button
@@ -31,15 +26,13 @@ export const ActionSection = ({
         disabled={isEditing || isUpdating}
         className={
           course.status === "PUBLISHED"
-            ? "bg-amber-600 hover:bg-amber-700"
-            : "bg-emerald-600 hover:bg-emerald-700"
+            ? "bg-amber-500 hover:bg-amber-600"
+            : "bg-emerald-500 hover:bg-emerald-600"
         }
       >
         {isUpdating ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
         {course.status === "PUBLISHED" ? "Unpublish" : "Publish"}
       </Button>
-
-
       <AlertComponent
         open={confirmOpen}
         onOpenChange={setConfirmOpen}
@@ -51,7 +44,7 @@ export const ActionSection = ({
         }
         confirmText={course.deletedAt ? "Enable" : "Disable"}
         cancelText="Cancel"
-        onConfirm={handleConfirm}
+        onConfirm={onToggleDelete}
         item={course}
       />
     </div>
