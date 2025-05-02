@@ -10,7 +10,6 @@ import {
 } from "@/types/content";
 import { useCreateContent } from "@/hooks/content/useCreateContent";
 import { useUpdateContent } from "@/hooks/content/useUpdateContent";
-import { FileUploadInput } from "./ContentFileUploadInput";
 import { validateForm } from "./ContentValidation";
 import { ContentTypeSelector } from "./ContentTypeSelector";
 import { TitleInput } from "./ContentTitleInput";
@@ -19,6 +18,7 @@ import { QuizInput } from "./ContentQuizInput";
 import { ThumbnailUploadInput } from "./ContentThumbnailInputSection";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { AlertTriangle } from "lucide-react";
+import { FileUploadInput } from "./ContentFileUploadInput";
 
 interface ContentInputFormProps {
   lessonId: string;
@@ -81,7 +81,6 @@ export const ContentInputForm = ({
   const showAlert = isEditing && (isTypeChanged || isFileChanged);
 
   const handleCancel = () => {
-    // Reset form fields to initial state
     setType(initialData?.type || ContentType.VIDEO);
     setTitle(initialData?.title || "");
     setDescription(initialData?.description || "");
@@ -95,8 +94,6 @@ export const ContentInputForm = ({
     setThumbnailUploadStatus("idle");
     setThumbnailUploadProgress(0);
     setErrors({});
-
-    // Trigger onSuccess to exit editing mode
     onSuccess?.();
   };
 
@@ -195,14 +192,25 @@ export const ContentInputForm = ({
   return (
     <form
       onSubmit={handleSubmit}
-      className="space-y-6 p-6 bg-white rounded-lg shadow-md"
+      className="space-y-8 p-8 bg-white rounded-2xl shadow-lg backdrop-blur-sm border border-gray-100"
     >
-      <ContentTypeSelector type={type} setType={setType} />
-      <TitleInput title={title} setTitle={setTitle} errors={errors} />
+      <div className="text-center mb-6">
+        <h2 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-indigo-700 bg-clip-text text-transparent">
+          {isEditing ? "Edit Content" : "Create Content"}
+        </h2>
+        <div className="h-1 w-16 bg-gradient-to-r from-blue-600 to-indigo-700 mx-auto mt-2 rounded-full"></div>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <ContentTypeSelector type={type} setType={setType} />
+        <TitleInput title={title} setTitle={setTitle} errors={errors} />
+      </div>
+
       <DescriptionInput
         description={description}
         setDescription={setDescription}
       />
+
       {(type === ContentType.VIDEO || type === ContentType.DOCUMENT) && (
         <FileUploadInput
           type={type}
@@ -217,6 +225,7 @@ export const ContentInputForm = ({
           errors={errors}
         />
       )}
+
       {type === ContentType.VIDEO && (
         <ThumbnailUploadInput
           file={thumbnail}
@@ -230,6 +239,7 @@ export const ContentInputForm = ({
           setUploadStatus={setThumbnailUploadStatus}
         />
       )}
+
       {type === ContentType.QUIZ && (
         <QuizInput
           questions={questions}
@@ -240,11 +250,17 @@ export const ContentInputForm = ({
           }
         />
       )}
+
       {showAlert && (
-        <Alert variant="destructive">
-          <AlertTriangle className="h-4 w-4" />
-          <AlertTitle>Warning: Potential Data Loss</AlertTitle>
-          <AlertDescription>
+        <Alert
+          variant="destructive"
+          className="bg-red-50 border border-red-200 rounded-xl"
+        >
+          <AlertTriangle className="h-5 w-5 text-red-500" />
+          <AlertTitle className="text-red-600 font-medium">
+            Warning: Potential Data Loss
+          </AlertTitle>
+          <AlertDescription className="text-red-500">
             {isTypeChanged && isFileChanged
               ? "Changing the content type or updating the file may cause data loss (e.g., existing files or quiz questions). You will need to re-upload any new files."
               : isTypeChanged
@@ -253,19 +269,46 @@ export const ContentInputForm = ({
           </AlertDescription>
         </Alert>
       )}
-      <div className="flex space-x-4">
+
+      <div className="flex space-x-6 pt-4">
         <button
           type="submit"
           disabled={isSubmitting}
-          className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
+          className="flex-1 px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-700 text-white rounded-xl hover:from-blue-700 hover:to-indigo-800 disabled:opacity-70 disabled:cursor-not-allowed transition-all duration-300 shadow-md hover:shadow-lg transform hover:-translate-y-1 font-medium"
         >
-          {isSubmitting ? "Submitting..." : "Submit"}
+          {isSubmitting ? (
+            <span className="flex items-center justify-center">
+              <svg
+                className="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+              >
+                <circle
+                  className="opacity-25"
+                  cx="12"
+                  cy="12"
+                  r="10"
+                  stroke="currentColor"
+                  strokeWidth="4"
+                ></circle>
+                <path
+                  className="opacity-75"
+                  fill="currentColor"
+                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                ></path>
+              </svg>
+              Processing...
+            </span>
+          ) : (
+            "Submit"
+          )}
         </button>
         <button
           type="button"
           onClick={handleCancel}
           disabled={isSubmitting}
-          className="flex-1 px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
+          className="flex-1 px-6 py-3 bg-gray-200 text-gray-700 rounded-xl hover:bg-gray-300 disabled:opacity-70 disabled:cursor-not-allowed transition-all duration-300 shadow-md hover:shadow-lg transform hover:-translate-y-1 font-medium"
         >
           Cancel
         </button>

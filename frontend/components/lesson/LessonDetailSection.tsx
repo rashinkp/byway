@@ -1,19 +1,31 @@
 "use client";
+
 import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Edit } from "lucide-react";
+import { useRouter } from "next/navigation";
 import {
-  LessonFormModal,
-} from "@/components/lesson/LessonFormModal";
-import { ILesson } from "@/types/lesson";
-import { StatusBadge } from "@/components/ui/StatusBadge";
+  Edit,
+  Trash2,
+  Eye,
+  EyeOff,
+  ArrowUpRight,
+  CalendarClock,
+  Hash,
+  StickyNote,
+} from "lucide-react";
 import { toast } from "sonner";
-import { formatDate } from "@/utils/formatDate";
+import { z } from "zod";
+
+// Component imports
+import { Button } from "@/components/ui/button";
+import { LessonFormModal } from "@/components/lesson/LessonFormModal";
+import { StatusBadge } from "@/components/ui/StatusBadge";
 import { AlertComponent } from "../ui/AlertComponent";
 import { DetailsSectionSkeleton } from "../skeleton/CourseDetailSectionSkeleton";
+
+// Utilities and API
+import { formatDate } from "@/utils/formatDate";
 import { deleteLesson } from "@/api/lesson";
-import { useRouter } from "next/navigation";
-import { z } from "zod";
+import { ILesson } from "@/types/lesson";
 import { LessonFormData, lessonSchema } from "@/lib/validations/lesson";
 
 interface LessonDetailSectionProps {
@@ -36,17 +48,17 @@ export function LessonDetailSection({
   const [isLessonModalOpen, setIsLessonModalOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [confirmOpen, setConfirmOpen] = useState(false);
-
   const router = useRouter();
 
   const handleEditLesson = async (data: LessonFormData) => {
     setIsSubmitting(true);
     try {
       lessonSchema.parse(data);
-       onUpdateLesson(data);
+      onUpdateLesson(data);
       setIsLessonModalOpen(false);
     } catch (err) {
       console.error(err);
+      toast.error("Failed to update lesson");
     } finally {
       setIsSubmitting(false);
     }
@@ -63,7 +75,6 @@ export function LessonDetailSection({
         status: updatedStatus,
         description: lesson.description || "",
       };
-      // Validate data
       lessonSchema.parse(data);
       onUpdateLesson(data);
     } catch (err) {
@@ -73,22 +84,19 @@ export function LessonDetailSection({
     }
   };
 
-  const handleOpenConfirm = () => {
-    setConfirmOpen(true);
-  };
+  const handleOpenConfirm = () => setConfirmOpen(true);
 
   const handleConfirmDelete = async () => {
     if (!lesson.id) {
       toast.error("Lesson ID is missing");
       return;
     }
+
     setIsSubmitting(true);
     try {
       await deleteLesson(lesson.id);
-      toast.success("Lesson deleted successfully");
       router.replace(`/instructor/courses/${courseId}`);
     } catch (err) {
-      toast.error("Failed to delete lesson");
       console.error("Error deleting lesson:", err);
     } finally {
       setIsSubmitting(false);
@@ -98,9 +106,11 @@ export function LessonDetailSection({
 
   if (error) {
     return (
-      <div className="bg-white shadow rounded-lg p-6">
+      <div className="bg-white rounded-lg p-8 shadow-md border border-red-100">
         <div className="text-red-600">
-          <p>Error loading lesson: {error.message || "Unknown error"}</p>
+          <p className="text-lg">
+            Error loading lesson: {error.message || "Unknown error"}
+          </p>
           {onRetry && (
             <Button
               onClick={onRetry}
@@ -119,68 +129,125 @@ export function LessonDetailSection({
   }
 
   return (
-    <div className="bg-white shadow rounded-lg p-6">
-      <div className="flex justify-between items-center">
-        <h1 className="text-2xl font-bold text-gray-800">{lesson.title}</h1>
-        <div className="flex space-x-2">
-          <Button
-            onClick={() => setIsLessonModalOpen(true)}
-            className="bg-blue-600 hover:bg-blue-700 text-white"
-            disabled={isLoading || isSubmitting}
-          >
-            <Edit className="mr-2 h-4 w-4" />
-            Edit Lesson
-          </Button>
-          <Button
-            onClick={handleOpenConfirm}
-            className="bg-red-600 hover:bg-red-700 text-white"
-            disabled={isLoading || isSubmitting}
-          >
-            Delete
-          </Button>
-          <Button
-            onClick={handleTogglePublish}
-            className={`${
-              lesson.status === "PUBLISHED"
-                ? "bg-yellow-600 hover:bg-yellow-700"
-                : "bg-black hover:bg-black"
-            } text-white`}
-            disabled={isLoading || isSubmitting}
-          >
-            {lesson.status === "PUBLISHED" ? "Make Draft" : "Publish"}
-          </Button>
+    <div className=" overflow-hidden">
+      {/* Header section */}
+      <div className="border-b border-gray-100 p-2">
+        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
+          <h1 className="text-2xl font-bold text-gray-800">{lesson.title}</h1>
+          <div className="flex flex-wrap gap-3">
+            <Button
+              onClick={() => setIsLessonModalOpen(true)}
+              className="bg-gray-100 text-gray-800 border-b-2 border-gray-400 hover:bg-gray-200 transition-all duration-200 shadow-sm"
+              disabled={isLoading || isSubmitting}
+              size="sm"
+            >
+              <Edit className="mr-2 h-4 w-4" />
+              Edit
+            </Button>
+
+            <Button
+              onClick={handleTogglePublish}
+              className={`${
+                lesson.status === "PUBLISHED"
+                  ? "bg-gray-200 text-gray-700"
+                  : "bg-white text-gray-800 border-b-2 border-gray-400"
+              } hover:bg-gray-100 transition-all duration-200 shadow-sm`}
+              disabled={isLoading || isSubmitting}
+              size="sm"
+            >
+              {lesson.status === "PUBLISHED" ? (
+                <>
+                  <EyeOff className="mr-2 h-4 w-4" />
+                  Unpublish
+                </>
+              ) : (
+                <>
+                  <Eye className="mr-2 h-4 w-4" />
+                  Publish
+                </>
+              )}
+            </Button>
+
+            <Button
+              onClick={handleOpenConfirm}
+              className="bg-white text-gray-700 border border-gray-300 hover:bg-gray-50 hover:text-gray-900 transition-all duration-200 shadow-sm"
+              disabled={isLoading || isSubmitting}
+              size="sm"
+            >
+              <Trash2 className="mr-2 h-4 w-4" />
+              Delete
+            </Button>
+          </div>
         </div>
       </div>
-      <div className="mt-4 space-y-2">
-        <p>
-          <span className="font-semibold">Description:</span>{" "}
-          {lesson.description || "N/A"}
-        </p>
-        <p>
-          <span className="font-semibold">Order:</span> {lesson.order}
-        </p>
-        <p>
-          <span className="font-semibold">Status:</span>{" "}
-          <StatusBadge isActive={!lesson.deletedAt} />
-        </p>
-        <p>
-          <span className="font-semibold">Stage:</span>{" "}
-          {lesson.status === "PUBLISHED" ? (
-            <span className="text-green-500">Published</span>
-          ) : (
-            <span className="text-red-500">Draft</span>
-          )}
-        </p>
-        <p>
-          <span className="font-semibold">Created At:</span>{" "}
-          {formatDate(lesson.createdAt)}
-        </p>
-        <p>
-          <span className="font-semibold">Updated At:</span>{" "}
-          {formatDate(lesson.updatedAt)}
-        </p>
+
+      {/* Lesson details */}
+      <div className="p-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-y-6 gap-x-12">
+          <div className="space-y-4">
+            <div className="flex items-start gap-3">
+              <StickyNote className="h-5 w-5 text-gray-400 mt-1" />
+              <div>
+                <h3 className="text-gray-500 font-medium text-sm">
+                  Description
+                </h3>
+                <p className="text-gray-800">
+                  {lesson.description || "No description provided"}
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-3">
+              <Hash className="h-5 w-5 text-gray-400" />
+              <div>
+                <h3 className="text-gray-500 font-medium text-sm">Order</h3>
+                <p className="text-gray-800">{lesson.order}</p>
+              </div>
+            </div>
+          </div>
+
+          <div className="space-y-4">
+            <div className="flex items-center gap-3">
+              <CalendarClock className="h-5 w-5 text-gray-400" />
+              <div>
+                <h3 className="text-gray-500 font-medium text-sm">Created</h3>
+                <p className="text-gray-800">{formatDate(lesson.createdAt)}</p>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-3">
+              <CalendarClock className="h-5 w-5 text-gray-400" />
+              <div>
+                <h3 className="text-gray-500 font-medium text-sm">
+                  Last Updated
+                </h3>
+                <p className="text-gray-800">{formatDate(lesson.updatedAt)}</p>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-3">
+              <ArrowUpRight className="h-5 w-5 text-gray-400" />
+              <div>
+                <h3 className="text-gray-500 font-medium text-sm">Status</h3>
+                <div className="flex items-center gap-3 mt-1">
+                  <StatusBadge isActive={!lesson.deletedAt} />
+                  <span
+                    className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                      lesson.status === "PUBLISHED"
+                        ? "bg-green-100 text-green-800"
+                        : "bg-amber-100 text-amber-800"
+                    }`}
+                  >
+                    {lesson.status === "PUBLISHED" ? "Published" : "Draft"}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
 
+      {/* Modals */}
       <LessonFormModal
         open={isLessonModalOpen}
         onOpenChange={setIsLessonModalOpen}
@@ -198,8 +265,8 @@ export function LessonDetailSection({
       <AlertComponent
         open={confirmOpen}
         onOpenChange={setConfirmOpen}
-        title="Are you sure?"
-        description="Are you sure you want to delete this lesson? This action cannot be undone."
+        title="Delete Lesson"
+        description="Are you sure you want to delete this lesson? This action cannot be undone and all associated content will be permanently removed."
         confirmText="Delete"
         cancelText="Cancel"
         onConfirm={handleConfirmDelete}

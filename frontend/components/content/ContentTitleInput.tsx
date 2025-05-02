@@ -14,7 +14,7 @@ export const TitleInput = ({ title, setTitle, errors }: TitleInputProps) => {
         type="text"
         value={title}
         onChange={(e) => setTitle(e.target.value)}
-        className={`w-full p-2 border rounded-md focus:ring-2 focus:ring-blue-500 ${
+        className={`w-full p-3 border rounded-xl focus:ring-2 focus:ring-blue-500 transition-all duration-300 ${
           errors.title ? "border-red-500" : "border-gray-300"
         }`}
         placeholder="Enter content title"

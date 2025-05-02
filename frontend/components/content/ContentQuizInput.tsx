@@ -101,8 +101,8 @@ export const QuizInput = ({
   };
 
   return (
-    <div>
-      <label className="block text-sm font-semibold text-gray-700 mb-1">
+    <div className="space-y-4">
+      <label className="block text-sm font-semibold text-gray-700">
         Questions
       </label>
       {questions.length === 0 && errors.questions && (
@@ -111,7 +111,7 @@ export const QuizInput = ({
       {questions.map((q, index) => (
         <div
           key={index}
-          className="mt-2 p-4 border border-gray-200 rounded-md bg-gray-50"
+          className="p-4 border border-blue-200 rounded-xl bg-blue-50"
         >
           {editingIndex === index ? (
             <div className="space-y-3">
@@ -120,7 +120,7 @@ export const QuizInput = ({
                   type="text"
                   value={editQuestion}
                   onChange={(e) => setEditQuestion(e.target.value)}
-                  className={`w-full p-2 border rounded-md focus:ring-2 focus:ring-blue-500 ${
+                  className={`w-full p-3 border rounded-xl focus:ring-2 focus:ring-blue-500 transition-all duration-300 ${
                     errors.editQuestion ? "border-red-500" : "border-gray-300"
                   }`}
                   placeholder="Enter question"
@@ -141,7 +141,7 @@ export const QuizInput = ({
                       updated[i] = e.target.value;
                       setEditOptions(updated);
                     }}
-                    className={`w-full p-2 border rounded-md focus:ring-2 focus:ring-blue-500 ${
+                    className={`w-full p-3 border rounded-xl focus:ring-2 focus:ring-blue-500 transition-all duration-300 ${
                       errors.editOptions ? "border-red-500" : "border-gray-300"
                     }`}
                     placeholder={`Option ${i + 1}`}
@@ -158,7 +158,7 @@ export const QuizInput = ({
                   type="text"
                   value={editAnswer}
                   onChange={(e) => setEditAnswer(e.target.value)}
-                  className={`w-full p-2 border rounded-md focus:ring-2 focus:ring-blue-500 ${
+                  className={`w-full p-3 border rounded-xl focus:ring-2 focus:ring-blue-500 transition-all duration-300 ${
                     errors.editAnswer ? "border-red-500" : "border-gray-300"
                   }`}
                   placeholder="Enter correct answer"
@@ -169,18 +169,18 @@ export const QuizInput = ({
                   </p>
                 )}
               </div>
-              <div className="flex space-x-2">
+              <div className="flex space-x-3">
                 <button
                   type="button"
                   onClick={handleSaveEdit}
-                  className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+                  className="px-4 py-2 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-all duration-300 shadow-md"
                 >
                   Save
                 </button>
                 <button
                   type="button"
                   onClick={handleCancelEdit}
-                  className="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 transition-colors"
+                  className="px-4 py-2 bg-gray-600 text-white rounded-xl hover:bg-gray-700 transition-all duration-300 shadow-md"
                 >
                   Cancel
                 </button>
@@ -188,7 +188,7 @@ export const QuizInput = ({
             </div>
           ) : (
             <>
-              <p className="font-medium">{q.question}</p>
+              <p className="font-medium text-gray-800">{q.question}</p>
               <ul className="list-disc pl-5 mt-2">
                 {q.options.map((opt, i) => (
                   <li key={i} className="text-sm text-gray-600">
@@ -199,18 +199,18 @@ export const QuizInput = ({
               <p className="mt-2 text-sm text-gray-700">
                 Answer: <span className="font-medium">{q.correctAnswer}</span>
               </p>
-              <div className="flex space-x-2 mt-2">
+              <div className="flex space-x-3 mt-3">
                 <button
                   type="button"
                   onClick={() => handleEditQuestion(index)}
-                  className="px-3 py-1 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+                  className="px-4 py-2 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-all duration-300 shadow-md"
                 >
                   Edit
                 </button>
                 <button
                   type="button"
                   onClick={() => handleDeleteQuestion(index)}
-                  className="px-3 py-1 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors"
+                  className="px-4 py-2 bg-red-600 text-white rounded-xl hover:bg-red-700 transition-all duration-300 shadow-md"
                 >
                   Delete
                 </button>
@@ -225,7 +225,7 @@ export const QuizInput = ({
             type="text"
             value={newQuestion}
             onChange={(e) => setNewQuestion(e.target.value)}
-            className={`w-full p-2 border rounded-md focus:ring-2 focus:ring-blue-500 ${
+            className={`w-full p-3 border rounded-xl focus:ring-2 focus:ring-blue-500 transition-all duration-300 ${
               errors.newQuestion ? "border-red-500" : "border-gray-300"
             }`}
             placeholder="Enter question"
@@ -244,7 +244,7 @@ export const QuizInput = ({
                 updated[i] = e.target.value;
                 setNewOptions(updated);
               }}
-              className={`w-full p-2 border rounded-md focus:ring-2 focus:ring-blue-500 ${
+              className={`w-full p-3 border rounded-xl focus:ring-2 focus:ring-blue-500 transition-all duration-300 ${
                 errors.newOptions ? "border-red-500" : "border-gray-300"
               }`}
               placeholder={`Option ${i + 1}`}
@@ -259,7 +259,7 @@ export const QuizInput = ({
             type="text"
             value={newAnswer}
             onChange={(e) => setNewAnswer(e.target.value)}
-            className={`w-full p-2 border rounded-md focus:ring-2 focus:ring-blue-500 ${
+            className={`w-full p-3 border rounded-xl focus:ring-2 focus:ring-blue-500 transition-all duration-300 ${
               errors.newAnswer ? "border-red-500" : "border-gray-300"
             }`}
             placeholder="Enter correct answer"
@@ -271,7 +271,7 @@ export const QuizInput = ({
         <button
           type="button"
           onClick={handleAddQuestion}
-          className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+          className="px-4 py-2 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-all duration-300 shadow-md"
         >
           Add Question
         </button>

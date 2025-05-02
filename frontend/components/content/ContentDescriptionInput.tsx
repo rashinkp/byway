@@ -15,7 +15,7 @@ export const DescriptionInput = ({
       <textarea
         value={description}
         onChange={(e) => setDescription(e.target.value)}
-        className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+        className="w-full p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300"
         placeholder="Enter content description"
         rows={4}
       />

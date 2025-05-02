@@ -1,14 +1,25 @@
 "use client";
 
 import { useState } from "react";
-import { ContentType, LessonContent } from "@/types/content";
-import { ContentInputForm } from "./ContentInputForm";
+import { ContentType } from "@/types/content";
 import { toast } from "sonner";
 import { useGetContentByLessonId } from "@/hooks/content/useGetContentByLessonId";
 import { useDeleteContent } from "@/hooks/content/useDeleteContent";
 import { ContentSectionSkeleton } from "../skeleton/LessonContentSectionSkeleton";
 import { AlertComponent } from "../ui/AlertComponent";
-
+import { ContentInputForm } from "./ContentInputForm";
+import {
+  Pencil,
+  Trash2,
+  Plus,
+  Video,
+  FileText,
+  HelpCircle,
+  ChevronRight,
+  Check,
+  X,
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 interface ContentSectionProps {
   lessonId: string;
@@ -41,93 +52,187 @@ export const ContentSection = ({ lessonId }: ContentSectionProps) => {
 
   const handleFormSuccess = () => {
     setIsEditing(false);
+    toast.success("Content saved successfully");
+  };
+
+  const getContentTypeIcon = (type: ContentType) => {
+    switch (type) {
+      case ContentType.VIDEO:
+        return <Video className="w-5 h-5 text-blue-500" />;
+      case ContentType.DOCUMENT:
+        return <FileText className="w-5 h-5 text-blue-500" />;
+      case ContentType.QUIZ:
+        return <HelpCircle className="w-5 h-5 text-blue-500" />;
+      default:
+        return null;
+    }
   };
 
   if (isLoading) {
     return <ContentSectionSkeleton />;
   }
 
-  return (
-    <div className="p-6">
-      <h2 className="text-xl font-semibold mb-4">Lesson Content</h2>
-      {isEditing ? (
+  if (isEditing) {
+    return (
+      <div className="bg-white rounded-2xl p-8 shadow-lg border border-gray-100 backdrop-blur-sm">
+        <h2 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-indigo-700 bg-clip-text text-transparent mb-6">
+          {content ? "Edit Content" : "Add New Content"}
+        </h2>
         <ContentInputForm
           lessonId={lessonId}
           initialData={content}
           onSuccess={handleFormSuccess}
         />
-      ) : content ? (
-        <div className="space-y-4">
-          <h3 className="text-lg font-medium">{content.title}</h3>
-          {content.description && (
-            <p className="text-gray-700">{content.description}</p>
-          )}
-          {content.type === ContentType.VIDEO && content.fileUrl && (
-            <div>
-              <video
-                src={content.fileUrl}
-                controls
-                className="w-full rounded-lg"
-                poster={content.thumbnailUrl || undefined}
-              />
-            </div>
-          )}
-          {content.type === ContentType.DOCUMENT && content.fileUrl && (
-            <a
-              href={content.fileUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-blue-600 hover:underline"
-            >
-              View Document
-            </a>
-          )}
-          {content.type === ContentType.QUIZ && content.quizQuestions && (
-            <div className="space-y-4">
-              {content.quizQuestions.map((q, index) => (
-                <div key={index} className="mb-4">
-                  <p className="font-medium">{q.question}</p>
-                  <ul className="list-disc pl-5 text-gray-700">
-                    {q.options.map((opt, i) => (
-                      <li key={i}>{opt}</li>
-                    ))}
-                  </ul>
-                  <p className="text-green-600 font-semibold">
-                    Answer: {q.correctAnswer}
-                  </p>
-                </div>
-              ))}
-            </div>
-          )}
-          <div className="flex space-x-4 mt-4">
-            <button
+      </div>
+    );
+  }
+
+  if (!content) {
+    return (
+      <div className="bg-white rounded-2xl p-8 shadow-lg border border-gray-100 backdrop-blur-sm">
+        <div className="text-center py-12">
+          <div className="bg-blue-50 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+            <Plus className="w-8 h-8 text-blue-600" />
+          </div>
+          <h2 className="text-2xl font-bold text-gray-800 mb-3">
+            No Content Yet
+          </h2>
+          <p className="text-gray-500 mb-6 max-w-md mx-auto">
+            This lesson doesn't have any content yet. Add videos, documents, or
+            quizzes to get started.
+          </p>
+          <Button
+            onClick={() => setIsEditing(true)}
+            className="bg-gradient-to-r from-blue-600 to-indigo-700 hover:from-blue-700 hover:to-indigo-800 text-white px-6 py-2 rounded-xl shadow-md hover:shadow-lg transform hover:-translate-y-1 transition-all"
+          >
+            <Plus className="mr-2 h-4 w-4" />
+            Add Content
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
+      {/* Content header */}
+      <div className="border-b border-gray-100 p-6">
+        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
+          <div className="flex items-center gap-3">
+            {getContentTypeIcon(content.type)}
+            <h2 className="text-xl font-bold text-gray-800">{content.title}</h2>
+          </div>
+          <div className="flex gap-3">
+            <Button
               onClick={() => setIsEditing(true)}
-              className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50"
+              className="bg-blue-600 hover:bg-blue-700 text-white rounded-xl"
               disabled={isDeleting}
+              size="sm"
             >
-              {isDeleting ? "Please wait..." : "Edit Content"}
-            </button>
-            <button
+              <Pencil className="mr-2 h-4 w-4" />
+              Edit
+            </Button>
+            <Button
               onClick={() => handleDelete(content.id)}
               disabled={isDeleting}
-              className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 disabled:opacity-50"
+              className="bg-red-600 hover:bg-red-700 text-white rounded-xl"
+              size="sm"
             >
-              {isDeleting ? "Deleting..." : "Delete Content"}
-            </button>
+              <Trash2 className="mr-2 h-4 w-4" />
+              {isDeleting ? "Deleting..." : "Delete"}
+            </Button>
           </div>
         </div>
-      ) : (
-        <button
-          onClick={() => setIsEditing(true)}
-          className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
-        >
-          Add Content
-        </button>
-      )}
+        {content.description && (
+          <p className="mt-3 text-gray-600 leading-relaxed">
+            {content.description}
+          </p>
+        )}
+      </div>
+
+      {/* Content body */}
+      <div className="p-6">
+        {content.type === ContentType.VIDEO && content.fileUrl && (
+          <div className="rounded-xl overflow-hidden border border-gray-200 shadow-sm">
+            <video
+              src={content.fileUrl}
+              controls
+              className="w-full"
+              poster={content.thumbnailUrl || undefined}
+            />
+          </div>
+        )}
+
+        {content.type === ContentType.DOCUMENT && content.fileUrl && (
+          <div className="flex items-center p-4 bg-blue-50 rounded-xl border border-blue-200">
+            <FileText className="w-10 h-10 text-blue-500 mr-4" />
+            <div>
+              <h3 className="text-gray-800 font-medium">Document</h3>
+              <a
+                href={content.fileUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-blue-600 hover:text-blue-800 flex items-center mt-1 group"
+              >
+                View Document
+                <ChevronRight className="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform" />
+              </a>
+            </div>
+          </div>
+        )}
+
+        {content.type === ContentType.QUIZ && content.quizQuestions && (
+          <div className="space-y-6">
+            {content.quizQuestions.map((q, index) => (
+              <div
+                key={index}
+                className="bg-blue-50 p-6 rounded-xl border border-blue-200"
+              >
+                <h3 className="text-lg font-medium text-gray-800 mb-4">
+                  Question {index + 1}: {q.question}
+                </h3>
+                <ul className="space-y-3 mb-4">
+                  {q.options.map((opt, i) => (
+                    <li
+                      key={i}
+                      className={`flex items-center p-3 rounded-lg ${
+                        opt === q.correctAnswer
+                          ? "bg-green-100 border border-green-200"
+                          : "bg-white border border-gray-200"
+                      }`}
+                    >
+                      {opt === q.correctAnswer ? (
+                        <Check className="w-5 h-5 text-green-600 mr-3 flex-shrink-0" />
+                      ) : (
+                        <X className="w-5 h-5 text-gray-400 mr-3 flex-shrink-0" />
+                      )}
+                      <span
+                        className={`${
+                          opt === q.correctAnswer
+                            ? "text-gray-800 font-medium"
+                            : "text-gray-600"
+                        }`}
+                      >
+                        {opt}
+                      </span>
+                      {opt === q.correctAnswer && (
+                        <span className="ml-auto text-xs bg-green-100 text-green-800 px-2 py-1 rounded">
+                          Correct Answer
+                        </span>
+                      )}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
       <AlertComponent
         open={isAlertOpen}
         onOpenChange={setIsAlertOpen}
-        title="Are you sure?"
+        title="Delete Content"
         description="Are you sure you want to delete this content? This action cannot be undone."
         confirmText="Delete"
         cancelText="Cancel"
