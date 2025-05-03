@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { validateQuestion } from "./ContentValidation";
+import { Pencil, Trash2, Check, X } from "lucide-react";
 
 interface Question {
   question: string;
@@ -187,35 +188,59 @@ export const QuizInput = ({
               </div>
             </div>
           ) : (
-            <>
-              <p className="font-medium text-gray-800">{q.question}</p>
-              <ul className="list-disc pl-5 mt-2">
+            <div className="space-y-4">
+              <h3 className="text-lg font-medium text-gray-800">
+                Question {index + 1}: {q.question}
+              </h3>
+              <ul className="space-y-3">
                 {q.options.map((opt, i) => (
-                  <li key={i} className="text-sm text-gray-600">
-                    {opt}
+                  <li
+                    key={i}
+                    className={`flex items-center p-3 rounded-lg ${
+                      opt === q.correctAnswer
+                        ? "bg-green-100 border border-green-200"
+                        : "bg-white border border-gray-200"
+                    }`}
+                  >
+                    {opt === q.correctAnswer ? (
+                      <Check className="w-5 h-5 text-green-600 mr-3 flex-shrink-0" />
+                    ) : (
+                      <X className="w-5 h-5 text-gray-400 mr-3 flex-shrink-0" />
+                    )}
+                    <span
+                      className={`${
+                        opt === q.correctAnswer
+                          ? "text-gray-800 font-medium"
+                          : "text-gray-600"
+                      }`}
+                    >
+                      {opt}
+                    </span>
+                    {opt === q.correctAnswer && (
+                      <span className="ml-auto text-xs bg-green-100 text-green-800 px-2 py-1 rounded">
+                        Correct Answer
+                      </span>
+                    )}
                   </li>
                 ))}
               </ul>
-              <p className="mt-2 text-sm text-gray-700">
-                Answer: <span className="font-medium">{q.correctAnswer}</span>
-              </p>
-              <div className="flex space-x-3 mt-3">
-                <button
-                  type="button"
+              <div className="flex flex-wrap gap-3">
+                <span
                   onClick={() => handleEditQuestion(index)}
-                  className="px-4 py-2 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-all duration-300 shadow-md"
+                  className="flex items-center text-blue-600 hover:text-blue-700 transition-colors duration-200 cursor-pointer"
                 >
+                  <Pencil className="mr-2 h-4 w-4" />
                   Edit
-                </button>
-                <button
-                  type="button"
+                </span>
+                <span
                   onClick={() => handleDeleteQuestion(index)}
-                  className="px-4 py-2 bg-red-600 text-white rounded-xl hover:bg-red-700 transition-all duration-300 shadow-md"
+                  className="flex items-center text-red-600 hover:text-red-700 transition-colors duration-200 cursor-pointer"
                 >
+                  <Trash2 className="mr-2 h-4 w-4" />
                   Delete
-                </button>
+                </span>
               </div>
-            </>
+            </div>
           )}
         </div>
       ))}
@@ -271,7 +296,7 @@ export const QuizInput = ({
         <button
           type="button"
           onClick={handleAddQuestion}
-          className="px-4 py-2 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-all duration-300 shadow-md"
+          className="px-4 py-2 text-blue-600 bg-transparent hover:text-blue-700 transition-all duration-300 "
         >
           Add Question
         </button>

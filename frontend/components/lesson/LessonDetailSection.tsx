@@ -134,31 +134,31 @@ export function LessonDetailSection({
       <div className="border-b border-gray-100 p-2">
         <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
           <h1 className="text-2xl font-bold text-gray-800">{lesson.title}</h1>
-          <div className="flex flex-wrap gap-3">
-            <Button
+          <div className="flex flex-wrap gap-6">
+            <span
               onClick={() => setIsLessonModalOpen(true)}
-              className="bg-gray-100 text-gray-800 border-b-2 border-gray-400 hover:bg-gray-200 transition-all duration-200 shadow-sm"
-              disabled={isLoading || isSubmitting}
-              size="sm"
+              className={`flex items-center text-blue-700 hover:text-blue-600 transition-colors duration-200 cursor-pointer ${
+                isLoading || isSubmitting ? "opacity-50 cursor-not-allowed" : ""
+              }`}
             >
               <Edit className="mr-2 h-4 w-4" />
               Edit
-            </Button>
+            </span>
 
-            <Button
+            <span
               onClick={handleTogglePublish}
-              className={`${
+              className={`flex items-center ${
                 lesson.status === "PUBLISHED"
-                  ? "bg-gray-200 text-gray-700"
-                  : "bg-white text-gray-800 border-b-2 border-gray-400"
-              } hover:bg-gray-100 transition-all duration-200 shadow-sm`}
-              disabled={isLoading || isSubmitting}
-              size="sm"
+                  ? "text-yellow-700 hover:text-yellow-500"
+                  : "text-green-800 hover:text-green-600"
+              } transition-colors duration-200 cursor-pointer ${
+                isLoading || isSubmitting ? "opacity-50 cursor-not-allowed" : ""
+              }`}
             >
               {lesson.status === "PUBLISHED" ? (
                 <>
                   <EyeOff className="mr-2 h-4 w-4" />
-                  Unpublish
+                  Make Draft
                 </>
               ) : (
                 <>
@@ -166,17 +166,17 @@ export function LessonDetailSection({
                   Publish
                 </>
               )}
-            </Button>
+            </span>
 
-            <Button
+            <span
               onClick={handleOpenConfirm}
-              className="bg-white text-gray-700 border border-gray-300 hover:bg-gray-50 hover:text-gray-900 transition-all duration-200 shadow-sm"
-              disabled={isLoading || isSubmitting}
-              size="sm"
+              className={`flex items-center text-red-700 hover:text-red-900 transition-colors duration-200 cursor-pointer ${
+                isLoading || isSubmitting ? "opacity-50 cursor-not-allowed" : ""
+              }`}
             >
               <Trash2 className="mr-2 h-4 w-4" />
               Delete
-            </Button>
+            </span>
           </div>
         </div>
       </div>

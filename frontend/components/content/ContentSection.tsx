@@ -42,7 +42,6 @@ export const ContentSection = ({ lessonId }: ContentSectionProps) => {
     if (deleteContentId) {
       deleteContent(deleteContentId, {
         onSuccess: () => {
-          toast.success("Content deleted successfully");
           setIsEditing(false);
         },
         onError: (error: Error) => toast.error(error.message),
@@ -52,7 +51,6 @@ export const ContentSection = ({ lessonId }: ContentSectionProps) => {
 
   const handleFormSuccess = () => {
     setIsEditing(false);
-    toast.success("Content saved successfully");
   };
 
   const getContentTypeIcon = (type: ContentType) => {
@@ -125,7 +123,7 @@ export const ContentSection = ({ lessonId }: ContentSectionProps) => {
           <div className="flex gap-3">
             <Button
               onClick={() => setIsEditing(true)}
-              className="bg-blue-600 hover:bg-blue-700 text-white rounded-xl"
+              className="text-blue-600 hover:text-blue-700  bg-inherit hover:bg-inherit"
               disabled={isDeleting}
               size="sm"
             >
@@ -135,7 +133,7 @@ export const ContentSection = ({ lessonId }: ContentSectionProps) => {
             <Button
               onClick={() => handleDelete(content.id)}
               disabled={isDeleting}
-              className="bg-red-600 hover:bg-red-700 text-white rounded-xl"
+              className="text-red-600 hover:text-red-700 bg-inherit hover:bg-inherit"
               size="sm"
             >
               <Trash2 className="mr-2 h-4 w-4" />

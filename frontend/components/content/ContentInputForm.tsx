@@ -190,10 +190,7 @@ export const ContentInputForm = ({
   };
 
   return (
-    <form
-      onSubmit={handleSubmit}
-      className="space-y-8 p-8 bg-white rounded-2xl shadow-lg backdrop-blur-sm border border-gray-100"
-    >
+    <form onSubmit={handleSubmit} className="space-y-8 p-8">
       <div className="text-center mb-6">
         <h2 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-indigo-700 bg-clip-text text-transparent">
           {isEditing ? "Edit Content" : "Create Content"}
@@ -202,7 +199,18 @@ export const ContentInputForm = ({
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <ContentTypeSelector type={type} setType={setType} />
+        {isEditing ? (
+          <div className="flex flex-col">
+            <label className="block text-sm font-semibold text-gray-700 mb-2">
+              Content Type
+            </label>
+            <div className="p-3 border border-gray-300 rounded-xl bg-gray-100 text-gray-700">
+              {type}
+            </div>
+          </div>
+        ) : (
+          <ContentTypeSelector type={type} setType={setType} />
+        )}
         <TitleInput title={title} setTitle={setTitle} errors={errors} />
       </div>
 
