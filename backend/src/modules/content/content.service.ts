@@ -139,6 +139,13 @@ export class ContentService {
 
 
     await this.contentRepository.deleteContent(id);
+    await this.lessonService.updateLesson(lesson.id, { status: 'DRAFT' })
+    const isValid = await this.lessonService.isCourseValidForPublishment(course.id);
+
+
+    if (!isValid) {
+      await this.courseService.updateCourse({id:course.id , createdBy:userId , status:'DRAFT'})
+    }
   }
 
   async getContentById(id: string): Promise<ILessonContent | null> {

@@ -20,6 +20,8 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { AlertTriangle } from "lucide-react";
 import { FileUploadInput } from "./ContentFileUploadInput";
 
+//todo: when editing content and all make sure the status update
+
 interface ContentInputFormProps {
   lessonId: string;
   initialData?: LessonContent | null;

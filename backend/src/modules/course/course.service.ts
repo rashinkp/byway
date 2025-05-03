@@ -20,10 +20,11 @@ import {
   courseIdSchema,
 } from "./course.validator";
 import { Role } from "@prisma/client";
+import { ICourseRepository } from "./course.repository.interface";
 
 export class CourseService {
   constructor(
-    private courseRepository: CourseRepository,
+    private courseRepository: ICourseRepository,
     private categoryService: CategoryService,
     private userService: UserService
   ) {}
@@ -165,7 +166,6 @@ export class CourseService {
 
   async updateCourse(input: IUpdateCourseInput): Promise<ICourse> {
     const parsedInput = updateCourseSchema.safeParse(input);
-    console.log(parsedInput)
     if (!parsedInput.success) {
       logger.warn("Validation failed for updateCourse", {
         errors: parsedInput.error.errors,
@@ -176,9 +176,9 @@ export class CourseService {
         "VALIDATION_ERROR"
       );
     }
-
+    
     const { id:courseId, categoryId, title, createdBy } = parsedInput.data;
-
+    
     // Validate course
     const course = await this.courseRepository.getCourseById(courseId);
     if (!course || course.deletedAt) {
@@ -189,7 +189,7 @@ export class CourseService {
         "NOT_FOUND"
       );
     }
-
+    
     // Validate ownership
     if (course.createdBy !== createdBy) {
       logger.warn("Unauthorized course update attempt", { courseId, createdBy });
@@ -199,7 +199,7 @@ export class CourseService {
         "FORBIDDEN"
       );
     }
-
+    
     // Validate category
     if (categoryId && categoryId !== course.categoryId) {
       const category = await this.categoryService.getCategoryById(categoryId);
@@ -212,7 +212,7 @@ export class CourseService {
         );
       }
     }
-
+    
     // Check for title uniqueness
     if (title && title !== course.title) {
       const existingCourse = await this.courseRepository.getCourseByName(title);
@@ -225,6 +225,7 @@ export class CourseService {
         );
       }
     }
+    
 
 
     try {

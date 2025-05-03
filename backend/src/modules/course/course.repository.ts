@@ -240,6 +240,7 @@ export class CourseRepository implements ICourseRepository {
           "VALIDATION_ERROR"
         );
       }
+
     }
 
     // Proceed with the course update
@@ -247,7 +248,7 @@ export class CourseRepository implements ICourseRepository {
       where: { id },
       data: {
         ...courseData,
-        status, // Include status in the update
+        status, 
         updatedAt: new Date(),
         details: details
           ? { upsert: { create: details, update: details } }
@@ -255,6 +256,8 @@ export class CourseRepository implements ICourseRepository {
       },
       include: { details: true },
     });
+
+    console.log(course);
 
     // Transform the response to match ICourse interface
     return {

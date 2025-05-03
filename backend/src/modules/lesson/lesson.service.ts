@@ -168,18 +168,25 @@ export class LessonService {
     let courseId = lesson.courseId;
     let inputOrder = input.order;
 
-    const where = {
-      courseId,
-      order: inputOrder,
-      id: { not: lessonId },
-    };
 
-    const existingLesson = await this.lessonRepository.findLessonByWhere(where);
+    
+    
+    if (inputOrder !== undefined) {
+      const where = {
+        courseId,
+        order: inputOrder,
+        id: { not: lessonId },
+      };
 
-    if (existingLesson) {
-      throw AppError.badRequest(
-        "A lesson with this order already exists in the course"
+      const existingLesson = await this.lessonRepository.findLessonByWhere(
+        where
       );
+
+      if (existingLesson) {
+        throw AppError.badRequest(
+          "A lesson with this order already exists in the course"
+        );
+      }
     }
 
     const updatedLesson = await this.lessonRepository.updateLesson(
@@ -190,5 +197,19 @@ export class LessonService {
       throw AppError.badRequest("Failed to update lesson");
     }
     return updatedLesson;
+  }
+
+  async isCourseValidForPublishment(courseId: string) : Promise<boolean> {
+    let where = {
+      courseId,
+      status: "PUBLISHED",
+    };
+    const lessons = await this.lessonRepository.findLessonByWhere(where);
+    
+     if (!lessons) {
+       return false;
+    }
+    
+    return true;
   }
 }
