@@ -1,4 +1,4 @@
-import { ICourse, ICreateCourseInput, ICreateEnrollmentInput, IEnrollment, IGetAllCoursesInput, IUpdateCourseInput } from "./course.types";
+import { ICourse, ICourseDetails, ICreateCourseInput, ICreateEnrollmentInput, IEnrollment, IGetAllCoursesInput, IUpdateCourseInput } from "./course.types";
 
 export interface ICourseRepository {
   createCourse(input: ICreateCourseInput): Promise<ICourse>;
@@ -11,4 +11,5 @@ export interface ICourseRepository {
   softDeleteCourse(courseId: string, deletedAt: Date | null): Promise<ICourse>;
   createEnrollment(input: ICreateEnrollmentInput): Promise<IEnrollment>;
   getEnrollment(userId: string, courseId: string): Promise<IEnrollment | null>;
+  getCourseDetails(courseId:string) : Promise<ICourseDetails | null>
 }

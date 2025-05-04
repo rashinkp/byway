@@ -35,7 +35,6 @@ export interface ICreateCourseInput {
   thumbnail?: string | null;
   duration?: number | null;
   offer?: number | null;
-  status: "DRAFT" | "PUBLISHED" | "ARCHIVED";
   categoryId: string;
   createdBy: string;
     prerequisites?: string | null;

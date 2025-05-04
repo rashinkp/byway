@@ -61,9 +61,6 @@ export const courseSchema = z
     thumbnail: z.union([z.instanceof(File), z.string().url()]).optional(),
     duration: z.number().min(0, "Duration cannot be negative"),
     offer: z.number().min(0, "Offer price cannot be negative").optional(),
-    status: z
-      .enum(["DRAFT", "PUBLISHED"])
-      .refine((val) => val !== undefined, "Status is required"),
     categoryId: z.string().nonempty("Category is required"),
     prerequisites: z
       .string()

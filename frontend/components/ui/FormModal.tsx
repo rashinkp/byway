@@ -51,6 +51,8 @@ export interface FormFieldConfig<T> {
   maxSize?: number;
   fileTypeLabel?: string;
   disabled?: boolean;
+  uploadStatus?: FileUploadStatus;
+  uploadProgress?: number;
 }
 
 interface FormModalProps<T extends z.ZodType<any, any>> {
@@ -85,7 +87,7 @@ export function FormModal<T extends z.ZodType<any, any>>({
           fields.map((field) => [
             field.name,
             field.type === "input" && field.fieldType === "number"
-              ? undefined // Allow undefined for number fields
+              ? undefined
               : field.type === "input" || field.type === "textarea"
               ? ""
               : field.fieldType === "file"
@@ -335,8 +337,8 @@ export function FormModal<T extends z.ZodType<any, any>>({
                             error={form.formState.errors[
                               field.name
                             ]?.message?.toString()}
-                            uploadStatus={FileUploadStatus.IDLE}
-                            uploadProgress={0}
+                            uploadStatus={field.uploadStatus || FileUploadStatus.IDLE}
+                            uploadProgress={field.uploadProgress || 0}
                           />
                         </FormControl>
                         {field.description && (

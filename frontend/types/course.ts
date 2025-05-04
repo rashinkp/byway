@@ -53,7 +53,6 @@ export interface CourseFormData {
   offer?: number;
   duration: number;
   level: "BEGINNER" | "MEDIUM" | "ADVANCED";
-  status: "DRAFT" | "PUBLISHED";
   prerequisites?: string;
   objectives?: string;
   targetAudience?: string;

@@ -11,7 +11,6 @@ import { courseSchema } from "@/lib/validations/course";
 import { FileUploadStatus } from "../FileUploadComponent";
 import { uploadToCloudinary } from "@/lib/cloudinary";
 
-// Define fields with explicit type to match courseSchema
 export const fields: FormFieldConfig<CourseFormData>[] = [
   {
     name: "title",
@@ -80,17 +79,6 @@ export const fields: FormFieldConfig<CourseFormData>[] = [
       { value: "BEGINNER", label: "Beginner" },
       { value: "MEDIUM", label: "Intermediate" },
       { value: "ADVANCED", label: "Advanced" },
-    ],
-  },
-  {
-    name: "status",
-    label: "Status",
-    type: "select",
-    placeholder: "Select a status",
-    description: "Choose whether the course is a draft or published.",
-    options: [
-      { value: "DRAFT", label: "Draft" },
-      { value: "PUBLISHED", label: "Published" },
     ],
   },
   {
@@ -165,16 +153,25 @@ export function CourseFormModal({
         };
       }
 
-      if (field.name === "thumbnail" && initialData?.thumbnail) {
+      if (field.name === "thumbnail") {
         return {
           ...field,
-          disabled: true,
+          disabled: !!initialData?.thumbnail,
+          uploadStatus: initialData?.thumbnail
+            ? FileUploadStatus.SUCCESS
+            : thumbnailUploadStatus,
+          uploadProgress: initialData?.thumbnail ? 100 : thumbnailUploadProgress,
         };
       }
 
       return field;
     });
-  }, [categories, initialData]);
+  }, [
+    categories,
+    initialData,
+    thumbnailUploadStatus,
+    thumbnailUploadProgress,
+  ]);
 
   const handleSubmit = async (data: CourseFormData) => {
     if (!user?.id) {
@@ -202,27 +199,24 @@ export function CourseFormModal({
 
       // Prepare data for submission
       const submitData: CourseFormData = {
-        ...data,
+        title: data.title,
+        description: data.description,
+        level: data.level,
         price: data.price ? Number(data.price) : undefined,
+        thumbnail: thumbnailUrl,
+        duration: data.duration,
         offer: data.offer ? Number(data.offer) : undefined,
-        duration: data.duration, // duration is required per schema
-        thumbnail: thumbnailUrl, // Send Cloudinary URL or undefined
+        categoryId: data.categoryId,
+        prerequisites: data.prerequisites,
+        longDescription: data.longDescription,
+        objectives: data.objectives,
+        targetAudience: data.targetAudience,
       };
 
       if (externalOnSubmit) {
         await externalOnSubmit(submitData);
       } else {
-        createCourse(submitData, {
-          onSuccess: () => {
-            toast.success("Course created successfully!");
-            onOpenChange(false);
-          },
-          onError: (error) => {
-            toast.error(error.message || "Failed to create course");
-            setThumbnailUploadStatus(FileUploadStatus.ERROR);
-            setThumbnailUploadProgress(0);
-          },
-        });
+        createCourse(submitData);
       }
     } catch (error: any) {
       toast.error(error.message || "An error occurred while submitting the form");

@@ -1,6 +1,7 @@
 import { CourseDetails, PrismaClient } from "@prisma/client";
 import {
   ICourse,
+  ICourseDetails,
   ICreateCourseInput,
   ICreateEnrollmentInput,
   IEnrollment,
@@ -182,6 +183,15 @@ export class CourseRepository implements ICourseRepository {
           }
         : undefined,
     };
+  }
+
+
+  async getCourseDetails(courseId: string): Promise<ICourseDetails | null> {
+    const courseDetails = await this.prisma.courseDetails.findUnique({
+      where: { courseId: courseId }
+    });
+
+    return courseDetails;
   }
 
   async getCourseByName(title: string): Promise<ICourse | null> {

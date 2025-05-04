@@ -11,6 +11,7 @@ import {
   IGetAllCoursesInput,
   ICreateEnrollmentInput,
   IEnrollment,
+  ICourseDetails,
 } from "./course.types";
 import {
   createCourseSchema,
@@ -164,6 +165,44 @@ export class CourseService {
     }
   }
 
+  async getCourseDetails(courseId: string): Promise<ICourseDetails | null> {
+    const parsedInput = courseIdSchema.safeParse({ courseId });
+    if (!parsedInput.success) {
+      logger.warn("Validation failed for getCourseById", {
+        errors: parsedInput.error.errors,
+      });
+      throw new AppError(
+        `Validation failed: ${parsedInput.error.message}`,
+        StatusCodes.BAD_REQUEST,
+        "VALIDATION_ERROR"
+      );
+    }
+
+    try {
+      const courseDetails = await this.courseRepository.getCourseById(
+        parsedInput.data.courseId
+      );
+      if (!courseDetails) {
+        logger.warn("Course not found", { courseId });
+        throw new AppError(
+          "Course not found",
+          StatusCodes.NOT_FOUND,
+          "NOT_FOUND"
+        );
+      }
+      return {...courseDetails , courseId};
+    } catch (error) {
+      logger.error("Error retrieving course by ID", { error, courseId });
+      throw error instanceof AppError
+        ? error
+        : new AppError(
+            "Failed to retrieve course",
+            StatusCodes.INTERNAL_SERVER_ERROR,
+            "INTERNAL_ERROR"
+          );
+    }
+  }
+
   async updateCourse(input: IUpdateCourseInput): Promise<ICourse> {
     const parsedInput = updateCourseSchema.safeParse(input);
     if (!parsedInput.success) {
@@ -176,9 +215,9 @@ export class CourseService {
         "VALIDATION_ERROR"
       );
     }
-    
-    const { id:courseId, categoryId, title, createdBy } = parsedInput.data;
-    
+
+    const { id: courseId, categoryId, title, createdBy } = parsedInput.data;
+
     // Validate course
     const course = await this.courseRepository.getCourseById(courseId);
     if (!course || course.deletedAt) {
@@ -189,17 +228,20 @@ export class CourseService {
         "NOT_FOUND"
       );
     }
-    
+
     // Validate ownership
     if (course.createdBy !== createdBy) {
-      logger.warn("Unauthorized course update attempt", { courseId, createdBy });
+      logger.warn("Unauthorized course update attempt", {
+        courseId,
+        createdBy,
+      });
       throw new AppError(
         "Unauthorized: You can only update your own courses",
         StatusCodes.FORBIDDEN,
         "FORBIDDEN"
       );
     }
-    
+
     // Validate category
     if (categoryId && categoryId !== course.categoryId) {
       const category = await this.categoryService.getCategoryById(categoryId);
@@ -212,7 +254,7 @@ export class CourseService {
         );
       }
     }
-    
+
     // Check for title uniqueness
     if (title && title !== course.title) {
       const existingCourse = await this.courseRepository.getCourseByName(title);
@@ -225,8 +267,6 @@ export class CourseService {
         );
       }
     }
-    
-
 
     try {
       return await this.courseRepository.updateCourse(parsedInput.data);
@@ -242,7 +282,11 @@ export class CourseService {
     }
   }
 
-  async softDeleteCourse(courseId: string, userId: string , role:'ADMIN'|'INSTRUCTOR' | 'USER'): Promise<ICourse> {
+  async softDeleteCourse(
+    courseId: string,
+    userId: string,
+    role: "ADMIN" | "INSTRUCTOR" | "USER"
+  ): Promise<ICourse> {
     const parsedInput = courseIdSchema.safeParse({ courseId });
     if (!parsedInput.success) {
       logger.warn("Validation failed for softDeleteCourse", {
@@ -265,7 +309,7 @@ export class CourseService {
           "NOT_FOUND"
         );
       }
-      if (course.createdBy !== userId && role !== 'ADMIN') {
+      if (course.createdBy !== userId && role !== "ADMIN") {
         logger.warn("Unauthorized course delete attempt", { courseId, userId });
         throw new AppError(
           "Unauthorized: You can only delete your own courses",

@@ -1,4 +1,5 @@
 "use client";
+
 import { Course, CourseEditFormData } from "@/types/course";
 import { Edit, Check, X, Loader2 } from "lucide-react";
 import { Button } from "../ui/button";
@@ -16,8 +17,20 @@ import { DetailsSection } from "./CourseDetailsSection";
 import { OverviewSection } from "./CourseOverviewSection";
 import { ObjectivesSection } from "./CourseObjectiveSection";
 import { ActionSection } from "./CourseActionSection";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { AdditionalDetailsSection } from "./CourseAdditionalDetails";
 
-export function CourseDetails({ course, src, alt, isLoading }: { course?: Course; src: string | StaticImageData; alt: string; isLoading: boolean }) {
+export function CourseDetails({
+  course,
+  src,
+  alt,
+  isLoading,
+}: {
+  course?: Course;
+  src: string | StaticImageData;
+  alt: string;
+  isLoading: boolean;
+}) {
   const [isEditing, setIsEditing] = useState(false);
   const [uploadProgress, setUploadProgress] = useState<number | null>(null);
   const [uploadError, setUploadError] = useState<string | null>(null);
@@ -88,11 +101,18 @@ export function CourseDetails({ course, src, alt, isLoading }: { course?: Course
       { data, id: course.id },
       {
         onSuccess: () => {
+          toast.success("Course updated successfully!", {
+            description: `The course "${data.title}" has been updated.`,
+          });
           form.reset(data);
           setIsEditing(false);
         },
         onError: (error: any) => {
-          console.error("Error updating course:", error);
+          toast.error("Failed to update course", {
+            description:
+              error.message ||
+              `An error occurred while updating "${data.title}". Please try again.`,
+          });
         },
       }
     );
@@ -102,10 +122,21 @@ export function CourseDetails({ course, src, alt, isLoading }: { course?: Course
     if (!course) return;
     toggleDeleteCourse(course, {
       onSuccess: () => {
-        toast.success(`Course ${course.deletedAt ? "restored" : "disabled"} successfully.`);
+        toast.success(
+          `Course ${course.deletedAt ? "restored" : "disabled"} successfully.`,
+          {
+            description: `The course "${course.title}" is now ${
+              course.deletedAt ? "active" : "inactive"
+            }.`,
+          }
+        );
       },
       onError: (error: any) => {
-        toast.error(error?.response?.data?.message || "Failed to toggle course status. Please try again.");
+        toast.error("Failed to toggle course status", {
+          description:
+            error?.response?.data?.message ||
+            `An error occurred while updating the status of "${course.title}". Please try again.`,
+        });
       },
     });
   };
@@ -118,13 +149,25 @@ export function CourseDetails({ course, src, alt, isLoading }: { course?: Course
   };
 
   if (isLoading) {
-    return <div className="animate-pulse space-y-4"><div className="h-32 w-32 bg-gray-200 rounded"></div><div className="h-4 w-3/4 bg-gray-200 rounded"></div></div>;
+    return (
+      <div className="animate-pulse space-y-4">
+        <div className="h-32 w-32 bg-gray-200 rounded"></div>
+        <div className="h-4 w-3/4 bg-gray-200 rounded"></div>
+      </div>
+    );
   }
 
   return (
     <div className="space-y-8">
       <div className="flex flex-col md:flex-row gap-6">
-        <ImageSection src={src} alt={alt} onImageChange={handleImageUpload} isUploading={uploadProgress !== null} uploadProgress={uploadProgress} uploadError={uploadError} />
+        <ImageSection
+          src={src}
+          alt={alt}
+          onImageChange={handleImageUpload}
+          isUploading={uploadProgress !== null}
+          uploadProgress={uploadProgress}
+          uploadError={uploadError}
+        />
         <div className="flex-1">
           {!isEditing && (
             <Button
@@ -139,14 +182,24 @@ export function CourseDetails({ course, src, alt, isLoading }: { course?: Course
           )}
           {isEditing ? (
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-              <DetailsSection course={course} isEditing={isEditing} form={form} onImageUpload={handleImageUpload} uploadProgress={uploadProgress} />
+              <DetailsSection
+                course={course}
+                isEditing={isEditing}
+                form={form}
+                onImageUpload={handleImageUpload}
+                uploadProgress={uploadProgress}
+              />
               <div className="flex gap-3">
                 <Button
                   type="submit"
                   disabled={isUpdating || !course || uploadProgress !== null}
                   className="bg-primary hover:bg-primary/90 text-white"
                 >
-                  {isUpdating ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Check className="mr-2 h-4 w-4" />}
+                  {isUpdating ? (
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  ) : (
+                    <Check className="mr-2 h-4 w-4" />
+                  )}
                   Save Changes
                 </Button>
                 <Button
@@ -162,16 +215,38 @@ export function CourseDetails({ course, src, alt, isLoading }: { course?: Course
                   <X className="mr-2 h-4 w-4" />
                   Cancel
                 </Button>
-                </div>
-              </form>
-            ) : (
-              <DetailsSection course={course} isEditing={isEditing} form={form} onImageUpload={handleImageUpload} uploadProgress={uploadProgress} />
-            )}
+              </div>
+            </form>
+          ) : (
+            <DetailsSection
+              course={course}
+              isEditing={isEditing}
+              form={form}
+              onImageUpload={handleImageUpload}
+              uploadProgress={uploadProgress}
+            />
+          )}
         </div>
       </div>
-      <OverviewSection course={course} isEditing={isEditing} form={form} />
-      <ObjectivesSection />
-      {course && <ActionSection course={course} isEditing={isEditing} isUpdating={isUpdating} onPublish={onPublish} onToggleDelete={onToggleDelete} />}
+      <Tabs defaultValue="overview" className="w-full">
+        <TabsList>
+          <TabsTrigger value="overview">Overview</TabsTrigger>
+          <TabsTrigger value="details">Details</TabsTrigger>
+          <TabsTrigger value="objectives">Objectives</TabsTrigger>
+        </TabsList>
+        <OverviewSection course={course} isEditing={isEditing} form={form} />
+        <AdditionalDetailsSection course={course} />
+        <ObjectivesSection />
+      </Tabs>
+      {course && (
+        <ActionSection
+          course={course}
+          isEditing={isEditing}
+          isUpdating={isUpdating}
+          onPublish={onPublish}
+          onToggleDelete={onToggleDelete}
+        />
+      )}
     </div>
   );
 }

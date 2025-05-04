@@ -30,9 +30,6 @@ export const createCourseSchema = z
       .min(0, "Offer price cannot be negative")
       .optional()
       .nullable(),
-    status: z
-      .enum(["DRAFT", "PUBLISHED", "ARCHIVED"])
-      .refine((val) => val !== undefined, "Status is required"),
     categoryId: z.string().uuid("Category ID must be a valid UUID"),
     createdBy: z.string().uuid("Created by must be a valid user ID"),
         prerequisites: z

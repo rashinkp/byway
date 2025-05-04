@@ -1,5 +1,5 @@
 "use client";
-import { useRouter, useParams } from "next/navigation";
+import { useParams } from "next/navigation";
 import { LessonManager } from "@/components/lesson/LessonManager";
 import { useGetCourseById } from "@/hooks/course/useGetCourseById";
 import PlaceHolderImage from "@/public/placeHolder.jpg";
@@ -14,10 +14,10 @@ import {
 } from "lucide-react";
 import ErrorDisplay from "@/components/ErrorDisplay";
 import { CourseDetails } from "@/components/course/CourseDetails";
+import { AdditionalDetailsSection } from "@/components/course/CourseAdditionalDetails";
 
 export default function CourseDetailPage() {
   const { courseId } = useParams();
-  const router = useRouter();
   const {
     data: course,
     isLoading,
@@ -35,6 +35,8 @@ export default function CourseDetailPage() {
       />
     );
   }
+
+  console.log(course);
 
   const tabItems = [
     { id: "overview", label: "Overview", icon: InfoIcon },
@@ -105,7 +107,7 @@ export default function CourseDetailPage() {
           <p className="text-gray-600">No customer data available yet.</p>
         </TabsContent>
         <TabsContent value="details" className="mt-0">
-          <p className="text-gray-600">No additional details available yet.</p>
+          <AdditionalDetailsSection course={course}/>
         </TabsContent>
       </Tabs>
     </div>
