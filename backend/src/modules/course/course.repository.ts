@@ -1,4 +1,4 @@
-import { PrismaClient } from "@prisma/client";
+import { CourseDetails, PrismaClient } from "@prisma/client";
 import {
   ICourse,
   ICreateCourseInput,
@@ -15,42 +15,48 @@ export class CourseRepository implements ICourseRepository {
   constructor(private prisma: PrismaClient) {}
 
   async createCourse(input: ICreateCourseInput): Promise<ICourse> {
-    const { details, ...courseData } = input;
-    const course = await this.prisma.course.create({
-      data: {
-        ...courseData,
-        details: details ? { create: details } : undefined,
-      },
-      include: { details: true },
-    });
-    return {
-      id: course.id,
-      title: course.title,
-      description: course.description || undefined,
-      level: course.level,
-      price: course.price?.toNumber(),
-      thumbnail: course.thumbnail || undefined,
-      duration: course.duration || undefined,
-      offer: course.offer?.toNumber(),
-      status: course.status,
-      categoryId: course.categoryId,
-      createdBy: course.createdBy,
-      createdAt: course.createdAt,
-      updatedAt: course.updatedAt,
-      deletedAt: course.deletedAt || undefined,
-      details: course.details
-        ? {
-            id: course.details.id,
-            courseId: course.details.courseId,
-            prerequisites: course.details.prerequisites || undefined,
-            longDescription: course.details.longDescription || undefined,
-            objectives: course.details.objectives || undefined,
-            targetAudience: course.details.targetAudience || undefined,
-            createdAt: course.details.createdAt,
-            updatedAt: course.details.updatedAt,
-          }
-        : undefined,
-    };
+    
+    const {
+      prerequisites,
+      longDescription,
+      objectives,
+      targetAudience,
+      ...courseData
+    } = input;
+    const course = await this.prisma.$transaction(async (tx) => {
+      // Create the Course record
+      const createdCourse = await tx.course.create({
+        data: {
+          ...courseData,
+          price: courseData.price ? courseData.price : null,
+          offer: courseData.offer ? courseData.offer : null,
+          duration: courseData.duration, // duration is required
+        },
+      });
+
+      let createdDetails: CourseDetails | undefined;
+      if (prerequisites || longDescription || objectives || targetAudience) {
+        createdDetails = await tx.courseDetails.create({
+          data: {
+            courseId: createdCourse.id,
+            prerequisites: prerequisites || null,
+            longDescription: longDescription || null,
+            objectives: objectives || null,
+            targetAudience: targetAudience || null,
+          },
+        });
+
+      }
+
+        return {
+          ...createdCourse,
+          price: createdCourse.price?.toNumber() ?? null,
+          offer: createdCourse.offer?.toNumber() ?? null,
+        };
+      });
+  
+    
+    return course;
   }
 
   async getAllCourses(

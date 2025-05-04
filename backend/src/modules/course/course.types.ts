@@ -30,20 +30,19 @@ export interface ICourseDetails {
 export interface ICreateCourseInput {
   title: string;
   description?: string | null;
-  level?: "BEGINNER" | "MEDIUM" | "ADVANCED";
+  level: "BEGINNER" | "MEDIUM" | "ADVANCED";
   price?: number | null;
   thumbnail?: string | null;
   duration?: number | null;
   offer?: number | null;
-  status?: "DRAFT" | "PUBLISHED" | "ARCHIVED";
+  status: "DRAFT" | "PUBLISHED" | "ARCHIVED";
   categoryId: string;
   createdBy: string;
-  details?: {
     prerequisites?: string | null;
     longDescription?: string | null;
     objectives?: string | null;
     targetAudience?: string | null;
-  } | null;
+  
 }
 
 export interface IUpdateCourseInput {

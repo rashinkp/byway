@@ -1,6 +1,6 @@
-import { UseGetAllCoursesParams } from "@/hooks/course/useGetAllCourse";
+
 import { api } from "./api";
-import { CourseApiResponse, Course, AddCourseParams, CourseEditFormData } from "@/types/course";
+import { CourseApiResponse, Course, AddCourseParams, CourseEditFormData, IGetAllCoursesInput } from "@/types/course";
 
 
 
@@ -12,7 +12,7 @@ export async function getAllCourses({
   includeDeleted = false,
   filterBy = "All",
   search
-}: UseGetAllCoursesParams): Promise<CourseApiResponse> {
+}: IGetAllCoursesInput): Promise<CourseApiResponse> {
   try {
     const response = await api.get<{ data: CourseApiResponse }>("/courses/", {
       params: {

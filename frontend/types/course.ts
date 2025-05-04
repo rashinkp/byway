@@ -33,15 +33,31 @@ export interface AddCourseParams {
   price?: number | null;
   duration?: number | null;
   level?: "BEGINNER" | "MEDIUM" | "ADVANCED";
-  thumbnail?: string | null;
+  thumbnailUrl?: string | null;
   offer?: number | null;
-  status?: "DRAFT" | "PUBLISHED" | "ARCHIVED";
+  status?: "DRAFT" | "PUBLISHED";
   details?: {
     prerequisites?: string | null;
     longDescription?: string | null;
     objectives?: string | null;
     targetAudience?: string | null;
   } | null;
+}
+
+export interface CourseFormData {
+  title: string;
+  description?: string;
+  longDescription?: string;
+  categoryId: string;
+  price?: number;
+  offer?: number;
+  duration: number;
+  level: "BEGINNER" | "MEDIUM" | "ADVANCED";
+  status: "DRAFT" | "PUBLISHED";
+  prerequisites?: string;
+  objectives?: string;
+  targetAudience?: string;
+  thumbnail?: string | File;
 }
 
 

@@ -262,7 +262,7 @@ export const FileUploadInput = ({
 
 FileUploadInput.uploadToCloudinary = async (
   file: File,
-  contentType: ContentType,
+  contentType: ContentType | 'image',
   setUploadStatus: (status: "idle" | "uploading" | "success" | "error") => void,
   setUploadProgress: (progress: number) => void
 ): Promise<string> => {

@@ -93,10 +93,6 @@ export default function InstructorsPage() {
         { value: "email", label: "Email" },
         { value: "createdAt", label: "Newest first" },
       ]}
-      addButton={{
-        label: "Add Instructor",
-        onClick: () => setIsAddOpen(true),
-      }}
       defaultSortBy="name"
       role="INSTRUCTOR"
     />

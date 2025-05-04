@@ -1,33 +1,42 @@
 "use client";
 
-import { CourseFormData } from "@/app/instructor/courses/page";
+import { CourseFormData } from "@/types/course";
 import { useCreateCourse } from "@/hooks/course/useCreateCourse";
 import { useAuthStore } from "@/stores/auth.store";
 import { toast } from "sonner";
 import { FormModal, FormFieldConfig } from "../ui/FormModal";
 import { useCategories } from "@/hooks/category/useCategories";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { courseSchema } from "@/lib/validations/course";
+import { FileUploadStatus } from "../FileUploadComponent";
+import { uploadToCloudinary } from "@/lib/cloudinary";
 
+// Define fields with explicit type to match courseSchema
 export const fields: FormFieldConfig<CourseFormData>[] = [
   {
     name: "title",
-    label: "Title",
+    label: "Course Title",
     type: "input",
     fieldType: "text",
     placeholder: "e.g., Introduction to Web Development",
-    description: "Enter the title of your course.",
+    description: "Enter the title of your course (max 100 characters).",
     maxLength: 100,
-    column: "left",
   },
   {
     name: "description",
-    label: "Description",
+    label: "Short Description",
     type: "textarea",
     placeholder: "e.g., Learn the basics of HTML, CSS, and JavaScript",
-    description: "Provide a brief description of the course .",
+    description: "Provide a brief overview of the course (max 1000 characters).",
     maxLength: 1000,
-    column: "right",
+  },
+  {
+    name: "longDescription",
+    label: "Detailed Description",
+    type: "textarea",
+    placeholder: "e.g., In-depth explanation of course content and structure",
+    description: "Provide a detailed description of the course (max 5000 characters).",
+    maxLength: 5000,
   },
   {
     name: "categoryId",
@@ -36,7 +45,6 @@ export const fields: FormFieldConfig<CourseFormData>[] = [
     placeholder: "Select a category",
     description: "Choose the category that best fits your course.",
     options: [],
-    column: "left",
   },
   {
     name: "price",
@@ -44,32 +52,80 @@ export const fields: FormFieldConfig<CourseFormData>[] = [
     type: "input",
     fieldType: "number",
     placeholder: "e.g., 49.99",
-    description: "Set the price for your course.",
-    maxLength: 10,
-    column: "right",
+    description: "Set the price for your course (optional).",
+  },
+  {
+    name: "offer",
+    label: "Discounted Price (USD)",
+    type: "input",
+    fieldType: "number",
+    placeholder: "e.g., 39.99",
+    description: "Set a discounted price for promotions (optional).",
   },
   {
     name: "duration",
-    label: "Duration",
+    label: "Duration (Hours)",
     type: "input",
     fieldType: "number",
-    placeholder: "e.g., 15 , 10",
-    description: "Specify the total duration of the course in minutes.",
-    maxLength: 50,
-    column: "left",
+    placeholder: "e.g., 15",
+    description: "Specify the total duration of the course in hours.",
   },
   {
     name: "level",
-    label: "Level",
+    label: "Difficulty Level",
     type: "select",
     placeholder: "Select a level",
     description: "Choose the difficulty level of the course.",
     options: [
-      { value: "BEGINNER", label: "BEGINNER" },
-      { value: "MEDIUM", label: "MEDIUM" },
-      { value: "ADVANCED", label: "ADVANCED" },
+      { value: "BEGINNER", label: "Beginner" },
+      { value: "MEDIUM", label: "Intermediate" },
+      { value: "ADVANCED", label: "Advanced" },
     ],
-    column: "right",
+  },
+  {
+    name: "status",
+    label: "Status",
+    type: "select",
+    placeholder: "Select a status",
+    description: "Choose whether the course is a draft or published.",
+    options: [
+      { value: "DRAFT", label: "Draft" },
+      { value: "PUBLISHED", label: "Published" },
+    ],
+  },
+  {
+    name: "prerequisites",
+    label: "Prerequisites",
+    type: "textarea",
+    placeholder: "e.g., Basic knowledge of programming",
+    description: "List any prerequisites for the course (optional, max 1000 characters).",
+    maxLength: 1000,
+  },
+  {
+    name: "objectives",
+    label: "Learning Objectives",
+    type: "textarea",
+    placeholder: "e.g., Understand core web development concepts",
+    description: "List the learning objectives of the course (optional, max 2000 characters).",
+    maxLength: 2000,
+  },
+  {
+    name: "targetAudience",
+    label: "Target Audience",
+    type: "textarea",
+    placeholder: "e.g., Aspiring web developers",
+    description: "Describe the intended audience for the course (optional, max 1000 characters).",
+    maxLength: 1000,
+  },
+  {
+    name: "thumbnail",
+    label: "Thumbnail",
+    type: "input",
+    fieldType: "file",
+    description: "Upload a thumbnail image for the course.",
+    accept: "image/*",
+    maxSize: 5 * 1024 * 1024, // 5MB
+    fileTypeLabel: "image",
   },
 ];
 
@@ -90,55 +146,102 @@ export function CourseFormModal({
 }: CourseFormModalProps) {
   const { user } = useAuthStore();
   const { mutate: createCourse, isPending } = useCreateCourse();
-  const { categories, loading: categoriesLoading } = useCategories();
-
-  console.log(user);
+  const { data, isLoading: categoriesLoading } = useCategories();
+  const categories = data?.items;
+  const [thumbnailUploadStatus, setThumbnailUploadStatus] =
+    useState<FileUploadStatus>(FileUploadStatus.IDLE);
+  const [thumbnailUploadProgress, setThumbnailUploadProgress] = useState(0);
 
   const dynamicFields = useMemo(() => {
-    return fields.map((field) =>
-      field.name === "categoryId"
-        ? {
-            ...field,
-            options:
-              categories?.map((category) => ({
-                value: category.id,
-                label: category.name,
-              })) || [],
-          }
-        : field
-    );
-  }, [categories]);
+    return fields.map((field) => {
+      if (field.name === "categoryId") {
+        return {
+          ...field,
+          options:
+            categories?.map((category) => ({
+              value: category.id,
+              label: category.name,
+            })) || [],
+        };
+      }
+
+      if (field.name === "thumbnail" && initialData?.thumbnail) {
+        return {
+          ...field,
+          disabled: true,
+        };
+      }
+
+      return field;
+    });
+  }, [categories, initialData]);
 
   const handleSubmit = async (data: CourseFormData) => {
-
     if (!user?.id) {
       toast.error("Instructor ID not found");
       return;
     }
 
-    const submitData = {
-      ...data,
-      price: Number(data.price),
-    };
+    let thumbnailUrl: string | undefined;
 
-    if (externalOnSubmit) {
-      await externalOnSubmit(submitData);
-    } else {
-      createCourse(submitData, {
-        onSuccess: () => {
-          onOpenChange(false);
-        },
-      });
+    try {
+      // Handle thumbnail upload to Cloudinary
+      if (data.thumbnail instanceof File) {
+        setThumbnailUploadStatus(FileUploadStatus.UPLOADING);
+        const uploadResult = await uploadToCloudinary(data.thumbnail, {
+          folder: "courses",
+          onProgress: (progress) => {
+            setThumbnailUploadProgress(progress.percent);
+          },
+        });
+        thumbnailUrl = uploadResult.secure_url;
+        setThumbnailUploadStatus(FileUploadStatus.SUCCESS);
+      } else if (typeof data.thumbnail === "string") {
+        thumbnailUrl = data.thumbnail; // Use existing URL if provided
+      }
+
+      // Prepare data for submission
+      const submitData: CourseFormData = {
+        ...data,
+        price: data.price ? Number(data.price) : undefined,
+        offer: data.offer ? Number(data.offer) : undefined,
+        duration: data.duration, // duration is required per schema
+        thumbnail: thumbnailUrl, // Send Cloudinary URL or undefined
+      };
+
+      if (externalOnSubmit) {
+        await externalOnSubmit(submitData);
+      } else {
+        createCourse(submitData, {
+          onSuccess: () => {
+            toast.success("Course created successfully!");
+            onOpenChange(false);
+          },
+          onError: (error) => {
+            toast.error(error.message || "Failed to create course");
+            setThumbnailUploadStatus(FileUploadStatus.ERROR);
+            setThumbnailUploadProgress(0);
+          },
+        });
+      }
+    } catch (error: any) {
+      toast.error(error.message || "An error occurred while submitting the form");
+      setThumbnailUploadStatus(FileUploadStatus.ERROR);
+      setThumbnailUploadProgress(0);
     }
   };
-  //todo: price validtion is not working while submitting the form
+
   return (
     <FormModal
       open={open}
       onOpenChange={onOpenChange}
       onSubmit={handleSubmit}
       schema={courseSchema}
-      initialData={initialData}
+      initialData={
+        initialData
+          ? { ...initialData, thumbnail: initialData.thumbnail || undefined }
+          : undefined
+      }
       title={initialData ? "Edit Course" : "Create New Course"}
       submitText="Save"
       fields={dynamicFields}
