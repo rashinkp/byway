@@ -8,7 +8,9 @@ interface AdditionalDetailsSectionProps {
   course?: Course;
 }
 
-export function AdditionalDetailsSection({ course }: AdditionalDetailsSectionProps) {
+export function AdditionalDetailsSection({
+  course,
+}: AdditionalDetailsSectionProps) {
   const status = course?.deletedAt ? "Inactive" : "Active";
 
   return (
@@ -64,8 +66,7 @@ export function AdditionalDetailsSection({ course }: AdditionalDetailsSectionPro
             Target Audience
           </h3>
           <p className="text-gray-600">
-            {course?.details?.targetAudience ||
-              "No target audience specified."}
+            {course?.details?.targetAudience || "No target audience specified."}
           </p>
         </div>
       </div>

@@ -58,7 +58,7 @@ export interface FormFieldConfig<T> {
 interface FormModalProps<T extends z.ZodType<any, any>> {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onSubmit: (data: z.infer<T>) => Promise<void>;
+  onSubmit: (data: any) => Promise<void>;
   schema: T;
   initialData?: Partial<z.infer<T>>;
   title: string;
@@ -80,24 +80,24 @@ export function FormModal<T extends z.ZodType<any, any>>({
   description,
   isSubmitting: externalSubmitting,
 }: FormModalProps<T>) {
-  const defaultValues = useMemo(
-    () =>
-      ({
-        ...Object.fromEntries(
-          fields.map((field) => [
-            field.name,
-            field.type === "input" && field.fieldType === "number"
-              ? undefined
-              : field.type === "input" || field.type === "textarea"
-              ? ""
-              : field.fieldType === "file"
-              ? undefined
-              : undefined,
-          ])
-        ),
-      } as z.infer<T>),
-    [fields]
-  );
+const defaultValues = useMemo(
+  () =>
+    ({
+      ...Object.fromEntries(
+        fields.map((field) => [
+          field.name,
+          field.type === "input" && field.fieldType === "number"
+            ? undefined
+            : field.type === "input" || field.type === "textarea"
+            ? ""
+            : field.fieldType === "file"
+            ? undefined
+            : undefined,
+        ])
+      ),
+    } as z.infer<T>),
+  [fields]
+);
 
   const form = useForm<z.infer<T>>({
     resolver: zodResolver(schema),
@@ -307,7 +307,7 @@ export function FormModal<T extends z.ZodType<any, any>>({
               </div>
             )}
 
-            {/* File fields (full width) */}
+            {/* File fields (full width) with thumbnail preview */}
             {fileFields.length > 0 && (
               <div className="space-y-6 mb-6">
                 {fileFields.map((field) => (
@@ -320,6 +320,15 @@ export function FormModal<T extends z.ZodType<any, any>>({
                         <FormLabel className="text-sm font-normal">
                           {field.label}
                         </FormLabel>
+                        {typeof formField.value === "string" && formField.value && (
+                          <div className="mb-4">
+                            <img
+                              src={formField.value}
+                              alt="Course thumbnail preview"
+                              className="w-32 h-32 object-cover rounded-md"
+                            />
+                          </div>
+                        )}
                         <FormControl>
                           <FileUploadComponent
                             label={field.label}
@@ -327,7 +336,7 @@ export function FormModal<T extends z.ZodType<any, any>>({
                             maxSize={field.maxSize || 10 * 1024 * 1024}
                             fileTypeLabel={field.fileTypeLabel || "file"}
                             onFileChange={(file, error) => {
-                              formField.onChange(file || undefined);
+                              formField.onChange(file || formField.value);
                               if (error) {
                                 form.setError(field.name, { message: error });
                               } else {

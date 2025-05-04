@@ -1,4 +1,5 @@
 "use client";
+
 import { useParams } from "next/navigation";
 import { LessonManager } from "@/components/lesson/LessonManager";
 import { useGetCourseById } from "@/hooks/course/useGetCourseById";
@@ -35,8 +36,6 @@ export default function CourseDetailPage() {
       />
     );
   }
-
-  console.log(course);
 
   const tabItems = [
     { id: "overview", label: "Overview", icon: InfoIcon },
@@ -107,7 +106,7 @@ export default function CourseDetailPage() {
           <p className="text-gray-600">No customer data available yet.</p>
         </TabsContent>
         <TabsContent value="details" className="mt-0">
-          <AdditionalDetailsSection course={course}/>
+          <AdditionalDetailsSection course={course} />
         </TabsContent>
       </Tabs>
     </div>

@@ -1,5 +1,5 @@
-import { courseEditSchema } from "@/lib/validations/course";
 import { z } from "zod";
+import { courseEditSchema } from "@/lib/validations/course";
 
 export type SortByType = "createdAt" | "name" | "updatedAt";
 
@@ -32,10 +32,10 @@ export interface AddCourseParams {
   categoryId: string;
   price?: number | null;
   duration?: number | null;
-  level?: "BEGINNER" | "MEDIUM" | "ADVANCED";
-  thumbnailUrl?: string | null;
+  level: "BEGINNER" | "MEDIUM" | "ADVANCED";
+  thumbnail?: string | null;
   offer?: number | null;
-  status?: "DRAFT" | "PUBLISHED";
+  status: "DRAFT" | "PUBLISHED" | "ARCHIVED";
   details?: {
     prerequisites?: string | null;
     longDescription?: string | null;
@@ -48,6 +48,7 @@ export interface CourseFormData {
   title: string;
   description?: string;
   longDescription?: string;
+  status?: "DRAFT" | "PUBLISHED" | "ARCHIVED";
   categoryId: string;
   price?: number;
   offer?: number;
@@ -59,7 +60,6 @@ export interface CourseFormData {
   thumbnail?: string | File;
 }
 
-
 export interface CourseApiResponse {
   courses: Course[];
   total: number;
@@ -67,7 +67,6 @@ export interface CourseApiResponse {
   limit: number;
   totalPage: number;
 }
-
 
 export type CourseEditFormData = z.infer<typeof courseEditSchema>;
 
