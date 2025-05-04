@@ -6,7 +6,6 @@ import { OtpService } from "../otp/otp.service";
 import { AppError } from "../../utils/appError";
 import { StatusCodes } from "http-status-codes";
 import { UserService } from "../user/user.service";
-import axios from "axios";
 import { IAuthRepository } from "./auth.repository.interface";
 
 

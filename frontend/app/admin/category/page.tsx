@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Plus } from "lucide-react";
+import { Plus, Eye } from "lucide-react";
 import { Category, CategoryFormData } from "@/types/category";
 import { useCategories } from "@/hooks/category/useCategories";
 import { useCreateCategory } from "@/hooks/category/useCreateCategory";
@@ -11,10 +11,15 @@ import { useToggleDeleteCategory } from "@/hooks/category/useToggleDeleteCategor
 import CategoryFormModal from "@/components/admin/CategoryFormModal";
 import { StatusBadge } from "@/components/ui/StatusBadge";
 import ListPage from "@/components/ListingPage";
+import { AlertComponent } from "@/components/ui/AlertComponent";
 
 export default function CategoriesPage() {
   const [isAddOpen, setIsAddOpen] = useState(false);
   const [isEditOpen, setIsEditOpen] = useState(false);
+  const [isViewOpen, setIsViewOpen] = useState(false);
+  const [viewCategory, setViewCategory] = useState<Category | undefined>(
+    undefined
+  );
   const [editCategory, setEditCategory] = useState<Category | undefined>(
     undefined
   );
@@ -41,6 +46,40 @@ export default function CategoriesPage() {
       }
     );
   };
+
+  const handleViewCategory = (category: Category) => {
+    setViewCategory(category);
+    setIsViewOpen(true);
+  };
+
+  const renderCategoryDetails = (category: Category) => (
+    <div className="space-y-4">
+      <div>
+        <h3 className="text-sm font-semibold text-gray-700">Name</h3>
+        <p className="text-sm text-gray-600">{category.name}</p>
+      </div>
+      <div>
+        <h3 className="text-sm font-semibold text-gray-700">Description</h3>
+        <p className="text-sm text-gray-600">{category.description || "N/A"}</p>
+      </div>
+      <div>
+        <h3 className="text-sm font-semibold text-gray-700">Status</h3>
+        <StatusBadge isActive={!category.deletedAt} />
+      </div>
+      <div>
+        <h3 className="text-sm font-semibold text-gray-700">Created At</h3>
+        <p className="text-sm text-gray-600">
+          {new Date(category.createdAt).toLocaleString()}
+        </p>
+      </div>
+      <div>
+        <h3 className="text-sm font-semibold text-gray-700">Updated At</h3>
+        <p className="text-sm text-gray-600">
+          {new Date(category.updatedAt).toLocaleString()}
+        </p>
+      </div>
+    </div>
+  );
 
   return (
     <>
@@ -82,6 +121,11 @@ export default function CategoriesPage() {
           },
         ]}
         actions={[
+          {
+            label: "View",
+            onClick: (category) => handleViewCategory(category),
+            variant: "outline",
+          },
           {
             label: "Edit",
             onClick: (category) => {
@@ -144,6 +188,21 @@ export default function CategoriesPage() {
         title="Edit Category"
         submitText="Update"
       />
+
+      {viewCategory && (
+        <AlertComponent
+          open={isViewOpen}
+          onOpenChange={(open) => {
+            setIsViewOpen(open);
+            if (!open) setViewCategory(undefined);
+          }}
+          title={`View Category: ${viewCategory.name}`}
+          description={renderCategoryDetails(viewCategory)}
+          confirmText="Close"
+          cancelText={null}
+          onConfirm={() => setIsViewOpen(false)}
+        />
+      )}
     </>
   );
 }

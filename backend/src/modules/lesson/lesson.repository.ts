@@ -71,8 +71,10 @@ export class LessonRepository implements ILessonRepository {
       this.prisma.lesson.count({ where }),
     ]);
 
+ 
+
     return {
-      lessons: lessons.map((lesson) => ({
+      lessons: lessons.map((lesson:ILesson) => ({
         id: lesson.id,
         courseId: lesson.courseId,
         title: lesson.title,
@@ -117,7 +119,7 @@ export class LessonRepository implements ILessonRepository {
       where: { courseId, deletedAt: null },
       orderBy: { order: "asc" },
     });
-    return lessons.map((lesson) => ({
+    return lessons.map((lesson: ILesson) => ({
       id: lesson.id,
       courseId: lesson.courseId,
       title: lesson.title,
@@ -168,7 +170,7 @@ export class LessonRepository implements ILessonRepository {
       where: { userId, courseId },
       orderBy: { lesson: { order: "asc" } },
     });
-    return progress.map((p) => ({
+    return progress.map((p:any) => ({
       userId: p.userId,
       courseId: p.courseId,
       lessonId: p.lessonId,
@@ -188,7 +190,7 @@ export class LessonRepository implements ILessonRepository {
         where: { id: lessonId },
         data: input,
       })
-      .then((lesson) => ({
+      .then((lesson: ILesson) => ({
         id: lesson.id,
         courseId: lesson.courseId,
         title: lesson.title,

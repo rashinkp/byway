@@ -158,13 +158,24 @@ export function DataTable<T>({
                       {columns.map((column, colIndex) => (
                         <TableCell
                           key={colIndex}
-                          className="text-gray-800 text-sm py-3"
+                          className="text-gray-800 text-sm py-3 max-w-xs truncate"
+                          title={
+                            column.render
+                              ? undefined
+                              : String(item[column.accessor as keyof T])
+                          }
                         >
-                          {column.render
-                            ? column.render(item)
-                            : (item[
-                                column.accessor as keyof T
-                              ] as React.ReactNode)}
+                          {column.render ? (
+                            column.render(item)
+                          ) : (
+                            <span className="block truncate">
+                              {
+                                item[
+                                  column.accessor as keyof T
+                                ] as React.ReactNode
+                              }
+                            </span>
+                          )}
                         </TableCell>
                       ))}
                       {actions.length > 0 && (

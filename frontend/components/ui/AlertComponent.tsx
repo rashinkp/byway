@@ -16,9 +16,9 @@ interface AlertProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   title?: string;
-  description?: string | ((item: any) => string);
+  description?: string | ((item: any) => string) | ReactNode;
   confirmText?: string;
-  cancelText?: string;
+  cancelText?: string | null;
   onConfirm: () => void;
   item?: any;
   actions?: Array<{ confirmationMessage?: (item: any) => string }>;
@@ -38,10 +38,19 @@ export function AlertComponent({
   actionIndex,
 }: AlertProps) {
   const getDynamicDescription = useCallback(() => {
-    if (item && actions && actionIndex !== undefined && actionIndex >= 0 && actionIndex < actions.length) {
+    if (
+      item &&
+      actions &&
+      actionIndex !== undefined &&
+      actionIndex >= 0 &&
+      actionIndex < actions.length
+    ) {
       return actions[actionIndex]?.confirmationMessage?.(item) || description;
     }
-    return typeof description === "function" ? description(item) : description;
+    if (typeof description === "function") {
+      return description(item);
+    }
+    return description;
   }, [item, actions, actionIndex, description]);
 
   const handleConfirm = () => {
@@ -62,12 +71,14 @@ export function AlertComponent({
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter className="mt-4 flex justify-end gap-2">
-          <AlertDialogCancel className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-md">
-            {cancelText}
-          </AlertDialogCancel>
+          {cancelText && (
+            <AlertDialogCancel className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-md">
+              {cancelText}
+            </AlertDialogCancel>
+          )}
           <AlertDialogAction
             onClick={handleConfirm}
-            className="px-4 py-2 text-sm font-medium text-white bg-primary hover:bg-primary/90 rounded-md"
+            className="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-md"
           >
             {confirmText}
           </AlertDialogAction>

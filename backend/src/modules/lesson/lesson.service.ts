@@ -1,4 +1,4 @@
-import { PrismaClient } from "@prisma/client";
+
 import { CourseRepository } from "../course/course.repository";
 import {
   ILesson,
