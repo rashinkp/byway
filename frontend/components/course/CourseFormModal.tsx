@@ -258,16 +258,7 @@ export function CourseFormModal({
             },
             id: initialData.id,
           },
-          {
-            onSuccess: () => {
-              onOpenChange(false);
-            },
-            onError: (error: any) => {
-              toast.error("Failed to update course", {
-                description: error.message || "Please try again.",
-              });
-            },
-          }
+          
         );
       } else {
         // Create new course
@@ -276,17 +267,7 @@ export function CourseFormModal({
             ...submitData,
             status: "DRAFT",
           },
-          {
-            onSuccess: () => {
-              toast.success("Course created successfully");
-              onOpenChange(false);
-            },
-            onError: (error: any) => {
-              toast.error("Failed to create course", {
-                description: error.message || "Please try again.",
-              });
-            },
-          }
+          
         );
       }
     } catch (error: any) {
@@ -296,6 +277,8 @@ export function CourseFormModal({
       });
       setThumbnailUploadStatus(FileUploadStatus.ERROR);
       setThumbnailUploadProgress(0);
+    } finally {
+      onOpenChange(false);
     }
   };
 

@@ -10,7 +10,7 @@ import { toast } from "sonner";
 import { ImageSection } from "./CourseDetailsImageSection";
 import { DetailsSection } from "./CourseDetailsSection";
 import { OverviewSection } from "./CourseOverviewSection";
-import { ObjectivesSection } from "./CourseObjectiveSection";
+
 import { ActionSection } from "./CourseActionSection";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { CourseFormModal } from "./CourseFormModal";
@@ -28,8 +28,6 @@ export function CourseDetails({
   isLoading: boolean;
 }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const { mutate: toggleDeleteCourse, isPending: isToggling } =
-    useSoftDeleteCourse();
 
 
   const onPublish = () => {
@@ -57,29 +55,21 @@ export function CourseDetails({
           uploadProgress={null}
         />
         <div className="flex-1">
-          <Button
-            variant="ghost"
-            onClick={() => setIsModalOpen(true)}
-            className="mb-4 text-primary hover:text-primary/80"
-            disabled={!course}
-          >
-            <Edit className="mr-2 h-4 w-4" />
-            Edit Details
-          </Button>
+         
           <DetailsSection course={course} />
         </div>
       </div>
       <Tabs defaultValue="overview" className="w-full">
         <OverviewSection course={course} isEditing={isLoading} form={{}} />
         <AdditionalDetailsSection course={course} />
-        <ObjectivesSection />
       </Tabs>
       {course && (
         <ActionSection
           course={course}
-          isUpdating={isToggling}
+          isUpdating={false}
           onPublish={onPublish}
           isEditing={isLoading}
+          setIsModalOpen={setIsModalOpen}
         />
       )}
       {course && (

@@ -11,7 +11,7 @@ export const courseEditSchema = z
     status: z.enum(["DRAFT", "PUBLISHED", "ARCHIVED"], {
       errorMap: () => ({ message: "Status is required" }),
     }),
-    thumbnail: z.string().url("Invalid URL format").optional(),
+    thumbnail: z.union([z.instanceof(File), z.string().url()]).optional(),
     categoryId: z.string().nonempty("Category is required"),
     prerequisites: z
       .string()
@@ -30,6 +30,18 @@ export const courseEditSchema = z
       .max(2000, "Target audience cannot exceed 2000 characters")
       .optional(),
   })
+  .refine(
+    (data) => {
+      if (data.thumbnail instanceof File) {
+        return data.thumbnail.size <= 5 * 1024 * 1024; // 5MB
+      }
+      return true;
+    },
+    {
+      message: "Thumbnail must be an image file under 5MB",
+      path: ["thumbnail"],
+    }
+  )
   .refine(
     (data) => {
       if (data.offer !== undefined && data.price !== undefined) {
