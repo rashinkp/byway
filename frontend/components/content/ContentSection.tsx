@@ -152,12 +152,17 @@ export const ContentSection = ({ lessonId }: ContentSectionProps) => {
       <div className="p-6">
         {content.type === ContentType.VIDEO && content.fileUrl && (
           <div className="rounded-xl overflow-hidden border border-gray-200 shadow-sm">
-            <video
-              src={content.fileUrl}
-              controls
-              className="w-full"
-              poster={content.thumbnailUrl || undefined}
-            />
+            <div
+              className="relative w-full"
+              style={{ paddingTop: "56.25%" /* 16:9 aspect ratio */ }}
+            >
+              <video
+                src={content.fileUrl}
+                controls
+                className="absolute top-0 left-0 w-full h-full object-contain bg-black"
+                poster={content.thumbnailUrl || undefined}
+              />
+            </div>
           </div>
         )}
 
