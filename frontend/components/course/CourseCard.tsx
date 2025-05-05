@@ -1,34 +1,35 @@
-'use client'
+"use client";
 import { cn } from "@/utils/cn";
 import { useState } from "react";
-import { Star, Clock, BookOpen, ChevronRight } from "lucide-react";
+import { Star, Clock, BookOpen } from "lucide-react";
 
 interface CourseCardProps {
+  id: string;
   thumbnail: string;
   title: string;
-  tutorName: string;
   rating: number;
   reviewCount: number;
-  duration: string;
   lessons: number;
   price: number;
   bestSeller?: boolean;
   className?: string;
+  formattedDuration: string;
 }
 
 export function CourseCard({
+  id,
   thumbnail,
   title,
-  tutorName,
   rating,
   reviewCount,
-  duration,
   lessons,
   price,
   bestSeller = false,
   className,
+  formattedDuration: duration,
 }: CourseCardProps) {
   const [isHovered, setIsHovered] = useState(false);
+  
 
   // Format price to display with 2 decimal places
   const formattedPrice = price.toFixed(2);
@@ -44,7 +45,7 @@ export function CourseCard({
         {[...Array(starCount)].map((_, i) => (
           <Star
             key={i}
-            size={14}
+            size={12}
             className={cn(
               "stroke-current",
               i < fullStars
@@ -62,76 +63,63 @@ export function CourseCard({
   return (
     <div
       className={cn(
-        "flex flex-col bg-white rounded-xl overflow-hidden border border-gray-100 transition-all duration-300",
-        isHovered && "shadow-lg transform translate-y-[-4px]",
-        !isHovered && "shadow-sm",
-        "w-full h-full",
+        "flex flex-col bg-white rounded-lg border border-gray-200 transition-shadow duration-200 w-[320px] h-[320px]",
+        isHovered && "shadow-md",
         className
       )}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      {/* Thumbnail with overlay */}
-      <div className="relative overflow-hidden h-52">
+      {/* Thumbnail */}
+      <div className="h-[180px] overflow-hidden rounded-t-lg relative">
         <img
           src={thumbnail}
           alt={title}
-          className={cn(
-            "w-full h-full object-cover transition-transform duration-700",
-            isHovered && "scale-110"
-          )}
+          className="w-full h-full object-cover"
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 transition-opacity duration-300 flex items-end p-4">
-          <button className="bg-white text-blue-600 py-2 px-4 rounded-lg font-medium text-sm flex items-center gap-1 opacity-0 transform translate-y-4 transition-all duration-300">
-            Preview Course <ChevronRight size={16} />
-          </button>
-        </div>
-
         {/* Best seller badge */}
         {bestSeller && (
-          <div className="absolute top-4 left-4">
-            <span className="bg-yellow-400 text-yellow-800 text-xs font-bold px-2 py-1 rounded-md">
-              BEST SELLER
+          <div className="absolute top-2 left-2">
+            <span className="bg-yellow-100 text-yellow-800 text-xs font-medium px-1.5 py-0.5 rounded">
+              Best Seller
             </span>
           </div>
         )}
       </div>
 
       {/* Course info */}
-      <div className="flex flex-col flex-grow p-5">
-        <div className="flex items-center gap-2 mb-2">
+      <div className="flex flex-col flex-grow p-4">
+        <div className="flex items-center gap-2 mb-1">
           <div className="flex items-center gap-1">
             {renderStars(rating)}
-            <span className="text-sm font-medium text-gray-700 ml-1">
+            <span className="text-xs font-medium text-gray-600 ml-1">
               {rating}
             </span>
           </div>
-          <span className="text-xs text-gray-400">({reviewCount} reviews)</span>
+          <span className="text-xs text-gray-400">({reviewCount})</span>
         </div>
 
-        <h3 className="text-lg font-bold text-gray-800 line-clamp-2 mb-2">
+        <h3 className="text-base font-semibold text-gray-800 line-clamp-2 mb-2 max-h-[40px] overflow-hidden">
           {title}
         </h3>
 
-        <p className="text-sm text-gray-500 mb-3">By {tutorName}</p>
-
-        <div className="flex items-center gap-4 text-sm text-gray-600 mb-4">
+        <div className="flex items-center gap-3 text-xs text-gray-500 mb-3">
           <div className="flex items-center gap-1">
-            <Clock size={14} className="text-gray-400" />
+            <Clock size={12} className="text-gray-400" />
             <span>{duration}</span>
           </div>
           <div className="flex items-center gap-1">
-            <BookOpen size={14} className="text-gray-400" />
+            <BookOpen size={12} className="text-gray-400" />
             <span>{lessons} lessons</span>
           </div>
         </div>
 
         <div className="mt-auto flex items-center justify-between">
-          <span className="font-bold text-lg text-blue-600">
+          <span className="font-semibold text-base text-gray-800">
             ${formattedPrice}
           </span>
-          <button className="bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg text-sm font-medium transition-colors">
-            Enroll Now
+          <button className="bg-blue-500 hover:bg-blue-600 text-white py-1 px-3 rounded-md text-xs font-medium transition-colors">
+            Enroll
           </button>
         </div>
       </div>

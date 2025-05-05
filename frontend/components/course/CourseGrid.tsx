@@ -1,23 +1,24 @@
+"use client";
+
 import { cn } from "@/utils/cn";
 import { CourseCard } from "@/components/course/CourseCard";
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Course } from "@/types/course";
 
-interface Course {
-  thumbnail: string;
-  title: string;
-  tutorName: string;
+interface GridCourse extends Course {
   rating: number;
   reviewCount: number;
-  duration: string;
+  formattedDuration: string;
   lessons: number;
+  bestSeller: boolean;
+  thumbnail: string;
   price: number;
-  bestSeller?: boolean;
 }
 
 interface CourseGridProps {
-  courses: Course[];
+  courses: GridCourse[];
   className?: string;
   isLoading?: boolean;
 }
@@ -61,16 +62,11 @@ export function CourseGrid({
   // Skeleton Card Component using shadcn/ui Skeleton
   const SkeletonCard = () => (
     <div className="flex flex-col bg-white rounded-xl border border-gray-100 shadow-sm w-full h-[450px]">
-      {/* Thumbnail Skeleton */}
       <div className="relative h-52">
         <Skeleton className="w-full h-full rounded-t-xl" />
-        {/* Best Seller Badge Skeleton */}
         <Skeleton className="absolute top-4 left-4 w-20 h-6 rounded-md" />
       </div>
-
-      {/* Course Info Skeleton */}
       <div className="flex flex-col flex-grow p-5">
-        {/* Rating Skeleton */}
         <div className="flex items-center gap-2 mb-2">
           <div className="flex items-center gap-1">
             {[...Array(5)].map((_, i) => (
@@ -79,15 +75,9 @@ export function CourseGrid({
           </div>
           <Skeleton className="w-12 h-4 rounded" />
         </div>
-
-        {/* Title Skeleton */}
         <Skeleton className="w-3/4 h-6 rounded mb-2" />
         <Skeleton className="w-1/2 h-6 rounded mb-3" />
-
-        {/* Tutor Name Skeleton */}
         <Skeleton className="w-2/3 h-4 rounded mb-4" />
-
-        {/* Duration and Lessons Skeleton */}
         <div className="flex items-center gap-4 mb-4">
           <div className="flex items-center gap-1">
             <Skeleton className="w-4 h-4 rounded" />
@@ -98,8 +88,6 @@ export function CourseGrid({
             <Skeleton className="w-16 h-4 rounded" />
           </div>
         </div>
-
-        {/* Price and Button Skeleton */}
         <div className="mt-auto flex items-center justify-between">
           <Skeleton className="w-12 h-6 rounded" />
           <Skeleton className="w-24 h-10 rounded-lg" />
@@ -138,10 +126,8 @@ export function CourseGrid({
 
   return (
     <div className="relative">
-      {/* Visual design element */}
       <div className="absolute -top-16 -right-16 w-64 h-64 bg-blue-50 rounded-full opacity-50 blur-3xl -z-10" />
       <div className="absolute -bottom-16 -left-16 w-64 h-64 bg-indigo-50 rounded-full opacity-50 blur-3xl -z-10" />
-
       <div className="mb-6 flex justify-between items-center">
         <div>
           <h2 className="text-xl font-bold text-gray-800">Available Courses</h2>
@@ -158,7 +144,6 @@ export function CourseGrid({
           </span>
         </div>
       </div>
-
       <motion.div
         className={cn(
           "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8",
@@ -169,16 +154,28 @@ export function CourseGrid({
         animate={isLoaded ? "show" : "hidden"}
       >
         {isLoading
-          ? // Render skeleton cards while loading
-            [...Array(6)].map((_, index) => (
+          ? [...Array(6)].map((_, index) => (
               <motion.div key={index} variants={itemVariants} className="flex">
                 <SkeletonCard />
               </motion.div>
             ))
-          : // Render actual course cards when loaded
-            courses.map((course, index) => (
-              <motion.div key={index} variants={itemVariants} className="flex">
-                <CourseCard {...course} />
+          : courses.map((course) => (
+              <motion.div
+                key={course.id}
+                variants={itemVariants}
+                className="flex"
+              >
+                <CourseCard
+                  id={course.id}
+                  thumbnail={course.thumbnail}
+                  title={course.title}
+                  rating={course.rating}
+                  reviewCount={course.reviewCount}
+                  formattedDuration={course.formattedDuration}
+                  lessons={course.lessons}
+                  price={course.price}
+                  bestSeller={course.bestSeller}
+                />
               </motion.div>
             ))}
       </motion.div>
