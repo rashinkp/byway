@@ -26,7 +26,6 @@ export interface ICourseDetails {
   createdAt: Date;
   updatedAt: Date;
 }
-
 export interface ICreateCourseInput {
   title: string;
   description?: string | null;
@@ -37,11 +36,10 @@ export interface ICreateCourseInput {
   offer?: number | null;
   categoryId: string;
   createdBy: string;
-    prerequisites?: string | null;
-    longDescription?: string | null;
-    objectives?: string | null;
-    targetAudience?: string | null;
-  
+  prerequisites?: string | null;
+  longDescription?: string | null;
+  objectives?: string | null;
+  targetAudience?: string | null;
 }
 
 export interface IUpdateCourseInput {
@@ -67,12 +65,14 @@ export interface IUpdateCourseInput {
 export interface IGetAllCoursesInput {
   page?: number;
   limit?: number;
-  sortBy?: "title" | "createdAt" | "updatedAt" | undefined;
+  sortBy?: "title" | "createdAt" | "updatedAt";
   sortOrder?: "asc" | "desc";
   includeDeleted?: boolean;
   search?: string;
-  filterBy?: "All" | "Active" | "Draft" | "Inactive" | undefined;
-  userId?: string | undefined;
+  filterBy?: "All" | "Active" | "Draft" | "Inactive";
+  userId?: string;
+  myCourses?: boolean; // New parameter to filter instructor's courses
+  role?: "USER" | "INSTRUCTOR" | "ADMIN"; // Role to determine access level
 }
 
 export interface ICreateEnrollmentInput {
@@ -85,4 +85,3 @@ export interface IEnrollment {
   courseId: string;
   enrolledAt: Date;
 }
-

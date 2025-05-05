@@ -44,7 +44,7 @@ export const adaptCourseController = (controller: CourseController) => ({
     }
   ),
 
-  getAllCourses: asyncHandler(
+  getAllCourses : asyncHandler(
     async (req: AuthenticatedRequest, res: Response) => {
       const {
         page,
@@ -54,32 +54,35 @@ export const adaptCourseController = (controller: CourseController) => ({
         includeDeleted,
         search,
         filterBy,
+        myCourses,
       } = req.query;
 
-      let userId = req.user?.id;
-      if (!userId) {
+      const userId = req.user?.id;
+      const role = req.user?.role;
+
+      if (!userId || !role) {
         throw new AppError(
           "User not authenticated",
           StatusCodes.UNAUTHORIZED,
           "AUTH_ERROR"
         );
       }
-      if(req.user?.role === "ADMIN") {
-        userId = undefined; 
-      }
 
       const input: IGetAllCoursesInput = {
         page: page ? parseInt(page as string, 10) : undefined,
-      limit: limit ? parseInt(limit as string, 10) : undefined,
-      sortBy: sortBy as "title" | "createdAt" | "updatedAt",
-      sortOrder: sortOrder as "asc" | "desc" | undefined,
-      includeDeleted: includeDeleted === "true" ? true : false,
-      search: search ? (search as string) : "",
-      filterBy: filterBy as "All" | "Active" | "Draft" | undefined,
-      userId,
+        limit: limit ? parseInt(limit as string, 10) : undefined,
+        sortBy: sortBy as "title" | "createdAt" | "updatedAt",
+        sortOrder: sortOrder as "asc" | "desc",
+        includeDeleted: includeDeleted === "true",
+        search: search ? (search as string) : "",
+        filterBy: filterBy as "All" | "Active" | "Draft" | "Inactive",
+        userId: role === "INSTRUCTOR" ? userId : undefined,
+        myCourses: myCourses === "true",
+        role: role as "INSTRUCTOR" | "USER" | "ADMIN" | undefined,
       };
-      const result = await controller.getAllCourses(input);
-      res.status(result.statusCode).json(result);
+
+      const result = await await controller.getAllCourses(input);
+      res.status(StatusCodes.OK).json(result);
     }
   ),
 

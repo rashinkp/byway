@@ -136,8 +136,13 @@ export const getAllCoursesSchema = z.object({
   sortOrder: z.enum(["asc", "desc"]).optional().default("desc"),
   includeDeleted: z.boolean().optional().default(false),
   search: z.string().optional().default(""),
-  filterBy: z.enum(["All", "Active", "Draft" , "Inactive"]).optional().default("All"),
+  filterBy: z
+    .enum(["All", "Active", "Draft", "Inactive"])
+    .optional()
+    .default("All"),
   userId: z.string().uuid("Invalid user ID").optional(),
+  myCourses: z.boolean().optional().default(false),
+  role: z.enum(["USER", "INSTRUCTOR", "ADMIN"]).optional(),
 });
 
 

@@ -60,11 +60,9 @@ export interface CourseFormData {
   thumbnail?: string | File;
 }
 
-export interface CourseApiResponse {
+interface CourseApiResponse {
   courses: Course[];
   total: number;
-  page: number;
-  limit: number;
   totalPage: number;
 }
 
@@ -76,9 +74,12 @@ export type NegativeSortByField = `-${SortByField}`;
 export interface IGetAllCoursesInput {
   page?: number;
   limit?: number;
-  search?: string;
-  includeDeleted?: boolean;
+  sortBy?: "title" | "createdAt" | "updatedAt";
   sortOrder?: "asc" | "desc";
-  sortBy?: SortByField | NegativeSortByField | undefined;
-  filterBy?: "All" | "Active" | "Inactive";
+  includeDeleted?: boolean;
+  search?: string;
+  filterBy?: "All" | "Active" | "Draft" | "Inactive";
+  userId?: string;
+  myCourses?: boolean;
+  role?: "USER" | "INSTRUCTOR" | "ADMIN";
 }

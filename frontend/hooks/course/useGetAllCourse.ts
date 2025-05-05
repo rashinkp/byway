@@ -1,8 +1,8 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import { Course, IGetAllCoursesInput } from "@/types/course";
-import { getAllCourses } from "@/api/course"; // Assume this API function exists
+import { IGetAllCoursesInput, Course, CourseApiResponse } from "@/types/course";
+import { getAllCourses } from "@/api/course";
 
 interface UseCoursesReturn {
   data: { items: Course[]; total: number; totalPages: number } | undefined;
@@ -19,10 +19,13 @@ export function useGetAllCourses({
   sortOrder = "asc",
   sortBy = "title",
   filterBy = "All",
+  myCourses = false,
+  role = "USER",
 }: IGetAllCoursesInput = {}): UseCoursesReturn {
   let adjustedSortBy: IGetAllCoursesInput["sortBy"] = sortBy;
   let adjustedSortOrder: IGetAllCoursesInput["sortOrder"] = sortOrder;
 
+  // Handle negative sortBy (e.g., "-title" for descending)
   if (sortBy?.startsWith("-")) {
     adjustedSortBy = sortBy.slice(1) as IGetAllCoursesInput["sortBy"];
     adjustedSortOrder = sortOrder === "asc" ? "desc" : "asc";
@@ -36,12 +39,18 @@ export function useGetAllCourses({
       ? false
       : includeDeleted;
 
-  const { data, isLoading, error, refetch } = useQuery<{
-    courses: Course[];
-    total: number;
-    totalPage: number;
-  }>({
-    queryKey: ["courses", page, limit, search, sortBy, sortOrder, filterBy],
+  const { data, isLoading, error, refetch } = useQuery<CourseApiResponse>({
+    queryKey: [
+      "courses",
+      page,
+      limit,
+      search,
+      sortBy,
+      sortOrder,
+      filterBy,
+      myCourses,
+      role,
+    ],
     queryFn: async () => {
       const response = await getAllCourses({
         page,
@@ -51,8 +60,9 @@ export function useGetAllCourses({
         sortOrder: adjustedSortOrder,
         sortBy: adjustedSortBy,
         filterBy,
+        myCourses,
+        role,
       });
-
       return response;
     },
   });

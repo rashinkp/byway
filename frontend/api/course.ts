@@ -11,7 +11,9 @@ export async function getAllCourses({
   sortOrder = "desc",
   includeDeleted = false,
   filterBy = "All",
-  search
+  search = "",
+  myCourses = false,
+  role = "USER",
 }: IGetAllCoursesInput): Promise<CourseApiResponse> {
   try {
     const response = await api.get<{ data: CourseApiResponse }>("/courses/", {
@@ -23,6 +25,8 @@ export async function getAllCourses({
         includeDeleted,
         search,
         filterBy,
+        myCourses,
+        role,
       },
     });
     return response.data.data;

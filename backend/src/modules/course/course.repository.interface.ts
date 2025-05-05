@@ -4,7 +4,7 @@ export interface ICourseRepository {
   createCourse(input: ICreateCourseInput): Promise<ICourse>;
   getAllCourses(
     input: IGetAllCoursesInput
-  ): Promise<{ courses: ICourse[]; total: number }>;
+  ): Promise<{ courses: ICourse[]; total: number; totalPage:number }>;
   getCourseById(courseId: string): Promise<ICourse | null>;
   getCourseByName(title: string): Promise<ICourse | null>;
   updateCourse(input: IUpdateCourseInput): Promise<ICourse>;

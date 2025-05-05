@@ -98,9 +98,9 @@ export class CourseService {
     }
   }
 
-  async getAllCourses(
+ async getAllCourses(
     input: IGetAllCoursesInput
-  ): Promise<{ courses: ICourse[]; total: number }> {
+  ): Promise<{ courses: ICourse[]; total: number; totalPage: number }> {
     const parsedInput = getAllCoursesSchema.safeParse(input);
     if (!parsedInput.success) {
       logger.warn("Validation failed for getAllCourses", {

@@ -16,7 +16,6 @@ export class CourseRepository implements ICourseRepository {
   constructor(private prisma: PrismaClient) {}
 
   async createCourse(input: ICreateCourseInput): Promise<ICourse> {
-    
     const {
       prerequisites,
       longDescription,
@@ -46,17 +45,15 @@ export class CourseRepository implements ICourseRepository {
             targetAudience: targetAudience || null,
           },
         });
-
       }
 
-        return {
-          ...createdCourse,
-          price: createdCourse.price?.toNumber() ?? null,
-          offer: createdCourse.offer?.toNumber() ?? null,
-        };
-      });
-  
-    
+      return {
+        ...createdCourse,
+        price: createdCourse.price?.toNumber() ?? null,
+        offer: createdCourse.offer?.toNumber() ?? null,
+      };
+    });
+
     return course;
   }
 
@@ -72,6 +69,8 @@ export class CourseRepository implements ICourseRepository {
       search = "",
       filterBy = "All",
       userId,
+      myCourses = false,
+      role = "USER",
     } = input;
 
     const allowedSortFields = ["title", "createdAt", "updatedAt"];
@@ -79,11 +78,30 @@ export class CourseRepository implements ICourseRepository {
       ? sortBy
       : "createdAt";
 
-    const where: any = {
-      ...(userId ? { createdBy: userId } : {}),
-      ...(includeDeleted ? {} : { deletedAt: null }),
-    };
+    const where: any = {};
 
+    // Role-based logic
+    if (role === "USER") {
+      // Users only see PUBLISHED and non-deleted courses
+      where.status = "PUBLISHED";
+      where.deletedAt = null;
+    } else if (role === "INSTRUCTOR") {
+      // Instructors see all courses unless myCourses is true
+      if (myCourses && userId) {
+        where.createdBy = userId;
+      }
+      // Include deleted courses only if explicitly requested
+      if (!includeDeleted) {
+        where.deletedAt = null;
+      }
+    } else if (role === "ADMIN") {
+      // Admins see all courses, including deleted ones if includeDeleted is true
+      if (!includeDeleted) {
+        where.deletedAt = null;
+      }
+    }
+
+    // Apply filterBy conditions
     if (filterBy === "Active") {
       where.status = "PUBLISHED";
     } else if (filterBy === "Draft") {
@@ -92,6 +110,7 @@ export class CourseRepository implements ICourseRepository {
       where.deletedAt = { not: null };
     }
 
+    // Apply search conditions
     if (search) {
       where.OR = [
         { title: { contains: search, mode: "insensitive" } },
@@ -185,10 +204,9 @@ export class CourseRepository implements ICourseRepository {
     };
   }
 
-
   async getCourseDetails(courseId: string): Promise<ICourseDetails | null> {
     const courseDetails = await this.prisma.courseDetails.findUnique({
-      where: { courseId: courseId }
+      where: { courseId: courseId },
     });
 
     return courseDetails;
@@ -256,7 +274,6 @@ export class CourseRepository implements ICourseRepository {
           "VALIDATION_ERROR"
         );
       }
-
     }
 
     // Proceed with the course update
@@ -264,7 +281,7 @@ export class CourseRepository implements ICourseRepository {
       where: { id },
       data: {
         ...courseData,
-        status, 
+        status,
         updatedAt: new Date(),
         details: details
           ? { upsert: { create: details, update: details } }
