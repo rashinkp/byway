@@ -91,3 +91,34 @@ export const protect = (
     throw AppError.unauthorized("Authentication error");
   }
 };
+
+
+
+
+export const optionalAuth = (
+  req: AuthenticatedRequest,
+  res: Response,
+  next: NextFunction
+): void => {
+  const token = req.cookies?.jwt;
+  const jwtSecret = process.env.JWT_SECRET;
+  if (!jwtSecret) {
+    throw new AppError(
+      "JWT_SECRET not configured",
+      StatusCodes.INTERNAL_SERVER_ERROR,
+      "CONFIG_ERROR"
+    );
+  }
+
+  if (!token) {
+    return next(); // No token provided, proceed without setting req.user
+  }
+
+  try {
+    const decoded = JwtUtil.verifyToken(token, jwtSecret);
+    req.user = decoded;
+    next();
+  } catch (error) {
+    next();
+  }
+};

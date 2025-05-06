@@ -1,11 +1,9 @@
-// middleware.ts
 import { NextRequest, NextResponse } from "next/server";
 import { getCurrentUserServer } from "@/api/auth";
 
 export async function middleware(request: NextRequest) {
   const { pathname, searchParams } = request.nextUrl;
 
-  // Get cookies as a string (includes securecookie)
   const cookies = request.headers.get("cookie") || "";
   const user = await getCurrentUserServer(cookies);
 
@@ -44,45 +42,38 @@ export async function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
-  // Allow public access to course pages (excluding lessons)
-  if (pathname.startsWith("/courses") && !pathname.includes("/lessons")) {
-    return NextResponse.next();
+  // Protect /admin and /instructor routes
+  if (pathname.startsWith("/admin") || pathname.startsWith("/instructor")) {
+    if (!user) {
+      const response = NextResponse.redirect(
+        new URL("/login?clearAuth=true", request.url)
+      );
+
+      response.cookies.set("jwt", "", {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "strict",
+        expires: new Date(0), // Expire immediately to delete the cookie
+        path: "/",
+      });
+
+      response.headers.set("x-clear-auth", "true");
+      return response;
+    }
+
+    // Role-based route protection
+    const role = user.role;
+
+    if (pathname.startsWith("/admin") && role !== "ADMIN") {
+      return NextResponse.redirect(new URL("/login", request.url));
+    }
+
+    if (pathname.startsWith("/instructor") && role !== "INSTRUCTOR") {
+      return NextResponse.redirect(new URL("/login", request.url));
+    }
   }
 
-  // Require authentication for protected routes
-  if (!user) {
-    //remove token from secure cookie and from local storage
-
-    const response = NextResponse.redirect(new URL("/login?clearAuth=true", request.url));
-
-    response.cookies.set("jwt", "", {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "strict",
-      expires: new Date(0), // Expire immediately to delete the cookie
-      path: "/",
-    });
-
-    response.headers.set("x-clear-auth", "true");
-    return response;
-  }
-
-  // Role-based route protection
-  const role = user.role;
-
-  if (pathname.startsWith("/admin") && role !== "ADMIN") {
-    return NextResponse.redirect(new URL("/login", request.url));
-  }
-
-  if (pathname.startsWith("/instructor") && role !== "INSTRUCTOR") {
-    return NextResponse.redirect(new URL("/login", request.url));
-  }
-
-  // Allow USER and INSTRUCTOR to access lesson routes
-  if (pathname.includes("/lessons") && !["USER", "INSTRUCTOR"].includes(role)) {
-    return NextResponse.redirect(new URL("/login", request.url));
-  }
-
+  // Allow access to all other routes
   return NextResponse.next();
 }
 
@@ -95,7 +86,5 @@ export const config = {
     "/reset-password",
     "/admin/:path*",
     "/instructor/:path*",
-    "/courses/:courseId/lessons/:path*",
-    "/",
   ],
 };

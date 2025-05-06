@@ -60,7 +60,7 @@ export interface CourseFormData {
   thumbnail?: string | File;
 }
 
-interface CourseApiResponse {
+export interface CourseApiResponse {
   courses: Course[];
   total: number;
   totalPage: number;

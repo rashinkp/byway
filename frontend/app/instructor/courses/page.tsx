@@ -24,7 +24,9 @@ export default function CoursesPage() {
             sortBy: params.sortBy as
               | "title"
               | "createdAt"
-              | `-${"title" | "createdAt"}`,
+              | `updatedAt`,
+            role: "INSTRUCTOR",
+            myCourses:true,
           })
         }
         columns={[

@@ -2,7 +2,7 @@
 import { Router } from "express";
 import { CourseController } from "./course.controller";
 import { adaptCourseController } from "../../adapters/expressCourseAdapters";
-import { authMiddleware, protect } from "../../middlewares/authMiddleware";
+import { authMiddleware, optionalAuth, protect } from "../../middlewares/authMiddleware";
 
 export const createCourseRouter = (
   courseController: CourseController
@@ -11,7 +11,7 @@ export const createCourseRouter = (
   const adapt = adaptCourseController(courseController);
 
   router.post("/", authMiddleware("INSTRUCTOR"), adapt.createCourse);
-  router.get("/", protect, adapt.getAllCourses);
+  router.get("/", optionalAuth, adapt.getAllCourses);
   router.get("/:id", protect, adapt.getCourseById);
   router.put("/:id", authMiddleware("INSTRUCTOR"), adapt.updateCourse);
   router.delete("/:id", authMiddleware("ADMIN"), adapt.softDeleteCourse);

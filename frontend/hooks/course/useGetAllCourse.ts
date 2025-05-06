@@ -67,7 +67,6 @@ export function useGetAllCourses({
     },
   });
 
-  // Map error to ensure it has a message property
   const mappedError = error
     ? {
         message:
