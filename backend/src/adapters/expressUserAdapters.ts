@@ -37,14 +37,49 @@ export const adaptUserController = (controller: UserController) => ({
         );
       }
 
-      const { name, password, avatar, ...profileFields } = req.body;
+      const {
+        name,
+        password,
+        avatar,
+        bio,
+        education,
+        skills,
+        phoneNumber,
+        country,
+        city,
+        address,
+        dateOfBirth,
+        gender,
+      } = req.body;
+
       const result = await controller.updateUser({
         userId,
         user:
           name || password || avatar ? { name, password, avatar } : undefined,
         profile:
-          Object.keys(profileFields).length > 0 ? profileFields : undefined,
+          bio ||
+          education ||
+          skills ||
+          phoneNumber ||
+          country ||
+          city ||
+          address ||
+          dateOfBirth ||
+          gender
+            ? {
+                bio,
+                education,
+                skills,
+                phoneNumber,
+                country,
+                city,
+                address,
+                dateOfBirth,
+                gender,
+              }
+            : undefined,
       });
+
       res.status(result.statusCode).json({
         status: result.status,
         data: result.data,
@@ -121,7 +156,6 @@ export const adaptUserController = (controller: UserController) => ({
 
       let userId: string;
 
-      // If the requester is an ADMIN, get userId from params
       if (userRole === Role.ADMIN) {
         const userIdFromParams = req.params.userId;
         if (!userIdFromParams) {
@@ -132,7 +166,6 @@ export const adaptUserController = (controller: UserController) => ({
           );
         }
 
-        // Validate userId from params using Zod
         const parsedInput = findUserByIdSchema.safeParse({
           id: userIdFromParams,
         });
@@ -149,7 +182,6 @@ export const adaptUserController = (controller: UserController) => ({
 
         userId = parsedInput.data.id;
       } else {
-        // For non-admin users (USER, INSTRUCTOR), use the authenticated user's ID
         userId = authenticatedUserId;
       }
 

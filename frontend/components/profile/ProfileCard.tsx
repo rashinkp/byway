@@ -19,7 +19,7 @@ interface ProfileCardProps {
   city?: string;
   address?: string;
   dateOfBirth?: string;
-  gender?: string;
+  gender?: "MALE" | "FEMALE" | "OTHER";
   isVerified?: boolean;
   createdAt?: string;
   updatedAt?: string;
@@ -41,7 +41,7 @@ const ProfileCard: React.FC<ProfileCardProps> = ({
   city = "",
   address = "",
   dateOfBirth = "",
-  gender = "",
+  gender = undefined as "MALE" | "FEMALE" | "OTHER" | undefined,
   isVerified = false,
   createdAt = new Date().toISOString(),
   updatedAt = new Date().toISOString(),

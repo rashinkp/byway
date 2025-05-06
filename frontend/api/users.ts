@@ -74,3 +74,27 @@ export async function getUserDataById(userId: string): Promise<User> {
     throw new Error(error.response?.data?.error || "Failed to get user data");
   }
 }
+
+
+export async function updateUser(data: {
+  name?: string;
+  avatar?: string;
+  bio?: string;
+  education?: string;
+  skills?: string;
+  phoneNumber?: string;
+  country?: string;
+  city?: string;
+  address?: string;
+  dateOfBirth?: string;
+  gender?: "MALE" | "FEMALE" | "OTHER";
+}): Promise<User> {
+  try {
+    const response = await api.put(`/user/users`, data);
+    return response.data.data.user; // Extract the user object from IUserWithProfile
+  } catch (error: any) {
+    throw new Error(
+      error.response?.data?.error || "Failed to update user data"
+    );
+  }
+}

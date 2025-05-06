@@ -243,7 +243,10 @@ export class UserService {
     }
 
     try {
-      const user = await this.userRepository.getUserData(parsedInput.data.id , requesterRole);
+      const user = await this.userRepository.getUserData(
+        parsedInput.data.id,
+        requesterRole
+      );
       if (!user) {
         logger.warn("User not found by ID", { userId });
         throw new AppError(

@@ -1,24 +1,22 @@
-'use client'
 import React, { useState } from "react";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useUpdateUser } from "@/hooks/user/useUpdateUser";
 
 // Define the user data interface
 interface UserData {
   name: string;
-  avatar: string;
   email: string;
   phoneNumber?: string;
   bio?: string;
   skills: string[];
-  role: string;
   education?: string;
   country?: string;
   city?: string;
   address?: string;
   dateOfBirth?: string;
-  gender?: string;
+  gender?: "MALE" | "FEMALE" | "OTHER";
   isVerified: boolean;
   createdAt: string;
   updatedAt: string;
@@ -29,13 +27,25 @@ interface ProfileSectionProps {
   userData: UserData;
   isEditing: boolean;
   setIsEditing: (value: boolean) => void;
+  error?: string;
 }
 
 // Zod schema for validation
 const profileSchema = z.object({
-  name: z.string().min(1, "Name is required"),
-  email: z.string().email("Invalid email address"),
-  phoneNumber: z.string().optional(),
+  name: z
+    .string()
+    .optional()
+    .refine((val) => !val || val.length >= 1, {
+      message: "Name must be at least 1 character long if provided",
+    }),
+  email: z.string().email("Invalid email address").optional(),
+  phoneNumber: z
+    .string()
+    .optional()
+    .refine((val) => !val || /^\+?[1-9]\d{1,14}$/.test(val), {
+      message:
+        "Phone number must be a valid international number (e.g., +1234567890)",
+    }),
   bio: z.string().optional(),
   skills: z.array(z.string()).optional(),
   education: z.string().optional(),
@@ -43,7 +53,7 @@ const profileSchema = z.object({
   city: z.string().optional(),
   address: z.string().optional(),
   dateOfBirth: z.string().optional(),
-  gender: z.string().optional(),
+  gender: z.enum(["MALE", "FEMALE", "OTHER", ""]).optional(), // Allow empty string for "Select Gender"
 });
 
 // Infer the type from the Zod schema for the form
@@ -53,10 +63,16 @@ const ProfileSection: React.FC<ProfileSectionProps> = ({
   userData,
   isEditing,
   setIsEditing,
+  error,
 }) => {
   const [skillsInput, setSkillsInput] = useState<string>(
     userData.skills.join(", ")
   );
+  const {
+    mutate: updateUserData,
+    isLoading: isUpdating,
+    error: updateError,
+  } = useUpdateUser();
 
   const {
     register,
@@ -64,16 +80,54 @@ const ProfileSection: React.FC<ProfileSectionProps> = ({
     formState: { errors },
   } = useForm<ProfileFormData>({
     resolver: zodResolver(profileSchema),
-    defaultValues: userData,
+    defaultValues: {
+      ...userData,
+      gender: userData.gender || "", // Ensure gender defaults to empty string if undefined
+    },
   });
 
   const onSubmit = (data: ProfileFormData) => {
     const updatedSkills = skillsInput
       ? skillsInput.split(",").map((skill) => skill.trim())
-      : [];
-    console.log({ ...data, skills: updatedSkills }); // Replace with API call to update data
-    setIsEditing(false);
+      : userData.skills; // Fallback to original skills if unchanged
+
+    // Only include fields that have changed or are explicitly provided
+    const updateData: { [key: string]: any } = {
+      skills: updatedSkills.join(", "),
+    };
+
+    // Add fields to updateData only if they are provided or changed
+    if (data.name !== userData.name) updateData.name = data.name || undefined;
+    if (data.phoneNumber !== userData.phoneNumber)
+      updateData.phoneNumber = data.phoneNumber || undefined;
+    if (data.bio !== userData.bio) updateData.bio = data.bio || undefined;
+    if (data.education !== userData.education)
+      updateData.education = data.education || undefined;
+    if (data.country !== userData.country)
+      updateData.country = data.country || undefined;
+    if (data.city !== userData.city) updateData.city = data.city || undefined;
+    if (data.address !== userData.address)
+      updateData.address = data.address || undefined;
+    if (data.dateOfBirth !== userData.dateOfBirth)
+      updateData.dateOfBirth = data.dateOfBirth || undefined;
+    if (data.gender !== (userData.gender || ""))
+      updateData.gender = data.gender || undefined;
+
+    updateUserData(updateData);
   };
+
+  if (error === "ACCESS_DENIED") {
+    return (
+      <div className="flex-1 p-8">
+        <div className="bg-white shadow-md rounded-lg p-6">
+          <h2 className="text-2xl font-semibold mb-4">Profile Details</h2>
+          <p className="text-red-500">
+            Your account has been deleted and cannot be accessed.
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex-1 p-8">
@@ -83,10 +137,15 @@ const ProfileSection: React.FC<ProfileSectionProps> = ({
           <button
             onClick={() => setIsEditing(!isEditing)}
             className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+            disabled={isUpdating}
           >
             {isEditing ? "Cancel" : "Edit"}
           </button>
         </div>
+
+        {updateError && (
+          <p className="text-red-500 mb-4">{updateError.message}</p>
+        )}
 
         {isEditing ? (
           <form
@@ -100,18 +159,22 @@ const ProfileSection: React.FC<ProfileSectionProps> = ({
                 className="mt-1 p-2 border rounded w-full"
               />
               {errors.name && (
-                <p className="text-red-500">{errors.name.message}</p>
+                <p className="text-red-500 text-sm mt-1">
+                  {errors.name.message}
+                </p>
               )}
             </div>
             <div>
               <label className="block text-gray-600 font-medium">Email</label>
               <input
                 {...register("email")}
-                className="mt-1 p-2 border rounded w-full"
+                className="mt-1 p-2 border rounded w-full bg-gray-100"
                 disabled
               />
               {errors.email && (
-                <p className="text-red-500">{errors.email.message}</p>
+                <p className="text-red-500 text-sm mt-1">
+                  {errors.email.message}
+                </p>
               )}
             </div>
             <div>
@@ -121,15 +184,13 @@ const ProfileSection: React.FC<ProfileSectionProps> = ({
               <input
                 {...register("phoneNumber")}
                 className="mt-1 p-2 border rounded w-full"
+                placeholder="e.g., +1234567890"
               />
-            </div>
-            <div>
-              <label className="block text-gray-600 font-medium">Role</label>
-              <input
-                value={userData.role}
-                className="mt-1 p-2 border rounded w-full"
-                disabled
-              />
+              {errors.phoneNumber && (
+                <p className="text-red-500 text-sm mt-1">
+                  {errors.phoneNumber.message}
+                </p>
+              )}
             </div>
             <div>
               <label className="block text-gray-600 font-medium">
@@ -139,6 +200,11 @@ const ProfileSection: React.FC<ProfileSectionProps> = ({
                 {...register("education")}
                 className="mt-1 p-2 border rounded w-full"
               />
+              {errors.education && (
+                <p className="text-red-500 text-sm mt-1">
+                  {errors.education.message}
+                </p>
+              )}
             </div>
             <div>
               <label className="block text-gray-600 font-medium">Country</label>
@@ -146,6 +212,11 @@ const ProfileSection: React.FC<ProfileSectionProps> = ({
                 {...register("country")}
                 className="mt-1 p-2 border rounded w-full"
               />
+              {errors.country && (
+                <p className="text-red-500 text-sm mt-1">
+                  {errors.country.message}
+                </p>
+              )}
             </div>
             <div>
               <label className="block text-gray-600 font-medium">City</label>
@@ -153,6 +224,11 @@ const ProfileSection: React.FC<ProfileSectionProps> = ({
                 {...register("city")}
                 className="mt-1 p-2 border rounded w-full"
               />
+              {errors.city && (
+                <p className="text-red-500 text-sm mt-1">
+                  {errors.city.message}
+                </p>
+              )}
             </div>
             <div>
               <label className="block text-gray-600 font-medium">Address</label>
@@ -160,6 +236,11 @@ const ProfileSection: React.FC<ProfileSectionProps> = ({
                 {...register("address")}
                 className="mt-1 p-2 border rounded w-full"
               />
+              {errors.address && (
+                <p className="text-red-500 text-sm mt-1">
+                  {errors.address.message}
+                </p>
+              )}
             </div>
             <div>
               <label className="block text-gray-600 font-medium">
@@ -170,6 +251,11 @@ const ProfileSection: React.FC<ProfileSectionProps> = ({
                 {...register("dateOfBirth")}
                 className="mt-1 p-2 border rounded w-full"
               />
+              {errors.dateOfBirth && (
+                <p className="text-red-500 text-sm mt-1">
+                  {errors.dateOfBirth.message}
+                </p>
+              )}
             </div>
             <div>
               <label className="block text-gray-600 font-medium">Gender</label>
@@ -182,6 +268,11 @@ const ProfileSection: React.FC<ProfileSectionProps> = ({
                 <option value="FEMALE">Female</option>
                 <option value="OTHER">Other</option>
               </select>
+              {errors.gender && (
+                <p className="text-red-500 text-sm mt-1">
+                  {errors.gender.message}
+                </p>
+              )}
             </div>
             <div className="col-span-2">
               <label className="block text-gray-600 font-medium">Bio</label>
@@ -189,6 +280,11 @@ const ProfileSection: React.FC<ProfileSectionProps> = ({
                 {...register("bio")}
                 className="mt-1 p-2 border rounded w-full min-h-[100px]"
               />
+              {errors.bio && (
+                <p className="text-red-500 text-sm mt-1">
+                  {errors.bio.message}
+                </p>
+              )}
             </div>
             <div className="col-span-2">
               <label className="block text-gray-600 font-medium">
@@ -201,13 +297,19 @@ const ProfileSection: React.FC<ProfileSectionProps> = ({
                 }
                 className="mt-1 p-2 border rounded w-full"
               />
+              {errors.skills && (
+                <p className="text-red-500 text-sm mt-1">
+                  {errors.skills.message}
+                </p>
+              )}
             </div>
             <div className="col-span-2">
               <button
                 type="submit"
                 className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
+                disabled={isUpdating}
               >
-                Save
+                {isUpdating ? "Saving..." : "Save"}
               </button>
             </div>
           </form>
@@ -215,7 +317,9 @@ const ProfileSection: React.FC<ProfileSectionProps> = ({
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
               <label className="block text-gray-600 font-medium">Name</label>
-              <p className="mt-1 p-2 border rounded w-full">{userData.name}</p>
+              <p className="mt-1 p-2 border rounded w-full">
+                {userData.name || "Not provided"}
+              </p>
             </div>
             <div>
               <label className="block text-gray-600 font-medium">Email</label>
@@ -228,10 +332,6 @@ const ProfileSection: React.FC<ProfileSectionProps> = ({
               <p className="mt-1 p-2 border rounded w-full">
                 {userData.phoneNumber || "Not provided"}
               </p>
-            </div>
-            <div>
-              <label className="block text-gray-600 font-medium">Role</label>
-              <p className="mt-1 p-2 border rounded w-full">{userData.role}</p>
             </div>
             <div>
               <label className="block text-gray-600 font-medium">
@@ -302,7 +402,7 @@ const ProfileSection: React.FC<ProfileSectionProps> = ({
             <div className="col-span-2">
               <label className="block text-gray-600 font-medium">Bio</label>
               <p className="mt-1 p-2 border rounded w-full min-h-[100px]">
-                {userData.bio}
+                {userData.bio || "Not provided"}
               </p>
             </div>
             <div className="col-span-2">

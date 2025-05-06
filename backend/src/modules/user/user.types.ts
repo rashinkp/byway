@@ -3,13 +3,15 @@ import { Role } from "@prisma/client";
 export interface IUser {
   id: string;
   email: string;
-  role: string;
+  role: "USER" | "INSTRUCTOR" | "ADMIN";
   name?: string;
   password?: string;
   avatar?: string;
   isVerified?: boolean;
-  authProvider?: string;
+  createdAt: Date;
+  updatedAt: Date;
   deletedAt?: Date | null;
+  userProfile?: IUserProfile;
 }
 
 export interface IUserProfile {
@@ -22,10 +24,10 @@ export interface IUserProfile {
   country?: string;
   city?: string;
   address?: string;
-  socialLinks?: string;
   dateOfBirth?: Date;
   gender?: "MALE" | "FEMALE" | "OTHER";
 }
+
 
 export interface UpdateUserInput {
   userId: string;
@@ -45,6 +47,7 @@ export interface IUserWithProfile {
   user: IUser;
   profile?: IUserProfile;
 }
+
 
 export interface IRegisterInput {
   name: string;

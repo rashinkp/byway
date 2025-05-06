@@ -7,13 +7,10 @@ export const createUserRouter = (userController: UserController): Router => {
   const userRouter = Router();
   const adapt = adaptUserController(userController);
 
-  // Update user (same as before)
   userRouter.put("/users", authMiddleware("USER"), adapt.updateUser);
 
-  // Get all users (same as before)
   userRouter.get("/admin/users", authMiddleware("ADMIN"), adapt.getAllUsers);
 
-  // Update user by admin (same as before)
   userRouter.put(
     "/admin/:userId",
     authMiddleware("ADMIN"),
