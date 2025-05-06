@@ -227,6 +227,8 @@ model QuizQuestion {
   updatedAt      DateTime      @updatedAt
 }
 
+
+
 enum ContentType {
   VIDEO
   DOCUMENT

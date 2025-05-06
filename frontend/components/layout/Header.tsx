@@ -189,13 +189,16 @@ export function Header({ client }: HeaderProps = {}) {
                       </Badge>
                     </div>
                     <div className="relative group">
-                      <ShoppingCart
-                        className="w-6 h-6 text-gray-600 group-hover:text-blue-500 transition-colors cursor-pointer"
-                        strokeWidth={1.5}
-                      />
-                      <Badge className="absolute -top-2 -right-2 w-5 h-5 p-0 flex items-center justify-center text-xs">
-                        2
-                      </Badge>
+                      <Link href='/user/cart'>
+                        
+                        <ShoppingCart
+                          className="w-6 h-6 text-gray-600 group-hover:text-blue-500 transition-colors cursor-pointer"
+                          strokeWidth={1.5}
+                        />
+                        <Badge className="absolute -top-2 -right-2 w-5 h-5 p-0 flex items-center justify-center text-xs">
+                          2
+                        </Badge>
+                      </Link>
                     </div>
                     <div className="relative group">
                       <Bell
