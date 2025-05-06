@@ -66,6 +66,8 @@ export class UserRepository implements IUserRepository {
           avatar: updatedUser.avatar || undefined,
           isVerified: updatedUser.isVerified,
           deletedAt: updatedUser.deletedAt || undefined,
+          createdAt: updatedUser.createdAt,
+          updatedAt: updatedUser.updatedAt,
         },
         profile: updatedProfile
           ? {
@@ -204,6 +206,8 @@ export class UserRepository implements IUserRepository {
       email: user.email,
       role: user.role,
       isVerified: user.isVerified,
+      createdAt: user.createdAt,
+      updatedAt: user.updatedAt,
     };
   }
 }

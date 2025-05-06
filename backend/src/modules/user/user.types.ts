@@ -12,6 +12,7 @@ export interface IUser {
   updatedAt: Date;
   deletedAt?: Date | null;
   userProfile?: IUserProfile;
+  authProvider?: "EMAIL_PASSWORD" | "GOOGLE" | "FACEBOOK";
 }
 
 export interface IUserProfile {

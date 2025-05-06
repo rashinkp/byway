@@ -16,13 +16,15 @@ export interface IForgotPasswordInput {
 export interface IAuthUser {
   id: string;
   email: string;
-  role: string;
+  role: "USER" | "INSTRUCTOR" | "ADMIN";
   name?: string;
   password?: string;
   avatar?: string;
   isVerified?: boolean;
-  authProvider?: string;
+  authProvider?: "EMAIL_PASSWORD" | "GOOGLE" | "FACEBOOK";
   deletedAt?: Date | null;
+  createdAt: Date ;
+  updatedAt: Date;
 }
 
 
