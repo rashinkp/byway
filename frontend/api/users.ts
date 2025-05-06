@@ -25,19 +25,19 @@ export const getAllUsers = async ({
     const params = new URLSearchParams();
     params.append("page", page.toString());
     params.append("limit", limit.toString());
-    
+
     if (sortBy) params.append("sortBy", sortBy);
     if (sortOrder) params.append("sortOrder", sortOrder);
     if (includeDeleted) params.append("includeDeleted", "true");
     if (search) params.append("search", search);
     if (filterBy) params.append("filterBy", filterBy);
     if (role) params.append("role", role);
-    
+
     const response = await api.get(`/user/admin/users?${params.toString()}`);
-    return response.data.data;
-  } catch (error) {
+    return response.data; // Adjusted to return the full ApiResponse
+  } catch (error: any) {
     console.error("Error fetching users:", error);
-    throw error;
+    throw new Error(error.response?.data?.message || "Failed to fetch users");
   }
 };
 
@@ -45,21 +45,32 @@ export async function deleteUser(id: string): Promise<void> {
   try {
     await api.put(`/user/admin/${id}`, { deletedAt: "true" });
   } catch (error: any) {
-    throw new Error(
-      error.response?.data?.message || "Failed to delete user"
-    );
+    throw new Error(error.response?.data?.message || "Failed to delete user");
   }
 }
 
-export async function recoverUser(id: string): Promise<User> {
+export async function recoverUser(id: string): Promise<void> {
   try {
-    const response = await api.put(`/user/admin/${id}`, { deletedAt: "false" });
+    await api.put(`/user/admin/${id}`, { deletedAt: "false" });
+  } catch (error: any) {
+    throw new Error(error.response?.data?.message || "Failed to recover user");
+  }
+}
+
+export async function getUserData(): Promise<User> {
+  try {
+    const response = await api.get(`/user/users/me`);
     return response.data.data;
   } catch (error: any) {
-    throw new Error(
-      error.response?.data?.message || "Failed to recover user"
-    );
+    throw new Error(error.response?.data?.error || "Failed to get user data");
   }
-} 
+}
 
-
+export async function getUserDataById(userId: string): Promise<User> {
+  try {
+    const response = await api.get(`/user/users/${userId}`);
+    return response.data.data;
+  } catch (error: any) {
+    throw new Error(error.response?.data?.error || "Failed to get user data");
+  }
+}

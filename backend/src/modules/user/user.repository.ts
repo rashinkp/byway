@@ -102,25 +102,21 @@ export class UserRepository implements IUserRepository {
     } = input;
 
     const where: any = {};
-    
-    // Add role filter if provided
+
     if (role) {
       where.role = role;
     }
-    
-    // Handle filtering based on filterBy parameter
+
     if (filterBy === "Active") {
-      where.deletedAt = null; // Only active users
+      where.deletedAt = null;
     } else if (filterBy === "Inactive") {
-      where.deletedAt = { not: null }; // Only inactive users
+      where.deletedAt = { not: null };
     } else if (filterBy === "All" && !includeDeleted) {
-      where.deletedAt = null; // All active users when includeDeleted is false
+      where.deletedAt = null;
     }
-    
-    // Only include verified users
+
     where.isVerified = true;
-    
-    // Search in name and email
+
     if (search) {
       where.OR = [
         { name: { contains: search, mode: "insensitive" } },
@@ -148,7 +144,7 @@ export class UserRepository implements IUserRepository {
           avatar: true,
         },
       }),
-      this.prisma.user.count({where}),
+      this.prisma.user.count({ where }),
     ]);
 
     return {
@@ -182,8 +178,18 @@ export class UserRepository implements IUserRepository {
 
   async findUserById(userId: string): Promise<IUser | null> {
     return this.prisma.user.findUnique({
-      where: { id:userId },
+      where: { id: userId },
     }) as Promise<IUser | null>;
+  }
+
+  async getUserData(userId: string, requesterRole: Role): Promise<IUser> {
+    const user = await this.prisma.user.findUniqueOrThrow({
+      where: { id: userId },
+      include: {
+        userProfile: true,
+      },
+    });
+    return user as IUser;
   }
 
   async updateUserRole(input: UpdateUserRoleInput): Promise<IUser> {

@@ -5,7 +5,7 @@ import {
   IUser,
   IUserWithProfile,
   UpdateUserInput,
-  IGetAllUsersWithSkip,
+  UpdateUserRoleInput,
 } from "./user.types";
 import { UserRepository } from "./user.repository";
 import * as bcrypt from "bcrypt";
@@ -58,14 +58,23 @@ export class UserService {
     });
   }
 
-  async getAllUsers(input: IGetAllUsersInput): Promise<ApiResponse<IPaginatedResponse<IUser>>> {
+  async getAllUsers(
+    input: IGetAllUsersInput
+  ): Promise<ApiResponse<IPaginatedResponse<IUser>>> {
     try {
-      const { page = 1, limit = 10, sortBy, sortOrder, includeDeleted, search, filterBy, role } = input;
-      
-      // Calculate skip for pagination
+      const {
+        page = 1,
+        limit = 10,
+        sortBy,
+        sortOrder,
+        includeDeleted,
+        search,
+        filterBy,
+        role,
+      } = input;
+
       const skip = (page - 1) * limit;
-      
-      // Call repository with the input including skip
+
       const result = await this.userRepository.getAllUsers({
         page,
         limit,
@@ -75,24 +84,23 @@ export class UserService {
         search,
         filterBy,
         role,
-        skip
+        skip,
       });
-      
-      // Transform the repository result into IPaginatedResponse
+
       const totalPages = Math.ceil(result.total / limit);
       const paginatedResponse: IPaginatedResponse<IUser> = {
         items: result.users,
         total: result.total,
         page,
         limit,
-        totalPages
+        totalPages,
       };
-      
+
       return {
         statusCode: 200,
         success: true,
         message: "Users retrieved successfully",
-        data: paginatedResponse
+        data: paginatedResponse,
       };
     } catch (error) {
       console.error("Error in getAllUsers:", error);
@@ -100,7 +108,7 @@ export class UserService {
         statusCode: 500,
         success: false,
         message: "Failed to retrieve users",
-        error: error instanceof Error ? error.message : "Unknown error"
+        error: error instanceof Error ? error.message : "Unknown error",
       };
     }
   }
@@ -215,6 +223,56 @@ export class UserService {
         ? error
         : new AppError(
             "Failed to update user role",
+            StatusCodes.INTERNAL_SERVER_ERROR,
+            "INTERNAL_ERROR"
+          );
+    }
+  }
+
+  async getUserData(userId: string, requesterRole: Role): Promise<IUser> {
+    const parsedInput = findUserByIdSchema.safeParse({ id: userId });
+    if (!parsedInput.success) {
+      logger.warn("Validation failed for getting user", {
+        errors: parsedInput.error.errors,
+      });
+      throw new AppError(
+        `Validation failed: ${parsedInput.error.message}`,
+        StatusCodes.BAD_REQUEST,
+        "VALIDATION_ERROR"
+      );
+    }
+
+    try {
+      const user = await this.userRepository.getUserData(parsedInput.data.id , requesterRole);
+      if (!user) {
+        logger.warn("User not found by ID", { userId });
+        throw new AppError(
+          "User not found",
+          StatusCodes.NOT_FOUND,
+          "NOT_FOUND"
+        );
+      }
+
+      // If requester is not an admin and the user is soft-deleted, deny access
+      if (requesterRole !== Role.ADMIN && user.deletedAt !== null) {
+        logger.warn("Non-admin user attempted to access soft-deleted account", {
+          userId,
+          requesterRole,
+        });
+        throw new AppError(
+          "Account has been deleted",
+          StatusCodes.FORBIDDEN,
+          "ACCESS_DENIED"
+        );
+      }
+
+      return user;
+    } catch (error) {
+      logger.error("Error getting user data", { error, userId });
+      throw error instanceof AppError
+        ? error
+        : new AppError(
+            "Failed to get user data",
             StatusCodes.INTERNAL_SERVER_ERROR,
             "INTERNAL_ERROR"
           );

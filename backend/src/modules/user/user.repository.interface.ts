@@ -1,4 +1,12 @@
-import { AdminUpdateUserInput, IGetAllUsersWithSkip, IUser, IUserWithProfile, UpdateUserInput, UpdateUserRoleInput } from "./user.types";
+import {
+  AdminUpdateUserInput,
+  IGetAllUsersWithSkip,
+  IUser,
+  IUserWithProfile,
+  UpdateUserInput,
+  UpdateUserRoleInput,
+} from "./user.types";
+import { Role } from "@prisma/client";
 
 export interface IUserRepository {
   updateUser(input: UpdateUserInput): Promise<IUserWithProfile>;
@@ -9,4 +17,5 @@ export interface IUserRepository {
   findUserByEmail(email: string): Promise<IUser | null>;
   findUserById(userId: string): Promise<IUser | null>;
   updateUserRole(input: UpdateUserRoleInput): Promise<IUser>;
+  getUserData(userId: string, requesterRole: Role): Promise<IUser>;
 }

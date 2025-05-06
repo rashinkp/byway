@@ -9,6 +9,7 @@ import {
 import { UserService } from "./user.service";
 import { AppError } from "../../utils/appError";
 import { logger } from "../../utils/logger";
+import { Role } from "@prisma/client";
 
 export class UserController {
   constructor(private userService: UserService) {}
@@ -87,6 +88,34 @@ export class UserController {
         );
       }
       throw AppError.internal("Failed to update user");
+    }
+  }
+
+  async getUserData(userId: string, requesterRole: Role): Promise<ApiResponse> {
+    try {
+      const response = await this.userService.getUserData(
+        userId,
+        requesterRole
+      );
+      return {
+        status: "success",
+        data: response,
+        message: "User data retrieved successfully",
+        statusCode: StatusCodes.OK,
+      };
+    } catch (error) {
+      logger.error("Error while getting user data:", { error });
+      if (error instanceof AppError) {
+        throw error;
+      }
+      if (error instanceof Error) {
+        throw new AppError(
+          error.message,
+          StatusCodes.INTERNAL_SERVER_ERROR,
+          "GETTING_FAILED"
+        );
+      }
+      throw AppError.internal("Failed to get user");
     }
   }
 }
