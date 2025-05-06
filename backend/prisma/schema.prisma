@@ -28,6 +28,7 @@ model User {
   categories        Category[]         @relation("CategoryCreator")
   coursesCreated    Course[]        @relation("CourseCreator")
   enrollments       Enrollment[]    @relation("UserEnrollments")
+  cartItems         Cart[]          @relation("UserToCart")
 }
 
 model UserProfile {
@@ -133,6 +134,7 @@ model Course {
   details        CourseDetails? @relation("CourseToDetails")
   lessons        Lesson[]      @relation("CourseLessons") 
   enrollments    Enrollment[]  @relation("CourseEnrollments") 
+  cartItems      Cart[]        @relation("CourseToCart")
 }
 
 model CourseDetails {
@@ -247,4 +249,18 @@ enum LessonStatus {
   PUBLISHED
 }
 
-//hello
+model Cart {
+  id           String     @id @default(uuid())
+  userId       String
+  courseId     String
+  couponId     String?    // Optional reference to a coupon
+  discount     Decimal    @default(0.00) // Discount amount applied
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+  deletedAt    DateTime?  // Soft deletion
+  user         User       @relation("UserToCart", fields: [userId], references: [id], onDelete: Cascade)
+  course       Course     @relation("CourseToCart", fields: [courseId], references: [id], onDelete: Cascade)
+  @@unique([userId, courseId]) // Prevent duplicate course entries in a user's cart
+  @@index([userId])
+  @@index([courseId])
+}
