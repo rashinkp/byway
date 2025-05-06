@@ -50,9 +50,9 @@ const profileSchema = z.object({
     .string()
     .max(200, "Address must be less than 200 characters")
     .optional(),
-  dateOfBirth: z
-    .string()
-    .regex(/^\d{4}-\d{2}-\d{2}$/, "Invalid date format (YYYY-MM-DD)")
+  dateOfBirth: z.coerce
+    .date()
+    .transform((date) => date.toISOString())
     .optional(),
   gender: z.enum(["MALE", "FEMALE", "OTHER"]).optional(),
 });
@@ -96,7 +96,7 @@ const formFields: FormFieldConfig<z.infer<typeof profileSchema>>[] = [
     type: "input",
     fieldType: "text",
     placeholder: "Comma-separated skills",
-    description: "List your professional skills",
+    description: "List your professional skills (e.g., JavaScript, Python)",
   },
   {
     name: "phoneNumber",
@@ -131,9 +131,9 @@ const formFields: FormFieldConfig<z.infer<typeof profileSchema>>[] = [
     name: "dateOfBirth",
     label: "Date of Birth",
     type: "input",
-    fieldType: "text",
+    fieldType: "date",
     placeholder: "YYYY-MM-DD",
-    description: "Your date of birth in YYYY-MM-DD format",
+    description: "Your date of birth",
   },
   {
     name: "gender",
@@ -150,13 +150,22 @@ const formFields: FormFieldConfig<z.infer<typeof profileSchema>>[] = [
 
 export default function ProfilePage() {
   const { data: user, isLoading, error } = useUserData();
-  const { mutate, isLoading: isUpdating } = useUpdateUser();
+  const { mutate:updateUser, isLoading: isUpdating } = useUpdateUser();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [activeSection, setActiveSection] = useState("profile");
 
   const handleSubmit = async (data: z.infer<typeof profileSchema>) => {
-    mutate(data);
+    // Transform skills string to array for server
+    const transformedData = {
+      ...data,
+      skills: data.skills
+        ? data.skills.split(",").map((s) => s.trim()).join(", ")
+        : undefined,
+    };
+    updateUser(transformedData);
   };
+
+  console.log(user);
 
   if (isLoading) {
     return (
@@ -229,7 +238,7 @@ export default function ProfilePage() {
                 <h2 className="text-xl font-semibold text-gray-800">
                   {user?.name}
                 </h2>
-                <p className="text-gray-600">{user?.bio}</p>
+                <p className="text-gray-600">{user?.userProfile?.bio}</p>
               </div>
             </div>
 
@@ -241,7 +250,11 @@ export default function ProfilePage() {
                     <div>
                       <p className="text-sm text-gray-500">Date of Birth</p>
                       <p className="text-gray-800">
-                        {user?.dateOfBirth || "Not set"}
+                        {user?.userProfile?.dateOfBirth
+                          ? new Date(
+                              user?.userProfile?.dateOfBirth
+                            ).toLocaleDateString()
+                          : "Not set"}
                       </p>
                     </div>
                   </div>
@@ -250,7 +263,7 @@ export default function ProfilePage() {
                     <div>
                       <p className="text-sm text-gray-500">Gender</p>
                       <p className="text-gray-800">
-                        {user?.gender || "Not set"}
+                        {user?.userProfile?.gender || "Not set"}
                       </p>
                     </div>
                   </div>
@@ -264,7 +277,7 @@ export default function ProfilePage() {
                     <div>
                       <p className="text-sm text-gray-500">Phone Number</p>
                       <p className="text-gray-800">
-                        {user?.phoneNumber || "Not set"}
+                        {user?.userProfile?.phoneNumber || "Not set"}
                       </p>
                     </div>
                   </div>
@@ -273,10 +286,10 @@ export default function ProfilePage() {
                     <div>
                       <p className="text-sm text-gray-500">Address</p>
                       <p className="text-gray-800">
-                        {user?.address
-                          ? `${user.address}, ${user.city || ""}, ${
-                              user.country || ""
-                            }`
+                        {user?.userProfile?.address
+                          ? `${user?.userProfile?.address}, ${
+                              user?.userProfile?.city || ""
+                            }, ${user?.userProfile?.country || ""}`
                           : "Not set"}
                       </p>
                     </div>
@@ -291,7 +304,7 @@ export default function ProfilePage() {
                     <div>
                       <p className="text-sm text-gray-500">Education</p>
                       <p className="text-gray-800">
-                        {user?.education || "Not set"}
+                        {user?.userProfile?.education || "Not set"}
                       </p>
                     </div>
                   </div>
@@ -300,7 +313,9 @@ export default function ProfilePage() {
                     <div>
                       <p className="text-sm text-gray-500">Skills</p>
                       <p className="text-gray-800">
-                        {user?.skills || "Not set"}
+                        {Array.isArray(user?.userProfile?.skills)
+                          ? user?.userProfile?.skills.join(", ")
+                          : user?.userProfile?.skills || "Not set"}
                       </p>
                     </div>
                   </div>
@@ -317,7 +332,19 @@ export default function ProfilePage() {
         onOpenChange={setIsModalOpen}
         onSubmit={handleSubmit}
         schema={profileSchema}
-        initialData={user ? {...user, skills: user.skills?.join(', ')} : undefined}
+        initialData={
+          user
+            ? {
+                ...user,
+                skills: Array.isArray(user.userProfile?.skills)
+                  ? user.userProfile?.skills.join(", ")
+                  : user.userProfile?.skills,
+                dateOfBirth: user.userProfile?.dateOfBirth
+                  ? new Date(user.userProfile?.dateOfBirth).toISOString().split("T")[0]
+                  : undefined,
+              }
+            : undefined
+        }
         title="Edit Profile"
         submitText="Save Changes"
         fields={formFields}

@@ -1,11 +1,11 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import { User, UserProfileType } from "@/types/user";
+import { User } from "@/types/user";
 import { getUserData, getUserDataById } from "@/api/users";
 
 export interface UseUserDataReturn {
-  data: UserProfileType | undefined;
+  data: User | undefined;
   isLoading: boolean;
   error: { message: string; code?: string } | null;
   refetch: () => void;
@@ -13,7 +13,7 @@ export interface UseUserDataReturn {
 
 // Hook for fetching the current user's data
 export function useUserData(): UseUserDataReturn {
-  const { data, isLoading, error, refetch } = useQuery<UserProfileType>({
+  const { data, isLoading, error, refetch } = useQuery<User>({
     queryKey: ["userData"],
     queryFn: async () => {
       const userData = await getUserData();

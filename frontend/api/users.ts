@@ -1,6 +1,6 @@
 import { api } from "@/api/api";
 import { ApiResponse, IPaginatedResponse } from "@/types/apiResponse";
-import { User, UserProfileType } from "@/types/user";
+import { User } from "@/types/user";
 
 export const getAllUsers = async ({
   page = 1,
@@ -57,7 +57,7 @@ export async function recoverUser(id: string): Promise<void> {
   }
 }
 
-export async function getUserData(): Promise<UserProfileType> {
+export async function getUserData(): Promise<User> {
   try {
     const response = await api.get(`/user/users/me`);
     return response.data.data;

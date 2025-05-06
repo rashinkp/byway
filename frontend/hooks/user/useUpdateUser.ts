@@ -47,7 +47,7 @@ export function useUpdateUser(): UseUpdateUserReturn {
     onSuccess: (data) => {
       // Invalidate the userData query to refetch the updated user data
       queryClient.invalidateQueries({ queryKey: ["userData"] });
-      toast("Success",{
+      toast.success("Success",{
         description: "Your profile has been updated successfully."
       });
     },

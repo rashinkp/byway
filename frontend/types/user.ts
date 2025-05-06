@@ -36,6 +36,9 @@ export interface User {
   userProfile?: UserProfile; // Added to match backend IUser type
 }
 
+
+
+
 export interface IGetAllUsersResponse {
   users: User[];
   total: number;

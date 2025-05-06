@@ -41,7 +41,7 @@ export interface FormFieldConfig<T> {
   name: Path<T>;
   label: string;
   type: "input" | "textarea" | "select";
-  fieldType?: "text" | "number" | "file";
+  fieldType?: "text" | "number" | "file" | "date";
   placeholder?: string;
   description?: string;
   maxLength?: number;
@@ -80,24 +80,26 @@ export function FormModal<T extends z.ZodType<any, any>>({
   description,
   isSubmitting: externalSubmitting,
 }: FormModalProps<T>) {
-const defaultValues = useMemo(
-  () =>
-    ({
-      ...Object.fromEntries(
-        fields.map((field) => [
-          field.name,
-          field.type === "input" && field.fieldType === "number"
-            ? undefined
-            : field.type === "input" || field.type === "textarea"
-            ? ""
-            : field.fieldType === "file"
-            ? undefined
-            : undefined,
-        ])
-      ),
-    } as z.infer<T>),
-  [fields]
-);
+  const defaultValues = useMemo(
+    () =>
+      ({
+        ...Object.fromEntries(
+          fields.map((field) => [
+            field.name,
+            field.type === "input" && field.fieldType === "number"
+              ? undefined
+              : field.type === "input" && field.fieldType === "date"
+              ? undefined
+              : field.type === "input" || field.type === "textarea"
+              ? ""
+              : field.fieldType === "file"
+              ? undefined
+              : undefined,
+          ])
+        ),
+      } as z.infer<T>),
+    [fields]
+  );
 
   const form = useForm<z.infer<T>>({
     resolver: zodResolver(schema),
@@ -132,7 +134,9 @@ const defaultValues = useMemo(
   const inputFields = fields.filter(
     (field) =>
       (field.type === "input" &&
-        (field.fieldType === "text" || field.fieldType === "number")) ||
+        (field.fieldType === "text" ||
+          field.fieldType === "number" ||
+          field.fieldType === "date")) ||
       field.type === "select"
   );
   const textareaFields = fields.filter((field) => field.type === "textarea");
@@ -191,7 +195,7 @@ const defaultValues = useMemo(
               </div>
             )}
 
-            {/* Input fields (text, number, select) in columns */}
+            {/* Input fields (text, number, date, select) in columns */}
             {inputFields.length > 0 && (
               <div
                 className={`grid grid-cols-1 sm:grid-cols-${numInputColumns} gap-6 mb-6`}
@@ -217,6 +221,13 @@ const defaultValues = useMemo(
                                   value={
                                     field.fieldType === "number"
                                       ? formField.value ?? ""
+                                      : field.fieldType === "date" &&
+                                        formField.value
+                                      ? typeof formField.value === "string"
+                                        ? formField.value.split("T")[0] // Ensure YYYY-MM-DD format for date input
+                                        : new Date(formField.value)
+                                            .toISOString()
+                                            .split("T")[0]
                                       : typeof formField.value === "string"
                                       ? formField.value
                                       : ""
@@ -227,6 +238,15 @@ const defaultValues = useMemo(
                                           formField.onChange(
                                             e.target.value
                                               ? Number(e.target.value)
+                                              : undefined
+                                          )
+                                      : field.fieldType === "date"
+                                      ? (e) =>
+                                          formField.onChange(
+                                            e.target.value
+                                              ? new Date(
+                                                  e.target.value
+                                                ).toISOString()
                                               : undefined
                                           )
                                       : formField.onChange
@@ -320,15 +340,16 @@ const defaultValues = useMemo(
                         <FormLabel className="text-sm font-normal">
                           {field.label}
                         </FormLabel>
-                        {typeof formField.value === "string" && formField.value && (
-                          <div className="mb-4">
-                            <img
-                              src={formField.value}
-                              alt="Course thumbnail preview"
-                              className="w-32 h-32 object-cover rounded-md"
-                            />
-                          </div>
-                        )}
+                        {typeof formField.value === "string" &&
+                          formField.value && (
+                            <div className="mb-4">
+                              <img
+                                src={formField.value}
+                                alt="Course thumbnail preview"
+                                className="w-32 h-32 object-cover rounded-md"
+                              />
+                            </div>
+                          )}
                         <FormControl>
                           <FileUploadComponent
                             label={field.label}
@@ -346,7 +367,9 @@ const defaultValues = useMemo(
                             error={form.formState.errors[
                               field.name
                             ]?.message?.toString()}
-                            uploadStatus={field.uploadStatus || FileUploadStatus.IDLE}
+                            uploadStatus={
+                              field.uploadStatus || FileUploadStatus.IDLE
+                            }
                             uploadProgress={field.uploadProgress || 0}
                           />
                         </FormControl>
