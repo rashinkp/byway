@@ -3,6 +3,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { User } from "@/types/user";
 import { updateUser } from "@/api/users";
+import { toast } from "sonner";
 
 interface UseUpdateUserReturn {
   mutate: (data: {
@@ -46,6 +47,17 @@ export function useUpdateUser(): UseUpdateUserReturn {
     onSuccess: (data) => {
       // Invalidate the userData query to refetch the updated user data
       queryClient.invalidateQueries({ queryKey: ["userData"] });
+      toast("Success",{
+        description: "Your profile has been updated successfully."
+      });
+    },
+    onError: (error) => {
+      toast.error("Error", {
+        description:
+          error instanceof Error
+            ? error.message
+            : "An unexpected error occurred while updating your profile."
+      });
     },
   });
 
