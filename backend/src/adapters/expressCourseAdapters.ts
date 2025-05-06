@@ -60,13 +60,7 @@ export const adaptCourseController = (controller: CourseController) => ({
       const userId = req.user?.id;
       const role = req.user?.role;
 
-      if (!userId || !role) {
-        throw new AppError(
-          "User not authenticated",
-          StatusCodes.UNAUTHORIZED,
-          "AUTH_ERROR"
-        );
-      }
+
 
       const input: IGetAllCoursesInput = {
         page: page ? parseInt(page as string, 10) : undefined,

@@ -9,6 +9,7 @@ import { Atom, Code, Megaphone, Telescope } from "lucide-react";
 export default function UserDashboard() {
   const topCourses = [
     {
+      id: "1",
       thumbnail:
         "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=60",
       title: "Beginner's Guide to Design",
@@ -16,6 +17,7 @@ export default function UserDashboard() {
       rating: 4.9,
       reviewCount: 1200,
       duration: "22 Total Hours",
+      formattedDuration: "22 Total Hours",
       lessons: 155,
       price: 149.9,
       bestSeller: true,

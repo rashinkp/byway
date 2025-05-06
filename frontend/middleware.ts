@@ -43,7 +43,7 @@ export async function middleware(request: NextRequest) {
   }
 
   // Protect /admin and /instructor routes
-  if (pathname.startsWith("/admin") || pathname.startsWith("/instructor")) {
+  if (pathname.startsWith("/admin") || pathname.startsWith("/instructor") || pathname.startsWith('/user')) {
     if (!user) {
       const response = NextResponse.redirect(
         new URL("/login?clearAuth=true", request.url)
@@ -86,5 +86,6 @@ export const config = {
     "/reset-password",
     "/admin/:path*",
     "/instructor/:path*",
+    '/user/:path*'
   ],
 };

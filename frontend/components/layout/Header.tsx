@@ -226,7 +226,7 @@ export function Header({ client }: HeaderProps = {}) {
                         <DropdownMenuSeparator />
                         <DropdownMenuItem>
                           <Link
-                            href="/profile"
+                            href="/user/profile"
                             className="flex items-center w-full"
                           >
                             <User className="mr-2 h-4 w-4" />
@@ -316,7 +316,7 @@ export function Header({ client }: HeaderProps = {}) {
 
               {user && (
                 <div className="relative group">
-                  <Link href="/profile">
+                  <Link href="/user/profile">
                     <div className="w-9 h-9 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-medium border-2 border-blue-200 group-hover:border-blue-300 transition-all">
                       {user.name?.charAt(0) || "U"}
                     </div>
@@ -355,7 +355,7 @@ export function Header({ client }: HeaderProps = {}) {
                 ) : user ? (
                   <>
                     <Link
-                      href="/profile"
+                      href="/user/profile"
                       className="block px-2 py-1 text-gray-700 hover:text-blue-600 text-base"
                     >
                       Profile
