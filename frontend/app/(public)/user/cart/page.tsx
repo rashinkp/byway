@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import { useState } from "react";
 import {
@@ -7,79 +7,32 @@ import {
   BookOpen,
   Award,
   Trash2,
-  Tag,
   ChevronRight,
 } from "lucide-react";
-
-// Define the Course interface
-interface Course {
-  id: number;
-  title: string;
-  instructor: string;
-  image: string;
-  price: number;
-  originalPrice: number;
-  discount: string;
-  duration: string;
-  lectures: number;
-  level: string;
-}
+import { ICart, Course } from "@/types/cart";
+import { useCart } from "@/hooks/cart/useCart";
+import { useRemoveFromCart } from "@/hooks/cart/useRemoveFromCart";
+import { useClearCart } from "@/hooks/cart/useClearCart";
+import { useGetCourseById } from "@/hooks/course/useGetCourseById";
+import Link from "next/link";
 
 export default function CartPage() {
-  const [courses, setCourses] = useState<Course[]>([
-    {
-      id: 1,
-      title: "Complete Web Development Bootcamp",
-      instructor: "Dr. Sarah Johnson",
-      image: "/api/placeholder/200/120",
-      price: 39.99,
-      originalPrice: 129.99,
-      discount: "70% OFF",
-      duration: "28 hours",
-      lectures: 285,
-      level: "Beginner to Advanced",
-    },
-    {
-      id: 2,
-      title: "Python for Data Science and Machine Learning",
-      instructor: "Prof. Michael Chen",
-      image: "/api/placeholder/200/120",
-      price: 44.99,
-      originalPrice: 149.99,
-      discount: "70% OFF",
-      duration: "35 hours",
-      lectures: 412,
-      level: "Intermediate",
-    },
-    {
-      id: 3,
-      title: "UI/UX Design Principles Masterclass",
-      instructor: "Jessica Williams",
-      image: "/api/placeholder/200/120",
-      price: 29.99,
-      originalPrice: 99.99,
-      discount: "70% OFF",
-      duration: "18 hours",
-      lectures: 164,
-      level: "All Levels",
-    },
-  ]);
+  const [courses, setCourses] = useState<Course[]>([]);
+  const { data, isLoading, error } = useCart({ page: 1, limit: 10 });
+  const removeFromCartMutation = useRemoveFromCart();
+  const clearCartMutation = useClearCart();
 
-  const [couponCode, setCouponCode] = useState<string>("");
-  const [couponApplied, setCouponApplied] = useState<boolean>(false);
-  const [discount, setDiscount] = useState<number>(0);
+  // Map cart items to course details using useGetCourseById
+  const courseQueries =
+    data?.items?.map((item: ICart) => useGetCourseById(item.courseId)) || [];
 
-  const removeCourse = (id: number): void => {
-    setCourses(courses.filter((course) => course.id !== id));
+
+  const handleRemoveCourse = (courseId: string) => {
+    removeFromCartMutation.mutate(courseId);
   };
 
-  const applyCoupon = (): void => {
-    if (couponCode.toLowerCase() === "learn25") {
-      setDiscount(calculateSubtotal() * 0.25);
-      setCouponApplied(true);
-    } else {
-      alert("Invalid coupon code");
-    }
+  const handleClearCart = () => {
+    clearCartMutation.mutate();
   };
 
   const calculateSubtotal = (): number => {
@@ -91,17 +44,26 @@ export default function CartPage() {
   };
 
   const calculateTotal = (): number => {
-    return calculateSubtotal() + calculateTax() - discount;
+    return calculateSubtotal() + calculateTax();
   };
 
   return (
     <div className="min-h-screen pb-10">
-
       {/* Main Content */}
       <main className="container mx-auto px-4 max-w-6xl">
         <h1 className="text-3xl font-bold mt-8 mb-6">Your Cart</h1>
 
-        {courses.length > 0 ? (
+        {isLoading || courseQueries.some((query) => query.isLoading) ? (
+          <div className="bg-white p-12 rounded-lg shadow-sm text-center">
+            <p>Loading...</p>
+          </div>
+        ) : error || courseQueries.some((query) => query.error) ? (
+          <div className="bg-white p-12 rounded-lg shadow-sm text-center">
+            <p className="text-red-500">
+              Error: {error?.message || "Failed to load course details"}
+            </p>
+          </div>
+        ) : courses.length > 0 ? (
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             {/* Cart Items */}
             <div className="lg:col-span-2">
@@ -148,11 +110,16 @@ export default function CartPage() {
                           ${course.originalPrice.toFixed(2)}
                         </div>
                         <span className="inline-block bg-red-50 text-red-500 text-xs font-medium px-2 py-1 rounded mt-1">
-                          {course.discount}
+                          {Math.round(
+                            ((course.originalPrice - course.price) /
+                              course.originalPrice) *
+                              100
+                          )}
+                          % OFF
                         </span>
                       </div>
                       <button
-                        onClick={() => removeCourse(course.id)}
+                        onClick={() => handleRemoveCourse(course.id)}
                         className="absolute top-6 right-6 text-gray-400 hover:text-red-500"
                       >
                         <Trash2 size={18} />
@@ -179,12 +146,6 @@ export default function CartPage() {
                     <span className="text-gray-600">Tax (7%)</span>
                     <span>${calculateTax().toFixed(2)}</span>
                   </div>
-                  {couponApplied && (
-                    <div className="flex justify-between text-green-600">
-                      <span>Discount</span>
-                      <span>-${discount.toFixed(2)}</span>
-                    </div>
-                  )}
                 </div>
 
                 <div className="flex justify-between font-bold text-lg pt-4 border-t mt-4">
@@ -192,37 +153,10 @@ export default function CartPage() {
                   <span>${calculateTotal().toFixed(2)}</span>
                 </div>
 
-                {/* Coupon Code */}
-                <div className="mt-6 pt-4 border-t">
-                  <label className="flex items-center text-gray-700 font-medium mb-2">
-                    <Tag size={16} className="mr-2" />
-                    Apply Coupon
-                  </label>
-                  <div className="flex space-x-2">
-                    <input
-                      type="text"
-                      placeholder="Enter coupon code"
-                      className="flex-1 border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      value={couponCode}
-                      onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                        setCouponCode(e.target.value)
-                      }
-                    />
-                    <button
-                      onClick={applyCoupon}
-                      className="bg-gray-100 text-gray-700 px-3 py-2 rounded text-sm font-medium hover:bg-gray-200"
-                    >
-                      Apply
-                    </button>
-                  </div>
-                  {couponApplied && (
-                    <div className="text-green-600 text-sm mt-2">
-                      Coupon applied successfully!
-                    </div>
-                  )}
-                </div>
-
-                <button className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-4 rounded-md mt-6 flex items-center justify-center">
+                <button
+                  className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-4 rounded-md mt-6 flex items-center justify-center"
+                  disabled={courses.length === 0}
+                >
                   Proceed to Checkout
                   <ChevronRight size={18} className="ml-1" />
                 </button>
@@ -247,12 +181,13 @@ export default function CartPage() {
             <p className="text-gray-500 mb-6">
               Browse our courses and find something to learn today!
             </p>
-            <a
-              href="#"
+                  <Link
+                    
+              href="/courses"
               className="inline-block bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-6 rounded-md"
             >
               Explore Courses
-            </a>
+            </Link>
           </div>
         )}
       </main>
