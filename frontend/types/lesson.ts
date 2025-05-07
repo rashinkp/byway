@@ -51,3 +51,28 @@ export interface UpdateLessonInput {
   order?: number;
   status?: LessonStatus; 
 }
+
+
+export interface GetPublicLessonsParams {
+  courseId: string;
+  page?: number;
+  limit?: number;
+  sortBy?: "order" | "title" | "createdAt" | "updatedAt";
+  sortOrder?: "asc" | "desc";
+  search?: string;
+}
+
+export interface PublicLesson {
+  id: string;
+  title: string;
+  description?: string | null;
+  order: number;
+}
+
+export interface GetPublicLessonsResponse {
+  lessons: PublicLesson[];
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
+}

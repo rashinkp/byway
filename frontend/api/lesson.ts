@@ -1,4 +1,4 @@
-import { GetAllLessonsParams, GetAllLessonsResponse, ILesson } from "@/types/lesson";
+import { GetAllLessonsParams, GetAllLessonsResponse, GetPublicLessonsParams, GetPublicLessonsResponse, ILesson } from "@/types/lesson";
 import { api } from "./api";
 
 export async function getAllLessonsInCourse({
@@ -91,6 +91,35 @@ export async function getLessonById(lessonId: string): Promise<ILesson> {
     throw new Error(error.response?.data?.message || "Failed to fetch lesson");
   }
 
-
 }
 
+
+
+export async function getPublicLessons({
+  courseId,
+  page = 1,
+  limit = 10,
+  sortBy = "order",
+  sortOrder = "asc",
+  search = "",
+}: GetPublicLessonsParams): Promise<GetPublicLessonsResponse> {
+  try {
+    const response = await api.get<{ data: GetPublicLessonsResponse }>(
+      `/lessons/${courseId}/public-lessons`,
+      {
+        params: {
+          page,
+          limit,
+          sortBy,
+          sortOrder,
+          search,
+        },
+      }
+    );
+    return response.data.data;
+  } catch (error: any) {
+    throw new Error(
+      error.response?.data?.message || "Failed to fetch public lessons"
+    );
+  }
+}

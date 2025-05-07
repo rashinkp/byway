@@ -4,7 +4,7 @@ import { ChevronDown, Star, Clock, Users, BookOpen } from "lucide-react";
 import { useGetCourseById } from "@/hooks/course/useGetCourseById";
 import { useParams } from "next/navigation";
 import ErrorDisplay from "@/components/ErrorDisplay";
-import { useGetAllLessonsInCourse } from "@/hooks/lesson/useGetAllLesson";
+import { useGetPublicLessons } from "@/hooks/lesson/useGetPublicLessons";
 
 interface CourseInstructor {
   name: string;
@@ -88,9 +88,9 @@ export default function CourseDetail() {
   const [expandedModules, setExpandedModules] = useState<string[]>([]);
   const { courseId } = useParams();
   const { data: course, isLoading:courseLoading, error } = useGetCourseById(courseId as string);
-  const { data: lessons, isLoading: lessonLoading } = useGetAllLessonsInCourse({ courseId: courseId as string })
+  const { data, isLoading: lessonLoading } = useGetPublicLessons({ courseId: courseId as string })
   
-  console.log(lessons);
+  const lessons = data?.lessons;
   
 
   const toggleModule = (moduleTitle: string) => {
@@ -157,7 +157,7 @@ export default function CourseDetail() {
             <span className="mx-1">|</span>
             <span>{course?.duration} Total Hours</span>
             <span className="mx-1">|</span>
-            <span>{courseData.lectures} Lectures</span>
+            <span>{lessons?.length} Lectures</span>
             <span className="mx-1">|</span>
             <span>{course?.level}</span>
           </div>
@@ -271,35 +271,35 @@ export default function CourseDetail() {
                 <h2 className="text-xl font-bold mb-4">Syllabus</h2>
 
                 <div className="space-y-4">
-                  {courseData.modules.map((module, index) => (
+                  {lessons?.map((lesson, index) => (
                     <div
                       key={index}
                       className="border rounded-lg overflow-hidden"
                     >
                       <button
                         className="w-full flex justify-between items-center p-4 bg-gray-50"
-                        onClick={() => toggleModule(module.title)}
+                        onClick={() => toggleModule(lesson.title)}
                       >
                         <div className="flex items-center gap-2">
                           <ChevronDown
                             size={20}
                             className={`transform transition-transform ${
-                              expandedModules.includes(module.title)
+                              expandedModules.includes(lesson.title)
                                 ? "rotate-180"
                                 : ""
                             }`}
                           />
-                          <span className="font-medium">{module.title}</span>
+                          <span className="font-medium">{lesson.title}</span>
                         </div>
                         <div className="text-gray-500 text-sm">
-                          {module.lessons} Lessons · {module.hours} hour
+                          {lesson.order}
                         </div>
                       </button>
 
-                      {expandedModules.includes(module.title) && (
+                      {expandedModules.includes(lesson.title) && (
                         <div className="p-4 bg-white">
                           <p className="text-gray-600">
-                            Module content would appear here
+                            {lesson.description}
                           </p>
                         </div>
                       )}
@@ -358,7 +358,7 @@ export default function CourseDetail() {
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-600">Lectures:</span>
-                  <span className="font-medium">{courseData.lectures}</span>
+                  <span className="font-medium">{lessons?.length}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-600">Level:</span>
