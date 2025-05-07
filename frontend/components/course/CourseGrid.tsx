@@ -6,6 +6,7 @@ import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Course } from "@/types/course";
+import Link from "next/link";
 
 interface GridCourse extends Course {
   rating: number;
@@ -165,17 +166,19 @@ export function CourseGrid({
                 variants={itemVariants}
                 className="flex"
               >
-                <CourseCard
-                  id={course.id}
-                  thumbnail={course.thumbnail}
-                  title={course.title}
-                  rating={course.rating}
-                  reviewCount={course.reviewCount}
-                  formattedDuration={course.formattedDuration}
-                  lessons={course.lessons}
-                  price={course.price}
-                  bestSeller={course.bestSeller}
-                />
+                <Link href={`/courses/${course.id}`}>
+                  <CourseCard
+                    id={course.id}
+                    thumbnail={course.thumbnail}
+                    title={course.title}
+                    rating={course.rating}
+                    reviewCount={course.reviewCount}
+                    formattedDuration={course.formattedDuration}
+                    lessons={course.lessons}
+                    price={course.price}
+                    bestSeller={course.bestSeller}
+                  />
+                </Link>
               </motion.div>
             ))}
       </motion.div>

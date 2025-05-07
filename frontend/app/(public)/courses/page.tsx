@@ -8,7 +8,6 @@ import ErrorDisplay from "@/components/ErrorDisplay";
 import { Course, IGetAllCoursesInput } from "@/types/course";
 import { useGetAllCourses } from "@/hooks/course/useGetAllCourse";
 
-// Define the GridCourse interface to match CourseGrid expectations
 interface GridCourse extends Course {
   rating: number;
   reviewCount: number;
@@ -48,7 +47,6 @@ export default function CourseListingPage() {
 
   const totalPages = data?.totalPages;
 
-  // Transform Course data to GridCourse
   const courses: GridCourse[] =
     data?.items?.map((course: Course) => ({
       ...course,
