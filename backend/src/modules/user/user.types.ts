@@ -84,3 +84,13 @@ export interface AdminUpdateUserInput {
 export interface IGetAllUsersWithSkip extends IGetAllUsersInput {
   skip: number;
 }
+
+
+export interface IPublicUser {
+  id: string;
+  name?: string;
+  avatar?: string;
+  bio?: string;
+  role: "USER" | "INSTRUCTOR" | "ADMIN";
+  deletedAt?: Date | null;
+}

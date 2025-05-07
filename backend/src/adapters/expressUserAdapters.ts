@@ -189,4 +189,22 @@ export const adaptUserController = (controller: UserController) => ({
       res.status(result.statusCode).json(result);
     }
   ),
+
+  getPublicUserData: asyncHandler(async (req: Request, res: Response) => {
+    const userId = req.params.userId;
+    const parsedInput = findUserByIdSchema.safeParse({ id: userId });
+    if (!parsedInput.success) {
+      logger.warn("Invalid user ID in params for getPublicUserData", {
+        errors: parsedInput.error.errors,
+      });
+      throw new AppError(
+        `Validation failed: ${parsedInput.error.message}`,
+        StatusCodes.BAD_REQUEST,
+        "VALIDATION_ERROR"
+      );
+    }
+
+    const result = await controller.getPublicUserData(userId);
+    res.status(result.statusCode).json(result);
+  }),
 });

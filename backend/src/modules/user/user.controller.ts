@@ -3,6 +3,7 @@ import { ApiResponse } from "../../types/response";
 import {
   AdminUpdateUserInput,
   IGetAllUsersInput,
+  IPublicUser,
   IUserWithProfile,
   UpdateUserInput,
 } from "./user.types";
@@ -116,6 +117,31 @@ export class UserController {
         );
       }
       throw AppError.internal("Failed to get user");
+    }
+  }
+
+  async getPublicUserData(userId: string): Promise<ApiResponse<IPublicUser>> {
+    try {
+      const user = await this.userService.getPublicUserData(userId);
+      return {
+        status: "success",
+        data: user,
+        message: "Public user data retrieved successfully",
+        statusCode: StatusCodes.OK,
+      };
+    } catch (error) {
+      logger.error("Error while getting public user data:", { error });
+      if (error instanceof AppError) {
+        throw error;
+      }
+      if (error instanceof Error) {
+        throw new AppError(
+          error.message,
+          StatusCodes.BAD_REQUEST,
+          "GETTING_FAILED"
+        );
+      }
+      throw AppError.badRequest("Failed to get public user data");
     }
   }
 }

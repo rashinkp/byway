@@ -1,6 +1,7 @@
 import {
   AdminUpdateUserInput,
   IGetAllUsersWithSkip,
+  IPublicUser,
   IUser,
   IUserWithProfile,
   UpdateUserInput,
@@ -18,4 +19,5 @@ export interface IUserRepository {
   findUserById(userId: string): Promise<IUser | null>;
   updateUserRole(input: UpdateUserRoleInput): Promise<IUser>;
   getUserData(userId: string, requesterRole: Role): Promise<IUser>;
+  getPublicUserData(userId: string): Promise<IPublicUser>;
 }

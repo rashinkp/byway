@@ -12,6 +12,7 @@ import {
   IGetAllUsersWithSkip,
   UpdateUserRoleInput,
   IGetAllUsersInput,
+  IPublicUser,
 } from "./user.types";
 import { IUserRepository } from "./user.repository.interface";
 
@@ -208,6 +209,37 @@ export class UserRepository implements IUserRepository {
       isVerified: user.isVerified,
       createdAt: user.createdAt,
       updatedAt: user.updatedAt,
+    };
+  }
+
+  async getPublicUserData(userId: string): Promise<IPublicUser> {
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+      select: {
+        id: true,
+        name: true,
+        avatar: true,
+        role: true,
+        deletedAt: true,
+        userProfile: {
+          select: {
+            bio: true,
+          },
+        },
+      },
+    });
+
+    if (!user) {
+      throw new Error('User not found');
+    }
+
+    return {
+      id: user.id,
+      name: user.name || undefined,
+      avatar: user.avatar || undefined,
+      bio: user.userProfile?.bio || undefined,
+      role: user.role,
+      deletedAt: user.deletedAt || undefined,
     };
   }
 }

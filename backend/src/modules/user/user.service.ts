@@ -2,6 +2,7 @@ import {
   AdminUpdateUserInput,
   IGetAllUsersInput,
   IGetAllUsersResponse,
+  IPublicUser,
   IUser,
   IUserWithProfile,
   UpdateUserInput,
@@ -276,6 +277,58 @@ export class UserService {
         ? error
         : new AppError(
             "Failed to get user data",
+            StatusCodes.INTERNAL_SERVER_ERROR,
+            "INTERNAL_ERROR"
+          );
+    }
+  }
+
+  async getPublicUserData(userId: string): Promise<IPublicUser> {
+    const parsedInput = findUserByIdSchema.safeParse({ id: userId });
+    if (!parsedInput.success) {
+      logger.warn("Validation failed for getting public user", {
+        errors: parsedInput.error.errors,
+      });
+      throw new AppError(
+        `Validation failed: ${parsedInput.error.message}`,
+        StatusCodes.BAD_REQUEST,
+        "VALIDATION_ERROR"
+      );
+    }
+
+    try {
+      const user = await this.userRepository.getPublicUserData(userId);
+      if (!user) {
+        logger.warn("User not found by ID", { userId });
+        throw new AppError(
+          "User not found",
+          StatusCodes.NOT_FOUND,
+          "NOT_FOUND"
+        );
+      }
+      if (user.role !== Role.INSTRUCTOR) {
+        logger.warn("User is not an instructor", { userId });
+        throw new AppError(
+          "User is not an instructor",
+          StatusCodes.BAD_REQUEST,
+          "INVALID_ROLE"
+        );
+      }
+      if (user.deletedAt !== null) {
+        logger.warn("Attempted to access soft-deleted user", { userId });
+        throw new AppError(
+          "User account has been deleted",
+          StatusCodes.NOT_FOUND,
+          "NOT_FOUND"
+        );
+      }
+      return user;
+    } catch (error) {
+      logger.error("Error getting public user data", { error, userId });
+      throw error instanceof AppError
+        ? error
+        : new AppError(
+            "Failed to get public user data",
             StatusCodes.INTERNAL_SERVER_ERROR,
             "INTERNAL_ERROR"
           );

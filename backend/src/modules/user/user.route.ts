@@ -18,6 +18,7 @@ export const createUserRouter = (userController: UserController): Router => {
   );
   userRouter.get("/users/me", protect, adapt.getUserData);
   userRouter.get("/users/:userId", authMiddleware("ADMIN"), adapt.getUserData);
+  userRouter.get("/users/:userId/public", adapt.getPublicUserData);
 
   return userRouter;
 };
