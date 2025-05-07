@@ -314,7 +314,7 @@ export class UserService {
           "INVALID_ROLE"
         );
       }
-      if (user.deletedAt !== null) {
+      if (user.deletedAt) {
         logger.warn("Attempted to access soft-deleted user", { userId });
         throw new AppError(
           "User account has been deleted",

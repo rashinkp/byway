@@ -220,10 +220,13 @@ export class UserRepository implements IUserRepository {
         name: true,
         avatar: true,
         role: true,
+        email:true,
         deletedAt: true,
         userProfile: {
           select: {
             bio: true,
+            skills: true,
+            gender:true
           },
         },
       },
@@ -238,6 +241,9 @@ export class UserRepository implements IUserRepository {
       name: user.name || undefined,
       avatar: user.avatar || undefined,
       bio: user.userProfile?.bio || undefined,
+      email:user.email,
+      skills: user.userProfile?.skills || undefined,
+      gender: user.userProfile?.gender as 'MALE' | 'FEMALE' || undefined,
       role: user.role,
       deletedAt: user.deletedAt || undefined,
     };

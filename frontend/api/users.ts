@@ -1,6 +1,6 @@
 import { api } from "@/api/api";
 import { ApiResponse, IPaginatedResponse } from "@/types/apiResponse";
-import { User } from "@/types/user";
+import { PublicUser, User } from "@/types/user";
 
 export const getAllUsers = async ({
   page = 1,
@@ -98,3 +98,17 @@ export async function updateUser(data: {
     );
   }
 }
+
+
+ export async function getPublicUser(userId: string): Promise<PublicUser> {
+   try {
+     const response = await api.get<{ data: PublicUser }>(
+       `/user/users/${userId}/public`
+     );
+     return response.data.data;
+   } catch (error: any) {
+     throw new Error(
+       error.response?.data?.message || "Failed to fetch public user data"
+     );
+   }
+ }

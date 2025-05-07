@@ -90,6 +90,9 @@ export interface IPublicUser {
   id: string;
   name?: string;
   avatar?: string;
+  email?: string;
+  skills?: string;
+  gender?: 'MALE' | 'FEMALE' | undefined;
   bio?: string;
   role: "USER" | "INSTRUCTOR" | "ADMIN";
   deletedAt?: Date | null;

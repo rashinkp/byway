@@ -123,6 +123,7 @@ export class UserController {
   async getPublicUserData(userId: string): Promise<ApiResponse<IPublicUser>> {
     try {
       const user = await this.userService.getPublicUserData(userId);
+      console.log(user);
       return {
         status: "success",
         data: user,

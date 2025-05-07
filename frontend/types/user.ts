@@ -122,3 +122,14 @@ export const transformUserData = (user: User): UserProfileType => {
     deletedAt: user.deletedAt,
   };
 };
+
+
+export interface PublicUser {
+  id: string;
+  name?: string;
+  email?: string;
+  gender?: string;
+  skills?: string;
+  avatar?: string;
+  bio?: string;
+}
