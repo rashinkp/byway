@@ -8,6 +8,8 @@ import {
   IGetProgressInput,
   IGetAllLessonsInput,
   IGetAllLessonsResponse,
+  IGetPublicLessonsInput,
+  IGetPublicLessonsResponse,
 } from "./lesson.types";
 import { ILessonRepository } from "./lesson.repository.interface";
 
@@ -71,10 +73,8 @@ export class LessonRepository implements ILessonRepository {
       this.prisma.lesson.count({ where }),
     ]);
 
- 
-
     return {
-      lessons: lessons.map((lesson:ILesson) => ({
+      lessons: lessons.map((lesson: ILesson) => ({
         id: lesson.id,
         courseId: lesson.courseId,
         title: lesson.title,
@@ -170,7 +170,7 @@ export class LessonRepository implements ILessonRepository {
       where: { userId, courseId },
       orderBy: { lesson: { order: "asc" } },
     });
-    return progress.map((p:any) => ({
+    return progress.map((p: any) => ({
       userId: p.userId,
       courseId: p.courseId,
       lessonId: p.lessonId,
@@ -252,6 +252,62 @@ export class LessonRepository implements ILessonRepository {
       completedAt: previousProgress.completedAt || undefined,
       createdAt: previousProgress.createdAt,
       updatedAt: previousProgress.updatedAt,
+    };
+  }
+
+  async getPublicLessons(
+    input: IGetPublicLessonsInput
+  ): Promise<IGetPublicLessonsResponse> {
+    const {
+      courseId,
+      page = 1,
+      limit = 10,
+      sortBy = "order",
+      sortOrder = "asc",
+      search = "",
+    } = input;
+
+    const where: any = {
+      courseId,
+      deletedAt: null,
+      status: "PUBLISHED", // Only show published lessons
+      ...(search
+        ? {
+            OR: [
+              { title: { contains: search, mode: "insensitive" } },
+              { description: { contains: search, mode: "insensitive" } },
+            ],
+          }
+        : {}),
+    };
+
+    const [lessons, total] = await Promise.all([
+      this.prisma.lesson.findMany({
+        where,
+        select: {
+          id: true,
+          title: true,
+          description: true,
+          order: true,
+        },
+        orderBy: { [sortBy]: sortOrder },
+        skip: (page - 1) * limit,
+        take: limit,
+      }),
+      this.prisma.lesson.count({ where }),
+    ]);
+
+    return {
+      lessons: lessons.map((lesson) => ({
+        id: lesson.id,
+        title: lesson.title,
+        description: lesson.description || undefined,
+        order: lesson.order,
+      })),
+      total,
+      page,
+      limit,
+      totalPages: Math.ceil(total / limit),
     };
   }
 }

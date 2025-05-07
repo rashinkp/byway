@@ -1,4 +1,4 @@
-import { ICreateLessonInput, IGetAllLessonsInput, IGetAllLessonsResponse, IGetProgressInput, ILesson, IUpdateLessonProgressInput, IUserLessonProgress } from "./lesson.types";
+import { ICreateLessonInput, IGetAllLessonsInput, IGetAllLessonsResponse, IGetProgressInput, IGetPublicLessonsInput, IGetPublicLessonsResponse, ILesson, IUpdateLessonProgressInput, IUserLessonProgress } from "./lesson.types";
 
 export interface ILessonRepository {
   createLesson(input: ICreateLessonInput): Promise<ILesson>;
@@ -20,4 +20,7 @@ export interface ILessonRepository {
     courseId: string,
     lessonOrder: number
   ): Promise<IUserLessonProgress | null>;
+  getPublicLessons(
+    input: IGetPublicLessonsInput
+  ): Promise<IGetPublicLessonsResponse>;
 }

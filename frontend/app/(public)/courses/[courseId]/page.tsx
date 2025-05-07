@@ -4,6 +4,7 @@ import { ChevronDown, Star, Clock, Users, BookOpen } from "lucide-react";
 import { useGetCourseById } from "@/hooks/course/useGetCourseById";
 import { useParams } from "next/navigation";
 import ErrorDisplay from "@/components/ErrorDisplay";
+import { useGetAllLessonsInCourse } from "@/hooks/lesson/useGetAllLesson";
 
 interface CourseInstructor {
   name: string;
@@ -86,8 +87,10 @@ export default function CourseDetail() {
   const [activeTab, setActiveTab] = useState("description");
   const [expandedModules, setExpandedModules] = useState<string[]>([]);
   const { courseId } = useParams();
-  const { data: course, isLoading, error } = useGetCourseById(courseId as string);
+  const { data: course, isLoading:courseLoading, error } = useGetCourseById(courseId as string);
+  const { data: lessons, isLoading: lessonLoading } = useGetAllLessonsInCourse({ courseId: courseId as string })
   
+  console.log(lessons);
   
 
   const toggleModule = (moduleTitle: string) => {
@@ -120,10 +123,8 @@ export default function CourseDetail() {
     return <ErrorDisplay  error={error} title="course error"/>
   }
 
-  if (isLoading) {
-    return (
-      <div>Loading.....</div>
-    )
+  if (lessonLoading || courseLoading) {
+    return <div>Loading.....</div>;
   }
 
   return (

@@ -2,7 +2,7 @@
 import { Router } from "express";
 import { LessonController } from "./lesson.controller";
 import { adaptLessonController } from "../../adapters/expressLessonAdapters";
-import { authMiddleware, protect } from "../../middlewares/authMiddleware";
+import { authMiddleware, optionalAuth, protect } from "../../middlewares/authMiddleware";
 
 export const createLessonRouter = (
   lessonController: LessonController
@@ -21,5 +21,6 @@ export const createLessonRouter = (
   router.get("/:lessonId", protect, adapt.getLessonById);
   router.delete('/:lessonId', authMiddleware("INSTRUCTOR"), adapt.deleteLesson);
   router.patch('/:lessonId', authMiddleware("INSTRUCTOR"), adapt.updateLesson);
+  router.get("/:courseId/public-lessons",optionalAuth, adapt.getPublicLessons);
   return router;
 };

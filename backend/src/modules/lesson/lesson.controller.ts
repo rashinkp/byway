@@ -7,6 +7,7 @@ import {
   IUpdateLessonProgressInput,
   IGetProgressInput,
   IGetAllLessonsInput,
+  IGetPublicLessonsInput,
 } from "./lesson.types";
 
 export class LessonController {
@@ -121,7 +122,6 @@ export class LessonController {
     }
   }
 
-
   getLessonById = async (lessonId: string): Promise<ApiResponse> => {
     try {
       const lesson = await this.lessonService.getLessonById(lessonId);
@@ -146,7 +146,7 @@ export class LessonController {
         data: null,
       };
     }
-  }
+  };
 
   async deleteLesson(lessonId: string): Promise<ApiResponse> {
     try {
@@ -174,8 +174,7 @@ export class LessonController {
     }
   }
 
-
-  updateLesson = async(
+  updateLesson = async (
     lessonId: string,
     input: Partial<ICreateLessonInput>
   ): Promise<ApiResponse> => {
@@ -194,6 +193,32 @@ export class LessonController {
         ? StatusCodes.NOT_FOUND
         : message.includes("Unauthorized")
         ? StatusCodes.FORBIDDEN
+        : StatusCodes.BAD_REQUEST;
+      return {
+        status: "error",
+        message,
+        statusCode,
+        data: null,
+      };
+    }
+  };
+
+  async getPublicLessons(input: IGetPublicLessonsInput): Promise<ApiResponse> {
+    try {
+      const result = await this.lessonService.getPublicLessons(input);
+      return {
+        status: "success",
+        data: result,
+        message: "Public lessons retrieved successfully",
+        statusCode: StatusCodes.OK,
+      };
+    } catch (error) {
+      const message =
+        error instanceof Error
+          ? error.message
+          : "Failed to retrieve public lessons";
+      const statusCode = message.includes("not found")
+        ? StatusCodes.NOT_FOUND
         : StatusCodes.BAD_REQUEST;
       return {
         status: "error",

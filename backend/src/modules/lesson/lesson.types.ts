@@ -83,3 +83,25 @@ export interface ICreateLessonContentInput {
   data: Record<string, any>;
 }
 
+export interface IGetPublicLessonsInput {
+  courseId: string;
+  page?: number;
+  limit?: number;
+  sortBy?: "order" | "title" | "createdAt" | "updatedAt";
+  sortOrder?: "asc" | "desc";
+  search?: string;
+}
+
+
+export interface IGetPublicLessonsResponse {
+  lessons: {
+    id: string;
+    title: string;
+    description?: string | null;
+    order: number;
+  }[];
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
+}

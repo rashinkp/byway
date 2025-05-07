@@ -8,6 +8,8 @@ import {
   IGetProgressInput,
   IGetAllLessonsInput,
   IGetAllLessonsResponse,
+  IGetPublicLessonsInput,
+  IGetPublicLessonsResponse,
 } from "./lesson.types";
 import { ILessonRepository } from "./lesson.repository.interface";
 import { AppError } from "../../utils/appError";
@@ -168,9 +170,6 @@ export class LessonService {
     let courseId = lesson.courseId;
     let inputOrder = input.order;
 
-
-    
-    
     if (inputOrder !== undefined) {
       const where = {
         courseId,
@@ -199,17 +198,30 @@ export class LessonService {
     return updatedLesson;
   }
 
-  async isCourseValidForPublishment(courseId: string) : Promise<boolean> {
+  async isCourseValidForPublishment(courseId: string): Promise<boolean> {
     let where = {
       courseId,
       status: "PUBLISHED",
     };
     const lessons = await this.lessonRepository.findLessonByWhere(where);
-    
-     if (!lessons) {
-       return false;
+
+    if (!lessons) {
+      return false;
     }
-    
+
     return true;
+  }
+
+  async getPublicLessons(
+    input: IGetPublicLessonsInput
+  ): Promise<IGetPublicLessonsResponse> {
+    const { courseId } = input;
+
+    const course = await this.courseRepository.getCourseById(courseId);
+    if (!course || course.deletedAt) {
+      throw AppError.badRequest("Course not found or deleted");
+    }
+
+    return this.lessonRepository.getPublicLessons(input);
   }
 }

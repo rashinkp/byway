@@ -6,6 +6,7 @@ import {
   IUpdateLessonProgressInput,
   IGetProgressInput,
   IGetAllLessonsInput,
+  IGetPublicLessonsInput,
 } from "../modules/lesson/lesson.types";
 import { getAllLessonsSchema } from "../modules/lesson/lesson.validator";
 import { get } from "http";
@@ -99,4 +100,18 @@ export const adaptLessonController = (controller: LessonController) => ({
       res.status(result.statusCode).json(result);
     }
   ),
+
+  getPublicLessons: asyncHandler(async (req: Request, res: Response) => {
+    const sortBy = (req.query.sortBy as string) || "order";
+    const input: IGetPublicLessonsInput = {
+      courseId: req.params.courseId,
+      page: parseInt(req.query.page as string) || 1,
+      limit: parseInt(req.query.limit as string) || 10,
+      sortBy: sortBy as "order" | "title" | "createdAt" | "updatedAt",
+      sortOrder: (req.query.sortOrder as "asc" | "desc") || "asc",
+      search: (req.query.search as string) || "",
+    };
+    const result = await controller.getPublicLessons(input);
+    res.status(result.statusCode).json(result);
+  }),
 });
