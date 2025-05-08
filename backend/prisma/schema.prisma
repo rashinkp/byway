@@ -29,6 +29,9 @@ model User {
   coursesCreated    Course[]        @relation("CourseCreator")
   enrollments       Enrollment[]    @relation("UserEnrollments")
   cartItems         Cart[]          @relation("UserToCart")
+  orders            Order[]                   @relation("UserToOrder")
+  transactions      TransactionHistory[]      @relation("UserToTransactionHistory")
+  refunds           Refund[]                  @relation("UserToRefund")
 }
 
 model UserProfile {
@@ -135,6 +138,9 @@ model Course {
   lessons        Lesson[]      @relation("CourseLessons") 
   enrollments    Enrollment[]  @relation("CourseEnrollments") 
   cartItems      Cart[]        @relation("CourseToCart")
+  transactions   TransactionHistory[]      @relation("CourseToTransactionHistory")
+  orders         Order[]       @relation("CourseToOrder")
+  refunds        Refund[]                  @relation("CourseToRefund")
 }
 
 model CourseDetails {
@@ -180,13 +186,22 @@ model Lesson {
 }
 
 model Enrollment {
-  userId     String
-  courseId   String
-  user       User       @relation("UserEnrollments", fields: [userId], references: [id])
-  course     Course     @relation("CourseEnrollments", fields: [courseId], references: [id])
-  enrolledAt DateTime   @default(now())
-  progress   UserLessonProgress[] @relation("EnrollmentProgress")
+  userId          String
+  courseId        String
+  user            User            @relation("UserEnrollments", fields: [userId], references: [id])
+  course          Course          @relation("CourseEnrollments", fields: [courseId], references: [id])
+  enrolledAt      DateTime        @default(now())
+  orderId         String?         @unique // Link to the order that created this enrollment
+  order           Order?          @relation("OrderToEnrollment", fields: [orderId], references: [id], onDelete: SetNull)
+  accessStatus    AccessStatus    @default(ACTIVE) // Track if user can access the course
+  progress        UserLessonProgress[] @relation("EnrollmentProgress")
   @@id([userId, courseId])
+}
+
+enum AccessStatus {
+  ACTIVE
+  BLOCKED
+  EXPIRED
 }
 
 model UserLessonProgress {
@@ -263,4 +278,99 @@ model Cart {
   @@unique([userId, courseId]) // Prevent duplicate course entries in a user's cart
   @@index([userId])
   @@index([courseId])
+}
+
+
+model Order {
+  id              String                    @id @default(uuid())
+  userId          String
+  courseId        String
+  amount          Decimal                   // Total amount paid (after discounts)
+  coursePrice     Decimal                   // Course price at purchase time
+  discount        Decimal?                  // Discount applied (if any)
+  couponId        String?                   // Reference to applied coupon
+  paymentStatus   PaymentStatus             @default(PENDING)
+  paymentGateway  PaymentGateway?           // Gateway used for payment
+  paymentId       String?                   // External payment gateway transaction ID
+  orderStatus     OrderStatus               @default(PENDING)
+  createdAt       DateTime                  @default(now())
+  updatedAt       DateTime                  @updatedAt
+  deletedAt       DateTime?                 // Soft deletion
+  user            User                      @relation("UserToOrder", fields: [userId], references: [id], onDelete: Cascade)
+  course          Course                    @relation("CourseToOrder", fields: [courseId], references: [id], onDelete: Cascade)
+  enrollment      Enrollment?               @relation("OrderToEnrollment")
+  transactions    TransactionHistory[]      @relation("OrderToTransactionHistory")
+  refund          Refund?                   @relation("OrderToRefund")
+  @@index([userId])
+  @@index([courseId])
+}
+
+enum PaymentStatus {
+  PENDING
+  COMPLETED
+  FAILED
+  REFUNDED
+}
+
+enum OrderStatus {
+  PENDING
+  CONFIRMED
+  CANCELLED
+}
+
+
+model Refund {
+  id            String        @id @default(uuid())
+  orderId       String        @unique // One refund per order
+  userId        String
+  courseId      String
+  amount        Decimal       // Refunded amount
+  reason        String?       // Reason for refund (e.g., "Course blocked")
+  status        RefundStatus  @default(PENDING)
+  transactionId String?       // External refund transaction ID (if processed via gateway)
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+  order         Order         @relation("OrderToRefund", fields: [orderId], references: [id], onDelete: Cascade)
+  user          User          @relation("UserToRefund", fields: [userId], references: [id], onDelete: Cascade)
+  course        Course        @relation("CourseToRefund", fields: [courseId], references: [id], onDelete: Cascade)
+  @@index([userId])
+  @@index([orderId])
+  @@index([courseId])
+}
+
+enum RefundStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  PROCESSED
+}
+
+
+model TransactionHistory {
+  id              String           @id @default(uuid())
+  orderId         String           // Link to the order
+  userId          String           // User who made the payment
+  courseId        String           // Course associated with the payment
+  amount          Decimal          // Transaction amount
+  currency        String           @default("USD") // Currency code (e.g., USD, EUR)
+  paymentGateway  PaymentGateway   // Gateway used (e.g., Stripe, PayPal)
+  transactionId   String?          // External transaction ID from gateway
+  status          PaymentStatus    // Transaction status
+  failureReason   String?          // Reason for failure (if applicable)
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+  deletedAt       DateTime?        // Soft deletion
+  order           Order            @relation("OrderToTransactionHistory", fields: [orderId], references: [id], onDelete: Cascade)
+  user            User             @relation("UserToTransactionHistory", fields: [userId], references: [id], onDelete: Cascade)
+  course          Course           @relation("CourseToTransactionHistory", fields: [courseId], references: [id], onDelete: Cascade)
+  @@index([userId])
+  @@index([orderId])
+  @@index([courseId])
+}
+
+enum PaymentGateway {
+  STRIPE
+  PAYPAL
+  RAZORPAY
+  // Add other gateways as needed
 }

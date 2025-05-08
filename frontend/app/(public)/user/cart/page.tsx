@@ -113,7 +113,7 @@ export default function CartPage() {
                 </div>
                 {cart?.map((cart) => (
                   <div
-                    key={cart.id}
+                    key={cart.courseId}
                     className="p-6 border-b last:border-b-0 hover:bg-gray-50 flex items-start"
                   >
                     {removeFromCartMutation.isPending &&
