@@ -4,17 +4,20 @@ import { UserService } from "../user/user.service";
 import { CourseService } from "../course/course.service";
 import { IEnrollmentRepository } from "./enrollment.repository.interface";
 import { IEnrollment } from "./enrollment.types";
+import { PaymentService } from "../payment/payment.service";
 
 export class EnrollmentService {
   constructor(
     private enrollmentRepository: IEnrollmentRepository,
     private userService: UserService,
-    private courseService: CourseService
+    private courseService: CourseService,
+    private paymentService: PaymentService
   ) {}
 
   async createEnrollment(
     userId: string,
-    courseId: string
+    courseId: string,
+    orderItemId: string
   ): Promise<IEnrollment> {
     try {
       const user = await this.userService.findUserById(userId);
@@ -27,8 +30,8 @@ export class EnrollmentService {
         throw AppError.notFound("Course not found");
       }
 
-      if (course.deletedAt) {
-        throw AppError.forbidden("Course is currently blocked");
+      if (course.status !== "PUBLISHED") {
+        throw AppError.forbidden("Course is not available");
       }
 
       const existingEnrollment = await this.enrollmentRepository.findEnrollment(
@@ -39,14 +42,38 @@ export class EnrollmentService {
         throw AppError.badRequest("User is already enrolled in this course");
       }
 
-      // Note: Payment validation will be added later when Payment module is implemented
+      const order = await this.paymentService.findOrderById(orderItemId);
+      if (!order || order.userId !== userId) {
+        throw AppError.badRequest("Invalid order");
+      }
+      const orderItem = order.items.find(
+        (item) => item.id === orderItemId && item.courseId === courseId
+      );
+      if (!orderItem) {
+        throw AppError.badRequest(
+          "Order item not found or does not match course"
+        );
+      }
+      if (
+        order.paymentStatus !== "COMPLETED" ||
+        order.orderStatus !== "CONFIRMED"
+      ) {
+        throw AppError.badRequest("Payment not completed");
+      }
+
       const enrollment = await this.enrollmentRepository.createEnrollment(
         userId,
-        courseId
+        courseId,
+        orderItemId
       );
       return enrollment;
     } catch (error) {
-      logger.error("Create enrollment error:", { error, userId, courseId });
+      logger.error("Create enrollment error:", {
+        error,
+        userId,
+        courseId,
+        orderItemId,
+      });
       throw error;
     }
   }

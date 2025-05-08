@@ -10,6 +10,7 @@ import { AppDependencies } from "../core/dependacies/index";
 import { createContentRouter } from "../modules/content/content.routes";
 import { createCartRouter } from "../modules/cart/cart.routes";
 import { createEnrollmentRouter } from "../modules/enrollment/enrollment.routes";
+import { createPaymentRouter } from "../modules/payment/payment.routes";
 
 export const configureRoutes = (
   app: Express,
@@ -33,5 +34,9 @@ export const configureRoutes = (
   app.use(
     "/api/v1/enrollments",
     createEnrollmentRouter(dependencies.enrollmentController)
+  );
+  app.use(
+    "/api/v1/payments",
+    createPaymentRouter(dependencies.paymentController)
   );
 };

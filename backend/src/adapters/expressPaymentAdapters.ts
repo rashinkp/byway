@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from "express";
-import { EnrollmentController } from "../modules/enrollment/enrollment.controller";
+import { PaymentController } from "../modules/payment/payment.controller";
 import { AppError } from "../utils/appError";
 import { StatusCodes } from "http-status-codes";
 
@@ -18,10 +18,8 @@ const asyncHandler = (
     Promise.resolve(fn(req as AuthenticatedRequest, res, next)).catch(next);
 };
 
-export const adaptEnrollmentController = (
-  controller: EnrollmentController
-) => ({
-  createEnrollment: asyncHandler(
+export const adaptPaymentController = (controller: PaymentController) => ({
+  createOrder: asyncHandler(
     async (req: AuthenticatedRequest, res: Response) => {
       if (!req.user) {
         throw new AppError(
@@ -30,10 +28,10 @@ export const adaptEnrollmentController = (
           "UNAUTHORIZED"
         );
       }
-      const result = await controller.createEnrollment({
+      const result = await controller.createOrder({
         userId: req.user.id,
-        courseId: req.body.courseId,
-        orderItemId: req.body.orderItemId,
+        courseIds: req.body.courseIds,
+        couponCode: req.body.couponCode,
       });
       res.status(result.statusCode).json({
         status: result.status,
@@ -43,33 +41,10 @@ export const adaptEnrollmentController = (
     }
   ),
 
-  getEnrollment: asyncHandler(
+  updateOrderStatus: asyncHandler(
     async (req: AuthenticatedRequest, res: Response) => {
-      if (!req.user) {
-        throw new AppError(
-          "Unauthorized",
-          StatusCodes.UNAUTHORIZED,
-          "UNAUTHORIZED"
-        );
-      }
-      const result = await controller.getEnrollment({
-        userId: req.user.id,
-        courseId: req.params.courseId,
-      });
-      res.status(result.statusCode).json({
-        status: result.status,
-        data: result.data,
-        message: result.message,
-      });
-    }
-  ),
-
-  updateAccessStatus: asyncHandler(
-    async (req: AuthenticatedRequest, res: Response) => {
-      if (!req.user || req.user.role !== "ADMIN") {
-        throw new AppError("Forbidden", StatusCodes.FORBIDDEN, "FORBIDDEN");
-      }
-      const result = await controller.updateAccessStatus(req.body);
+      // Note: This endpoint may be called by payment gateway webhooks, so auth is optional
+      const result = await controller.updateOrderStatus(req.body);
       res.status(result.statusCode).json({
         status: result.status,
         data: result.data,

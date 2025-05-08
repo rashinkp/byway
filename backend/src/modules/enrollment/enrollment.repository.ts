@@ -7,12 +7,14 @@ export class EnrollmentRepository implements IEnrollmentRepository {
 
   async createEnrollment(
     userId: string,
-    courseId: string
+    courseId: string,
+    orderItemId: string
   ): Promise<IEnrollment> {
     return this.prisma.enrollment.create({
       data: {
         userId,
         courseId,
+        orderItemId,
         accessStatus: "ACTIVE",
       },
     }) as unknown as Promise<IEnrollment>;

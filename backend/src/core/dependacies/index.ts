@@ -21,9 +21,22 @@ import {
   initializeLessonDependencies,
   LessonDependencies,
 } from "./lessonDependencies";
-import { ContentDependencies, initializeContentDependencies } from "./contentDependancy";
-import { CartDependencies, initializeCartDependencies } from "./cart.dependencies";
-import { EnrollmentDependencies, initializeEnrollmentDependencies } from "./enrollmentDependencies";
+import {
+  ContentDependencies,
+  initializeContentDependencies,
+} from "./contentDependancy";
+import {
+  CartDependencies,
+  initializeCartDependencies,
+} from "./cart.dependencies";
+import {
+  EnrollmentDependencies,
+  initializeEnrollmentDependencies,
+} from "./enrollmentDependencies";
+import {
+  initializePaymentDependencies,
+  PaymentDependencies,
+} from "./paymentDependencies";
 
 export interface AppDependencies {
   authController: AuthDependencies["authController"];
@@ -34,9 +47,9 @@ export interface AppDependencies {
   courseController: CourseDependencies["courseController"];
   lessonController: LessonDependencies["lessonController"];
   contentController: ContentDependencies["contentController"];
-  cartController: CartDependencies['cartController'],
+  cartController: CartDependencies["cartController"];
   enrollmentController: EnrollmentDependencies["enrollmentController"];
-  
+  paymentController: PaymentDependencies["paymentController"];
 }
 
 export const initializeAppDependencies = (
@@ -44,9 +57,19 @@ export const initializeAppDependencies = (
 ): AppDependencies => {
   const userDeps = initializeUserDependencies(dbProvider);
   const otpDeps = initializeOtpDependencies(dbProvider);
-  const authDeps = initializeAuthDependencies(dbProvider, otpDeps.otpService , userDeps.userService);
-  const instructorDeps = initializeInstructorDependencies(dbProvider, userDeps.userService );
-  const categoryDeps = initializeCategoryDependencies(dbProvider , userDeps.userService);
+  const authDeps = initializeAuthDependencies(
+    dbProvider,
+    otpDeps.otpService,
+    userDeps.userService
+  );
+  const instructorDeps = initializeInstructorDependencies(
+    dbProvider,
+    userDeps.userService
+  );
+  const categoryDeps = initializeCategoryDependencies(
+    dbProvider,
+    userDeps.userService
+  );
   const courseDeps = initializeCourseDependencies(
     dbProvider,
     categoryDeps.categoryService,
@@ -59,21 +82,30 @@ export const initializeAppDependencies = (
   const contentDeps = initializeContentDependencies(
     dbProvider,
     lessonDeps.lessonService,
-    courseDeps.courseService,
+    courseDeps.courseService
   );
-
   const cartDeps = initializeCartDependencies(
-    dbProvider,
-    userDeps.userService,
-    courseDeps.courseService,
-  )
-
-  const enrollmentDeps = initializeEnrollmentDependencies(
     dbProvider,
     userDeps.userService,
     courseDeps.courseService
   );
 
+
+  // Initialize EnrollmentDependencies and PaymentDependencies without circular dependencies
+  const enrollmentDeps = initializeEnrollmentDependencies(
+    dbProvider,
+    userDeps.userService,
+    courseDeps.courseService
+  );
+  const paymentDeps = initializePaymentDependencies(
+    dbProvider,
+    userDeps.userService,
+    courseDeps.courseService,
+  );
+
+  // Inject dependent services to break circular dependency
+  enrollmentDeps.setPaymentService(paymentDeps.paymentService);
+  paymentDeps.setEnrollmentService(enrollmentDeps.enrollmentService);
 
   return {
     authController: authDeps.authController,
@@ -86,5 +118,6 @@ export const initializeAppDependencies = (
     contentController: contentDeps.contentController,
     cartController: cartDeps.cartController,
     enrollmentController: enrollmentDeps.enrollmentController,
+    paymentController: paymentDeps.paymentController,
   };
 };

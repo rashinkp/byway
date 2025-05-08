@@ -1,7 +1,11 @@
 import { IEnrollment } from "./enrollment.types";
 
 export interface IEnrollmentRepository {
-  createEnrollment(userId: string, courseId: string): Promise<IEnrollment>;
+  createEnrollment(
+    userId: string,
+    courseId: string,
+    orderItemId: string
+  ): Promise<IEnrollment>;
   findEnrollment(userId: string, courseId: string): Promise<IEnrollment | null>;
   updateAccessStatus(
     userId: string,

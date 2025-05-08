@@ -1,15 +1,13 @@
-import { NextFunction, Request, Response } from "express";
 import { EnrollmentService } from "./enrollment.service";
 import { StatusCodes } from "http-status-codes";
 import { ApiResponse } from "../../types/response";
 import { z } from "zod";
 import { AppError } from "../../utils/appError";
 import { logger } from "../../utils/logger";
-import { CreateEnrollmentSchema, GetEnrollmentSchema } from "./enrollment.validators";
-
-interface AuthenticatedRequest extends Request {
-  user?: { id: string; email: string; role: string };
-}
+import {
+  CreateEnrollmentSchema,
+  GetEnrollmentSchema,
+} from "./enrollment.validators";
 
 export class EnrollmentController {
   constructor(private enrollmentService: EnrollmentService) {}
@@ -17,10 +15,11 @@ export class EnrollmentController {
   async createEnrollment(input: unknown): Promise<ApiResponse> {
     try {
       const validatedInput = CreateEnrollmentSchema.parse(input);
-      const { userId, courseId } = validatedInput;
+      const { userId, courseId, orderItemId } = validatedInput;
       const enrollment = await this.enrollmentService.createEnrollment(
         userId,
-        courseId
+        courseId,
+        orderItemId
       );
       return {
         status: "success",

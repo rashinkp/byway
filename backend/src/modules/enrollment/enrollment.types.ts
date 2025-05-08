@@ -3,7 +3,7 @@ export interface IEnrollment {
   courseId: string;
   enrolledAt: Date;
   accessStatus: "ACTIVE" | "BLOCKED" | "EXPIRED";
-  orderId?: string | null;
+  orderItemId?: string | null;
   createdAt: Date;
   updatedAt: Date;
 }
