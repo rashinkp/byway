@@ -37,6 +37,7 @@ import {
   initializePaymentDependencies,
   PaymentDependencies,
 } from "./paymentDependencies";
+import { initializeTransactionHistoryDependencies, TransactionHistoryDependencies } from "./transactionDependacies";
 
 export interface AppDependencies {
   authController: AuthDependencies["authController"];
@@ -50,6 +51,7 @@ export interface AppDependencies {
   cartController: CartDependencies["cartController"];
   enrollmentController: EnrollmentDependencies["enrollmentController"];
   paymentController: PaymentDependencies["paymentController"];
+  transactionHistoryController: TransactionHistoryDependencies["transactionHistoryController"];
 }
 
 export const initializeAppDependencies = (
@@ -89,9 +91,6 @@ export const initializeAppDependencies = (
     userDeps.userService,
     courseDeps.courseService
   );
-
-
-  // Initialize EnrollmentDependencies and PaymentDependencies without circular dependencies
   const enrollmentDeps = initializeEnrollmentDependencies(
     dbProvider,
     userDeps.userService,
@@ -102,6 +101,12 @@ export const initializeAppDependencies = (
     userDeps.userService,
     courseDeps.courseService,
   );
+
+   const transactionHistoryDeps = initializeTransactionHistoryDependencies(
+     dbProvider,
+     paymentDeps.paymentService,
+     userDeps.userService
+   );
 
   // Inject dependent services to break circular dependency
   enrollmentDeps.setPaymentService(paymentDeps.paymentService);
@@ -119,5 +124,7 @@ export const initializeAppDependencies = (
     cartController: cartDeps.cartController,
     enrollmentController: enrollmentDeps.enrollmentController,
     paymentController: paymentDeps.paymentController,
+    transactionHistoryController:
+      transactionHistoryDeps.transactionHistoryController,
   };
 };
