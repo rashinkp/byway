@@ -1,87 +1,171 @@
+"use client";
 
-'use client'
-import { useState } from "react";
+import { useState, useMemo, useCallback, JSX } from "react";
+import { useSearchParams } from "next/navigation";
 import {
   CreditCard,
-  Calendar,
-  User,
-  BookOpen,
   CheckCircle,
   Lock,
   ChevronRight,
   ShoppingCart,
+  DollarSign,
 } from "lucide-react";
+import { useCart } from "@/hooks/cart/useCart";
+import { useCreateOrder } from "@/hooks/order/useOrder";
+import { ICart, Course } from "@/types/cart";
+import { toast } from "sonner";
+import { useGetCourseById } from "@/hooks/course/useGetCourseById";
 
-// Mock data for course
-const courseData = {
-  title: "Complete Web Development Bootcamp",
-  description: "Master HTML, CSS, JavaScript, React, Node.js and more",
-  price: 129.99,
-  discountPrice: 89.99,
-  duration: "12 weeks",
-  lessons: 85,
-};
-
-// Define TypeScript interfaces
-interface PaymentDetails {
-  cardNumber: string;
-  cardholderName: string;
-  expiryDate: string;
-  cvv: string;
+interface PaymentMethod {
+  id: "razorpay" | "paypal" | "stripe";
+  name: string;
+  icon: JSX.Element;
 }
 
-interface BillingDetails {
-  firstName: string;
-  lastName: string;
-  email: string;
-  address: string;
-  city: string;
-  zipCode: string;
-  country: string;
-}
+const paymentMethods: PaymentMethod[] = [
+  {
+    id: "razorpay",
+    name: "Razorpay",
+    icon: <CreditCard size={20} className="text-blue-700" />,
+  },
+  {
+    id: "paypal",
+    name: "PayPal",
+    icon: <DollarSign size={20} className="text-blue-700" />,
+  },
+  {
+    id: "stripe",
+    name: "Stripe",
+    icon: <CreditCard size={20} className="text-blue-700" />,
+  },
+];
 
 export default function CheckoutPage() {
+  const searchParams = useSearchParams();
+  const courseId = searchParams.get("courseId"); // For direct purchase
+  const { data: cartData, isLoading: cartLoading } = useCart();
+  const { data: singleCourse, isLoading: courseLoading } = useGetCourseById(courseId as string);
+  const { mutate: createOrder, isPending } = useCreateOrder();
   const [activeStep, setActiveStep] = useState(1);
-  const [paymentDetails, setPaymentDetails] = useState<PaymentDetails>({
-    cardNumber: "",
-    cardholderName: "",
-    expiryDate: "",
-    cvv: "",
-  });
-  const [billingDetails, setBillingDetails] = useState<BillingDetails>({
-    firstName: "",
-    lastName: "",
-    email: "",
-    address: "",
-    city: "",
-    zipCode: "",
-    country: "United States",
-  });
+  const [selectedPaymentMethod, setSelectedPaymentMethod] =
+    useState<PaymentMethod["id"]>("razorpay");
   const [orderComplete, setOrderComplete] = useState(false);
+  const [courseIds, setCourseIds] = useState<string[]>([]);
+  const [couponCode, setCouponCode] = useState<string>("");
 
-  const handlePaymentChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setPaymentDetails((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-  };
+  // Memoize courseIds to prevent unnecessary updates
+  useMemo(() => {
+    if (courseId) {
+      setCourseIds([courseId]);
+    } else if (cartData?.items) {
+      const ids = cartData.items.map((item: ICart) => item.courseId);
+      setCourseIds(ids);
+    } else {
+      setCourseIds([]);
+    }
+  }, [courseId, cartData?.items]);
 
-  const handleBillingChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
-  ) => {
-    const { name, value } = e.target;
-    setBillingDetails((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-  };
+  // Calculate total price and course details
+  const { totalOriginalPrice, totalDiscountedPrice, courseDetails } =
+    useMemo(() => {
+      if (courseId && singleCourse) {
+        const price =
+          typeof singleCourse.price === "string"
+            ? parseFloat(singleCourse.price)
+            : singleCourse.price;
+        const offer =
+          typeof singleCourse.offer === "string"
+            ? parseFloat(singleCourse.offer)
+            : singleCourse.offer;
+        return {
+          totalOriginalPrice: price,
+          totalDiscountedPrice: offer,
+          courseDetails: [singleCourse],
+        };
+      } else if (cartData?.items) {
+        const courses = cartData.items
+          .map((item: ICart) => item.course)
+          .filter((course): course is Course => !!course)
+          .map((course) => ({
+            ...course,
+            price:
+              typeof course.price === "string"
+                ? parseFloat(course.price)
+                : course.price,
+            offer:
+              typeof course.offer === "string"
+                ? parseFloat(course.offer)
+                : course.offer,
+          }));
+        const totalOriginal = courses.reduce(
+          (sum, course) => sum + course.price,
+          0
+        );
+        const totalDiscounted = courses.reduce(
+          (sum, course) => sum + course.offer,
+          0
+        );
+        return {
+          totalOriginalPrice: totalOriginal,
+          totalDiscountedPrice: totalDiscounted,
+          courseDetails: courses,
+        };
+      }
+      return {
+        totalOriginalPrice: 0,
+        totalDiscountedPrice: 0,
+        courseDetails: [],
+      };
+    }, [courseId, singleCourse, cartData?.items]);
 
-  const handleSubmit = (e: React.MouseEvent) => {
-    e.preventDefault();
-    // Process payment
-    setOrderComplete(true);
-  };
+  const handlePaymentMethodSelect = useCallback(
+    (methodId: PaymentMethod["id"]) => {
+      setSelectedPaymentMethod(methodId);
+    },
+    []
+  );
+
+  const handleSubmit = useCallback(
+    (e: React.MouseEvent) => {
+      e.preventDefault();
+      if (!courseIds.length) {
+        toast.error("No courses selected for purchase");
+        return;
+      }
+
+      createOrder(
+        { courseIds, couponCode },
+        {
+          onSuccess: (order) => {
+            // Simulate payment processing (replace with actual gateway integration)
+            switch (selectedPaymentMethod) {
+              case "razorpay":
+                console.log("Initiating Razorpay payment for order:", order.id);
+                // TODO: Initialize Razorpay SDK
+                break;
+              case "paypal":
+                console.log("Initiating PayPal payment for order:", order.id);
+                // TODO: Initialize PayPal SDK
+                break;
+              case "stripe":
+                console.log("Initiating Stripe payment for order:", order.id);
+                // TODO: Initialize Stripe SDK
+                break;
+            }
+            setOrderComplete(true);
+            setActiveStep(2);
+            toast.success("Order created successfully!");
+          },
+          onError: (error) => {
+            toast.error(error.message);
+          },
+        }
+      );
+    },
+    [courseIds, couponCode, createOrder, selectedPaymentMethod]
+  );
+
+  const isLoading = cartLoading || courseLoading;
 
   return (
     <div className="min-h-screen bg-gray-50 py-8">
@@ -92,7 +176,7 @@ export default function CheckoutPage() {
             Complete Your Purchase
           </h1>
           <p className="text-gray-600 mt-2">
-            You're just a few steps away from accessing your course
+            You're just a few steps away from accessing your course(s)
           </p>
         </div>
 
@@ -118,7 +202,7 @@ export default function CheckoutPage() {
                 >
                   1
                 </div>
-                Billing
+                Payment
               </div>
               <div
                 className={`flex-1 text-center ${
@@ -136,24 +220,6 @@ export default function CheckoutPage() {
                 >
                   2
                 </div>
-                Payment
-              </div>
-              <div
-                className={`flex-1 text-center ${
-                  activeStep >= 3
-                    ? "text-blue-700 font-medium"
-                    : "text-gray-400"
-                }`}
-              >
-                <div
-                  className={`w-8 h-8 mx-auto mb-2 rounded-full flex items-center justify-center ${
-                    activeStep >= 3
-                      ? "bg-blue-700 text-white"
-                      : "bg-gray-200 text-gray-500"
-                  }`}
-                >
-                  3
-                </div>
                 Confirmation
               </div>
             </div>
@@ -168,284 +234,121 @@ export default function CheckoutPage() {
                 </h2>
                 <p className="text-gray-600 mb-6">
                   Your payment was successful. You now have access to your
-                  course.
+                  course(s).
                 </p>
-                <button className="bg-blue-700 hover:bg-blue-800 text-white py-3 px-8 rounded-md font-medium transition duration-300">
+                <button
+                  className="bg-blue-700 hover:bg-blue-800 text-white py-3 px-8 rounded-md font-medium transition duration-300"
+                  onClick={() => (window.location.href = "/courses")}
+                >
                   Start Learning Now
                 </button>
               </div>
             ) : (
-              <div>
-                {activeStep === 1 && (
-                  <div className="space-y-6">
-                    <h2 className="text-xl font-semibold text-gray-800 mb-4">
-                      Billing Information
-                    </h2>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                          First Name
-                        </label>
-                        <input
-                          type="text"
-                          name="firstName"
-                          value={billingDetails.firstName}
-                          onChange={handleBillingChange}
-                          className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                          required
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                          Last Name
-                        </label>
-                        <input
-                          type="text"
-                          name="lastName"
-                          value={billingDetails.lastName}
-                          onChange={handleBillingChange}
-                          className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                          required
-                        />
-                      </div>
-                      <div className="md:col-span-2">
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                          Email Address
-                        </label>
-                        <input
-                          type="email"
-                          name="email"
-                          value={billingDetails.email}
-                          onChange={handleBillingChange}
-                          className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                          required
-                        />
-                      </div>
-                      <div className="md:col-span-2">
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                          Address
-                        </label>
-                        <input
-                          type="text"
-                          name="address"
-                          value={billingDetails.address}
-                          onChange={handleBillingChange}
-                          className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                          required
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                          City
-                        </label>
-                        <input
-                          type="text"
-                          name="city"
-                          value={billingDetails.city}
-                          onChange={handleBillingChange}
-                          className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                          required
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                          ZIP Code
-                        </label>
-                        <input
-                          type="text"
-                          name="zipCode"
-                          value={billingDetails.zipCode}
-                          onChange={handleBillingChange}
-                          className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                          required
-                        />
-                      </div>
-                      <div className="md:col-span-2">
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                          Country
-                        </label>
-                        <select
-                          name="country"
-                          value={billingDetails.country}
-                          onChange={handleBillingChange}
-                          className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                          required
-                        >
-                          <option value="United States">United States</option>
-                          <option value="Canada">Canada</option>
-                          <option value="United Kingdom">United Kingdom</option>
-                          <option value="Australia">Australia</option>
-                          <option value="Germany">Germany</option>
-                          <option value="France">France</option>
-                        </select>
-                      </div>
-                    </div>
-                    <div className="mt-8 flex justify-end">
-                      <button
-                        type="button"
-                        onClick={() => setActiveStep(2)}
-                        className="flex items-center bg-blue-700 hover:bg-blue-800 text-white py-3 px-8 rounded-md font-medium transition duration-300"
-                      >
-                        Continue to Payment{" "}
-                        <ChevronRight className="ml-2" size={16} />
-                      </button>
-                    </div>
-                  </div>
-                )}
+              <div className="space-y-6">
+                <h2 className="text-xl font-semibold text-gray-800 mb-4">
+                  Select Payment Method
+                </h2>
+                <div className="bg-blue-50 border border-blue-200 rounded-md p-4 mb-6 flex items-center">
+                  <Lock className="text-blue-700 mr-3" size={20} />
+                  <span className="text-sm text-blue-800">
+                    Your payment information is secure and encrypted
+                  </span>
+                </div>
 
-                {activeStep === 2 && (
-                  <div className="space-y-6">
-                    <h2 className="text-xl font-semibold text-gray-800 mb-4">
-                      Payment Details
-                    </h2>
-                    <div className="bg-blue-50 border border-blue-200 rounded-md p-4 mb-6 flex items-center">
-                      <Lock className="text-blue-700 mr-3" size={20} />
-                      <span className="text-sm text-blue-800">
-                        Your payment information is secure and encrypted
-                      </span>
-                    </div>
-
-                    <div className="space-y-4">
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                          Card Number
-                        </label>
-                        <div className="relative">
-                          <input
-                            type="text"
-                            name="cardNumber"
-                            value={paymentDetails.cardNumber}
-                            onChange={handlePaymentChange}
-                            placeholder="1234 5678 9012 3456"
-                            className="w-full pl-12 pr-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                            required
-                          />
-                          <CreditCard
-                            className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400"
-                            size={18}
-                          />
-                        </div>
+                {/* Payment Methods */}
+                <div className="space-y-4">
+                  {paymentMethods.map((method) => (
+                    <label
+                      key={method.id}
+                      className={`flex items-center p-4 border rounded-md cursor-pointer transition duration-200 ${
+                        selectedPaymentMethod === method.id
+                          ? "border-blue-500 bg-blue-50"
+                          : "border-gray-300"
+                      }`}
+                    >
+                      <input
+                        type="radio"
+                        name="paymentMethod"
+                        value={method.id}
+                        checked={selectedPaymentMethod === method.id}
+                        onChange={() => handlePaymentMethodSelect(method.id)}
+                        className="mr-3 text-blue-700 focus:ring-blue-500"
+                      />
+                      <div className="flex items-center">
+                        {method.icon}
+                        <span className="ml-2 text-gray-800">
+                          {method.name}
+                        </span>
                       </div>
+                    </label>
+                  ))}
+                </div>
 
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                          Cardholder Name
-                        </label>
-                        <div className="relative">
-                          <input
-                            type="text"
-                            name="cardholderName"
-                            value={paymentDetails.cardholderName}
-                            onChange={handlePaymentChange}
-                            placeholder="John Smith"
-                            className="w-full pl-12 pr-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                            required
-                          />
-                          <User
-                            className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400"
-                            size={18}
-                          />
-                        </div>
-                      </div>
+                {/* Coupon Code */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Coupon Code
+                  </label>
+                  <input
+                    type="text"
+                    value={couponCode}
+                    onChange={(e) => setCouponCode(e.target.value)}
+                    placeholder="Enter coupon code"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  />
+                </div>
 
-                      <div className="grid grid-cols-2 gap-4">
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-1">
-                            Expiry Date
-                          </label>
-                          <div className="relative">
-                            <input
-                              type="text"
-                              name="expiryDate"
-                              value={paymentDetails.expiryDate}
-                              onChange={handlePaymentChange}
-                              placeholder="MM/YY"
-                              className="w-full pl-12 pr-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                              required
-                            />
-                            <Calendar
-                              className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400"
-                              size={18}
-                            />
-                          </div>
-                        </div>
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-1">
-                            CVV
-                          </label>
-                          <div className="relative">
-                            <input
-                              type="text"
-                              name="cvv"
-                              value={paymentDetails.cvv}
-                              onChange={handlePaymentChange}
-                              placeholder="123"
-                              className="w-full pl-12 pr-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                              required
-                            />
-                            <CreditCard
-                              className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400"
-                              size={18}
-                            />
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="mt-8 flex justify-between">
-                      <button
-                        type="button"
-                        onClick={() => setActiveStep(1)}
-                        className="text-blue-700 hover:text-blue-800 py-3 px-6 font-medium transition duration-300"
-                      >
-                        Back
-                      </button>
-                      <button
-                        type="button"
-                        onClick={handleSubmit}
-                        className="bg-blue-700 hover:bg-blue-800 text-white py-3 px-8 rounded-md font-medium transition duration-300"
-                      >
-                        Complete Purchase
-                      </button>
-                    </div>
-                  </div>
-                )}
+                <div className="mt-8 flex justify-end">
+                  <button
+                    type="button"
+                    onClick={handleSubmit}
+                    disabled={isPending || isLoading || !courseIds.length}
+                    className="bg-blue-700 hover:bg-blue-800 text-white py-3 px-8 rounded-md font-medium transition duration-300 disabled:bg-gray-400"
+                  >
+                    {isPending ? "Processing..." : "Complete Purchase"}
+                    <ChevronRight className="ml-2 inline" size={16} />
+                  </button>
+                </div>
               </div>
             )}
           </div>
 
-          {/* Order summary */}
+          {/* Order Summary */}
           <div className="w-full lg:w-1/3">
             <div className="bg-white rounded-lg shadow-md p-6 sticky top-6">
               <h2 className="text-xl font-semibold text-gray-800 mb-4">
                 Order Summary
               </h2>
 
-              <div className="flex items-start mb-4 pb-4 border-b border-gray-200">
-                <div className="bg-blue-100 rounded-md p-2 mr-4">
-                  <BookOpen className="text-blue-700" size={24} />
-                </div>
-                <div>
-                  <h3 className="font-medium text-gray-800">
-                    {courseData.title}
-                  </h3>
-                  <p className="text-sm text-gray-600">
-                    {courseData.description}
-                  </p>
-                </div>
+              <div className="mb-4 pb-4 border-b border-gray-200">
+                {courseDetails.map((course) => (
+                  <div key={course.id} className="flex items-start mb-4">
+                    <div className="bg-blue-100 rounded-md p-2 mr-4">
+                      <ShoppingCart className="text-blue-700" size={24} />
+                    </div>
+                    <div>
+                      <h3 className="font-medium text-gray-800">
+                        {course.title}
+                      </h3>
+                      <p className="text-sm text-gray-600">
+                        {course.level} Level
+                      </p>
+                    </div>
+                  </div>
+                ))}
               </div>
 
               <div className="mb-4">
                 <div className="flex items-center justify-between py-2">
-                  <span className="text-gray-600">Course Price</span>
+                  <span className="text-gray-600">Original Price</span>
                   <span className="text-gray-800 line-through">
-                    ${courseData.price}
+                    ${(totalOriginalPrice || 0).toFixed(2)}
                   </span>
                 </div>
                 <div className="flex items-center justify-between py-2">
                   <span className="text-gray-600">Discounted Price</span>
                   <span className="text-blue-700 font-semibold">
-                    ${courseData.discountPrice}
+                    ${(totalDiscountedPrice|| 0).toFixed(2)}
                   </span>
                 </div>
               </div>
@@ -453,12 +356,8 @@ export default function CheckoutPage() {
               <div className="mb-4 pb-4 border-b border-gray-200">
                 <div className="flex items-center justify-between py-2">
                   <span className="text-gray-600">Course Duration</span>
-                  <span className="text-gray-800">{courseData.duration}</span>
-                </div>
-                <div className="flex items-center justify-between py-2">
-                  <span className="text-gray-600">Total Lessons</span>
                   <span className="text-gray-800">
-                    {courseData.lessons} lessons
+                    {courseDetails[0]?.duration || "Varies"}
                   </span>
                 </div>
               </div>
@@ -466,7 +365,7 @@ export default function CheckoutPage() {
               <div className="flex items-center justify-between py-3 font-semibold">
                 <span className="text-gray-800">Total</span>
                 <span className="text-xl text-blue-700">
-                  ${courseData.discountPrice}
+                  ${(totalDiscountedPrice || 0).toFixed(2)}
                 </span>
               </div>
 

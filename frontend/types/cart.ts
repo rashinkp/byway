@@ -2,8 +2,8 @@ export interface Course {
   id: string;
   title: string;
   image: string;
-  price: number | string; 
-  offer: number | string; 
+  price: number | string;
+  offer: number | string;
   duration: string;
   lectures: number;
   level: string;
@@ -12,6 +12,7 @@ export interface Course {
     name: string;
   };
 }
+
 export interface ICart {
   id: string;
   userId: string;

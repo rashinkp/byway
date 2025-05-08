@@ -235,17 +235,19 @@ export default function CartPage() {
                   <span>${calculateTotal().toFixed(2)}</span>
                 </div>
 
-                <button
-                  className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-4 rounded-md mt-6 flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
-                  disabled={
+                <Link
+                  href="/user/checkout"
+                  className={`w-full bg-blue-600 text-white font-medium py-3 px-4 rounded-md mt-6 flex items-center justify-center ${
                     cart?.length === 0 ||
                     clearCartMutation.isPending ||
                     removeFromCartMutation.isPending
-                  }
+                      ? "opacity-50 cursor-not-allowed"
+                      : "hover:bg-blue-700"
+                  }`}
                 >
                   Proceed to Checkout
                   <ChevronRight size={18} className="ml-1" />
-                </button>
+                </Link>
 
                 <div className="mt-6 text-center text-sm text-gray-500">
                   <p>
