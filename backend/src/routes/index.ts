@@ -11,6 +11,7 @@ import { createContentRouter } from "../modules/content/content.routes";
 import { createCartRouter } from "../modules/cart/cart.routes";
 import { createEnrollmentRouter } from "../modules/enrollment/enrollment.routes";
 import { createPaymentRouter } from "../modules/order/order.routes";
+import { createPaypalRouter } from "../modules/paypal/paypal.routes";
 
 export const configureRoutes = (
   app: Express,
@@ -40,6 +41,10 @@ export const configureRoutes = (
   );
   app.use(
     "/api/v1/payments",
-    createPaymentRouter(dependencies.paymentController)
+    createPaymentRouter(dependencies.orderController)
   );
+    app.use(
+      "/api/v1/paypal",
+      createPaypalRouter(dependencies.paypalController)
+    );
 };

@@ -12,6 +12,8 @@
   "type": "commonjs",
   "description": "",
   "dependencies": {
+    "@paypal/checkout-server-sdk": "^1.0.3",
+    "@paypal/paypal-server-sdk": "^1.0.0",
     "@prisma/client": "^6.7.0",
     "@types/cookie-parser": "^1.4.8",
     "@types/jsonwebtoken": "^9.0.9",
@@ -40,6 +42,7 @@
     "@types/cors": "^2.8.17",
     "@types/express": "^5.0.1",
     "@types/node": "^22.13.17",
+    "@types/paypal__checkout-server-sdk": "^1.0.8",
     "nodemon": "^3.1.9",
     "prisma": "^6.7.0",
     "prisma-import": "^1.0.5",

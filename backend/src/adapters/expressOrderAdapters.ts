@@ -18,7 +18,7 @@ const asyncHandler = (
     Promise.resolve(fn(req as AuthenticatedRequest, res, next)).catch(next);
 };
 
-export const adaptPaymentController = (controller: OrderController) => ({
+export const adaptOrderController = (controller: OrderController) => ({
   createOrder: asyncHandler(
     async (req: AuthenticatedRequest, res: Response) => {
       if (!req.user) {
