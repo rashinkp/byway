@@ -1,14 +1,24 @@
+"use client";
+import { useRouter } from "next/navigation";
 import { Skeleton } from "@/components/ui/skeleton";
+import { User } from "@/types/user";
+import { useAddToCart } from "@/hooks/cart/useAddToCart";
 
 interface CourseSidebarProps {
   course: any;
   isLoading: boolean;
+  handleAddToCart: () => void
+  isCartLoading: boolean;
 }
 
 export default function CourseSidebar({
   course,
   isLoading,
+  handleAddToCart,
+  isCartLoading
 }: CourseSidebarProps) {
+
+
   if (isLoading) {
     return (
       <div className="sticky top-4 border rounded-lg overflow-hidden shadow-md">
@@ -41,10 +51,23 @@ export default function CourseSidebar({
             <span className="text-gray-500 line-through">${course?.price}</span>
           </div>
         </div>
-        <button className="w-full bg-blue-600 text-white font-medium py-3 rounded mb-2 hover:bg-blue-700 transition">
-          Add To Cart
+        <button
+          onClick={handleAddToCart}
+          disabled={isCartLoading}
+          className={`w-full bg-blue-600 text-white font-medium py-3 rounded mb-2 transition ${
+            isCartLoading
+              ? "opacity-50 cursor-not-allowed"
+              : "hover:bg-blue-700"
+          }`}
+        >
+          {isCartLoading ? "Adding..." : "Add To Cart"}
         </button>
-        <button className="w-full border border-gray-300 text-gray-800 font-medium py-3 rounded hover:bg-gray-50 transition">
+        <button
+          disabled={isCartLoading}
+          className={`w-full border border-gray-300 text-gray-800 font-medium py-3 rounded transition ${
+            isCartLoading ? "opacity-50 cursor-not-allowed" : "hover:bg-gray-50"
+          }`}
+        >
           Buy Now
         </button>
       </div>

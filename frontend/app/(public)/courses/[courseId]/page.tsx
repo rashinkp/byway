@@ -12,10 +12,15 @@ import CourseDescription from "@/components/course/courseDetail/CourseDescriptio
 import CourseInstructor from "@/components/course/courseDetail/CourseInstructor";
 import CourseSyllabus from "@/components/course/courseDetail/CourseSyllabus";
 import CourseSidebar from "@/components/course/courseDetail/CourseSidebar";
+import { useAuth } from "@/hooks/auth/useAuth";
+import { useRouter } from "next/navigation";
+import { useAddToCart } from "@/hooks/cart/useAddToCart";
 
 export default function CourseDetail() {
+  const router = useRouter();
   const [activeTab, setActiveTab] = useState("description");
   const { courseId } = useParams();
+  const { user , isLoading:userLoading} = useAuth();
   const {
     data: course,
     isLoading: courseLoading,
@@ -31,6 +36,20 @@ export default function CourseDetail() {
     isLoading: instructorLoading,
     error: instructorError,
   } = useGetPublicUser(course?.createdBy as string);
+
+    const { mutate: addToCart, isPending: isCartLoading } = useAddToCart();
+
+    const handleAddToCart = () => {
+      if (!user) {
+        router.push("/login");
+        return;
+      }
+      if (course?.id) {
+        addToCart({ courseId: course.id });
+      }
+  };
+  
+
 
   if (courseError || instructorError || lessonError) {
     return (
@@ -85,7 +104,9 @@ export default function CourseDetail() {
         <div className="lg:w-1/4">
           <CourseSidebar
             course={course}
-            isLoading={courseLoading}
+            isLoading={courseLoading || userLoading}
+            isCartLoading = {isCartLoading}
+            handleAddToCart={handleAddToCart}
           />
         </div>
       </div>

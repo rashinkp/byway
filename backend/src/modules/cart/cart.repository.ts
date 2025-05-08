@@ -13,6 +13,56 @@ export class CartRepository implements ICartRepository {
 
   async createCart(input: ICreateCartInput): Promise<ICart> {
     const { userId, courseId } = input;
+
+    // Check for existing cart item (including deleted ones)
+    const existingCartItem = await this.prisma.cart.findUnique({
+      where: {
+        userId_courseId: { userId, courseId },
+      },
+      select: {
+        id: true,
+        userId: true,
+        courseId: true,
+        createdAt: true,
+        updatedAt: true,
+        deletedAt: true,
+      },
+    });
+
+    if (existingCartItem) {
+      // If the item exists and is deleted, "undelete" it
+      if (existingCartItem.deletedAt) {
+        const updatedCartItem = await this.prisma.cart.update({
+          where: {
+            userId_courseId: { userId, courseId },
+          },
+          data: {
+            deletedAt: null,
+            updatedAt: new Date(),
+          },
+          select: {
+            id: true,
+            userId: true,
+            courseId: true,
+            createdAt: true,
+            updatedAt: true,
+            deletedAt: true,
+          },
+        });
+        return {
+          id: updatedCartItem.id,
+          userId: updatedCartItem.userId,
+          courseId: updatedCartItem.courseId,
+          createdAt: updatedCartItem.createdAt,
+          updatedAt: updatedCartItem.updatedAt,
+          deletedAt: updatedCartItem.deletedAt || null,
+        };
+      }
+      // If the item exists and is not deleted, throw an error
+      throw new Error("Cart item already exists");
+    }
+
+    // Create new cart item if none exists
     const cartItem = await this.prisma.cart.create({
       data: {
         userId,
@@ -54,13 +104,23 @@ export class CartRepository implements ICartRepository {
         skip,
         take: limit,
         orderBy: { createdAt: "desc" },
-        select: {
-          id: true,
-          userId: true,
-          courseId: true,
-          createdAt: true,
-          updatedAt: true,
-          deletedAt: true,
+        include: {
+          course: {
+            select: {
+              id: true,
+              title: true,
+              price: true,
+              offer: true,
+              thumbnail: true,
+              description: true,
+              duration: true,
+              creator: {
+                select: {
+                  name: true,
+                },
+              },
+            },
+          },
         },
       }),
       this.prisma.cart.count({ where }),
@@ -74,6 +134,18 @@ export class CartRepository implements ICartRepository {
         createdAt: item.createdAt,
         updatedAt: item.updatedAt,
         deletedAt: item.deletedAt || null,
+        course: {
+          id: item.course.id,
+          title: item.course.title,
+          price: item.course.price,
+          offer: item.course.offer,
+          thumbnail: item.course.thumbnail,
+          description: item.course.description,
+          duration: item.course.duration?.toString(),
+          creator: {
+            name: item.course.creator.name,
+          },
+        },
       })),
       total,
     };

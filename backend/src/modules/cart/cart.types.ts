@@ -1,3 +1,19 @@
+
+
+
+interface Course {
+    id: string;
+    title: string;
+    price: number;
+    originalPrice: number;
+  description: string;
+  thumbnail?: string;
+    duration: string;
+    creator: {
+      name: string;
+    };
+}
+
 export interface ICart {
   id: string;
   userId: string;
@@ -6,6 +22,18 @@ export interface ICart {
   updatedAt: Date;
   deletedAt?: Date | null;
 }
+
+
+export interface ICartWithCourse {
+  id: string;
+  userId: string;
+  courseId: string;
+  createdAt: Date;
+  updatedAt: Date;
+  deletedAt?: Date | null;
+  course?: Course
+}
+
 
 export interface ICreateCartInput {
   courseId: string;

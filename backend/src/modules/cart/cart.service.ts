@@ -9,15 +9,19 @@ import {
   IRemoveCartItemInput,
   IClearCartInput,
 } from "./cart.types";
-
 import { UserService } from "../user/user.service";
-import { Role } from "@prisma/client";
-import { CourseService } from "../course/course.service"; // Assuming CourseService exists
-import { clearCartSchema, createCartSchema, getCartSchema, removeCartItemSchema } from "./cart.validations";
+import { CourseService } from "../course/course.service";
+import {
+  clearCartSchema,
+  createCartSchema,
+  getCartSchema,
+  removeCartItemSchema,
+} from "./cart.validations";
+import { ICartRepository } from "./cart.repository.interface";
 
 export class CartService {
   constructor(
-    private cartRepository: CartRepository,
+    private cartRepository: ICartRepository,
     private userService: UserService,
     private courseService: CourseService
   ) {}
@@ -45,7 +49,7 @@ export class CartService {
     }
 
     // Validate course exists and is published
-    const course = await this.courseService.getCourseById(courseId); // Assuming CourseService has this method
+    const course = await this.courseService.getCourseById(courseId);
     if (!course || course.status !== "PUBLISHED") {
       logger.warn("Course not found or not published", { courseId });
       throw new AppError(
@@ -55,24 +59,20 @@ export class CartService {
       );
     }
 
-    // Check for existing cart item
-    const existingCartItem = await this.cartRepository.getCartItemByCourseId(
-      userId,
-      courseId
-    );
-    if (existingCartItem && !existingCartItem.deletedAt) {
-      logger.warn("Course already in cart", { userId, courseId });
-      throw new AppError(
-        "Course is already in your cart",
-        StatusCodes.BAD_REQUEST,
-        "ALREADY_EXISTS"
-      );
-    }
-
     try {
       return await this.cartRepository.createCart(parsedInput.data);
     } catch (error) {
       logger.error("Error creating cart item", { error, input });
+       if (
+         error instanceof Error &&
+         error.message === "Cart item already exists"
+       ) {
+         throw new AppError(
+           "Course is already in your cart",
+           StatusCodes.BAD_REQUEST,
+           "ALREADY_EXISTS"
+         );
+       }
       throw error instanceof AppError
         ? error
         : new AppError(

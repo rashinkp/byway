@@ -1,3 +1,17 @@
+export interface Course {
+  id: string;
+  title: string;
+  image: string;
+  price: number | string; 
+  offer: number | string; 
+  duration: string;
+  lectures: number;
+  level: string;
+  thumbnail?: string;
+  creator: {
+    name: string;
+  };
+}
 export interface ICart {
   id: string;
   userId: string;
@@ -7,18 +21,7 @@ export interface ICart {
   deletedAt?: string | null;
   couponId?: string | null;
   discount?: number;
-}
-
-export interface Course {
-  id: string;
-  title: string;
-  instructor: string;
-  image: string;
-  price: number;
-  originalPrice: number;
-  duration: string;
-  lectures: number;
-  level: string;
+  course?: Course;
 }
 
 export interface ICartFormData {

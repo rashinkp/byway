@@ -33,7 +33,7 @@ export class CartController {
 
   async getCart(input: IGetCartInput): Promise<ApiResponse> {
     try {
-      const result = await this.cartService.getCart(input);
+      const result = await this.cartService.getCart(input);  
       return {
         status: "success",
         data: result,
