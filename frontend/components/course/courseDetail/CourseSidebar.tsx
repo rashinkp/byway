@@ -3,6 +3,7 @@ import { useRouter } from "next/navigation";
 import { Skeleton } from "@/components/ui/skeleton";
 import { User } from "@/types/user";
 import { useAddToCart } from "@/hooks/cart/useAddToCart";
+import Link from "next/link";
 
 interface CourseSidebarProps {
   course: any;
@@ -62,14 +63,14 @@ export default function CourseSidebar({
         >
           {isCartLoading ? "Adding..." : "Add To Cart"}
         </button>
-        <button
-          disabled={isCartLoading}
-          className={`w-full border border-gray-300 text-gray-800 font-medium py-3 rounded transition ${
+        <Link
+          href={`/user/checkout?courseId=${course.id}`}
+          className={`w-full border border-gray-300 text-gray-800 font-medium py-3 rounded transition block text-center ${
             isCartLoading ? "opacity-50 cursor-not-allowed" : "hover:bg-gray-50"
           }`}
         >
           Buy Now
-        </button>
+        </Link>
       </div>
     </div>
   );

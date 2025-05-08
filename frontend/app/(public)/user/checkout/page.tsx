@@ -273,7 +273,7 @@ export default function CheckoutPage() {
                         className="flex items-start border-b pb-4"
                       >
                         <div className="bg-blue-100 rounded-md p-2 mr-4">
-                          <ShoppingCart className="text-blue-700" size={24} />
+                          <img src={course.thumbnail || ''} alt="" className="w-20 h-20 object-cover"  />
                         </div>
                         <div className="flex-1">
                           <h3 className="font-medium text-gray-800">
@@ -304,12 +304,7 @@ export default function CheckoutPage() {
                         </div>
                       </div>
                     ))}
-                    <div className="flex items-center justify-between py-3 font-semibold">
-                      <span className="text-gray-800">Total</span>
-                      <span className="text-xl text-blue-700">
-                        ${(totalDiscountedPrice || 0).toFixed(2)}
-                      </span>
-                    </div>
+                    
                   </div>
                 )}
                 <div className="mt-8 flex justify-end">
