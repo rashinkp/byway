@@ -12,9 +12,9 @@ import {
 } from "lucide-react";
 import { useCart } from "@/hooks/cart/useCart";
 import { useCreateOrder } from "@/hooks/order/useOrder";
+import { useGetCourseById } from "@/hooks/course/useGetCourseById";
 import { ICart, Course } from "@/types/cart";
 import { toast } from "sonner";
-import { useGetCourseById } from "@/hooks/course/useGetCourseById";
 
 interface PaymentMethod {
   id: "razorpay" | "paypal" | "stripe";
@@ -44,7 +44,9 @@ export default function CheckoutPage() {
   const searchParams = useSearchParams();
   const courseId = searchParams.get("courseId"); // For direct purchase
   const { data: cartData, isLoading: cartLoading } = useCart();
-  const { data: singleCourse, isLoading: courseLoading } = useGetCourseById(courseId as string);
+  const { data: singleCourse, isLoading: courseLoading } = useGetCourseById(
+    courseId as string
+  );
   const { mutate: createOrder, isPending } = useCreateOrder();
   const [activeStep, setActiveStep] = useState(1);
   const [selectedPaymentMethod, setSelectedPaymentMethod] =
@@ -125,6 +127,14 @@ export default function CheckoutPage() {
     []
   );
 
+  const handleProceedToPayment = useCallback(() => {
+    if (!courseIds.length) {
+      toast.error("No courses selected for purchase");
+      return;
+    }
+    setActiveStep(2);
+  }, [courseIds]);
+
   const handleSubmit = useCallback(
     (e: React.MouseEvent) => {
       e.preventDefault();
@@ -153,7 +163,7 @@ export default function CheckoutPage() {
                 break;
             }
             setOrderComplete(true);
-            setActiveStep(2);
+            setActiveStep(3);
             toast.success("Order created successfully!");
           },
           onError: (error) => {
@@ -202,7 +212,7 @@ export default function CheckoutPage() {
                 >
                   1
                 </div>
-                Payment
+                Order Details
               </div>
               <div
                 className={`flex-1 text-center ${
@@ -220,30 +230,103 @@ export default function CheckoutPage() {
                 >
                   2
                 </div>
+                Payment
+              </div>
+              <div
+                className={`flex-1 text-center ${
+                  activeStep >= 3
+                    ? "text-blue-700 font-medium"
+                    : "text-gray-400"
+                }`}
+              >
+                <div
+                  className={`w-8 h-8 mx-auto mb-2 rounded-full flex items-center justify-center ${
+                    activeStep >= 3
+                      ? "bg-blue-700 text-white"
+                      : "bg-gray-200 text-gray-500"
+                  }`}
+                >
+                  3
+                </div>
                 Confirmation
               </div>
             </div>
 
-            {orderComplete ? (
-              <div className="text-center py-12">
-                <div className="flex justify-center mb-4">
-                  <CheckCircle size={64} className="text-green-500" />
-                </div>
-                <h2 className="text-2xl font-bold text-gray-800 mb-2">
-                  Order Confirmed!
+            {activeStep === 1 && (
+              <div className="space-y-6">
+                <h2 className="text-xl font-semibold text-gray-800 mb-4">
+                  Order Details
                 </h2>
-                <p className="text-gray-600 mb-6">
-                  Your payment was successful. You now have access to your
-                  course(s).
-                </p>
-                <button
-                  className="bg-blue-700 hover:bg-blue-800 text-white py-3 px-8 rounded-md font-medium transition duration-300"
-                  onClick={() => (window.location.href = "/courses")}
-                >
-                  Start Learning Now
-                </button>
+                {isLoading ? (
+                  <div className="text-center text-gray-600">
+                    Loading courses...
+                  </div>
+                ) : courseDetails.length === 0 ? (
+                  <div className="text-center text-gray-600">
+                    No courses selected
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    {courseDetails.map((course) => (
+                      <div
+                        key={course.id}
+                        className="flex items-start border-b pb-4"
+                      >
+                        <div className="bg-blue-100 rounded-md p-2 mr-4">
+                          <ShoppingCart className="text-blue-700" size={24} />
+                        </div>
+                        <div className="flex-1">
+                          <h3 className="font-medium text-gray-800">
+                            {course.title}
+                          </h3>
+                          <p className="text-sm text-gray-600">
+                            {course.level} Level
+                          </p>
+                          <p className="text-sm text-gray-600">
+                            Duration: {course.duration}
+                          </p>
+                          <div className="mt-2">
+                            <span className="text-gray-600 line-through">
+                              $
+                              {(typeof course?.price === "string"
+                                ? parseFloat(course.price)
+                                : course?.price ?? 0
+                              ).toFixed(2)}
+                            </span>
+                            <span className="ml-2 text-blue-700 font-semibold">
+                              $
+                              {(typeof course?.offer === "string"
+                                ? parseFloat(course.offer)
+                                : course?.offer ?? 0
+                              ).toFixed(2)}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                    <div className="flex items-center justify-between py-3 font-semibold">
+                      <span className="text-gray-800">Total</span>
+                      <span className="text-xl text-blue-700">
+                        ${(totalDiscountedPrice || 0).toFixed(2)}
+                      </span>
+                    </div>
+                  </div>
+                )}
+                <div className="mt-8 flex justify-end">
+                  <button
+                    type="button"
+                    onClick={handleProceedToPayment}
+                    disabled={isLoading || !courseIds.length}
+                    className="bg-blue-700 hover:bg-blue-800 text-white py-3 px-8 rounded-md font-medium transition duration-300 disabled:bg-gray-400"
+                  >
+                    Proceed to Payment
+                    <ChevronRight className="ml-2 inline" size={16} />
+                  </button>
+                </div>
               </div>
-            ) : (
+            )}
+
+            {activeStep === 2 && (
               <div className="space-y-6">
                 <h2 className="text-xl font-semibold text-gray-800 mb-4">
                   Select Payment Method
@@ -311,6 +394,27 @@ export default function CheckoutPage() {
                 </div>
               </div>
             )}
+
+            {activeStep === 3 && orderComplete && (
+              <div className="text-center py-12">
+                <div className="flex justify-center mb-4">
+                  <CheckCircle size={64} className="text-green-500" />
+                </div>
+                <h2 className="text-2xl font-bold text-gray-800 mb-2">
+                  Order Confirmed!
+                </h2>
+                <p className="text-gray-600 mb-6">
+                  Your payment was successful. You now have access to your
+                  course(s).
+                </p>
+                <button
+                  className="bg-blue-700 hover:bg-blue-800 text-white py-3 px-8 rounded-md font-medium transition duration-300"
+                  onClick={() => (window.location.href = "/courses")}
+                >
+                  Start Learning Now
+                </button>
+              </div>
+            )}
           </div>
 
           {/* Order Summary */}
@@ -319,24 +423,6 @@ export default function CheckoutPage() {
               <h2 className="text-xl font-semibold text-gray-800 mb-4">
                 Order Summary
               </h2>
-
-              <div className="mb-4 pb-4 border-b border-gray-200">
-                {courseDetails.map((course) => (
-                  <div key={course.id} className="flex items-start mb-4">
-                    <div className="bg-blue-100 rounded-md p-2 mr-4">
-                      <ShoppingCart className="text-blue-700" size={24} />
-                    </div>
-                    <div>
-                      <h3 className="font-medium text-gray-800">
-                        {course.title}
-                      </h3>
-                      <p className="text-sm text-gray-600">
-                        {course.level} Level
-                      </p>
-                    </div>
-                  </div>
-                ))}
-              </div>
 
               <div className="mb-4">
                 <div className="flex items-center justify-between py-2">
@@ -348,17 +434,15 @@ export default function CheckoutPage() {
                 <div className="flex items-center justify-between py-2">
                   <span className="text-gray-600">Discounted Price</span>
                   <span className="text-blue-700 font-semibold">
-                    ${(totalDiscountedPrice|| 0).toFixed(2)}
+                    ${(totalDiscountedPrice || 0).toFixed(2)}
                   </span>
                 </div>
               </div>
 
               <div className="mb-4 pb-4 border-b border-gray-200">
                 <div className="flex items-center justify-between py-2">
-                  <span className="text-gray-600">Course Duration</span>
-                  <span className="text-gray-800">
-                    {courseDetails[0]?.duration || "Varies"}
-                  </span>
+                  <span className="text-gray-600">Courses</span>
+                  <span className="text-gray-800">{courseDetails.length}</span>
                 </div>
               </div>
 
