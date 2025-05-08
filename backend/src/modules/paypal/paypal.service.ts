@@ -41,7 +41,7 @@ export class PaypalService {
     try {
       const PaypalClient = client();
       const request = new paypal.orders.OrdersCreateRequest();
-      request.headers["Prefer"] = "return=representation"; 
+      request.headers["Prefer"] = "return=representation";
       request.requestBody({
         intent: "CAPTURE",
         purchase_units: [
@@ -103,6 +103,7 @@ export class PaypalService {
 
     // Validate user exists
     const user = await this.userService.findUserById(userId);
+    
     if (!user) {
       logger.warn("User not found for order capture", { userId });
       throw new AppError("User not found", StatusCodes.NOT_FOUND, "NOT_FOUND");
