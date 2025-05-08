@@ -1,6 +1,6 @@
 import { PrismaClient } from "@prisma/client";
-import { IOrderRepository } from "./payment.repository.interface";
-import { IOrder } from "./payment.types";
+import { IOrderRepository } from "./order.repository.interface";
+import { IOrder } from "./order.types";
 
 export class OrderRepository implements IOrderRepository {
   constructor(private prisma: PrismaClient) {}

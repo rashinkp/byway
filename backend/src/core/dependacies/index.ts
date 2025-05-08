@@ -36,7 +36,7 @@ import {
 import {
   initializePaymentDependencies,
   PaymentDependencies,
-} from "./paymentDependencies";
+} from "./orderDependencies";
 import { initializeTransactionHistoryDependencies, TransactionHistoryDependencies } from "./transactionDependacies";
 
 export interface AppDependencies {

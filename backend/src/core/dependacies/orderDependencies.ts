@@ -1,41 +1,40 @@
 import { CourseService } from "../../modules/course/course.service";
 import { EnrollmentService } from "../../modules/enrollment/enrollment.service";
-import { PaymentController } from "../../modules/payment/payment.controller";
-import { OrderRepository } from "../../modules/payment/payment.repository";
-import { PaymentService } from "../../modules/payment/payment.service";
+import { OrderController } from "../../modules/order/order.controller";
+import { OrderRepository } from "../../modules/order/order.repository";
+import { OrderService } from "../../modules/order/order.service";
 import { UserService } from "../../modules/user/user.service";
 import { IDatabaseProvider } from "../database";
 
-
 export interface PaymentDependencies {
-  paymentService: PaymentService;
-  paymentController: PaymentController;
+  orderService: OrderService;
+  orderController: OrderController;
   setEnrollmentService: (enrollmentService: EnrollmentService) => void;
 }
 
 export const initializePaymentDependencies = (
   dbProvider: IDatabaseProvider,
   userService: UserService,
-  courseService: CourseService,
+  courseService: CourseService
 ): PaymentDependencies => {
   let enrollmentService: EnrollmentService | undefined;
 
   const orderRepository = new OrderRepository(dbProvider.getClient());
-  const paymentService = new PaymentService(
+  const orderService = new OrderService(
     orderRepository,
     userService,
     courseService,
-    enrollmentService!,
+    enrollmentService!
   );
-  const paymentController = new PaymentController(paymentService);
+  const orderController = new OrderController(orderService);
 
   return {
-    paymentService,
-    paymentController,
+    orderService,
+    orderController,
     setEnrollmentService: (service: EnrollmentService) => {
       enrollmentService = service;
       // Update PaymentService with the injected EnrollmentService
-      Object.assign(paymentService, { enrollmentService });
+      Object.assign(orderService, { enrollmentService });
     },
   };
 };

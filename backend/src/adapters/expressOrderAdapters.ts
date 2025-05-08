@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from "express";
-import { PaymentController } from "../modules/payment/payment.controller";
+import { OrderController } from "../modules/order/order.controller";
 import { AppError } from "../utils/appError";
 import { StatusCodes } from "http-status-codes";
 
@@ -18,7 +18,7 @@ const asyncHandler = (
     Promise.resolve(fn(req as AuthenticatedRequest, res, next)).catch(next);
 };
 
-export const adaptPaymentController = (controller: PaymentController) => ({
+export const adaptPaymentController = (controller: OrderController) => ({
   createOrder: asyncHandler(
     async (req: AuthenticatedRequest, res: Response) => {
       if (!req.user) {

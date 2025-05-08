@@ -1,4 +1,4 @@
-import { PaymentService } from "./payment.service";
+import { OrderService } from "./order.service";
 import { StatusCodes } from "http-status-codes";
 import { ApiResponse } from "../../types/response";
 import { z } from "zod";
@@ -7,16 +7,15 @@ import { logger } from "../../utils/logger";
 import {
   CreateOrderSchema,
   UpdateOrderStatusSchema,
-} from "./payment.validators";
+} from "./order.validators";
 
-export class PaymentController {
-  constructor(private paymentService: PaymentService) {}
-
+export class OrderController {
+  constructor(private orderService: OrderService) {}
   async createOrder(input: unknown): Promise<ApiResponse> {
     try {
       const validatedInput = CreateOrderSchema.parse(input);
       const { userId, courseIds, couponCode } = validatedInput;
-      const order = await this.paymentService.createOrder(
+      const order = await this.orderService.createOrder(
         userId,
         courseIds,
         couponCode
@@ -55,7 +54,7 @@ export class PaymentController {
       const validatedInput = UpdateOrderStatusSchema.parse(input);
       const { orderId, paymentStatus, paymentId, paymentGateway } =
         validatedInput;
-      const order = await this.paymentService.updateOrderStatus(
+      const order = await this.orderService.updateOrderStatus(
         orderId,
         paymentStatus,
         paymentId,

@@ -1,13 +1,13 @@
 import { Router } from "express";
-import { PaymentController } from "./payment.controller";
+import { OrderController } from "./order.controller";
 import { protect } from "../../middlewares/authMiddleware";
-import { adaptPaymentController } from "../../adapters/expressPaymentAdapters";
+import { adaptPaymentController } from "../../adapters/expressOrderAdapters";
 
 export const createPaymentRouter = (
-  paymentController: PaymentController
+  orderController: OrderController
 ): Router => {
   const paymentRouter = Router();
-  const adapt = adaptPaymentController(paymentController);
+  const adapt = adaptPaymentController(orderController);
 
   paymentRouter.post("/orders", protect, adapt.createOrder);
   paymentRouter.post("/orders/status", adapt.updateOrderStatus);

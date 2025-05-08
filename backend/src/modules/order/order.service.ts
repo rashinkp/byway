@@ -3,15 +3,15 @@ import { AppError } from "../../utils/appError";
 import { logger } from "../../utils/logger";
 import { UserService } from "../user/user.service";
 import { CourseService } from "../course/course.service";
-import { IOrderRepository } from "./payment.repository.interface";
-import { IOrder } from "./payment.types";
+import { IOrderRepository } from "./order.repository.interface";
+import { IOrder } from "./order.types";
 import { EnrollmentService } from "../enrollment/enrollment.service";
-export class PaymentService {
+export class OrderService {
   constructor(
     private orderRepository: IOrderRepository,
     private userService: UserService,
     private courseService: CourseService,
-    private enrollmentService: EnrollmentService,
+    private enrollmentService: EnrollmentService
   ) {}
 
   async createOrder(
@@ -140,7 +140,7 @@ export class PaymentService {
           await this.enrollmentService.createEnrollment(
             updatedOrder.userId,
             item.courseId,
-            item.id,
+            item.id
           );
         }
       }

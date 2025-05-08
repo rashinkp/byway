@@ -10,7 +10,7 @@ import { AppDependencies } from "../core/dependacies/index";
 import { createContentRouter } from "../modules/content/content.routes";
 import { createCartRouter } from "../modules/cart/cart.routes";
 import { createEnrollmentRouter } from "../modules/enrollment/enrollment.routes";
-import { createPaymentRouter } from "../modules/payment/payment.routes";
+import { createPaymentRouter } from "../modules/order/order.routes";
 
 export const configureRoutes = (
   app: Express,
@@ -29,8 +29,11 @@ export const configureRoutes = (
   );
   app.use("/api/v1/courses", createCourseRouter(dependencies.courseController));
   app.use("/api/v1/lessons", createLessonRouter(dependencies.lessonController));
-  app.use('/api/v1/content', createContentRouter(dependencies.contentController));
-  app.use('/api/v1/cart', createCartRouter(dependencies.cartController));
+  app.use(
+    "/api/v1/content",
+    createContentRouter(dependencies.contentController)
+  );
+  app.use("/api/v1/cart", createCartRouter(dependencies.cartController));
   app.use(
     "/api/v1/enrollments",
     createEnrollmentRouter(dependencies.enrollmentController)

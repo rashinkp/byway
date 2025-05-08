@@ -4,12 +4,12 @@ import { logger } from "../../utils/logger";
 import { UserService } from "../user/user.service";
 import { ITransactionHistoryRepository } from "./transaction.repository.interface";
 import { ITransaction } from "./transaction.types";
-import { PaymentService } from "../payment/payment.service";
+import { OrderService } from "../order/order.service";
 
 export class TransactionHistoryService {
   constructor(
     private transactionHistoryRepository: ITransactionHistoryRepository,
-    private paymentService: PaymentService,
+    private paymentService: OrderService,
     private userService: UserService
   ) {}
 
@@ -211,7 +211,7 @@ export class TransactionHistoryService {
         await this.transactionHistoryRepository.updateTransactionStatus(
           data.transactionId,
           data.status,
-          data.paymentGateway,
+          data.paymentGateway
         );
       return updatedTransaction;
     } catch (error) {

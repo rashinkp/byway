@@ -1,4 +1,4 @@
-import { IOrder } from "./payment.types";
+import { IOrder } from "./order.types";
 
 export interface IOrderRepository {
   createOrder(data: {

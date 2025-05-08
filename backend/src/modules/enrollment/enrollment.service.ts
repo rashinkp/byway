@@ -4,14 +4,14 @@ import { UserService } from "../user/user.service";
 import { CourseService } from "../course/course.service";
 import { IEnrollmentRepository } from "./enrollment.repository.interface";
 import { IEnrollment } from "./enrollment.types";
-import { PaymentService } from "../payment/payment.service";
+import { OrderService } from "../order/order.service";
 
 export class EnrollmentService {
   constructor(
     private enrollmentRepository: IEnrollmentRepository,
     private userService: UserService,
     private courseService: CourseService,
-    private paymentService: PaymentService
+    private paymentService: OrderService
   ) {}
 
   async createEnrollment(
