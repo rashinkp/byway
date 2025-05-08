@@ -1,6 +1,6 @@
 export default function OrderSummarySkeleton() {
   return (
-    <div className="w-full lg:w-1/3 animate-pulse">
+    <div className="w-full lg:w-1/3 animate-pulse sticky">
       <div className="bg-white rounded-lg shadow-md p-6">
         <div className="h-6 bg-gray-200 rounded w-1/3 mb-4"></div>
         <div className="mb-4">

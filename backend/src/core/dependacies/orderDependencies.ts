@@ -6,17 +6,17 @@ import { OrderService } from "../../modules/order/order.service";
 import { UserService } from "../../modules/user/user.service";
 import { IDatabaseProvider } from "../database";
 
-export interface PaymentDependencies {
+export interface OrderDependencies {
   orderService: OrderService;
   orderController: OrderController;
   setEnrollmentService: (enrollmentService: EnrollmentService) => void;
 }
 
-export const initializePaymentDependencies = (
+export const initializeOrderDependencies = (
   dbProvider: IDatabaseProvider,
   userService: UserService,
   courseService: CourseService
-): PaymentDependencies => {
+): OrderDependencies => {
   let enrollmentService: EnrollmentService | undefined;
 
   const orderRepository = new OrderRepository(dbProvider.getClient());

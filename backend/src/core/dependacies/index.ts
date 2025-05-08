@@ -33,11 +33,8 @@ import {
   EnrollmentDependencies,
   initializeEnrollmentDependencies,
 } from "./enrollmentDependencies";
-import {
-  initializePaymentDependencies,
-  PaymentDependencies,
-} from "./orderDependencies";
 import { initializeTransactionHistoryDependencies, TransactionHistoryDependencies } from "./transactionDependacies";
+import { initializeOrderDependencies, OrderDependencies } from "./orderDependencies";
 
 export interface AppDependencies {
   authController: AuthDependencies["authController"];
@@ -50,7 +47,7 @@ export interface AppDependencies {
   contentController: ContentDependencies["contentController"];
   cartController: CartDependencies["cartController"];
   enrollmentController: EnrollmentDependencies["enrollmentController"];
-  paymentController: PaymentDependencies["paymentController"];
+  orderController: OrderDependencies["orderController"];
   transactionHistoryController: TransactionHistoryDependencies["transactionHistoryController"];
 }
 
@@ -96,7 +93,7 @@ export const initializeAppDependencies = (
     userDeps.userService,
     courseDeps.courseService
   );
-  const paymentDeps = initializePaymentDependencies(
+  const orderDeps = initializeOrderDependencies(
     dbProvider,
     userDeps.userService,
     courseDeps.courseService,
@@ -104,13 +101,13 @@ export const initializeAppDependencies = (
 
    const transactionHistoryDeps = initializeTransactionHistoryDependencies(
      dbProvider,
-     paymentDeps.paymentService,
+     orderDeps.orderService,
      userDeps.userService
    );
 
   // Inject dependent services to break circular dependency
-  enrollmentDeps.setPaymentService(paymentDeps.paymentService);
-  paymentDeps.setEnrollmentService(enrollmentDeps.enrollmentService);
+  enrollmentDeps.setPaymentService(orderDeps.orderService);
+  orderDeps.setEnrollmentService(enrollmentDeps.enrollmentService);
 
   return {
     authController: authDeps.authController,
@@ -123,7 +120,7 @@ export const initializeAppDependencies = (
     contentController: contentDeps.contentController,
     cartController: cartDeps.cartController,
     enrollmentController: enrollmentDeps.enrollmentController,
-    paymentController: paymentDeps.paymentController,
+    orderController: orderDeps.orderController,
     transactionHistoryController:
       transactionHistoryDeps.transactionHistoryController,
   };
