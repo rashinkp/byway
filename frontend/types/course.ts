@@ -52,7 +52,7 @@ export interface CourseFormData {
   categoryId: string;
   price?: number;
   offer?: number;
-  duration: number;
+  duration: number | null | undefined;
   level: "BEGINNER" | "MEDIUM" | "ADVANCED";
   prerequisites?: string;
   objectives?: string;

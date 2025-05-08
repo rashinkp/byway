@@ -1,27 +1,22 @@
-
-import { Course, ICart } from "@/types/cart";
 import { ChevronRight } from "lucide-react";
 import Link from "next/link";
 import { useCallback } from "react";
-
-
-
-
+import { Course } from "@/types/cart";
 
 interface OrderSummaryProps {
   courses: Course[];
 }
 
-export const OrderSummary = ({ courses }: OrderSummaryProps) => {
+export function OrderSummary({ courses }: OrderSummaryProps) {
   const calculateSubtotal = useCallback((): number => {
     return (
       courses?.reduce(
-        (total, item) =>
+        (total, course) =>
           total +
-          (typeof item?.offer === "string"
-            ? parseFloat(item.offer)
-            : typeof item?.offer === "number"
-            ? item.offer
+          (typeof course?.offer === "string"
+            ? parseFloat(course.offer)
+            : typeof course?.offer === "number"
+            ? course.offer
             : 0),
         0
       ) ?? 0
@@ -37,7 +32,7 @@ export const OrderSummary = ({ courses }: OrderSummaryProps) => {
   }, [calculateSubtotal, calculateTax]);
 
   return (
-    <div className="bg-white rounded-lg shadow-sm p-6 sticky top-24">
+    <div className="bg-white rounded-lg shadow-sm p-6 sticky top-6">
       <h2 className="text-xl font-semibold pb-4 border-b mb-4">
         Order Summary
       </h2>
