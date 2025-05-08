@@ -55,7 +55,7 @@ export default function CourseSidebar({
         <button
           onClick={handleAddToCart}
           disabled={isCartLoading}
-          className={`w-full bg-blue-600 text-white font-medium py-3 rounded mb-2 transition ${
+          className={`w-full bg-blue-600 rounded-lg text-white font-medium py-3  mb-2 transition ${
             isCartLoading
               ? "opacity-50 cursor-not-allowed"
               : "hover:bg-blue-700"
@@ -65,11 +65,11 @@ export default function CourseSidebar({
         </button>
         <Link
           href={`/user/checkout?courseId=${course.id}`}
-          className={`w-full border border-gray-300 text-gray-800 font-medium py-3 rounded transition block text-center ${
+          className={`w-full border rounded-lg border-gray-300 text-gray-800 font-medium py-3 transition block text-center ${
             isCartLoading ? "opacity-50 cursor-not-allowed" : "hover:bg-gray-50"
           }`}
         >
-          Buy Now
+          Enroll Now
         </Link>
       </div>
     </div>
