@@ -1,7 +1,6 @@
 import { FC, memo, useState, useEffect } from "react";
 import { PayPalScriptProvider, PayPalButtons } from "@paypal/react-paypal-js";
 import { toast } from "sonner";
-import { IPaypalOrder } from "@/types/paypal.types";
 
 interface PaymentMethod {
   id: "razorpay" | "paypal" | "stripe";
@@ -21,13 +20,7 @@ interface PaymentMethodSelectionProps {
     currency: string;
     intent?: string;
   };
-  // createPaypalOrder: () => Promise<{
-  //   status: string;
-  //   order: { order: IPaypalOrder };
-  //   message: string;
-  //   statusCode: number;
-  // }>;
-  // capturePaypalOrder: (orderID: string) => Promise<void>;
+  finalAmount: number; // New prop for the final amount (totalDiscountedPrice + tax)
 }
 
 const paymentMethods: PaymentMethod[] = [{ id: "paypal", name: "PayPal" }];
@@ -42,8 +35,7 @@ const PaymentMethodSelection: FC<PaymentMethodSelectionProps> = memo(
     isPending,
     isDisabled,
     paypalOptions,
-    // createPaypalOrder,
-    // capturePaypalOrder,
+    finalAmount,
   }) => {
     console.log("Rendering PaymentMethodSelection, props:", {
       selectedMethod,
@@ -51,25 +43,32 @@ const PaymentMethodSelection: FC<PaymentMethodSelectionProps> = memo(
       isPending,
       isDisabled,
       paypalOptions,
+      finalAmount,
     });
     const [isPaypalLoading, setIsPaypalLoading] = useState(false);
 
-    // Log prop changes
     useEffect(() => {
       console.log("PaymentMethodSelection props changed:", {
         selectedMethod,
         couponCode,
         isPending,
         isDisabled,
+        finalAmount,
       });
-    }, [selectedMethod, couponCode, isPending, isDisabled]);
-    console.log(paypalOptions, "paypalOptions");
+    }, [selectedMethod, couponCode, isPending, isDisabled, finalAmount]);
+
     const createOrder = (data: any, actions: any) => {
+      if (finalAmount <= 0) {
+        toast.error("Invalid order amount");
+        throw new Error("Invalid order amount");
+      }
+
       return actions.order.create({
         purchase_units: [
           {
             amount: {
-              value: 1000,
+              value: finalAmount.toFixed(2), // Use the final amount
+              currency_code: paypalOptions.currency,
             },
           },
         ],
@@ -104,9 +103,9 @@ const PaymentMethodSelection: FC<PaymentMethodSelectionProps> = memo(
           ))}
         </div>
 
-        {true ? (
+        {selectedMethod === "paypal" && (
           <div className="mt-6">
-            {false ? (
+            {isPaypalLoading ? (
               <div className="text-center">Loading PayPal Buttons...</div>
             ) : (
               <PayPalScriptProvider options={paypalOptions}>
@@ -116,11 +115,13 @@ const PaymentMethodSelection: FC<PaymentMethodSelectionProps> = memo(
                     console.log("PayPal SDK initialized:", data);
                   }}
                   createOrder={createOrder}
-                  onApprove={async (data,action) => {
+                  onApprove={async (data, actions) => {
                     try {
                       console.log("PayPal order approved:", data);
-                      const details = await action.order?.capture();
-                      toast.success("Payment completed successfully!" , details);
+                      const details = await actions.order?.capture();
+                      toast.success("Payment completed successfully!", {
+                        description: JSON.stringify(details),
+                      });
                     } catch (error) {
                       console.error("Error in onApprove:", error);
                       toast.error("Failed to complete PayPal payment");
@@ -131,11 +132,7 @@ const PaymentMethodSelection: FC<PaymentMethodSelectionProps> = memo(
                     toast.info("PayPal payment was cancelled");
                   }}
                   onError={(err) => {
-                    console.error("PayPal button error:", err, {
-                      message: err.message,
-                      stack: err.stack,
-                      name: err.name,
-                    });
+                    console.error("PayPal button error:", err);
                     toast.error(
                       "An error occurred with PayPal. Please try again."
                     );
@@ -144,7 +141,9 @@ const PaymentMethodSelection: FC<PaymentMethodSelectionProps> = memo(
               </PayPalScriptProvider>
             )}
           </div>
-        ) : (
+        )}
+
+        {selectedMethod !== "paypal" && (
           <>
             <div>
               <label className="block text-sm font-medium text-gray-700">

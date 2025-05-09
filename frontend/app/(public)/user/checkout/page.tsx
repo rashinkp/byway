@@ -1,11 +1,10 @@
-'use client'
+"use client";
 
 import { useState, useMemo, useCallback, memo, FC } from "react";
 import { useSearchParams } from "next/navigation";
 import { useCart } from "@/hooks/cart/useCart";
 import { useGetCourseById } from "@/hooks/course/useGetCourseById";
 import { useCreateOrder } from "@/hooks/order/useOrder";
-import { usePaypal } from "@/hooks/paypal/usePaypal";
 import { toast } from "sonner";
 import { Course, ICart } from "@/types/cart";
 import OrderDetailsSkeleton from "@/components/checkout/OrderDetailsSkeleton";
@@ -31,61 +30,27 @@ const CheckoutPage: FC<CheckoutPageProps> = memo(({ page = 1, limit = 10 }) => {
   const searchParams = useSearchParams();
   const courseId = searchParams.get("courseId");
   const { data: cartData, isLoading: cartLoading } = useCart({ page, limit });
-  const { data: singleCourse, isLoading: courseLoading } = useGetCourseById(courseId as string);
+  const { data: singleCourse, isLoading: courseLoading } = useGetCourseById(
+    courseId as string
+  );
   const { mutate: createOrder, isPending } = useCreateOrder();
-  const { createPaypalOrder, capturePaypalOrder, isCreatingOrder, isCapturingOrder } = usePaypal();
   const [activeStep, setActiveStep] = useState(1);
-  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<PaymentMethod["id"]>("paypal");
+  const [selectedPaymentMethod, setSelectedPaymentMethod] =
+    useState<PaymentMethod["id"]>("paypal");
   const [orderComplete, setOrderComplete] = useState(false);
   const [courseIds, setCourseIds] = useState<string[]>([]);
   const [couponCode, setCouponCode] = useState<string>("");
   const { user } = useAuthStore();
 
-  // Memoize paypalOptions
   const paypalOptions = useMemo(
     () => ({
       clientId: process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID || "",
       currency: "USD",
-      // intent: "capture",
+      intent: "capture",
     }),
     []
   );
 
-  // // Memoize createPaypalOrder
-  // const handleCreatePaypalOrder = useCallback(() => {
-  //   if (!user?.id) {
-  //     toast.error("Please log in to proceed with payment");
-  //     throw new Error("User not authenticated");
-  //   }
-  //   return createPaypalOrder({
-  //     userId: user.id,
-  //     order_price: String(
-  //       parseFloat(totalDiscountedPrice.toFixed(2)) === 0
-  //         ? 10
-  //         : totalDiscountedPrice.toFixed(2)
-  //     ),
-  //   });
-  // }, [user?.id, createPaypalOrder]);
-
-  // Memoize capturePaypalOrder
-  // const handleCapturePaypalOrder = useCallback(
-  //   (orderID: string) => {
-  //     if (!user?.id) {
-  //       toast.error("Please log in to complete payment");
-  //       throw new Error("User not authenticated");
-  //     }
-  //     return capturePaypalOrder({
-  //       orderID,
-  //       userId: user.id,
-  //     }).then(() => {
-  //       setOrderComplete(true);
-  //       setActiveStep(3);
-  //     });
-  //   },
-  //   [user?.id, capturePaypalOrder]
-  // );
-
-  // Memoize courseIds
   const courseIdsMemo = useMemo(() => {
     if (courseId) {
       return [courseId];
@@ -99,122 +64,147 @@ const CheckoutPage: FC<CheckoutPageProps> = memo(({ page = 1, limit = 10 }) => {
     setCourseIds(courseIdsMemo);
   }, [courseIdsMemo]);
 
-  // Calculate totals and course details
-  const { totalOriginalPrice, totalDiscountedPrice, courseDetails } =
-    useMemo(() => {
-      if (courseId && singleCourse) {
-        const price =
-          typeof singleCourse.price === "string"
-            ? parseFloat(singleCourse.price)
-            : singleCourse.price ?? 0;
-        const offer =
-          typeof singleCourse.offer === "string"
-            ? parseFloat(singleCourse.offer)
-            : singleCourse.offer ?? price;
-        // Ensure offer is not zero
-        const validatedOffer = offer > 0 ? offer : price;
-        if (validatedOffer <= 0) {
-          console.error("Invalid price for single course:", {
-            price,
-            offer,
-            validatedOffer,
-          });
-          return {
-            totalOriginalPrice: 0,
-            totalDiscountedPrice: 0,
-            courseDetails: [],
-          };
-        }
+  // Calculate totals, tax, and course details
+  const {
+    totalOriginalPrice,
+    totalDiscountedPrice,
+    tax,
+    finalAmount,
+    courseDetails,
+  } = useMemo(() => {
+    const TAX_RATE = 0.1; // 10% tax rate, adjust as needed
+
+    if (courseId && singleCourse) {
+      const price =
+        typeof singleCourse.price === "string"
+          ? parseFloat(singleCourse.price)
+          : singleCourse.price ?? 0;
+      const offer =
+        typeof singleCourse.offer === "string"
+          ? parseFloat(singleCourse.offer)
+          : singleCourse.offer ?? price;
+      const validatedOffer = offer > 0 ? offer : price;
+      if (validatedOffer <= 0) {
+        console.error("Invalid price for single course:", {
+          price,
+          offer,
+          validatedOffer,
+        });
         return {
-          totalOriginalPrice: price,
-          totalDiscountedPrice: validatedOffer,
-          courseDetails: [
-            {
-              id: singleCourse.id,
-              title: singleCourse.title,
-              thumbnail: singleCourse.thumbnail,
-              image: singleCourse.thumbnail || "",
-              price,
-              offer: validatedOffer,
-              duration: String(singleCourse.duration ?? ""),
-              level: singleCourse.level,
-            } as Course,
-          ],
-        };
-      } else if (cartData?.items) {
-        const courses = cartData.items
-          .map((item: ICart) => item.course)
-          .filter((course): course is Course => !!course)
-          .map((course) => {
-            const price =
-              typeof course.price === "string"
-                ? parseFloat(course.price)
-                : course.price ?? 0;
-            const offer =
-              typeof course.offer === "string"
-                ? parseFloat(course.offer)
-                : course.offer ?? price;
-            // Ensure offer is not zero
-            const validatedOffer = offer > 0 ? offer : price;
-            return {
-              id: course.id,
-              title: course.title,
-              thumbnail: course.thumbnail,
-              image: course.image ?? "",
-              price,
-              offer: validatedOffer,
-              duration: String(course.duration ?? ""),
-              level: course.level,
-              lectures: course.lectures ?? 0,
-              creator: course.creator ?? { name: "" },
-            };
-          });
-        const totalOriginal = courses.reduce(
-          (sum, course) => sum + Number(course.price),
-          0
-        );
-        const totalDiscounted = courses.reduce(
-          (sum, course) => sum + Number(course.offer),
-          0
-        );
-        if (totalDiscounted <= 0) {
-          console.error("Invalid total discounted price for cart:", {
-            totalOriginal,
-            totalDiscounted,
-            courses,
-          });
-          return {
-            totalOriginalPrice: 0,
-            totalDiscountedPrice: 0,
-            courseDetails: [],
-          };
-        }
-        return {
-          totalOriginalPrice: totalOriginal,
-          totalDiscountedPrice: totalDiscounted,
-          courseDetails: courses,
+          totalOriginalPrice: 0,
+          totalDiscountedPrice: 0,
+          tax: 0,
+          finalAmount: 0,
+          courseDetails: [],
         };
       }
+      const calculatedTax = validatedOffer * TAX_RATE;
+      const finalAmount = validatedOffer + calculatedTax;
       return {
-        totalOriginalPrice: 0,
-        totalDiscountedPrice: 0,
-        courseDetails: [] as Course[],
+        totalOriginalPrice: price,
+        totalDiscountedPrice: validatedOffer,
+        tax: calculatedTax,
+        finalAmount: finalAmount,
+        courseDetails: [
+          {
+            id: singleCourse.id,
+            title: singleCourse.title,
+            thumbnail: singleCourse.thumbnail,
+            image: singleCourse.thumbnail || "",
+            price,
+            offer: validatedOffer,
+            duration: String(singleCourse.duration ?? ""),
+            level: singleCourse.level,
+          } as Course,
+        ],
       };
-    }, [courseId, singleCourse?.id, cartData?.items?.length]);
+    } else if (cartData?.items) {
+      const courses = cartData.items
+        .map((item: ICart) => item.course)
+        .filter((course): course is Course => !!course)
+        .map((course) => {
+          const price =
+            typeof course.price === "string"
+              ? parseFloat(course.price)
+              : course.price ?? 0;
+          const offer =
+            typeof course.offer === "string"
+              ? parseFloat(course.offer)
+              : course.offer ?? price;
+          const validatedOffer = offer > 0 ? offer : price;
+          return {
+            id: course.id,
+            title: course.title,
+            thumbnail: course.thumbnail,
+            image: course.image ?? "",
+            price,
+            offer: validatedOffer,
+            duration: String(course.duration ?? ""),
+            level: course.level,
+            lectures: course.lectures ?? 0,
+            creator: course.creator ?? { name: "" },
+          };
+        });
+      const totalOriginal = courses.reduce(
+        (sum, course) => sum + Number(course.price),
+        0
+      );
+      const totalDiscounted = courses.reduce(
+        (sum, course) => sum + Number(course.offer),
+        0
+      );
+      if (totalDiscounted <= 0) {
+        console.error("Invalid total discounted price for cart:", {
+          totalOriginal,
+          totalDiscounted,
+          courses,
+        });
+        return {
+          totalOriginalPrice: 0,
+          totalDiscountedPrice: 0,
+          tax: 0,
+          finalAmount: 0,
+          courseDetails: [],
+        };
+      }
+      const calculatedTax = totalDiscounted * TAX_RATE;
+      const finalAmount = totalDiscounted + calculatedTax;
+      return {
+        totalOriginalPrice: totalOriginal,
+        totalDiscountedPrice: totalDiscounted,
+        tax: calculatedTax,
+        finalAmount: finalAmount,
+        courseDetails: courses,
+      };
+    }
+    return {
+      totalOriginalPrice: 0,
+      totalDiscountedPrice: 0,
+      tax: 0,
+      finalAmount: 0,
+      courseDetails: [] as Course[],
+    };
+  }, [courseId, singleCourse?.id, cartData?.items?.length]);
 
-  const handlePaymentMethodSelect = useCallback((methodId: PaymentMethod["id"]) => {
-    console.log("Selecting payment method:", methodId);
-    setSelectedPaymentMethod(methodId);
-  }, []);
-
+  const handlePaymentMethodSelect = useCallback(
+    (methodId: PaymentMethod["id"]) => {
+      console.log("Selecting payment method:", methodId);
+      setSelectedPaymentMethod(methodId);
+    },
+    []
+  );
 
   const handleProceedToPayment = useCallback(() => {
     if (!courseIds.length) {
       toast.error("No courses selected for purchase");
       return;
     }
+    if (finalAmount <= 0) {
+      toast.error("Invalid order amount");
+      return;
+    }
     setActiveStep(2);
-  }, [courseIds]);
+  }, [courseIds, finalAmount]);
 
   const handleSubmit = useCallback(
     (e: React.MouseEvent) => {
@@ -223,13 +213,20 @@ const CheckoutPage: FC<CheckoutPageProps> = memo(({ page = 1, limit = 10 }) => {
         toast.error("No courses selected for purchase");
         return;
       }
+      if (finalAmount <= 0) {
+        toast.error("Invalid order amount");
+        return;
+      }
 
       if (selectedPaymentMethod !== "paypal") {
         createOrder(
           { courseIds, couponCode },
           {
             onSuccess: (order) => {
-              console.log(`Initiating ${selectedPaymentMethod} payment for order:`, order.id);
+              console.log(
+                `Initiating ${selectedPaymentMethod} payment for order:`,
+                order.id
+              );
               setOrderComplete(true);
               setActiveStep(3);
               toast.success("Order created successfully!");
@@ -239,11 +236,9 @@ const CheckoutPage: FC<CheckoutPageProps> = memo(({ page = 1, limit = 10 }) => {
             },
           }
         );
-      } else {
-        // For PayPal, order creation is handled by PayPalButtons
       }
     },
-    [courseIds, couponCode, createOrder, selectedPaymentMethod]
+    [courseIds, couponCode, createOrder, selectedPaymentMethod, finalAmount]
   );
 
   const isLoading = cartLoading || courseLoading;
@@ -252,19 +247,29 @@ const CheckoutPage: FC<CheckoutPageProps> = memo(({ page = 1, limit = 10 }) => {
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-blue-800">Complete Your Purchase</h1>
-          <p className="text-gray-600 mt-2">You're just a few steps away from accessing your course(s)</p>
+          <h1 className="text-3xl font-bold text-blue-800">
+            Complete Your Purchase
+          </h1>
+          <p className="text-gray-600 mt-2">
+            You're just a few steps away from accessing your course(s)
+          </p>
         </div>
 
         <div className="flex flex-col lg:flex-row gap-6">
           <div className="w-full lg:w-7/12 bg-white rounded-lg shadow-md p-6">
             <div className="flex mb-8 border-b pb-4">
               <div
-                className={`flex-1 text-center ${activeStep >= 1 ? "text-blue-700 font-medium" : "text-gray-400"}`}
+                className={`flex-1 text-center ${
+                  activeStep >= 1
+                    ? "text-blue-700 font-medium"
+                    : "text-gray-400"
+                }`}
               >
                 <div
                   className={`w-8 h-8 mx-auto mb-2 rounded-full flex items-center justify-center ${
-                    activeStep >= 1 ? "bg-blue-700 text-white" : "bg-gray-200 text-gray-500"
+                    activeStep >= 1
+                      ? "bg-blue-700 text-white"
+                      : "bg-gray-200 text-gray-500"
                   }`}
                 >
                   1
@@ -272,11 +277,17 @@ const CheckoutPage: FC<CheckoutPageProps> = memo(({ page = 1, limit = 10 }) => {
                 Order Details
               </div>
               <div
-                className={`flex-1 text-center ${activeStep >= 2 ? "text-blue-700 font-medium" : "text-gray-400"}`}
+                className={`flex-1 text-center ${
+                  activeStep >= 2
+                    ? "text-blue-700 font-medium"
+                    : "text-gray-400"
+                }`}
               >
                 <div
                   className={`w-8 h-8 mx-auto mb-2 rounded-full flex items-center justify-center ${
-                    activeStep >= 2 ? "bg-blue-700 text-white" : "bg-gray-200 text-gray-500"
+                    activeStep >= 2
+                      ? "bg-blue-700 text-white"
+                      : "bg-gray-200 text-gray-500"
                   }`}
                 >
                   2
@@ -284,11 +295,17 @@ const CheckoutPage: FC<CheckoutPageProps> = memo(({ page = 1, limit = 10 }) => {
                 Payment
               </div>
               <div
-                className={`flex-1 text-center ${activeStep >= 3 ? "text-blue-700 font-medium" : "text-gray-400"}`}
+                className={`flex-1 text-center ${
+                  activeStep >= 3
+                    ? "text-blue-700 font-medium"
+                    : "text-gray-400"
+                }`}
               >
                 <div
                   className={`w-8 h-8 mx-auto mb-2 rounded-full flex items-center justify-center ${
-                    activeStep >= 3 ? "bg-blue-700 text-white" : "bg-gray-200 text-gray-500"
+                    activeStep >= 3
+                      ? "bg-blue-700 text-white"
+                      : "bg-gray-200 text-gray-500"
                   }`}
                 >
                   3
@@ -303,10 +320,10 @@ const CheckoutPage: FC<CheckoutPageProps> = memo(({ page = 1, limit = 10 }) => {
               <OrderDetails
                 courseDetails={courseDetails}
                 onProceed={handleProceedToPayment}
-                isDisabled={!courseIds.length}
+                isDisabled={!courseIds.length || finalAmount <= 0}
               />
             ) : activeStep === 2 ? (
-              isPending || isCreatingOrder || isCapturingOrder ? (
+              isPending ? (
                 <PaymentMethodSkeleton />
               ) : (
                 <PaymentMethodSelection
@@ -315,11 +332,10 @@ const CheckoutPage: FC<CheckoutPageProps> = memo(({ page = 1, limit = 10 }) => {
                   couponCode={couponCode}
                   onCouponChange={setCouponCode}
                   onSubmit={handleSubmit}
-                  isPending={isPending || isCreatingOrder || isCapturingOrder}
-                  isDisabled={!courseIds.length}
+                  isPending={isPending}
+                  isDisabled={!courseIds.length || finalAmount <= 0}
                   paypalOptions={paypalOptions}
-                  // createPaypalOrder={handleCreatePaypalOrder}
-                  // capturePaypalOrder={handleCapturePaypalOrder}
+                  finalAmount={finalAmount} // Pass the final amount
                 />
               )
             ) : (
@@ -328,7 +344,16 @@ const CheckoutPage: FC<CheckoutPageProps> = memo(({ page = 1, limit = 10 }) => {
           </div>
 
           <div className="w-full lg:w-5/12">
-            {isLoading ? <OrderSummarySkeleton /> : <OrderSummary courses={courseDetails} />}
+            {isLoading ? (
+              <OrderSummarySkeleton />
+            ) : (
+              <OrderSummary
+                courses={courseDetails}
+                totalDiscountedPrice={totalDiscountedPrice}
+                tax={tax}
+                finalAmount={finalAmount}
+              />
+            )}
           </div>
         </div>
       </div>
