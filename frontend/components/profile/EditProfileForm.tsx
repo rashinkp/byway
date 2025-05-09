@@ -1,14 +1,21 @@
 import { z } from "zod";
 import { FormFieldConfig, FormModal } from "@/components/ui/FormModal";
 import { useUpdateUser } from "@/hooks/user/useUpdateUser";
+import { uploadToCloudinary } from "@/lib/cloudinary";
 
-// Zod schema for profile validation
+// Zod schema for profile validation (unchanged)
 const profileSchema = z.object({
   name: z
     .string()
     .min(2, "Name must be at least 2 characters")
     .max(50, "Name must be less than 50 characters"),
-  avatar: z.string().url("Invalid URL").optional().or(z.literal("")),
+  avatar: z
+    .union([
+      z.instanceof(File), // Allow File objects
+      z.string().url("Invalid URL").optional(), // Allow valid URLs or empty
+      z.literal(""), // Allow empty string
+    ])
+    .optional(),
   bio: z.string().max(500, "Bio must be less than 500 characters").optional(),
   education: z
     .string()
@@ -38,7 +45,7 @@ const profileSchema = z.object({
   gender: z.enum(["MALE", "FEMALE", "OTHER"]).optional(),
 });
 
-// Form field configurations
+// Form field configurations (unchanged)
 const formFields: FormFieldConfig<z.infer<typeof profileSchema>>[] = [
   {
     name: "name",
@@ -50,11 +57,13 @@ const formFields: FormFieldConfig<z.infer<typeof profileSchema>>[] = [
   },
   {
     name: "avatar",
-    label: "Profile Picture URL",
+    label: "Profile Picture",
     type: "input",
-    fieldType: "text",
-    placeholder: "Enter image URL",
-    description: "URL to your profile picture",
+    fieldType: "file",
+    accept: "image/*",
+    maxSize: 5 * 1024 * 1024,
+    fileTypeLabel: "image",
+    description: "Upload a profile picture (max 5MB)",
   },
   {
     name: "bio",
@@ -162,8 +171,28 @@ export default function EditProfileForm({
   const { mutate: updateUser, isLoading: isUpdating } = useUpdateUser();
 
   const handleSubmit = async (data: z.infer<typeof profileSchema>) => {
+    let avatarUrl: string | undefined;
+
+    // If avatar is a File, upload to Cloudinary
+    if (data.avatar instanceof File) {
+      try {
+        const uploadResult = await uploadToCloudinary(data.avatar, {
+          uploadPreset: process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET,
+          folder: "profile-pictures",
+        });
+        avatarUrl = uploadResult.secure_url; // Set the Cloudinary URL
+      } catch (error) {
+        console.error("Failed to upload avatar to Cloudinary:", error);
+        throw new Error("Failed to upload profile picture");
+      }
+    } else {
+      // If avatar is a string (URL or empty), use it directly
+      avatarUrl = typeof data.avatar === "string" ? data.avatar : undefined;
+    }
+
     const transformedData = {
       ...data,
+      avatar: avatarUrl, // Ensure avatar is string | undefined
       skills: data.skills
         ? data.skills
             .split(",")
@@ -171,6 +200,7 @@ export default function EditProfileForm({
             .join(", ")
         : undefined,
     };
+
     updateUser(transformedData);
     onOpenChange(false);
   };

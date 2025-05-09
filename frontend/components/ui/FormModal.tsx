@@ -194,7 +194,6 @@ export function FormModal<T extends z.ZodType<any, any>>({
                 </div>
               </div>
             )}
-
             {/* Input fields (text, number, date, select) in columns */}
             {inputFields.length > 0 && (
               <div
@@ -294,7 +293,6 @@ export function FormModal<T extends z.ZodType<any, any>>({
                 ))}
               </div>
             )}
-
             {/* Textarea fields (full width) */}
             {textareaFields.length > 0 && (
               <div className="space-y-6 mb-6">
@@ -326,7 +324,6 @@ export function FormModal<T extends z.ZodType<any, any>>({
                 ))}
               </div>
             )}
-
             {/* File fields (full width) with thumbnail preview */}
             {fileFields.length > 0 && (
               <div className="space-y-6 mb-6">
@@ -345,7 +342,7 @@ export function FormModal<T extends z.ZodType<any, any>>({
                             <div className="mb-4">
                               <img
                                 src={formField.value}
-                                alt="Course thumbnail preview"
+                                alt={`${field.label} preview`}
                                 className="w-32 h-32 object-cover rounded-md"
                               />
                             </div>
@@ -386,7 +383,6 @@ export function FormModal<T extends z.ZodType<any, any>>({
                 ))}
               </div>
             )}
-
             <DialogFooter className="pt-6 bg-white pb-4 border-t sticky bottom-0">
               <Button
                 type="button"
