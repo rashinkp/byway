@@ -44,7 +44,7 @@ export const adaptCourseController = (controller: CourseController) => ({
     }
   ),
 
-  getAllCourses : asyncHandler(
+  getAllCourses: asyncHandler(
     async (req: AuthenticatedRequest, res: Response) => {
       const {
         page,
@@ -55,17 +55,23 @@ export const adaptCourseController = (controller: CourseController) => ({
         search,
         filterBy,
         myCourses,
+        level,
+        duration,
+        price,
       } = req.query;
 
       const userId = req.user?.id;
       const role = req.user?.role;
 
-
-
       const input: IGetAllCoursesInput = {
         page: page ? parseInt(page as string, 10) : undefined,
         limit: limit ? parseInt(limit as string, 10) : undefined,
-        sortBy: sortBy as "title" | "createdAt" | "updatedAt",
+        sortBy: sortBy as
+          | "title"
+          | "createdAt"
+          | "updatedAt"
+          | "price"
+          | "duration",
         sortOrder: sortOrder as "asc" | "desc",
         includeDeleted: includeDeleted === "true",
         search: search ? (search as string) : "",
@@ -73,9 +79,12 @@ export const adaptCourseController = (controller: CourseController) => ({
         userId: role === "INSTRUCTOR" ? userId : undefined,
         myCourses: myCourses === "true",
         role: role as "INSTRUCTOR" | "USER" | "ADMIN" | undefined,
+        level: level as "BEGINNER" | "MEDIUM" | "ADVANCED" | "All",
+        duration: duration as "All" | "Under5" | "5to10" | "Over10",
+        price: price as "All" | "Free" | "Paid",
       };
 
-      const result = await await controller.getAllCourses(input);
+      const result = await controller.getAllCourses(input);
       res.status(StatusCodes.OK).json(result);
     }
   ),

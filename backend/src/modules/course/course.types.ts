@@ -65,16 +65,18 @@ export interface IUpdateCourseInput {
 export interface IGetAllCoursesInput {
   page?: number;
   limit?: number;
-  sortBy?: "title" | "createdAt" | "updatedAt";
+  sortBy?: "title" | "createdAt" | "updatedAt" | "price" | "duration";
   sortOrder?: "asc" | "desc";
   includeDeleted?: boolean;
   search?: string;
   filterBy?: "All" | "Active" | "Draft" | "Inactive";
   userId?: string;
-  myCourses?: boolean; // New parameter to filter instructor's courses
-  role?: "USER" | "INSTRUCTOR" | "ADMIN"; // Role to determine access level
+  myCourses?: boolean;
+  role?: "USER" | "INSTRUCTOR" | "ADMIN";
+  level?: "BEGINNER" | "MEDIUM" | "ADVANCED" | "All";
+  duration?: "All" | "Under5" | "5to10" | "Over10";
+  price?: "All" | "Free" | "Paid";
 }
-
 export interface ICreateEnrollmentInput {
   userId: string;
   courseId: string;

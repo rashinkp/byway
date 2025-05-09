@@ -130,7 +130,7 @@ export const getAllCoursesSchema = z.object({
   page: z.number().int().positive().optional().default(1),
   limit: z.number().int().positive().optional().default(10),
   sortBy: z
-    .enum(["title", "createdAt", "updatedAt"])
+    .enum(["title", "createdAt", "updatedAt", "price", "duration"]) // Add price and duration to sort options
     .optional()
     .default("createdAt"),
   sortOrder: z.enum(["asc", "desc"]).optional().default("desc"),
@@ -143,6 +143,18 @@ export const getAllCoursesSchema = z.object({
   userId: z.string().uuid("Invalid user ID").optional(),
   myCourses: z.boolean().optional().default(false),
   role: z.enum(["USER", "INSTRUCTOR", "ADMIN"]).optional(),
+  level: z // Add level filter
+    .enum(["BEGINNER", "MEDIUM", "ADVANCED", "All"])
+    .optional()
+    .default("All"),
+  duration: z // Add duration filter
+    .enum(["All", "Under5", "5to10", "Over10"])
+    .optional()
+    .default("All"),
+  price: z // Add price filter
+    .enum(["All", "Free", "Paid"])
+    .optional()
+    .default("All"),
 });
 
 

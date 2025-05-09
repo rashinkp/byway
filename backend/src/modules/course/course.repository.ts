@@ -71,9 +71,18 @@ export class CourseRepository implements ICourseRepository {
       userId,
       myCourses = false,
       role = "USER",
+      level = "All",
+      duration = "All",
+      price = "All",
     } = input;
 
-    const allowedSortFields = ["title", "createdAt", "updatedAt"];
+    const allowedSortFields = [
+      "title",
+      "createdAt",
+      "updatedAt",
+      "price",
+      "duration",
+    ];
     const safeSortBy = allowedSortFields.includes(sortBy)
       ? sortBy
       : "createdAt";
@@ -82,20 +91,16 @@ export class CourseRepository implements ICourseRepository {
 
     // Role-based logic
     if (role === "USER") {
-      // Users only see PUBLISHED and non-deleted courses
       where.status = "PUBLISHED";
       where.deletedAt = null;
     } else if (role === "INSTRUCTOR") {
-      // Instructors see all courses unless myCourses is true
       if (myCourses && userId) {
         where.createdBy = userId;
       }
-      // Include deleted courses only if explicitly requested
       if (!includeDeleted) {
         where.deletedAt = null;
       }
     } else if (role === "ADMIN") {
-      // Admins see all courses, including deleted ones if includeDeleted is true
       if (!includeDeleted) {
         where.deletedAt = null;
       }
@@ -116,6 +121,31 @@ export class CourseRepository implements ICourseRepository {
         { title: { contains: search, mode: "insensitive" } },
         { description: { contains: search, mode: "insensitive" } },
       ];
+    }
+
+    // Apply level filter
+    if (level !== "All") {
+      where.level = level;
+    }
+
+    // Apply duration filter
+    if (duration !== "All") {
+      if (duration === "Under5") {
+        where.duration = { lte: 5 * 60 }; // Assuming duration is in minutes
+      } else if (duration === "5to10") {
+        where.duration = { gte: 5 * 60, lte: 10 * 60 };
+      } else if (duration === "Over10") {
+        where.duration = { gte: 10 * 60 };
+      }
+    }
+
+    // Apply price filter
+    if (price !== "All") {
+      if (price === "Free") {
+        where.offer = { equals: 0 }; // Free courses have offer === 0
+      } else if (price === "Paid") {
+        where.offer = { gt: 0 }; // Paid courses have offer > 0
+      }
     }
 
     const skip = (page - 1) * limit;
