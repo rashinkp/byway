@@ -1,10 +1,11 @@
-"use client";
+'use client'
 
-import { useState, useMemo, useCallback } from "react";
+import { useState, useMemo, useCallback, memo, FC } from "react";
 import { useSearchParams } from "next/navigation";
 import { useCart } from "@/hooks/cart/useCart";
 import { useGetCourseById } from "@/hooks/course/useGetCourseById";
 import { useCreateOrder } from "@/hooks/order/useOrder";
+import { usePaypal } from "@/hooks/paypal/usePaypal";
 import { toast } from "sonner";
 import { Course, ICart } from "@/types/cart";
 import OrderDetailsSkeleton from "@/components/checkout/OrderDetailsSkeleton";
@@ -14,6 +15,7 @@ import PaymentMethodSelection from "@/components/checkout/PaymentMethodSelection
 import OrderConfirmation from "@/components/checkout/OrderConfirmation";
 import OrderSummarySkeleton from "@/components/checkout/OrderSummerySkeleton";
 import { OrderSummary } from "@/components/checkout/OrderSummery";
+import { useAuthStore } from "@/stores/auth.store";
 
 interface PaymentMethod {
   id: "razorpay" | "paypal" | "stripe";
@@ -25,35 +27,77 @@ interface CheckoutPageProps {
   limit?: number;
 }
 
-export default function CheckoutPage({
-  page = 1,
-  limit = 10,
-}: CheckoutPageProps) {
+const CheckoutPage: FC<CheckoutPageProps> = memo(({ page = 1, limit = 10 }) => {
   const searchParams = useSearchParams();
   const courseId = searchParams.get("courseId");
   const { data: cartData, isLoading: cartLoading } = useCart({ page, limit });
-  const { data: singleCourse, isLoading: courseLoading } = useGetCourseById(
-    courseId as string
-  );
+  const { data: singleCourse, isLoading: courseLoading } = useGetCourseById(courseId as string);
   const { mutate: createOrder, isPending } = useCreateOrder();
+  const { createPaypalOrder, capturePaypalOrder, isCreatingOrder, isCapturingOrder } = usePaypal();
   const [activeStep, setActiveStep] = useState(1);
-  const [selectedPaymentMethod, setSelectedPaymentMethod] =
-    useState<PaymentMethod["id"]>("razorpay");
+  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<PaymentMethod["id"]>("paypal");
   const [orderComplete, setOrderComplete] = useState(false);
   const [courseIds, setCourseIds] = useState<string[]>([]);
   const [couponCode, setCouponCode] = useState<string>("");
+  const { user } = useAuthStore();
+
+  // Memoize paypalOptions
+  const paypalOptions = useMemo(
+    () => ({
+      clientId: process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID || "",
+      currency: "USD",
+      // intent: "capture",
+    }),
+    []
+  );
+
+  // // Memoize createPaypalOrder
+  // const handleCreatePaypalOrder = useCallback(() => {
+  //   if (!user?.id) {
+  //     toast.error("Please log in to proceed with payment");
+  //     throw new Error("User not authenticated");
+  //   }
+  //   return createPaypalOrder({
+  //     userId: user.id,
+  //     order_price: String(
+  //       parseFloat(totalDiscountedPrice.toFixed(2)) === 0
+  //         ? 10
+  //         : totalDiscountedPrice.toFixed(2)
+  //     ),
+  //   });
+  // }, [user?.id, createPaypalOrder]);
+
+  // Memoize capturePaypalOrder
+  // const handleCapturePaypalOrder = useCallback(
+  //   (orderID: string) => {
+  //     if (!user?.id) {
+  //       toast.error("Please log in to complete payment");
+  //       throw new Error("User not authenticated");
+  //     }
+  //     return capturePaypalOrder({
+  //       orderID,
+  //       userId: user.id,
+  //     }).then(() => {
+  //       setOrderComplete(true);
+  //       setActiveStep(3);
+  //     });
+  //   },
+  //   [user?.id, capturePaypalOrder]
+  // );
 
   // Memoize courseIds
-  useMemo(() => {
+  const courseIdsMemo = useMemo(() => {
     if (courseId) {
-      setCourseIds([courseId]);
+      return [courseId];
     } else if (cartData?.items) {
-      const ids = cartData.items.map((item: ICart) => item.courseId);
-      setCourseIds(ids);
-    } else {
-      setCourseIds([]);
+      return cartData.items.map((item: ICart) => item.courseId);
     }
+    return [];
   }, [courseId, cartData?.items]);
+
+  useMemo(() => {
+    setCourseIds(courseIdsMemo);
+  }, [courseIdsMemo]);
 
   // Calculate totals and course details
   const { totalOriginalPrice, totalDiscountedPrice, courseDetails } =
@@ -66,10 +110,24 @@ export default function CheckoutPage({
         const offer =
           typeof singleCourse.offer === "string"
             ? parseFloat(singleCourse.offer)
-            : singleCourse.offer ?? 0;
+            : singleCourse.offer ?? price;
+        // Ensure offer is not zero
+        const validatedOffer = offer > 0 ? offer : price;
+        if (validatedOffer <= 0) {
+          console.error("Invalid price for single course:", {
+            price,
+            offer,
+            validatedOffer,
+          });
+          return {
+            totalOriginalPrice: 0,
+            totalDiscountedPrice: 0,
+            courseDetails: [],
+          };
+        }
         return {
           totalOriginalPrice: price,
-          totalDiscountedPrice: offer,
+          totalDiscountedPrice: validatedOffer,
           courseDetails: [
             {
               id: singleCourse.id,
@@ -77,7 +135,7 @@ export default function CheckoutPage({
               thumbnail: singleCourse.thumbnail,
               image: singleCourse.thumbnail || "",
               price,
-              offer,
+              offer: validatedOffer,
               duration: String(singleCourse.duration ?? ""),
               level: singleCourse.level,
             } as Course,
@@ -87,24 +145,30 @@ export default function CheckoutPage({
         const courses = cartData.items
           .map((item: ICart) => item.course)
           .filter((course): course is Course => !!course)
-          .map((course) => ({
-            id: course.id,
-            title: course.title,
-            thumbnail: course.thumbnail,
-            image: course.image ?? "",
-            price:
+          .map((course) => {
+            const price =
               typeof course.price === "string"
                 ? parseFloat(course.price)
-                : course.price ?? 0,
-            offer:
+                : course.price ?? 0;
+            const offer =
               typeof course.offer === "string"
                 ? parseFloat(course.offer)
-                : course.offer ?? 0,
-            duration: String(course.duration ?? ""),
-            level: course.level,
-            lectures: course.lectures ?? 0,
-            creator: course.creator ?? { name: "" },
-          }));
+                : course.offer ?? price;
+            // Ensure offer is not zero
+            const validatedOffer = offer > 0 ? offer : price;
+            return {
+              id: course.id,
+              title: course.title,
+              thumbnail: course.thumbnail,
+              image: course.image ?? "",
+              price,
+              offer: validatedOffer,
+              duration: String(course.duration ?? ""),
+              level: course.level,
+              lectures: course.lectures ?? 0,
+              creator: course.creator ?? { name: "" },
+            };
+          });
         const totalOriginal = courses.reduce(
           (sum, course) => sum + Number(course.price),
           0
@@ -113,6 +177,18 @@ export default function CheckoutPage({
           (sum, course) => sum + Number(course.offer),
           0
         );
+        if (totalDiscounted <= 0) {
+          console.error("Invalid total discounted price for cart:", {
+            totalOriginal,
+            totalDiscounted,
+            courses,
+          });
+          return {
+            totalOriginalPrice: 0,
+            totalDiscountedPrice: 0,
+            courseDetails: [],
+          };
+        }
         return {
           totalOriginalPrice: totalOriginal,
           totalDiscountedPrice: totalDiscounted,
@@ -124,14 +200,13 @@ export default function CheckoutPage({
         totalDiscountedPrice: 0,
         courseDetails: [] as Course[],
       };
-    }, [courseId, singleCourse, cartData?.items]);
+    }, [courseId, singleCourse?.id, cartData?.items?.length]);
 
-  const handlePaymentMethodSelect = useCallback(
-    (methodId: PaymentMethod["id"]) => {
-      setSelectedPaymentMethod(methodId);
-    },
-    []
-  );
+  const handlePaymentMethodSelect = useCallback((methodId: PaymentMethod["id"]) => {
+    console.log("Selecting payment method:", methodId);
+    setSelectedPaymentMethod(methodId);
+  }, []);
+
 
   const handleProceedToPayment = useCallback(() => {
     if (!courseIds.length) {
@@ -149,23 +224,24 @@ export default function CheckoutPage({
         return;
       }
 
-      createOrder(
-        { courseIds, couponCode },
-        {
-          onSuccess: (order) => {
-            console.log(
-              `Initiating ${selectedPaymentMethod} payment for order:`,
-              order.id
-            );
-            setOrderComplete(true);
-            setActiveStep(3);
-            toast.success("Order created successfully!");
-          },
-          onError: (error) => {
-            toast.error(error.message);
-          },
-        }
-      );
+      if (selectedPaymentMethod !== "paypal") {
+        createOrder(
+          { courseIds, couponCode },
+          {
+            onSuccess: (order) => {
+              console.log(`Initiating ${selectedPaymentMethod} payment for order:`, order.id);
+              setOrderComplete(true);
+              setActiveStep(3);
+              toast.success("Order created successfully!");
+            },
+            onError: (error) => {
+              toast.error(error.message);
+            },
+          }
+        );
+      } else {
+        // For PayPal, order creation is handled by PayPalButtons
+      }
     },
     [courseIds, couponCode, createOrder, selectedPaymentMethod]
   );
@@ -176,29 +252,19 @@ export default function CheckoutPage({
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-blue-800">
-            Complete Your Purchase
-          </h1>
-          <p className="text-gray-600 mt-2">
-            You're just a few steps away from accessing your course(s)
-          </p>
+          <h1 className="text-3xl font-bold text-blue-800">Complete Your Purchase</h1>
+          <p className="text-gray-600 mt-2">You're just a few steps away from accessing your course(s)</p>
         </div>
 
         <div className="flex flex-col lg:flex-row gap-6">
           <div className="w-full lg:w-7/12 bg-white rounded-lg shadow-md p-6">
             <div className="flex mb-8 border-b pb-4">
               <div
-                className={`flex-1 text-center ${
-                  activeStep >= 1
-                    ? "text-blue-700 font-medium"
-                    : "text-gray-400"
-                }`}
+                className={`flex-1 text-center ${activeStep >= 1 ? "text-blue-700 font-medium" : "text-gray-400"}`}
               >
                 <div
                   className={`w-8 h-8 mx-auto mb-2 rounded-full flex items-center justify-center ${
-                    activeStep >= 1
-                      ? "bg-blue-700 text-white"
-                      : "bg-gray-200 text-gray-500"
+                    activeStep >= 1 ? "bg-blue-700 text-white" : "bg-gray-200 text-gray-500"
                   }`}
                 >
                   1
@@ -206,17 +272,11 @@ export default function CheckoutPage({
                 Order Details
               </div>
               <div
-                className={`flex-1 text-center ${
-                  activeStep >= 2
-                    ? "text-blue-700 font-medium"
-                    : "text-gray-400"
-                }`}
+                className={`flex-1 text-center ${activeStep >= 2 ? "text-blue-700 font-medium" : "text-gray-400"}`}
               >
                 <div
                   className={`w-8 h-8 mx-auto mb-2 rounded-full flex items-center justify-center ${
-                    activeStep >= 2
-                      ? "bg-blue-700 text-white"
-                      : "bg-gray-200 text-gray-500"
+                    activeStep >= 2 ? "bg-blue-700 text-white" : "bg-gray-200 text-gray-500"
                   }`}
                 >
                   2
@@ -224,17 +284,11 @@ export default function CheckoutPage({
                 Payment
               </div>
               <div
-                className={`flex-1 text-center ${
-                  activeStep >= 3
-                    ? "text-blue-700 font-medium"
-                    : "text-gray-400"
-                }`}
+                className={`flex-1 text-center ${activeStep >= 3 ? "text-blue-700 font-medium" : "text-gray-400"}`}
               >
                 <div
                   className={`w-8 h-8 mx-auto mb-2 rounded-full flex items-center justify-center ${
-                    activeStep >= 3
-                      ? "bg-blue-700 text-white"
-                      : "bg-gray-200 text-gray-500"
+                    activeStep >= 3 ? "bg-blue-700 text-white" : "bg-gray-200 text-gray-500"
                   }`}
                 >
                   3
@@ -252,7 +306,7 @@ export default function CheckoutPage({
                 isDisabled={!courseIds.length}
               />
             ) : activeStep === 2 ? (
-              isPending ? (
+              isPending || isCreatingOrder || isCapturingOrder ? (
                 <PaymentMethodSkeleton />
               ) : (
                 <PaymentMethodSelection
@@ -261,8 +315,11 @@ export default function CheckoutPage({
                   couponCode={couponCode}
                   onCouponChange={setCouponCode}
                   onSubmit={handleSubmit}
-                  isPending={isPending}
+                  isPending={isPending || isCreatingOrder || isCapturingOrder}
                   isDisabled={!courseIds.length}
+                  paypalOptions={paypalOptions}
+                  // createPaypalOrder={handleCreatePaypalOrder}
+                  // capturePaypalOrder={handleCapturePaypalOrder}
                 />
               )
             ) : (
@@ -271,14 +328,12 @@ export default function CheckoutPage({
           </div>
 
           <div className="w-full lg:w-5/12">
-            {isLoading ? (
-              <OrderSummarySkeleton />
-            ) : (
-              <OrderSummary courses={courseDetails} />
-            )}
+            {isLoading ? <OrderSummarySkeleton /> : <OrderSummary courses={courseDetails} />}
           </div>
         </div>
       </div>
     </div>
   );
-}
+});
+
+export default CheckoutPage;

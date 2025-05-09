@@ -1,29 +1,12 @@
-import { CreditCard, DollarSign, Lock, ChevronRight } from "lucide-react";
-import { JSX } from "react";
+import { FC, memo, useState, useEffect } from "react";
+import { PayPalScriptProvider, PayPalButtons } from "@paypal/react-paypal-js";
+import { toast } from "sonner";
+import { IPaypalOrder } from "@/types/paypal.types";
 
 interface PaymentMethod {
   id: "razorpay" | "paypal" | "stripe";
   name: string;
-  icon: JSX.Element;
 }
-
-const paymentMethods: PaymentMethod[] = [
-  {
-    id: "razorpay",
-    name: "Razorpay",
-    icon: <CreditCard size={20} className="text-blue-700" />,
-  },
-  {
-    id: "paypal",
-    name: "PayPal",
-    icon: <DollarSign size={20} className="text-blue-700" />,
-  },
-  {
-    id: "stripe",
-    name: "Stripe",
-    icon: <CreditCard size={20} className="text-blue-700" />,
-  },
-];
 
 interface PaymentMethodSelectionProps {
   selectedMethod: PaymentMethod["id"];
@@ -33,79 +16,168 @@ interface PaymentMethodSelectionProps {
   onSubmit: (e: React.MouseEvent) => void;
   isPending: boolean;
   isDisabled: boolean;
+  paypalOptions: {
+    clientId: string;
+    currency: string;
+    intent?: string;
+  };
+  // createPaypalOrder: () => Promise<{
+  //   status: string;
+  //   order: { order: IPaypalOrder };
+  //   message: string;
+  //   statusCode: number;
+  // }>;
+  // capturePaypalOrder: (orderID: string) => Promise<void>;
 }
 
-export default function PaymentMethodSelection({
-  selectedMethod,
-  onMethodSelect,
-  couponCode,
-  onCouponChange,
-  onSubmit,
-  isPending,
-  isDisabled,
-}: PaymentMethodSelectionProps) {
-  return (
-    <div className="space-y-6">
-      <h2 className="text-xl font-semibold text-gray-800 mb-4">
-        Select Payment Method
-      </h2>
-      <div className="bg-blue-50 border border-blue-200 rounded-md p-4 mb-6 flex items-center">
-        <Lock className="text-blue-700 mr-3" size={20} />
-        <span className="text-sm text-blue-800">
-          Your payment information is secure and encrypted
-        </span>
-      </div>
+const paymentMethods: PaymentMethod[] = [{ id: "paypal", name: "PayPal" }];
 
-      <div className="space-y-4">
-        {paymentMethods.map((method) => (
-          <label
-            key={method.id}
-            className={`flex items-center p-4 border rounded-md cursor-pointer transition duration-200 ${
-              selectedMethod === method.id
-                ? "border-blue-500 bg-blue-50"
-                : "border-gray-300"
-            }`}
-          >
-            <input
-              type="radio"
-              name="paymentMethod"
-              value={method.id}
-              checked={selectedMethod === method.id}
-              onChange={() => onMethodSelect(method.id)}
-              className="mr-3 text-blue-700 focus:ring-blue-500"
-            />
-            <div className="flex items-center">
-              {method.icon}
-              <span className="ml-2 text-gray-800">{method.name}</span>
+const PaymentMethodSelection: FC<PaymentMethodSelectionProps> = memo(
+  ({
+    selectedMethod,
+    onMethodSelect,
+    couponCode,
+    onCouponChange,
+    onSubmit,
+    isPending,
+    isDisabled,
+    paypalOptions,
+    // createPaypalOrder,
+    // capturePaypalOrder,
+  }) => {
+    console.log("Rendering PaymentMethodSelection, props:", {
+      selectedMethod,
+      couponCode,
+      isPending,
+      isDisabled,
+      paypalOptions,
+    });
+    const [isPaypalLoading, setIsPaypalLoading] = useState(false);
+
+    // Log prop changes
+    useEffect(() => {
+      console.log("PaymentMethodSelection props changed:", {
+        selectedMethod,
+        couponCode,
+        isPending,
+        isDisabled,
+      });
+    }, [selectedMethod, couponCode, isPending, isDisabled]);
+    console.log(paypalOptions, "paypalOptions");
+    const createOrder = (data: any, actions: any) => {
+      return actions.order.create({
+        purchase_units: [
+          {
+            amount: {
+              value: 1000,
+            },
+          },
+        ],
+      });
+    };
+
+    return (
+      <div className="space-y-6">
+        <h2 className="text-xl font-semibold text-gray-800">
+          Select Payment Method
+        </h2>
+
+        <div className="bg-gray-50 p-4 rounded-md mb-6">
+          {paymentMethods.map((method) => (
+            <div
+              key={method.id}
+              className="flex items-center p-4 border rounded-md mb-2 cursor-pointer hover:bg-gray-100"
+              onClick={() =>
+                !isPending && !isPaypalLoading && onMethodSelect(method.id)
+              }
+            >
+              <input
+                type="radio"
+                name="paymentMethod"
+                checked={selectedMethod === method.id}
+                onChange={() => onMethodSelect(method.id)}
+                disabled={isPending || isPaypalLoading}
+                className="h-5 w-5 text-blue-600 focus:ring-blue-500"
+              />
+              <span className="ml-3 text-gray-700">{method.name}</span>
             </div>
-          </label>
-        ))}
-      </div>
+          ))}
+        </div>
 
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">
-          Coupon Code
-        </label>
-        <input
-          type="text"
-          value={couponCode}
-          onChange={(e) => onCouponChange(e.target.value)}
-          placeholder="Enter coupon code"
-          className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-        />
-      </div>
+        {true ? (
+          <div className="mt-6">
+            {false ? (
+              <div className="text-center">Loading PayPal Buttons...</div>
+            ) : (
+              <PayPalScriptProvider options={paypalOptions}>
+                <PayPalButtons
+                  style={{ layout: "vertical" }}
+                  onInit={(data, actions) => {
+                    console.log("PayPal SDK initialized:", data);
+                  }}
+                  createOrder={createOrder}
+                  onApprove={async (data,action) => {
+                    try {
+                      console.log("PayPal order approved:", data);
+                      const details = await action.order?.capture();
+                      toast.success("Payment completed successfully!" , details);
+                    } catch (error) {
+                      console.error("Error in onApprove:", error);
+                      toast.error("Failed to complete PayPal payment");
+                    }
+                  }}
+                  onCancel={(data) => {
+                    console.log("PayPal payment cancelled:", data);
+                    toast.info("PayPal payment was cancelled");
+                  }}
+                  onError={(err) => {
+                    console.error("PayPal button error:", err, {
+                      message: err.message,
+                      stack: err.stack,
+                      name: err.name,
+                    });
+                    toast.error(
+                      "An error occurred with PayPal. Please try again."
+                    );
+                  }}
+                />
+              </PayPalScriptProvider>
+            )}
+          </div>
+        ) : (
+          <>
+            <div>
+              <label className="block text-sm font-medium text-gray-700">
+                Coupon Code (Optional)
+              </label>
+              <input
+                type="text"
+                value={couponCode}
+                onChange={(e) => onCouponChange(e.target.value)}
+                className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                placeholder="Enter coupon code"
+              />
+            </div>
 
-      <div className="mt-8 flex justify-end">
-        <button
-          type="button"
-          onClick={onSubmit}
-          disabled={isPending || isDisabled}
-          className="bg-blue-700 hover:bg-blue-800 text-white py-3 px-8 rounded-md font-medium transition duration-300 disabled:bg-gray-400"
-        >
-          {isPending ? "Processing..." : "Complete Purchase"}
-          <ChevronRight className="ml-2 inline" size={16} />
-        </button>
+            <div className="flex justify-end">
+              <button
+                type="button"
+                onClick={onSubmit}
+                disabled={isPending || isDisabled}
+                className={`inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-white ${
+                  isPending || isDisabled
+                    ? "bg-gray-400 cursor-not-allowed"
+                    : "bg-blue-600 hover:bg-blue-700"
+                } focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500`}
+              >
+                {isPending ? "Processing..." : "Confirm Payment"}
+              </button>
+            </div>
+          </>
+        )}
       </div>
-    </div>
-  );
-}
+    );
+  }
+);
+
+export default PaymentMethodSelection;
