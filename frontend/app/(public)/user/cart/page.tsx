@@ -1,7 +1,5 @@
 "use client";
-import {
-  Trash2,
-} from "lucide-react";
+import { Trash2 } from "lucide-react";
 import { useCart } from "@/hooks/cart/useCart";
 import { useRemoveFromCart } from "@/hooks/cart/useRemoveFromCart";
 import { useClearCart } from "@/hooks/cart/useClearCart";
@@ -22,6 +20,8 @@ export default function CartPage({ page = 1, limit = 10 }: CartPageProps) {
   const clearCartMutation = useClearCart();
 
   const cart = data?.items;
+
+  console.log(cart);
 
   const handleRemoveCourse = useCallback(
     (courseId: string) => {

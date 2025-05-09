@@ -40,7 +40,6 @@ const CheckoutPage: FC<CheckoutPageProps> = memo(({ page = 1, limit = 10 }) => {
   const [orderComplete, setOrderComplete] = useState(false);
   const [courseIds, setCourseIds] = useState<string[]>([]);
   const [couponCode, setCouponCode] = useState<string>("");
-  const { user } = useAuthStore();
 
   const paypalOptions = useMemo(
     () => ({

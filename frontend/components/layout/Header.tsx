@@ -32,6 +32,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/utils/cn";
+import { useRouter } from "next/navigation"; 
 
 interface HeaderProps {
   client?: { id: string; name: string };
@@ -45,6 +46,7 @@ export function Header({ client }: HeaderProps = {}) {
   const [isInstructorModalOpen, setIsInstructorModalOpen] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const router = useRouter()
 
   const handleInstructorSubmit = useCallback(
     async (data: InstructorFormData): Promise<void> => {
@@ -181,23 +183,22 @@ export function Header({ client }: HeaderProps = {}) {
                         className="w-6 h-6 text-gray-600 group-hover:text-red-500 transition-colors cursor-pointer"
                         strokeWidth={1.5}
                       />
-                      <Badge
+                      {/* <Badge
                         variant="destructive"
                         className="absolute -top-2 -right-2 w-5 h-5 p-0 flex items-center justify-center text-xs"
                       >
                         3
-                      </Badge>
+                      </Badge> */}
                     </div>
                     <div className="relative group">
-                      <Link href='/user/cart'>
-                        
+                      <Link href="/user/cart">
                         <ShoppingCart
                           className="w-6 h-6 text-gray-600 group-hover:text-blue-500 transition-colors cursor-pointer"
                           strokeWidth={1.5}
                         />
-                        <Badge className="absolute -top-2 -right-2 w-5 h-5 p-0 flex items-center justify-center text-xs">
+                        {/* <Badge className="absolute -top-2 -right-2 w-5 h-5 p-0 flex items-center justify-center text-xs">
                           2
-                        </Badge>
+                        </Badge> */}
                       </Link>
                     </div>
                     <div className="relative group">
@@ -247,7 +248,10 @@ export function Header({ client }: HeaderProps = {}) {
                         </DropdownMenuItem>
                         <DropdownMenuSeparator />
                         <DropdownMenuItem
-                          onClick={() => logout()}
+                            onClick={() => {
+                              logout()
+                              router.push('/login')
+                            }}
                           disabled={isLoggingOut}
                           className="text-gray-700 hover:text-red-600"
                         >
