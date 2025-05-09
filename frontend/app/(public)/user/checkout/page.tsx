@@ -14,7 +14,6 @@ import PaymentMethodSelection from "@/components/checkout/PaymentMethodSelection
 import OrderConfirmation from "@/components/checkout/OrderConfirmation";
 import OrderSummarySkeleton from "@/components/checkout/OrderSummerySkeleton";
 import { OrderSummary } from "@/components/checkout/OrderSummery";
-import { useAuthStore } from "@/stores/auth.store";
 
 interface PaymentMethod {
   id: "razorpay" | "paypal" | "stripe";
