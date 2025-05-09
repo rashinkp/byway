@@ -9,24 +9,26 @@ import { useCallback } from "react";
 
 
 interface OrderSummaryProps {
-  courses: Course[];
+  cart: ICart[];
 }
 
-export const OrderSummary = ({ courses }: OrderSummaryProps) => {
+export const OrderSummary = ({ cart }: OrderSummaryProps) => {
+
+  console.log(cart);
   const calculateSubtotal = useCallback((): number => {
     return (
-      courses?.reduce(
+      cart?.reduce(
         (total, item) =>
           total +
-          (typeof item?.offer === "string"
-            ? parseFloat(item.offer)
-            : typeof item?.offer === "number"
-            ? item.offer
+          (typeof item?.course?.offer === "string"
+            ? parseFloat(item.course?.offer)
+            : typeof item?.course?.offer === "number"
+            ? item.course?.offer
             : 0),
         0
       ) ?? 0
     );
-  }, [courses]);
+  }, [cart]);
 
   const calculateTax = useCallback((): number => {
     return calculateSubtotal() * 0.07;
@@ -58,7 +60,7 @@ export const OrderSummary = ({ courses }: OrderSummaryProps) => {
       <Link
         href="/user/checkout"
         className={`w-full bg-blue-600 text-white font-medium py-3 px-4 rounded-md mt-6 flex items-center justify-center ${
-          courses?.length === 0
+          cart?.length === 0
             ? "opacity-50 cursor-not-allowed"
             : "hover:bg-blue-700"
         }`}

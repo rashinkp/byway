@@ -23,6 +23,7 @@ export default function CartPage({ page = 1, limit = 10 }: CartPageProps) {
 
   console.log(cart);
 
+
   const handleRemoveCourse = useCallback(
     (courseId: string) => {
       removeFromCartMutation.mutate(courseId);
