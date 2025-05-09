@@ -1,6 +1,5 @@
 import { cn } from "@/utils/cn";
 import { Button } from "@/components/ui/button";
-import { ChevronDown } from "lucide-react";
 import { useState } from "react";
 
 interface FilterSidebarProps {
@@ -13,16 +12,20 @@ export function FilterSidebar({
   onFilterChange,
 }: FilterSidebarProps) {
   const [filters, setFilters] = useState({
-    category: "",
-    level: "",
-    price: "",
-    rating: "",
-    duration: "",
-    sort: "popularity-desc",
+    category: "all",
+    level: "all",
+    price: "all",
+    rating: "all",
+    duration: "all",
+    sort: "title-asc",
   });
 
-  const handleFilterChange = (key: string, value: string | Record<string, string>) => {
-    const updatedFilters = key === 'reset' ? value : { ...filters, [key]: value };
+  const handleFilterChange = (
+    key: string,
+    value: string | Record<string, string>
+  ) => {
+    const updatedFilters =
+      key === "reset" ? value : { ...filters, [key]: value };
     setFilters(updatedFilters as typeof filters);
     if (onFilterChange) {
       onFilterChange(updatedFilters as typeof filters);
@@ -46,10 +49,14 @@ export function FilterSidebar({
           onChange={(e) => handleFilterChange("sort", e.target.value)}
           className="w-full border border-gray-300 rounded-md p-2 text-sm focus:ring-blue-500 focus:border-blue-500"
         >
-          <option value="popularity-desc">Popularity (High to Low)</option>
-          <option value="popularity-asc">Popularity (Low to High)</option>
-          <option value="price-desc">Price (High to Low)</option>
+          <option value="title-asc">Title (A-Z)</option>
+          <option value="title-desc">Title (Z-A)</option>
           <option value="price-asc">Price (Low to High)</option>
+          <option value="price-desc">Price (High to Low)</option>
+          <option value="duration-asc">Duration (Short to Long)</option>
+          <option value="duration-desc">Duration (Long to Short)</option>
+          <option value="createdAt-desc">Newest First</option>
+          <option value="createdAt-asc">Oldest First</option>
         </select>
       </div>
 
@@ -91,7 +98,7 @@ export function FilterSidebar({
                 onChange={() =>
                   handleFilterChange("level", level.toLowerCase())
                 }
-                className="h-4 w-4 text-blue-600 focus:ring-blue-500"
+                className="h-4 w-4 text-blue-600-urban focus:ring-blue-500-urban"
               />
               <span className="text-sm text-gray-600">{level}</span>
             </label>
@@ -113,7 +120,7 @@ export function FilterSidebar({
                 onChange={() =>
                   handleFilterChange("price", price.toLowerCase())
                 }
-                className="h-4 w-4 text-blue-600 focus:ring-blue-500"
+                className="h-4 w-4 text-blue-600-urban focus:ring-blue-500-urban"
               />
               <span className="text-sm text-gray-600">{price}</span>
             </label>
@@ -135,7 +142,8 @@ export function FilterSidebar({
                 onChange={() =>
                   handleFilterChange("rating", rating.toLowerCase())
                 }
-                className="h-4 w-4 text-blue-600 focus:ring-blue-500"
+                className="h-4 w-4 text-blue-600-urban focus:ring-blue-500-urban"
+                disabled // Disable until backend supports rating filter
               />
               <span className="text-sm text-gray-600">{rating}</span>
             </label>
@@ -158,7 +166,7 @@ export function FilterSidebar({
                   onChange={() =>
                     handleFilterChange("duration", duration.toLowerCase())
                   }
-                  className="h-4 w-4 text-blue-600 focus:ring-blue-500"
+                  className="h-4 w-4 text-blue-600-urban focus:ring-blue-500-urban"
                 />
                 <span className="text-sm text-gray-600">{duration}</span>
               </label>
@@ -173,12 +181,12 @@ export function FilterSidebar({
         className="w-full border-gray-300 text-gray-700 hover:text-blue-600 hover:border-blue-600"
         onClick={() =>
           handleFilterChange("reset", {
-            category: "",
-            level: "",
-            price: "",
-            rating: "",
-            duration: "",
-            sort: "popularity-desc",
+            category: "all",
+            level: "all",
+            price: "all",
+            rating: "all",
+            duration: "all",
+            sort: "title-asc",
           })
         }
       >

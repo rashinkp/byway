@@ -21,6 +21,9 @@ export function useGetAllCourses({
   filterBy = "All",
   myCourses = false,
   role = "USER",
+  level = "All",
+  duration = "All",
+  price = "All",
 }: IGetAllCoursesInput = {}): UseCoursesReturn {
   let adjustedSortBy: IGetAllCoursesInput["sortBy"] = sortBy;
   let adjustedSortOrder: IGetAllCoursesInput["sortOrder"] = sortOrder;
@@ -50,6 +53,9 @@ export function useGetAllCourses({
       filterBy,
       myCourses,
       role,
+      level,
+      duration,
+      price, // Add new filters to query key
     ],
     queryFn: async () => {
       const response = await getAllCourses({
@@ -62,6 +68,9 @@ export function useGetAllCourses({
         filterBy,
         myCourses,
         role,
+        level,
+        duration,
+        price,
       });
       return response;
     },

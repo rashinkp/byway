@@ -74,7 +74,7 @@ export type NegativeSortByField = `-${SortByField}`;
 export interface IGetAllCoursesInput {
   page?: number;
   limit?: number;
-  sortBy?: "title" | "createdAt" | "updatedAt";
+  sortBy?: "title" | "createdAt" | "updatedAt" | "price" | "duration"; // Add price and duration to sort options
   sortOrder?: "asc" | "desc";
   includeDeleted?: boolean;
   search?: string;
@@ -82,4 +82,7 @@ export interface IGetAllCoursesInput {
   userId?: string;
   myCourses?: boolean;
   role?: "USER" | "INSTRUCTOR" | "ADMIN";
+  level?: "BEGINNER" | "MEDIUM" | "ADVANCED" | "All"; // Add level filter
+  duration?: "All" | "Under5" | "5to10" | "Over10"; // Add duration filter
+  price?: "All" | "Free" | "Paid"; // Add price filter
 }

@@ -14,6 +14,9 @@ export async function getAllCourses({
   search = "",
   myCourses = false,
   role = "USER",
+  level = "All",
+  duration = "All",
+  price = "All",
 }: IGetAllCoursesInput): Promise<CourseApiResponse> {
   try {
     const response = await api.get<{ data: CourseApiResponse }>("/courses/", {
@@ -27,6 +30,9 @@ export async function getAllCourses({
         filterBy,
         myCourses,
         role,
+        level,
+        duration,
+        price,
       },
     });
     return response.data.data;
@@ -35,7 +41,6 @@ export async function getAllCourses({
     throw new Error("Failed to fetch courses");
   }
 }
-
 
 export async function createCourse(
   courseData: AddCourseParams

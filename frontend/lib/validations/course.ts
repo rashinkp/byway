@@ -3,32 +3,47 @@ import { z } from "zod";
 export const courseEditSchema = z
   .object({
     title: z.string().min(1, "Title is required"),
-    description: z.string().optional(),
+    description: z.string().optional().nullable(),
     level: z.enum(["BEGINNER", "MEDIUM", "ADVANCED"]),
-    price: z.number().min(0, "Price cannot be negative").optional(),
-    duration: z.number().min(1, "Duration must be at least 1 hour"),
-    offer: z.number().min(0, "Offer price cannot be negative").optional(),
+    price: z.number().min(0, "Price cannot be negative").optional().nullable(),
+    duration: z
+      .number()
+      .min(0, "Duration cannot be negative")
+      .optional()
+      .nullable(), // Allow duration to be optional and nullable
+    offer: z
+      .number()
+      .min(0, "Offer price cannot be negative")
+      .optional()
+      .nullable(),
     status: z.enum(["DRAFT", "PUBLISHED", "ARCHIVED"], {
       errorMap: () => ({ message: "Status is required" }),
     }),
-    thumbnail: z.union([z.instanceof(File), z.string().url()]).optional(),
+    thumbnail: z
+      .union([z.instanceof(File), z.string().url()])
+      .optional()
+      .nullable(),
     categoryId: z.string().nonempty("Category is required"),
     prerequisites: z
       .string()
       .max(2000, "Prerequisites cannot exceed 2000 characters")
-      .optional(),
+      .optional()
+      .nullable(),
     longDescription: z
       .string()
       .max(5000, "Detailed description cannot exceed 5000 characters")
-      .optional(),
+      .optional()
+      .nullable(),
     objectives: z
       .string()
       .max(2000, "Objectives cannot exceed 2000 characters")
-      .optional(),
+      .optional()
+      .nullable(),
     targetAudience: z
       .string()
       .max(2000, "Target audience cannot exceed 2000 characters")
-      .optional(),
+      .optional()
+      .nullable(),
   })
   .refine(
     (data) => {
@@ -44,7 +59,12 @@ export const courseEditSchema = z
   )
   .refine(
     (data) => {
-      if (data.offer !== undefined && data.price !== undefined) {
+      if (
+        data.offer !== undefined &&
+        data.offer !== null &&
+        data.price !== undefined &&
+        data.price !== null
+      ) {
         return data.offer <= data.price;
       }
       return true;
@@ -65,31 +85,47 @@ export const courseSchema = z
     description: z
       .string()
       .max(1000, "Description cannot exceed 1000 characters")
-      .optional(),
+      .optional()
+      .nullable(),
     level: z
       .enum(["BEGINNER", "MEDIUM", "ADVANCED"])
       .refine((val) => val !== undefined, "Level is required"),
-    price: z.number().min(0, "Price cannot be negative").optional(),
-    thumbnail: z.union([z.instanceof(File), z.string().url()]).optional(),
-    duration: z.number().min(0, "Duration cannot be negative"),
-    offer: z.number().min(0, "Offer price cannot be negative").optional(),
+    price: z.number().min(0, "Price cannot be negative").optional().nullable(),
+    thumbnail: z
+      .union([z.instanceof(File), z.string().url()])
+      .optional()
+      .nullable(),
+    duration: z
+      .number()
+      .min(0, "Duration cannot be negative")
+      .optional()
+      .nullable(), // Allow duration to be optional and nullable
+    offer: z
+      .number()
+      .min(0, "Offer price cannot be negative")
+      .optional()
+      .nullable(),
     categoryId: z.string().nonempty("Category is required"),
     prerequisites: z
       .string()
       .max(2000, "Prerequisites cannot exceed 2000 characters")
-      .optional(),
+      .optional()
+      .nullable(),
     longDescription: z
       .string()
       .max(5000, "Detailed description cannot exceed 5000 characters")
-      .optional(),
+      .optional()
+      .nullable(),
     objectives: z
       .string()
       .max(2000, "Objectives cannot exceed 2000 characters")
-      .optional(),
+      .optional()
+      .nullable(),
     targetAudience: z
       .string()
       .max(2000, "Target audience cannot exceed 2000 characters")
-      .optional(),
+      .optional()
+      .nullable(),
   })
   .refine(
     (data) => {
@@ -105,7 +141,12 @@ export const courseSchema = z
   )
   .refine(
     (data) => {
-      if (data.price !== undefined && data.offer !== undefined) {
+      if (
+        data.price !== undefined &&
+        data.price !== null &&
+        data.offer !== undefined &&
+        data.offer !== null
+      ) {
         return data.offer <= data.price;
       }
       return true;
