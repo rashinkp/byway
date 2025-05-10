@@ -8,7 +8,7 @@ export const createStripeRouter = (controller: StripeController): Router => {
   const adapt = adaptStripeController(controller);
 
   // Protected route for creating Checkout Sessions
-  router.post("/create-checkout-session", protect, adapt.createCheckoutSession);
+  router.post("/create-checkout-session",express.json(), protect, adapt.createCheckoutSession);
 
   // Webhook route with raw body parsing
   router.post(

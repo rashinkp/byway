@@ -18,10 +18,11 @@ const dbProvider = new PrismaDatabaseProvider();
 const dependencies = initializeAppDependencies(dbProvider);
 
 // Mount Stripe router before global middleware to bypass express.json()
-app.use("/api/v1/strip", createStripeRouter(dependencies.stripeController));
 
 // Configure middleware
 configureMiddleware(app);
+app.use("/api/v1/strip", createStripeRouter(dependencies.stripeController));
+ app.use(express.json());
 
 // Health check endpoint
 app.get("/health", (req: Request, res: Response) => {

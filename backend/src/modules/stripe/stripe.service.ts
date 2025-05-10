@@ -21,9 +21,8 @@ export class StripeService {
   private stripe: Stripe;
 
   constructor(
-    private userService: UserService
-  ) // private stripeRepository: IStripeRepository
-  {
+    private userService: UserService // private stripeRepository: IStripeRepository
+  ) {
     this.stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
       apiVersion: "2025-04-30.basil",
     });
@@ -53,6 +52,17 @@ export class StripeService {
       throw new AppError("User not found", StatusCodes.NOT_FOUND, "NOT_FOUND");
     }
 
+    // Validate FRONTEND_URL
+    const frontendUrl = process.env.FRONTEND_URL;
+    if (!frontendUrl) {
+      logger.error("FRONTEND_URL is not defined in environment variables");
+      throw new AppError(
+        "Server configuration error: FRONTEND_URL is missing",
+        StatusCodes.INTERNAL_SERVER_ERROR,
+        "CONFIG_ERROR"
+      );
+    }
+
     try {
       // TODO: Fetch course details from database to validate and get prices
       const lineItems: Stripe.Checkout.SessionCreateParams.LineItem[] =
@@ -72,8 +82,8 @@ export class StripeService {
         payment_method_types: ["card"],
         line_items: lineItems,
         mode: "payment",
-        success_url: `${process.env.FRONTEND_URL}/success?session_id={CHECKOUT_SESSION_ID}`,
-        cancel_url: `${process.env.FRONTEND_URL}/cancel`,
+        success_url: `${frontendUrl}/success?session_id={CHECKOUT_SESSION_ID}`,
+        cancel_url: `${frontendUrl}/cancel`,
         customer_email: user.email,
         metadata: {
           userId,
@@ -106,6 +116,12 @@ export class StripeService {
       logger.error("Error creating Stripe checkout session", { error, input });
       throw error instanceof AppError
         ? error
+        : error instanceof Stripe.errors.StripeInvalidRequestError
+        ? new AppError(
+            error.message,
+            StatusCodes.BAD_REQUEST,
+            "STRIPE_INVALID_REQUEST"
+          )
         : new AppError(
             "Failed to create Stripe checkout session",
             StatusCodes.INTERNAL_SERVER_ERROR,

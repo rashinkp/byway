@@ -12,7 +12,7 @@ export const configureMiddleware = (app: Express): void => {
       credentials: true,
     })
   );
-  app.use(express.json());
+ 
   app.use(cookieParser());
   app.use(morgan("dev"));
 
