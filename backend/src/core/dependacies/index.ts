@@ -36,6 +36,7 @@ import {
 import { initializeTransactionHistoryDependencies, TransactionHistoryDependencies } from "./transactionDependacies";
 import { initializeOrderDependencies, OrderDependencies } from "./orderDependencies";
 import { initializePaypalDependencies, PaypalDependencies } from "./paypalDependencies";
+import { initializeStripeDependencies, StripeDependencies } from "./stripeDependencies";
 
 export interface AppDependencies {
   authController: AuthDependencies["authController"];
@@ -51,6 +52,7 @@ export interface AppDependencies {
   orderController: OrderDependencies["orderController"];
   transactionHistoryController: TransactionHistoryDependencies["transactionHistoryController"];
   paypalController: PaypalDependencies["paypalController"];
+  stripeController: StripeDependencies["stripeController"];
 }
 
 export const initializeAppDependencies = (
@@ -111,6 +113,12 @@ export const initializeAppDependencies = (
       dbProvider,
       userDeps.userService
   );
+
+
+  const stripeDeps = initializeStripeDependencies(
+    dbProvider,
+    userDeps.userService
+  );
   
 
   // Inject dependent services to break circular dependency
@@ -132,5 +140,6 @@ export const initializeAppDependencies = (
     transactionHistoryController:
       transactionHistoryDeps.transactionHistoryController,
     paypalController: paypalDeps.paypalController,
+    stripeController: stripeDeps.stripeController,
   };
 };

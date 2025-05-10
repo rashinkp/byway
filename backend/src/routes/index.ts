@@ -12,6 +12,7 @@ import { createCartRouter } from "../modules/cart/cart.routes";
 import { createEnrollmentRouter } from "../modules/enrollment/enrollment.routes";
 import { createPaymentRouter } from "../modules/order/order.routes";
 import { createPaypalRouter } from "../modules/paypal/paypal.routes";
+import { createStripeRouter } from "../modules/stripe/stripe.routes";
 
 export const configureRoutes = (
   app: Express,
@@ -46,5 +47,6 @@ export const configureRoutes = (
     app.use(
       "/api/v1/paypal",
       createPaypalRouter(dependencies.paypalController)
-    );
+  );
+  
 };

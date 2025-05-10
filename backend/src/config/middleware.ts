@@ -15,4 +15,5 @@ export const configureMiddleware = (app: Express): void => {
   app.use(express.json());
   app.use(cookieParser());
   app.use(morgan("dev"));
+
 };
