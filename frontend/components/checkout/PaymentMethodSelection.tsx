@@ -1,7 +1,10 @@
 "use client";
 
 import { FC, memo, useEffect } from "react";
-import PayPalPayment from "../PayPalPayment"; 
+import PayPalPayment from "../PayPalPayment";
+import { useStripe } from "@/hooks/stripe/useStripe";
+import { useAuth } from "@/hooks/auth/useAuth";
+import { toast } from "sonner";
 
 interface PaymentMethod {
   id: "razorpay" | "paypal" | "stripe";
@@ -22,6 +25,7 @@ interface PaymentMethodSelectionProps {
     intent?: string;
   };
   finalAmount: number;
+  courseIds: string[];
 }
 
 const paymentMethods: PaymentMethod[] = [
@@ -41,15 +45,10 @@ const PaymentMethodSelection: FC<PaymentMethodSelectionProps> = memo(
     isDisabled,
     paypalOptions,
     finalAmount,
+    courseIds,
   }) => {
-    console.log("Rendering PaymentMethodSelection, props:", {
-      selectedMethod,
-      couponCode,
-      isPending,
-      isDisabled,
-      paypalOptions,
-      finalAmount,
-    });
+    const { createStripeCheckoutSession, isCreatingSession } = useStripe();
+    const { user } = useAuth();
 
     useEffect(() => {
       console.log("PaymentMethodSelection props changed:", {
@@ -102,41 +101,53 @@ const PaymentMethodSelection: FC<PaymentMethodSelectionProps> = memo(
         )}
 
         {selectedMethod === "stripe" && (
-          <div className="text-center text-gray-500">
-            Stripe integration coming soon
-          </div>
-        )}
-
-        {selectedMethod !== "paypal" && (
-          <>
-            <div>
-              <label className="block text-sm font-medium text-gray-700">
-                Coupon Code (Optional)
-              </label>
-              <input
-                type="text"
-                value={couponCode}
-                onChange={(e) => onCouponChange(e.target.value)}
-                className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                placeholder="Enter coupon code"
-              />
-            </div>
-
+          <div className="space-y-4">
+            <p className="text-gray-700">
+              You will be redirected to Stripe to complete your payment.
+            </p>
             <div className="flex justify-end">
               <button
                 type="button"
-                onClick={onSubmit}
-                disabled={isPending || isDisabled}
+                onClick={() => {
+                  if (!user?.id) {
+                    toast.error("Please log in to proceed with payment");
+                    return;
+                  }
+                  createStripeCheckoutSession({
+                    userId: user.id,
+                    courseIds,
+                    couponCode,
+                  }).catch((error) => {
+                    console.error("Stripe checkout error:", error);
+                    // Error toast is handled by useStripe
+                  });
+                }}
+                disabled={isPending || isDisabled || isCreatingSession}
                 className={`inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-white ${
-                  isPending || isDisabled
+                  isPending || isDisabled || isCreatingSession
                     ? "bg-gray-400 cursor-not-allowed"
                     : "bg-blue-600 hover:bg-blue-700"
                 } focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500`}
               >
-                {isPending ? "Processing..." : "Confirm Payment"}
+                {isCreatingSession ? "Processing..." : "Pay with Stripe"}
               </button>
             </div>
-          </>
+          </div>
+        )}
+
+        {selectedMethod !== "paypal" && (
+          <div>
+            <label className="block text-sm font-medium text-gray-700">
+              Coupon Code (Optional)
+            </label>
+            <input
+              type="text"
+              value={couponCode}
+              onChange={(e) => onCouponChange(e.target.value)}
+              className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+              placeholder="Enter coupon code"
+            />
+          </div>
         )}
       </div>
     );

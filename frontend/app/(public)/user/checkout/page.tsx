@@ -14,6 +14,7 @@ import PaymentMethodSelection from "@/components/checkout/PaymentMethodSelection
 import OrderConfirmation from "@/components/checkout/OrderConfirmation";
 import OrderSummarySkeleton from "@/components/checkout/OrderSummerySkeleton";
 import { OrderSummary } from "@/components/checkout/OrderSummery";
+import { useAuth } from "@/hooks/auth/useAuth";
 
 interface PaymentMethod {
   id: "razorpay" | "paypal" | "stripe";
@@ -39,6 +40,8 @@ const CheckoutPage: FC<CheckoutPageProps> = memo(({ page = 1, limit = 10 }) => {
   const [orderComplete, setOrderComplete] = useState(false);
   const [courseIds, setCourseIds] = useState<string[]>([]);
   const [couponCode, setCouponCode] = useState<string>("");
+
+  const { user } = useAuth()
 
   const paypalOptions = useMemo(
     () => ({
@@ -215,8 +218,16 @@ const CheckoutPage: FC<CheckoutPageProps> = memo(({ page = 1, limit = 10 }) => {
         toast.error("Invalid order amount");
         return;
       }
+      if (!user?.id) {
+        toast.error("Please log in to proceed with payment");
+        return;
+      }
 
-      if (selectedPaymentMethod !== "paypal") {
+      if (selectedPaymentMethod === "stripe") {
+        // Stripe: Initiate checkout session (handled in PaymentMethodSelection)
+        // No need to call createOrder; webhook handles order creation
+        setActiveStep(2); // Move to payment step
+      } else if (selectedPaymentMethod !== "paypal") {
         createOrder(
           { courseIds, couponCode },
           {
@@ -236,7 +247,14 @@ const CheckoutPage: FC<CheckoutPageProps> = memo(({ page = 1, limit = 10 }) => {
         );
       }
     },
-    [courseIds, couponCode, createOrder, selectedPaymentMethod, finalAmount]
+    [
+      courseIds,
+      couponCode,
+      createOrder,
+      selectedPaymentMethod,
+      finalAmount,
+      user,
+    ]
   );
 
   const isLoading = cartLoading || courseLoading;
@@ -333,7 +351,8 @@ const CheckoutPage: FC<CheckoutPageProps> = memo(({ page = 1, limit = 10 }) => {
                   isPending={isPending}
                   isDisabled={!courseIds.length || finalAmount <= 0}
                   paypalOptions={paypalOptions}
-                  finalAmount={finalAmount} // Pass the final amount
+                  finalAmount={finalAmount}
+                  courseIds={courseIds} // Pass courseIds
                 />
               )
             ) : (
