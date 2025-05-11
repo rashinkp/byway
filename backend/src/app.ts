@@ -21,7 +21,7 @@ const dependencies = initializeAppDependencies(dbProvider);
 
 // Configure middleware
 configureMiddleware(app);
-app.use("/api/v1/strip", createStripeRouter(dependencies.stripeController));
+app.use("/api/v1/stripe", createStripeRouter(dependencies.stripeController));
  app.use(express.json());
 
 // Health check endpoint

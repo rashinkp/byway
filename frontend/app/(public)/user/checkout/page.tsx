@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo, useCallback, memo, FC } from "react";
+import { useState, useMemo, useCallback, memo, FC, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
 import { useCart } from "@/hooks/cart/useCart";
 import { useGetCourseById } from "@/hooks/course/useGetCourseById";
@@ -12,9 +12,9 @@ import OrderDetails from "@/components/checkout/OrderDetails";
 import PaymentMethodSkeleton from "@/components/checkout/PaymentMethodSkeleton";
 import PaymentMethodSelection from "@/components/checkout/PaymentMethodSelection";
 import OrderConfirmation from "@/components/checkout/OrderConfirmation";
-import OrderSummarySkeleton from "@/components/checkout/OrderSummerySkeleton";
-import { OrderSummary } from "@/components/checkout/OrderSummery";
 import { useAuth } from "@/hooks/auth/useAuth";
+import { OrderSummary } from "@/components/checkout/OrderSummery";
+import OrderSummarySkeleton from "@/components/checkout/OrderSummerySkeleton";
 
 interface PaymentMethod {
   id: "razorpay" | "paypal" | "stripe";
@@ -36,12 +36,11 @@ const CheckoutPage: FC<CheckoutPageProps> = memo(({ page = 1, limit = 10 }) => {
   const { mutate: createOrder, isPending } = useCreateOrder();
   const [activeStep, setActiveStep] = useState(1);
   const [selectedPaymentMethod, setSelectedPaymentMethod] =
-    useState<PaymentMethod["id"]>("paypal");
+    useState<PaymentMethod["id"]>("stripe");
   const [orderComplete, setOrderComplete] = useState(false);
-  const [courseIds, setCourseIds] = useState<string[]>([]);
   const [couponCode, setCouponCode] = useState<string>("");
 
-  const { user } = useAuth()
+  const { user } = useAuth();
 
   const paypalOptions = useMemo(
     () => ({
@@ -52,19 +51,6 @@ const CheckoutPage: FC<CheckoutPageProps> = memo(({ page = 1, limit = 10 }) => {
     []
   );
 
-  const courseIdsMemo = useMemo(() => {
-    if (courseId) {
-      return [courseId];
-    } else if (cartData?.items) {
-      return cartData.items.map((item: ICart) => item.courseId);
-    }
-    return [];
-  }, [courseId, cartData?.items]);
-
-  useMemo(() => {
-    setCourseIds(courseIdsMemo);
-  }, [courseIdsMemo]);
-
   // Calculate totals, tax, and course details
   const {
     totalOriginalPrice,
@@ -73,24 +59,37 @@ const CheckoutPage: FC<CheckoutPageProps> = memo(({ page = 1, limit = 10 }) => {
     finalAmount,
     courseDetails,
   } = useMemo(() => {
-    const TAX_RATE = 0.1; // 10% tax rate, adjust as needed
+    const TAX_RATE = 0.1; // 10% tax rate
+
+    const validatePrice = (
+      price: any,
+      field: string,
+      courseId: string
+    ): number => {
+      const value = typeof price === "string" ? parseFloat(price) : price;
+      if (isNaN(value) || value <= 0) {
+        console.error(`Invalid ${field} for course ${courseId}:`, {
+          price,
+          value,
+        });
+        return 0;
+      }
+      return value;
+    };
 
     if (courseId && singleCourse) {
-      const price =
-        typeof singleCourse.price === "string"
-          ? parseFloat(singleCourse.price)
-          : singleCourse.price ?? 0;
-      const offer =
-        typeof singleCourse.offer === "string"
-          ? parseFloat(singleCourse.offer)
-          : singleCourse.offer ?? price;
-      const validatedOffer = offer > 0 ? offer : price;
-      if (validatedOffer <= 0) {
-        console.error("Invalid price for single course:", {
-          price,
-          offer,
-          validatedOffer,
-        });
+      const price = validatePrice(singleCourse.price, "price", singleCourse.id);
+      const offer = validatePrice(
+        singleCourse.offer ?? price,
+        "offer",
+        singleCourse.id
+      );
+      if (price === 0 || offer === 0) {
+        console.error(
+          "Invalid price or offer for single course:",
+          singleCourse
+        );
+        toast.error("Unable to process course due to invalid price");
         return {
           totalOriginalPrice: 0,
           totalDiscountedPrice: 0,
@@ -99,59 +98,69 @@ const CheckoutPage: FC<CheckoutPageProps> = memo(({ page = 1, limit = 10 }) => {
           courseDetails: [],
         };
       }
-      const calculatedTax = validatedOffer * TAX_RATE;
-      const finalAmount = validatedOffer + calculatedTax;
+      const calculatedTax = offer * TAX_RATE;
+      const finalAmount = offer + calculatedTax;
       return {
         totalOriginalPrice: price,
-        totalDiscountedPrice: validatedOffer,
+        totalDiscountedPrice: offer,
         tax: calculatedTax,
-        finalAmount: finalAmount,
+        finalAmount,
         courseDetails: [
           {
             id: singleCourse.id,
-            title: singleCourse.title,
-            thumbnail: singleCourse.thumbnail,
-            image: singleCourse.thumbnail || "",
+            title: singleCourse.title || "Unknown Course",
+            description: singleCourse.description || "No description available",
+            thumbnail: singleCourse.thumbnail || "/default-thumbnail.jpg",
             price,
-            offer: validatedOffer,
-            duration: String(singleCourse.duration ?? ""),
-            level: singleCourse.level,
+            offer,
+            duration: String(singleCourse.duration ?? "Unknown"),
+            level: singleCourse.level || "Unknown",
           } as Course,
         ],
       };
     } else if (cartData?.items) {
       const courses = cartData.items
         .map((item: ICart) => item.course)
-        .filter((course): course is Course => !!course)
+        .filter((course): course is NonNullable<ICart["course"]> => !!course)
         .map((course) => {
-          const price =
-            typeof course.price === "string"
-              ? parseFloat(course.price)
-              : course.price ?? 0;
-          const offer =
-            typeof course.offer === "string"
-              ? parseFloat(course.offer)
-              : course.offer ?? price;
-          const validatedOffer = offer > 0 ? offer : price;
+          const price = validatePrice(course.price, "price", course.id);
+          const offer = validatePrice(
+            course.offer ?? price,
+            "offer",
+            course.id
+          );
           return {
             id: course.id,
-            title: course.title,
-            thumbnail: course.thumbnail,
-            image: course.image ?? "",
+            title: course.title || "Unknown Course",
+            description: course.description || "No description available",
+            thumbnail: course.thumbnail || "/default-thumbnail.jpg",
             price,
-            offer: validatedOffer,
-            duration: String(course.duration ?? ""),
-            level: course.level,
+            offer,
+            duration: String(course.duration ?? "Unknown"),
+            level: course.level || "Unknown",
             lectures: course.lectures ?? 0,
-            creator: course.creator ?? { name: "" },
-          };
+            creator: course.creator ?? { name: "Unknown" },
+          } as Course;
         });
+
+      if (courses.length === 0) {
+        console.error("No valid courses in cart:", cartData.items);
+        toast.error("No valid courses in cart");
+        return {
+          totalOriginalPrice: 0,
+          totalDiscountedPrice: 0,
+          tax: 0,
+          finalAmount: 0,
+          courseDetails: [],
+        };
+      }
+
       const totalOriginal = courses.reduce(
-        (sum, course) => sum + Number(course.price),
+        (sum, course) => sum + course.price,
         0
       );
       const totalDiscounted = courses.reduce(
-        (sum, course) => sum + Number(course.offer),
+        (sum, course) => sum + course.offer,
         0
       );
       if (totalDiscounted <= 0) {
@@ -160,6 +169,7 @@ const CheckoutPage: FC<CheckoutPageProps> = memo(({ page = 1, limit = 10 }) => {
           totalDiscounted,
           courses,
         });
+        toast.error("Invalid cart total");
         return {
           totalOriginalPrice: 0,
           totalDiscountedPrice: 0,
@@ -168,16 +178,19 @@ const CheckoutPage: FC<CheckoutPageProps> = memo(({ page = 1, limit = 10 }) => {
           courseDetails: [],
         };
       }
+
       const calculatedTax = totalDiscounted * TAX_RATE;
       const finalAmount = totalDiscounted + calculatedTax;
+
       return {
         totalOriginalPrice: totalOriginal,
         totalDiscountedPrice: totalDiscounted,
         tax: calculatedTax,
-        finalAmount: finalAmount,
+        finalAmount,
         courseDetails: courses,
       };
     }
+
     return {
       totalOriginalPrice: 0,
       totalDiscountedPrice: 0,
@@ -185,7 +198,20 @@ const CheckoutPage: FC<CheckoutPageProps> = memo(({ page = 1, limit = 10 }) => {
       finalAmount: 0,
       courseDetails: [] as Course[],
     };
-  }, [courseId, singleCourse?.id, cartData?.items?.length]);
+  }, [courseId, singleCourse, cartData?.items]);
+
+  const coursesInput = useMemo(() => {
+    return courseDetails.map((course) => ({
+      id: course.id,
+      title: course.title,
+      description: course.description,
+      price: course.price,
+      offer: course.offer,
+      thumbnail: course.thumbnail,
+      duration: course.duration,
+      level: course.level,
+    }));
+  }, [courseDetails]);
 
   const handlePaymentMethodSelect = useCallback(
     (methodId: PaymentMethod["id"]) => {
@@ -196,7 +222,7 @@ const CheckoutPage: FC<CheckoutPageProps> = memo(({ page = 1, limit = 10 }) => {
   );
 
   const handleProceedToPayment = useCallback(() => {
-    if (!courseIds.length) {
+    if (!courseDetails.length) {
       toast.error("No courses selected for purchase");
       return;
     }
@@ -205,12 +231,12 @@ const CheckoutPage: FC<CheckoutPageProps> = memo(({ page = 1, limit = 10 }) => {
       return;
     }
     setActiveStep(2);
-  }, [courseIds, finalAmount]);
+  }, [courseDetails, finalAmount]);
 
   const handleSubmit = useCallback(
     (e: React.MouseEvent) => {
       e.preventDefault();
-      if (!courseIds.length) {
+      if (!courseDetails.length) {
         toast.error("No courses selected for purchase");
         return;
       }
@@ -224,12 +250,10 @@ const CheckoutPage: FC<CheckoutPageProps> = memo(({ page = 1, limit = 10 }) => {
       }
 
       if (selectedPaymentMethod === "stripe") {
-        // Stripe: Initiate checkout session (handled in PaymentMethodSelection)
-        // No need to call createOrder; webhook handles order creation
         setActiveStep(2); // Move to payment step
       } else if (selectedPaymentMethod !== "paypal") {
         createOrder(
-          { courseIds, couponCode },
+          { courseIds: courseDetails.map((course) => course.id), couponCode },
           {
             onSuccess: (order) => {
               console.log(
@@ -248,7 +272,7 @@ const CheckoutPage: FC<CheckoutPageProps> = memo(({ page = 1, limit = 10 }) => {
       }
     },
     [
-      courseIds,
+      courseDetails,
       couponCode,
       createOrder,
       selectedPaymentMethod,
@@ -336,7 +360,7 @@ const CheckoutPage: FC<CheckoutPageProps> = memo(({ page = 1, limit = 10 }) => {
               <OrderDetails
                 courseDetails={courseDetails}
                 onProceed={handleProceedToPayment}
-                isDisabled={!courseIds.length || finalAmount <= 0}
+                isDisabled={!courseDetails.length || finalAmount <= 0}
               />
             ) : activeStep === 2 ? (
               isPending ? (
@@ -349,10 +373,10 @@ const CheckoutPage: FC<CheckoutPageProps> = memo(({ page = 1, limit = 10 }) => {
                   onCouponChange={setCouponCode}
                   onSubmit={handleSubmit}
                   isPending={isPending}
-                  isDisabled={!courseIds.length || finalAmount <= 0}
+                  isDisabled={!courseDetails.length || finalAmount <= 0}
                   paypalOptions={paypalOptions}
                   finalAmount={finalAmount}
-                  courseIds={courseIds} // Pass courseIds
+                  courses={coursesInput}
                 />
               )
             ) : (

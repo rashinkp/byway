@@ -1,13 +1,13 @@
 export interface Course {
   id: string;
   title: string;
-  image: string;
-  price: number | string;
-  offer: number | string;
-  duration: string;
+  description: string; 
+  thumbnail: string; 
+  price: number; 
+  offer: number; 
+  duration: string; 
   lectures: number;
-  level: string;
-  thumbnail?: string;
+  level: string; 
   creator: {
     name: string;
   };
@@ -60,5 +60,3 @@ export interface IGetCartInput {
   limit?: number;
   includeDeleted?: boolean;
 }
-
-

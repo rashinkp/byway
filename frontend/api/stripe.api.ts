@@ -9,7 +9,7 @@ export const createStripeCheckoutSession = async (
   data: ICreateStripeCheckoutSessionInput
 ): Promise<StripeApiResponse<IStripeCheckoutSession>> => {
   try {
-    const response = await api.post("/strip/create-checkout-session", data);
+    const response = await api.post("/stripe/create-checkout-session", data);
     return response.data;
   } catch (error: any) {
     console.error("Error creating Stripe checkout session:", error);

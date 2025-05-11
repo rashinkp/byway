@@ -5,6 +5,7 @@ import PayPalPayment from "../PayPalPayment";
 import { useStripe } from "@/hooks/stripe/useStripe";
 import { useAuth } from "@/hooks/auth/useAuth";
 import { toast } from "sonner";
+import { ICourseInput } from "@/types/stripe.types";
 
 interface PaymentMethod {
   id: "razorpay" | "paypal" | "stripe";
@@ -25,7 +26,7 @@ interface PaymentMethodSelectionProps {
     intent?: string;
   };
   finalAmount: number;
-  courseIds: string[];
+  courses: ICourseInput[];
 }
 
 const paymentMethods: PaymentMethod[] = [
@@ -45,20 +46,19 @@ const PaymentMethodSelection: FC<PaymentMethodSelectionProps> = memo(
     isDisabled,
     paypalOptions,
     finalAmount,
-    courseIds,
+    courses,
   }) => {
     const { createStripeCheckoutSession, isCreatingSession } = useStripe();
     const { user } = useAuth();
 
     useEffect(() => {
-      console.log("PaymentMethodSelection props changed:", {
-        selectedMethod,
+      console.log("PaymentMethodSelection inputs:", {
+        userId: user?.id,
+        courses,
         couponCode,
-        isPending,
-        isDisabled,
         finalAmount,
       });
-    }, [selectedMethod, couponCode, isPending, isDisabled, finalAmount]);
+    }, [user?.id, courses, couponCode, finalAmount]);
 
     return (
       <div className="space-y-6">
@@ -113,13 +113,16 @@ const PaymentMethodSelection: FC<PaymentMethodSelectionProps> = memo(
                     toast.error("Please log in to proceed with payment");
                     return;
                   }
+                  if (!courses.length) {
+                    toast.error("No courses selected for payment");
+                    return;
+                  }
                   createStripeCheckoutSession({
                     userId: user.id,
-                    courseIds,
-                    couponCode,
+                    courses,
+                    couponCode: couponCode || undefined,
                   }).catch((error) => {
-                    console.error("Stripe checkout error:", error);
-                    // Error toast is handled by useStripe
+                    // Error handling is managed by useStripe
                   });
                 }}
                 disabled={isPending || isDisabled || isCreatingSession}

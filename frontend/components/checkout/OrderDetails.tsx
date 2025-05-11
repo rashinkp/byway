@@ -25,7 +25,7 @@ export default function OrderDetails({
             <div key={course.id} className="flex items-start border-b pb-4">
               <div className="bg-blue-100 rounded-md p-2 mr-4">
                 <img
-                  src={course.thumbnail || course.image || ""}
+                  src={course.thumbnail || ""}
                   alt={course.title}
                   className="w-20 h-20 object-cover"
                 />

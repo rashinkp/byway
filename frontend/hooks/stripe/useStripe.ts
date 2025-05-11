@@ -5,45 +5,43 @@ import {
   IStripeCheckoutSession,
   StripeApiResponse,
 } from "@/types/stripe.types";
-import { ApiResponse } from "@/types/apiResponse";
 import { createStripeCheckoutSession } from "@/api/stripe.api";
 
 export function useStripe() {
   const createCheckoutSessionMutation = useMutation<
-    ApiResponse<IStripeCheckoutSession>,
+    StripeApiResponse<IStripeCheckoutSession>,
     Error,
     ICreateStripeCheckoutSessionInput
   >({
     mutationFn: (data) =>
       createStripeCheckoutSession(data).then((res) => {
-        console.log("Stripe checkout session response:", res); // Debug log
+        console.log("Raw Stripe response:", JSON.stringify(res, null, 2));
         if (!res.data?.session) {
-          throw new Error("No session data received");
+          throw new Error(res.message || "No session data received");
         }
         return {
           statusCode: res.statusCode,
-          success: res.status === "success",
+          status: res.status,
           message: res.message,
-          data: res.data.session,
-          error: res.status === "error" ? res.message : undefined,
+          data: { session: res.data.session },
         };
       }),
     onMutate: async () => {
       toast.loading("Creating Stripe checkout session...");
     },
     onSuccess: (data) => {
-      console.log("Stripe checkout session success:", data); // Debug log
+      console.log("Stripe checkout session success:", data);
       toast.success("Stripe checkout session created successfully!");
-      if (data.data?.url) {
-        console.log("Redirecting to Stripe checkout:", data.data.url); // Debug log
-        window.location.href = data.data.url;
+      if (data.data?.session?.url) {
+        console.log("Redirecting to Stripe checkout:", data.data.session.url);
+        window.location.href = data.data.session.url;
       } else {
         console.error("No session URL in response:", data);
         toast.error("Failed to redirect to Stripe checkout");
       }
     },
     onError: (error) => {
-      console.error("Stripe checkout session error:", error); // Debug log
+      console.error("Stripe checkout session error:", error);
       toast.error("Failed to create Stripe checkout session", {
         description: error.message || "An error occurred. Please try again.",
       });
