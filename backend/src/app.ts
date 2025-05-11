@@ -8,6 +8,7 @@ import { errorHandlingMiddleware } from "./middlewares/errorHandlingMiddleware";
 import { createStripeRouter } from "./modules/stripe/stripe.routes"; // Note: .routes, not .router
 import dotenv from "dotenv";
 import { logger } from "./utils/logger";
+import { adaptStripeController } from "./adapters/expressStripeAdapters";
 
 const app: Express = express();
 
@@ -16,12 +17,13 @@ dotenv.config();
 // Initialize dependencies
 const dbProvider = new PrismaDatabaseProvider();
 const dependencies = initializeAppDependencies(dbProvider);
+const adaptStripe = adaptStripeController(dependencies.stripeController);
 
 // Mount Stripe router before global middleware to bypass express.json()
 
+app.use("/api/v1/stripe/webhook", express.raw({ type: "application/json" }),adaptStripe.handleWebhook);
 // Configure middleware
 configureMiddleware(app);
-app.use("/api/v1/stripe", createStripeRouter(dependencies.stripeController));
  app.use(express.json());
 
 // Health check endpoint

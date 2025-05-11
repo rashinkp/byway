@@ -16,13 +16,7 @@ export interface ICreateCheckoutSessionInput {
 }
 
 export interface IWebhookInput {
-  event: {
-    id: string;
-    type: string;
-    data: {
-      object: Record<string, any>;
-    };
-  };
+  event: Buffer; 
   signature: string;
 }
 

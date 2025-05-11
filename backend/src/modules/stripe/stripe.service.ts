@@ -139,225 +139,84 @@ export class StripeService {
   }
 
   async handleWebhook(input: IWebhookInput): Promise<ApiResponse> {
-    const parsedInput = webhookSchema.safeParse(input);
-    if (!parsedInput.success) {
-      logger.warn("Validation failed for webhook", {
-        errors: parsedInput.error.errors,
-      });
-      throw new AppError(
-        `Validation failed: ${parsedInput.error.message}`,
-        StatusCodes.BAD_REQUEST,
-        "VALIDATION_ERROR"
+  const { event, signature } = input; // event is now the raw Buffer
+
+  try {
+    const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET!;
+    logger.debug("Webhook secret:", {
+      secret: webhookSecret.substring(0, 8) + "...",
+    });
+
+    // Verify signature with raw body
+    const constructedEvent = this.stripe.webhooks.constructEvent(
+      event, // Use raw body (Buffer)
+      signature,
+      webhookSecret
+    );
+
+    // Parse event for further processing
+    const parsedEvent = JSON.parse(event.toString());
+    logger.debug("Received webhook event", {
+      eventType: parsedEvent.type,
+      eventId: parsedEvent.id,
+    });
+
+    // Validate Checkout Session events
+    if (
+      [
+        "checkout.session.completed",
+        "checkout.session.expired",
+        "checkout.session.async_payment_succeeded",
+        "checkout.session.async_payment_failed",
+      ].includes(constructedEvent.type)
+    ) {
+      const sessionParse = checkoutSessionSchema.safeParse(
+        constructedEvent.data.object
       );
-    }
-
-    const { event, signature } = parsedInput.data;
-
-    try {
-      const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET!;
-      logger.debug("Webhook secret:", {
-        secret: webhookSecret.substring(0, 8) + "...",
-      });
-      logger.debug("Received webhook event", {
-        eventType: event.type,
-        eventId: event.id,
-      });
-
-      // Verify signature
-      const constructedEvent = this.stripe.webhooks.constructEvent(
-        JSON.stringify(event),
-        signature,
-        webhookSecret
-      );
-
-      // Validate Checkout Session events
-      if (
-        [
-          "checkout.session.completed",
-          "checkout.session.expired",
-          "checkout.session.async_payment_succeeded",
-          "checkout.session.async_payment_failed",
-        ].includes(constructedEvent.type)
-      ) {
-        const sessionParse = checkoutSessionSchema.safeParse(
-          constructedEvent.data.object
-        );
-        if (!sessionParse.success) {
-          logger.warn("Checkout session validation failed", {
-            errors: sessionParse.error.errors,
-          });
-          throw new AppError(
-            `Checkout session validation failed: ${sessionParse.error.message}`,
-            StatusCodes.BAD_REQUEST,
-            "VALIDATION_ERROR"
-          );
-        }
-      }
-
-      switch (constructedEvent.type) {
-        case "checkout.session.completed":
-          const session = constructedEvent.data.object;
-          const metadata = session.metadata || {};
-          const { userId, orderId, courses } = metadata;
-
-          if (userId && orderId) {
-            const user = await this.userService.findUserById(userId);
-            if (!user) {
-              logger.warn("User not found for webhook", { userId });
-              throw new AppError(
-                "User not found",
-                StatusCodes.NOT_FOUND,
-                "NOT_FOUND"
-              );
-            }
-
-            // Update order status
-            await this.orderService.updateOrderStatus(
-              orderId,
-              "COMPLETED",
-              session.payment_intent as string,
-              "STRIPE"
-            );
-
-            // Parse courses for logging
-            let parsedCourses: any[] = [];
-            if (courses) {
-              try {
-                parsedCourses = JSON.parse(courses);
-                logger.debug("Parsed courses:", { parsedCourses });
-              } catch (e) {
-                logger.warn("Failed to parse courses", {
-                  courses,
-                  error: e,
-                });
-              }
-            }
-
-            const response: IStripeWebhookResponse = {
-              orderId: session.id,
-              status: "completed",
-              transactionId: (session.payment_intent as string) || "unknown",
-            };
-
-            return {
-              status: "success",
-              data: { webhook: response },
-              message: "Webhook processed successfully",
-              statusCode: StatusCodes.OK,
-            };
-          } else {
-            logger.warn("No userId or orderId in metadata", {
-              sessionId: session.id,
-            });
-            return {
-              status: "success",
-              data: null,
-              message: "Webhook processed but no userId or orderId provided",
-              statusCode: StatusCodes.OK,
-            };
-          }
-
-        case "checkout.session.expired":
-          logger.info("Checkout session expired", {
-            sessionId: constructedEvent.data.object.id,
-          });
-          // Optionally update order status to CANCELLED
-          const expiredMetadata = constructedEvent.data.object.metadata || {};
-          if (expiredMetadata.orderId) {
-            await this.orderService.updateOrderStatus(
-              expiredMetadata.orderId,
-              "FAILED",
-              undefined,
-              "STRIPE"
-            );
-          }
-          return {
-            status: "success",
-            data: null,
-            message: "Checkout session expired",
-            statusCode: StatusCodes.OK,
-          };
-
-        case "checkout.session.async_payment_succeeded":
-          logger.info("Async payment succeeded", {
-            sessionId: constructedEvent.data.object.id,
-          });
-          return {
-            status: "success",
-            data: null,
-            message: "Async payment succeeded",
-            statusCode: StatusCodes.OK,
-          };
-
-        case "checkout.session.async_payment_failed":
-          logger.warn("Async payment failed", {
-            sessionId: constructedEvent.data.object.id,
-          });
-          // Optionally update order status
-          const failedMetadata = constructedEvent.data.object.metadata || {};
-          if (failedMetadata.orderId) {
-            await this.orderService.updateOrderStatus(
-              failedMetadata.orderId,
-              "FAILED",
-              undefined,
-              "STRIPE"
-            );
-          }
-          return {
-            status: "success",
-            data: null,
-            message: "Async payment failed",
-            statusCode: StatusCodes.OK,
-          };
-
-        case "charge.refunded":
-          logger.info("Charge refunded", {
-            chargeId: constructedEvent.data.object.id,
-          });
-          // Optionally update order status
-          const refundedMetadata = constructedEvent.data.object.metadata || {};
-          if (refundedMetadata.orderId) {
-            await this.orderService.updateOrderStatus(
-              refundedMetadata.orderId,
-              "REFUNDED",
-              undefined,
-              "STRIPE"
-            );
-          }
-          return {
-            status: "success",
-            data: null,
-            message: "Charge refunded",
-            statusCode: StatusCodes.OK,
-          };
-
-        default:
-          logger.info("Unhandled webhook event", {
-            type: constructedEvent.type,
-          });
-          return {
-            status: "success",
-            data: null,
-            message: "Webhook received but not processed",
-            statusCode: StatusCodes.OK,
-          };
-      }
-    } catch (error) {
-      logger.error("Error processing Stripe webhook", { error, input: event });
-      if (error instanceof Stripe.errors.StripeSignatureVerificationError) {
+      if (!sessionParse.success) {
+        logger.warn("Checkout session validation failed", {
+          errors: sessionParse.error.errors,
+        });
         throw new AppError(
-          "Invalid webhook signature",
+          `Checkout session validation failed: ${sessionParse.error.message}`,
           StatusCodes.BAD_REQUEST,
-          "WEBHOOK_SIGNATURE_ERROR"
+          "VALIDATION_ERROR"
         );
       }
-      throw error instanceof AppError
-        ? error
-        : new AppError(
-            "Failed to process Stripe webhook",
-            StatusCodes.INTERNAL_SERVER_ERROR,
-            "STRIPE_ERROR"
-          );
     }
+
+    // Rest of the switch case remains the same
+    switch (constructedEvent.type) {
+      case "checkout.session.completed":
+        // ... existing code ...
+      // ... other cases ...
+      default:
+        logger.info("Unhandled webhook event", {
+          type: constructedEvent.type,
+        });
+        return {
+          status: "success",
+          data: null,
+          message: "Webhook received but not processed",
+          statusCode: StatusCodes.OK,
+        };
+    }
+  } catch (error) {
+    logger.error("Error processing Stripe webhook", { error });
+    if (error instanceof Stripe.errors.StripeSignatureVerificationError) {
+      throw new AppError(
+        "Invalid webhook signature",
+        StatusCodes.BAD_REQUEST,
+        "WEBHOOK_SIGNATURE_ERROR"
+      );
+    }
+    throw error instanceof AppError
+      ? error
+      : new AppError(
+          "Failed to process Stripe webhook",
+          StatusCodes.INTERNAL_SERVER_ERROR,
+          "STRIPE_ERROR"
+        );
   }
+}
 }

@@ -14,6 +14,10 @@ export const configureMiddleware = (app: Express): void => {
   );
  
   app.use(cookieParser());
-  app.use(morgan("dev"));
+  app.use(
+    morgan("dev", {
+      skip: (req) => req.url === "/api/v1/stripe/webhook",
+    })
+  );
 
 };

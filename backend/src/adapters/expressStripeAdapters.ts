@@ -50,27 +50,13 @@ export const adaptStripeController = (controller: StripeController) => ({
         ? signatureHeader[0]
         : signatureHeader;
 
-      // Debug raw body
       logger.debug("Webhook raw body type:", {
         isBuffer: Buffer.isBuffer(req.body),
         body: req.body.toString(),
       });
 
-      // Parse raw body to JSON
-      let event;
-      try {
-        event = JSON.parse(req.body.toString());
-      } catch (e) {
-        logger.error("Failed to parse webhook body", { error: e });
-        throw new AppError(
-          "Invalid webhook body",
-          StatusCodes.BAD_REQUEST,
-          "WEBHOOK_BODY_ERROR"
-        );
-      }
-
       const input: IWebhookInput = {
-        event,
+        event: req.body, // Pass raw body as Buffer
         signature,
       };
 

@@ -40,7 +40,7 @@ export default function CourseSidebar({
     <div className="sticky top-4 ">
       <div className="aspect-w-16 aspect-h-10 relative">
         <img
-          src={course?.thumbnail || ""}
+          src={course?.thumbnail}
           alt="Course Preview"
           className="w-full h-full object-cover"
         />
@@ -63,14 +63,29 @@ export default function CourseSidebar({
         >
           {isCartLoading ? "Adding..." : "Add To Cart"}
         </button>
-        <Link
-          href={`/user/checkout?courseId=${course.id}`}
-          className={`w-full border rounded-lg border-gray-300 text-gray-800 font-medium py-3 transition block text-center ${
-            isCartLoading ? "opacity-50 cursor-not-allowed" : "hover:bg-gray-50"
-          }`}
-        >
-          Enroll Now
-        </Link>
+        {course ? (
+          <Link
+            href={`/user/checkout?courseId=${course.id}`}
+            className={`w-full border rounded-lg border-gray-300 text-gray-800 font-medium py-3 transition block text-center ${
+              isCartLoading
+                ? "opacity-50 cursor-not-allowed"
+                : "hover:bg-gray-50"
+            }`}
+          >
+            Enroll Now
+          </Link>
+        ) : (
+          <Link
+            href={`/login`}
+            className={`w-full border rounded-lg border-gray-300 text-gray-800 font-medium py-3 transition block text-center ${
+              isCartLoading
+                ? "opacity-50 cursor-not-allowed"
+                : "hover:bg-gray-50"
+            }`}
+          >
+            Enroll Now
+          </Link>
+        )}
       </div>
     </div>
   );

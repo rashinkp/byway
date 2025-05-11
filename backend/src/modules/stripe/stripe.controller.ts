@@ -29,8 +29,7 @@ export class StripeController {
   async handleWebhook(input: IWebhookInput): Promise<ApiResponse> {
     try {
       logger.debug("Handling webhook", {
-        eventType: input.event.type,
-        eventId: input.event.id,
+        event: input.event,
       });
       return await this.stripeService.handleWebhook(input);
     } catch (error) {

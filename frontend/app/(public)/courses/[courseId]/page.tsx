@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import ErrorDisplay from "@/components/ErrorDisplay";
 import { useGetCourseById } from "@/hooks/course/useGetCourseById";
 import { useGetPublicLessons } from "@/hooks/lesson/useGetPublicLessons";
@@ -20,36 +20,36 @@ export default function CourseDetail() {
   const router = useRouter();
   const [activeTab, setActiveTab] = useState("description");
   const { courseId } = useParams();
-  const { user , isLoading:userLoading} = useAuth();
+  const { user, isLoading: userLoading } = useAuth();
   const {
     data: course,
     isLoading: courseLoading,
     error: courseError,
   } = useGetCourseById(courseId as string);
   const {
-    data,
-    isLoading: lessonLoading,
-    error: lessonError,
-  } = useGetPublicLessons({ courseId: courseId as string });
-  const {
     data: instructor,
     isLoading: instructorLoading,
     error: instructorError,
   } = useGetPublicUser(course?.createdBy as string);
+  const {
+    data,
+    isLoading: lessonLoading,
+    error: lessonError,
+  } = useGetPublicLessons(
+    { courseId: courseId as string }
+  );
 
-    const { mutate: addToCart, isPending: isCartLoading } = useAddToCart();
+  const { mutate: addToCart, isPending: isCartLoading } = useAddToCart();
 
-    const handleAddToCart = () => {
-      if (!user) {
-        router.push("/login");
-        return;
-      }
-      if (course?.id) {
-        addToCart({ courseId: course.id });
-      }
+  const handleAddToCart = () => {
+    if (!user) {
+      router.push("/login");
+      return;
+    }
+    if (course?.id) {
+      addToCart({ courseId: course.id });
+    }
   };
-  
-
 
   if (courseError || instructorError || lessonError) {
     return (
@@ -88,10 +88,25 @@ export default function CourseDetail() {
               />
             )}
             {activeTab === "syllabus" && (
-              <CourseSyllabus
-                lessons={data?.lessons}
-                isLoading={lessonLoading}
-              />
+              <>
+                {!user && (
+                  <div className="p-4 bg-gray-100 rounded-md">
+                    <p className="text-lg">
+                      Please{" "}
+                      <a href="/login" className="text-blue-600 underline">
+                        log in
+                      </a>{" "}
+                      to view the course syllabus.
+                    </p>
+                  </div>
+                )}
+                {user && (
+                  <CourseSyllabus
+                    lessons={data?.lessons}
+                    isLoading={lessonLoading}
+                  />
+                )}
+              </>
             )}
             {activeTab === "reviews" && (
               <div>
@@ -105,7 +120,7 @@ export default function CourseDetail() {
           <CourseSidebar
             course={course}
             isLoading={courseLoading || userLoading}
-            isCartLoading = {isCartLoading}
+            isCartLoading={isCartLoading}
             handleAddToCart={handleAddToCart}
           />
         </div>

@@ -45,5 +45,6 @@ export const configureRoutes = (
       "/api/v1/paypal",
       createPaypalRouter(dependencies.paypalController)
   );
-  
+  app.use("/api/v1/stripe", createStripeRouter(dependencies.stripeController));
+
 };
