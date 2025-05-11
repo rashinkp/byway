@@ -6,6 +6,7 @@ import { AppError } from "../../utils/appError";
 import { StatusCodes } from "http-status-codes";
 import { OrderService } from "../../modules/order/order.service";
 import { CourseService } from "../../modules/course/course.service";
+import { TransactionHistoryService } from "../../modules/transaction/transaction.service";
 
 export interface StripeDependencies {
   stripeController: StripeController;
@@ -17,6 +18,7 @@ export const initializeStripeDependencies = (
   userService: UserService,
   orderService: OrderService,
   courseService: CourseService,
+  transactionsService: TransactionHistoryService,
 ): StripeDependencies => {
   if (!process.env.STRIPE_SECRET_KEY || !process.env.STRIPE_WEBHOOK_SECRET) {
     throw new AppError(
@@ -30,7 +32,7 @@ export const initializeStripeDependencies = (
   // const prisma = dbProvider.getClient();
   // const stripeRepository = new StripeRepository(prisma);
 
-  const stripeService = new StripeService(userService , orderService , courseService);
+  const stripeService = new StripeService(userService , orderService , courseService , transactionsService);
   const stripeController = new StripeController(stripeService);
 
   return { stripeController, stripeService };

@@ -16,6 +16,7 @@ import {
 } from "./stripe.validators";
 import Stripe from "stripe";
 import { CourseService } from "../course/course.service";
+import { TransactionHistoryService } from "../transaction/transaction.service";
 
 export class StripeService {
   private stripe: Stripe;
@@ -23,7 +24,8 @@ export class StripeService {
   constructor(
     private userService: UserService,
     private orderService: OrderService,
-    private courseService:CourseService
+    private courseService: CourseService,
+    private transactionService: TransactionHistoryService,
   ) {
     this.stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
       apiVersion: "2025-04-30.basil",
@@ -188,6 +190,7 @@ export class StripeService {
 
     // Rest of the switch case remains the same
     switch (constructedEvent.type) {
+      // In the checkout.session.completed case
       case "checkout.session.completed":
         const session = constructedEvent.data.object;
         const metadata = session.metadata || {};
@@ -232,34 +235,58 @@ export class StripeService {
             // Continue processing to avoid failing the webhook
           }
 
-          // Enroll user in courses
+          // Enрол user in courses and store transaction history
           if (courses) {
             try {
-              const parsedCourses: { id: string }[] = JSON.parse(courses);
+              const parsedCourses: {
+                id: string;
+                price?: number;
+                offer?: number;
+              }[] = JSON.parse(courses);
               const courseIds = parsedCourses.map((course) => course.id);
-              await this.courseService.enrollCourse({ userId, courseIds });
               logger.debug("User enrolled in courses:", { courseIds });
+
+              // Enroll user in courses
+              await this.courseService.enrollCourse({ userId, courseIds });
+
+              // Store transaction history for each course
+              for (const course of parsedCourses) {
+                const coursePrice = course.offer ?? course.price ?? 0;
+                if (coursePrice <= 0) {
+                  logger.warn(
+                    "Skipping transaction for course with zero price",
+                    { courseId: course.id }
+                  );
+                  continue;
+                }
+
+                await this.transactionService.createTransaction({
+                  orderId,
+                  userId,
+                  courseId: course.id,
+                  amount: coursePrice,
+                  type: "PAYMENT",
+                  status: "COMPLETED",
+                  paymentGateway: "STRIPE",
+                  transactionId: session.payment_intent as string,
+                });
+                logger.debug("Transaction created for course", {
+                  courseId: course.id,
+                  orderId,
+                });
+              }
             } catch (error) {
-              logger.error("Failed to enroll user in courses", {
-                userId,
-                courses,
-                error: error instanceof Error ? error.message : String(error),
-              });
+              logger.error(
+                "Failed to enroll user in courses or store transaction",
+                {
+                  userId,
+                  error: error instanceof Error ? error.message : String(error),
+                }
+              );
               // Continue processing to avoid failing the webhook
             }
           }
 
-          // Send confirmation email
-          try {
-            // await this.userService.sendOrderConfirmationEmail(userId, orderId);
-          } catch (error) {
-            logger.error("Failed to send confirmation email", {
-              userId,
-              orderId,
-              error: error instanceof Error ? error.message : String(error),
-            });
-            // Continue processing
-          }
 
           const response: IStripeWebhookResponse = {
             orderId: session.id,

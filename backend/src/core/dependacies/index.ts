@@ -120,6 +120,7 @@ export const initializeAppDependencies = (
     userDeps.userService,
     orderDeps.orderService,
     courseDeps.courseService,
+    transactionHistoryDeps.transactionHistoryService,
   );
   
 
