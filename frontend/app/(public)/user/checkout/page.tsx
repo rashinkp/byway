@@ -1,17 +1,16 @@
 "use client";
 
-import { useState, useMemo, useCallback, memo, FC, useEffect } from "react";
+import { useState, useMemo, useCallback, memo, FC } from "react";
 import { useSearchParams } from "next/navigation";
 import { useCart } from "@/hooks/cart/useCart";
 import { useGetCourseById } from "@/hooks/course/useGetCourseById";
-import { useCreateOrder } from "@/hooks/order/useOrder";
+import { useStripe } from "@/hooks/stripe/useStripe"; // Import the custom Stripe hook
 import { toast } from "sonner";
 import { Course, ICart } from "@/types/cart";
 import OrderDetailsSkeleton from "@/components/checkout/OrderDetailsSkeleton";
 import OrderDetails from "@/components/checkout/OrderDetails";
 import PaymentMethodSkeleton from "@/components/checkout/PaymentMethodSkeleton";
 import PaymentMethodSelection from "@/components/checkout/PaymentMethodSelection";
-import OrderConfirmation from "@/components/checkout/OrderConfirmation";
 import { useAuth } from "@/hooks/auth/useAuth";
 import { OrderSummary } from "@/components/checkout/OrderSummery";
 import OrderSummarySkeleton from "@/components/checkout/OrderSummerySkeleton";
@@ -33,11 +32,10 @@ const CheckoutPage: FC<CheckoutPageProps> = memo(({ page = 1, limit = 10 }) => {
   const { data: singleCourse, isLoading: courseLoading } = useGetCourseById(
     courseId as string
   );
-  const { mutate: createOrder, isPending } = useCreateOrder();
+  const { createStripeCheckoutSession, isCreatingSession } = useStripe();
   const [activeStep, setActiveStep] = useState(1);
   const [selectedPaymentMethod, setSelectedPaymentMethod] =
     useState<PaymentMethod["id"]>("stripe");
-  const [orderComplete, setOrderComplete] = useState(false);
   const [couponCode, setCouponCode] = useState<string>("");
 
   const { user } = useAuth();
@@ -207,6 +205,7 @@ const CheckoutPage: FC<CheckoutPageProps> = memo(({ page = 1, limit = 10 }) => {
       description: course.description,
       price: course.price,
       offer: course.offer,
+
       thumbnail: course.thumbnail,
       duration: course.duration,
       level: course.level,
@@ -234,7 +233,7 @@ const CheckoutPage: FC<CheckoutPageProps> = memo(({ page = 1, limit = 10 }) => {
   }, [courseDetails, finalAmount]);
 
   const handleSubmit = useCallback(
-    (e: React.MouseEvent) => {
+    async (e: React.MouseEvent) => {
       e.preventDefault();
       if (!courseDetails.length) {
         toast.error("No courses selected for purchase");
@@ -250,34 +249,33 @@ const CheckoutPage: FC<CheckoutPageProps> = memo(({ page = 1, limit = 10 }) => {
       }
 
       if (selectedPaymentMethod === "stripe") {
-        setActiveStep(2); // Move to payment step
-      } else if (selectedPaymentMethod !== "paypal") {
-        createOrder(
-          { courseIds: courseDetails.map((course) => course.id), couponCode },
-          {
-            onSuccess: (order) => {
-              console.log(
-                `Initiating ${selectedPaymentMethod} payment for order:`,
-                order.id
-              );
-              setOrderComplete(true);
-              setActiveStep(3);
-              toast.success("Order created successfully!");
-            },
-            onError: (error) => {
-              toast.error(error.message);
-            },
-          }
-        );
+        try {
+          await createStripeCheckoutSession({
+            courses: coursesInput,
+            userId: user.id,
+            couponCode,
+          });
+          // No need to set activeStep, as Stripe will redirect to the success page
+        } catch (error) {
+          console.error("Error creating Stripe checkout session:", error);
+          toast.error("Failed to initiate Stripe checkout");
+        }
+      } else if (selectedPaymentMethod === "paypal") {
+        // Handle PayPal payment (existing logic)
+        toast.error("PayPal is not implemented yet");
+      } else {
+        // Handle other payment methods (e.g., Razorpay)
+        toast.error("Selected payment method is not supported");
       }
     },
     [
       courseDetails,
       couponCode,
-      createOrder,
+      createStripeCheckoutSession,
       selectedPaymentMethod,
       finalAmount,
       user,
+      coursesInput,
     ]
   );
 
@@ -334,24 +332,6 @@ const CheckoutPage: FC<CheckoutPageProps> = memo(({ page = 1, limit = 10 }) => {
                 </div>
                 Payment
               </div>
-              <div
-                className={`flex-1 text-center ${
-                  activeStep >= 3
-                    ? "text-blue-700 font-medium"
-                    : "text-gray-400"
-                }`}
-              >
-                <div
-                  className={`w-8 h-8 mx-auto mb-2 rounded-full flex items-center justify-center ${
-                    activeStep >= 3
-                      ? "bg-blue-700 text-white"
-                      : "bg-gray-200 text-gray-500"
-                  }`}
-                >
-                  3
-                </div>
-                Confirmation
-              </div>
             </div>
 
             {isLoading ? (
@@ -362,25 +342,21 @@ const CheckoutPage: FC<CheckoutPageProps> = memo(({ page = 1, limit = 10 }) => {
                 onProceed={handleProceedToPayment}
                 isDisabled={!courseDetails.length || finalAmount <= 0}
               />
-            ) : activeStep === 2 ? (
-              isPending ? (
-                <PaymentMethodSkeleton />
-              ) : (
-                <PaymentMethodSelection
-                  selectedMethod={selectedPaymentMethod}
-                  onMethodSelect={handlePaymentMethodSelect}
-                  couponCode={couponCode}
-                  onCouponChange={setCouponCode}
-                  onSubmit={handleSubmit}
-                  isPending={isPending}
-                  isDisabled={!courseDetails.length || finalAmount <= 0}
-                  paypalOptions={paypalOptions}
-                  finalAmount={finalAmount}
-                  courses={coursesInput}
-                />
-              )
+            ) : isCreatingSession ? (
+              <PaymentMethodSkeleton />
             ) : (
-              <OrderConfirmation />
+              <PaymentMethodSelection
+                selectedMethod={selectedPaymentMethod}
+                onMethodSelect={handlePaymentMethodSelect}
+                couponCode={couponCode}
+                onCouponChange={setCouponCode}
+                onSubmit={handleSubmit}
+                isPending={isCreatingSession}
+                isDisabled={!courseDetails.length || finalAmount <= 0}
+                paypalOptions={paypalOptions}
+                finalAmount={finalAmount}
+                courses={coursesInput}
+              />
             )}
           </div>
 

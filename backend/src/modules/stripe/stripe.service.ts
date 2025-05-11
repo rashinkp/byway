@@ -13,7 +13,6 @@ import { ApiResponse } from "../../types/response";
 import {
   checkoutSessionSchema,
   createCheckoutSessionSchema,
-  webhookSchema,
 } from "./stripe.validators";
 import Stripe from "stripe";
 
@@ -188,8 +187,161 @@ export class StripeService {
     // Rest of the switch case remains the same
     switch (constructedEvent.type) {
       case "checkout.session.completed":
-        // ... existing code ...
-      // ... other cases ...
+        const session = constructedEvent.data.object;
+        const metadata = session.metadata || {};
+        const { userId, orderId, courses } = metadata;
+
+        if (userId && orderId) {
+          const user = await this.userService.findUserById(userId);
+          if (!user) {
+            logger.warn("User not found for webhook", { userId });
+            throw new AppError(
+              "User not found",
+              StatusCodes.NOT_FOUND,
+              "NOT_FOUND"
+            );
+          }
+
+          // Check for idempotency
+          const order = await this.orderService.findOrderById(orderId);
+          if (order?.paymentStatus === "COMPLETED") {
+            logger.info("Order already completed", { orderId });
+            return {
+              status: "success",
+              data: null,
+              message: "Order already processed",
+              statusCode: StatusCodes.OK,
+            };
+          }
+
+          try {
+            // Update order status
+            await this.orderService.updateOrderStatus(
+              orderId,
+              "COMPLETED",
+              session.payment_intent as string,
+              "STRIPE"
+            );
+          } catch (error) {
+            logger.error("Failed to update order status", {
+              orderId,
+              error: error instanceof Error ? error.message : String(error)
+            });
+            // Continue processing to avoid failing the webhook
+          }
+
+          // Enroll user in courses
+          let parsedCourses: any[] = [];
+          if (courses) {
+            try {
+              parsedCourses = JSON.parse(courses);
+              // await this.userService.enrollUserInCourses(userId, parsedCourses);
+              logger.debug("User enrolled in courses:", { parsedCourses });
+            } catch (error) {
+              logger.error("Failed to update order status", {
+                orderId,
+                error: error instanceof Error ? error.message : String(error),
+              });
+              // Continue processing to avoid failing the webhook
+            }
+          }
+
+          // Send confirmation email
+          try {
+            // await this.userService.sendOrderConfirmationEmail(userId, orderId);
+          } catch (error) {
+            logger.error("Failed to send confirmation email", {
+              userId,
+              orderId,
+              error: error instanceof Error ? error.message : String(error)
+            });
+            // Continue processing
+          }
+
+          const response: IStripeWebhookResponse = {
+            orderId: session.id,
+            status: "completed",
+            transactionId: (session.payment_intent as string) || "unknown",
+          };
+
+          return {
+            status: "success",
+            data: { webhook: response },
+            message: "Payment processed successfully",
+            statusCode: StatusCodes.OK,
+          };
+        } else {
+          logger.warn("No userId or orderId in metadata", {
+            sessionId: session.id,
+          });
+          return {
+            status: "success",
+            data: null,
+            message: "Webhook processed but no userId or orderId provided",
+            statusCode: StatusCodes.OK,
+          };
+        }
+
+      case "charge.succeeded":
+        logger.info("Charge succeeded", {
+          chargeId: constructedEvent.data.object.id,
+          amount: constructedEvent.data.object.amount,
+          currency: constructedEvent.data.object.currency,
+        });
+        // Optional: Log or update additional records
+        return {
+          status: "success",
+          data: null,
+          message: "Charge succeeded",
+          statusCode: StatusCodes.OK,
+        };
+
+      case "payment_intent.succeeded":
+        logger.info("Payment intent succeeded", {
+          paymentIntentId: constructedEvent.data.object.id,
+          amount: constructedEvent.data.object.amount,
+        });
+        // Optional: Update payment records or trigger additional actions
+        return {
+          status: "success",
+          data: null,
+          message: "Payment intent succeeded",
+          statusCode: StatusCodes.OK,
+        };
+
+      case "payment_intent.created":
+        logger.info("Payment intent created", {
+          paymentIntentId: constructedEvent.data.object.id,
+        });
+        // Typically no action needed, but log for debugging
+        return {
+          status: "success",
+          data: null,
+          message: "Payment intent created",
+          statusCode: StatusCodes.OK,
+        };
+
+      case "charge.updated":
+        logger.info("Charge updated", {
+          chargeId: constructedEvent.data.object.id,
+        });
+        // Optional: Handle updates (e.g., metadata changes)
+        return {
+          status: "success",
+          data: null,
+          message: "Charge updated",
+          statusCode: StatusCodes.OK,
+        };
+
+      case "checkout.session.expired":
+      // ... existing code ...
+      case "checkout.session.async_payment_succeeded":
+      // ... existing code ...
+      case "checkout.session.async_payment_failed":
+      // ... existing code ...
+      case "charge.refunded":
+      // ... existing code ...
+
       default:
         logger.info("Unhandled webhook event", {
           type: constructedEvent.type,
