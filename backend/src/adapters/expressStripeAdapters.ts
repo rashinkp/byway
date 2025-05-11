@@ -27,7 +27,7 @@ export const adaptStripeController = (controller: StripeController) => ({
   createCheckoutSession: asyncHandler(
     async (req: AuthenticatedRequest, res: Response) => {
       const input: ICreateCheckoutSessionInput = {
-        courseIds: req.body.courseIds,
+        courses: req.body.courses,
         userId: req.user.id,
         couponCode: req.body.couponCode,
       };
@@ -46,7 +46,9 @@ export const adaptStripeController = (controller: StripeController) => ({
           "WEBHOOK_ERROR"
         );
       }
-      const signature = Array.isArray(signatureHeader) ? signatureHeader[0] : signatureHeader;
+      const signature = Array.isArray(signatureHeader)
+        ? signatureHeader[0]
+        : signatureHeader;
 
       // Debug raw body
       logger.debug("Webhook raw body type:", {

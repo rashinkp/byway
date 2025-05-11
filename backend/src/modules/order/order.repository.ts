@@ -9,8 +9,9 @@ export class OrderRepository implements IOrderRepository {
     userId: string;
     items: {
       courseId: string;
+      courseTitle: string;
       coursePrice: number;
-      discount: number;
+      discount: number | null;
       couponId: string | null;
     }[];
     amount: number;
@@ -28,6 +29,7 @@ export class OrderRepository implements IOrderRepository {
         items: {
           create: data.items.map((item) => ({
             courseId: item.courseId,
+            courseTitle: item.courseTitle,
             coursePrice: item.coursePrice,
             discount: item.discount,
             couponId: item.couponId,

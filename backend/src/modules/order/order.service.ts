@@ -4,8 +4,9 @@ import { logger } from "../../utils/logger";
 import { UserService } from "../user/user.service";
 import { CourseService } from "../course/course.service";
 import { IOrderRepository } from "./order.repository.interface";
-import { IOrder } from "./order.types";
+import { IOrder, ICourseInput } from "./order.types";
 import { EnrollmentService } from "../enrollment/enrollment.service";
+
 export class OrderService {
   constructor(
     private orderRepository: IOrderRepository,
@@ -16,7 +17,7 @@ export class OrderService {
 
   async createOrder(
     userId: string,
-    courseIds: string[],
+    courses: ICourseInput[],
     couponCode?: string
   ): Promise<IOrder> {
     try {
@@ -25,34 +26,53 @@ export class OrderService {
         throw AppError.notFound("User not found or deactivated");
       }
 
-      const courses = await Promise.all(
-        courseIds.map(async (courseId) => {
-          const course = await this.courseService.getCourseById(courseId);
+      // Validate courses against database
+      const dbCourses = await Promise.all(
+        courses.map(async (inputCourse) => {
+          const course = await this.courseService.getCourseById(inputCourse.id);
           if (!course || course.deletedAt) {
-            throw AppError.notFound(`Course not found: ${courseId}`);
+            throw AppError.notFound(`Course not found: ${inputCourse.id}`);
           }
           if (course.status !== "PUBLISHED") {
-            throw AppError.forbidden(`Course is not available: ${courseId}`);
+            throw AppError.forbidden(
+              `Course is not available: ${inputCourse.id}`
+            );
+          }
+          // Validate price and offer
+          if (course.price !== inputCourse.price) {
+            throw AppError.badRequest(
+              `Invalid price for course ${inputCourse.id}`
+            );
+          }
+          if (
+            inputCourse.offer &&
+            (!course.offer || course.offer !== inputCourse.offer)
+          ) {
+            throw AppError.badRequest(
+              `Invalid offer for course ${inputCourse.id}`
+            );
           }
           return course;
         })
       );
 
       // Calculate amount and items
-      const items = courses.map((course) => {
+      const items = courses.map((inputCourse, index) => {
+        const course = dbCourses[index];
         let coursePrice = course.price || 0;
-        let discount = 0;
+        let discount = course.offer ? coursePrice - course.offer : 0;
         // TODO: Implement coupon validation logic when Coupon module is added
         if (couponCode) {
           // Placeholder: Validate coupon and apply discount
           // const coupon = await couponService.validateCoupon(couponCode, course.id);
-          // discount = coupon.discount;
-          // coursePrice -= discount;
+          // discount += coupon.discount;
+          // coursePrice -= coupon.discount;
         }
         return {
           courseId: course.id,
+          courseTitle: inputCourse.title,
           coursePrice,
-          discount,
+          discount: discount || null,
           couponId: couponCode || null,
         };
       });
@@ -71,11 +91,11 @@ export class OrderService {
         orderStatus: "PENDING",
       });
 
-      // Create TransactionHistory record
+      // TODO: Create TransactionHistory record
       // await this.transactionHistoryService.createTransaction({
       //   orderId: order.id,
       //   userId,
-      //   courseId: items.length === 1 ? items[0].courseId : null, // Set courseId for single-course orders
+      //   courseId: items.length === 1 ? items[0].courseId : null,
       //   amount,
       //   type: "PAYMENT",
       //   status: "PENDING",
@@ -83,16 +103,12 @@ export class OrderService {
       //   transactionId: null,
       // });
 
-      // TODO: Initiate payment gateway request (e.g., Stripe, PayPal)
-      // const paymentUrl = await paymentGateway.initiatePayment(order);
-      // order.paymentUrl = paymentUrl;
-
       return order;
     } catch (error) {
       logger.error("Create order error:", {
         error,
         userId,
-        courseIds,
+        courses,
         couponCode,
       });
       throw error;
@@ -126,7 +142,7 @@ export class OrderService {
         paymentGateway
       );
 
-      // Update TransactionHistory
+      // TODO: Update TransactionHistory
       // await this.transactionHistoryService.updateTransactionStatus({
       //   orderId,
       //   paymentStatus,

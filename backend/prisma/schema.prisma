@@ -306,6 +306,7 @@ model OrderItem {
   orderId       String
   courseId      String
   coursePrice   Decimal       // Course price at purchase time
+  courseTitle   String
   discount      Decimal?      // Discount applied (if any)
   couponId      String?       // Reference to applied coupon
   createdAt     DateTime      @default(now())

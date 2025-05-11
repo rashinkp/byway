@@ -1,6 +1,17 @@
+export interface ICourseInput {
+  id: string;
+  title: string;
+  description?: string;
+  price: number;
+  offer?: number;
+  thumbnail?: string;
+  duration?: string;
+  level?: string;
+}
+
 export interface ICreateCheckoutSessionInput {
-  courseIds: string[];
   userId: string;
+  courses: ICourseInput[];
   couponCode?: string;
 }
 
@@ -9,7 +20,7 @@ export interface IWebhookInput {
     id: string;
     type: string;
     data: {
-      object: Record<string, any>; // Flexible object
+      object: Record<string, any>;
     };
   };
   signature: string;

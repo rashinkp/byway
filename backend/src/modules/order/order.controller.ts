@@ -4,20 +4,18 @@ import { ApiResponse } from "../../types/response";
 import { z } from "zod";
 import { AppError } from "../../utils/appError";
 import { logger } from "../../utils/logger";
-import {
-  CreateOrderSchema,
-  UpdateOrderStatusSchema,
-} from "./order.validators";
+import { CreateOrderSchema, UpdateOrderStatusSchema } from "./order.validators";
 
 export class OrderController {
   constructor(private orderService: OrderService) {}
+
   async createOrder(input: unknown): Promise<ApiResponse> {
     try {
       const validatedInput = CreateOrderSchema.parse(input);
-      const { userId, courseIds, couponCode } = validatedInput;
+      const { userId, courses, couponCode } = validatedInput;
       const order = await this.orderService.createOrder(
         userId,
-        courseIds,
+        courses,
         couponCode
       );
       return {
@@ -32,6 +30,7 @@ export class OrderController {
           items: order.items.map((item) => ({
             id: item.id,
             courseId: item.courseId,
+            courseTitle: item.courseTitle,
             coursePrice: item.coursePrice,
             discount: item.discount,
             couponId: item.couponId,
@@ -69,6 +68,7 @@ export class OrderController {
           items: order.items.map((item) => ({
             id: item.id,
             courseId: item.courseId,
+            courseTitle: item.courseTitle,
             coursePrice: item.coursePrice,
             discount: item.discount,
             couponId: item.couponId,

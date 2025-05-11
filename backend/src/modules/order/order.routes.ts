@@ -3,7 +3,7 @@ import { OrderController } from "./order.controller";
 import { protect } from "../../middlewares/authMiddleware";
 import { adaptOrderController } from "../../adapters/expressOrderAdapters";
 
-export const createPaymentRouter = (
+export const createOrderouter = (
   orderController: OrderController
 ): Router => {
   const paymentRouter = Router();

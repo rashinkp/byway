@@ -10,7 +10,7 @@ import { AppDependencies } from "../core/dependacies/index";
 import { createContentRouter } from "../modules/content/content.routes";
 import { createCartRouter } from "../modules/cart/cart.routes";
 import { createEnrollmentRouter } from "../modules/enrollment/enrollment.routes";
-import { createPaymentRouter } from "../modules/order/order.routes";
+import { createOrderouter } from "../modules/order/order.routes";
 import { createPaypalRouter } from "../modules/paypal/paypal.routes";
 import { createStripeRouter } from "../modules/stripe/stripe.routes";
 
@@ -40,10 +40,7 @@ export const configureRoutes = (
     "/api/v1/enrollments",
     createEnrollmentRouter(dependencies.enrollmentController)
   );
-  app.use(
-    "/api/v1/payments",
-    createPaymentRouter(dependencies.orderController)
-  );
+  app.use("/api/v1/orders", createOrderouter(dependencies.orderController));
     app.use(
       "/api/v1/paypal",
       createPaypalRouter(dependencies.paypalController)

@@ -2,6 +2,7 @@ import { StatusCodes } from "http-status-codes";
 import { AppError } from "../../utils/appError";
 import { logger } from "../../utils/logger";
 import { UserService } from "../user/user.service";
+import { OrderService } from "../order/order.service";
 import {
   ICreateCheckoutSessionInput,
   IWebhookInput,
@@ -14,14 +15,14 @@ import {
   createCheckoutSessionSchema,
   webhookSchema,
 } from "./stripe.validators";
-import { IStripeRepository } from "./stripe.repository.interface";
 import Stripe from "stripe";
 
 export class StripeService {
   private stripe: Stripe;
 
   constructor(
-    private userService: UserService // private stripeRepository: IStripeRepository
+    private userService: UserService,
+    private orderService: OrderService
   ) {
     this.stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
       apiVersion: "2025-04-30.basil",
@@ -43,7 +44,7 @@ export class StripeService {
       );
     }
 
-    const { courseIds, userId, couponCode } = parsedInput.data;
+    const { userId, courses, couponCode } = parsedInput.data;
 
     // Validate user exists
     const user = await this.userService.findUserById(userId);
@@ -51,6 +52,13 @@ export class StripeService {
       logger.warn("User not found for checkout session", { userId });
       throw new AppError("User not found", StatusCodes.NOT_FOUND, "NOT_FOUND");
     }
+
+    // Create pending order
+    const order = await this.orderService.createOrder(
+      userId,
+      courses,
+      couponCode
+    );
 
     // Validate FRONTEND_URL
     const frontendUrl = process.env.FRONTEND_URL;
@@ -64,16 +72,22 @@ export class StripeService {
     }
 
     try {
-      // TODO: Fetch course details from database to validate and get prices
+      // Create line items from course details
       const lineItems: Stripe.Checkout.SessionCreateParams.LineItem[] =
-        courseIds.map((courseId) => ({
+        courses.map((course) => ({
           price_data: {
             currency: "usd",
             product_data: {
-              name: `Course ${courseId}`, // Replace with actual course name
-              metadata: { courseId },
+              name: course.title,
+              description: course.description || undefined,
+              images: course.thumbnail ? [course.thumbnail] : undefined,
+              metadata: {
+                courseId: course.id,
+                ...(course.duration && { duration: course.duration }),
+                ...(course.level && { level: course.level }),
+              },
             },
-            unit_amount: 1000, // Replace with actual price in cents (e.g., $10.00)
+            unit_amount: Math.round((course.offer || course.price) * 100),
           },
           quantity: 1,
         }));
@@ -87,17 +101,11 @@ export class StripeService {
         customer_email: user.email,
         metadata: {
           userId,
-          courseIds: JSON.stringify(courseIds),
+          orderId: order.id,
+          courses: JSON.stringify(courses),
         },
         discounts: couponCode ? [{ coupon: couponCode }] : undefined,
       });
-
-      // await this.stripeRepository.storeCheckoutSession({
-      //   sessionId: session.id,
-      //   userId,
-      //   courseIds,
-      //   status: session.payment_status,
-      // });
 
       const response: IStripeCheckoutSessionResponse = {
         id: session.id,
@@ -190,9 +198,9 @@ export class StripeService {
         case "checkout.session.completed":
           const session = constructedEvent.data.object;
           const metadata = session.metadata || {};
-          const { userId, courseIds } = metadata;
+          const { userId, orderId, courses } = metadata;
 
-          if (userId) {
+          if (userId && orderId) {
             const user = await this.userService.findUserById(userId);
             if (!user) {
               logger.warn("User not found for webhook", { userId });
@@ -203,21 +211,28 @@ export class StripeService {
               );
             }
 
-            // Parse courseIds if present
-            let parsedCourseIds: string[] = [];
-            if (courseIds) {
+            // Update order status
+            await this.orderService.updateOrderStatus(
+              orderId,
+              "COMPLETED",
+              session.payment_intent as string,
+              "STRIPE"
+            );
+
+            // Parse courses for logging
+            let parsedCourses: any[] = [];
+            if (courses) {
               try {
-                parsedCourseIds = JSON.parse(courseIds);
-                logger.debug("Parsed courseIds:", { parsedCourseIds });
+                parsedCourses = JSON.parse(courses);
+                logger.debug("Parsed courses:", { parsedCourses });
               } catch (e) {
-                logger.warn("Failed to parse courseIds", {
-                  courseIds,
+                logger.warn("Failed to parse courses", {
+                  courses,
                   error: e,
                 });
               }
             }
 
-            // TODO: Create order and grant course access
             const response: IStripeWebhookResponse = {
               orderId: session.id,
               status: "completed",
@@ -231,11 +246,13 @@ export class StripeService {
               statusCode: StatusCodes.OK,
             };
           } else {
-            logger.warn("No userId in metadata", { sessionId: session.id });
+            logger.warn("No userId or orderId in metadata", {
+              sessionId: session.id,
+            });
             return {
               status: "success",
               data: null,
-              message: "Webhook processed but no userId provided",
+              message: "Webhook processed but no userId or orderId provided",
               statusCode: StatusCodes.OK,
             };
           }
@@ -244,6 +261,16 @@ export class StripeService {
           logger.info("Checkout session expired", {
             sessionId: constructedEvent.data.object.id,
           });
+          // Optionally update order status to CANCELLED
+          const expiredMetadata = constructedEvent.data.object.metadata || {};
+          if (expiredMetadata.orderId) {
+            await this.orderService.updateOrderStatus(
+              expiredMetadata.orderId,
+              "FAILED",
+              undefined,
+              "STRIPE"
+            );
+          }
           return {
             status: "success",
             data: null,
@@ -266,6 +293,16 @@ export class StripeService {
           logger.warn("Async payment failed", {
             sessionId: constructedEvent.data.object.id,
           });
+          // Optionally update order status
+          const failedMetadata = constructedEvent.data.object.metadata || {};
+          if (failedMetadata.orderId) {
+            await this.orderService.updateOrderStatus(
+              failedMetadata.orderId,
+              "FAILED",
+              undefined,
+              "STRIPE"
+            );
+          }
           return {
             status: "success",
             data: null,
@@ -277,6 +314,16 @@ export class StripeService {
           logger.info("Charge refunded", {
             chargeId: constructedEvent.data.object.id,
           });
+          // Optionally update order status
+          const refundedMetadata = constructedEvent.data.object.metadata || {};
+          if (refundedMetadata.orderId) {
+            await this.orderService.updateOrderStatus(
+              refundedMetadata.orderId,
+              "REFUNDED",
+              undefined,
+              "STRIPE"
+            );
+          }
           return {
             status: "success",
             data: null,
