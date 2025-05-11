@@ -107,9 +107,17 @@ export class CourseController {
     }
   }
 
-  async softDeleteCourse(courseId: string, userId: string , role:'ADMIN'|'USER'|'INSTRUCTOR'): Promise<ApiResponse> {
+  async softDeleteCourse(
+    courseId: string,
+    userId: string,
+    role: "ADMIN" | "USER" | "INSTRUCTOR"
+  ): Promise<ApiResponse> {
     try {
-      const course = await this.courseService.softDeleteCourse(courseId, userId , role);
+      const course = await this.courseService.softDeleteCourse(
+        courseId,
+        userId,
+        role
+      );
       return {
         status: "success",
         data: course,
@@ -130,15 +138,15 @@ export class CourseController {
 
   async enrollCourse(input: ICreateEnrollmentInput): Promise<ApiResponse> {
     try {
-      const enrollment = await this.courseService.enrollCourse(input);
+      const enrollments = await this.courseService.enrollCourse(input);
       return {
         status: "success",
-        data: enrollment,
-        message: "Enrolled successfully",
+        data: enrollments,
+        message: "Enrolled successfully in courses",
         statusCode: StatusCodes.CREATED,
       };
     } catch (error) {
-      logger.error("Error enrolling course", { error });
+      logger.error("Error enrolling courses", { error });
       throw error instanceof AppError
         ? error
         : new AppError(

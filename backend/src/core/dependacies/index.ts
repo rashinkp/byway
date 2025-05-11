@@ -118,7 +118,8 @@ export const initializeAppDependencies = (
   const stripeDeps = initializeStripeDependencies(
     dbProvider,
     userDeps.userService,
-    orderDeps.orderService
+    orderDeps.orderService,
+    courseDeps.courseService,
   );
   
 

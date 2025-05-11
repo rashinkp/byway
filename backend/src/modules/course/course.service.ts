@@ -98,7 +98,7 @@ export class CourseService {
     }
   }
 
- async getAllCourses(
+  async getAllCourses(
     input: IGetAllCoursesInput
   ): Promise<{ courses: ICourse[]; total: number; totalPage: number }> {
     const parsedInput = getAllCoursesSchema.safeParse(input);
@@ -190,7 +190,7 @@ export class CourseService {
           "NOT_FOUND"
         );
       }
-      return {...courseDetails , courseId};
+      return { ...courseDetails, courseId };
     } catch (error) {
       logger.error("Error retrieving course by ID", { error, courseId });
       throw error instanceof AppError
@@ -332,7 +332,7 @@ export class CourseService {
     }
   }
 
-  async enrollCourse(input: ICreateEnrollmentInput): Promise<IEnrollment> {
+  async enrollCourse(input: ICreateEnrollmentInput): Promise<IEnrollment[]> {
     const parsedInput = createEnrollmentSchema.safeParse(input);
     if (!parsedInput.success) {
       logger.warn("Validation failed for enrollCourse", {
@@ -345,7 +345,7 @@ export class CourseService {
       );
     }
 
-    const { userId, courseId } = parsedInput.data;
+    const { userId, courseIds } = parsedInput.data;
 
     // Validate user
     const user = await this.userService.findUserById(userId);
@@ -354,39 +354,57 @@ export class CourseService {
       throw new AppError("User not found", StatusCodes.NOT_FOUND, "NOT_FOUND");
     }
 
-    // Validate course
-    const course = await this.courseRepository.getCourseById(courseId);
-    if (!course || course.deletedAt || course.status !== "PUBLISHED") {
-      logger.warn("Course not found, deleted, or not published", { courseId });
-      throw new AppError(
-        "Course not found, deleted, or not published",
-        StatusCodes.NOT_FOUND,
-        "NOT_FOUND"
+    // Validate courses and check for existing enrollments
+    const enrollments: IEnrollment[] = [];
+    for (const courseId of courseIds) {
+      // Validate course
+      const course = await this.courseRepository.getCourseById(courseId);
+      if (!course || course.deletedAt || course.status !== "PUBLISHED") {
+        logger.warn("Course not found, deleted, or not published", {
+          courseId,
+        });
+        throw new AppError(
+          `Course not found, deleted, or not published: ${courseId}`,
+          StatusCodes.NOT_FOUND,
+          "NOT_FOUND"
+        );
+      }
+
+      // Check for existing enrollment
+      const existingEnrollment = await this.courseRepository.getEnrollment(
+        userId,
+        courseId
       );
+      if (existingEnrollment) {
+        logger.warn("User already enrolled in course", { userId, courseId });
+        continue; // Skip duplicate enrollment
+      }
+
+      // Create enrollment
+      const enrollment = await this.courseRepository.createEnrollment({
+        userId,
+        courseIds,
+      });
+      enrollments.push(enrollment);
     }
 
-    // Check for existing enrollment
-    const existingEnrollment = await this.courseRepository.getEnrollment(
-      userId,
-      courseId
-    );
-    if (existingEnrollment) {
-      logger.warn("User already enrolled in course", { userId, courseId });
+    if (enrollments.length === 0) {
+      logger.warn("No new enrollments created", { userId, courseIds });
       throw new AppError(
-        "You are already enrolled in this course",
+        "No new enrollments created (all courses already enrolled)",
         StatusCodes.CONFLICT,
         "ALREADY_ENROLLED"
       );
     }
 
     try {
-      return await this.courseRepository.createEnrollment(parsedInput.data);
+      return enrollments;
     } catch (error) {
-      logger.error("Error enrolling course", { error, input });
+      logger.error("Error enrolling courses", { error, input });
       throw error instanceof AppError
         ? error
         : new AppError(
-            "Failed to enroll course",
+            "Failed to enroll courses",
             StatusCodes.INTERNAL_SERVER_ERROR,
             "INTERNAL_ERROR"
           );

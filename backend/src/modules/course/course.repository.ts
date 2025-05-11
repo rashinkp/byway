@@ -392,10 +392,36 @@ export class CourseRepository implements ICourseRepository {
     };
   }
 
-  async createEnrollment(input: ICreateEnrollmentInput): Promise<IEnrollment> {
-    const enrollment = await this.prisma.enrollment.create({
-      data: input,
+  async createEnrollment(
+    input: ICreateEnrollmentInput
+  ): Promise<IEnrollment> {
+    const { userId, courseIds } = input;
+    
+    // Use a transaction to ensure atomicity and return the first enrollment
+    const enrollment = await this.prisma.$transaction(async (tx) => {
+      const firstEnrollment = await tx.enrollment.create({
+        data: {
+          userId,
+          courseId: courseIds[0], 
+          enrolledAt: new Date(),
+        },
+      });
+
+      if (courseIds.length > 1) {
+        for (const courseId of courseIds.slice(1)) {
+          await tx.enrollment.create({
+            data: {
+              userId,
+              courseId,
+              enrolledAt: new Date(),
+            },
+          });
+        }
+      }
+
+      return firstEnrollment;
     });
+
     return {
       userId: enrollment.userId,
       courseId: enrollment.courseId,

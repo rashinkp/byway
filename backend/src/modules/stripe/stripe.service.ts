@@ -15,13 +15,15 @@ import {
   createCheckoutSessionSchema,
 } from "./stripe.validators";
 import Stripe from "stripe";
+import { CourseService } from "../course/course.service";
 
 export class StripeService {
   private stripe: Stripe;
 
   constructor(
     private userService: UserService,
-    private orderService: OrderService
+    private orderService: OrderService,
+    private courseService:CourseService
   ) {
     this.stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
       apiVersion: "2025-04-30.basil",
@@ -225,21 +227,22 @@ export class StripeService {
           } catch (error) {
             logger.error("Failed to update order status", {
               orderId,
-              error: error instanceof Error ? error.message : String(error)
+              error: error instanceof Error ? error.message : String(error),
             });
             // Continue processing to avoid failing the webhook
           }
 
           // Enroll user in courses
-          let parsedCourses: any[] = [];
           if (courses) {
             try {
-              parsedCourses = JSON.parse(courses);
-              // await this.userService.enrollUserInCourses(userId, parsedCourses);
-              logger.debug("User enrolled in courses:", { parsedCourses });
+              const parsedCourses: { id: string }[] = JSON.parse(courses);
+              const courseIds = parsedCourses.map((course) => course.id);
+              await this.courseService.enrollCourse({ userId, courseIds });
+              logger.debug("User enrolled in courses:", { courseIds });
             } catch (error) {
-              logger.error("Failed to update order status", {
-                orderId,
+              logger.error("Failed to enroll user in courses", {
+                userId,
+                courses,
                 error: error instanceof Error ? error.message : String(error),
               });
               // Continue processing to avoid failing the webhook
@@ -253,7 +256,7 @@ export class StripeService {
             logger.error("Failed to send confirmation email", {
               userId,
               orderId,
-              error: error instanceof Error ? error.message : String(error)
+              error: error instanceof Error ? error.message : String(error),
             });
             // Continue processing
           }

@@ -79,7 +79,7 @@ export interface IGetAllCoursesInput {
 }
 export interface ICreateEnrollmentInput {
   userId: string;
-  courseId: string;
+  courseIds: string[]; 
 }
 
 export interface IEnrollment {

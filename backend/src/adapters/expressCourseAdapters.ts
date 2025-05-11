@@ -153,7 +153,7 @@ export const adaptCourseController = (controller: CourseController) => ({
       }
       const input: ICreateEnrollmentInput = {
         userId: req.user.id,
-        courseId: req.body.courseId,
+        courseIds: req.body.courseIds, 
       };
       const result = await controller.enrollCourse(input);
       res.status(result.statusCode).json(result);

@@ -160,9 +160,10 @@ export const getAllCoursesSchema = z.object({
 
 export const createEnrollmentSchema = z.object({
   userId: z.string().uuid("Invalid user ID"),
-  courseId: z.string().uuid("Invalid course ID"),
+  courseIds: z
+    .array(z.string().uuid("Invalid course ID"))
+    .min(1, "At least one course ID is required"),
 });
-
 export const courseIdSchema = z.object({
   courseId: z.string().uuid("Invalid course ID"),
 });
