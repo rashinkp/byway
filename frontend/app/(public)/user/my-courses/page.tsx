@@ -1,11 +1,14 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { CourseGrid } from "@/components/course/CourseGrid";
 import { Pagination } from "@/components/ui/Pagination";
 import ErrorDisplay from "@/components/ErrorDisplay";
 import { Course } from "@/types/course";
 import { useGetEnrolledCourses } from "@/hooks/course/useGetEnrolledCourses";
+import { motion } from "framer-motion";
+import { CourseCard } from "@/components/course/CourseCard";
+import Link from "next/link";
 
 // Utility function to format duration (in minutes) to hours
 const formatDuration = (duration?: number | null): string => {
@@ -15,6 +18,18 @@ const formatDuration = (duration?: number | null): string => {
   return `${hours}h ${minutes > 0 ? `${minutes}m` : ""}`;
 };
 
+// Interface for GridCourse to match CourseCard requirements
+interface GridCourse extends Course {
+  rating: number;
+  reviewCount: number;
+  formattedDuration: string;
+  lessons: number;
+  bestSeller: boolean;
+  thumbnail: string;
+  price: number;
+  lastAccessed: string;
+}
+
 export default function MyCoursesPage() {
   const itemsPerPage = 6;
   const [currentPage, setCurrentPage] = useState(1);
@@ -22,6 +37,7 @@ export default function MyCoursesPage() {
     "enrolledAt"
   );
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
+  const [isLoaded, setIsLoaded] = useState(false);
 
   // Fetch enrolled courses using the hook
   const { data, isLoading, error, refetch } = useGetEnrolledCourses({
@@ -29,30 +45,34 @@ export default function MyCoursesPage() {
     limit: itemsPerPage,
     sortBy,
     sortOrder,
-    search: "", 
+    search: "",
     level: "All",
   });
 
-  // Map API courses to include UI-specific fields, ensuring GridCourse compatibility
-  const courses: Course[] =
+  // Map API courses to include UI-specific fields for CourseCard
+  const courses: GridCourse[] =
     data?.items.map((course) => ({
       ...course,
-      rating: course.rating ?? 4.5, // Default rating
-      reviewCount: course.reviewCount ?? 100, // Default review count
-      formattedDuration: formatDuration(course.duration), // Non-optional
-      lessons: course.lessons ?? 50, // Default lesson count
-      bestSeller: course.bestSeller ?? false, // Default bestseller status
-      progress: course.progress ?? 0, // Default progress
-      completedLessons: course.completedLessons ?? 0, // Default completed lessons
-      totalLessons: course.totalLessons ?? 50, // Default total lessons
-      lastAccessed: course.lastAccessed ?? "Unknown", // Default last accessed
-      thumbnail: course.thumbnail ?? "/default-thumbnail.png", // Non-optional fallback
-      price: course.price ?? 0, // Non-optional fallback
+      rating: course.rating ?? 4.5,
+      reviewCount: course.reviewCount ?? 100,
+      formattedDuration: formatDuration(course.duration),
+      lessons: course.lessons ?? 50,
+      bestSeller: course.bestSeller ?? false,
+      thumbnail: course.thumbnail ?? "/default-thumbnail.png",
+      price: course.price ?? 0,
+      lastAccessed: course.lastAccessed ?? "Unknown",
     })) ?? [];
 
   // Calculate pagination values
   const totalPages = data?.totalPages ?? 1;
   const totalCourses = data?.total ?? 0;
+
+  // Handle animation loading state
+  useEffect(() => {
+    if (!isLoading) {
+      setIsLoaded(true);
+    }
+  }, [isLoading]);
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
@@ -63,54 +83,12 @@ export default function MyCoursesPage() {
       setSortBy("enrolledAt");
       setSortOrder("desc");
     } else if (value === "progress") {
-      setSortBy("enrolledAt"); // Replace with actual progress sorting when available
+      setSortBy("enrolledAt"); // Placeholder until progress sorting is supported
       setSortOrder("desc");
     } else if (value === "title") {
       setSortBy("title");
       setSortOrder("asc");
     }
-  };
-
-  // Component to render course grid with progress
-  const CourseGridWithProgress = ({
-    courses,
-    isLoading,
-  }: {
-    courses: Course[];
-    isLoading: boolean;
-  }) => {
-    const gridCourses = courses.map((course) => ({
-      ...course,
-      id: course.id,
-      title: course.title,
-      rating: course.rating || 0,
-      reviewCount: course.reviewCount || 0,
-      formattedDuration: course.formattedDuration || "",
-      lessons: course.lessons || 0,
-      bestSeller: course.bestSeller || false,
-      thumbnail: course.thumbnail || "",
-      price: course.price || 0,
-      level: course.level || "Beginner",
-      status: course.status || "published",
-      categoryId: course.categoryId || "",
-      createdBy: course.createdBy || "",
-    }));
-
-    return (
-      <div className="mb-8">
-        <CourseGrid courses={gridCourses} isLoading={isLoading} />
-        {courses.length === 0 && !isLoading && (
-          <div className="flex flex-col items-center justify-center py-12 bg-gray-50 rounded-lg">
-            <h3 className="text-xl font-semibold text-gray-700 mb-2">
-              No courses found
-            </h3>
-            <p className="text-gray-500">
-              You haven't enrolled in any courses yet.
-            </p>
-          </div>
-        )}
-      </div>
-    );
   };
 
   if (error) {
@@ -123,14 +101,26 @@ export default function MyCoursesPage() {
     );
   }
 
+  // Animation variants for staggered appearance (from CourseGrid)
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    show: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1,
+      },
+    },
+  };
+
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="container mx-auto px-4 py-2">
+      {/* Header with Sorting */}
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold text-gray-800">My Courses</h1>
         <div className="flex items-center">
           <span className="text-gray-600 mr-2">Sort by:</span>
           <select
-            className="bg-white border border-gray-300 rounded-md px-3 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="border border-gray-300 rounded-md px-3 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500"
             value={
               sortBy === "enrolledAt" && sortOrder === "desc"
                 ? "recent"
@@ -145,7 +135,8 @@ export default function MyCoursesPage() {
         </div>
       </div>
 
-      <div className="bg-white rounded-lg shadow-sm p-4 mb-8">
+      {/* Continue Learning Section */}
+      <div className="p-4 mb-8">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-4">
           <div>
             <h2 className="text-lg font-semibold text-gray-800">
@@ -161,71 +152,52 @@ export default function MyCoursesPage() {
           </a>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <motion.div
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
+          variants={containerVariants}
+          initial="hidden"
+          animate={isLoaded ? "show" : "hidden"}
+        >
           {courses.slice(0, 3).map((course) => (
-            <div
+            <motion.div
               key={`continue-${course.id}`}
-              className="border rounded-lg overflow-hidden hover:shadow-md transition-shadow"
+              variants={{
+                hidden: { opacity: 0, y: 20 },
+                show: {
+                  opacity: 1,
+                  y: 0,
+                  transition: { duration: 0.4, ease: "easeOut" },
+                },
+              }}
             >
-              <div className="relative h-40 bg-gray-200">
-                <img
-                  src={course?.thumbnail || undefined}
-                  alt={course.title}
-                  className="w-full h-full object-cover"
-                  onError={(e) => {
-                    const target = e.target as HTMLImageElement;
-                    target.src = "/default-thumbnail.png";
-                  }}
+              <Link href={`/courses/${course.id}`}>
+                <CourseCard
+                  id={course.id}
+                  thumbnail={course.thumbnail}
+                  title={course.title}
+                  rating={course.rating}
+                  reviewCount={course.reviewCount}
+                  formattedDuration={course.formattedDuration}
+                  lessons={course.lessons}
+                  price={course.price}
+                  bestSeller={course.bestSeller}
+                  className="w-full"
                 />
-                <div className="absolute inset-0 bg-black bg-opacity-30 flex items-center justify-center">
-                  <button className="bg-blue-600 hover:bg-blue-700 text-white rounded-full w-12 h-12 flex items-center justify-center">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      className="h-6 w-6"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"
-                      />
-                    </svg>
-                  </button>
-                </div>
-              </div>
-              <div className="p-4">
-                <h3 className="font-semibold text-gray-800 mb-1 line-clamp-1">
-                  {course.title}
-                </h3>
-                <p className="text-sm text-gray-600 mb-2">
-                  Last accessed {course.lastAccessed}
-                </p>
-                <div className="w-full bg-gray-200 rounded-full h-2 mb-1">
-                  <div
-                    className="bg-blue-600 h-2 rounded-full"
-                    style={{ width: `${course.progress}%` }}
-                  ></div>
-                </div>
-                <p className="text-xs text-gray-600">
-                  {course.progress}% complete • {course.completedLessons}/
-                  {course.totalLessons} lessons
-                </p>
-              </div>
-            </div>
+              </Link>
+              <p className="text-sm text-gray-600 mt-2">
+                Last accessed {course.lastAccessed}
+              </p>
+            </motion.div>
           ))}
-        </div>
+        </motion.div>
       </div>
 
-      <div className="mb-6">
-        <h2 className="text-lg font-semibold text-gray-800 mb-4">
-          All My Courses
-        </h2>
-        <CourseGridWithProgress courses={courses} isLoading={isLoading} />
-      </div>
+      {/* All My Courses Section */}
+      {/* <div className="mb-6">
+        <CourseGrid courses={courses} isLoading={isLoading} />
+      </div> */}
 
+      {/* Pagination */}
       {totalPages > 1 && (
         <Pagination
           totalPages={totalPages}

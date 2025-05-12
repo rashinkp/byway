@@ -6,6 +6,7 @@ import { cn } from "@/utils/cn";
 import Sidebar from "@/components/profile/SideBarProfile";
 import ProfileSection from "@/components/profile/ProfileSection";
 import EditProfileForm from "@/components/profile/EditProfileForm";
+import MyCoursesPage from "../my-courses/page";
 
 export default function ProfilePage() {
   const { data: user, isLoading, error } = useUserData();
@@ -38,7 +39,11 @@ export default function ProfilePage() {
         {activeSection === "profile" && (
           <ProfileSection user={user} setIsModalOpen={setIsModalOpen} />
         )}
-        {["courses", "certificates", "settings"].map(
+
+        {activeSection === 'courses' && (
+          <MyCoursesPage />
+        )}
+        {["certificates", "settings"].map(
           (section) =>
             activeSection === section && (
               <div key={section} className="max-w-4xl mx-auto">
