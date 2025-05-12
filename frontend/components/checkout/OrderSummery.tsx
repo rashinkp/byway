@@ -34,17 +34,6 @@ export function OrderSummary({
         <span>Total</span>
         <span>${finalAmount.toFixed(2)}</span>
       </div>
-      <Link
-        href="/user/checkout"
-        className={`w-full bg-blue-600 text-white font-medium py-3 px-4 rounded-md mt-6 flex items-center justify-center ${
-          courses?.length === 0 || finalAmount <= 0
-            ? "opacity-50 cursor-not-allowed"
-            : "hover:bg-blue-700"
-        }`}
-      >
-        Proceed to Checkout
-        <ChevronRight size={18} className="ml-1" />
-      </Link>
       <div className="mt-6 text-center text-sm text-gray-500">
         <p>
           Need help?{" "}
