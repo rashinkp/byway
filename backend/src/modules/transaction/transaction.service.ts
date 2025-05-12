@@ -155,8 +155,8 @@ export class TransactionHistoryService {
 
   async getTransactionsByUserId(
     userId: string,
-    requestingUser: { id: string; role: string }
   ): Promise<ITransaction[]> {
+
     try {
       const user = await this.userService.findUserById(userId);
       if (!user || user.deletedAt) {
@@ -166,13 +166,13 @@ export class TransactionHistoryService {
           "NOT_FOUND"
         );
       }
-      if (requestingUser.role !== "ADMIN" && requestingUser.id !== userId) {
-        throw new AppError(
-          "Unauthorized to access this user's transactions",
-          StatusCodes.FORBIDDEN,
-          "FORBIDDEN"
-        );
-      }
+      // if (requestingUser.role !== "ADMIN" && requestingUser.id !== userId) {
+      //   throw new AppError(
+      //     "Unauthorized to access this user's transactions",
+      //     StatusCodes.FORBIDDEN,
+      //     "FORBIDDEN"
+      //   );
+      // }
       const transactions =
         await this.transactionHistoryRepository.findTransactionsByUserId(
           userId

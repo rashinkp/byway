@@ -13,6 +13,7 @@ import { createEnrollmentRouter } from "../modules/enrollment/enrollment.routes"
 import { createOrderouter } from "../modules/order/order.routes";
 import { createPaypalRouter } from "../modules/paypal/paypal.routes";
 import { createStripeRouter } from "../modules/stripe/stripe.routes";
+import { createTransactionHistoryRouter } from "../modules/transaction/transaction.routes";
 
 export const configureRoutes = (
   app: Express,
@@ -46,5 +47,6 @@ export const configureRoutes = (
       createPaypalRouter(dependencies.paypalController)
   );
   app.use("/api/v1/stripe", createStripeRouter(dependencies.stripeController));
+  app.use("/api/v1/transactions", createTransactionHistoryRouter(dependencies.transactionHistoryController));
 
 };

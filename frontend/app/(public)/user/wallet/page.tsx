@@ -2,77 +2,77 @@
 
 import { useState } from "react";
 import { Plus, ArrowDown, ArrowUp, CreditCard } from "lucide-react";
+import { createTransaction } from "@/api/transaction";
+import { Transaction } from "@/types/transactions";
+import { useGetTransactionsByUser } from "@/hooks/transaction/useGetTransactionByUser";
+import ErrorDisplay from "@/components/ErrorDisplay";
+
+interface DisplayTransaction {
+  id: string;
+  type: "deposit" | "withdrawal";
+  amount: number;
+  date: string;
+  time: string;
+  description: string;
+}
 
 export default function WalletTransactionPage() {
-  // Wallet balance state
+
+  // Wallet balance state (temporary until wallet API is added)
   const [walletBalance, setWalletBalance] = useState(529.75);
 
-  // Transaction data state
-  const [transactions, setTransactions] = useState([
-    {
-      id: 1,
-      type: "deposit",
-      amount: 100.0,
-      date: "2025-05-10",
-      description: "Added funds",
-      time: "14:32",
-    },
-    {
-      id: 2,
-      type: "withdrawal",
-      amount: 45.25,
-      date: "2025-05-09",
-      description: "Coffee shop",
-      time: "09:15",
-    },
-    {
-      id: 3,
-      type: "deposit",
-      amount: 500.0,
-      date: "2025-05-05",
-      description: "Salary deposit",
-      time: "00:01",
-    },
-    {
-      id: 4,
-      type: "withdrawal",
-      amount: 125.0,
-      date: "2025-05-03",
-      description: "Grocery shopping",
-      time: "17:45",
-    },
-  ]);
+  // Fetch transactions using the hook
+  const { data: transactions, isLoading, error: transactionHistoryError, refetch: transactionRefetch } = useGetTransactionsByUser();
+  
+
+
+  // Map backend transactions to display format
+  const displayTransactions: DisplayTransaction[] = (transactions || []).map((t: Transaction) => {
+    const date = new Date(t.createdAt);
+    return {
+      id: t.id,
+      type: t.type === "PAYMENT" ? "deposit" : "withdrawal", // Map PAYMENT to deposit, REFUND to withdrawal
+      amount: t.amount,
+      date: date.toISOString().split("T")[0],
+      time: date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+      description:
+        t.type === "PAYMENT" ? "Added funds" : `Refund for order ${t.orderId}`,
+    };
+  });
 
   // Add money modal state
   const [showAddMoneyModal, setShowAddMoneyModal] = useState(false);
   const [amountToAdd, setAmountToAdd] = useState("");
 
-  const handleAddMoney = () => {
-    const amount = parseFloat(amountToAdd);
-    if (isNaN(amount) || amount <= 0) return;
+  const handleAddMoney = async () => {
+    // const amount = parseFloat(amountToAdd);
+    // if (isNaN(amount) || amount <= 0) return;
 
-    // Update wallet balance
-    setWalletBalance((prev) => prev + amount);
+    // try {
+    //   // Create transaction via API
+    //   await createTransaction({
+    //     orderId: `order-${Date.now()}`, // Dummy orderId; replace with actual order ID
+    //     userId,
+    //     amount,
+    //     type: "PAYMENT",
+    //     status: "COMPLETED",
+    //     description: "Added funds",
+    //   });
 
-    // Add new transaction
-    const newTransaction = {
-      id: transactions.length + 1,
-      type: "deposit",
-      amount,
-      date: new Date().toISOString().split("T")[0],
-      description: "Added funds",
-      time: new Date().toLocaleTimeString([], {
-        hour: "2-digit",
-        minute: "2-digit",
-      }),
-    };
+    //   // Update local balance (temporary until wallet API is added)
+    //   setWalletBalance((prev) => prev + amount);
 
-    setTransactions([newTransaction, ...transactions]);
-
-    // Reset and close modal
-    setAmountToAdd("");
-    setShowAddMoneyModal(false);
+    //   // Reset and close modal
+    //   setAmountToAdd("");
+    //   setShowAddMoneyModal(false);
+    // } catch (error) {
+    //   console.error("Failed to add money:", error);
+    //   alert("Failed to add money. Please try again.");
+    // }
   };
+
+
+
 
   return (
     <div className="container mx-auto max-w-3xl px-4 py-8 min-h-screen">
@@ -103,14 +103,19 @@ export default function WalletTransactionPage() {
           Transaction History
         </h3>
 
-        {transactions.length === 0 ? (
+        {isLoading ? (
           <div className="flex flex-col items-center justify-center py-12 text-gray-500">
-            <p className="text-lg font-medium">No transactions yet</p>
-            <p className="text-sm">Your transactions will appear here</p>
+            <p className="text-lg font-medium">Loading transactions...</p>
           </div>
+        ) : transactionHistoryError ? (
+          <ErrorDisplay
+            onRetry={transactionRefetch}
+            error={transactionHistoryError}
+            title="transaction error"
+          />
         ) : (
           <div className="space-y-4">
-            {transactions.map((transaction) => (
+            {displayTransactions.map((transaction) => (
               <div
                 key={transaction.id}
                 className="flex items-center p-4 border border-gray-100 rounded-md hover:bg-gray-50 transition-colors"

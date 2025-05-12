@@ -52,10 +52,9 @@ export const getTransactionsByOrder = async (
 };
 
 export const getTransactionsByUser = async (
-  userId: string
 ): Promise<ApiResponse<Transaction[]>> => {
   try {
-    const response = await api.get(`/transactions/user/${userId}`);
+    const response = await api.get(`/transactions/user`);
     return response.data;
   } catch (error: any) {
     console.error("Error fetching transactions by user:", error);

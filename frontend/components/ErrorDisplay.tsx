@@ -1,4 +1,5 @@
 import React, { FC } from "react";
+import { AlertCircle } from "lucide-react";
 
 interface ErrorDisplayProps {
   error: unknown;
@@ -10,8 +11,8 @@ interface ErrorDisplayProps {
 const ErrorDisplay: FC<ErrorDisplayProps> = ({
   error,
   onRetry,
-  title,
-  description,
+  title = "Something Went Wrong",
+  description = "An error occurred while processing your request. Please try again.",
 }) => {
   const errorMessage =
     error instanceof Error
@@ -21,23 +22,21 @@ const ErrorDisplay: FC<ErrorDisplayProps> = ({
       : "An unexpected error occurred";
 
   return (
-    <div className="space-y-6">
-      {(title || description) && (
-        <div className="flex items-center justify-between">
-          <div>
-            {title && (
-              <h1 className="text-3xl font-bold text-gray-800">{title}</h1>
-            )}
-            {description && <p className="text-gray-500 mt-1">{description}</p>}
-          </div>
+    <div className="container mx-auto max-w-2xl px-4 py-8 min-h-screen flex items-center justify-center">
+      <div className="bg-white rounded-lg shadow-sm p-8 w-full text-center">
+        <div className="flex justify-center mb-6">
+          <AlertCircle size={48} className="text-red-500" aria-hidden="true" />
         </div>
-      )}
-      <div className="text-red-600">
-        <p>Error: {errorMessage}</p>
+        <h1 className="text-2xl font-bold text-gray-800 mb-2">{title}</h1>
+        <p className="text-gray-600 mb-4">{description}</p>
+        <p className="text-red-600 font-medium mb-6" role="alert">
+          Error: {errorMessage}
+        </p>
         {onRetry && (
           <button
             onClick={onRetry}
-            className="mt-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
+            className="inline-flex items-center px-6 py-3 bg-blue-600 text-white rounded-md font-medium hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:outline-none transition-colors"
+            aria-label="Retry the action"
           >
             Retry
           </button>

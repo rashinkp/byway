@@ -25,13 +25,14 @@ model User {
   instructorDetails InstructorDetails? @relation("UserToInstructorDetails") 
   userProfile       UserProfile?    @relation("UserToUserProfile") 
   verifications     UserVerification[] @relation("UserToVerification")
-  categories        Category[]         @relation("CategoryCreator")
+  categories        Category[]      @relation("CategoryCreator")
   coursesCreated    Course[]        @relation("CourseCreator")
   enrollments       Enrollment[]    @relation("UserEnrollments")
   cartItems         Cart[]          @relation("UserToCart")
   orders            Order[]         @relation("UserToOrder")
   transactions      TransactionHistory[] @relation("UserToTransactionHistory")
   refunds           Refund[]        @relation("UserToRefund")
+  wallet            Wallet?         @relation("UserToWallet")
 }
 
 model UserProfile {
@@ -363,6 +364,7 @@ model TransactionHistory {
   id            String          @id @default(uuid())
   orderId       String
   userId        String
+  walletId      String
   courseId      String?
   amount        Decimal
   type          TransactionType
@@ -373,9 +375,11 @@ model TransactionHistory {
   updatedAt     DateTime        @updatedAt
   order         Order           @relation("OrderToTransactionHistory", fields: [orderId], references: [id], onDelete: Cascade)
   user          User            @relation("UserToTransactionHistory", fields: [userId], references: [id], onDelete: Cascade)
+  wallet        Wallet          @relation("WalletToTransactionHistory", fields: [walletId], references: [id], onDelete: Cascade)
   course        Course?         @relation("CourseToTransactionHistory", fields: [courseId], references: [id], onDelete: SetNull)
   @@index([orderId])
   @@index([userId])
+  @@index([walletId])
   @@index([courseId])
 }
 
@@ -395,4 +399,17 @@ enum PaymentGateway {
   PAYPAL
   RAZORPAY
   // Add other gateways as needed
+}
+
+
+
+model Wallet {
+  id        String   @id @default(uuid())
+  userId    String   @unique
+  balance   Decimal  @default(0.00)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  user      User     @relation("UserToWallet", fields: [userId], references: [id], onDelete: Cascade)
+  transactions TransactionHistory[] @relation("WalletToTransactionHistory")
+  @@index([userId])
 }

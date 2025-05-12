@@ -16,6 +16,7 @@ export class TransactionHistoryRepository
     status: "PENDING" | "COMPLETED" | "FAILED";
     paymentGateway: "STRIPE" | "PAYPAL" | "RAZORPAY" | null;
     transactionId: string | null;
+    walletId: string;
   }): Promise<ITransaction> {
     return this.prisma.transactionHistory.create({
       data,

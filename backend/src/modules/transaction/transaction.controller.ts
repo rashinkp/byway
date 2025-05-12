@@ -127,15 +127,12 @@ export class TransactionHistoryController {
   }
 
   async getTransactionsByUser(
-    input: unknown,
-    requestingUser: { id: string; role: string }
+    userId:string
   ): Promise<ApiResponse> {
     try {
-      const validatedInput = GetTransactionsByUserSchema.parse(input);
       const transactions =
         await this.transactionHistoryService.getTransactionsByUserId(
-          validatedInput.userId,
-          requestingUser
+          userId
         );
       return {
         status: "success",
@@ -155,7 +152,7 @@ export class TransactionHistoryController {
         message: "Transactions retrieved successfully",
       };
     } catch (error) {
-      logger.error("Get transactions by user error:", { error, input });
+      logger.error("Get transactions by user error:", { error });
       if (error instanceof z.ZodError) {
         throw AppError.badRequest("Validation failed: " + error.message);
       }

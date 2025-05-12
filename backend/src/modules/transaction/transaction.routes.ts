@@ -9,15 +9,21 @@ export const createTransactionHistoryRouter = (
   const transactionRouter = Router();
   const adapt = adaptTransactionHistoryController(transactionHistoryController);
 
+
+  transactionRouter.get("/user", protect, adapt.getTransactionsByUser);
+  transactionRouter.patch("/status", protect, adapt.updateTransactionStatus);
+
+
   transactionRouter.post("/", protect, adapt.createTransaction);
+
+  
   transactionRouter.get("/:transactionId", protect, adapt.getTransactionById);
   transactionRouter.get(
     "/order/:orderId",
     protect,
     adapt.getTransactionsByOrder
   );
-  transactionRouter.get("/user/:userId", protect, adapt.getTransactionsByUser);
-  transactionRouter.patch("/status", protect, adapt.updateTransactionStatus);
+  
 
   return transactionRouter;
 };

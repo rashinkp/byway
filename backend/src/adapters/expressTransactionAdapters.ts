@@ -90,9 +90,9 @@ export const adaptTransactionHistoryController = (
           "UNAUTHORIZED"
         );
       }
+
       const result = await controller.getTransactionsByUser(
-        { userId: req.params.userId },
-        req.user
+        req.user.id
       );
       res.status(result.statusCode).json({
         status: result.status,

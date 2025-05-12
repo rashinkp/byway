@@ -4,15 +4,13 @@ import { Transaction } from "@/types/transactions";
 import { useQuery } from "@tanstack/react-query";
 
 
-export const useGetTransactionsByUser = (userId: string) => {
+export const useGetTransactionsByUser = () => {
   return useQuery<Transaction[], Error>({
-    queryKey: ["transactions", "user", userId],
+    queryKey: ["transactions", "user"],
     queryFn: async () => {
-      const validatedData = getTransactionsByUserSchema.parse({ userId });
-      const response = await getTransactionsByUser(validatedData.userId);
+      const response = await getTransactionsByUser();
       return response.data;
     },
-    enabled: !!userId,
   });
 };
 
