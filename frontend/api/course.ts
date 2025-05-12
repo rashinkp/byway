@@ -1,6 +1,6 @@
 
 import { api } from "./api";
-import { CourseApiResponse, Course, AddCourseParams, CourseEditFormData, IGetAllCoursesInput } from "@/types/course";
+import { CourseApiResponse, Course, AddCourseParams, CourseEditFormData, IGetAllCoursesInput, IGetEnrolledCoursesInput } from "@/types/course";
 
 
 
@@ -87,5 +87,39 @@ export async function updateCourse(
      const errorMessage =
        error.response?.data?.message || "Failed to update course";
      throw new Error(`${errorMessage}`);
+  }
+
+
+
+}
+
+
+
+export async function getEnrolledCourses({
+  page = 1,
+  limit = 10,
+  sortBy = "enrolledAt",
+  sortOrder = "desc",
+  search = "",
+  level = "All",
+}: IGetEnrolledCoursesInput): Promise<CourseApiResponse> {
+  try {
+    const response = await api.get<{ data: CourseApiResponse }>(
+      "/courses/enrolled",
+      {
+        params: {
+          page,
+          limit,
+          sortBy,
+          sortOrder,
+          search,
+          level,
+        },
+      }
+    );
+    return response.data.data;
+  } catch (error) {
+    console.error("Failed to fetch enrolled courses:", error);
+    throw new Error("Failed to fetch enrolled courses");
   }
 }

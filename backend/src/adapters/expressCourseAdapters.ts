@@ -163,6 +163,7 @@ export const adaptCourseController = (controller: CourseController) => ({
 
   getEnrolledCourses: asyncHandler(
     async (req: AuthenticatedRequest, res: Response) => {
+
       if (!req.user?.id) {
         logger.error("Unauthorized: No user ID found in token", {
           request: req.body,

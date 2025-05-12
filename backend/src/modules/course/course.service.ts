@@ -427,8 +427,10 @@ export class CourseService {
         "VALIDATION_ERROR"
       );
     }
+    logger.info("Parsed input for getEnrolledCourses", {
+      input: parsedInput.data,
+    }); // Add this
 
-    // Validate user
     const user = await this.userService.findUserById(parsedInput.data.userId);
     if (!user) {
       logger.warn("User not found for enrolled courses", {
@@ -438,7 +440,11 @@ export class CourseService {
     }
 
     try {
-      return await this.courseRepository.getEnrolledCourses(parsedInput.data);
+      const result = await this.courseRepository.getEnrolledCourses(
+        parsedInput.data
+      );
+      logger.info("Retrieved enrolled courses", { result }); // Add this
+      return result;
     } catch (error) {
       logger.error("Error retrieving enrolled courses", { error, input });
       throw error instanceof AppError

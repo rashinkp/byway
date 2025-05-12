@@ -164,6 +164,7 @@ export class CourseController {
     input: IGetEnrolledCoursesInput
   ): Promise<ApiResponse> {
     try {
+
       const result = await this.courseService.getEnrolledCourses(input);
       return {
         status: "success",

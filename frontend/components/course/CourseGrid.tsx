@@ -8,7 +8,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Course } from "@/types/course";
 import Link from "next/link";
 
-interface GridCourse extends Course {
+type GridCourse = Course & {
   rating: number;
   reviewCount: number;
   formattedDuration: string;
@@ -16,7 +16,7 @@ interface GridCourse extends Course {
   bestSeller: boolean;
   thumbnail: string;
   price: number;
-}
+};
 
 interface CourseGridProps {
   courses: GridCourse[];

@@ -1,6 +1,5 @@
 import { z } from "zod";
 import { courseEditSchema } from "@/lib/validations/course";
-
 export type SortByType = "createdAt" | "name" | "updatedAt";
 
 export interface Course {
@@ -24,6 +23,16 @@ export interface Course {
     objectives?: string | null;
     targetAudience?: string | null;
   } | null;
+  // Frontend-specific fields (optional, as they may not come from backend)
+  rating?: number;
+  reviewCount?: number;
+  formattedDuration?: string;
+  lessons?: number;
+  bestSeller?: boolean;
+  progress?: number;
+  completedLessons?: number;
+  totalLessons?: number;
+  lastAccessed?: string;
 }
 
 export interface AddCourseParams {
@@ -68,13 +77,13 @@ export interface CourseApiResponse {
 
 export type CourseEditFormData = z.infer<typeof courseEditSchema>;
 
-export type SortByField = "title" | "createdAt";
+export type SortByField = "title" | "createdAt" | "enrolledAt";
 export type NegativeSortByField = `-${SortByField}`;
 
 export interface IGetAllCoursesInput {
   page?: number;
   limit?: number;
-  sortBy?: "title" | "createdAt" | "updatedAt" | "price" | "duration"; // Add price and duration to sort options
+  sortBy?: "title" | "createdAt" | "updatedAt" | "price" | "duration";
   sortOrder?: "asc" | "desc";
   includeDeleted?: boolean;
   search?: string;
@@ -82,7 +91,16 @@ export interface IGetAllCoursesInput {
   userId?: string;
   myCourses?: boolean;
   role?: "USER" | "INSTRUCTOR" | "ADMIN";
-  level?: "BEGINNER" | "MEDIUM" | "ADVANCED" | "All"; // Add level filter
-  duration?: "All" | "Under5" | "5to10" | "Over10"; // Add duration filter
-  price?: "All" | "Free" | "Paid"; // Add price filter
+  level?: "BEGINNER" | "MEDIUM" | "ADVANCED" | "All";
+  duration?: "All" | "Under5" | "5to10" | "Over10";
+  price?: "All" | "Free" | "Paid";
+}
+
+export interface IGetEnrolledCoursesInput {
+  page?: number;
+  limit?: number;
+  sortBy?: "title" | "enrolledAt" | "createdAt";
+  sortOrder?: "asc" | "desc";
+  search?: string;
+  level?: "BEGINNER" | "MEDIUM" | "ADVANCED" | "All";
 }
