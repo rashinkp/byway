@@ -1,11 +1,14 @@
-import { CourseDetails, PrismaClient } from "@prisma/client";
+import { Course, CourseDetails, Prisma, PrismaClient } from "@prisma/client";
 import {
+  CourseWithEnrollments,
+  CourseWithRelations,
   ICourse,
   ICourseDetails,
   ICreateCourseInput,
   ICreateEnrollmentInput,
   IEnrollment,
   IGetAllCoursesInput,
+  IGetEnrolledCoursesInput,
   IUpdateCourseInput,
 } from "./course.types";
 import { AppError } from "../../utils/appError";
@@ -392,17 +395,15 @@ export class CourseRepository implements ICourseRepository {
     };
   }
 
-  async createEnrollment(
-    input: ICreateEnrollmentInput
-  ): Promise<IEnrollment> {
+  async createEnrollment(input: ICreateEnrollmentInput): Promise<IEnrollment> {
     const { userId, courseIds } = input;
-    
+
     // Use a transaction to ensure atomicity and return the first enrollment
     const enrollment = await this.prisma.$transaction(async (tx) => {
       const firstEnrollment = await tx.enrollment.create({
         data: {
           userId,
-          courseId: courseIds[0], 
+          courseId: courseIds[0],
           enrolledAt: new Date(),
         },
       });
@@ -443,4 +444,106 @@ export class CourseRepository implements ICourseRepository {
       enrolledAt: enrollment.enrolledAt,
     };
   }
+
+ 
+  
+  
+  async getEnrolledCourses(
+    input: IGetEnrolledCoursesInput
+  ): Promise<{ courses: ICourse[]; total: number; totalPage: number }> {
+    const {
+      userId,
+      page = 1,
+      limit = 10,
+      sortBy = "enrolledAt",
+      sortOrder = "desc",
+      search = "",
+      level = "All",
+    } = input;
+  
+    const allowedSortFields = ["title", "enrolledAt", "createdAt"];
+    const safeSortBy = allowedSortFields.includes(sortBy) ? sortBy : "enrolledAt";
+  
+    const where: Prisma.CourseWhereInput = {
+      enrollments: {
+        some: { userId },
+      },
+      status: "PUBLISHED",
+      deletedAt: null,
+    };
+  
+    // Apply search conditions
+    if (search) {
+      where.OR = [
+        { title: { contains: search, mode: "insensitive" } },
+        { description: { contains: search, mode: "insensitive" } },
+      ];
+    }
+  
+    // Apply level filter
+    if (level !== "All") {
+      where.level = level ;
+    }
+  
+    const skip = (page - 1) * limit;
+    const orderBy: Prisma.CourseOrderByWithRelationInput =
+      safeSortBy === "enrolledAt"
+        ? { enrollments: { _count: sortOrder } }
+        : { [safeSortBy]: sortOrder };
+  
+    const [courses, total] = await Promise.all([
+      this.prisma.course.findMany({
+        where,
+        skip,
+        take: limit,
+        orderBy,
+        include: {
+          details: true,
+          enrollments: {
+            where: { userId },
+            select: { enrolledAt: true },
+          },
+        },
+      }) as Promise<CourseWithRelations[]>,
+      this.prisma.course.count({ where }),
+    ]);
+  
+    const totalPage = Math.ceil(total / limit);
+  
+    return {
+      courses: courses.map((course) => ({
+        id: course.id,
+        title: course.title,
+        description: course.description || undefined,
+        level: course.level as "BEGINNER" | "MEDIUM" | "ADVANCED",
+        price: course.price ? Number(course.price) : null,
+        thumbnail: course.thumbnail || undefined,
+        duration: course.duration || undefined,
+        offer: course.offer ? Number(course.offer) : null,
+        status: course.status as "DRAFT" | "PUBLISHED" | "ARCHIVED",
+        categoryId: course.categoryId,
+        createdBy: course.createdBy,
+        createdAt: course.createdAt,
+        updatedAt: course.updatedAt,
+        deletedAt: course.deletedAt || undefined,
+        details: course.details
+          ? {
+              id: course.details.id,
+              courseId: course.details.courseId,
+              prerequisites: course.details.prerequisites || undefined,
+              longDescription: course.details.longDescription || undefined,
+              objectives: course.details.objectives || undefined,
+              targetAudience: course.details.targetAudience || undefined,
+              createdAt: course.details.createdAt,
+              updatedAt: course.details.updatedAt,
+            }
+          : undefined,
+      })),
+      total,
+      totalPage,
+    };
+  }
+
+
+
 }

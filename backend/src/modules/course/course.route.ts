@@ -16,6 +16,6 @@ export const createCourseRouter = (
   router.put("/:id", authMiddleware("INSTRUCTOR"), adapt.updateCourse);
   router.delete("/:id", authMiddleware("ADMIN"), adapt.softDeleteCourse);
   router.post("/enroll", authMiddleware('USER'), adapt.enrollCourse);
-
+  router.get("/enrolled", authMiddleware("USER"), adapt.getEnrolledCourses);
   return router;
 };

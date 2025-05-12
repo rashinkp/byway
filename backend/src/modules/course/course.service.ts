@@ -12,6 +12,7 @@ import {
   ICreateEnrollmentInput,
   IEnrollment,
   ICourseDetails,
+  IGetEnrolledCoursesInput,
 } from "./course.types";
 import {
   createCourseSchema,
@@ -19,6 +20,7 @@ import {
   getAllCoursesSchema,
   createEnrollmentSchema,
   courseIdSchema,
+  getEnrolledCoursesSchema,
 } from "./course.validator";
 import { Role } from "@prisma/client";
 import { ICourseRepository } from "./course.repository.interface";
@@ -405,6 +407,44 @@ export class CourseService {
         ? error
         : new AppError(
             "Failed to enroll courses",
+            StatusCodes.INTERNAL_SERVER_ERROR,
+            "INTERNAL_ERROR"
+          );
+    }
+  }
+
+  async getEnrolledCourses(
+    input: IGetEnrolledCoursesInput
+  ): Promise<{ courses: ICourse[]; total: number; totalPage: number }> {
+    const parsedInput = getEnrolledCoursesSchema.safeParse(input);
+    if (!parsedInput.success) {
+      logger.warn("Validation failed for getEnrolledCourses", {
+        errors: parsedInput.error.errors,
+      });
+      throw new AppError(
+        `Validation failed: ${parsedInput.error.message}`,
+        StatusCodes.BAD_REQUEST,
+        "VALIDATION_ERROR"
+      );
+    }
+
+    // Validate user
+    const user = await this.userService.findUserById(parsedInput.data.userId);
+    if (!user) {
+      logger.warn("User not found for enrolled courses", {
+        userId: parsedInput.data.userId,
+      });
+      throw new AppError("User not found", StatusCodes.NOT_FOUND, "NOT_FOUND");
+    }
+
+    try {
+      return await this.courseRepository.getEnrolledCourses(parsedInput.data);
+    } catch (error) {
+      logger.error("Error retrieving enrolled courses", { error, input });
+      throw error instanceof AppError
+        ? error
+        : new AppError(
+            "Failed to retrieve enrolled courses",
             StatusCodes.INTERNAL_SERVER_ERROR,
             "INTERNAL_ERROR"
           );

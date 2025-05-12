@@ -8,6 +8,7 @@ import {
   IUpdateCourseInput,
   IGetAllCoursesInput,
   ICreateEnrollmentInput,
+  IGetEnrolledCoursesInput,
 } from "../modules/course/course.types";
 
 interface AuthenticatedRequest extends Request {
@@ -153,10 +154,39 @@ export const adaptCourseController = (controller: CourseController) => ({
       }
       const input: ICreateEnrollmentInput = {
         userId: req.user.id,
-        courseIds: req.body.courseIds, 
+        courseIds: req.body.courseIds,
       };
       const result = await controller.enrollCourse(input);
       res.status(result.statusCode).json(result);
+    }
+  ),
+
+  getEnrolledCourses: asyncHandler(
+    async (req: AuthenticatedRequest, res: Response) => {
+      if (!req.user?.id) {
+        logger.error("Unauthorized: No user ID found in token", {
+          request: req.body,
+        });
+        throw new AppError(
+          "Unauthorized: No user ID found in token",
+          StatusCodes.UNAUTHORIZED,
+          "UNAUTHORIZED"
+        );
+      }
+      const { page, limit, sortBy, sortOrder, search, level } = req.query;
+
+      const input: IGetEnrolledCoursesInput = {
+        userId: req.user.id,
+        page: page ? parseInt(page as string, 10) : undefined,
+        limit: limit ? parseInt(limit as string, 10) : undefined,
+        sortBy: sortBy as "title" | "enrolledAt" | "createdAt",
+        sortOrder: sortOrder as "asc" | "desc",
+        search: search ? (search as string) : "",
+        level: level as "BEGINNER" | "MEDIUM" | "ADVANCED" | "All",
+      };
+
+      const result = await controller.getEnrolledCourses(input);
+      res.status(StatusCodes.OK).json(result);
     }
   ),
 });

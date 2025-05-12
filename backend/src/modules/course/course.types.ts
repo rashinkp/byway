@@ -1,3 +1,5 @@
+import { Course, CourseDetails } from "@prisma/client";
+
 export interface ICourse {
   id: string;
   title: string;
@@ -87,3 +89,40 @@ export interface IEnrollment {
   courseId: string;
   enrolledAt: Date;
 }
+
+
+export interface IGetEnrolledCoursesInput {
+  userId: string;
+  page?: number;
+  limit?: number;
+  sortBy?: "title" | "enrolledAt" | "createdAt";
+  sortOrder?: "asc" | "desc";
+  search?: string;
+  level?: "BEGINNER" | "MEDIUM" | "ADVANCED" | "All";
+}
+
+
+
+export interface CourseWithEnrollments {
+  id: string;
+  title: string;
+  description: string | null;
+  level: string;
+  price: Number | null;
+  thumbnail: string | null;
+  duration: number | null;
+  offer: Number | null;
+  status: string;
+  categoryId: string;
+  createdBy: string;
+  createdAt: Date;
+  updatedAt: Date;
+  deletedAt: Date | null;
+  details: CourseDetails | null;
+  enrollments: Array<{ enrolledAt: Date }>;
+}
+
+export type CourseWithRelations = Course & {
+  details: CourseDetails | null;
+  enrollments: Array<{ enrolledAt: Date }>;
+};

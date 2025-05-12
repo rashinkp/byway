@@ -167,3 +167,21 @@ export const createEnrollmentSchema = z.object({
 export const courseIdSchema = z.object({
   courseId: z.string().uuid("Invalid course ID"),
 });
+
+
+
+export const getEnrolledCoursesSchema = z.object({
+  userId: z.string().uuid("Invalid user ID"),
+  page: z.number().int().positive().optional().default(1),
+  limit: z.number().int().positive().optional().default(10),
+  sortBy: z
+    .enum(["title", "enrolledAt", "createdAt"])
+    .optional()
+    .default("enrolledAt"),
+  sortOrder: z.enum(["asc", "desc"]).optional().default("desc"),
+  search: z.string().optional().default(""),
+  level: z
+    .enum(["BEGINNER", "MEDIUM", "ADVANCED", "All"])
+    .optional()
+    .default("All"),
+});

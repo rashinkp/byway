@@ -8,6 +8,7 @@ import {
   IUpdateCourseInput,
   IGetAllCoursesInput,
   ICreateEnrollmentInput,
+  IGetEnrolledCoursesInput,
 } from "./course.types";
 
 export class CourseController {
@@ -151,6 +152,33 @@ export class CourseController {
         ? error
         : new AppError(
             error instanceof Error ? error.message : "Failed to enroll",
+            StatusCodes.INTERNAL_SERVER_ERROR,
+            "INTERNAL_ERROR"
+          );
+    }
+  }
+
+  // src/modules/course/course.controller.ts
+
+  async getEnrolledCourses(
+    input: IGetEnrolledCoursesInput
+  ): Promise<ApiResponse> {
+    try {
+      const result = await this.courseService.getEnrolledCourses(input);
+      return {
+        status: "success",
+        data: result,
+        message: "Enrolled courses retrieved successfully",
+        statusCode: StatusCodes.OK,
+      };
+    } catch (error) {
+      logger.error("Error retrieving enrolled courses", { error });
+      throw error instanceof AppError
+        ? error
+        : new AppError(
+            error instanceof Error
+              ? error.message
+              : "Failed to retrieve enrolled courses",
             StatusCodes.INTERNAL_SERVER_ERROR,
             "INTERNAL_ERROR"
           );
