@@ -7,6 +7,7 @@ import Sidebar from "@/components/profile/SideBarProfile";
 import ProfileSection from "@/components/profile/ProfileSection";
 import EditProfileForm from "@/components/profile/EditProfileForm";
 import MyCoursesPage from "../my-courses/page";
+import WalletTransactionPage from "../wallet/page";
 
 export default function ProfilePage() {
   const { data: user, isLoading, error } = useUserData();
@@ -42,6 +43,9 @@ export default function ProfilePage() {
 
         {activeSection === 'courses' && (
           <MyCoursesPage />
+        )}
+        {activeSection === 'wallet' && (
+          <WalletTransactionPage />
         )}
         {["certificates", "settings"].map(
           (section) =>
