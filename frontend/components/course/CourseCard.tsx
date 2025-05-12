@@ -118,9 +118,6 @@ export function CourseCard({
           <span className="font-semibold text-base text-gray-800">
             ${formattedPrice}
           </span>
-          <button className="bg-blue-500 hover:bg-blue-600 text-white py-1 px-3 rounded-md text-xs font-medium transition-colors">
-            Enroll
-          </button>
         </div>
       </div>
     </div>

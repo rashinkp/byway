@@ -39,7 +39,7 @@ const SuccessPage = () => {
   }, [sessionId]);
 
   const handleGoToCourses = () => {
-    router.push("/my-courses");
+    router.push("/user/my-courses");
   };
 
   if (isLoading) {
