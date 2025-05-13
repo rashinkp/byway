@@ -9,6 +9,7 @@ import {
   IGetAllCoursesInput,
   ICreateEnrollmentInput,
   IGetEnrolledCoursesInput,
+  ICourseWithEnrollmentStatus,
 } from "./course.types";
 
 export class CourseController {
@@ -58,9 +59,20 @@ export class CourseController {
     }
   }
 
-  async getCourseById(courseId: string): Promise<ApiResponse> {
+  async getCourseById(
+    courseId: string,
+    userId?: string
+  ): Promise<ApiResponse<ICourseWithEnrollmentStatus | null>> {
     try {
-      const course = await this.courseService.getCourseById(courseId);
+      const course = await this.courseService.getCourseById(courseId, userId);
+      if (!course) {
+        return {
+          status: "error",
+          data: null,
+          message: "Course not found",
+          statusCode: StatusCodes.NOT_FOUND,
+        };
+      }
       return {
         status: "success",
         data: course,
@@ -158,13 +170,10 @@ export class CourseController {
     }
   }
 
-  // src/modules/course/course.controller.ts
-
   async getEnrolledCourses(
     input: IGetEnrolledCoursesInput
   ): Promise<ApiResponse> {
     try {
-
       const result = await this.courseService.getEnrolledCourses(input);
       return {
         status: "success",

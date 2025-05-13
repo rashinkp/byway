@@ -126,3 +126,8 @@ export type CourseWithRelations = Course & {
   details: CourseDetails | null;
   enrollments: Array<{ enrolledAt: Date }>;
 };
+
+
+export interface ICourseWithEnrollmentStatus extends ICourse {
+  isEnrolled: boolean;
+}

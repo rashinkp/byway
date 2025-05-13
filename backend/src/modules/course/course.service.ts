@@ -13,6 +13,7 @@ import {
   IEnrollment,
   ICourseDetails,
   IGetEnrolledCoursesInput,
+  ICourseWithEnrollmentStatus,
 } from "./course.types";
 import {
   createCourseSchema,
@@ -24,12 +25,14 @@ import {
 } from "./course.validator";
 import { Role } from "@prisma/client";
 import { ICourseRepository } from "./course.repository.interface";
+import { EnrollmentService } from "../enrollment/enrollment.service";
 
 export class CourseService {
   constructor(
     private courseRepository: ICourseRepository,
     private categoryService: CategoryService,
-    private userService: UserService
+    private userService: UserService,
+    private enrollmentService: EnrollmentService
   ) {}
 
   async createCourse(input: ICreateCourseInput): Promise<ICourse> {
@@ -129,7 +132,10 @@ export class CourseService {
     }
   }
 
-  async getCourseById(courseId: string): Promise<ICourse | null> {
+  async getCourseById(
+    courseId: string,
+    userId?: string
+  ): Promise<ICourseWithEnrollmentStatus | null> {
     const parsedInput = courseIdSchema.safeParse({ courseId });
     if (!parsedInput.success) {
       logger.warn("Validation failed for getCourseById", {
@@ -154,7 +160,21 @@ export class CourseService {
           "NOT_FOUND"
         );
       }
-      return course;
+
+      // Check enrollment status if userId is provided
+      let isEnrolled = false;
+      if (userId) {
+        const enrollment = await this.enrollmentService.getEnrollment(
+          userId,
+          courseId
+        );
+        isEnrolled = !!enrollment; 
+      }
+
+      return {
+        ...course,
+        isEnrolled,
+      };
     } catch (error) {
       logger.error("Error retrieving course by ID", { error, courseId });
       throw error instanceof AppError

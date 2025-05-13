@@ -92,7 +92,10 @@ export const adaptCourseController = (controller: CourseController) => ({
 
   getCourseById: asyncHandler(
     async (req: AuthenticatedRequest, res: Response) => {
-      const result = await controller.getCourseById(req.params.id);
+      const result = await controller.getCourseById(
+        req.params.id,
+        req.user?.id
+      );
       res.status(result.statusCode).json(result);
     }
   ),
@@ -163,7 +166,6 @@ export const adaptCourseController = (controller: CourseController) => ({
 
   getEnrolledCourses: asyncHandler(
     async (req: AuthenticatedRequest, res: Response) => {
-
       if (!req.user?.id) {
         logger.error("Unauthorized: No user ID found in token", {
           request: req.body,
