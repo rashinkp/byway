@@ -21,7 +21,7 @@ export default function CourseSidebar({
 
   const handleLearnNow = () => {
     if (course?.id) {
-      router.push(`/courses/${course.id}/learn`);
+      router.push(`/user/my-courses/${course.id}`);
     }
   };
 

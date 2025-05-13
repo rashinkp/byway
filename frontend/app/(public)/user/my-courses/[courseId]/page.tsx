@@ -144,8 +144,8 @@ export default function CourseContent() {
                 key={lesson.id}
                 className={`w-full flex items-center p-4 text-left hover:bg-gray-50 border-l-4 transition-colors ${
                   selectedLesson?.id === lesson.id
-                    ? 'border-blue-600 bg-blue-50'
-                    : 'border-transparent'
+                    ? "border-blue-600 bg-blue-50"
+                    : "border-transparent"
                 }`}
                 onClick={() => handleLessonSelect(lesson)}
               >
@@ -161,7 +161,7 @@ export default function CourseContent() {
                     {lesson.title}
                   </div>
                   <div className="text-xs text-gray-500 mt-1 line-clamp-2">
-                    {lesson.description || 'No description available.'}
+                    {lesson.description || "No description available."}
                   </div>
                 </div>
               </button>
@@ -233,19 +233,32 @@ export default function CourseContent() {
             {/* Lesson Content and Details */}
             <div className="bg-white shadow-xl rounded-xl overflow-hidden">
               {/* Content Section */}
+
+              {/* Lesson Details */}
+              <div className="p-6">
+                <h3 className="text-lg font-semibold text-gray-800 mb-3 truncate">
+                  {selectedLesson.title}
+                </h3>
+                <p className="text-gray-600 leading-relaxed mb-4 line-clamp-2">
+                  {selectedLesson.description || "No description available."}
+                </p>
+              </div>
+
               {isContentLoading ? (
                 <div className="p-6 text-gray-600">Loading content...</div>
               ) : isContentError ? (
-                <div className="p-6 text-red-600">Error: {contentError?.message}</div>
+                <div className="p-6 text-red-600">
+                  Error: {contentError?.message}
+                </div>
               ) : !content ? (
                 <div className="p-6 text-gray-600">No content available.</div>
               ) : (
                 <>
-                  {content.type === 'VIDEO' && (
+                  {content.type === "VIDEO" && (
                     <div className="relative aspect-w-16 aspect-h-9 bg-black">
                       <img
-                        src={content.thumbnailUrl || '/api/placeholder/800/450'}
-                        alt={content.title || 'content thumbnail'}
+                        src={content.thumbnailUrl || "/api/placeholder/800/450"}
+                        alt={content.title || "content thumbnail"}
                         className="w-full h-full object-cover"
                       />
                       <div className="absolute inset-0 flex items-center justify-center">
@@ -256,33 +269,34 @@ export default function CourseContent() {
                     </div>
                   )}
 
-                  {content.type === 'DOCUMENT' && (
+                  {content.type === "DOCUMENT" && (
                     <div className="border-b border-gray-200">
                       <div className="p-5 flex items-center justify-between">
                         <div className="flex items-center">
                           <FileText size={26} className="text-blue-600 mr-3" />
-                          <span className="font-semibold text-gray-800">Document</span>
+                          <span className="font-semibold text-gray-800">
+                            Document
+                          </span>
                         </div>
-                        <button className="text-blue-600 hover:text-blue-800 font-medium">
-                          Download
-                        </button>
                       </div>
                       <div className="p-6 bg-gray-50">
                         <div className="border border-gray-200 rounded-lg p-5 bg-white min-h-64">
                           <img
-                            src={content.thumbnailUrl || '/api/placeholder/800/600'}
+                            src={
+                              content.thumbnailUrl || "/api/placeholder/800/600"
+                            }
                             alt="Document preview"
                             className="w-full object-contain mb-4 rounded"
                           />
                           <p className="text-gray-700 leading-relaxed">
-                            {content.description || 'No description available.'}
+                            {content.description || "No description available."}
                           </p>
                         </div>
                       </div>
                     </div>
                   )}
 
-                  {content.type === 'QUIZ' && (
+                  {content.type === "QUIZ" && (
                     <div className="p-6">
                       <h3 className="text-xl font-semibold text-gray-800 mb-4">
                         Quiz: {content.title}
@@ -290,14 +304,15 @@ export default function CourseContent() {
                       <div className="space-y-4">
                         <div className="border border-gray-200 rounded-lg p-5">
                           <p className="font-medium text-gray-800 mb-3">
-                            Sample Question: What is a key principle of UX design?
+                            Sample Question: What is a key principle of UX
+                            design?
                           </p>
                           <div className="space-y-3">
                             {[
-                              'Focus on aesthetics only',
-                              'Prioritize user needs and usability',
-                              'Minimize development time',
-                              'Increase server performance',
+                              "Focus on aesthetics only",
+                              "Prioritize user needs and usability",
+                              "Minimize development time",
+                              "Increase server performance",
                             ].map((option, idx) => (
                               <div key={idx} className="flex items-center">
                                 <input
@@ -306,7 +321,10 @@ export default function CourseContent() {
                                   name="sample-question"
                                   className="mr-2 accent-blue-600"
                                 />
-                                <label htmlFor={`option-${idx}`} className="text-gray-700">
+                                <label
+                                  htmlFor={`option-${idx}`}
+                                  className="text-gray-700"
+                                >
                                   {option}
                                 </label>
                               </div>
@@ -319,57 +337,35 @@ export default function CourseContent() {
                 </>
               )}
 
-              {/* Lesson Details */}
-              <div className="p-6">
-                <h3 className="text-lg font-semibold text-gray-800 mb-3 truncate">
-                  {selectedLesson.title}
-                </h3>
-                <p className="text-gray-600 leading-relaxed mb-4 line-clamp-2">
-                  {selectedLesson.description || 'No description available.'}
-                </p>
-                <div className="text-sm text-gray-500">
-                  <p>
-                    <span className="font-medium">Status:</span> {selectedLesson.status}
-                  </p>
-                  <p>
-                    <span className="font-medium">Order:</span> {selectedLesson.order}
-                  </p>
-                  <p>
-                    <span className="font-medium">Created At:</span>{' '}
-                    {new Date(selectedLesson.createdAt).toLocaleDateString()}
-                  </p>
-                  <p>
-                    <span className="font-medium">Updated At:</span>{' '}
-                    {new Date(selectedLesson.updatedAt).toLocaleDateString()}
-                  </p>
-                </div>
-              </div>
-
               {/* Completion Button */}
               <div className="p-6 border-t border-gray-200 bg-gray-50 flex justify-between items-center">
                 <div className="flex items-center">
                   {selectedLesson.completed ? (
                     <>
                       <CheckCircle size={22} className="text-green-600 mr-2" />
-                      <span className="text-green-600 font-medium">Completed</span>
+                      <span className="text-green-600 font-medium">
+                        Completed
+                      </span>
                     </>
                   ) : (
                     <>
                       <Clock size={22} className="text-gray-500 mr-2" />
-                      <span className="text-gray-500 font-medium">Not completed</span>
+                      <span className="text-gray-500 font-medium">
+                        Not completed
+                      </span>
                     </>
                   )}
                 </div>
                 <button
                   className={`px-5 py-2 rounded-lg font-medium transition-colors ${
                     selectedLesson.completed
-                      ? 'bg-gray-200 text-gray-700 cursor-not-allowed'
-                      : 'bg-green-600 text-white hover:bg-green-700'
+                      ? "bg-gray-200 text-gray-700 cursor-not-allowed"
+                      : "bg-green-600 text-white hover:bg-green-700"
                   }`}
                   onClick={markLessonComplete}
                   disabled={selectedLesson.completed}
                 >
-                  {selectedLesson.completed ? 'Completed' : 'Mark as Complete'}
+                  {selectedLesson.completed ? "Completed" : "Mark as Complete"}
                 </button>
               </div>
             </div>
@@ -394,10 +390,12 @@ export default function CourseContent() {
                 <div
                   className={`flex items-center ${
                     selectedLesson.completed
-                      ? 'text-gray-700 hover:text-blue-600 cursor-pointer'
-                      : 'text-gray-400 cursor-not-allowed'
+                      ? "text-gray-700 hover:text-blue-600 cursor-pointer"
+                      : "text-gray-400 cursor-not-allowed"
                   } transition-colors`}
-                  onClick={selectedLesson.completed ? goToNextLesson : undefined}
+                  onClick={
+                    selectedLesson.completed ? goToNextLesson : undefined
+                  }
                 >
                   <span className="font-medium truncate">
                     Next: {allLessons[currentLessonIndex + 1].title}
