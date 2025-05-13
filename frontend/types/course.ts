@@ -23,7 +23,6 @@ export interface Course {
     objectives?: string | null;
     targetAudience?: string | null;
   } | null;
-  // Frontend-specific fields (optional, as they may not come from backend)
   rating?: number;
   reviewCount?: number;
   formattedDuration?: string;
@@ -33,6 +32,7 @@ export interface Course {
   completedLessons?: number;
   totalLessons?: number;
   lastAccessed?: string;
+  isEnrolled?:boolean
 }
 
 export interface AddCourseParams {
