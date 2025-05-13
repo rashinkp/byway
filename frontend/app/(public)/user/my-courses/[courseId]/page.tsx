@@ -1,6 +1,6 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect } from "react";
 import {
   ChevronDown,
   ChevronUp,
@@ -8,22 +8,23 @@ import {
   Clock,
   ChevronLeft,
   ChevronRight,
-  PlayCircle,
   FileText,
-  HelpCircle,
-} from 'lucide-react';
-import { ILesson, LessonStatus } from '@/types/lesson';
-import { useGetAllLessonsInCourse } from '@/hooks/lesson/useGetAllLesson';
-import { useGetContentByLessonId } from '@/hooks/content/useGetContentByLessonId';
-import { useParams } from 'next/navigation';
+} from "lucide-react";
+import { ILesson } from "@/types/lesson";
+import { useGetAllLessonsInCourse } from "@/hooks/lesson/useGetAllLesson";
+import { useGetContentByLessonId } from "@/hooks/content/useGetContentByLessonId";
+import { useParams } from "next/navigation";
 
 interface LessonWithCompletion extends ILesson {
   completed: boolean;
 }
 
 export default function CourseContent() {
-  const [selectedLesson, setSelectedLesson] = useState<LessonWithCompletion | null>(null);
-  const [lessonsWithCompletion, setLessonsWithCompletion] = useState<LessonWithCompletion[]>([]);
+  const [selectedLesson, setSelectedLesson] =
+    useState<LessonWithCompletion | null>(null);
+  const [lessonsWithCompletion, setLessonsWithCompletion] = useState<
+    LessonWithCompletion[]
+  >([]);
   const [page, setPage] = useState(1);
   const limit = 10;
 
@@ -35,22 +36,29 @@ export default function CourseContent() {
     courseId,
     page,
     limit,
-    sortBy: 'order',
-    sortOrder: 'asc',
-    filterBy: 'PUBLISHED',
+    sortBy: "order",
+    sortOrder: "asc",
+    filterBy: "PUBLISHED",
     includeDeleted: false,
   });
 
   // Fetch content for the selected lesson
-  const { data: content, isLoading: isContentLoading, isError: isContentError, error: contentError } = useGetContentByLessonId(selectedLesson?.id || '');
+  const {
+    data: content,
+    isLoading: isContentLoading,
+    isError: isContentError,
+    error: contentError,
+  } = useGetContentByLessonId(selectedLesson?.id || "");
 
   // Initialize lessons with completion status
   useEffect(() => {
     if (data?.lessons) {
-      const initializedLessons: LessonWithCompletion[] = data.lessons.map((lesson) => ({
-        ...lesson,
-        completed: false,
-      }));
+      const initializedLessons: LessonWithCompletion[] = data.lessons.map(
+        (lesson) => ({
+          ...lesson,
+          completed: false,
+        })
+      );
       setLessonsWithCompletion(initializedLessons);
       if (initializedLessons.length > 0) {
         setSelectedLesson(initializedLessons[0]);
@@ -70,13 +78,7 @@ export default function CourseContent() {
   };
 
   const markLessonComplete = () => {
-  //   if (!selectedLesson?.completed) {
-  //     const updatedLessons = lessonsWithCompletion.map((lesson, index) =>
-  //       index === currentLessonIndex ? { ...lesson, completed: true } : lesson
-  //     );
-  //     setLessonsWithCompletion(updatedLessons);
-  //     setSelectedLesson({ ...selectedLesson, completed: true });
-  //   }
+    // Implementation remains commented as in original
   };
 
   const goToNextLesson = () => {
@@ -106,8 +108,11 @@ export default function CourseContent() {
     }
   };
 
-  const completedLessons = allLessons.filter((lesson) => lesson.completed).length;
-  const progressPercentage = allLessons.length > 0 ? (completedLessons / allLessons.length) * 100 : 0;
+  const completedLessons = allLessons.filter(
+    (lesson) => lesson.completed
+  ).length;
+  const progressPercentage =
+    allLessons.length > 0 ? (completedLessons / allLessons.length) * 100 : 0;
 
   return (
     <div className="flex flex-col lg:flex-row w-full bg-gray-100 min-h-screen">
@@ -156,8 +161,8 @@ export default function CourseContent() {
                     <Clock size={20} className="text-gray-400" />
                   )}
                 </div>
-                <div className="flex-1">
-                  <div className="text-sm font-medium text-gray-800 truncate">
+                <div className="flex-1 min-w-0">
+                  <div className="text-sm font-medium text-gray-800 truncate max-w-[220px]">
                     {lesson.title}
                   </div>
                   <div className="text-xs text-gray-500 mt-1 line-clamp-2">
@@ -232,8 +237,6 @@ export default function CourseContent() {
 
             {/* Lesson Content and Details */}
             <div className="bg-white shadow-xl rounded-xl overflow-hidden">
-              {/* Content Section */}
-
               {/* Lesson Details */}
               <div className="p-6">
                 <h3 className="text-lg font-semibold text-gray-800 mb-3 truncate">
@@ -255,16 +258,28 @@ export default function CourseContent() {
               ) : (
                 <>
                   {content.type === "VIDEO" && (
-                    <div className="relative aspect-w-16 aspect-h-9 bg-black">
-                      <img
-                        src={content.thumbnailUrl || "/api/placeholder/800/450"}
-                        alt={content.title || "content thumbnail"}
-                        className="w-full h-full object-cover"
-                      />
-                      <div className="absolute inset-0 flex items-center justify-center">
-                        <button className="bg-blue-600 bg-opacity-90 rounded-full p-4 text-white hover:bg-opacity-100 transition-all">
-                          <PlayCircle size={50} />
-                        </button>
+                    <div className="relative w-full max-w-[800px] mx-auto">
+                      <div
+                        className="relative"
+                        style={{
+                          width: "800px",
+                          height: "450px",
+                        }}
+                      >
+                        <video
+                          controls
+                          poster={
+                            content.thumbnailUrl || "/api/placeholder/800/450"
+                          }
+                          className="w-full h-full rounded-lg object-cover"
+                          style={{ objectFit: "cover" }}
+                        >
+                          <source
+                            src={content.fileUrl ?? undefined}
+                            type="video/mp4"
+                          />
+                          Your browser does not support the video tag.
+                        </video>
                       </div>
                     </div>
                   )}
@@ -414,7 +429,7 @@ export default function CourseContent() {
         )}
       </div>
 
-      {/* CSS for Animations */}
+      {/* CSS for Animations and Video Player */}
       <style jsx>{`
         @keyframes fadeIn {
           from {
@@ -428,6 +443,16 @@ export default function CourseContent() {
         }
         .animate-fade-in {
           animation: fadeIn 0.3s ease-out;
+        }
+        video::-webkit-media-controls-panel {
+          background-color: rgba(0, 0, 0, 0.7);
+        }
+        video::-webkit-media-controls-play-button,
+        video::-webkit-media-controls-volume-slider,
+        video::-webkit-media-controls-mute-button,
+        video::-webkit-media-controls-timeline,
+        video::-webkit-media-controls-current-time-display {
+          filter: brightness(1.2);
         }
       `}</style>
     </div>
