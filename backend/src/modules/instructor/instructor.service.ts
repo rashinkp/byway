@@ -56,18 +56,18 @@ export class InstructorService {
       throw new AppError("User not found", StatusCodes.NOT_FOUND, "NOT_FOUND");
     }
 
-    if (user.role === Role.INSTRUCTOR) {
-      logger.warn("User is already an instructor", { userId });
+    // Check if user is already an instructor
+    const existingInstructor = await this.instructorRepository.findInstructorByUserId(userId);
+    if (existingInstructor) {
+      logger.warn("User is already registered as an instructor", { userId });
       throw new AppError(
-        "User is already an instructor",
+        "User is already registered as an instructor",
         StatusCodes.BAD_REQUEST,
         "ALREADY_INSTRUCTOR"
       );
     }
 
     try {
-      await this.userService.updateUserRole(userId, Role.INSTRUCTOR);
-
       const instructorDetails =
         await this.instructorRepository.createInstructor({
           areaOfExpertise,
@@ -80,14 +80,14 @@ export class InstructorService {
       const instructor = {
         ...instructorDetails,
         email: user.email,
-        role: Role.INSTRUCTOR,
+        role: user.role, // Keep the original user role
       };
 
       const newToken = JwtUtil.generateToken(
         {
           id: user.id,
           email: user.email,
-          role: Role.INSTRUCTOR,
+          role: user.role,
         },
         this.jwtSecret
       );
@@ -142,10 +142,28 @@ export class InstructorService {
       );
     }
 
-    return this.instructorRepository.updateInstructorStatus({
-      instructorId,
-      status: InstructorStatus.APPROVED,
-    });
+    try {
+      // Update instructor status to APPROVED
+      const updatedInstructor =
+        await this.instructorRepository.updateInstructorStatus({
+          instructorId,
+          status: InstructorStatus.APPROVED,
+        });
+
+      // Update user role to INSTRUCTOR
+      await this.userService.updateUserRole(instructor.userId, Role.INSTRUCTOR);
+
+      return updatedInstructor;
+    } catch (error) {
+      logger.error("Error approving instructor", { error, input });
+      throw error instanceof AppError
+        ? error
+        : new AppError(
+            "Failed to approve instructor",
+            StatusCodes.INTERNAL_SERVER_ERROR,
+            "INTERNAL_ERROR"
+          );
+    }
   }
 
   async declineInstructor(
@@ -164,9 +182,7 @@ export class InstructorService {
     }
 
     const { instructorId } = parsedInput.data;
-    const instructor = await this.instructorRepository.findInstructorById(
-      instructorId
-    );
+    const instructor = await this.instructorRepository.findInstructorById(instructorId);
     if (!instructor) {
       logger.warn("Instructor not found", { instructorId });
       throw new AppError(

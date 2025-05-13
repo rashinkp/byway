@@ -10,5 +10,6 @@ export interface IInstructorRepository {
     input: UpdateInstructorStatusInput
   ): Promise<IInstructorDetails>;
   findInstructorById(instructorId: string): Promise<IInstructorDetails | null>;
+  findInstructorByUserId(userId: string): Promise<IInstructorDetails | null>;
   findAllInstructors(): Promise<IInstructorDetails[]>;
 }

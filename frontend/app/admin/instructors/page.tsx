@@ -6,9 +6,9 @@ import { useGetAllUsers } from "@/hooks/user/useGetAllUsers";
 import { useToggleDeleteUser } from "@/hooks/user/useToggleDeleteUser";
 import { StatusBadge } from "@/components/ui/StatusBadge";
 import ListPage from "@/components/ListingPage";
+import { InstructorApprovalModal } from "@/components/instructor/InstructorApprovalModal";
 
 export default function InstructorsPage() {
-  const [isAddOpen, setIsAddOpen] = useState(false);
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [editInstructor, setEditInstructor] = useState<User | undefined>(
     undefined
@@ -37,7 +37,11 @@ export default function InstructorsPage() {
           header: "Name",
           accessor: "name",
           render: (user) =>
-            user.name ? (<span>{user.name}</span>) : (<span className="text-gray-400">N/A</span>),
+            user.name ? (
+              <span>{user.name}</span>
+            ) : (
+              <span className="text-gray-400">N/A</span>
+            ),
         },
         {
           header: "Email",
@@ -95,6 +99,7 @@ export default function InstructorsPage() {
       ]}
       defaultSortBy="name"
       role="INSTRUCTOR"
+      extraButtons={[<InstructorApprovalModal key="approval-modal" />]}
     />
   );
 }

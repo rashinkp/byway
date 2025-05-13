@@ -112,6 +112,35 @@ export class InstructorRepository implements IInstructorRepository {
     }
   }
 
+  async findInstructorByUserId(
+    userId: string
+  ): Promise<IInstructorDetails | null> {
+    try {
+      const instructorDetails = await this.prisma.instructorDetails.findFirst({
+        where: { userId },
+      });
+
+      if (!instructorDetails) return null;
+
+      return {
+        id: instructorDetails.id,
+        areaOfExpertise: instructorDetails.areaOfExpertise,
+        professionalExperience: instructorDetails.professionalExperience,
+        about: instructorDetails.about ?? null,
+        userId: instructorDetails.userId,
+        website: instructorDetails.website ?? null,
+        status: instructorDetails.status,
+      };
+    } catch (error) {
+      logger.error("Error finding instructor by user ID", { error, userId });
+      throw new AppError(
+        "Failed to find instructor",
+        StatusCodes.INTERNAL_SERVER_ERROR,
+        "DATABASE_ERROR"
+      );
+    }
+  }
+
   async findAllInstructors(): Promise<IInstructorDetails[]> {
     try {
       const instructors = await this.prisma.instructorDetails.findMany();
