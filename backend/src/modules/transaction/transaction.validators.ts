@@ -12,6 +12,7 @@ export const CreateTransactionSchema = z.object({
     .nullable()
     .default(null),
   transactionId: z.string().nullable().default(null),
+  walletId: z.string().optional(),
 });
 
 export const GetTransactionsByOrderSchema = z.object({

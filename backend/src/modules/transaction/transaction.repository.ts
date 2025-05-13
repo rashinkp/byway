@@ -2,9 +2,7 @@ import { PrismaClient } from "@prisma/client";
 import { ITransactionHistoryRepository } from "./transaction.repository.interface";
 import { ITransaction } from "./transaction.types";
 
-export class TransactionHistoryRepository
-  implements ITransactionHistoryRepository
-{
+export class TransactionHistoryRepository implements ITransactionHistoryRepository {
   constructor(private prisma: PrismaClient) {}
 
   async createTransaction(data: {
@@ -16,10 +14,20 @@ export class TransactionHistoryRepository
     status: "PENDING" | "COMPLETED" | "FAILED";
     paymentGateway: "STRIPE" | "PAYPAL" | "RAZORPAY" | null;
     transactionId: string | null;
-    walletId: string;
+    walletId?: string; // Make walletId optional
   }): Promise<ITransaction> {
     return this.prisma.transactionHistory.create({
-      data,
+      data: {
+        orderId: data.orderId,
+        userId: data.userId,
+        courseId: data.courseId,
+        amount: data.amount,
+        type: data.type,
+        status: data.status,
+        paymentGateway: data.paymentGateway,
+        transactionId: data.transactionId,
+        walletId: data.walletId,
+      },
     }) as unknown as Promise<ITransaction>;
   }
 
@@ -46,7 +54,7 @@ export class TransactionHistoryRepository
   async updateTransactionStatus(
     transactionId: string,
     status: "PENDING" | "COMPLETED" | "FAILED",
-    paymentGateway?: "STRIPE" | "PAYPAL" | "RAZORPAY" | null,
+    paymentGateway?: "STRIPE" | "PAYPAL" | "RAZORPAY" | null
   ): Promise<ITransaction> {
     return this.prisma.transactionHistory.update({
       where: { id: transactionId },

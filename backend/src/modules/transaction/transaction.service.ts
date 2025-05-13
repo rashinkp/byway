@@ -22,6 +22,7 @@ export class TransactionHistoryService {
     status: "PENDING" | "COMPLETED" | "FAILED";
     paymentGateway: "STRIPE" | "PAYPAL" | "RAZORPAY" | null;
     transactionId: string | null;
+    walletId?: string; // Make walletId optional
   }): Promise<ITransaction> {
     try {
       const order = await this.paymentService.findOrderById(data.orderId);
@@ -58,6 +59,20 @@ export class TransactionHistoryService {
           "BAD_REQUEST"
         );
       }
+
+      // Validate walletId only if provided
+      // if (data.walletId) {
+      //   const wallet = await this.prisma.wallet.findUnique({
+      //     where: { id: data.walletId },
+      //   });
+      //   if (!wallet) {
+      //     throw new AppError(
+      //       "Wallet not found",
+      //       StatusCodes.NOT_FOUND,
+      //       "NOT_FOUND"
+      //     );
+      //   }
+      // }
 
       const transaction =
         await this.transactionHistoryRepository.createTransaction(data);
@@ -153,10 +168,7 @@ export class TransactionHistoryService {
     }
   }
 
-  async getTransactionsByUserId(
-    userId: string,
-  ): Promise<ITransaction[]> {
-
+  async getTransactionsByUserId(userId: string): Promise<ITransaction[]> {
     try {
       const user = await this.userService.findUserById(userId);
       if (!user || user.deletedAt) {

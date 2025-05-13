@@ -2,6 +2,7 @@ export interface ITransaction {
   id: string;
   orderId: string;
   userId: string;
+  walletId: string | null; // Make walletId nullable
   courseId: string | null;
   amount: number;
   type: "PAYMENT" | "REFUND";

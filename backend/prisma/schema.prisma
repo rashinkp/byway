@@ -364,7 +364,7 @@ model TransactionHistory {
   id            String          @id @default(uuid())
   orderId       String
   userId        String
-  walletId      String
+  walletId      String?         // Make walletId optional
   courseId      String?
   amount        Decimal
   type          TransactionType
@@ -375,7 +375,7 @@ model TransactionHistory {
   updatedAt     DateTime        @updatedAt
   order         Order           @relation("OrderToTransactionHistory", fields: [orderId], references: [id], onDelete: Cascade)
   user          User            @relation("UserToTransactionHistory", fields: [userId], references: [id], onDelete: Cascade)
-  wallet        Wallet          @relation("WalletToTransactionHistory", fields: [walletId], references: [id], onDelete: Cascade)
+  wallet        Wallet?         @relation("WalletToTransactionHistory", fields: [walletId], references: [id], onDelete: SetNull) // Make wallet relation optional
   course        Course?         @relation("CourseToTransactionHistory", fields: [courseId], references: [id], onDelete: SetNull)
   @@index([orderId])
   @@index([userId])

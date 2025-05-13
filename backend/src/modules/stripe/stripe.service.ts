@@ -259,6 +259,8 @@ export class StripeService {
                   );
                   continue;
                 }
+                
+
 
                 await this.transactionService.createTransaction({
                   orderId,
