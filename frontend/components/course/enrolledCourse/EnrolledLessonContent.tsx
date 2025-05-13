@@ -1,5 +1,7 @@
+"use client";
+
+import { FileText, CheckCircle, Clock } from "lucide-react";
 import { ILesson } from "@/types/lesson";
-import { CheckCircle, Clock, FileText } from "lucide-react";
 
 interface LessonWithCompletion extends ILesson {
   completed: boolean;
@@ -30,6 +32,14 @@ export function LessonContent({
   goToNextLesson,
   markLessonComplete,
 }: LessonContentProps) {
+  // Helper to detect file type based on URL extension
+  const getFileType = (url: string) => {
+    const extension = url.split(".").pop()?.toLowerCase();
+    if (extension === "pdf") return "pdf";
+    if (extension === "doc" || extension === "docx") return "doc";
+    return "unknown";
+  };
+
   return (
     <>
       <div className="flex justify-between items-center mb-8">
@@ -106,17 +116,66 @@ export function LessonContent({
                       Document
                     </span>
                   </div>
+                  {content.fileUrl && (
+                    <a
+                      href={content.fileUrl}
+                      download
+                      className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                    >
+                      Download{" "}
+                      {getFileType(content.fileUrl) === "pdf"
+                        ? "PDF"
+                        : "Document"}
+                    </a>
+                  )}
                 </div>
                 <div className="p-6 bg-gray-50">
                   <div className="border border-gray-200 rounded-lg p-5 bg-white min-h-64">
-                    <img
-                      src={content.thumbnailUrl || "/api/placeholder/800/600"}
-                      alt="Document preview"
-                      className="w-full object-contain mb-4 rounded"
-                    />
+                    {content.fileUrl ? (
+                      getFileType(content.fileUrl) === "pdf" ? (
+                        <>
+                          <iframe
+                            src={content.fileUrl}
+                            className="w-full h-[600px] rounded mb-4"
+                            title="Document preview"
+                            onError={(e) => {
+                              console.error("Iframe load error:", e);
+                            }}
+                          />
+                          <p className="text-gray-500 text-sm mt-2">
+                            If the PDF doesn’t load, use the download button
+                            above.
+                          </p>
+                        </>
+                      ) : (
+                        <div className="text-center py-8">
+                          <FileText
+                            size={48}
+                            className="text-gray-400 mx-auto mb-4"
+                          />
+                          <p className="text-gray-700 font-medium">
+                            Word documents cannot be previewed in the browser.
+                          </p>
+                          <p className="text-gray-500 text-sm mt-2">
+                            Please download the document to view it.
+                          </p>
+                        </div>
+                      )
+                    ) : (
+                      <img
+                        src={content.thumbnailUrl || "/api/placeholder/800/600"}
+                        alt="Document preview"
+                        className="w-full object-contain mb-4 rounded"
+                      />
+                    )}
                     <p className="text-gray-700 leading-relaxed">
                       {content.description || "No description available."}
                     </p>
+                    {!content.fileUrl && (
+                      <p className="text-red-500 text-sm mt-2">
+                        No document available for preview.
+                      </p>
+                    )}
                   </div>
                 </div>
               </div>

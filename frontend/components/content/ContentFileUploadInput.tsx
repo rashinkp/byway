@@ -33,7 +33,7 @@ export const FileUploadInput = ({
   useEffect(() => {
     const script = document.createElement("script");
     script.src =
-      process.env.NEXT_PUBLIC_CLOUDINARY_WIDGET_URL ||
+      process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME ||
       "https://widget.cloudinary.com/v2.0/global/all.js";
     script.async = true;
     script.onload = () => setIsScriptLoaded(true);
@@ -104,7 +104,11 @@ export const FileUploadInput = ({
         xhr.open(
           "POST",
           `${apiBaseUrl}/${cloudName}/${
-            contentType === ContentType.VIDEO ? "video" : "auto"
+            contentType === ContentType.VIDEO
+              ? "video"
+              : contentType === ContentType.DOCUMENT
+              ? "raw"
+              : "auto"
           }/upload`,
           true
         );
@@ -122,7 +126,7 @@ export const FileUploadInput = ({
             resolve(response.secure_url);
           } else {
             setUploadStatus("error");
-            reject(new Error("Upload failed"));
+            reject(new Error(`Upload failed with status ${xhr.status}`));
           }
         };
 
@@ -262,7 +266,7 @@ export const FileUploadInput = ({
 
 FileUploadInput.uploadToCloudinary = async (
   file: File,
-  contentType: ContentType | 'image',
+  contentType: ContentType | "image",
   setUploadStatus: (status: "idle" | "uploading" | "success" | "error") => void,
   setUploadProgress: (progress: number) => void
 ): Promise<string> => {
@@ -285,7 +289,13 @@ FileUploadInput.uploadToCloudinary = async (
     xhr.open(
       "POST",
       `${apiBaseUrl}/${cloudName}/${
-        contentType === ContentType.VIDEO ? "video" : "auto"
+        contentType === ContentType.VIDEO
+          ? "video"
+          : contentType === ContentType.DOCUMENT
+          ? "raw"
+          : contentType === "image"
+          ? "image"
+          : "auto"
       }/upload`,
       true
     );
@@ -303,7 +313,7 @@ FileUploadInput.uploadToCloudinary = async (
         resolve(response.secure_url);
       } else {
         setUploadStatus("error");
-        reject(new Error("Upload failed"));
+        reject(new Error(`Upload failed with status ${xhr.status}`));
       }
     };
 
