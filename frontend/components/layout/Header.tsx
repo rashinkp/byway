@@ -3,6 +3,7 @@ import Link from "next/link";
 import { useAuth } from "@/hooks/auth/useAuth";
 import { useLogout } from "@/hooks/auth/useLogout";
 import { useCreateInstructor } from "@/hooks/instructor/useCreateInstructor";
+import { useGetInstructorByUserId } from "@/hooks/instructor/useGetInstructorByUserId"; // Add this import
 import { Button } from "@/components/ui/button";
 import {
   Loader2,
@@ -32,7 +33,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/utils/cn";
-import { useRouter } from "next/navigation"; 
+import { useRouter } from "next/navigation";
 
 interface HeaderProps {
   client?: { id: string; name: string };
@@ -43,14 +44,15 @@ export function Header({ client }: HeaderProps = {}) {
   const { mutate: logout, isPending: isLoggingOut } = useLogout();
   const { mutate: createInstructor, isPending: isCreatingInstructor } =
     useCreateInstructor();
+  const { data: instructorData, isLoading: isInstructorLoading } =
+    useGetInstructorByUserId(); // Fetch instructor data
   const [isInstructorModalOpen, setIsInstructorModalOpen] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-  const router = useRouter()
+  const router = useRouter();
 
   const handleInstructorSubmit = useCallback(
     async (data: InstructorFormData): Promise<void> => {
-
       return new Promise((resolve) => {
         createInstructor(data, {
           onSuccess: () => {
@@ -75,6 +77,10 @@ export function Header({ client }: HeaderProps = {}) {
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
+
+  // Check if instructor application is pending
+  const isInstructorPending =
+    instructorData?.data?.status === "PENDING" || isInstructorLoading;
 
   return (
     <>
@@ -158,7 +164,7 @@ export function Header({ client }: HeaderProps = {}) {
                 <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
               ) : user ? (
                 <>
-                  {user.role !== "INSTRUCTOR" && (
+                  {user.role !== "INSTRUCTOR" && !isInstructorPending && (
                     <Button
                       variant="ghost"
                       onClick={() => setIsInstructorModalOpen(true)}
@@ -184,12 +190,6 @@ export function Header({ client }: HeaderProps = {}) {
                         className="w-6 h-6 text-gray-600 group-hover:text-red-500 transition-colors cursor-pointer"
                         strokeWidth={1.5}
                       />
-                      {/* <Badge
-                        variant="destructive"
-                        className="absolute -top-2 -right-2 w-5 h-5 p-0 flex items-center justify-center text-xs"
-                      >
-                        3
-                      </Badge> */}
                     </div>
                     <div className="relative group">
                       <Link href="/user/cart">
@@ -197,9 +197,6 @@ export function Header({ client }: HeaderProps = {}) {
                           className="w-6 h-6 text-gray-600 group-hover:text-blue-500 transition-colors cursor-pointer"
                           strokeWidth={1.5}
                         />
-                        {/* <Badge className="absolute -top-2 -right-2 w-5 h-5 p-0 flex items-center justify-center text-xs">
-                          2
-                        </Badge> */}
                       </Link>
                     </div>
                     <div className="relative group">
@@ -249,10 +246,10 @@ export function Header({ client }: HeaderProps = {}) {
                         </DropdownMenuItem>
                         <DropdownMenuSeparator />
                         <DropdownMenuItem
-                            onClick={() => {
-                              logout()
-                              router.push('/login')
-                            }}
+                          onClick={() => {
+                            logout();
+                            router.push("/login");
+                          }}
                           disabled={isLoggingOut}
                           className="text-gray-700 hover:text-red-600"
                         >
@@ -374,7 +371,7 @@ export function Header({ client }: HeaderProps = {}) {
                     >
                       My Courses
                     </Link>
-                    {user.role !== "INSTRUCTOR" && (
+                    {user.role !== "INSTRUCTOR" && !isInstructorPending && (
                       <button
                         onClick={() => setIsInstructorModalOpen(true)}
                         disabled={isLoggingOut || isCreatingInstructor}
