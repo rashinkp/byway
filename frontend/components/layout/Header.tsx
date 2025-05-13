@@ -50,6 +50,7 @@ export function Header({ client }: HeaderProps = {}) {
 
   const handleInstructorSubmit = useCallback(
     async (data: InstructorFormData): Promise<void> => {
+
       return new Promise((resolve) => {
         createInstructor(data, {
           onSuccess: () => {

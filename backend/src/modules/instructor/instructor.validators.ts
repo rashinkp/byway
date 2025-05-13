@@ -17,5 +17,5 @@ export const createInstructorSchema = z.object({
   website: z
     .string()
     .url("Invalid website URL")
-    .max(500, "Website URL must be at most 500 characters"),
+    .max(500, "Website URL must be at most 500 characters").optional(),
 });

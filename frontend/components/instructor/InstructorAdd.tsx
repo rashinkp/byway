@@ -28,6 +28,7 @@ const fields: {
   name: Path<InstructorFormData>;
   label: string;
   type: "input" | "textarea";
+  fieldType?: "text" | "number" | "file" | "date";
   placeholder: string;
   description?: string;
   maxLength?: number;
@@ -36,6 +37,7 @@ const fields: {
     name: "areaOfExpertise",
     label: "Area of Expertise",
     type: "input",
+    fieldType: "text", // Add this
     placeholder: "e.g., Web Development",
     description: "Specify your primary area of expertise.",
     maxLength: 100,
@@ -55,14 +57,6 @@ const fields: {
     placeholder: "e.g., Experienced developer in MERN stack",
     description: "Provide a brief bio (optional).",
     maxLength: 1000,
-  },
-  {
-    name: "website",
-    label: "Website",
-    type: "input",
-    placeholder: "e.g., https://devinstructor.com",
-    description: "Your personal or professional website (optional).",
-    maxLength: 200,
   },
 ];
 
