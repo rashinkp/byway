@@ -12,5 +12,5 @@ export interface IInstructorRepository {
   ): Promise<IInstructorDetails>;
   findInstructorById(instructorId: string): Promise<IInstructorDetails | null>;
   findInstructorByUserId(userId: string): Promise<IInstructorWithUserDetails>;
-  findAllInstructors(): Promise<IInstructorWithUserDetails[]>; // Updated return type
+  findAllInstructors(): Promise<IInstructorWithUserDetails[]>; 
 }

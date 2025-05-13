@@ -15,6 +15,7 @@ export interface ICourse {
   createdAt: Date;
   updatedAt: Date;
   deletedAt?: Date | null;
+  approvalStatus: "PENDING" | "APPROVED" | "DECLINED"; // New field
   details?: ICourseDetails | null;
 }
 
@@ -28,6 +29,7 @@ export interface ICourseDetails {
   createdAt: Date;
   updatedAt: Date;
 }
+
 export interface ICreateCourseInput {
   title: string;
   description?: string | null;
@@ -79,9 +81,10 @@ export interface IGetAllCoursesInput {
   duration?: "All" | "Under5" | "5to10" | "Over10";
   price?: "All" | "Free" | "Paid";
 }
+
 export interface ICreateEnrollmentInput {
   userId: string;
-  courseIds: string[]; 
+  courseIds: string[];
 }
 
 export interface IEnrollment {
@@ -89,7 +92,6 @@ export interface IEnrollment {
   courseId: string;
   enrolledAt: Date;
 }
-
 
 export interface IGetEnrolledCoursesInput {
   userId: string;
@@ -101,7 +103,11 @@ export interface IGetEnrolledCoursesInput {
   level?: "BEGINNER" | "MEDIUM" | "ADVANCED" | "All";
 }
 
-
+// New input type for approving/declining courses
+export interface IUpdateCourseApprovalInput {
+  courseId: string;
+  approvalStatus: "PENDING" | "APPROVED" | "DECLINED";
+}
 
 export interface CourseWithEnrollments {
   id: string;
@@ -118,6 +124,7 @@ export interface CourseWithEnrollments {
   createdAt: Date;
   updatedAt: Date;
   deletedAt: Date | null;
+  approvalStatus: "PENDING" | "APPROVED" | "DECLINED"; // New field
   details: CourseDetails | null;
   enrollments: Array<{ enrolledAt: Date }>;
 }
@@ -126,7 +133,6 @@ export type CourseWithRelations = Course & {
   details: CourseDetails | null;
   enrollments: Array<{ enrolledAt: Date }>;
 };
-
 
 export interface ICourseWithEnrollmentStatus extends ICourse {
   isEnrolled: boolean;

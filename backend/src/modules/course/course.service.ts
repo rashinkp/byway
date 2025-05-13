@@ -14,6 +14,7 @@ import {
   ICourseDetails,
   IGetEnrolledCoursesInput,
   ICourseWithEnrollmentStatus,
+  IUpdateCourseApprovalInput,
 } from "./course.types";
 import {
   createCourseSchema,
@@ -22,6 +23,7 @@ import {
   createEnrollmentSchema,
   courseIdSchema,
   getEnrolledCoursesSchema,
+  updateCourseApprovalSchema,
 } from "./course.validator";
 import { Role } from "@prisma/client";
 import { ICourseRepository } from "./course.repository.interface";
@@ -168,7 +170,7 @@ export class CourseService {
           userId,
           courseId
         );
-        isEnrolled = !!enrollment; 
+        isEnrolled = !!enrollment;
       }
 
       return {
@@ -447,9 +449,6 @@ export class CourseService {
         "VALIDATION_ERROR"
       );
     }
-    logger.info("Parsed input for getEnrolledCourses", {
-      input: parsedInput.data,
-    }); // Add this
 
     const user = await this.userService.findUserById(parsedInput.data.userId);
     if (!user) {
@@ -460,17 +459,113 @@ export class CourseService {
     }
 
     try {
-      const result = await this.courseRepository.getEnrolledCourses(
-        parsedInput.data
-      );
-      logger.info("Retrieved enrolled courses", { result }); // Add this
-      return result;
+      return await this.courseRepository.getEnrolledCourses(parsedInput.data);
     } catch (error) {
       logger.error("Error retrieving enrolled courses", { error, input });
       throw error instanceof AppError
         ? error
         : new AppError(
             "Failed to retrieve enrolled courses",
+            StatusCodes.INTERNAL_SERVER_ERROR,
+            "INTERNAL_ERROR"
+          );
+    }
+  }
+
+  async approveCourse(input: IUpdateCourseApprovalInput): Promise<ICourse> {
+    const parsedInput = updateCourseApprovalSchema.safeParse(input);
+    if (!parsedInput.success) {
+      logger.warn("Validation failed for approveCourse", {
+        errors: parsedInput.error.errors,
+      });
+      throw new AppError(
+        `Validation failed: ${parsedInput.error.message}`,
+        StatusCodes.BAD_REQUEST,
+        "VALIDATION_ERROR"
+      );
+    }
+
+    const { courseId } = parsedInput.data;
+    const course = await this.courseRepository.getCourseById(courseId);
+    if (!course) {
+      logger.warn("Course not found", { courseId });
+      throw new AppError(
+        "Course not found",
+        StatusCodes.NOT_FOUND,
+        "NOT_FOUND"
+      );
+    }
+
+    if (course.approvalStatus === "APPROVED") {
+      logger.warn("Course already approved", { courseId });
+      throw new AppError(
+        "Course already approved",
+        StatusCodes.BAD_REQUEST,
+        "ALREADY_APPROVED"
+      );
+    }
+
+    try {
+      return await this.courseRepository.updateCourseApproval({
+        courseId,
+        approvalStatus: "APPROVED",
+      });
+    } catch (error) {
+      logger.error("Error approving course", { error, input });
+      throw error instanceof AppError
+        ? error
+        : new AppError(
+            "Failed to approve course",
+            StatusCodes.INTERNAL_SERVER_ERROR,
+            "INTERNAL_ERROR"
+          );
+    }
+  }
+
+  async declineCourse(input: IUpdateCourseApprovalInput): Promise<ICourse> {
+    const parsedInput = updateCourseApprovalSchema.safeParse(input);
+    if (!parsedInput.success) {
+      logger.warn("Validation failed for declineCourse", {
+        errors: parsedInput.error.errors,
+      });
+      throw new AppError(
+        `Validation failed: ${parsedInput.error.message}`,
+        StatusCodes.BAD_REQUEST,
+        "VALIDATION_ERROR"
+      );
+    }
+
+    const { courseId } = parsedInput.data;
+    const course = await this.courseRepository.getCourseById(courseId);
+    if (!course) {
+      logger.warn("Course not found", { courseId });
+      throw new AppError(
+        "Course not found",
+        StatusCodes.NOT_FOUND,
+        "NOT_FOUND"
+      );
+    }
+
+    if (course.approvalStatus === "DECLINED") {
+      logger.warn("Course already declined", { courseId });
+      throw new AppError(
+        "Course already declined",
+        StatusCodes.BAD_REQUEST,
+        "ALREADY_DECLINED"
+      );
+    }
+
+    try {
+      return await this.courseRepository.updateCourseApproval({
+        courseId,
+        approvalStatus: "DECLINED",
+      });
+    } catch (error) {
+      logger.error("Error declining course", { error, input });
+      throw error instanceof AppError
+        ? error
+        : new AppError(
+            "Failed to decline course",
             StatusCodes.INTERNAL_SERVER_ERROR,
             "INTERNAL_ERROR"
           );

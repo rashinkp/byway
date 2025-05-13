@@ -9,6 +9,7 @@ import {
   IEnrollment,
   IGetAllCoursesInput,
   IGetEnrolledCoursesInput,
+  IUpdateCourseApprovalInput,
   IUpdateCourseInput,
 } from "./course.types";
 import { AppError } from "../../utils/appError";
@@ -96,14 +97,19 @@ export class CourseRepository implements ICourseRepository {
     if (role === "USER") {
       where.status = "PUBLISHED";
       where.deletedAt = null;
+      where.approvalStatus = "APPROVED"; // Only show APPROVED courses for users
     } else if (role === "INSTRUCTOR") {
       if (myCourses && userId) {
         where.createdBy = userId;
+        // Instructors can see their own PENDING/DECLINED courses
+      } else {
+        where.approvalStatus = "APPROVED"; // Only show APPROVED courses for other instructors' courses
       }
       if (!includeDeleted) {
         where.deletedAt = null;
       }
     } else if (role === "ADMIN") {
+      // Admins can see all courses, including PENDING/DECLINED
       if (!includeDeleted) {
         where.deletedAt = null;
       }
@@ -112,6 +118,7 @@ export class CourseRepository implements ICourseRepository {
     // Apply filterBy conditions
     if (filterBy === "Active") {
       where.status = "PUBLISHED";
+      where.approvalStatus = "APPROVED";
     } else if (filterBy === "Draft") {
       where.status = "DRAFT";
     } else if (filterBy === "Inactive") {
@@ -134,7 +141,7 @@ export class CourseRepository implements ICourseRepository {
     // Apply duration filter
     if (duration !== "All") {
       if (duration === "Under5") {
-        where.duration = { lte: 5 * 60 }; // Assuming duration is in minutes
+        where.duration = { lte: 5 * 60 };
       } else if (duration === "5to10") {
         where.duration = { gte: 5 * 60, lte: 10 * 60 };
       } else if (duration === "Over10") {
@@ -145,9 +152,9 @@ export class CourseRepository implements ICourseRepository {
     // Apply price filter
     if (price !== "All") {
       if (price === "Free") {
-        where.offer = { equals: 0 }; // Free courses have offer === 0
+        where.offer = { equals: 0 };
       } else if (price === "Paid") {
-        where.offer = { gt: 0 }; // Paid courses have offer > 0
+        where.offer = { gt: 0 };
       }
     }
 
@@ -183,6 +190,7 @@ export class CourseRepository implements ICourseRepository {
         createdAt: course.createdAt,
         updatedAt: course.updatedAt,
         deletedAt: course.deletedAt || undefined,
+        approvalStatus: course.approvalStatus, // Include approvalStatus
         details: course.details
           ? {
               id: course.details.id,
@@ -218,6 +226,7 @@ export class CourseRepository implements ICourseRepository {
       offer: course.offer?.toNumber(),
       status: course.status,
       categoryId: course.categoryId,
+      approvalStatus:course.approvalStatus,
       createdBy: course.createdBy,
       createdAt: course.createdAt,
       updatedAt: course.updatedAt,
@@ -270,6 +279,7 @@ export class CourseRepository implements ICourseRepository {
       createdBy: course.createdBy,
       createdAt: course.createdAt,
       updatedAt: course.updatedAt,
+      approvalStatus:course.approvalStatus,
       deletedAt: course.deletedAt || undefined,
       details: course.details
         ? {
@@ -340,6 +350,7 @@ export class CourseRepository implements ICourseRepository {
       createdBy: course.createdBy,
       createdAt: course.createdAt,
       updatedAt: course.updatedAt,
+      approvalStatus:course.approvalStatus,
       deletedAt: course.deletedAt || undefined,
       details: course.details
         ? {
@@ -380,6 +391,7 @@ export class CourseRepository implements ICourseRepository {
       createdAt: course.createdAt,
       updatedAt: course.updatedAt,
       deletedAt: course.deletedAt || undefined,
+      approvalStatus:course.approvalStatus,
       details: course.details
         ? {
             id: course.details.id,
@@ -445,9 +457,6 @@ export class CourseRepository implements ICourseRepository {
     };
   }
 
- 
-  
-  
   async getEnrolledCourses(
     input: IGetEnrolledCoursesInput
   ): Promise<{ courses: ICourse[]; total: number; totalPage: number }> {
@@ -460,18 +469,21 @@ export class CourseRepository implements ICourseRepository {
       search = "",
       level = "All",
     } = input;
-  
+
     const allowedSortFields = ["title", "enrolledAt", "createdAt"];
-    const safeSortBy = allowedSortFields.includes(sortBy) ? sortBy : "enrolledAt";
-  
+    const safeSortBy = allowedSortFields.includes(sortBy)
+      ? sortBy
+      : "enrolledAt";
+
     const where: Prisma.CourseWhereInput = {
       enrollments: {
         some: { userId },
       },
       status: "PUBLISHED",
       deletedAt: null,
+      approvalStatus: "APPROVED", // Only show APPROVED courses for enrolled courses
     };
-  
+
     // Apply search conditions
     if (search) {
       where.OR = [
@@ -479,18 +491,18 @@ export class CourseRepository implements ICourseRepository {
         { description: { contains: search, mode: "insensitive" } },
       ];
     }
-  
+
     // Apply level filter
     if (level !== "All") {
-      where.level = level ;
+      where.level = level;
     }
-  
+
     const skip = (page - 1) * limit;
     const orderBy: Prisma.CourseOrderByWithRelationInput =
       safeSortBy === "enrolledAt"
         ? { enrollments: { _count: sortOrder } }
         : { [safeSortBy]: sortOrder };
-  
+
     const [courses, total] = await Promise.all([
       this.prisma.course.findMany({
         where,
@@ -507,9 +519,9 @@ export class CourseRepository implements ICourseRepository {
       }) as Promise<CourseWithRelations[]>,
       this.prisma.course.count({ where }),
     ]);
-  
+
     const totalPage = Math.ceil(total / limit);
-  
+
     return {
       courses: courses.map((course) => ({
         id: course.id,
@@ -526,6 +538,7 @@ export class CourseRepository implements ICourseRepository {
         createdAt: course.createdAt,
         updatedAt: course.updatedAt,
         deletedAt: course.deletedAt || undefined,
+        approvalStatus: course.approvalStatus, // Include approvalStatus
         details: course.details
           ? {
               id: course.details.id,
@@ -544,6 +557,56 @@ export class CourseRepository implements ICourseRepository {
     };
   }
 
+  async updateCourseApproval(
+    input: IUpdateCourseApprovalInput
+  ): Promise<ICourse> {
+    const { courseId, approvalStatus } = input;
 
+    try {
+      const course = await this.prisma.course.update({
+        where: { id: courseId },
+        data: {
+          approvalStatus,
+          updatedAt: new Date(),
+        },
+        include: { details: true },
+      });
 
+      return {
+        id: course.id,
+        title: course.title,
+        description: course.description || undefined,
+        level: course.level,
+        price: course.price?.toNumber(),
+        thumbnail: course.thumbnail || undefined,
+        duration: course.duration || undefined,
+        offer: course.offer?.toNumber(),
+        status: course.status,
+        categoryId: course.categoryId,
+        createdBy: course.createdBy,
+        createdAt: course.createdAt,
+        updatedAt: course.updatedAt,
+        deletedAt: course.deletedAt || undefined,
+        approvalStatus: course.approvalStatus,
+        details: course.details
+          ? {
+              id: course.details.id,
+              courseId: course.details.courseId,
+              prerequisites: course.details.prerequisites || undefined,
+              longDescription: course.details.longDescription || undefined,
+              objectives: course.details.objectives || undefined,
+              targetAudience: course.details.targetAudience || undefined,
+              createdAt: course.details.createdAt,
+              updatedAt: course.details.updatedAt,
+            }
+          : undefined,
+      };
+    } catch (error) {
+      throw new AppError(
+        "Failed to update course approval status",
+        StatusCodes.INTERNAL_SERVER_ERROR,
+        "DATABASE_ERROR"
+      );
+    }
+  }
 }

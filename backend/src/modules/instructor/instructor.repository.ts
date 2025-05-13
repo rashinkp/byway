@@ -1,4 +1,4 @@
-import { InstructorStatus, PrismaClient } from "@prisma/client";
+import { APPROVALSTATUS, PrismaClient } from "@prisma/client";
 import { AppError } from "../../utils/appError";
 import { StatusCodes } from "http-status-codes";
 import { logger } from "../../utils/logger";
@@ -37,7 +37,7 @@ export class InstructorRepository implements IInstructorRepository {
             professionalExperience,
             about,
             website,
-            status: InstructorStatus.PENDING, // Reset to PENDING for reapplication
+            status: APPROVALSTATUS.PENDING, // Reset to PENDING for reapplication
           },
         });
       } else {
@@ -49,7 +49,7 @@ export class InstructorRepository implements IInstructorRepository {
             about,
             userId,
             website,
-            status: InstructorStatus.PENDING,
+            status: APPROVALSTATUS.PENDING,
           },
         });
       }

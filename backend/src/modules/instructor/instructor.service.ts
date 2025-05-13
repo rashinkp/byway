@@ -14,7 +14,7 @@ import {
   IInstructorWithUserDetails,
 } from "./instructor.types";
 import { UserService } from "../user/user.service";
-import { Role, InstructorStatus } from "@prisma/client";
+import { Role, APPROVALSTATUS } from "@prisma/client";
 import { IInstructorRepository } from "./instructor.repository.interface";
 
 export class InstructorService {
@@ -111,7 +111,7 @@ export class InstructorService {
       );
     }
 
-    const { instructorId } = parsedInput.data;
+    const { instructorId } = parsedInput.data as { instructorId: string };
     const instructor = await this.instructorRepository.findInstructorById(
       instructorId
     );
@@ -124,7 +124,7 @@ export class InstructorService {
       );
     }
 
-    if (instructor.status === InstructorStatus.APPROVED) {
+    if (instructor.status === APPROVALSTATUS.APPROVED) {
       logger.warn("Instructor already approved", { instructorId });
       throw new AppError(
         "Instructor already approved",
@@ -138,7 +138,7 @@ export class InstructorService {
       const updatedInstructor =
         await this.instructorRepository.updateInstructorStatus({
           instructorId,
-          status: InstructorStatus.APPROVED,
+          status: APPROVALSTATUS.APPROVED,
         });
 
       // Update user role to INSTRUCTOR
@@ -172,7 +172,7 @@ export class InstructorService {
       );
     }
 
-    const { instructorId } = parsedInput.data;
+    const { instructorId } = parsedInput.data as { instructorId: string };
     const instructor = await this.instructorRepository.findInstructorById(
       instructorId
     );
@@ -185,7 +185,7 @@ export class InstructorService {
       );
     }
 
-    if (instructor.status === InstructorStatus.DECLINED) {
+    if (instructor.status === APPROVALSTATUS.DECLINED) {
       logger.warn("Instructor already declined", { instructorId });
       throw new AppError(
         "Instructor already declined",
@@ -196,7 +196,7 @@ export class InstructorService {
 
     return this.instructorRepository.updateInstructorStatus({
       instructorId,
-      status: InstructorStatus.DECLINED,
+      status: APPROVALSTATUS.DECLINED,
     });
   }
 

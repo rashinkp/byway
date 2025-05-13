@@ -9,6 +9,7 @@ import {
   IGetAllCoursesInput,
   ICreateEnrollmentInput,
   IGetEnrolledCoursesInput,
+  IUpdateCourseApprovalInput,
 } from "../modules/course/course.types";
 
 interface AuthenticatedRequest extends Request {
@@ -190,6 +191,68 @@ export const adaptCourseController = (controller: CourseController) => ({
 
       const result = await controller.getEnrolledCourses(input);
       res.status(StatusCodes.OK).json(result);
+    }
+  ),
+
+  approveCourse: asyncHandler(
+    async (req: AuthenticatedRequest, res: Response) => {
+      if (!req.user?.id) {
+        logger.error("Unauthorized: No user ID found in token", {
+          request: req.body,
+        });
+        throw new AppError(
+          "Unauthorized: No user ID found in token",
+          StatusCodes.UNAUTHORIZED,
+          "UNAUTHORIZED"
+        );
+      }
+      if (req.user.role !== "ADMIN") {
+        logger.error("Forbidden: Admin access required", {
+          userId: req.user.id,
+        });
+        throw new AppError(
+          "Forbidden: Admin access required",
+          StatusCodes.FORBIDDEN,
+          "FORBIDDEN"
+        );
+      }
+      const input: IUpdateCourseApprovalInput = {
+        courseId: req.body.courseId,
+        approvalStatus: "APPROVED",
+      };
+      const result = await controller.approveCourse(input);
+      res.status(result.statusCode).json(result);
+    }
+  ),
+
+  declineCourse: asyncHandler(
+    async (req: AuthenticatedRequest, res: Response) => {
+      if (!req.user?.id) {
+        logger.error("Unauthorized: No user ID found in token", {
+          request: req.body,
+        });
+        throw new AppError(
+          "Unauthorized: No user ID found in token",
+          StatusCodes.UNAUTHORIZED,
+          "UNAUTHORIZED"
+        );
+      }
+      if (req.user.role !== "ADMIN") {
+        logger.error("Forbidden: Admin access required", {
+          userId: req.user.id,
+        });
+        throw new AppError(
+          "Forbidden: Admin access required",
+          StatusCodes.FORBIDDEN,
+          "FORBIDDEN"
+        );
+      }
+      const input: IUpdateCourseApprovalInput = {
+        courseId: req.body.courseId,
+        approvalStatus: "DECLINED",
+      };
+      const result = await controller.declineCourse(input);
+      res.status(result.statusCode).json(result);
     }
   ),
 });

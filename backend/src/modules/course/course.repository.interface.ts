@@ -1,4 +1,4 @@
-import { ICourse, ICourseDetails, ICreateCourseInput, ICreateEnrollmentInput, IEnrollment, IGetAllCoursesInput, IGetEnrolledCoursesInput, IUpdateCourseInput } from "./course.types";
+import { ICourse, ICourseDetails, ICreateCourseInput, ICreateEnrollmentInput, IEnrollment, IGetAllCoursesInput, IGetEnrolledCoursesInput, IUpdateCourseApprovalInput, IUpdateCourseInput } from "./course.types";
 
 export interface ICourseRepository {
   createCourse(input: ICreateCourseInput): Promise<ICourse>;
@@ -15,4 +15,5 @@ export interface ICourseRepository {
   getEnrolledCourses(
     input: IGetEnrolledCoursesInput
   ): Promise<{ courses: ICourse[]; total: number; totalPage: number }>;
+  updateCourseApproval(input: IUpdateCourseApprovalInput): Promise<ICourse>;
 }

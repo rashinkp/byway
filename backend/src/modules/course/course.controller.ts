@@ -10,6 +10,7 @@ import {
   ICreateEnrollmentInput,
   IGetEnrolledCoursesInput,
   ICourseWithEnrollmentStatus,
+  IUpdateCourseApprovalInput,
 } from "./course.types";
 
 export class CourseController {
@@ -189,6 +190,48 @@ export class CourseController {
             error instanceof Error
               ? error.message
               : "Failed to retrieve enrolled courses",
+            StatusCodes.INTERNAL_SERVER_ERROR,
+            "INTERNAL_ERROR"
+          );
+    }
+  }
+
+  async approveCourse(input: IUpdateCourseApprovalInput): Promise<ApiResponse> {
+    try {
+      const course = await this.courseService.approveCourse(input);
+      return {
+        status: "success",
+        data: course,
+        message: "Course approved successfully",
+        statusCode: StatusCodes.OK,
+      };
+    } catch (error) {
+      logger.error("Error approving course", { error });
+      throw error instanceof AppError
+        ? error
+        : new AppError(
+            error instanceof Error ? error.message : "Failed to approve course",
+            StatusCodes.INTERNAL_SERVER_ERROR,
+            "INTERNAL_ERROR"
+          );
+    }
+  }
+
+  async declineCourse(input: IUpdateCourseApprovalInput): Promise<ApiResponse> {
+    try {
+      const course = await this.courseService.declineCourse(input);
+      return {
+        status: "success",
+        data: course,
+        message: "Course declined successfully",
+        statusCode: StatusCodes.OK,
+      };
+    } catch (error) {
+      logger.error("Error declining course", { error });
+      throw error instanceof AppError
+        ? error
+        : new AppError(
+            error instanceof Error ? error.message : "Failed to decline course",
             StatusCodes.INTERNAL_SERVER_ERROR,
             "INTERNAL_ERROR"
           );

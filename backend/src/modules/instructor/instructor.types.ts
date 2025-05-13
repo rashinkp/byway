@@ -1,4 +1,4 @@
-import { InstructorStatus, Role } from "@prisma/client";
+import { APPROVALSTATUS, Role } from "@prisma/client";
 
 export interface BaseInstructorDetails {
   areaOfExpertise: string;
@@ -6,14 +6,14 @@ export interface BaseInstructorDetails {
   about: string | null;
   userId: string;
   website?: string | null;
-  status?: InstructorStatus;
+  status?: APPROVALSTATUS;
 }
 
 export type CreateInstructorInput = BaseInstructorDetails;
 
 export interface IInstructorDetails extends BaseInstructorDetails {
   id: string;
-  status: InstructorStatus;
+  status: APPROVALSTATUS;
 }
 
 export interface IUserDetails {
@@ -40,5 +40,5 @@ export interface IInstructorWithUserDetails {
 
 export interface UpdateInstructorStatusInput {
   instructorId: string;
-  status: InstructorStatus;
+  status: APPROVALSTATUS;
 }

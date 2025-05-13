@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { InstructorStatus } from "@prisma/client";
+import { APPROVALSTATUS } from "@prisma/client";
 
 export const createInstructorSchema = z.object({
   areaOfExpertise: z
@@ -24,7 +24,7 @@ export const createInstructorSchema = z.object({
 
 export const updateInstructorStatusSchema = z.object({
   instructorId: z.string().uuid("Invalid instructor ID"),
-  status: z.nativeEnum(InstructorStatus, {
+  status: z.nativeEnum(APPROVALSTATUS, {
     errorMap: () => ({ message: "Invalid status" }),
   }),
 });

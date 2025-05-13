@@ -185,3 +185,12 @@ export const getEnrolledCoursesSchema = z.object({
     .optional()
     .default("All"),
 });
+
+export const updateCourseApprovalSchema = z.object({
+  courseId: z.string().uuid("Invalid course ID"),
+  approvalStatus: z.enum(["PENDING", "APPROVED", "DECLINED"], {
+    errorMap: () => ({
+      message: "Approval status must be PENDING, APPROVED, or DECLINED",
+    }),
+  }),
+});

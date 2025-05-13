@@ -74,7 +74,7 @@ model InstructorDetails {
   areaOfExpertise        String
   professionalExperience String
   about                  String?
-   status                InstructorStatus @default(PENDING)
+   status                APPROVALSTATUS @default(PENDING)
   website                String?
   createdAt              DateTime @default(now())
   updatedAt              DateTime @updatedAt
@@ -97,7 +97,7 @@ model Category {
 
 
 
-enum InstructorStatus { 
+enum APPROVALSTATUS { 
   PENDING 
   APPROVED 
   DECLINED 
@@ -140,7 +140,8 @@ model Course {
   creator        User          @relation("CourseCreator", fields: [createdBy], references: [id])
   createdAt      DateTime      @default(now())
   updatedAt      DateTime      @updatedAt
-  deletedAt      DateTime?     
+  deletedAt      DateTime?  
+  approvalStatus APPROVALSTATUS @default(PENDING)
   details        CourseDetails? @relation("CourseToDetails")
   lessons        Lesson[]      @relation("CourseLessons") 
   enrollments    Enrollment[]  @relation("CourseEnrollments") 
