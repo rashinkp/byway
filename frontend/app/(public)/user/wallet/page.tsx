@@ -45,7 +45,7 @@ export default function WalletTransactionPage() {
           t.type === "DEPOSIT" || t.type === "PURCHASE" 
             ? "deposit"
             : "withdrawal",
-        amount: typeof t.amount === "string" ? parseFloat(t.amount) : t.amount, // Convert string to number
+        amount: typeof t.amount === "string" ? parseFloat(t.amount) : t.amount,
         date: date.toISOString().split("T")[0],
         time: date.toLocaleTimeString([], {
           hour: "2-digit",
