@@ -2,13 +2,18 @@ import { StatusCodes } from "http-status-codes";
 import { AppError } from "../../utils/appError";
 import { JwtUtil } from "../../utils/jwt.util";
 import { logger } from "../../utils/logger";
-import { createInstructorSchema } from "./instructor.validators";
+import {
+  createInstructorSchema,
+  updateInstructorStatusSchema,
+} from "./instructor.validators";
 import {
   CreateInstructorInput,
   InstructorWithToken,
+  IInstructorDetails,
+  UpdateInstructorStatusInput,
 } from "./instructor.types";
 import { UserService } from "../user/user.service";
-import { Role } from "@prisma/client";
+import { Role, InstructorStatus } from "@prisma/client";
 import { IInstructorRepository } from "./instructor.repository.interface";
 
 export class InstructorService {
@@ -45,15 +50,13 @@ export class InstructorService {
     const { areaOfExpertise, professionalExperience, about, userId, website } =
       parsedInput.data;
 
-    // Check if user exists
     const user = await this.userService.findUserById(userId);
     if (!user) {
       logger.warn("User not found for instructor creation", { userId });
       throw new AppError("User not found", StatusCodes.NOT_FOUND, "NOT_FOUND");
     }
 
-    // Check if user is already an instructor
-    if (user.role === "INSTRUCTOR") {
+    if (user.role === Role.INSTRUCTOR) {
       logger.warn("User is already an instructor", { userId });
       throw new AppError(
         "User is already an instructor",
@@ -63,10 +66,8 @@ export class InstructorService {
     }
 
     try {
-      // Update user role to INSTRUCTOR
       await this.userService.updateUserRole(userId, Role.INSTRUCTOR);
 
-      // Create instructor details
       const instructorDetails =
         await this.instructorRepository.createInstructor({
           areaOfExpertise,
@@ -98,6 +99,107 @@ export class InstructorService {
         ? error
         : new AppError(
             "Failed to create instructor",
+            StatusCodes.INTERNAL_SERVER_ERROR,
+            "INTERNAL_ERROR"
+          );
+    }
+  }
+
+  async approveInstructor(
+    input: UpdateInstructorStatusInput
+  ): Promise<IInstructorDetails> {
+    const parsedInput = updateInstructorStatusSchema.safeParse(input);
+    if (!parsedInput.success) {
+      logger.warn("Validation failed for approveInstructor", {
+        errors: parsedInput.error.errors,
+      });
+      throw new AppError(
+        `Validation failed: ${parsedInput.error.message}`,
+        StatusCodes.BAD_REQUEST,
+        "VALIDATION_ERROR"
+      );
+    }
+
+    const { instructorId } = parsedInput.data;
+    const instructor = await this.instructorRepository.findInstructorById(
+      instructorId
+    );
+    if (!instructor) {
+      logger.warn("Instructor not found", { instructorId });
+      throw new AppError(
+        "Instructor not found",
+        StatusCodes.NOT_FOUND,
+        "NOT_FOUND"
+      );
+    }
+
+    if (instructor.status === InstructorStatus.APPROVED) {
+      logger.warn("Instructor already approved", { instructorId });
+      throw new AppError(
+        "Instructor already approved",
+        StatusCodes.BAD_REQUEST,
+        "ALREADY_APPROVED"
+      );
+    }
+
+    return this.instructorRepository.updateInstructorStatus({
+      instructorId,
+      status: InstructorStatus.APPROVED,
+    });
+  }
+
+  async declineInstructor(
+    input: UpdateInstructorStatusInput
+  ): Promise<IInstructorDetails> {
+    const parsedInput = updateInstructorStatusSchema.safeParse(input);
+    if (!parsedInput.success) {
+      logger.warn("Validation failed for declineInstructor", {
+        errors: parsedInput.error.errors,
+      });
+      throw new AppError(
+        `Validation failed: ${parsedInput.error.message}`,
+        StatusCodes.BAD_REQUEST,
+        "VALIDATION_ERROR"
+      );
+    }
+
+    const { instructorId } = parsedInput.data;
+    const instructor = await this.instructorRepository.findInstructorById(
+      instructorId
+    );
+    if (!instructor) {
+      logger.warn("Instructor not found", { instructorId });
+      throw new AppError(
+        "Instructor not found",
+        StatusCodes.NOT_FOUND,
+        "NOT_FOUND"
+      );
+    }
+
+    if (instructor.status === InstructorStatus.DECLINED) {
+      logger.warn("Instructor already declined", { instructorId });
+      throw new AppError(
+        "Instructor already declined",
+        StatusCodes.BAD_REQUEST,
+        "ALREADY_DECLINED"
+      );
+    }
+
+    return this.instructorRepository.updateInstructorStatus({
+      instructorId,
+      status: InstructorStatus.DECLINED,
+    });
+  }
+
+  async getAllInstructors(): Promise<IInstructorDetails[]> {
+    try {
+      return await this.instructorRepository.findAllInstructors();
+    } catch (error) {
+      logger.error("Error fetching all instructors", { error });
+      throw error instanceof AppError
+        ? error
+        : new AppError(
+            "Failed to fetch instructors",
             StatusCodes.INTERNAL_SERVER_ERROR,
             "INTERNAL_ERROR"
           );

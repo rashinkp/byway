@@ -61,7 +61,7 @@ export class UserService {
 
   async getAllUsers(
     input: IGetAllUsersInput
-  ): Promise<ApiResponse<IPaginatedResponse<IUser>>> {
+  ): Promise<IPaginatedResponse<IUser>> {
     try {
       const {
         page = 1,
@@ -97,19 +97,15 @@ export class UserService {
         totalPages,
       };
 
-      return {
-        statusCode: 200,
-        success: true,
-        message: "Users retrieved successfully",
-        data: paginatedResponse,
-      };
+      return paginatedResponse;
     } catch (error) {
       console.error("Error in getAllUsers:", error);
       return {
-        statusCode: 500,
-        success: false,
-        message: "Failed to retrieve users",
-        error: error instanceof Error ? error.message : "Unknown error",
+        items: [],
+        total: 0,
+        page: 1,
+        limit: 10,
+        totalPages: 0
       };
     }
   }

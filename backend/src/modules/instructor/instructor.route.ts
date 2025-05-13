@@ -15,5 +15,23 @@ export const createInstructorRouter = (
     adapt.createInstructor
   );
 
+  instructorRouter.post(
+    "/approve",
+    authMiddleware("ADMIN"),
+    adapt.approveInstructor
+  );
+
+  instructorRouter.post(
+    "/decline",
+    authMiddleware("ADMIN"),
+    adapt.declineInstructor
+  );
+
+  instructorRouter.get(
+    "/all",
+    authMiddleware("ADMIN"),
+    adapt.getAllInstructors
+  );
+
   return instructorRouter;
 };

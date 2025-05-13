@@ -5,16 +5,18 @@ import { useAuthStore } from "@/stores/auth.store";
 import { User } from "@/types/user";
 import { toast } from "sonner";
 import { queryClient } from "@/utils/queryClient";
+import { ApiResponse } from "@/types/apiResponse";
 
 export function useCreateInstructor() {
   const { setUser } = useAuthStore();
 
   return useMutation<
-    { data: User }, 
-    Error, 
-    InstructorFormData 
+    ApiResponse<User>,
+    Error,
+    InstructorFormData
   >({
-    mutationFn: (data: InstructorFormData) => createInstructor(data),
+    mutationFn: (characters: InstructorFormData) =>
+      createInstructor(characters),
     onSuccess: (response) => {
       setUser(response.data);
       queryClient.invalidateQueries({ queryKey: ["user"] });

@@ -1,6 +1,6 @@
 import { api } from "@/api/api";
 import { ApiResponse } from "@/types/apiResponse";
-import { InstructorFormData } from "@/types/instructor";
+import { IInstructorDetails, InstructorFormData } from "@/types/instructor";
 import { User } from "@/types/user";
 
 export const createInstructor = async (
@@ -16,6 +16,54 @@ export const createInstructor = async (
     console.error("Error creating instructor:", error);
     throw new Error(
       error.response?.data?.message || "Failed to create instructor"
+    );
+  }
+};
+
+export const approveInstructor = async (
+  instructorId: string
+): Promise<ApiResponse<{ id: string; status: string }>> => {
+  try {
+    const response = await api.post<
+      ApiResponse<{ id: string; status: string }>
+    >("/instructor/approve", { instructorId });
+    return response.data;
+  } catch (error: any) {
+    console.error("Error approving instructor:", error);
+    throw new Error(
+      error.response?.data?.message || "Failed to approve instructor"
+    );
+  }
+};
+
+export const declineInstructor = async (
+  instructorId: string
+): Promise<ApiResponse<{ id: string; status: string }>> => {
+  try {
+    const response = await api.post<
+      ApiResponse<{ id: string; status: string }>
+    >("/instructor/decline", { instructorId });
+    return response.data;
+  } catch (error: any) {
+    console.error("Error declining instructor:", error);
+    throw new Error(
+      error.response?.data?.message || "Failed to decline instructor"
+    );
+  }
+};
+
+export const getAllInstructors = async (): Promise<
+  ApiResponse<IInstructorDetails[]>
+> => {
+  try {
+    const response = await api.get<ApiResponse<IInstructorDetails[]>>(
+      "/instructor/all"
+    );
+    return response.data;
+  } catch (error: any) {
+    console.error("Error fetching instructors:", error);
+    throw new Error(
+      error.response?.data?.message || "Failed to fetch instructors"
     );
   }
 };

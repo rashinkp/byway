@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { InstructorStatus } from "@prisma/client";
 
 export const createInstructorSchema = z.object({
   areaOfExpertise: z
@@ -17,5 +18,13 @@ export const createInstructorSchema = z.object({
   website: z
     .string()
     .url("Invalid website URL")
-    .max(500, "Website URL must be at most 500 characters").optional(),
+    .max(500, "Website URL must be at most 500 characters")
+    .optional(),
+});
+
+export const updateInstructorStatusSchema = z.object({
+  instructorId: z.string().uuid("Invalid instructor ID"),
+  status: z.nativeEnum(InstructorStatus, {
+    errorMap: () => ({ message: "Invalid status" }),
+  }),
 });

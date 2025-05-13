@@ -1,4 +1,4 @@
-import { Role } from "@prisma/client";
+import { InstructorStatus, Role } from "@prisma/client";
 
 export interface BaseInstructorDetails {
   areaOfExpertise: string;
@@ -6,12 +6,14 @@ export interface BaseInstructorDetails {
   about: string | null;
   userId: string;
   website?: string | null;
+  status?: InstructorStatus;
 }
 
 export type CreateInstructorInput = BaseInstructorDetails;
 
 export interface IInstructorDetails extends BaseInstructorDetails {
   id: string;
+  status: InstructorStatus;
 }
 
 export interface IInstructor extends IInstructorDetails {
@@ -21,3 +23,7 @@ export interface IInstructor extends IInstructorDetails {
 
 export type InstructorWithToken = IInstructor & { newToken: string };
 
+export interface UpdateInstructorStatusInput {
+  instructorId: string;
+  status: InstructorStatus;
+}
