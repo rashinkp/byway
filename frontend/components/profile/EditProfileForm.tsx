@@ -8,7 +8,10 @@ const profileSchema = z.object({
   name: z
     .string()
     .min(2, "Name must be at least 2 characters")
-    .max(50, "Name must be less than 50 characters"),
+    .max(50, "Name must be less than 50 characters")
+    .refine((val) => val.trim().length > 0, {
+      message: "Name cannot be only white spaces",
+    }),
   avatar: z
     .union([
       z.instanceof(File), // Allow File objects

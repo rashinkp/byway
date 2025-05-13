@@ -5,7 +5,7 @@ export interface BaseInstructorDetails {
   professionalExperience: string;
   about: string | null;
   userId: string;
-  website: string | null;
+  website?: string | null;
 }
 
 export type CreateInstructorInput = BaseInstructorDetails;
