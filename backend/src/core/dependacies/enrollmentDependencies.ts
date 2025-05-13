@@ -33,7 +33,6 @@ export const initializeEnrollmentDependencies = (
     enrollmentController,
     setPaymentService: (service: OrderService) => {
       paymentService = service;
-      // Update EnrollmentService with the injected PaymentService
       Object.assign(enrollmentService, { paymentService });
     },
   };

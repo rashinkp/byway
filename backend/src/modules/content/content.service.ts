@@ -1,4 +1,5 @@
 import { CourseService } from "../course/course.service";
+import { EnrollmentService } from "../enrollment/enrollment.service";
 import { LessonService } from "../lesson/lesson.service";
 import { IContentRepository } from "./content.repository.interface";
 import {
@@ -11,7 +12,8 @@ export class ContentService {
   constructor(
     private contentRepository: IContentRepository,
     private lessonService: LessonService,
-    private courseService: CourseService
+    private courseService: CourseService,
+    private enrollmentService: EnrollmentService,
   ) {}
 
   async createContent(
@@ -69,11 +71,12 @@ export class ContentService {
       throw new Error("Course not found");
     }
     const isCreator = course.createdBy === userId;
-    // const enrollment = await this.courseService.getEnrollment(
-    //   userId,
-    //   lesson.courseId
-    // );
-    if (!isCreator) {
+    const enrollment = await this.enrollmentService.getEnrollment(
+      userId,
+      course.id
+    );
+    
+    if (!isCreator && !enrollment) {
       throw new Error("You are not enrolled in this course or not the creator");
     }
 

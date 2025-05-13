@@ -127,6 +127,7 @@ export const initializeAppDependencies = (
   // Inject dependent services to break circular dependency
   enrollmentDeps.setPaymentService(orderDeps.orderService);
   courseDeps.setEnrollmentService(enrollmentDeps.enrollmentService)
+  contentDeps.setEnrollmentService(enrollmentDeps.enrollmentService);
   orderDeps.setEnrollmentService(enrollmentDeps.enrollmentService);
 
   return {
