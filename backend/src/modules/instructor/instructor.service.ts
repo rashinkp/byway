@@ -11,6 +11,7 @@ import {
   InstructorWithToken,
   IInstructorDetails,
   UpdateInstructorStatusInput,
+  IInstructorWithUserDetails,
 } from "./instructor.types";
 import { UserService } from "../user/user.service";
 import { Role, InstructorStatus } from "@prisma/client";
@@ -55,18 +56,6 @@ export class InstructorService {
       logger.warn("User not found for instructor creation", { userId });
       throw new AppError("User not found", StatusCodes.NOT_FOUND, "NOT_FOUND");
     }
-
-    // Check if user is already an instructor
-    // const existingInstructor =
-    //   await this.instructorRepository.findInstructorByUserId(userId);
-    // if (existingInstructor) {
-    //   logger.warn("User is already registered as an instructor", { userId });
-    //   throw new AppError(
-    //     "User is already registered as an instructor",
-    //     StatusCodes.BAD_REQUEST,
-    //     "ALREADY_INSTRUCTOR"
-    //   );
-    // }
 
     try {
       const instructorDetails =
@@ -211,7 +200,7 @@ export class InstructorService {
     });
   }
 
-  async getAllInstructors(): Promise<IInstructorDetails[]> {
+  async getAllInstructors(): Promise<IInstructorWithUserDetails[]> {
     try {
       return await this.instructorRepository.findAllInstructors();
     } catch (error) {
@@ -228,7 +217,7 @@ export class InstructorService {
 
   async getInstructorByUserId(
     userId: string
-  ): Promise<IInstructorDetails | null> {
+  ): Promise<IInstructorWithUserDetails | null> {
     try {
       const instructor = await this.instructorRepository.findInstructorByUserId(
         userId

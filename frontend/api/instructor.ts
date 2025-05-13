@@ -1,6 +1,6 @@
 import { api } from "@/api/api";
 import { ApiResponse } from "@/types/apiResponse";
-import { IInstructorDetails, InstructorFormData } from "@/types/instructor";
+import { IInstructorDetails, IInstructorWithUserDetails, InstructorFormData } from "@/types/instructor";
 import { User } from "@/types/user";
 
 export const createInstructor = async (
@@ -53,10 +53,10 @@ export const declineInstructor = async (
 };
 
 export const getAllInstructors = async (): Promise<
-  ApiResponse<IInstructorDetails[]>
+  ApiResponse<IInstructorWithUserDetails[]>
 > => {
   try {
-    const response = await api.get<ApiResponse<IInstructorDetails[]>>(
+    const response = await api.get<ApiResponse<IInstructorWithUserDetails[]>>(
       "/instructor/all"
     );
     return response.data;

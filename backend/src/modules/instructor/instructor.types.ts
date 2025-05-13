@@ -16,12 +16,27 @@ export interface IInstructorDetails extends BaseInstructorDetails {
   status: InstructorStatus;
 }
 
+export interface IUserDetails {
+  id: string;
+  email: string;
+  name: string | null;
+  role: Role;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
 export interface IInstructor extends IInstructorDetails {
   email: string;
   role: Role;
 }
 
 export type InstructorWithToken = IInstructor & { newToken: string };
+
+// Combined user and instructor details (reused for both getInstructorByUserId and findAllInstructors)
+export interface IInstructorWithUserDetails {
+  instructor: IInstructorDetails | null;
+  user: IUserDetails;
+}
 
 export interface UpdateInstructorStatusInput {
   instructorId: string;

@@ -5,6 +5,8 @@ import { logger } from "../../utils/logger";
 import {
   CreateInstructorInput,
   IInstructorDetails,
+  IInstructorWithUserDetails,
+  IUserDetails,
   UpdateInstructorStatusInput,
 } from "./instructor.types";
 import { IInstructorRepository } from "./instructor.repository.interface";
@@ -139,22 +141,41 @@ export class InstructorRepository implements IInstructorRepository {
 
   async findInstructorByUserId(
     userId: string
-  ): Promise<IInstructorDetails | null> {
+  ): Promise<IInstructorWithUserDetails> {
     try {
       const instructorDetails = await this.prisma.instructorDetails.findFirst({
         where: { userId },
+        include: {
+          user: true,
+        },
       });
 
-      if (!instructorDetails) return null;
+      if (!instructorDetails) {
+        throw new AppError(
+          "Instructor not found",
+          StatusCodes.NOT_FOUND,
+          "NOT_FOUND"
+        );
+      }
 
       return {
-        id: instructorDetails.id,
-        areaOfExpertise: instructorDetails.areaOfExpertise,
-        professionalExperience: instructorDetails.professionalExperience,
-        about: instructorDetails.about ?? null,
-        userId: instructorDetails.userId,
-        website: instructorDetails.website ?? null,
-        status: instructorDetails.status,
+        instructor: {
+          id: instructorDetails.id,
+          areaOfExpertise: instructorDetails.areaOfExpertise,
+          professionalExperience: instructorDetails.professionalExperience,
+          about: instructorDetails.about ?? null,
+          userId: instructorDetails.userId,
+          website: instructorDetails.website ?? null,
+          status: instructorDetails.status,
+        },
+        user: {
+          id: instructorDetails.user.id,
+          email: instructorDetails.user.email,
+          name: instructorDetails.user.name ?? null,
+          role: instructorDetails.user.role,
+          createdAt: instructorDetails.user.createdAt,
+          updatedAt: instructorDetails.user.updatedAt,
+        },
       };
     } catch (error) {
       logger.error("Error finding instructor by user ID", { error, userId });
@@ -166,19 +187,41 @@ export class InstructorRepository implements IInstructorRepository {
     }
   }
 
-  async findAllInstructors(): Promise<IInstructorDetails[]> {
+  async findAllInstructors(): Promise<IInstructorWithUserDetails[]> {
     try {
-      const instructors = await this.prisma.instructorDetails.findMany();
+      // Fetch all instructor details with their associated user data
+      const instructors = await this.prisma.instructorDetails.findMany({
+        include: {
+          user: true, // Include user relation
+        },
+      });
 
-      return instructors.map((instructor) => ({
-        id: instructor.id,
-        areaOfExpertise: instructor.areaOfExpertise,
-        professionalExperience: instructor.professionalExperience,
-        about: instructor.about ?? null,
-        userId: instructor.userId,
-        website: instructor.website ?? null,
-        status: instructor.status,
-      }));
+      return instructors.map((instructor) => {
+        const user = instructor.user;
+        const userDetails: IUserDetails = {
+          id: user.id,
+          email: user.email,
+          name: user.name ?? null,
+          role: user.role,
+          createdAt: user.createdAt,
+          updatedAt: user.updatedAt,
+        };
+
+        const instructorDetails: IInstructorDetails = {
+          id: instructor.id,
+          areaOfExpertise: instructor.areaOfExpertise,
+          professionalExperience: instructor.professionalExperience,
+          about: instructor.about ?? null,
+          userId: instructor.userId,
+          website: instructor.website ?? null,
+          status: instructor.status,
+        };
+
+        return {
+          instructor: instructorDetails,
+          user: userDetails,
+        };
+      });
     } catch (error) {
       logger.error("Error fetching all instructors", { error });
       throw new AppError(

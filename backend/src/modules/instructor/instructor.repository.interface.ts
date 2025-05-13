@@ -2,6 +2,7 @@ import {
   CreateInstructorInput,
   IInstructorDetails,
   UpdateInstructorStatusInput,
+  IInstructorWithUserDetails,
 } from "./instructor.types";
 
 export interface IInstructorRepository {
@@ -10,6 +11,6 @@ export interface IInstructorRepository {
     input: UpdateInstructorStatusInput
   ): Promise<IInstructorDetails>;
   findInstructorById(instructorId: string): Promise<IInstructorDetails | null>;
-  findInstructorByUserId(userId: string): Promise<IInstructorDetails | null>;
-  findAllInstructors(): Promise<IInstructorDetails[]>;
+  findInstructorByUserId(userId: string): Promise<IInstructorWithUserDetails>;
+  findAllInstructors(): Promise<IInstructorWithUserDetails[]>; // Updated return type
 }
