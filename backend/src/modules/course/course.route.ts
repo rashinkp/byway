@@ -5,7 +5,6 @@ import { adaptCourseController } from "../../adapters/expressCourseAdapters";
 import {
   authMiddleware,
   optionalAuth,
-  protect,
 } from "../../middlewares/authMiddleware";
 
 export const createCourseRouter = (
