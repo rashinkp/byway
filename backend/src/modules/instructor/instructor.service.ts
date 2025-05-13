@@ -57,15 +57,16 @@ export class InstructorService {
     }
 
     // Check if user is already an instructor
-    const existingInstructor = await this.instructorRepository.findInstructorByUserId(userId);
-    if (existingInstructor) {
-      logger.warn("User is already registered as an instructor", { userId });
-      throw new AppError(
-        "User is already registered as an instructor",
-        StatusCodes.BAD_REQUEST,
-        "ALREADY_INSTRUCTOR"
-      );
-    }
+    // const existingInstructor =
+    //   await this.instructorRepository.findInstructorByUserId(userId);
+    // if (existingInstructor) {
+    //   logger.warn("User is already registered as an instructor", { userId });
+    //   throw new AppError(
+    //     "User is already registered as an instructor",
+    //     StatusCodes.BAD_REQUEST,
+    //     "ALREADY_INSTRUCTOR"
+    //   );
+    // }
 
     try {
       const instructorDetails =
@@ -95,6 +96,7 @@ export class InstructorService {
       return { ...instructor, newToken };
     } catch (error) {
       logger.error("Error creating instructor", { error, input });
+      console.log(error);
       throw error instanceof AppError
         ? error
         : new AppError(
@@ -182,7 +184,9 @@ export class InstructorService {
     }
 
     const { instructorId } = parsedInput.data;
-    const instructor = await this.instructorRepository.findInstructorById(instructorId);
+    const instructor = await this.instructorRepository.findInstructorById(
+      instructorId
+    );
     if (!instructor) {
       logger.warn("Instructor not found", { instructorId });
       throw new AppError(
@@ -216,6 +220,30 @@ export class InstructorService {
         ? error
         : new AppError(
             "Failed to fetch instructors",
+            StatusCodes.INTERNAL_SERVER_ERROR,
+            "INTERNAL_ERROR"
+          );
+    }
+  }
+
+  async getInstructorByUserId(
+    userId: string
+  ): Promise<IInstructorDetails | null> {
+    try {
+      const instructor = await this.instructorRepository.findInstructorByUserId(
+        userId
+      );
+      if (!instructor) {
+        logger.warn("Instructor not found for user", { userId });
+        return null;
+      }
+      return instructor;
+    } catch (error) {
+      logger.error("Error fetching instructor by user ID", { error, userId });
+      throw error instanceof AppError
+        ? error
+        : new AppError(
+            "Failed to fetch instructor",
             StatusCodes.INTERNAL_SERVER_ERROR,
             "INTERNAL_ERROR"
           );

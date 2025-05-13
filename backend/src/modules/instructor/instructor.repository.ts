@@ -19,16 +19,38 @@ export class InstructorRepository implements IInstructorRepository {
       input;
 
     try {
-      const instructorDetails = await this.prisma.instructorDetails.create({
-        data: {
-          areaOfExpertise,
-          professionalExperience,
-          about,
-          userId,
-          website,
-          status: InstructorStatus.PENDING,
-        },
+      // Check if an instructor record already exists for the user
+      const existingInstructor = await this.prisma.instructorDetails.findFirst({
+        where: { userId },
       });
+
+      let instructorDetails;
+
+      if (existingInstructor) {
+        // Update existing record
+        instructorDetails = await this.prisma.instructorDetails.update({
+          where: { id: existingInstructor.id },
+          data: {
+            areaOfExpertise,
+            professionalExperience,
+            about,
+            website,
+            status: InstructorStatus.PENDING, // Reset to PENDING for reapplication
+          },
+        });
+      } else {
+        // Create new record
+        instructorDetails = await this.prisma.instructorDetails.create({
+          data: {
+            areaOfExpertise,
+            professionalExperience,
+            about,
+            userId,
+            website,
+            status: InstructorStatus.PENDING,
+          },
+        });
+      }
 
       return {
         id: instructorDetails.id,
@@ -40,11 +62,14 @@ export class InstructorRepository implements IInstructorRepository {
         status: instructorDetails.status,
       };
     } catch (error) {
-      logger.error("Error creating instructor details", { error, input });
+      logger.error("Error creating or updating instructor details", {
+        error,
+        input,
+      });
       throw error instanceof AppError
         ? error
         : new AppError(
-            "Failed to create instructor details",
+            "Failed to create or update instructor details",
             StatusCodes.INTERNAL_SERVER_ERROR,
             "DATABASE_ERROR"
           );

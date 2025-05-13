@@ -20,7 +20,9 @@ export function useApproveInstructor() {
       return approveInstructor(instructorId);
     },
     onSuccess: (response) => {
+      // Invalidate both instructors and users queries to refetch updated data
       queryClient.invalidateQueries({ queryKey: ["instructors"] });
+      queryClient.invalidateQueries({ queryKey: ["users"] });
       toast.success("Instructor approved successfully!", {
         description: `Instructor with ID ${response.data.id} has been approved.`,
       });

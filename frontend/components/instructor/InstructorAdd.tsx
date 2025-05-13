@@ -3,6 +3,8 @@
 import { z } from "zod";
 import { FormModal } from "@/components/ui/FormModal";
 import { Path } from "react-hook-form";
+import { useGetInstructorByUserId } from "@/hooks/instructor/useGetInstructorByUserId";
+import { useAuthStore } from "@/stores/auth.store";
 
 export const instructorSchema = z.object({
   areaOfExpertise: z
@@ -37,7 +39,7 @@ const fields: {
     name: "areaOfExpertise",
     label: "Area of Expertise",
     type: "input",
-    fieldType: "text", // Add this
+    fieldType: "text",
     placeholder: "e.g., Web Development",
     description: "Specify your primary area of expertise.",
     maxLength: 100,
@@ -75,22 +77,82 @@ export function InstructorFormModal({
   initialData,
   isSubmitting,
 }: InstructorFormModalProps) {
-  return (
-    <FormModal
-      open={open}
-      onOpenChange={onOpenChange}
-      onSubmit={onSubmit}
-      schema={instructorSchema}
-      initialData={initialData}
-      title={initialData ? "Edit Instructor Profile" : "Become an Instructor"}
-      submitText="Save"
-      fields={fields}
-      description={
-        initialData
-          ? "Update your instructor profile details."
-          : "Apply to become an instructor by filling out your details."
+  const { user } = useAuthStore();
+  const { data: instructorData, isLoading: isInstructorLoading } =
+    useGetInstructorByUserId();
+
+  const renderContent = () => {
+    if (isInstructorLoading) {
+      return <div className="text-center py-4">Loading...</div>;
+    }
+
+    if (instructorData?.data) {
+      const status = instructorData.data.status;
+      if (status === "PENDING") {
+        return (
+          <div className="text-center py-4">
+            <p className="text-gray-700">
+              Your instructor application is pending verification.
+            </p>
+            <p className="text-gray-500 mt-2">
+              If you have questions, please contact{" "}
+              <a
+                href="mailto:support@example.com"
+                className="text-blue-600 hover:underline"
+              >
+                support@example.com
+              </a>
+              .
+            </p>
+          </div>
+        );
+      } else if (status === "APPROVED") {
+        return (
+          <div className="text-center py-4">
+            <p className="text-gray-700">
+              You are already an approved instructor.
+            </p>
+          </div>
+        );
+      } else if (status === "DECLINED") {
+        return (
+          <FormModal
+            open={open}
+            onOpenChange={onOpenChange}
+            onSubmit={onSubmit}
+            schema={instructorSchema}
+            initialData={initialData}
+            title="Reapply as Instructor"
+            submitText="Reapply"
+            fields={fields}
+            description="Your previous application was declined. Update your details and reapply."
+            isSubmitting={isSubmitting}
+          />
+        );
       }
-      isSubmitting={isSubmitting}
-    />
-  );
+    }
+
+    // Show form if no application exists
+    return (
+      <FormModal
+        open={open}
+        onOpenChange={onOpenChange}
+        onSubmit={onSubmit}
+        schema={instructorSchema}
+        initialData={initialData}
+        title="Become an Instructor"
+        submitText="Apply"
+        fields={fields}
+        description="Apply to become an instructor by filling out your details."
+        isSubmitting={isSubmitting}
+      />
+    );
+  };
+
+  // Only render modal if user is not an admin
+  if (user?.role === "ADMIN") {
+    return null;
+  }
+
+  return <div>{renderContent()}</div>;
 }

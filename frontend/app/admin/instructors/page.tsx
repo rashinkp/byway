@@ -55,14 +55,6 @@ export default function InstructorsPage() {
       ]}
       actions={[
         {
-          label: "Edit",
-          onClick: (instructor) => {
-            setEditInstructor(instructor);
-            setIsEditOpen(true);
-          },
-          variant: "outline",
-        },
-        {
           label: (instructor) => (instructor.deletedAt ? "Enable" : "Disable"),
           onClick: (instructor) => toggleDeleteUser(instructor),
           variant: (instructor) =>

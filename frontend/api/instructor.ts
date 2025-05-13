@@ -67,3 +67,21 @@ export const getAllInstructors = async (): Promise<
     );
   }
 };
+
+
+
+export const getInstructorByUserId = async (): Promise<
+  ApiResponse<IInstructorDetails | null>
+> => {
+  try {
+    const response = await api.get<ApiResponse<IInstructorDetails | null>>(
+      "/instructor/me"
+    );
+    return response.data;
+  } catch (error: any) {
+    console.error("Error fetching instructor by user ID:", error);
+    throw new Error(
+      error.response?.data?.message || "Failed to fetch instructor"
+    );
+  }
+};

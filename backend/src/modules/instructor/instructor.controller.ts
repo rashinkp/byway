@@ -120,4 +120,37 @@ export class InstructorController {
           );
     }
   }
+
+  async getInstructorByUserId(userId: string): Promise<ApiResponse> {
+    try {
+      const instructor = await this.instructorService.getInstructorByUserId(
+        userId
+      );
+      if (!instructor) {
+        return {
+          status: "success",
+          data: null,
+          message: "No instructor found for this user",
+          statusCode: StatusCodes.OK,
+        };
+      }
+      return {
+        status: "success",
+        data: instructor,
+        message: "Instructor fetched successfully",
+        statusCode: StatusCodes.OK,
+      };
+    } catch (error) {
+      logger.error("Error fetching instructor by user ID", { error });
+      throw error instanceof AppError
+        ? error
+        : new AppError(
+            error instanceof Error
+              ? error.message
+              : "Failed to fetch instructor",
+            StatusCodes.INTERNAL_SERVER_ERROR,
+            "INTERNAL_ERROR"
+          );
+    }
+  }
 }

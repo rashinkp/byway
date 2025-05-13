@@ -33,5 +33,12 @@ export const createInstructorRouter = (
     adapt.getAllInstructors
   );
 
+
+  instructorRouter.get(
+    "/me",
+    authMiddleware("USER"),
+    adapt.getInstructorByUserId
+  );
+
   return instructorRouter;
 };
