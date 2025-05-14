@@ -55,7 +55,7 @@ export function useGetAllCourses({
       role,
       level,
       duration,
-      price, // Add new filters to query key
+      price,
     ],
     queryFn: async () => {
       const response = await getAllCourses({

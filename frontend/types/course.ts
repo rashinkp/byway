@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { courseEditSchema } from "@/lib/validations/course";
+
 export type SortByType = "createdAt" | "name" | "updatedAt";
 
 export interface Course {
@@ -17,6 +18,7 @@ export interface Course {
   createdAt: Date;
   updatedAt: Date;
   deletedAt?: Date | null;
+  approvalStatus: "PENDING" | "APPROVED" | "DECLINED"; // New field
   details?: {
     prerequisites?: string | null;
     longDescription?: string | null;
@@ -32,7 +34,7 @@ export interface Course {
   completedLessons?: number;
   totalLessons?: number;
   lastAccessed?: string;
-  isEnrolled?:boolean
+  isEnrolled?: boolean;
 }
 
 export interface AddCourseParams {
@@ -103,4 +105,9 @@ export interface IGetEnrolledCoursesInput {
   sortOrder?: "asc" | "desc";
   search?: string;
   level?: "BEGINNER" | "MEDIUM" | "ADVANCED" | "All";
+}
+
+// New type for approve/decline operations
+export interface IUpdateCourseApprovalInput {
+  courseId: string;
 }

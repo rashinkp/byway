@@ -27,4 +27,5 @@ export type Action<T> = {
     | ((item: T) => "default" | "outline" | "destructive");
   confirmationMessage?: (item: T) => string;
   Icon?: React.ComponentType<{ className?: string }>;
+  hidden?: (item: T) => boolean; // Add optional hidden property
 };

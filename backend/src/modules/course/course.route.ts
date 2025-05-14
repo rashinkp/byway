@@ -16,8 +16,8 @@ export const createCourseRouter = (
   router.post("/enroll", authMiddleware("USER"), adapt.enrollCourse);
   router.get("/enrolled", authMiddleware("USER"), adapt.getEnrolledCourses);
 
-  router.post("/approve", adapt.approveCourse); 
-  router.post("/decline", adapt.declineCourse); 
+  router.post("/approve",authMiddleware('ADMIN'), adapt.approveCourse); 
+  router.post("/decline", authMiddleware("ADMIN"), adapt.declineCourse); 
 
   router.post("/", authMiddleware("INSTRUCTOR"), adapt.createCourse);
   router.get("/", optionalAuth, adapt.getAllCourses);
