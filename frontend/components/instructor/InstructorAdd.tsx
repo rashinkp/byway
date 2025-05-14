@@ -81,58 +81,81 @@ export function InstructorFormModal({
   const { data: instructorData, isLoading: isInstructorLoading } =
     useGetInstructorByUserId();
 
+  // Only render modal if user is not an admin
+  if (user?.role === "ADMIN") {
+    return null;
+  }
+
   const renderContent = () => {
     if (isInstructorLoading) {
-      return <div className="text-center py-4">Loading...</div>;
+      return (
+        <div className="text-center py-4">
+          <p className="text-gray-700">Loading...</p>
+        </div>
+      );
     }
 
-    if (instructorData?.data) {
-      const status = instructorData.data.status;
-      if (status === "PENDING") {
-        return (
-          <div className="text-center py-4">
-            <p className="text-gray-700">
-              Your instructor application is pending verification.
-            </p>
-            <p className="text-gray-500 mt-2">
-              If you have questions, please contact{" "}
-              <a
-                href="mailto:support@example.com"
-                className="text-blue-600 hover:underline"
-              >
-                support@example.com
-              </a>
-              .
-            </p>
-          </div>
-        );
-      } else if (status === "APPROVED") {
-        return (
-          <div className="text-center py-4">
-            <p className="text-gray-700">
-              You are already an approved instructor.
-            </p>
-          </div>
-        );
-      } else if (status === "DECLINED") {
-        return (
-          <FormModal
-            open={open}
-            onOpenChange={onOpenChange}
-            onSubmit={onSubmit}
-            schema={instructorSchema}
-            initialData={initialData}
-            title="Reapply as Instructor"
-            submitText="Reapply"
-            fields={fields}
-            description="Your previous application was declined. Update your details and reapply."
-            isSubmitting={isSubmitting}
-          />
-        );
-      }
+    const status = instructorData?.data?.instructor?.status;
+
+    if (status === "PENDING") {
+      return (
+        <div className="text-center py-4">
+          <p className="text-gray-700 font-semibold">
+            Your instructor application is pending verification.
+          </p>
+          <p className="text-gray-500 mt-2">
+            We'll notify you once your application is reviewed. For questions,
+            contact{" "}
+            <a
+              href="mailto:support@byway.com"
+              className="text-blue-600 hover:underline"
+            >
+              support@byway.com
+            </a>
+            .
+          </p>
+        </div>
+      );
     }
 
-    // Show form if no application exists
+    if (status === "APPROVED") {
+      return (
+        <div className="text-center py-4">
+          <p className="text-gray-700 font-semibold">
+            You are already an approved instructor.
+          </p>
+          <p className="text-gray-500 mt-2">
+            Start creating courses in the{" "}
+            <a
+              href="/instructor/dashboard"
+              className="text-blue-600 hover:underline"
+            >
+              Instructor Dashboard
+            </a>
+            .
+          </p>
+        </div>
+      );
+    }
+
+    if (status === "DECLINED") {
+      return (
+        <FormModal
+          open={open}
+          onOpenChange={onOpenChange}
+          onSubmit={onSubmit}
+          schema={instructorSchema}
+          initialData={initialData}
+          title="Reapply as Instructor"
+          submitText="Reapply"
+          fields={fields}
+          description="Your previous application was declined. Update your details and reapply to become an instructor."
+          isSubmitting={isSubmitting}
+        />
+      );
+    }
+
+    // No application exists, show the form for a new application
     return (
       <FormModal
         open={open}
@@ -148,11 +171,6 @@ export function InstructorFormModal({
       />
     );
   };
-
-  // Only render modal if user is not an admin
-  if (user?.role === "ADMIN") {
-    return null;
-  }
 
   return <div>{renderContent()}</div>;
 }

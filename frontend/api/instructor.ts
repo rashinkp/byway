@@ -71,12 +71,12 @@ export const getAllInstructors = async (): Promise<
 
 
 export const getInstructorByUserId = async (): Promise<
-  ApiResponse<IInstructorDetails | null>
+  ApiResponse<IInstructorWithUserDetails | null>
 > => {
   try {
-    const response = await api.get<ApiResponse<IInstructorDetails | null>>(
-      "/instructor/me"
-    );
+    const response = await api.get<
+      ApiResponse<IInstructorWithUserDetails | null>
+    >("/instructor/me");
     return response.data;
   } catch (error: any) {
     console.error("Error fetching instructor by user ID:", error);
