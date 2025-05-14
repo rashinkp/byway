@@ -25,7 +25,7 @@ interface ListPageProps<T> {
     sortBy: string;
     sortOrder: "asc" | "desc";
     includeDeleted: boolean;
-    filterBy: "All" | "Active" | "Inactive";
+    filterBy: "All" | "Active" | "Inactive" | "Declined";
     role?: string;
   }) => {
     data: { items: T[]; total: number; totalPages: number } | undefined;
@@ -65,7 +65,7 @@ function ListPage<T>({
   const [page, setPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
   const [filterStatus, setFilterStatus] = useState<
-    "All" | "Active" | "Inactive"
+    "All" | "Active" | "Inactive" | "Declined"
   >("All");
   const [sortBy, setSortBy] = useState<string>(defaultSortBy);
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
@@ -76,11 +76,10 @@ function ListPage<T>({
     search: searchTerm,
     sortBy,
     sortOrder,
-    includeDeleted: true,
+    includeDeleted: filterStatus === "Inactive" || filterStatus === "Declined",
     filterBy: filterStatus,
     role,
   });
-
 
   const items = data?.items || [];
   const total = data?.total || 0;
@@ -114,7 +113,7 @@ function ListPage<T>({
               {addButton.label}
             </Button>
           )}
-          {extraButtons}
+          {extraButtons && extraButtons.length > 0 && extraButtons}
         </div>
       </div>
 
@@ -129,7 +128,7 @@ function ListPage<T>({
         setSearchTerm={setSearchTerm}
         filterStatus={filterStatus}
         setFilterStatus={(status: string) =>
-          setFilterStatus(status as "All" | "Active" | "Inactive")
+          setFilterStatus(status as "All" | "Active" | "Inactive" | "Declined")
         }
         sortBy={sortBy}
         setSortBy={setSortBy}

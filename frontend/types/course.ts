@@ -89,7 +89,7 @@ export interface IGetAllCoursesInput {
   sortOrder?: "asc" | "desc";
   includeDeleted?: boolean;
   search?: string;
-  filterBy?: "All" | "Active" | "Draft" | "Inactive";
+  filterBy?: "All" | "Active" | "Inactive" | "Declined";
   userId?: string;
   myCourses?: boolean;
   role?: "USER" | "INSTRUCTOR" | "ADMIN";

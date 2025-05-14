@@ -10,10 +10,19 @@ import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/hooks/auth/useAuth";
 import { CourseApprovalModal } from "@/components/course/CourseApprovalModal";
-import {
-  useApproveCourse,
-  useDeclineCourse,
-} from "@/hooks/course/useApproveCourse";
+import { useApproveCourse, useDeclineCourse } from "@/hooks/course/useApproveCourse";
+
+interface CourseAction {
+  label: string | ((course: Course) => string);
+  onClick: (course: Course) => void;
+  variant:
+    | "outline"
+    | "default"
+    | "destructive"
+    | ((course: Course) => "outline" | "default" | "destructive");
+  confirmationMessage?: (course: Course) => string;
+  hidden?: (course: Course) => boolean;
+}
 
 export default function CoursesPage() {
   const { mutate: toggleDeleteCourse } = useSoftDeleteCourse();
@@ -89,19 +98,28 @@ export default function CoursesPage() {
         {
           label: "View",
           onClick: (course) => {
-            router.push(`/admin/courses/${course.id}`);
-          },
-          variant: "outline",
-        },
-        {
-          label: (course) => (course.deletedAt ? "Enable" : "Disable"),
-          onClick: (course) => toggleDeleteCourse(course),
-          variant: (course) => (course.deletedAt ? "default" : "destructive"),
-          confirmationMessage: (course) =>
-            course.deletedAt
-              ? `Are you sure you want to enable the course "${course.title}"?`
-              : `Are you sure you want to disable the course "${course.title}"?`,
-        },
+            interface CourseAction {
+              label: string | ((course: Course) => string);
+              onClick: (course: Course) => void;
+              variant: string | ((course: Course) => string);
+              confirmationMessage?: (course: Course) => string;
+              hidden?: (course: Course) => boolean;
+            }
+
+                        router.push(`/admin/courses/${course.id}`);
+                      },
+                      variant: "outline",
+                    } as CourseAction,
+                    {
+                      label: (course: Course) => (course.deletedAt ? "Enable" : "Disable"),
+                      onClick: (course: Course) => toggleDeleteCourse(course),
+                      variant: (course: Course) => (course.deletedAt ? "default" : "destructive"),
+                      confirmationMessage: (course: Course) =>
+                        course.deletedAt
+                          ? `Are you sure you want to enable the course "${course.title}"?`
+                          : `Are you sure you want to disable the course "${course.title}"?`,
+                    } as CourseAction,
+                    
       ]}
       extraButtons={
         isAdmin ? [<CourseApprovalModal key="course-approval-modal" />] : []
@@ -123,6 +141,13 @@ export default function CoursesPage() {
           value: courses.filter((course) => course.approvalStatus === "PENDING")
             .length,
           color: "text-yellow-600",
+        },
+        {
+          title: "Declined Courses",
+          value: courses.filter(
+            (course) => course.approvalStatus === "DECLINED"
+          ).length,
+          color: "text-red-600",
         },
       ]}
       sortOptions={[
