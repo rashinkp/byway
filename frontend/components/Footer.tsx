@@ -3,7 +3,7 @@ import {  Facebook, Twitter, Instagram, Linkedin } from "lucide-react";
 
 const BywayFooter = () => {
   return (
-    <footer className="bg-black text-white py-12 px-4">
+    <footer className="bg-black text-white py-12 px-4 z-50 relative mt-auto ">
       <div className="container mx-auto flex flex-col md:flex-row justify-between items-center max-w-6xl">
         {/* Logo and Tagline */}
         <div className="text-center md:text-left mb-6 md:mb-0">
