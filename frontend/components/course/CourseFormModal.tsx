@@ -226,7 +226,7 @@ export function CourseFormModal({
         thumbnailUrl = uploadResult.secure_url;
         setThumbnailUploadStatus(FileUploadStatus.SUCCESS);
       } else {
-        thumbnailUrl = data.thumbnail; // Use existing URL if provided
+        // thumbnailUrl = data.thumbnail; // Use existing URL if provided
       }
 
       // Prepare data for submission

@@ -3,8 +3,11 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "npx ts-node-dev --respawn src/server.ts"
+    "start": "node dist/presentation/express/settings/server.js",
+    "dev": "nodemon src/presentation/express/settings/server.ts",
+    "build": "tsc",
+    "lint": "eslint . --ext .ts",
+    "test": "jest"
   },
   "keywords": [],
   "author": "",

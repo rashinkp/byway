@@ -11,6 +11,7 @@ import { useGetAllCourses } from "@/hooks/course/useGetAllCourse";
 export default function CoursesPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const router = useRouter();
+  
 
   return (
     <>
