@@ -2,10 +2,10 @@ import { Request, Response } from "express";
 import { LoginUseCase } from "../../../app/usecases/auth/login.usecase";
 import { RegisterUseCase } from "../../../app/usecases/auth/register.usecase";
 import { VerifyOtpUseCase } from "../../../app/usecases/auth/verify-otp.usecase";
-import { RegisterDto } from "../../../domain/dtos/auth/register.dto";
-import { VerifyOtpDto } from "../../../domain/dtos/auth/verify-otp.dto";
-import { HttpSuccess } from "../utils/HttpSuccess";
 import { LoginDto } from "../../../domain/dtos/auth/login.dto";
+import { RegisterDto } from "../../../domain/dtos/auth/register.dto";
+import { HttpSuccess } from "../utils/HttpSuccess";
+import { HttpError } from "../utils/HttpErrors";
 
 export class AuthController {
   constructor(
@@ -16,6 +16,13 @@ export class AuthController {
 
   async login(req: Request, res: Response): Promise<void> {
     const dto: LoginDto = req.body;
+    // Basic validation
+    if (!dto.email || typeof dto.email !== "string") {
+      throw new HttpError("Email is required and must be a string", 400);
+    }
+    if (dto.authProvider === "EMAIL_PASSWORD" && !dto.password) {
+      throw new HttpError("Password is required for email/password login", 400);
+    }
     const result = await this.loginUseCase.execute(dto);
     res
       .status(200)
@@ -24,12 +31,31 @@ export class AuthController {
 
   async register(req: Request, res: Response): Promise<void> {
     const dto: RegisterDto = req.body;
+    // Basic validation
+    if (!dto.name || typeof dto.name !== "string") {
+      throw new HttpError("Name is required and must be a string", 400);
+    }
+    if (!dto.email || typeof dto.email !== "string") {
+      throw new HttpError("Email is required and must be a string", 400);
+    }
     const user = await this.registerUseCase.execute(dto);
     res.status(201).json(new HttpSuccess({ user }));
   }
 
   async verifyOtp(req: Request, res: Response): Promise<void> {
-    const dto: VerifyOtpDto = req.body;
+    const dto = req.body;
+    if (!dto.email || typeof dto.email !== "string" || !dto.email.trim()) {
+      throw new HttpError(
+        "Email is required and must be a non-empty string",
+        400
+      );
+    }
+    if (!dto.otp || typeof dto.otp !== "string" || !dto.otp.trim()) {
+      throw new HttpError(
+        "OTP is required and must be a non-empty string",
+        400
+      );
+    }
     await this.verifyOtpUseCase.execute(dto);
     res
       .status(200)

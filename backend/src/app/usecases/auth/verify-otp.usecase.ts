@@ -1,11 +1,28 @@
-import { VerifyOtpDto } from "../../../domain/dtos/auth/verify-otp.dto";
 import { IAuthRepository } from "../../repositories/auth.repository";
 import { HttpError } from "../../../presentation/http/utils/HttpErrors";
+
+export interface VerifyOtpDto {
+  email: string;
+  otp: string;
+}
 
 export class VerifyOtpUseCase {
   constructor(private authRepository: IAuthRepository) {}
 
   async execute(dto: VerifyOtpDto): Promise<void> {
+    if (!dto.email || typeof dto.email !== "string" || !dto.email.trim()) {
+      throw new HttpError(
+        "Email is required and must be a non-empty string",
+        400
+      );
+    }
+    if (!dto.otp || typeof dto.otp !== "string" || !dto.otp.trim()) {
+      throw new HttpError(
+        "OTP is required and must be a non-empty string",
+        400
+      );
+    }
+
     const verification = await this.authRepository.findVerificationByEmail(
       dto.email
     );
