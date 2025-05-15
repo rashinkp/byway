@@ -13,13 +13,14 @@ const logger = new WinstonLogger();
 const databaseProvider = new PrismaDatabaseProvider(logger);
 const authRepository = new AuthRepository(databaseProvider.getClient());
 const jwtProvider = new JwtProvider();
-const loginUseCase = new LoginUseCase(authRepository, jwtProvider);
+const loginUseCase = new LoginUseCase(authRepository);
 const registerUseCase = new RegisterUseCase(authRepository);
 const verifyOtpUseCase = new VerifyOtpUseCase(authRepository);
 const authController = new AuthController(
   loginUseCase,
   registerUseCase,
-  verifyOtpUseCase
+  verifyOtpUseCase,
+  jwtProvider,
 );
 
 router.post("/login", (req, res) =>

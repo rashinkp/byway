@@ -1,18 +1,13 @@
-
 import { User } from "../../../domain/entities/user";
 import { IAuthRepository } from "../../repositories/auth.repository";
-import { IJwtProvider } from "../../../infra/providers/auth/jwt.provider";
 import { HttpError } from "../../../presentation/http/utils/HttpErrors";
 import * as bcrypt from "bcrypt";
 import { LoginDto } from "../../../domain/dtos/auth/login.dto";
 
 export class LoginUseCase {
-  constructor(
-    private authRepository: IAuthRepository,
-    private jwtProvider: IJwtProvider
-  ) {}
+  constructor(private authRepository: IAuthRepository) {}
 
-  async execute(dto: LoginDto): Promise<{ user: User; token: string }> {
+  async execute(dto: LoginDto): Promise<User> {
     let user: User | null;
 
     if (dto.authProvider === "GOOGLE") {
@@ -40,12 +35,6 @@ export class LoginUseCase {
       throw new HttpError("Email not verified", 403);
     }
 
-    const token = this.jwtProvider.sign({
-      id: user.id,
-      email: user.email,
-      role: user.role,
-    });
-
-    return { user, token };
+    return user;
   }
 }
