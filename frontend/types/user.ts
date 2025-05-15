@@ -1,7 +1,7 @@
 // types/profile.ts
 
 export type GenderType = "MALE" | "FEMALE" | "OTHER" | undefined;
-export type UserRoleType = "USER" | "INSTRUCTOR" | "ADMIN";
+export type UserRoleType = "LEARNER" | "TUTOR" | "ADMIN";
 
 export interface ProfileTabType {
   id: string;
