@@ -14,16 +14,12 @@ export class ResetPasswordUseCase {
       throw new HttpError("Invalid or expired reset token", 404);
     }
 
-    if (verification.isUsed) {
+    if (!verification.isUsed) {
       throw new HttpError("Reset token already used", 400);
     }
 
     if (verification.expiresAt < new Date()) {
       throw new HttpError("Reset token expired", 400);
-    }
-
-    if (verification.otp !== dto.token) {
-      throw new HttpError("Invalid reset token", 400);
     }
 
     const user = await this.authRepository.findUserByEmail(dto.email);

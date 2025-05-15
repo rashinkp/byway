@@ -94,6 +94,7 @@ export class AuthRepository implements IAuthRepository {
   async createVerification(
     verification: UserVerification
   ): Promise<UserVerification> {
+
     const created = await this.prisma.userVerification.upsert({
       where: { email: verification.email },
       update: {

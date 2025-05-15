@@ -18,11 +18,8 @@ export class OtpProvider implements OtpProvider {
     userId: string,
     type: "VERIFICATION" | "RESET"
   ): Promise<UserVerification> {
-    // Generate 6-digit OTP or reset token
-    const otp =
-      type === "VERIFICATION"
-        ? Math.floor(100000 + Math.random() * 900000).toString()
-        : uuidv4().slice(0, 8); 
+    // Generate 6-digit numeric OTP for both verification and reset
+    const otp = Math.floor(100000 + Math.random() * 900000).toString(); // 6-digit (e.g., "123456")
 
     const verification = new UserVerification(
       uuidv4(),
@@ -35,8 +32,7 @@ export class OtpProvider implements OtpProvider {
       new Date()
     );
 
-    // Delete existing verifications for the user to avoid duplicates
-    // await this.authRepository.deleteVerificationsByEmail(email);
+
     await this.authRepository.createVerification(verification);
 
     return verification;

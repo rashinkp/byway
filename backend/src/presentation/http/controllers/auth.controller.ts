@@ -122,12 +122,6 @@ export class AuthController {
         400
       );
     }
-    if (!dto.token || typeof dto.token !== "string" || !dto.token.trim()) {
-      throw new HttpError(
-        "Token is required and must be a non-empty string",
-        400
-      );
-    }
     if (
       !dto.newPassword ||
       typeof dto.newPassword !== "string" ||
