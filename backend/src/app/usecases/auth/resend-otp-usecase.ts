@@ -14,9 +14,6 @@ export class ResendOtpUseCase {
     if (!user) {
       throw new HttpError("User not found", 404);
     }
-    if (user.isVerified) {
-      throw new HttpError("User already verified", 400);
-    }
 
     const verification = await this.otpProvider.generateOtp(
       user.email,
