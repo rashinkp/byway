@@ -39,7 +39,7 @@ export class AuthRepository implements IAuthRepository {
         facebookId: user.facebookId,
         role: user.role,
         authProvider: user.authProvider,
-        isVerified: user.isVerified, 
+        isVerified: user.isVerified,
         avatar: user.avatar,
         deletedAt: user.deletedAt,
         createdAt: user.createdAt,
@@ -52,8 +52,18 @@ export class AuthRepository implements IAuthRepository {
   async createVerification(
     verification: UserVerification
   ): Promise<UserVerification> {
-    const created = await this.prisma.userVerification.create({
-      data: {
+    const created = await this.prisma.userVerification.upsert({
+      where: { email: verification.email },
+      update: {
+        id: verification.id,
+        userId: verification.userId,
+        otp: verification.otp,
+        expiresAt: verification.expiresAt,
+        attemptCount: verification.attempts,
+        isUsed: verification.isUsed,
+        createdAt: verification.createdAt,
+      },
+      create: {
         id: verification.id,
         userId: verification.userId,
         email: verification.email,

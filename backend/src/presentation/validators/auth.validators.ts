@@ -97,6 +97,7 @@ export function validateResetPassword(data: unknown): ResetPasswordDto {
 const verifyOtpSchema = z.object({
   email: z.string().email("Invalid email address"),
   otp: z.string().min(1, "OTP is required"),
+  type:z.string(),
 });
 
 export function validateVerifyOtp(data: unknown): VerifyOtpDto {

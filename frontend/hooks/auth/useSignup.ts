@@ -18,7 +18,7 @@ export function useSignup() {
       password: string;
     }) => signup({ name, email, password }),
     onSuccess: (data) => {
-      const userEmail = data?.data?.user?.email;
+      const userEmail = data?.data?.email;
       console.log("Signup response:", data);
       if (userEmail) {
         setEmail(userEmail);

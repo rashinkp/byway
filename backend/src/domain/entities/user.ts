@@ -2,7 +2,6 @@ import { AuthProvider } from "../enum/auth-provider.enum";
 import { Role } from "../enum/role.enum";
 import { Email } from "../value-object/email";
 
-
 // Interface for User creation DTO
 interface ICreateUserRequestDTO {
   name: string;
@@ -272,9 +271,6 @@ export class User {
 
   // Method to change password
   changePassword(newPassword: string): void {
-    if (this._authProvider !== AuthProvider.EMAIL_PASSWORD) {
-      throw new Error("Cannot change password for non-email users");
-    }
     if (!newPassword || newPassword.trim() === "") {
       throw new Error("Password cannot be empty");
     }

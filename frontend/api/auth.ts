@@ -2,8 +2,11 @@ import { api } from "@/api/api";
 import { User } from "@/types/user";
 
 interface ApiResponse<T> {
+  statusCode: number;
+  success: boolean;
+  message: string;
   data: T;
-  message?: string;
+  error?: string;
 }
 
 interface SignupData {
@@ -20,15 +23,12 @@ interface FacebookAuthRequest {
   picture?: string;
 }
 
-export async function signup(data: SignupData) {
+export async function signup(data: SignupData): Promise<ApiResponse<User>> {
   try {
-    const response = await api.post<ApiResponse<{ user: User }>>(
-      "/auth/register",
-      data
-    );
+    const response = await api.post<ApiResponse<User>>("/auth/register", data);
     return response.data;
   } catch (error: any) {
-    throw new Error(error.response?.data?.message || "Signup failed");
+    throw new Error(error.response?.data?.error || "Signup failed");
   }
 }
 
@@ -63,16 +63,16 @@ export async function verifyOtp(
   otp: string,
   email: string,
   type: "signup" | "password-reset" = "signup"
-): Promise<User> {
+): Promise<ApiResponse<User>> {
   try {
     const response = await api.post<ApiResponse<User>>("/auth/verify-otp", {
       otp,
       email,
       type,
     });
-    return response.data.data;
+    return response.data;
   } catch (error: any) {
-    throw new Error(error.response?.data?.message || "OTP verification failed");
+    throw new Error(error.response?.data?.error || "OTP verification failed");
   }
 }
 

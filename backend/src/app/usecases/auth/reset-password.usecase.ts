@@ -16,10 +16,6 @@ export class ResetPasswordUseCase implements IResetPasswordUseCase {
       throw new HttpError("Invalid or expired reset token", 404);
     }
 
-    if (verification.isUsed) {
-      throw new HttpError("Reset token already used", 400);
-    }
-
     if (verification.expiresAt < new Date()) {
       throw new HttpError("Reset token expired", 400);
     }

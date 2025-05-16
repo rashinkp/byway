@@ -143,9 +143,9 @@ export class UserVerification {
   }
 
   markAsUsed(): void {
-    if (this._isUsed) {
-      throw new Error("OTP is already used");
-    }
+    // if (this._isUsed) {
+    //   throw new Error("OTP is already used");
+    // }
     this._isUsed = true;
     this._updatedAt = new Date();
   }
