@@ -16,7 +16,7 @@ model User {
   googleId          String?         @unique
   facebookId        String?         @unique
   avatar            String?  
-  role              Role            @default(LEARNER)
+  role              Role            @default(USER)
   authProvider      AuthProvider    @default(EMAIL_PASSWORD)
   isVerified        Boolean         @default(false)
   deletedAt         DateTime?  
@@ -105,8 +105,8 @@ enum APPROVALSTATUS {
 
 enum Role {
   ADMIN
-  TUTOR
-  LEARNER
+  INSTRUCTOR
+  USER
 }
 enum AuthProvider {
   EMAIL_PASSWORD

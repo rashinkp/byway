@@ -32,8 +32,8 @@ export async function middleware(request: NextRequest) {
     if (user) {
       const roleRedirects: Record<string, string> = {
         ADMIN: "/admin/dashboard",
-        TUTOR: "/instructor/dashboard",
-        LEARNER: "/",
+        INSTRUCTOR: "/instructor/dashboard",
+        USER: "/",
       };
       const redirectPath = roleRedirects[user.role] || "/";
       return NextResponse.redirect(new URL(redirectPath, request.url));
@@ -68,7 +68,7 @@ export async function middleware(request: NextRequest) {
       return NextResponse.redirect(new URL("/login", request.url));
     }
 
-    if (pathname.startsWith("/instructor") && role !== "TUTOR") {
+    if (pathname.startsWith("/instructor") && role !== "INSTRUCTOR") {
       return NextResponse.redirect(new URL("/login", request.url));
     }
   }

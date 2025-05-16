@@ -30,7 +30,7 @@ export class GoogleAuthUseCase {
         undefined, // No password for Google auth
         googleUser.googleId,
         undefined,
-        Role.LEARNER, // Default role, adjust as needed
+        Role.USER, // Default role, adjust as needed
         true, // Google users are verified by default
         new Date(),
         new Date(),

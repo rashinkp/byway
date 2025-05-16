@@ -90,7 +90,7 @@ router.post("/facebook", (req, res, next) =>
 // Protected routes
 router.post(
   "/logout",
-  restrictTo("ADMIN", "TUTOR", "LEARNER"),
+  restrictTo("ADMIN", "INSTRUCTOR", "USER"),
   (req, res, next) => authController.logout(req, res).catch(next)
 );
 

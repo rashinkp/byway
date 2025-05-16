@@ -9,7 +9,7 @@ export class User {
     public password?: string,
     public googleId?: string,
     public facebookId?: string,
-    public role: Role = Role.LEARNER,
+    public role: Role = Role.USER,
     public isVerified: boolean = false,
     public createdAt: Date = new Date(),
     public updatedAt: Date = new Date(),

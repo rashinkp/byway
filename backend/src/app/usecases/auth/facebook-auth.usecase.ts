@@ -24,7 +24,7 @@ export class FacebookAuthUseCase {
         undefined, // No password
         undefined, // No googleId
         userId, // facebookId
-        Role.LEARNER, // Default role
+        Role.USER, // Default role
         true, // Verified by default
         new Date(),
         new Date(),
