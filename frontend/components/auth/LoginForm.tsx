@@ -41,7 +41,7 @@ export function LoginForm() {
       { email: data.email, password: data.password },
       {
         onSuccess: (user) => {
-          redirectByRole(user.data.role);
+          redirectByRole(user.role);
         },
       }
     );

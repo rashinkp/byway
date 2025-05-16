@@ -17,6 +17,8 @@ import { optionalAuth, restrictTo } from "../middlewares/auth.middleware";
 import { GoogleAuthProvider } from "../../../infra/providers/auth/google-auth.provider";
 import { GoogleAuthUseCase } from "../../../app/usecases/auth/google-auth.usecase";
 
+import { FacebookAuthUseCase } from "../../../app/usecases/auth/facebook-auth.usecase";
+
 const router = Router();
 const logger = new WinstonLogger();
 const databaseProvider = new PrismaDatabaseProvider(logger);
@@ -39,7 +41,10 @@ const googleAuthProvider = new GoogleAuthProvider(
 const googleAuthUseCase = new GoogleAuthUseCase(
   authRepository,
   googleAuthProvider
-); // Fix: Add authRepository
+)
+const facebookAuthUseCase = new FacebookAuthUseCase(
+  authRepository,
+);
 
 const authController = new AuthController(
   loginUseCase,
@@ -49,7 +54,8 @@ const authController = new AuthController(
   resendOtpUseCase,
   forgotPasswordUseCase,
   resetPasswordUseCase,
-  googleAuthUseCase, // Add this
+  googleAuthUseCase,
+  facebookAuthUseCase,
   jwtProvider
 );
 
@@ -75,6 +81,10 @@ router.post("/reset-password", (req, res, next) =>
 router.post(
   "/google",
   (req, res, next) => authController.googleAuth(req, res).catch(next) 
+);
+
+router.post("/facebook", (req, res, next) =>
+  authController.facebookAuth(req, res).catch(next)
 );
 
 // Protected routes

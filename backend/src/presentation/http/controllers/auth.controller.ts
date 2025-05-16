@@ -17,6 +17,8 @@ import { cookieConfig } from "../../express/configs/cookie.config";
 import { ResetPasswordDto } from "../../../domain/dtos/auth/reset-password.dto";
 import { GoogleAuthDto } from "../../../domain/dtos/auth/googel-auth.dto";
 import { GoogleAuthUseCase } from "../../../app/usecases/auth/google-auth.usecase";
+import { FacebookAuthDto } from "../../../domain/dtos/auth/facebook-auth.dto";
+import { FacebookAuthUseCase } from "../../../app/usecases/auth/facebook-auth.usecase";
 
 export class AuthController {
   constructor(
@@ -28,7 +30,8 @@ export class AuthController {
     private forgotPasswordUseCase: ForgotPasswordUseCase,
     private resetPasswordUseCase: ResetPasswordUseCase,
     private googleAuthUseCase: GoogleAuthUseCase,
-    private jwtProvider: JwtProvider
+    private facebookAuthUseCase : FacebookAuthUseCase,
+    private jwtProvider: JwtProvider,
   ) {}
 
   async login(req: Request, res: Response): Promise<void> {
@@ -148,6 +151,30 @@ export class AuthController {
       throw new HttpError("Access token is required and must be a string", 400);
     }
     const user = await this.googleAuthUseCase.execute(dto.accessToken);
+    const token = this.jwtProvider.sign({
+      id: user.id,
+      email: user.email,
+      role: user.role,
+    });
+    res.cookie("jwt", token, cookieConfig.options);
+    res.status(200).json(new HttpSuccess({ user }));
+  }
+
+  async facebookAuth(req: Request, res: Response): Promise<void> {
+    const dto: FacebookAuthDto = req.body;
+    if (!dto.accessToken || typeof dto.accessToken !== "string") {
+      throw new HttpError("Access token is required and must be a string", 400);
+    }
+    if (!dto.userId || typeof dto.userId !== "string") {
+      throw new HttpError("User ID is required and must be a string", 400);
+    }
+    const user = await this.facebookAuthUseCase.execute({
+      accessToken: dto.accessToken,
+      userId: dto.userId,
+      name: dto.name,
+      email: dto.email,
+      picture:dto.picture
+    });
     const token = this.jwtProvider.sign({
       id: user.id,
       email: user.email,
