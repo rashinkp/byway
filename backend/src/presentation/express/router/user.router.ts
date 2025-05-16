@@ -20,12 +20,12 @@ export function userRouter(userController: UserController): Router {
 
   // User routes
   router.get(
-    "/users/me",
+    "/me",
     restrictTo("USER", "INSTRUCTOR", "ADMIN"),
     userController.getCurrentUser.bind(userController)
   );
   router.get(
-    "/users/:userId",
+    "/:userId",
     restrictTo("USER", "INSTRUCTOR", "ADMIN"),
     userController.getUserById.bind(userController)
   );
@@ -35,7 +35,7 @@ export function userRouter(userController: UserController): Router {
     userController.updateUser.bind(userController)
   );
   router.get(
-    "/users/:userId/public",
+    "/:userId/public",
     optionalAuth,
     userController.getPublicUser.bind(userController)
   );

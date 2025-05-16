@@ -51,7 +51,7 @@ export class AuthController {
     user: { id: string; email: string; role: string }
   ): void {
     const token = this.generateToken(user);
-    res.cookie("auth_token", token, {
+    res.cookie("jwt", token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "strict",
@@ -156,7 +156,7 @@ export class AuthController {
   async logout(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       await this.logoutUseCase.execute();
-      res.clearCookie("auth_token", {
+      res.clearCookie("jwt", {
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
         sameSite: "strict",

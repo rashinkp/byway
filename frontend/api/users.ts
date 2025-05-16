@@ -59,7 +59,7 @@ export async function recoverUser(id: string): Promise<void> {
 
 export async function getUserData(): Promise<User> {
   try {
-    const response = await api.get(`/user/users/me`);
+    const response = await api.get(`/user/me`);
     return response.data.data;
   } catch (error: any) {
     throw new Error(error.response?.data?.error || "Failed to get user data");

@@ -117,7 +117,7 @@ export async function resetPassword(
 
 export async function getCurrentUser(): Promise<User | null> {
   try {
-    const response = await api.get<ApiResponse<User>>("/auth/me");
+    const response = await api.get<ApiResponse<User>>("/user/me");
     return response.data.data;
   } catch (error: any) {
     if (error.response?.status === 401) {
@@ -141,7 +141,7 @@ export async function getCurrentUserServer(
   cookies: string
 ): Promise<User | null> {
   try {
-    const response = await api.get<ApiResponse<User>>("/auth/me", {
+    const response = await api.get<ApiResponse<User>>("/user/me", {
       headers: {
         Cookie: cookies,
       },
