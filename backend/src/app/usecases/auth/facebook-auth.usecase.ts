@@ -1,10 +1,13 @@
 import { User } from "../../../domain/entities/user";
 import { IAuthRepository } from "../../repositories/auth.repository";
-import { Role } from "../../../domain/enum/role.enum";
-import { v4 as uuidv4 } from "uuid";
+import { IUpdateUserRequestDTO } from "../../../domain/entities/user";
+import { IFacebookAuthUseCase } from "./interfaces/facebook-auth.usecase.interface";
 import { FacebookAuthDto } from "../../../domain/dtos/auth/facebook-auth.dto";
+import { AuthProvider } from "../../../domain/enum/auth-provider.enum";
+import { Role } from "../../../domain/enum/role.enum";
+import { HttpError } from "../../../presentation/http/utils/HttpErrors";
 
-export class FacebookAuthUseCase {
+export class FacebookAuthUseCase implements IFacebookAuthUseCase {
   constructor(private authRepository: IAuthRepository) {}
 
   async execute(dto: FacebookAuthDto): Promise<User> {
@@ -15,43 +18,38 @@ export class FacebookAuthUseCase {
 
     let user = await this.authRepository.findUserByEmail(userEmail);
 
-    if (!user) {
-      // Create new user
-      user = new User(
-        uuidv4(),
-        name,
-        userEmail,
-        undefined, // No password
-        undefined, // No googleId
-        userId, // facebookId
-        Role.USER, // Default role
-        true, // Verified by default
-        new Date(),
-        new Date(),
-        picture // profileImage
-      );
-      await this.authRepository.createUser(user);
-    } else {
-      // Update existing user (verified or not)
-      const updates: Partial<User> = {
+    try {
+      if (!user) {
+        // Create new user
+        user = User.create({
+          name,
+          email: userEmail,
+          facebookId: userId,
+          role: Role.USER,
+          authProvider: AuthProvider.FACEBOOK,
+          avatar: picture,
+        });
+        user.verifyEmail(); // Facebook users are verified by default
+        return await this.authRepository.createUser(user);
+      }
+
+      // Update existing user
+      const updates: IUpdateUserRequestDTO = {
+        id: user.id,
         facebookId: userId,
         avatar: picture,
-        updatedAt: new Date(),
+        isVerified: true,
       };
-
-      // Optionally update name if different
       if (name && name !== user.name) {
         updates.name = name;
       }
-
-      user = {
-        ...user,
-        ...updates,
-        isVerified: true,
-      };
-      await this.authRepository.updateUser(user);
+      user = User.update(user, updates);
+      return await this.authRepository.updateUser(user);
+    } catch (error) {
+      if (error instanceof Error) {
+        throw new HttpError(error.message, 400);
+      }
+      throw new HttpError("Failed to process Facebook authentication", 500);
     }
-
-    return user;
   }
 }

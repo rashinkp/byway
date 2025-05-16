@@ -1,186 +1,178 @@
-import { Request, Response } from "express";
-import { LoginUseCase } from "../../../app/usecases/auth/login.usecase";
-import { RegisterUseCase } from "../../../app/usecases/auth/register.usecase";
-import { VerifyOtpUseCase } from "../../../app/usecases/auth/verify-otp.usecase";
-import { LogoutUseCase } from "../../../app/usecases/auth/logout.usecase";
-import { ResetPasswordUseCase } from "../../../app/usecases/auth/reset-password.usecase";
-import { LoginDto } from "../../../domain/dtos/auth/login.dto";
-import { RegisterDto } from "../../../domain/dtos/auth/register.dto";
-import { ResendOtpDto } from "../../../domain/dtos/auth/resend-otp.dto";
-import { ForgotPasswordDto } from "../../../domain/dtos/auth/forgot-password.dto";
-import { JwtProvider } from "../../../infra/providers/auth/jwt.provider";
-import { HttpSuccess } from "../utils/HttpSuccess";
-import { HttpError } from "../utils/HttpErrors";
-import { ResendOtpUseCase } from "../../../app/usecases/auth/resend-otp-usecase";
-import { ForgotPasswordUseCase } from "../../../app/usecases/auth/forgot-passowrd.usecase";
-import { cookieConfig } from "../../express/configs/cookie.config";
-import { ResetPasswordDto } from "../../../domain/dtos/auth/reset-password.dto";
-import { GoogleAuthDto } from "../../../domain/dtos/auth/googel-auth.dto";
-import { GoogleAuthUseCase } from "../../../app/usecases/auth/google-auth.usecase";
-import { FacebookAuthDto } from "../../../domain/dtos/auth/facebook-auth.dto";
-import { FacebookAuthUseCase } from "../../../app/usecases/auth/facebook-auth.usecase";
+import { Request, Response, NextFunction } from "express";
+import { IFacebookAuthUseCase } from "../../../app/usecases/auth/interfaces/facebook-auth.usecase.interface";
+import { IForgotPasswordUseCase } from "../../../app/usecases/auth/interfaces/forgot-passowrd.usecase.interface";
+import { IGoogleAuthUseCase } from "../../../app/usecases/auth/interfaces/google-auth.usecase.interface";
+import { ILoginUseCase } from "../../../app/usecases/auth/interfaces/login.usecase.interface";
+import { ILogoutUseCase } from "../../../app/usecases/auth/interfaces/logout.usecase.interface";
+import { IRegisterUseCase } from "../../../app/usecases/auth/interfaces/register.usecase.interface";
+import { IResendOtpUseCase } from "../../../app/usecases/auth/interfaces/resend-otp.usecase.interface";
+import { IResetPasswordUseCase } from "../../../app/usecases/auth/interfaces/reset-password.usecase.interface";
+import { IVerifyOtpUseCase } from "../../../app/usecases/auth/interfaces/verify-otp.usecase.interface";
+import { validateFacebookAuth, validateForgotPassword, validateGoogleAuth, validateLogin, validateRegister, validateResendOtp, validateResetPassword, validateVerifyOtp } from "../../validators/auth.validators";
 
 export class AuthController {
   constructor(
-    private loginUseCase: LoginUseCase,
-    private registerUseCase: RegisterUseCase,
-    private verifyOtpUseCase: VerifyOtpUseCase,
-    private logoutUseCase: LogoutUseCase,
-    private resendOtpUseCase: ResendOtpUseCase,
-    private forgotPasswordUseCase: ForgotPasswordUseCase,
-    private resetPasswordUseCase: ResetPasswordUseCase,
-    private googleAuthUseCase: GoogleAuthUseCase,
-    private facebookAuthUseCase : FacebookAuthUseCase,
-    private jwtProvider: JwtProvider,
+    private facebookAuthUseCase: IFacebookAuthUseCase,
+    private forgotPasswordUseCase: IForgotPasswordUseCase,
+    private googleAuthUseCase: IGoogleAuthUseCase,
+    private loginUseCase: ILoginUseCase,
+    private logoutUseCase: ILogoutUseCase,
+    private registerUseCase: IRegisterUseCase,
+    private resendOtpUseCase: IResendOtpUseCase,
+    private resetPasswordUseCase: IResetPasswordUseCase,
+    private verifyOtpUseCase: IVerifyOtpUseCase
   ) {}
 
-  async login(req: Request, res: Response): Promise<void> {
-    const dto: LoginDto = req.body;
-    if (!dto.email || typeof dto.email !== "string") {
-      throw new HttpError("Email is required and must be a string", 400);
+  async facebookAuth(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> {
+    try {
+      const validated = validateFacebookAuth(req.body);
+      const user = await this.facebookAuthUseCase.execute(validated);
+      res
+        .status(200)
+        .json({
+          user: {
+            id: user.id,
+            name: user.name,
+            email: user.email,
+            role: user.role,
+          },
+        });
+    } catch (error) {
+      next(error);
     }
-    if (dto.authProvider === "EMAIL_PASSWORD" && !dto.password) {
-      throw new HttpError("Password is required for email/password login", 400);
-    }
-    const user = await this.loginUseCase.execute(dto);
-    const token = this.jwtProvider.sign({
-      id: user.id,
-      email: user.email,
-      role: user.role,
-    });
-    res.cookie("jwt", token, cookieConfig.options);
-    res.status(200).json(new HttpSuccess({ user }));
   }
 
-  async register(req: Request, res: Response): Promise<void> {
-    const dto: RegisterDto = req.body;
-    if (!dto.name || typeof dto.name !== "string") {
-      throw new HttpError("Name is required and must be a string", 400);
+  async forgotPassword(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> {
+    try {
+      const validated = validateForgotPassword(req.body);
+      await this.forgotPasswordUseCase.execute(validated);
+      res.status(200).json({ message: "Password reset OTP sent" });
+    } catch (error) {
+      next(error);
     }
-    if (!dto.email || typeof dto.email !== "string") {
-      throw new HttpError("Email is required and must be a string", 400);
-    }
-    const user = await this.registerUseCase.execute(dto);
-    res.status(201).json(new HttpSuccess({ user }));
   }
 
-  async verifyOtp(req: Request, res: Response): Promise<void> {
-    const dto = req.body;
-    if (!dto.email || typeof dto.email !== "string" || !dto.email.trim()) {
-      throw new HttpError(
-        "Email is required and must be a non-empty string",
-        400
-      );
+  async googleAuth(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> {
+    try {
+      const validated = validateGoogleAuth(req.body);
+      const user = await this.googleAuthUseCase.execute(validated.accessToken);
+      res
+        .status(200)
+        .json({
+          user: {
+            id: user.id,
+            name: user.name,
+            email: user.email,
+            role: user.role,
+          },
+        });
+    } catch (error) {
+      next(error);
     }
-    if (!dto.otp || typeof dto.otp !== "string" || !dto.otp.trim()) {
-      throw new HttpError(
-        "OTP is required and must be a non-empty string",
-        400
-      );
-    }
-    await this.verifyOtpUseCase.execute(dto);
-    res
-      .status(200)
-      .json(new HttpSuccess({ message: "Email verified successfully" }));
   }
 
-  async logout(req: Request, res: Response): Promise<void> {
-    await this.logoutUseCase.execute();
-    res.cookie("jwt", "", { ...cookieConfig.options, maxAge: 0 });
-    res
-      .status(200)
-      .json(new HttpSuccess({ message: "Logged out successfully" }));
+  async login(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const validated = validateLogin(req.body);
+      const user = await this.loginUseCase.execute(validated);
+      res
+        .status(200)
+        .json({
+          user: {
+            id: user.id,
+            name: user.name,
+            email: user.email,
+            role: user.role,
+          },
+        });
+    } catch (error) {
+      next(error);
+    }
   }
 
-  async resendOtp(req: Request, res: Response): Promise<void> {
-    const dto: ResendOtpDto = req.body;
-    if (!dto.email || typeof dto.email !== "string" || !dto.email.trim()) {
-      throw new HttpError(
-        "Email is required and must be a non-empty string",
-        400
-      );
+  async logout(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      await this.logoutUseCase.execute();
+      res.status(200).json({ message: "Logged out successfully" });
+    } catch (error) {
+      next(error);
     }
-    await this.resendOtpUseCase.execute(dto);
-    res
-      .status(200)
-      .json(new HttpSuccess({ message: "OTP resent successfully" }));
   }
 
-  async forgotPassword(req: Request, res: Response): Promise<void> {
-    const dto: ForgotPasswordDto = req.body;
-    if (!dto.email || typeof dto.email !== "string" || !dto.email.trim()) {
-      throw new HttpError(
-        "Email is required and must be a non-empty string",
-        400
-      );
+  async register(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> {
+    try {
+      const validated = validateRegister(req.body);
+      const user = await this.registerUseCase.execute(validated);
+      res
+        .status(201)
+        .json({
+          user: {
+            id: user.id,
+            name: user.name,
+            email: user.email,
+            role: user.role,
+          },
+        });
+    } catch (error) {
+      next(error);
     }
-    await this.forgotPasswordUseCase.execute(dto);
-    res
-      .status(200)
-      .json(new HttpSuccess({ message: "Password reset email sent" }));
   }
 
-  async resetPassword(req: Request, res: Response): Promise<void> {
-    const dto: ResetPasswordDto = req.body;
-    if (!dto.email || typeof dto.email !== "string" || !dto.email.trim()) {
-      throw new HttpError(
-        "Email is required and must be a non-empty string",
-        400
-      );
+  async resendOtp(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> {
+    try {
+      const validated = validateResendOtp(req.body);
+      await this.resendOtpUseCase.execute(validated);
+      res.status(200).json({ message: "OTP resent successfully" });
+    } catch (error) {
+      next(error);
     }
-    if (
-      !dto.newPassword ||
-      typeof dto.newPassword !== "string" ||
-      !dto.newPassword.trim()
-    ) {
-      throw new HttpError(
-        "New password is required and must be a non-empty string",
-        400
-      );
-    }
-    await this.resetPasswordUseCase.execute(dto);
-    res
-      .status(200)
-      .json(new HttpSuccess({ message: "Password reset successfully" }));
   }
 
-  // presentation/http/controllers/auth.controller.ts
-  async googleAuth(req: Request, res: Response): Promise<void> {
-    const dto: GoogleAuthDto = req.body;
-    if (!dto.accessToken || typeof dto.accessToken !== "string") {
-      throw new HttpError("Access token is required and must be a string", 400);
+  async resetPassword(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> {
+    try {
+      const validated = validateResetPassword(req.body);
+      await this.resetPasswordUseCase.execute(validated);
+      res.status(200).json({ message: "Password reset successfully" });
+    } catch (error) {
+      next(error);
     }
-    const user = await this.googleAuthUseCase.execute(dto.accessToken);
-    const token = this.jwtProvider.sign({
-      id: user.id,
-      email: user.email,
-      role: user.role,
-    });
-    res.cookie("jwt", token, cookieConfig.options);
-    res.status(200).json(new HttpSuccess({ user }));
   }
 
-  async facebookAuth(req: Request, res: Response): Promise<void> {
-    const dto: FacebookAuthDto = req.body;
-    if (!dto.accessToken || typeof dto.accessToken !== "string") {
-      throw new HttpError("Access token is required and must be a string", 400);
+  async verifyOtp(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> {
+    try {
+      const validated = validateVerifyOtp(req.body);
+      await this.verifyOtpUseCase.execute(validated);
+      res.status(200).json({ message: "OTP verified successfully" });
+    } catch (error) {
+      next(error);
     }
-    if (!dto.userId || typeof dto.userId !== "string") {
-      throw new HttpError("User ID is required and must be a string", 400);
-    }
-    const user = await this.facebookAuthUseCase.execute({
-      accessToken: dto.accessToken,
-      userId: dto.userId,
-      name: dto.name,
-      email: dto.email,
-      picture:dto.picture
-    });
-    const token = this.jwtProvider.sign({
-      id: user.id,
-      email: user.email,
-      role: user.role,
-    });
-    res.cookie("jwt", token, cookieConfig.options);
-    res.status(200).json(new HttpSuccess({ user }));
   }
 }

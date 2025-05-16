@@ -2,11 +2,12 @@ import { IAuthRepository } from "../../repositories/auth.repository";
 import { HttpError } from "../../../presentation/http/utils/HttpErrors";
 import { OtpProvider } from "../../../infra/providers/otp/otp.provider";
 import { ForgotPasswordDto } from "../../../domain/dtos/auth/forgot-password.dto";
+import { IForgotPasswordUseCase } from "./interfaces/forgot-passowrd.usecase.interface";
 
-export class ForgotPasswordUseCase {
+export class ForgotPasswordUseCase implements IForgotPasswordUseCase {
   constructor(
     private authRepository: IAuthRepository,
-    private otpProvider: OtpProvider,
+    private otpProvider: OtpProvider
   ) {}
 
   async execute(dto: ForgotPasswordDto): Promise<void> {
@@ -15,11 +16,15 @@ export class ForgotPasswordUseCase {
       throw new HttpError("User not found", 404);
     }
 
-    const verification = await this.otpProvider.generateOtp(
-      user.email,
-      user.id,
-      "RESET"
-    );
-    // await this.emailProvider.sendResetTokenEmail(user.email, verification.otp);
+    try {
+      await this.otpProvider.generateOtp(user.email, user.id, "RESET");
+      // TODO: Implement email sending
+      // await this.emailProvider.sendResetTokenEmail(user.email, verification.otp);
+    } catch (error) {
+      if (error instanceof Error) {
+        throw new HttpError(error.message, 400);
+      }
+      throw new HttpError("Failed to generate OTP", 500);
+    }
   }
 }

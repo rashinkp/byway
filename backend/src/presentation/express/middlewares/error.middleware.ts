@@ -1,22 +1,19 @@
 import { Request, Response, NextFunction } from "express";
+import { ZodError } from "zod";
 import { HttpError } from "../../http/utils/HttpErrors";
 
-export const errorMiddleware = (
-  error: Error,
+export function errorMiddleware(
+  err: Error,
   req: Request,
   res: Response,
   next: NextFunction
-): void => {
-  if (error instanceof HttpError) {
-    res.status(error.statusCode).json({
-      status: "error",
-      message: error.message,
-    });
+): void {
+  if (err instanceof HttpError) {
+    res.status(err.statusCode).json({ error: err.message });
+  } else if (err instanceof ZodError) {
+    res.status(400).json({ error: "Validation failed", details: err.errors });
   } else {
-    console.error("Unexpected error:", error);
-    res.status(500).json({
-      status: "error",
-      message: "Internal server error",
-    });
+    console.error(err);
+    res.status(500).json({ error: "Internal server error" });
   }
-};
+}

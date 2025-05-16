@@ -1,12 +1,13 @@
 import { IAuthRepository } from "../../repositories/auth.repository";
 import { HttpError } from "../../../presentation/http/utils/HttpErrors";
 import { OtpProvider } from "../../../infra/providers/otp/otp.provider";
+import { IResendOtpUseCase } from "./interfaces/resend-otp.usecase.interface";
 import { ResendOtpDto } from "../../../domain/dtos/auth/resend-otp.dto";
 
-export class ResendOtpUseCase {
+export class ResendOtpUseCase implements IResendOtpUseCase {
   constructor(
     private authRepository: IAuthRepository,
-    private otpProvider: OtpProvider,
+    private otpProvider: OtpProvider
   ) {}
 
   async execute(dto: ResendOtpDto): Promise<void> {
@@ -15,11 +16,15 @@ export class ResendOtpUseCase {
       throw new HttpError("User not found", 404);
     }
 
-    const verification = await this.otpProvider.generateOtp(
-      user.email,
-      user.id,
-      "VERIFICATION"
-    );
-    // await this.emailProvider.sendOtpEmail(user.email, verification.otp);
+    try {
+      await this.otpProvider.generateOtp(user.email, user.id, "VERIFICATION");
+      // TODO: Implement email sending
+      // await this.emailProvider.sendOtpEmail(user.email, verification.otp);
+    } catch (error) {
+      if (error instanceof Error) {
+        throw new HttpError(error.message, 400);
+      }
+      throw new HttpError("Failed to resend OTP", 500);
+    }
   }
 }

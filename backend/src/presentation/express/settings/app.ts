@@ -4,7 +4,8 @@ import cookieParser from "cookie-parser";
 import { corsConfig } from "../configs/cors.config";
 import { cookieConfig } from "../configs/cookie.config";
 import { errorMiddleware } from "../middlewares/error.middleware";
-import authRouter from '../router/auth.router'
+import authRouter from "../router/auth.router";
+import { createDependencies } from "../../../di/container";
 
 export const createApp = (): Application => {
   const app = express();
@@ -15,12 +16,14 @@ export const createApp = (): Application => {
   app.use(express.json());
   app.use(express.urlencoded({ extended: true }));
 
+  const { authController } = createDependencies();
+
   // Routers
   // app.use("/api/admin", adminRouter);
   // app.use("/api/tutor", tutorRouter);
   // app.use("/api/learner", learnerRouter);
   // app.use("/api/courses", courseRouter);
-  app.use("/api/v1/auth", authRouter);
+  app.use("/api/v1/auth", authRouter(authController));
   // app.use("/api/cart", cartRouter);
   // app.use("/api/orders", orderRouter);
   // app.use("/api/payments", paymentRouter);

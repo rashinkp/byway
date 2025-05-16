@@ -1,5 +1,5 @@
 import { User } from "../../domain/entities/user";
-import { UserVerification } from "../../domain/entities/verification";
+import { UserVerification } from "../../domain/entities/user-verification";
 
 export interface IAuthRepository {
   findUserByEmail(email: string): Promise<User | null>;

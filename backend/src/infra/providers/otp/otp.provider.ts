@@ -1,5 +1,6 @@
 import { v4 as uuidv4 } from "uuid";
-import { UserVerification } from "../../../domain/entities/verification";
+import nodemailer from "nodemailer";
+import { UserVerification } from "../../../domain/entities/user-verification";
 import { IAuthRepository } from "../../../app/repositories/auth.repository";
 
 export interface OtpProvider {
@@ -11,29 +12,48 @@ export interface OtpProvider {
 }
 
 export class OtpProvider implements OtpProvider {
-  constructor(private authRepository: IAuthRepository) {}
+  private transporter;
+
+  constructor(private authRepository: IAuthRepository) {
+    this.transporter = nodemailer.createTransport({
+      service: "gmail",
+      auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS,
+      },
+    });
+  }
 
   async generateOtp(
     email: string,
     userId: string,
     type: "VERIFICATION" | "RESET"
   ): Promise<UserVerification> {
-    // Generate 6-digit numeric OTP for both verification and reset
-    const otp = Math.floor(100000 + Math.random() * 900000).toString(); // 6-digit (e.g., "123456")
+    // Generate 6-digit numeric OTP
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
 
-    const verification = new UserVerification(
-      uuidv4(),
+    // Create UserVerification
+    const verification = UserVerification.create({
+      id: uuidv4(),
       userId,
       email,
       otp,
-      new Date(Date.now() + 10 * 60 * 1000), // Expires in 10 minutes
-      0,
-      false,
-      new Date()
-    );
+      expiresAt: new Date(Date.now() + 10 * 60 * 1000),
+      attempts: 0,
+      isUsed: false,
+      createdAt: new Date(),
+    });
 
-
+    // Store verification
     await this.authRepository.createVerification(verification);
+
+    // Send OTP via email
+    await this.transporter.sendMail({
+      to: email,
+      subject:
+        type === "VERIFICATION" ? "Verify Your Email" : "Reset Your Password",
+      text: `Your OTP is ${otp}. It expires in 10 minutes.`,
+    });
 
     return verification;
   }
