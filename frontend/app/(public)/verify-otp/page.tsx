@@ -12,6 +12,7 @@ export default function VerifyOtpPage() {
   const { isAuthenticated, isLoading, user } = useAuth();
   const email = searchParams.get("email");
 
+
   useEffect(() => {
     if (!isLoading && isAuthenticated && user) {
       const route = ROUTES[user.role as keyof typeof ROUTES] || ROUTES.DEFAULT;

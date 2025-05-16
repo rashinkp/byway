@@ -1,40 +1,8 @@
-import {api} from "@/api/api";
-import { ApiResponse } from "@/types/apiResponse";
+import { api } from "@/api/api";
 import { User } from "@/types/user";
 
-interface IVerifyOtpResponse {
-  data: User;
-}
-
-interface IResendOtpResponse {
-  message?: string;
-}
-
-interface IResetPasswordResponse {
-  message?: string;
-}
-
-interface ILoginResponse {
-  data: User;
-}
-
-interface ISignupResponse {
-  data: User;
-}
-
-interface IVerifyAuthResponse {
-  data: User;
-}
-
-interface IGetCurrentUserResponse {
-  data: User;
-}
-
-interface ILogoutResponse {
-  message?: string;
-}
-
-interface IForgotPasswordResponse {
+interface ApiResponse<T> {
+  data: T;
   message?: string;
 }
 
@@ -44,8 +12,6 @@ interface SignupData {
   name: string;
 }
 
-
-
 interface FacebookAuthRequest {
   accessToken: string;
   userId: string;
@@ -54,11 +20,12 @@ interface FacebookAuthRequest {
   picture?: string;
 }
 
-
-
 export async function signup(data: SignupData) {
   try {
-    const response = await api.post<ISignupResponse>("/auth/signup", data);
+    const response = await api.post<ApiResponse<{ user: User }>>(
+      "/auth/register",
+      data
+    );
     return response.data;
   } catch (error: any) {
     throw new Error(error.response?.data?.message || "Signup failed");
@@ -67,11 +34,11 @@ export async function signup(data: SignupData) {
 
 export async function login(email: string, password: string) {
   try {
-    const response = await api.post<ILoginResponse>("/auth/login", {
+    const response = await api.post<ApiResponse<User>>("/auth/login", {
       email,
       password,
     });
-    return response.data;
+    return response.data.data;
   } catch (error: any) {
     throw new Error(error.response?.data?.message || "Login failed");
   }
@@ -79,9 +46,9 @@ export async function login(email: string, password: string) {
 
 export async function googleAuth(
   access_token: string
-): Promise<IVerifyAuthResponse> {
+): Promise<ApiResponse<User>> {
   try {
-    const response = await api.post<IVerifyAuthResponse>("/auth/google", {
+    const response = await api.post<ApiResponse<User>>("/auth/google", {
       access_token,
     });
     return response.data;
@@ -92,12 +59,17 @@ export async function googleAuth(
   }
 }
 
-export async function verifyOtp(otp: string, email: string, type: "signup" | "password-reset" = "signup"): Promise<User> {
+export async function verifyOtp(
+  otp: string,
+  email: string,
+  type: "signup" | "password-reset" = "signup"
+): Promise<User> {
   try {
-    const response = await api.post<IVerifyOtpResponse>(
-      "/otp/verify",
-      { otp, email, type }
-    );
+    const response = await api.post<ApiResponse<User>>("/auth/verify-otp", {
+      otp,
+      email,
+      type,
+    });
     return response.data.data;
   } catch (error: any) {
     throw new Error(error.response?.data?.message || "OTP verification failed");
@@ -106,7 +78,7 @@ export async function verifyOtp(otp: string, email: string, type: "signup" | "pa
 
 export async function resendOtp(email: string): Promise<void> {
   try {
-    await api.post<IResendOtpResponse>("/otp/resend", { email });
+    await api.post<ApiResponse<unknown>>("/otp/resend", { email });
   } catch (error: any) {
     throw new Error(error.response?.data?.message || "Resend OTP failed");
   }
@@ -114,14 +86,16 @@ export async function resendOtp(email: string): Promise<void> {
 
 export async function forgotPassword(email: string): Promise<void> {
   try {
-    await api.post<IForgotPasswordResponse>("/auth/forgot-password", { email });
+    await api.post<ApiResponse<unknown>>("/auth/forgot-password", { email });
   } catch (error: any) {
-    // Check if the error is from our backend AppError
     if (error.response?.data?.status === "error") {
-      throw new Error(error.response.data.message || "Forgot password request failed");
+      throw new Error(
+        error.response.data.message || "Forgot password request failed"
+      );
     }
-    // For other errors
-    throw new Error(error.response?.data?.message || "Forgot password request failed");
+    throw new Error(
+      error.response?.data?.message || "Forgot password request failed"
+    );
   }
 }
 
@@ -131,7 +105,7 @@ export async function resetPassword(
   newPassword: string
 ): Promise<void> {
   try {
-    await api.post<IResetPasswordResponse>("/auth/reset-password", {
+    await api.post<ApiResponse<unknown>>("/auth/reset-password", {
       email,
       otp,
       newPassword,
@@ -143,7 +117,7 @@ export async function resetPassword(
 
 export async function getCurrentUser(): Promise<User | null> {
   try {
-    const response = await api.get<IGetCurrentUserResponse>("/auth/me");
+    const response = await api.get<ApiResponse<User>>("/auth/me");
     return response.data.data;
   } catch (error: any) {
     if (error.response?.status === 401) {
@@ -156,23 +130,20 @@ export async function getCurrentUser(): Promise<User | null> {
 }
 
 export async function logout(): Promise<void> {
-  
   try {
-    await api.post<ILogoutResponse>("/auth/logout");
+    await api.post<ApiResponse<unknown>>("/auth/logout");
   } catch (error: any) {
     throw new Error(error.response?.data?.message || "Logout failed");
   }
 }
 
-
-
 export async function getCurrentUserServer(
   cookies: string
 ): Promise<User | null> {
   try {
-    const response = await api.get<IGetCurrentUserResponse>("/auth/me", {
+    const response = await api.get<ApiResponse<User>>("/auth/me", {
       headers: {
-        Cookie: cookies, // Forward the securecookie
+        Cookie: cookies,
       },
     });
     return response.data.data;
@@ -185,18 +156,16 @@ export async function getCurrentUserServer(
   }
 }
 
-
 export async function facebookAuth(
   data: FacebookAuthRequest
-): Promise<ApiResponse> {
+): Promise<ApiResponse<User>> {
   try {
-    const response = await api.post<ApiResponse>(
-      "/auth/facebook",
-      data
-    );
+    const response = await api.post<ApiResponse<User>>("/auth/facebook", data);
     return response.data;
   } catch (error: any) {
     console.error("Error during Facebook authentication:", error);
-    throw error.response?.data?.error || "Failed to authenticate with Facebook";
+    throw new Error(
+      error.response?.data?.message || "Failed to authenticate with Facebook"
+    );
   }
 }

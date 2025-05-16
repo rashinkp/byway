@@ -1,4 +1,3 @@
-// src/hooks/auth/useSignup.ts
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { signup } from "@/api/auth";
@@ -17,13 +16,21 @@ export function useSignup() {
       name: string;
       email: string;
       password: string;
-    }) => signup({name, email, password}),
+    }) => signup({ name, email, password }),
     onSuccess: (data) => {
-      setEmail(data?.data?.email);
-      queryClient.invalidateQueries({ queryKey: ["auth"] });
-      toast.success("Signed up successfully", {
-        description: "Please verify your email with the OTP sent.",
-      });
+      const userEmail = data?.data?.user?.email;
+      console.log("Signup response:", data);
+      if (userEmail) {
+        setEmail(userEmail);
+        toast.success("Signed up successfully", {
+          description: "Please verify your email with the OTP sent.",
+        });
+        queryClient.invalidateQueries({ queryKey: ["auth"] });
+      } else {
+        toast.error("Signup failed", {
+          description: "Unable to retrieve email from response",
+        });
+      }
     },
     onError: (error: any) => {
       toast.error("Signup failed", {

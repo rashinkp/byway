@@ -1,4 +1,3 @@
-// src/stores/auth/authStore.ts
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
 import { User } from "@/types/user";
@@ -24,27 +23,36 @@ export const useAuthStore = create<AuthState>()(
       isInitialized: false,
       setUser: (user) => set({ user }),
       setEmail: (email) => set({ email }),
-      clearAuth: () => set({ user: null, email: null, isInitialized: true }),
+      clearAuth: () => set({ user: null, email: null, isInitialized: false }),
       initializeAuth: async () => {
-        // Only initialize if not already initialized
         if (get().isInitialized) return;
-        
+
         set({ isLoading: true });
         try {
           const user = await getCurrentUser();
-          set({ user, isLoading: false, isInitialized: true });
+          set({
+            user,
+            email: user?.email || get().email, // Retain existing email if user is null
+            isLoading: false,
+            isInitialized: true,
+          });
         } catch (error) {
-          set({ user: null, isLoading: false, isInitialized: true });
+          set({
+            user: null,
+            email: get().email, // Retain existing email on error
+            isLoading: false,
+            isInitialized: true,
+          });
         }
       },
     }),
     {
       name: "auth-storage",
       storage: createJSONStorage(() => localStorage),
-      partialize: (state) => ({ 
-        user: state.user, 
+      partialize: (state) => ({
+        user: state.user,
         email: state.email,
-        isInitialized: state.isInitialized 
+        isInitialized: state.isInitialized,
       }),
     }
   )

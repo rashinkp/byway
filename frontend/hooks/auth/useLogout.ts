@@ -1,22 +1,23 @@
-"use client";
-
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
 import { logout } from "@/api/auth";
 import { useAuthStore } from "@/stores/auth.store";
-import { useRouter } from "next/navigation";
 
 export function useLogout() {
-  const router = useRouter();
-  const clearAuth = useAuthStore((state) => state.clearAuth);
+  const queryClient = useQueryClient();
+  const { clearAuth } = useAuthStore();
 
   return useMutation({
-    mutationFn: logout,
+    mutationFn: () => logout(),
     onSuccess: () => {
-      clearAuth();
-      router.push("/login");
+      clearAuth(); // Clear store and localStorage
+      queryClient.invalidateQueries({ queryKey: ["auth"] }); // Invalidate auth queries
+      toast.success("Logged out successfully");
     },
-    onError: (error) => {
-      console.error("Logout failed:", error);
+    onError: (error: any) => {
+      toast.error("Logout failed", {
+        description: error.message || "Something went wrong",
+      });
     },
   });
 }
