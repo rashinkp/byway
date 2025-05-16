@@ -1,3 +1,4 @@
+// presentation/http/router/auth.router.ts
 import { Router } from "express";
 import { AuthController } from "../../http/controllers/auth.controller";
 import { LoginUseCase } from "../../../app/usecases/auth/login.usecase";
@@ -13,6 +14,8 @@ import { ResendOtpUseCase } from "../../../app/usecases/auth/resend-otp-usecase"
 import { ForgotPasswordUseCase } from "../../../app/usecases/auth/forgot-passowrd.usecase";
 import { ResetPasswordUseCase } from "../../../app/usecases/auth/reset-password.usecase";
 import { optionalAuth, restrictTo } from "../middlewares/auth.middleware";
+import { GoogleAuthProvider } from "../../../infra/providers/auth/google-auth.provider";
+import { GoogleAuthUseCase } from "../../../app/usecases/auth/google-auth.usecase";
 
 const router = Router();
 const logger = new WinstonLogger();
@@ -20,23 +23,24 @@ const databaseProvider = new PrismaDatabaseProvider(logger);
 const authRepository = new AuthRepository(databaseProvider.getClient());
 const jwtProvider = new JwtProvider();
 const otpProvider = new OtpProvider(authRepository);
-// const emailProvider = new EmailProvider();
 const loginUseCase = new LoginUseCase(authRepository);
-const registerUseCase = new RegisterUseCase(
-  authRepository,
-  otpProvider,
-);
+const registerUseCase = new RegisterUseCase(authRepository, otpProvider);
 const verifyOtpUseCase = new VerifyOtpUseCase(authRepository);
 const logoutUseCase = new LogoutUseCase();
-const resendOtpUseCase = new ResendOtpUseCase(
-  authRepository,
-  otpProvider,
-);
+const resendOtpUseCase = new ResendOtpUseCase(authRepository, otpProvider);
 const forgotPasswordUseCase = new ForgotPasswordUseCase(
   authRepository,
-  otpProvider,
+  otpProvider
 );
 const resetPasswordUseCase = new ResetPasswordUseCase(authRepository);
+const googleAuthProvider = new GoogleAuthProvider(
+  process.env.GOOGLE_CLIENT_ID || ""
+);
+const googleAuthUseCase = new GoogleAuthUseCase(
+  authRepository,
+  googleAuthProvider
+); // Fix: Add authRepository
+
 const authController = new AuthController(
   loginUseCase,
   registerUseCase,
@@ -45,6 +49,7 @@ const authController = new AuthController(
   resendOtpUseCase,
   forgotPasswordUseCase,
   resetPasswordUseCase,
+  googleAuthUseCase, // Add this
   jwtProvider
 );
 
@@ -67,6 +72,10 @@ router.post("/forgot-password", (req, res, next) =>
 router.post("/reset-password", (req, res, next) =>
   authController.resetPassword(req, res).catch(next)
 );
+router.post(
+  "/google",
+  (req, res, next) => authController.googleAuth(req, res).catch(next) 
+);
 
 // Protected routes
 router.post(
@@ -74,4 +83,5 @@ router.post(
   restrictTo("ADMIN", "TUTOR", "LEARNER"),
   (req, res, next) => authController.logout(req, res).catch(next)
 );
+
 export default router;

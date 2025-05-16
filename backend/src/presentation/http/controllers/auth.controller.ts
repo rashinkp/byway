@@ -15,6 +15,8 @@ import { ResendOtpUseCase } from "../../../app/usecases/auth/resend-otp-usecase"
 import { ForgotPasswordUseCase } from "../../../app/usecases/auth/forgot-passowrd.usecase";
 import { cookieConfig } from "../../express/configs/cookie.config";
 import { ResetPasswordDto } from "../../../domain/dtos/auth/reset-password.dto";
+import { GoogleAuthDto } from "../../../domain/dtos/auth/googel-auth.dto";
+import { GoogleAuthUseCase } from "../../../app/usecases/auth/google-auth.usecase";
 
 export class AuthController {
   constructor(
@@ -25,6 +27,7 @@ export class AuthController {
     private resendOtpUseCase: ResendOtpUseCase,
     private forgotPasswordUseCase: ForgotPasswordUseCase,
     private resetPasswordUseCase: ResetPasswordUseCase,
+    private googleAuthUseCase: GoogleAuthUseCase,
     private jwtProvider: JwtProvider
   ) {}
 
@@ -136,5 +139,21 @@ export class AuthController {
     res
       .status(200)
       .json(new HttpSuccess({ message: "Password reset successfully" }));
+  }
+
+  // presentation/http/controllers/auth.controller.ts
+  async googleAuth(req: Request, res: Response): Promise<void> {
+    const dto: GoogleAuthDto = req.body;
+    if (!dto.accessToken || typeof dto.accessToken !== "string") {
+      throw new HttpError("Access token is required and must be a string", 400);
+    }
+    const user = await this.googleAuthUseCase.execute(dto.accessToken);
+    const token = this.jwtProvider.sign({
+      id: user.id,
+      email: user.email,
+      role: user.role,
+    });
+    res.cookie("jwt", token, cookieConfig.options);
+    res.status(200).json(new HttpSuccess({ user }));
   }
 }

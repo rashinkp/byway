@@ -49,7 +49,7 @@ export async function googleAuth(
 ): Promise<ApiResponse<User>> {
   try {
     const response = await api.post<ApiResponse<User>>("/auth/google", {
-      access_token,
+      accessToken: access_token,
     });
     return response.data;
   } catch (error: any) {

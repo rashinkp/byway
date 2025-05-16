@@ -12,6 +12,7 @@ export class User {
     public role: Role = Role.LEARNER,
     public isVerified: boolean = false,
     public createdAt: Date = new Date(),
-    public updatedAt: Date = new Date()
+    public updatedAt: Date = new Date(),
+    public avatar?:string
   ) {}
 }

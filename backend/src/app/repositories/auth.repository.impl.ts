@@ -24,7 +24,8 @@ export class AuthRepository implements IAuthRepository {
       user.role as Role,
       user.isVerified,
       user.createdAt,
-      user.updatedAt
+      user.updatedAt,
+      user.avatar ?? undefined
     );
   }
 
@@ -41,7 +42,8 @@ export class AuthRepository implements IAuthRepository {
       user.role as Role,
       user.isVerified,
       user.createdAt,
-      user.updatedAt
+      user.updatedAt,
+      user.avatar ?? undefined
     );
   }
 
@@ -58,7 +60,8 @@ export class AuthRepository implements IAuthRepository {
       user.role as Role,
       user.isVerified,
       user.createdAt,
-      user.updatedAt
+      user.updatedAt,
+      user.avatar ?? undefined
     );
   }
 
@@ -75,6 +78,7 @@ export class AuthRepository implements IAuthRepository {
         isVerified: user.isVerified,
         createdAt: user.createdAt,
         updatedAt: user.updatedAt,
+        avatar: user.avatar,
       },
     });
     return new User(
@@ -87,14 +91,14 @@ export class AuthRepository implements IAuthRepository {
       created.role as Role,
       created.isVerified,
       created.createdAt,
-      created.updatedAt
+      created.updatedAt,
+      created.avatar ?? undefined
     );
   }
 
   async createVerification(
     verification: UserVerification
   ): Promise<UserVerification> {
-
     const created = await this.prisma.userVerification.upsert({
       where: { email: verification.email },
       update: {
@@ -176,6 +180,9 @@ export class AuthRepository implements IAuthRepository {
         name: user.name,
         email: user.email,
         password: user.password,
+        googleId: user.googleId,
+        facebookId: user.facebookId,
+        avatar: user.avatar,
         isVerified: user.isVerified,
         updatedAt: user.updatedAt,
       },
@@ -190,7 +197,8 @@ export class AuthRepository implements IAuthRepository {
       updated.role as Role,
       updated.isVerified,
       updated.createdAt,
-      updated.updatedAt
+      updated.updatedAt,
+      updated.avatar ?? undefined
     );
   }
 }
