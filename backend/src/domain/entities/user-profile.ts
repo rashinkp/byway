@@ -104,6 +104,38 @@ export class UserProfile {
     return new UserProfile(updatedProps);
   }
 
+  static fromPrisma(data: {
+    id: string;
+    userId: string;
+    bio?: string | null;
+    education?: string | null;
+    skills?: string | null;
+    phoneNumber?: string | null;
+    country?: string | null;
+    city?: string | null;
+    address?: string | null;
+    dateOfBirth?: Date | null;
+    gender?: string | null;
+    createdAt: Date;
+    updatedAt: Date;
+  }): UserProfile {
+    return new UserProfile({
+      id: data.id,
+      userId: data.userId,
+      bio: data.bio ?? undefined,
+      education: data.education ?? undefined,
+      skills: data.skills ?? undefined,
+      phoneNumber: data.phoneNumber ?? undefined,
+      country: data.country ?? undefined,
+      city: data.city ?? undefined,
+      address: data.address ?? undefined,
+      dateOfBirth: data.dateOfBirth ?? undefined,
+      gender: data.gender ?? undefined,
+      createdAt: data.createdAt,
+      updatedAt: data.updatedAt,
+    });
+  }
+
   private constructor(props: UserProfileInterface) {
     this._id = props.id;
     this._userId = props.userId;
