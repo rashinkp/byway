@@ -71,6 +71,7 @@ export class UserRepository implements IUserRepository {
   }
 
   async updateUser(user: User): Promise<User> {
+    
     const updated = await this.prisma.user.update({
       where: { id: user.id },
       data: {
@@ -83,7 +84,7 @@ export class UserRepository implements IUserRepository {
         authProvider: user.authProvider,
         isVerified: user.isVerified,
         avatar: user.avatar,
-        deletedAt: user.deletedAt,
+        deletedAt: user.deletedAt ? user.deletedAt : null,
         updatedAt: user.updatedAt,
       },
       include: { userProfile: true },

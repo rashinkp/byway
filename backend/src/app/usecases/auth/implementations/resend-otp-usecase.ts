@@ -1,8 +1,8 @@
-import { IAuthRepository } from "../../repositories/auth.repository";
-import { HttpError } from "../../../presentation/http/utils/HttpErrors";
-import { OtpProvider } from "../../../infra/providers/otp/otp.provider";
-import { IResendOtpUseCase } from "./interfaces/resend-otp.usecase.interface";
-import { ResendOtpDto } from "../../../domain/dtos/auth/resend-otp.dto";
+import { IAuthRepository } from "../../../repositories/auth.repository";
+import { HttpError } from "../../../../presentation/http/utils/HttpErrors";
+import { OtpProvider } from "../../../../infra/providers/otp/otp.provider";
+import { IResendOtpUseCase } from "../interfaces/resend-otp.usecase.interface";
+import { ResendOtpDto } from "../../../../domain/dtos/auth/resend-otp.dto";
 
 export class ResendOtpUseCase implements IResendOtpUseCase {
   constructor(

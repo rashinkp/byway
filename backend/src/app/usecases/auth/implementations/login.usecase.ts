@@ -1,10 +1,10 @@
-import { User } from "../../../domain/entities/user";
-import { IAuthRepository } from "../../repositories/auth.repository";
-import { HttpError } from "../../../presentation/http/utils/HttpErrors";
+import { User } from "../../../../domain/entities/user";
+import { IAuthRepository } from "../../../repositories/auth.repository";
+import { HttpError } from "../../../../presentation/http/utils/HttpErrors";
 import * as bcrypt from "bcrypt";
-import { AuthProvider } from "../../../domain/enum/auth-provider.enum";
-import { LoginDto } from "../../../domain/dtos/auth/login.dto";
-import { ILoginUseCase } from "./interfaces/login.usecase.interface";
+import { AuthProvider } from "../../../../domain/enum/auth-provider.enum";
+import { LoginDto } from "../../../../domain/dtos/auth/login.dto";
+import { ILoginUseCase } from "../interfaces/login.usecase.interface";
 
 export class LoginUseCase implements ILoginUseCase {
   constructor(private authRepository: IAuthRepository) {}
@@ -38,6 +38,9 @@ export class LoginUseCase implements ILoginUseCase {
       }
 
       if (!user.isVerified) {
+        throw new HttpError("Email not verified", 403);
+      }
+      if (user.deletedAt) {
         throw new HttpError("Email not verified", 403);
       }
 

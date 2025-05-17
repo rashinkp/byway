@@ -1,8 +1,8 @@
-import { UserVerification } from "../../../domain/entities/user-verification";
-import { User } from "../../../domain/entities/user";
-import { IAuthRepository } from "../../repositories/auth.repository";
-import { HttpError } from "../../../presentation/http/utils/HttpErrors";
-import { VerifyOtpDto } from "../../../domain/dtos/auth/verify-otp.dto";
+import { UserVerification } from "../../../../domain/entities/user-verification";
+import { User } from "../../../../domain/entities/user";
+import { IAuthRepository } from "../../../repositories/auth.repository";
+import { HttpError } from "../../../../presentation/http/utils/HttpErrors";
+import { VerifyOtpDto } from "../../../../domain/dtos/auth/verify-otp.dto";
 
 export interface IVerifyOtpUseCase {
   execute(dto: VerifyOtpDto): Promise<User>;

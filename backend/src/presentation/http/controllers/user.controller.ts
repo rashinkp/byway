@@ -73,6 +73,7 @@ export class UserController {
           updatedAt: user.updatedAt,
         },
       };
+
       res.status(200).json(response);
     } catch (error) {
       next(error);

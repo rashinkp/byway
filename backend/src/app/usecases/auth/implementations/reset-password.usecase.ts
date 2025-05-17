@@ -1,9 +1,9 @@
-import { User } from "../../../domain/entities/user";
-import { IAuthRepository } from "../../repositories/auth.repository";
-import { HttpError } from "../../../presentation/http/utils/HttpErrors";
+import { User } from "../../../../domain/entities/user";
+import { IAuthRepository } from "../../../repositories/auth.repository";
+import { HttpError } from "../../../../presentation/http/utils/HttpErrors";
 import * as bcrypt from "bcrypt";
-import { IResetPasswordUseCase } from "./interfaces/reset-password.usecase.interface";
-import { ResetPasswordDto } from "../../../domain/dtos/auth/reset-password.dto";
+import { IResetPasswordUseCase } from "../interfaces/reset-password.usecase.interface";
+import { ResetPasswordDto } from "../../../../domain/dtos/auth/reset-password.dto";
 
 export class ResetPasswordUseCase implements IResetPasswordUseCase {
   constructor(private authRepository: IAuthRepository) {}

@@ -1,8 +1,8 @@
-import { IAuthRepository } from "../../repositories/auth.repository";
-import { HttpError } from "../../../presentation/http/utils/HttpErrors";
-import { OtpProvider } from "../../../infra/providers/otp/otp.provider";
-import { ForgotPasswordDto } from "../../../domain/dtos/auth/forgot-password.dto";
-import { IForgotPasswordUseCase } from "./interfaces/forgot-passowrd.usecase.interface";
+import { IAuthRepository } from "../../../repositories/auth.repository";
+import { HttpError } from "../../../../presentation/http/utils/HttpErrors";
+import { OtpProvider } from "../../../../infra/providers/otp/otp.provider";
+import { ForgotPasswordDto } from "../../../../domain/dtos/auth/forgot-password.dto";
+import { IForgotPasswordUseCase } from "../interfaces/forgot-passowrd.usecase.interface";
 
 export class ForgotPasswordUseCase implements IForgotPasswordUseCase {
   constructor(

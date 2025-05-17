@@ -23,6 +23,8 @@ export default function StudentsPage() {
             | "createdAt"
             | `-${"name" | "email" | "createdAt"}`,
           role: "USER",
+          filterBy: params.filterBy as "All" | "Active" | "Inactive",
+          includeDeleted:true
         })
       }
       columns={[

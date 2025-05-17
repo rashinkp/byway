@@ -181,7 +181,6 @@ export class AuthController {
     try {
       const validated = validateRegister(req.body);
       const user = await this.registerUseCase.execute(validated);
-      this.setAuthCookie(res, user);
       const response: ApiResponse<UserResponse> = {
         statusCode: 201,
         success: true,

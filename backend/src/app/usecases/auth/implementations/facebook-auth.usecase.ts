@@ -1,11 +1,11 @@
-import { User } from "../../../domain/entities/user";
-import { IAuthRepository } from "../../repositories/auth.repository";
-import { IUpdateUserRequestDTO } from "../../../domain/entities/user";
-import { IFacebookAuthUseCase } from "./interfaces/facebook-auth.usecase.interface";
-import { FacebookAuthDto } from "../../../domain/dtos/auth/facebook-auth.dto";
-import { AuthProvider } from "../../../domain/enum/auth-provider.enum";
-import { Role } from "../../../domain/enum/role.enum";
-import { HttpError } from "../../../presentation/http/utils/HttpErrors";
+import { User } from "../../../../domain/entities/user";
+import { IAuthRepository } from "../../../repositories/auth.repository";
+import { IUpdateUserRequestDTO } from "../../../../domain/entities/user";
+import { IFacebookAuthUseCase } from "../interfaces/facebook-auth.usecase.interface";
+import { FacebookAuthDto } from "../../../../domain/dtos/auth/facebook-auth.dto";
+import { AuthProvider } from "../../../../domain/enum/auth-provider.enum";
+import { Role } from "../../../../domain/enum/role.enum";
+import { HttpError } from "../../../../presentation/http/utils/HttpErrors";
 
 export class FacebookAuthUseCase implements IFacebookAuthUseCase {
   constructor(private authRepository: IAuthRepository) {}

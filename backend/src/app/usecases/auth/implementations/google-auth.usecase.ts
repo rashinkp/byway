@@ -1,14 +1,14 @@
-import { User } from "../../../domain/entities/user";
-import { IAuthRepository } from "../../repositories/auth.repository";
+import { User } from "../../../../domain/entities/user";
+import { IAuthRepository } from "../../../repositories/auth.repository";
 import {
   GoogleAuthGateway,
   GoogleUserInfo,
-} from "../../../infra/providers/auth/google-auth.provider";
-import { IUpdateUserRequestDTO } from "../../../domain/entities/user";
-import { IGoogleAuthUseCase } from "./interfaces/google-auth.usecase.interface";
-import { HttpError } from "../../../presentation/http/utils/HttpErrors";
-import { Role } from "../../../domain/enum/role.enum";
-import { AuthProvider } from "../../../domain/enum/auth-provider.enum";
+} from "../../../../infra/providers/auth/google-auth.provider";
+import { IUpdateUserRequestDTO } from "../../../../domain/entities/user";
+import { IGoogleAuthUseCase } from "../interfaces/google-auth.usecase.interface";
+import { HttpError } from "../../../../presentation/http/utils/HttpErrors";
+import { Role } from "../../../../domain/enum/role.enum";
+import { AuthProvider } from "../../../../domain/enum/auth-provider.enum";
 
 export class GoogleAuthUseCase implements IGoogleAuthUseCase {
   constructor(

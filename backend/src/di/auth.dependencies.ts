@@ -4,15 +4,15 @@ import { AuthRepository } from "../app/repositories/auth.repository.impl";
 import { OtpProvider } from "../infra/providers/otp/otp.provider";
 import { GoogleAuthProvider } from "../infra/providers/auth/google-auth.provider";
 import { envConfig } from "../presentation/express/configs/env.config";
-import { FacebookAuthUseCase } from "../app/usecases/auth/facebook-auth.usecase";
-import { ForgotPasswordUseCase } from "../app/usecases/auth/forgot-passowrd.usecase";
-import { GoogleAuthUseCase } from "../app/usecases/auth/google-auth.usecase";
-import { LoginUseCase } from "../app/usecases/auth/login.usecase";
-import { LogoutUseCase } from "../app/usecases/auth/logout.usecase";
-import { RegisterUseCase } from "../app/usecases/auth/register.usecase";
-import { ResendOtpUseCase } from "../app/usecases/auth/resend-otp-usecase";
-import { ResetPasswordUseCase } from "../app/usecases/auth/reset-password.usecase";
-import { VerifyOtpUseCase } from "../app/usecases/auth/verify-otp.usecase";
+import { FacebookAuthUseCase } from "../app/usecases/auth/implementations/facebook-auth.usecase";
+import { ForgotPasswordUseCase } from "../app/usecases/auth/implementations/forgot-passowrd.usecase";
+import { GoogleAuthUseCase } from "../app/usecases/auth/implementations/google-auth.usecase";
+import { LoginUseCase } from "../app/usecases/auth/implementations/login.usecase";
+import { LogoutUseCase } from "../app/usecases/auth/implementations/logout.usecase";
+import { RegisterUseCase } from "../app/usecases/auth/implementations/register.usecase";
+import { ResendOtpUseCase } from "../app/usecases/auth/implementations/resend-otp-usecase";
+import { ResetPasswordUseCase } from "../app/usecases/auth/implementations/reset-password.usecase";
+import { VerifyOtpUseCase } from "../app/usecases/auth/implementations/verify-otp.usecase";
 
 export interface AuthDependencies {
   authController: AuthController;

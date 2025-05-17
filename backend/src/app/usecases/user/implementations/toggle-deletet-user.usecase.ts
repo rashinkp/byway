@@ -26,6 +26,7 @@ export class ToggleDeleteUserUseCase implements IToggleDeleteUserUseCase {
       user.restore();
     }
 
+
     return await this.userRepository.updateUser(user);
   }
 }
