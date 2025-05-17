@@ -41,12 +41,12 @@ export default function ProfilePage() {
           <ProfileSection user={user} setIsModalOpen={setIsModalOpen} />
         )}
 
-        {/* {activeSection === 'courses' && (
-          // <MyCoursesPage />
+        {activeSection === 'courses' && (
+          <MyCoursesPage />
         )}
         {activeSection === 'wallet' && (
           <WalletTransactionPage />
-        )} */}
+        )}
         {["certificates", "settings"].map(
           (section) =>
             activeSection === section && (
@@ -61,11 +61,11 @@ export default function ProfilePage() {
             )
         )}
       </main>
-      {/* <EditProfileForm
+      <EditProfileForm
         open={isModalOpen}
         onOpenChange={setIsModalOpen}
         user={user}
-      /> */}
+      />
     </div>
   );
 }

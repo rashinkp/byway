@@ -33,7 +33,15 @@ export interface User {
   createdAt: string; // Changed to string to match API response format
   updatedAt: string; // Changed to string to match API response format
   deletedAt?: string | null; // Changed to string to match API response format
-  userProfile?: UserProfile; // Added to match backend IUser type
+  bio?: string;
+  education?: string;
+  skills?: string;
+  phoneNumber?: string;
+  country?: string;
+  city?: string;
+  address?: string;
+  dateOfBirth?: string;
+  gender?: GenderType;
 }
 
 
@@ -105,17 +113,17 @@ export const transformUserData = (user: User): UserProfileType => {
     avatar: user.avatar || "/images/default-avatar.png",
     email: user.email,
     role: user.role,
-    phoneNumber: user.userProfile?.phoneNumber,
-    bio: user.userProfile?.bio,
-    skills: user.userProfile?.skills
-      ? user.userProfile.skills.split(",").map((skill) => skill.trim())
+    phoneNumber: user?.phoneNumber,
+    bio: user?.bio,
+    skills: user?.skills
+      ? user.skills.split(",").map((skill) => skill.trim())
       : [],
-    education: user.userProfile?.education,
-    country: user.userProfile?.country,
-    city: user.userProfile?.city,
-    address: user.userProfile?.address,
-    dateOfBirth: user.userProfile?.dateOfBirth,
-    gender: user.userProfile?.gender,
+    education: user?.education,
+    country: user?.country,
+    city: user?.city,
+    address: user?.address,
+    dateOfBirth: user?.dateOfBirth,
+    gender: user?.gender,
     isVerified: user.isVerified || false,
     createdAt: user.createdAt,
     updatedAt: user.updatedAt,

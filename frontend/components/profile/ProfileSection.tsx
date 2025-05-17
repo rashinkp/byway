@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
-  User,
+  User as UserIcon,
   Mail,
   Phone,
   MapPin,
@@ -12,6 +12,7 @@ import {
   Briefcase,
   Edit,
 } from "lucide-react";
+import { User } from "@/types/user";
 
 interface UserProfile {
   bio?: string;
@@ -25,12 +26,6 @@ interface UserProfile {
   skills?: string | string[];
 }
 
-interface User {
-  name?: string;
-  avatar?: string;
-  email?: string;
-  userProfile?: UserProfile;
-}
 
 interface ProfileSectionProps {
   user: User | undefined;
@@ -65,9 +60,7 @@ export default function ProfileSection({
             <h2 className="text-xl font-semibold text-gray-800">
               {user?.name}
             </h2>
-            <p className="text-gray-600">
-              {user?.userProfile?.bio || "No bio set"}
-            </p>
+            <p className="text-gray-600">{user?.bio || "No bio set"}</p>
           </div>
         </div>
 
@@ -85,7 +78,7 @@ export default function ProfileSection({
               <div>
                 <p className="text-sm text-gray-500">Phone Number</p>
                 <p className="text-gray-800">
-                  {user?.userProfile?.phoneNumber || "Not set"}
+                  {user?.phoneNumber || "Not set"}
                 </p>
               </div>
             </div>
@@ -94,10 +87,10 @@ export default function ProfileSection({
               <div>
                 <p className="text-sm text-gray-500">Address</p>
                 <p className="text-gray-800">
-                  {user?.userProfile?.address
-                    ? `${user?.userProfile?.address}, ${
-                        user?.userProfile?.city || ""
-                      }, ${user?.userProfile?.country || ""}`
+                  {user?.address
+                    ? `${user?.address}, ${user?.city || ""}, ${
+                        user?.country || ""
+                      }`
                     : "Not set"}
                 </p>
               </div>
@@ -107,30 +100,24 @@ export default function ProfileSection({
               <div>
                 <p className="text-sm text-gray-500">Date of Birth</p>
                 <p className="text-gray-800">
-                  {user?.userProfile?.dateOfBirth
-                    ? new Date(
-                        user?.userProfile?.dateOfBirth
-                      ).toLocaleDateString()
+                  {user?.dateOfBirth
+                    ? new Date(user?.dateOfBirth).toLocaleDateString()
                     : "Not set"}
                 </p>
               </div>
             </div>
             <div className="flex items-center">
-              <User className="h-5 w-5 mr-3 text-gray-500" />
+              <UserIcon className="h-5 w-5 mr-3 text-gray-500" />
               <div>
                 <p className="text-sm text-gray-500">Gender</p>
-                <p className="text-gray-800">
-                  {user?.userProfile?.gender || "Not set"}
-                </p>
+                <p className="text-gray-800">{user?.gender || "Not set"}</p>
               </div>
             </div>
             <div className="flex items-center">
               <BookOpen className="h-5 w-5 mr-3 text-gray-500" />
               <div>
                 <p className="text-sm text-gray-500">Education</p>
-                <p className="text-gray-800">
-                  {user?.userProfile?.education || "Not set"}
-                </p>
+                <p className="text-gray-800">{user?.education || "Not set"}</p>
               </div>
             </div>
             <div className="flex items-center">
@@ -138,9 +125,9 @@ export default function ProfileSection({
               <div>
                 <p className="text-sm text-gray-500">Skills</p>
                 <p className="text-gray-800">
-                  {Array.isArray(user?.userProfile?.skills)
-                    ? user?.userProfile?.skills.join(", ")
-                    : user?.userProfile?.skills || "Not set"}
+                  {Array.isArray(user?.skills)
+                    ? user?.skills.join(", ")
+                    : user?.skills || "Not set"}
                 </p>
               </div>
             </div>

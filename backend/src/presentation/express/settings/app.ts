@@ -7,6 +7,7 @@ import { errorMiddleware } from "../middlewares/error.middleware";
 import authRouter from "../router/auth.router";
 import { createAppDependencies } from "../../../di/index.dependencies";
 import { userRouter } from "../router/user.router";
+import morgan from "morgan";
 
 export const createApp = (): Application => {
   const app = express();
@@ -16,6 +17,7 @@ export const createApp = (): Application => {
   app.use(cookieParser(cookieConfig.secret));
   app.use(express.json());
   app.use(express.urlencoded({ extended: true }));
+  app.use(morgan("dev"));
 
   const { authController , userController } = createAppDependencies();
 
