@@ -2,6 +2,7 @@ import { z } from "zod";
 import { FormFieldConfig, FormModal } from "@/components/ui/FormModal";
 import { useUpdateUser } from "@/hooks/user/useUpdateUser";
 import { uploadToCloudinary } from "@/lib/cloudinary";
+import { User } from "@/types/user";
 
 // Zod schema for profile validation (unchanged)
 const profileSchema = z.object({
@@ -43,11 +44,20 @@ const profileSchema = z.object({
     .optional(),
   dateOfBirth: z.coerce
     .date()
+    .refine(
+      (date) => {
+        const today = new Date();
+        today.setHours(0, 0, 0, 0); // Reset time to start of day for comparison
+        return date < today;
+      },
+      {
+        message: "Date of birth must be in the past",
+      }
+    )
     .transform((date) => date.toISOString())
     .optional(),
   gender: z.enum(["MALE", "FEMALE", "OTHER"]).optional(),
 });
-
 // Form field configurations (unchanged)
 const formFields: FormFieldConfig<z.infer<typeof profileSchema>>[] = [
   {
@@ -141,24 +151,6 @@ const formFields: FormFieldConfig<z.infer<typeof profileSchema>>[] = [
   },
 ];
 
-interface UserProfile {
-  bio?: string;
-  dateOfBirth?: string;
-  gender?: "MALE" | "FEMALE" | "OTHER";
-  phoneNumber?: string;
-  address?: string;
-  city?: string;
-  country?: string;
-  education?: string;
-  skills?: string | string[];
-}
-
-interface User {
-  name?: string;
-  avatar?: string;
-  email?: string;
-  userProfile?: UserProfile;
-}
 
 interface EditProfileFormProps {
   open: boolean;
@@ -213,19 +205,19 @@ export default function EditProfileForm({
     ? {
         name: user.name || "",
         avatar: user.avatar || "",
-        bio: user.userProfile?.bio || "",
-        education: user.userProfile?.education || "",
-        skills: Array.isArray(user.userProfile?.skills)
-          ? user.userProfile.skills.join(", ")
-          : user.userProfile?.skills || "",
-        phoneNumber: user.userProfile?.phoneNumber || "",
-        country: user.userProfile?.country || "",
-        city: user.userProfile?.city || "",
-        address: user.userProfile?.address || "",
-        dateOfBirth: user.userProfile?.dateOfBirth
-          ? new Date(user.userProfile.dateOfBirth).toISOString().split("T")[0]
+        bio: user?.bio || "",
+        education: user?.education || "",
+        skills: Array.isArray(user?.skills)
+          ? user.skills.join(", ")
+          : user?.skills || "",
+        phoneNumber: user?.phoneNumber || "",
+        country: user?.country || "",
+        city: user?.city || "",
+        address: user?.address || "",
+        dateOfBirth: user?.dateOfBirth
+          ? new Date(user.dateOfBirth).toISOString().split("T")[0]
           : undefined,
-        gender: user.userProfile?.gender || undefined,
+        gender: user?.gender || undefined,
       }
     : undefined;
 
