@@ -19,6 +19,7 @@ export interface IUpdateUserRequestDTO {
   id: string;
   name?: string;
   email?: string;
+  role?: Role;
   password?: string;
   googleId?: string;
   facebookId?: string;

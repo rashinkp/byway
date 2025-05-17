@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from "express";
 import { JwtProvider } from "../../../infra/providers/auth/jwt.provider";
 import { HttpError } from "../../http/utils/HttpErrors";
 
-interface JwtPayload {
+export interface JwtPayload {
   id: string;
   email: string;
   role: string;

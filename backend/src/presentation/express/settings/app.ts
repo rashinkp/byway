@@ -8,6 +8,7 @@ import authRouter from "../router/auth.router";
 import { createAppDependencies } from "../../../di/index.dependencies";
 import { userRouter } from "../router/user.router";
 import morgan from "morgan";
+import { instructorRouter } from "../router/instructor.router";
 
 export const createApp = (): Application => {
   const app = express();
@@ -19,7 +20,7 @@ export const createApp = (): Application => {
   app.use(express.urlencoded({ extended: true }));
   app.use(morgan("dev"));
 
-  const { authController , userController } = createAppDependencies();
+  const { authController , userController , instructorController } = createAppDependencies();
 
   // Routers
   // app.use("/api/admin", adminRouter);
@@ -28,6 +29,7 @@ export const createApp = (): Application => {
   // app.use("/api/courses", courseRouter);
   app.use("/api/v1/auth", authRouter(authController));
   app.use("/api/v1/user", userRouter(userController));
+  app.use("/api/v1/instructor", instructorRouter(instructorController));
   // app.use("/api/cart", cartRouter);
   // app.use("/api/orders", orderRouter);
   // app.use("/api/payments", paymentRouter);
