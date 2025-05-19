@@ -14,7 +14,7 @@ export function useCreateInstructor() {
     mutationFn: (data: InstructorFormData) => createInstructor(data),
     onSuccess: (response) => {
       setUser(response.data);
-      queryClient.invalidateQueries({ queryKey: ["user"] });
+      queryClient.invalidateQueries({ queryKey: ["user"], exact: false });
       toast.success("Instructor application submitted successfully!", {
         description: "Your application is under review.",
       });

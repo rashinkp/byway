@@ -42,8 +42,12 @@ export async function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
-  // Protect /admin and /instructor routes
-  if (pathname.startsWith("/admin") || pathname.startsWith("/instructor") || pathname.startsWith('/user')) {
+  // Protect /admin, /instructor, and /user routes
+  if (
+    pathname.startsWith("/admin") ||
+    pathname.startsWith("/instructor") ||
+    pathname.startsWith("/user")
+  ) {
     if (!user) {
       const response = NextResponse.redirect(
         new URL("/login?clearAuth=true", request.url)
@@ -53,7 +57,7 @@ export async function middleware(request: NextRequest) {
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
         sameSite: "strict",
-        expires: new Date(0), // Expire immediately to delete the cookie
+        expires: new Date(0),
         path: "/",
       });
 
@@ -65,15 +69,18 @@ export async function middleware(request: NextRequest) {
     const role = user.role;
 
     if (pathname.startsWith("/admin") && role !== "ADMIN") {
-      return NextResponse.redirect(new URL("/login", request.url));
+      return NextResponse.redirect(
+        new URL("/login?clearAuth=true", request.url)
+      );
     }
 
     if (pathname.startsWith("/instructor") && role !== "INSTRUCTOR") {
-      return NextResponse.redirect(new URL("/login", request.url));
+      return NextResponse.redirect(
+        new URL("/login?clearAuth=true", request.url)
+      );
     }
   }
 
-  // Allow access to all other routes
   return NextResponse.next();
 }
 
@@ -86,6 +93,6 @@ export const config = {
     "/reset-password",
     "/admin/:path*",
     "/instructor/:path*",
-    '/user/:path*'
+    "/user/:path*",
   ],
 };

@@ -29,7 +29,7 @@ export default function CommonLayout({
   isCollapsible = false,
   skeleton,
 }: CommonLayoutProps) {
-  const { user, isLoading, isInitialized, initializeAuth } = useAuthStore();
+  const { user, isLoading, initializeAuth } = useAuthStore();
   const { mutate: logout } = useLogout();
   const router = useRouter();
   const pathname = usePathname();
@@ -37,9 +37,13 @@ export default function CommonLayout({
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   useEffect(() => {
-    if (!isInitialized) {
-      initializeAuth();
-    }
+    console.log("CommonLayout: Initializing auth, pathname:", pathname);
+    initializeAuth().then(() => {
+      console.log(
+        "CommonLayout: Auth initialized, user:",
+        user?.role || "null"
+      );
+    });
     if (isCollapsible) {
       const checkScreenSize = () => {
         setCollapsed(window.innerWidth < 1024);
@@ -48,7 +52,7 @@ export default function CommonLayout({
       window.addEventListener("resize", checkScreenSize);
       return () => window.removeEventListener("resize", checkScreenSize);
     }
-  }, [isInitialized, initializeAuth, isCollapsible]);
+  }, [initializeAuth, isCollapsible, pathname]);
 
   const handleLogout = async () => {
     try {
@@ -65,15 +69,18 @@ export default function CommonLayout({
     ? "AD"
     : "IN";
 
-  if (isLoading || !isInitialized) {
+  if (isLoading) {
+    console.log("CommonLayout: Showing skeleton, isLoading:", isLoading);
     return skeleton || null;
   }
 
   if (!user || user.role !== role) {
-    router.push("/login");
+    console.log(`Role mismatch: Expected ${role}, Got ${user?.role || "null"}`);
+    setTimeout(() => router.push("/login?clearAuth=true"), 100); // Delay redirect to allow state sync
     return null;
   }
 
+  console.log("CommonLayout: Rendering dashboard, user:", user.role);
   return (
     <div className="flex min-h-screen bg-gray-50">
       <div className="lg:hidden fixed top-4 left-4 z-50">
@@ -116,7 +123,7 @@ export default function CommonLayout({
             ? collapsed
               ? "lg:ml-20"
               : "lg:ml-64"
-            : "lg:ml-64 lg:[&  @media(min-width:1024px)]:ml-[80px] xl:ml-64"
+            : "lg:ml-64 lg:[&@media(min-width:1024px)]:ml-[80px] xl:ml-64"
         }`}
       >
         <TopNavbar pathname={pathname} navItems={navItems} />

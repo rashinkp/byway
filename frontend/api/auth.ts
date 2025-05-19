@@ -117,11 +117,16 @@ export async function resetPassword(
 
 export async function getCurrentUser(): Promise<User | null> {
   try {
-    const response = await api.get<ApiResponse<User>>("/user/me");
+    const response = await api.get<ApiResponse<User>>("/user/me", {
+      validateStatus: (status) => status >= 200 && status < 500,
+    });
+    if (response.status === 401) {
+      return null; 
+    }
     return response.data.data;
   } catch (error: any) {
     if (error.response?.status === 401) {
-      return null;
+      return null; 
     }
     throw new Error(
       error.response?.data?.message || "Failed to fetch current user"
