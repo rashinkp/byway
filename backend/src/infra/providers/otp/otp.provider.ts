@@ -1,6 +1,6 @@
 import { v4 as uuidv4 } from "uuid";
 import nodemailer from "nodemailer";
-import { UserVerification } from "../../../domain/entities/user-verification";
+import { UserVerification } from "../../../domain/entities/user-verification.entity";
 import { IAuthRepository } from "../../../app/repositories/auth.repository";
 
 export interface OtpProvider {

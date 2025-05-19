@@ -1,6 +1,6 @@
 import { PrismaClient, Gender } from "@prisma/client";
-import { User } from "../../domain/entities/user";
-import { UserProfile } from "../../domain/entities/user-profile";
+import { User } from "../../domain/entities/user.entity";
+import { UserProfile } from "../../domain/entities/user-profile.entity";
 import {
   IUserRepository,
   IPaginatedResponse,
@@ -71,7 +71,6 @@ export class UserRepository implements IUserRepository {
   }
 
   async updateUser(user: User): Promise<User> {
-    
     const updated = await this.prisma.user.update({
       where: { id: user.id },
       data: {

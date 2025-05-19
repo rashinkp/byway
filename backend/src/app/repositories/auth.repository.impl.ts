@@ -3,8 +3,8 @@ import {
   User as PrismaUser,
   UserVerification as PrismaVerification,
 } from "@prisma/client";
-import { User } from "../../domain/entities/user";
-import { UserVerification } from "../../domain/entities/user-verification";
+import { User } from "../../domain/entities/user.entity";
+import { UserVerification } from "../../domain/entities/user-verification.entity";
 import { IAuthRepository } from "../../app/repositories/auth.repository";
 
 export class AuthRepository implements IAuthRepository {

@@ -1,6 +1,6 @@
 import { GetUserDto } from "../../../../domain/dtos/user/user.dto";
-import { User } from "../../../../domain/entities/user";
-import { UserProfile } from "../../../../domain/entities/user-profile";
+import { User } from "../../../../domain/entities/user.entity";
+import { UserProfile } from "../../../../domain/entities/user-profile.entity";
 import { HttpError } from "../../../../presentation/http/utils/HttpErrors";
 import { IUserRepository } from "../../../repositories/user.repository";
 

@@ -21,17 +21,7 @@ export default function InstructorDashboard() {
   //   filterBy: "Active",
   // });
 
-  // useEffect(() => {
-  //   // Mock stats data (replace with real API calls)
-  //   setStats([
-  //     { title: "Total Courses", value: 5 }, // Replace with actual course count
-  //     {
-  //       title: "Active Students",
-  //       value: studentsData?.total || 0,
-  //     },
-  //     { title: "Pending Requests", value: 2 }, // Replace with actual request count
-  //   ]);
-  // }, [studentsData]);
+  // v
 
   return (
     <div className="space-y-6">

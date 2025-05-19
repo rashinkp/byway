@@ -1,5 +1,5 @@
-import { UserVerification } from "../../../../domain/entities/user-verification";
-import { User } from "../../../../domain/entities/user";
+import { UserVerification } from "../../../../domain/entities/user-verification.entity";
+import { User } from "../../../../domain/entities/user.entity";
 import { IAuthRepository } from "../../../repositories/auth.repository";
 import { HttpError } from "../../../../presentation/http/utils/HttpErrors";
 import { VerifyOtpDto } from "../../../../domain/dtos/auth/verify-otp.dto";

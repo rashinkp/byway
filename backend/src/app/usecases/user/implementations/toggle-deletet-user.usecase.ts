@@ -1,5 +1,5 @@
 import { ToggleDeleteUserDto } from "../../../../domain/dtos/user/user.dto";
-import { User } from "../../../../domain/entities/user";
+import { User } from "../../../../domain/entities/user.entity";
 import { HttpError } from "../../../../presentation/http/utils/HttpErrors";
 import { IUserRepository } from "../../../repositories/user.repository";
 import { IToggleDeleteUserUseCase } from "../interfaces/toggle-delete-user.usecase.interface";
@@ -25,7 +25,6 @@ export class ToggleDeleteUserUseCase implements IToggleDeleteUserUseCase {
     } else {
       user.restore();
     }
-
 
     return await this.userRepository.updateUser(user);
   }
