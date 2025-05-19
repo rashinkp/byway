@@ -2,7 +2,6 @@ import { APPROVALSTATUS } from "../../enum/approval-status.enum";
 import { Role } from "../../enum/role.enum";
 
 export interface CreateInstructorRequestDTO {
-  userId: string;
   areaOfExpertise: string;
   professionalExperience: string;
   about?: string;

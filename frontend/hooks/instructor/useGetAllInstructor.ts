@@ -8,33 +8,19 @@ import { ApiResponse } from "@/types/apiResponse";
 export function useGetAllInstructors() {
   const { user } = useAuthStore();
 
-  interface InstructorsQueryOptions {
-    queryKey: ["instructors"];
-    queryFn: () => Promise<ApiResponse<IInstructorWithUserDetails[]>>;
-    enabled: boolean;
-    onError: (error: Error) => void; // Changed from onFailure to onError to match useQuery
-  }
-
   return useQuery<
-    ApiResponse<IInstructorWithUserDetails[]>,
+    ApiResponse<{ items: IInstructorWithUserDetails[]; total: number; totalPages: number }>,
     Error,
-    ApiResponse<IInstructorWithUserDetails[]>,
+    ApiResponse<{ items: IInstructorWithUserDetails[]; total: number; totalPages: number }>,
     ["instructors"]
   >({
     queryKey: ["instructors"],
-    queryFn: (): Promise<ApiResponse<IInstructorWithUserDetails[]>> => {
+    queryFn: (): Promise<ApiResponse<{ items: IInstructorWithUserDetails[]; total: number; totalPages: number }>> => {
       if (user?.role !== "ADMIN") {
         throw new Error("Unauthorized: Admin access required");
       }
       return getAllInstructors();
     },
     enabled: !!user && user.role === "ADMIN",
-    onError: (error: Error): void => {
-      console.error("Fetching instructors failed:", error.message);
-      toast.error("Failed to Fetch Instructors", {
-        description:
-          error.message || "Something went wrong while fetching instructors",
-      });
-    },
-  } as InstructorsQueryOptions);
+  });
 }

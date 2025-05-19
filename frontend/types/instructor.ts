@@ -9,26 +9,38 @@ export interface InstructorFormData {
 // User details from the API response
 export interface IUserDetails {
   id: string;
+  name: string;
   email: string;
-  name: string | null;
-  role: "USER" | "INSTRUCTOR" | "ADMIN";
+  role: 'USER' | 'INSTRUCTOR' | 'ADMIN';
+  avatar?: string;
   createdAt: string;
-  updatedAt: string;
 }
 
 // Instructor details from the API response
 export interface IInstructorDetails {
   id: string;
+  userId: string;
   areaOfExpertise: string;
   professionalExperience: string;
-  about: string | null;
-  userId: string;
-  website: string | null;
+  about?: string;
+  website?: string;
   status: "PENDING" | "APPROVED" | "DECLINED";
+  totalStudents: number;
+  createdAt: string;
+  updatedAt: string;
 }
 
 // Response structure for useGetInstructorByUserId hook
 export interface IInstructorWithUserDetails {
-  instructor: IInstructorDetails | null;
+  id: string;
+  userId: string;
+  areaOfExpertise: string;
+  professionalExperience: string;
+  about?: string;
+  website?: string;
+  status: "PENDING" | "APPROVED" | "DECLINED";
+  totalStudents: number;
+  createdAt: string;
+  updatedAt: string;
   user: IUserDetails;
 }

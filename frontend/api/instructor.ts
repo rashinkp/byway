@@ -52,12 +52,13 @@ export const declineInstructor = async (
   }
 };
 
+
 export const getAllInstructors = async (): Promise<
-  ApiResponse<IInstructorWithUserDetails[]>
+  ApiResponse<{ items: IInstructorWithUserDetails[]; total: number; totalPages: number }>
 > => {
   try {
-    const response = await api.get<ApiResponse<IInstructorWithUserDetails[]>>(
-      "/instructor/all"
+    const response = await api.get<ApiResponse<{ items: IInstructorWithUserDetails[]; total: number; totalPages: number }>>(
+      "/instructor/admin/instructors"
     );
     return response.data;
   } catch (error: any) {

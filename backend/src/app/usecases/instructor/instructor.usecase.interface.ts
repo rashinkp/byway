@@ -4,7 +4,7 @@ import { JwtPayload } from "../../../presentation/express/middlewares/auth.middl
 
 
 export interface ICreateInstructorUseCase {
-  execute(dto: CreateInstructorRequestDTO, requestingUser: JwtPayload): Promise<Instructor>;
+  execute(dto: CreateInstructorRequestDTO & { userId: string }, requestingUser: JwtPayload): Promise<Instructor>;
 }
 
 export interface IUpdateInstructorUseCase {

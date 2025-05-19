@@ -1,4 +1,3 @@
-
 import { ApproveInstructorRequestDTO, CreateInstructorRequestDTO, DeclineInstructorRequestDTO, GetAllInstructorsRequestDTO, GetInstructorByUserIdRequestDTO, InstructorResponseDTO, UpdateInstructorRequestDTO } from "../../../domain/dtos/instructor/instructor.dto";
 import { Instructor } from "../../../domain/entities/instructor.entity";
 import { User } from "../../../domain/entities/user";
@@ -8,7 +7,8 @@ import { JwtPayload } from "../../../presentation/express/middlewares/auth.middl
 import { HttpError } from "../../../presentation/http/utils/HttpErrors";
 import { IInstructorRepository } from "../../repositories/instructor.repository";
 import { IUserRepository } from "../../repositories/user.repository";
-import { ICreateInstructorUseCase, IUpdateInstructorUseCase, IApproveInstructorUseCase, IDeclineInstructorUseCase, IGetInstructorByUserIdUseCase, IGetAllInstructorsUseCase } from "./instructor.usecase.interface";
+import { IApproveInstructorUseCase, ICreateInstructorUseCase, IDeclineInstructorUseCase, IGetAllInstructorsUseCase, IGetInstructorByUserIdUseCase, IUpdateInstructorUseCase } from "./instructor.usecase.interface";
+
 
 export class CreateInstructorUseCase implements ICreateInstructorUseCase {
   constructor(
@@ -16,7 +16,7 @@ export class CreateInstructorUseCase implements ICreateInstructorUseCase {
     private userRepository: IUserRepository
   ) {}
 
-  async execute(dto: CreateInstructorRequestDTO, requestingUser: JwtPayload): Promise<Instructor> {
+  async execute(dto: CreateInstructorRequestDTO & { userId: string }, requestingUser: JwtPayload): Promise<Instructor> {
     if (requestingUser.id !== dto.userId && requestingUser.role !== Role.ADMIN) {
       throw new HttpError("Unauthorized: Cannot create instructor for another user", 403);
     }

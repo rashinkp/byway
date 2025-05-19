@@ -2,9 +2,10 @@ import { z } from "zod";
 import { APPROVALSTATUS } from "../../domain/enum/approval-status.enum";
 
 const createInstructorSchema = z.object({
-  userId: z.string().min(1, "User ID is required"),
   areaOfExpertise: z.string().min(1, "Area of expertise is required"),
-  professionalExperience: z.string().min(1, "Professional experience is required"),
+  professionalExperience: z
+    .string()
+    .min(1, "Professional experience is required"),
   about: z.string().optional(),
   website: z.string().url().optional(),
 });
@@ -15,7 +16,13 @@ const updateInstructorSchema = z.object({
   professionalExperience: z.string().min(1).optional(),
   about: z.string().optional(),
   website: z.string().url().optional(),
-  status: z.enum([APPROVALSTATUS.PENDING, APPROVALSTATUS.APPROVED, APPROVALSTATUS.DECLINED]).optional(),
+  status: z
+    .enum([
+      APPROVALSTATUS.PENDING,
+      APPROVALSTATUS.APPROVED,
+      APPROVALSTATUS.DECLINED,
+    ])
+    .optional(),
 });
 
 const approveInstructorSchema = z.object({
@@ -31,9 +38,23 @@ const getInstructorByUserIdSchema = z.object({
 });
 
 const getAllInstructorsSchema = z.object({
-  page: z.string().regex(/^\d+$/).optional().transform(val => val ? Number(val) : undefined),
-  limit: z.string().regex(/^\d+$/).optional().transform(val => val ? Number(val) : undefined),
-  status: z.enum([APPROVALSTATUS.PENDING, APPROVALSTATUS.APPROVED, APPROVALSTATUS.DECLINED]).optional(),
+  page: z
+    .string()
+    .regex(/^\d+$/)
+    .optional()
+    .transform((val) => (val ? Number(val) : undefined)),
+  limit: z
+    .string()
+    .regex(/^\d+$/)
+    .optional()
+    .transform((val) => (val ? Number(val) : undefined)),
+  status: z
+    .enum([
+      APPROVALSTATUS.PENDING,
+      APPROVALSTATUS.APPROVED,
+      APPROVALSTATUS.DECLINED,
+    ])
+    .optional(),
 });
 
 export function validateCreateInstructor(data: unknown) {

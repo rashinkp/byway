@@ -1,11 +1,12 @@
 import { Request, Response, NextFunction } from "express";
-import { IApproveInstructorUseCase, ICreateInstructorUseCase, IDeclineInstructorUseCase, IGetAllInstructorsUseCase, IGetInstructorByUserIdUseCase, IUpdateInstructorUseCase } from "../../../app/usecases/instructor/instructor.usecase.interface";
+import { ICreateInstructorUseCase, IUpdateInstructorUseCase, IApproveInstructorUseCase, IDeclineInstructorUseCase, IGetInstructorByUserIdUseCase, IGetAllInstructorsUseCase } from "../../../app/usecases/instructor/instructor.usecase.interface";
 import { IUserRepository } from "../../../app/repositories/user.repository";
 import { validateApproveInstructor, validateCreateInstructor, validateDeclineInstructor, validateGetAllInstructors, validateGetInstructorByUserId, validateUpdateInstructor } from "../../validators/instructor.validators";
 import { JwtPayload } from "../../express/middlewares/auth.middleware";
 import { ApiResponse } from "../interfaces/ApiResponse";
 import { InstructorResponseDTO } from "../../../domain/dtos/instructor/instructor.dto";
 import { APPROVALSTATUS } from "../../../domain/enum/approval-status.enum";
+
 export class InstructorController {
   constructor(
     private createInstructorUseCase: ICreateInstructorUseCase,
@@ -20,8 +21,9 @@ export class InstructorController {
   async createInstructor(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const validated = validateCreateInstructor(req.body);
-      const instructor = await this.createInstructorUseCase.execute(validated, req.user as JwtPayload);
-      const user = await this.userRepository.findById((req.user as JwtPayload).id);
+      const userId = (req.user as JwtPayload).id;
+      const instructor = await this.createInstructorUseCase.execute({ ...validated, userId }, req.user as JwtPayload);
+      const user = await this.userRepository.findById(userId);
       if (!user) {
         throw new Error("User not found");
       }
