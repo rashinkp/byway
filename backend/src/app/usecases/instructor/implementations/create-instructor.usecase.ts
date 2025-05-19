@@ -20,9 +20,29 @@ export class CreateInstructorUseCase implements ICreateInstructorUseCase {
     }
 
     const existingInstructor = await this.instructorRepository.findInstructorByUserId(dto.userId);
-    if (existingInstructor) {
-      throw new HttpError("User is already an instructor", 400);
+    if (existingInstructor?.status === 'PENDING') {
+      throw new HttpError("Your application is under process please wait", 400);
     }
+
+
+    if (
+      existingInstructor?.status === "DECLINED" &&
+      existingInstructor.updatedAt
+    ) {
+      const now = new Date();
+      const updatedAt = new Date(existingInstructor.updatedAt);
+      const fiveMinutesInMs = 5 * 60 * 1000;
+
+      if (now.getTime() - updatedAt.getTime() < fiveMinutesInMs) {
+        throw new HttpError(
+          "Your application is declined. Please wait 5 minutes before retrying.",
+          400
+        );
+      }
+    }
+    
+    
+    
 
     const user = await this.userRepository.findById(dto.userId);
     if (!user) {

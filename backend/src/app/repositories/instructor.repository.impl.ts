@@ -6,9 +6,11 @@ export class InstructorRepository implements IInstructorRepository {
   constructor(private prisma: PrismaClient) {}
 
   async createInstructor(instructor: Instructor): Promise<Instructor> {
-    const created = await this.prisma.instructorDetails.create({
-      data: {
-        id: instructor.id,
+    const upserted = await this.prisma.instructorDetails.upsert({
+      where: {
+        userId: instructor.userId, // Use instructor.userId instead of instructor.id
+      },
+      update: {
         userId: instructor.userId,
         areaOfExpertise: instructor.areaOfExpertise,
         professionalExperience: instructor.professionalExperience,
@@ -16,11 +18,22 @@ export class InstructorRepository implements IInstructorRepository {
         website: instructor.website,
         status: instructor.status,
         totalStudents: instructor.totalStudents,
-        createdAt: instructor.createdAt,
-        updatedAt: instructor.updatedAt,
+        updatedAt: new Date(),
+      },
+      create: {
+        userId: instructor.userId,
+        areaOfExpertise: instructor.areaOfExpertise,
+        professionalExperience: instructor.professionalExperience,
+        about: instructor.about,
+        website: instructor.website,
+        status: instructor.status,
+        totalStudents: instructor.totalStudents,
+        createdAt: instructor.createdAt || new Date(), // Provide default if null
+        updatedAt: instructor.updatedAt || new Date(), // Provide default if null
       },
     });
-    return Instructor.fromPrisma(created);
+
+    return Instructor.fromPrisma(upserted);
   }
 
   async updateInstructor(instructor: Instructor): Promise<Instructor> {
@@ -55,7 +68,11 @@ export class InstructorRepository implements IInstructorRepository {
     return Instructor.fromPrisma(instructor);
   }
 
-  async findAllInstructors(page: number = 1, limit: number = 10, status?: APPROVALSTATUS): Promise<{ items: Instructor[]; total: number; totalPages: number }> {
+  async findAllInstructors(
+    page: number = 1,
+    limit: number = 10,
+    status?: APPROVALSTATUS
+  ): Promise<{ items: Instructor[]; total: number; totalPages: number }> {
     const skip = (page - 1) * limit;
     const where = status ? { status: { equals: status } } : {};
 
