@@ -30,6 +30,8 @@ export default function InstructorsPage() {
             | "createdAt"
             | `-${"name" | "email" | "createdAt"}`,
           role: "INSTRUCTOR",
+          filterBy: params.filterBy as "All" | "Active" | "Inactive",
+          includeDeleted: true,
         })
       }
       columns={[
