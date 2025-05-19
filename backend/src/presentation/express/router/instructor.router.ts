@@ -39,7 +39,7 @@ export function instructorRouter(instructorController: InstructorController): Ro
 
   router.get(
     "/me",
-    restrictTo("INSTRUCTOR", "ADMIN"),
+    restrictTo("INSTRUCTOR", "ADMIN" , "USER"),
     instructorController.getInstructorByUserId.bind(instructorController)
   );
 

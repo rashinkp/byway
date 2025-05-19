@@ -10,13 +10,8 @@ import { ApiResponse } from "@/types/apiResponse";
 export function useCreateInstructor() {
   const { setUser } = useAuthStore();
 
-  return useMutation<
-    ApiResponse<User>,
-    Error,
-    InstructorFormData
-  >({
-    mutationFn: (characters: InstructorFormData) =>
-      createInstructor(characters),
+  return useMutation<ApiResponse<User>, any, InstructorFormData>({
+    mutationFn: (data: InstructorFormData) => createInstructor(data),
     onSuccess: (response) => {
       setUser(response.data);
       queryClient.invalidateQueries({ queryKey: ["user"] });
@@ -25,9 +20,16 @@ export function useCreateInstructor() {
       });
     },
     onError: (error) => {
-      console.error("Instructor creation failed:", error.message);
+      console.error(
+        "Instructor creation failed:",
+        JSON.stringify(error, null, 2)
+      );
+      const errorMessage =
+        error.response?.data?.message ||
+        error.message ||
+        "Something went wrong while applying";
       toast.error("Instructor Apply Failed", {
-        description: error.message || "Something went wrong while applying",
+        description: errorMessage,
       });
     },
   });

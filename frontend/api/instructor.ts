@@ -9,14 +9,21 @@ export const createInstructor = async (
   try {
     const response = await api.post<ApiResponse<User>>(
       "/instructor/create",
-      data
+      data,
     );
     return response.data;
   } catch (error: any) {
     console.error("Error creating instructor:", error);
-    throw new Error(
-      error.response?.data?.message || "Failed to create instructor"
-    );
+    // Forward the full error object with response data
+    throw {
+      response: error.response
+        ? {
+            status: error.response.status,
+            data: error.response.data, // Preserve the ApiResponse structure
+          }
+        : undefined,
+      message: error.response?.data?.message || "Failed to create instructor",
+    };
   }
 };
 
