@@ -1,11 +1,16 @@
 import { Request, Response, NextFunction } from "express";
-import { ICreateInstructorUseCase, IUpdateInstructorUseCase, IApproveInstructorUseCase, IDeclineInstructorUseCase, IGetInstructorByUserIdUseCase, IGetAllInstructorsUseCase } from "../../../app/usecases/instructor/instructor.usecase.interface";
 import { IUserRepository } from "../../../app/repositories/user.repository";
 import { validateApproveInstructor, validateCreateInstructor, validateDeclineInstructor, validateGetAllInstructors, validateGetInstructorByUserId, validateUpdateInstructor } from "../../validators/instructor.validators";
 import { JwtPayload } from "../../express/middlewares/auth.middleware";
 import { ApiResponse } from "../interfaces/ApiResponse";
 import { InstructorResponseDTO } from "../../../domain/dtos/instructor/instructor.dto";
 import { APPROVALSTATUS } from "../../../domain/enum/approval-status.enum";
+import { ICreateInstructorUseCase } from "../../../app/usecases/instructor/interfaces/create-instructor.usecase.interface";
+import { IUpdateInstructorUseCase } from "../../../app/usecases/instructor/interfaces/update-instructor.usecase.interface";
+import { IApproveInstructorUseCase } from "../../../app/usecases/instructor/interfaces/approve-instructor.usecase.interface";
+import { IDeclineInstructorUseCase } from "../../../app/usecases/instructor/interfaces/decline-instructor.usecase.interface";
+import { IGetInstructorByUserIdUseCase } from "../../../app/usecases/instructor/interfaces/get-instructor-by-Id.usecase.interface";
+import { IGetAllInstructorsUseCase } from "../../../app/usecases/instructor/interfaces/get-all-instructors.usecase.interface";
 
 export class InstructorController {
   constructor(
@@ -15,6 +20,7 @@ export class InstructorController {
     private declineInstructorUseCase: IDeclineInstructorUseCase,
     private getInstructorByUserIdUseCase: IGetInstructorByUserIdUseCase,
     private getAllInstructorsUseCase: IGetAllInstructorsUseCase,
+
     private userRepository: IUserRepository
   ) {}
 

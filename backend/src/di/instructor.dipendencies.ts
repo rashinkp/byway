@@ -2,7 +2,12 @@ import { PrismaClient } from "@prisma/client";
 import { InstructorController } from "../presentation/http/controllers/instructor.controller";
 import { InstructorRepository } from "../app/repositories/instructor.repository.impl";
 import { UserRepository } from "../app/repositories/user.repository.impl";
-import { ApproveInstructorUseCase, CreateInstructorUseCase, DeclineInstructorUseCase, GetAllInstructorsUseCase, GetInstructorByUserIdUseCase, UpdateInstructorUseCase } from "../app/usecases/instructor/instructor.usecase";
+import { CreateInstructorUseCase } from "../app/usecases/instructor/implementations/create-instructor.usecase";
+import { UpdateInstructorUseCase } from "../app/usecases/instructor/implementations/update-instructor.usecase";
+import { ApproveInstructorUseCase } from "../app/usecases/instructor/implementations/approve-instructor.usecase";
+import { DeclineInstructorUseCase } from "../app/usecases/instructor/implementations/decline-instructor.usecase";
+import { GetInstructorByUserIdUseCase } from "../app/usecases/instructor/implementations/get-instructor-by-Id.usecase";
+import { GetAllInstructorsUseCase } from "../app/usecases/instructor/implementations/get-all-instructors.usecase";
 
 export interface InstructorDependencies {
   instructorController: InstructorController;

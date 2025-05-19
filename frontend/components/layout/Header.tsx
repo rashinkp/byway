@@ -80,7 +80,7 @@ export function Header({ client }: HeaderProps = {}) {
 
   // Check if instructor application is pending
   const isInstructorPending =
-    instructorData?.data?.instructor?.status === "PENDING" || isInstructorLoading;
+    instructorData?.data?.status === "PENDING" || isInstructorLoading;
 
   return (
     <>
