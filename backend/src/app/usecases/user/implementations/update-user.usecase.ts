@@ -1,15 +1,10 @@
 import { UpdateUserDto } from "../../../../domain/dtos/user/user.dto";
 import { User } from "../../../../domain/entities/user";
 import { UserProfile } from "../../../../domain/entities/user-profile";
+import { Role } from "../../../../domain/enum/role.enum";
 import { HttpError } from "../../../../presentation/http/utils/HttpErrors";
 import { IUserRepository } from "../../../repositories/user.repository";
-
-export interface IUpdateUserUseCase {
-  execute(
-    dto: UpdateUserDto,
-    userId: string
-  ): Promise<{ user: User; profile: UserProfile | null }>;
-}
+import { IUpdateUserUseCase } from "../interfaces/update-user.usecase.interface";
 
 export class UpdateUserUseCase implements IUpdateUserUseCase {
   constructor(private userRepository: IUserRepository) {}
@@ -27,6 +22,7 @@ export class UpdateUserUseCase implements IUpdateUserUseCase {
       id: user.id,
       name: dto.name,
       avatar: dto.avatar,
+      role: dto.role as Role,
     });
 
     let profile = await this.userRepository.findProfileByUserId(userId);
@@ -61,6 +57,7 @@ export class UpdateUserUseCase implements IUpdateUserUseCase {
     }
 
     const savedUser = await this.userRepository.updateUser(updatedUser);
+
     return { user: savedUser, profile };
   }
 }

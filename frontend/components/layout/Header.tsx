@@ -1,9 +1,10 @@
 "use client";
+
 import Link from "next/link";
 import { useAuth } from "@/hooks/auth/useAuth";
 import { useLogout } from "@/hooks/auth/useLogout";
 import { useCreateInstructor } from "@/hooks/instructor/useCreateInstructor";
-import { useGetInstructorByUserId } from "@/hooks/instructor/useGetInstructorByUserId"; // Add this import
+import { useGetInstructorByUserId } from "@/hooks/instructor/useGetInstructorByUserId";
 import { Button } from "@/components/ui/button";
 import {
   Loader2,
@@ -45,7 +46,7 @@ export function Header({ client }: HeaderProps = {}) {
   const { mutate: createInstructor, isPending: isCreatingInstructor } =
     useCreateInstructor();
   const { data: instructorData, isLoading: isInstructorLoading } =
-    useGetInstructorByUserId(); // Fetch instructor data
+    useGetInstructorByUserId(false); // Disable query in Header
   const [isInstructorModalOpen, setIsInstructorModalOpen] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
@@ -65,10 +66,9 @@ export function Header({ client }: HeaderProps = {}) {
         });
       });
     },
-    [createInstructor, setIsInstructorModalOpen]
+    [createInstructor]
   );
 
-  // Add scroll effect
   useEffect(() => {
     const handleScroll = () => {
       setScrolled(window.scrollY > 10);
@@ -93,7 +93,6 @@ export function Header({ client }: HeaderProps = {}) {
         <div className="container mx-auto px-10 py-3">
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center justify-between">
-            {/* Logo */}
             <div className="flex items-center gap-10">
               <Link
                 href="/"
@@ -101,8 +100,6 @@ export function Header({ client }: HeaderProps = {}) {
               >
                 Byway
               </Link>
-
-              {/* Categories Dropdown */}
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button
@@ -145,8 +142,6 @@ export function Header({ client }: HeaderProps = {}) {
                 </DropdownMenuContent>
               </DropdownMenu>
             </div>
-
-            {/* Search Bar */}
             <div className="flex-1 max-w-md mx-8">
               <div className="relative">
                 <input
@@ -157,14 +152,12 @@ export function Header({ client }: HeaderProps = {}) {
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
               </div>
             </div>
-
-            {/* Right Section */}
             <nav className="flex items-center gap-4">
               {isLoading ? (
                 <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
               ) : user ? (
                 <>
-                  {user.role !== "INSTRUCTOR" && !isInstructorPending && (
+                  {user.role !== "INSTRUCTOR" && (
                     <Button
                       variant="ghost"
                       onClick={() => setIsInstructorModalOpen(true)}
@@ -181,10 +174,7 @@ export function Header({ client }: HeaderProps = {}) {
                       )}
                     </Button>
                   )}
-
-                  {/* User Actions */}
                   <div className="flex items-center gap-5">
-                    {/* Plain Icons with Hover Effects */}
                     <div className="relative group">
                       <Heart
                         className="w-6 h-6 text-gray-600 group-hover:text-red-500 transition-colors cursor-pointer"
@@ -211,8 +201,6 @@ export function Header({ client }: HeaderProps = {}) {
                         5
                       </Badge>
                     </div>
-
-                    {/* User Profile Dropdown */}
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
                         <div className="relative group cursor-pointer">
@@ -279,10 +267,8 @@ export function Header({ client }: HeaderProps = {}) {
               )}
             </nav>
           </div>
-
           {/* Mobile Navigation */}
           <div className="flex md:hidden items-center justify-between">
-            {/* Mobile Menu Button */}
             <Button
               variant="ghost"
               size="icon"
@@ -295,8 +281,6 @@ export function Header({ client }: HeaderProps = {}) {
                 <Menu className="h-6 w-6" />
               )}
             </Button>
-
-            {/* Logo */}
             <Link
               href="/"
               className="text-xl font-bold text-blue-600 flex items-center gap-2"
@@ -304,8 +288,6 @@ export function Header({ client }: HeaderProps = {}) {
               <BookOpen className="w-6 h-6" />
               Byway
             </Link>
-
-            {/* Mobile Icons */}
             <div className="flex items-center gap-4">
               <div className="relative group">
                 <ShoppingCart
@@ -318,7 +300,6 @@ export function Header({ client }: HeaderProps = {}) {
                   </Badge>
                 )}
               </div>
-
               {user && (
                 <div className="relative group">
                   <Link href="/user/profile">
@@ -330,11 +311,8 @@ export function Header({ client }: HeaderProps = {}) {
               )}
             </div>
           </div>
-
-          {/* Mobile Menu Expanded */}
           {isMenuOpen && (
             <div className="md:hidden pt-4 pb-2 space-y-4 border-t mt-3">
-              {/* Mobile Search */}
               <div className="relative">
                 <input
                   type="text"
@@ -343,8 +321,6 @@ export function Header({ client }: HeaderProps = {}) {
                 />
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
               </div>
-
-              {/* Mobile Navigation Links */}
               <div className="space-y-3">
                 <Link
                   href="/categories"
@@ -352,7 +328,6 @@ export function Header({ client }: HeaderProps = {}) {
                 >
                   Categories
                 </Link>
-
                 {isLoading ? (
                   <div className="flex justify-center">
                     <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
@@ -371,7 +346,7 @@ export function Header({ client }: HeaderProps = {}) {
                     >
                       My Courses
                     </Link>
-                    {user.role !== "INSTRUCTOR" && !isInstructorPending && (
+                    {user.role !== "INSTRUCTOR" && (
                       <button
                         onClick={() => setIsInstructorModalOpen(true)}
                         disabled={isLoggingOut || isCreatingInstructor}
@@ -415,7 +390,6 @@ export function Header({ client }: HeaderProps = {}) {
           )}
         </div>
       </header>
-
       <InstructorFormModal
         open={isInstructorModalOpen}
         onOpenChange={setIsInstructorModalOpen}

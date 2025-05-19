@@ -155,6 +155,10 @@ export class User {
       updatedProps.deletedAt = dto.deletedAt;
     }
 
+    if (dto.role !== undefined) {
+      updatedProps.role = dto.role;
+    }
+
     return new User(updatedProps);
   }
 

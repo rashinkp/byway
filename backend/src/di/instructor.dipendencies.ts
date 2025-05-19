@@ -8,6 +8,7 @@ import { ApproveInstructorUseCase } from "../app/usecases/instructor/implementat
 import { DeclineInstructorUseCase } from "../app/usecases/instructor/implementations/decline-instructor.usecase";
 import { GetInstructorByUserIdUseCase } from "../app/usecases/instructor/implementations/get-instructor-by-Id.usecase";
 import { GetAllInstructorsUseCase } from "../app/usecases/instructor/implementations/get-all-instructors.usecase";
+import { UpdateUserUseCase } from "../app/usecases/user/implementations/update-user.usecase";
 
 export interface InstructorDependencies {
   instructorController: InstructorController;
@@ -18,12 +19,30 @@ export function createInstructorDependencies(): InstructorDependencies {
   const instructorRepository = new InstructorRepository(prisma);
   const userRepository = new UserRepository(prisma);
 
-  const createInstructorUseCase = new CreateInstructorUseCase(instructorRepository, userRepository);
-  const updateInstructorUseCase = new UpdateInstructorUseCase(instructorRepository, userRepository);
-  const approveInstructorUseCase = new ApproveInstructorUseCase(instructorRepository);
-  const declineInstructorUseCase = new DeclineInstructorUseCase(instructorRepository);
-  const getInstructorByUserIdUseCase = new GetInstructorByUserIdUseCase(instructorRepository);
-  const getAllInstructorsUseCase = new GetAllInstructorsUseCase(instructorRepository, userRepository);
+  const createInstructorUseCase = new CreateInstructorUseCase(
+    instructorRepository,
+    userRepository
+  );
+  const updateInstructorUseCase = new UpdateInstructorUseCase(
+    instructorRepository,
+    userRepository
+  );
+  const updateUserUseCase = new UpdateUserUseCase(userRepository);
+  const approveInstructorUseCase = new ApproveInstructorUseCase(
+    instructorRepository,
+    userRepository,
+    updateUserUseCase
+  );
+  const declineInstructorUseCase = new DeclineInstructorUseCase(
+    instructorRepository
+  );
+  const getInstructorByUserIdUseCase = new GetInstructorByUserIdUseCase(
+    instructorRepository
+  );
+  const getAllInstructorsUseCase = new GetAllInstructorsUseCase(
+    instructorRepository,
+    userRepository
+  );
 
   const instructorController = new InstructorController(
     createInstructorUseCase,

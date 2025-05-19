@@ -4,7 +4,7 @@ import { IInstructorWithUserDetails } from "@/types/instructor";
 import { ApiResponse } from "@/types/apiResponse";
 import { useAuthStore } from "@/stores/auth.store";
 
-export function useGetInstructorByUserId() {
+export function useGetInstructorByUserId(enabled: boolean = true) {
   const { user } = useAuthStore();
 
   const queryResult = useQuery<
@@ -13,7 +13,7 @@ export function useGetInstructorByUserId() {
   >({
     queryKey: ["instructor", user?.id],
     queryFn: getInstructorByUserId,
-    enabled: !!user,
+    enabled: !!user && enabled, // Only run if user exists and enabled is true
   });
 
   return queryResult;

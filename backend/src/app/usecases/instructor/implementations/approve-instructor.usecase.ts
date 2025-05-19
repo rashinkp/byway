@@ -4,10 +4,16 @@ import { Role } from "../../../../domain/enum/role.enum";
 import { JwtPayload } from "../../../../presentation/express/middlewares/auth.middleware";
 import { HttpError } from "../../../../presentation/http/utils/HttpErrors";
 import { IInstructorRepository } from "../../../repositories/instructor.repository";
+import { IUserRepository } from "../../../repositories/user.repository";
+import { IUpdateUserUseCase } from "../../user/interfaces/update-user.usecase.interface";
 import { IApproveInstructorUseCase } from "../interfaces/approve-instructor.usecase.interface";
 
 export class ApproveInstructorUseCase implements IApproveInstructorUseCase {
-  constructor(private instructorRepository: IInstructorRepository) {}
+  constructor(
+    private instructorRepository: IInstructorRepository,
+    private userRepository: IUserRepository,
+    private updateUserUseCase: IUpdateUserUseCase
+  ) { }
 
   async execute(dto: ApproveInstructorRequestDTO, requestingUser: JwtPayload): Promise<Instructor> {
     if (requestingUser.role !== Role.ADMIN) {
@@ -20,6 +26,20 @@ export class ApproveInstructorUseCase implements IApproveInstructorUseCase {
     }
 
     instructor.approve();
+
+    // Update the user's role to INSTRUCTOR
+    const user = await this.userRepository.findById(instructor.userId);
+    if (!user) {
+      throw new HttpError("User not found", 404);
+    }
+
+    await this.updateUserUseCase.execute(
+      {
+        role: Role.INSTRUCTOR,
+      },
+      user.id
+    );
+
     return this.instructorRepository.updateInstructor(instructor);
   }
 }

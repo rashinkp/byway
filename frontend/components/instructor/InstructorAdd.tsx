@@ -5,6 +5,16 @@ import { FormModal } from "@/components/ui/FormModal";
 import { Path } from "react-hook-form";
 import { useGetInstructorByUserId } from "@/hooks/instructor/useGetInstructorByUserId";
 import { useAuthStore } from "@/stores/auth.store";
+import { useEffect, useState } from "react";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Clock } from "lucide-react";
 
 export const instructorSchema = z.object({
   areaOfExpertise: z
@@ -25,7 +35,6 @@ export const instructorSchema = z.object({
 
 export type InstructorFormData = z.infer<typeof instructorSchema>;
 
-// Define fields outside the component to ensure stability
 const fields: {
   name: Path<InstructorFormData>;
   label: string;
@@ -79,83 +88,151 @@ export function InstructorFormModal({
 }: InstructorFormModalProps) {
   const { user } = useAuthStore();
   const { data: instructorData, isLoading: isInstructorLoading } =
-    useGetInstructorByUserId();
+    useGetInstructorByUserId(open);
+  const [timeLeft, setTimeLeft] = useState<number | null>(null);
 
-  // Only render modal if user is not an admin
+  useEffect(() => {
+    if (
+      instructorData?.data?.status === "DECLINED" &&
+      instructorData.data.updatedAt
+    ) {
+      const updatedAt = new Date(instructorData.data.updatedAt);
+      const now = new Date();
+      const fiveMinutesInMs = 5 * 60 * 1000;
+      const timeSinceUpdate = now.getTime() - updatedAt.getTime();
+      const remainingTime = fiveMinutesInMs - timeSinceUpdate;
+
+      if (remainingTime > 0) {
+        setTimeLeft(Math.ceil(remainingTime / 1000));
+        const interval = setInterval(() => {
+          setTimeLeft((prev) => {
+            if (prev === null || prev <= 1) {
+              clearInterval(interval);
+              return null;
+            }
+            return prev - 1;
+          });
+        }, 1000);
+        return () => clearInterval(interval);
+      } else {
+        setTimeLeft(null);
+      }
+    } else {
+      setTimeLeft(null);
+    }
+  }, [instructorData]);
+
   if (user?.role === "ADMIN") {
     return null;
   }
 
+  const formatTimeLeft = (seconds: number) => {
+    const minutes = Math.floor(seconds / 60);
+    const remainingSeconds = seconds % 60;
+    return `${minutes}:${remainingSeconds.toString().padStart(2, "0")}`;
+  };
+
   const renderContent = () => {
     if (isInstructorLoading) {
       return (
-        <div className="text-center py-4">
-          <p className="text-gray-700">Loading...</p>
+        <div className="text-center py-8">
+          <div className="inline-block animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-500"></div>
+          <p className="text-gray-600 mt-2">Loading...</p>
         </div>
       );
     }
 
-    const status = instructorData?.data?.instructor?.status;
+    const status = instructorData?.data?.status;
 
     if (status === "PENDING") {
       return (
-        <div className="text-center py-4">
-          <p className="text-gray-700 font-semibold">
-            Your instructor application is pending verification.
-          </p>
-          <p className="text-gray-500 mt-2">
-            We'll notify you once your application is reviewed. For questions,
-            contact{" "}
-            <a
-              href="mailto:support@byway.com"
-              className="text-blue-600 hover:underline"
-            >
-              support@byway.com
-            </a>
-            .
-          </p>
-        </div>
+        <>
+          <DialogHeader>
+            <DialogTitle className="text-xl font-semibold text-gray-800">
+              Application Pending
+            </DialogTitle>
+            <DialogDescription className="text-gray-600">
+              Your instructor application is under review.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="text-center py-4">
+            <p className="text-gray-600 mb-4">
+              Your application is currently under review. We'll notify you once
+              a decision is made.
+            </p>
+            <p className="text-gray-500">
+              For questions, please contact{" "}
+              <a
+                href="mailto:support@byway.com"
+                className="text-blue-600 hover:underline"
+              >
+                support@byway.com
+              </a>
+              .
+            </p>
+          </div>
+        </>
       );
     }
 
     if (status === "APPROVED") {
       return (
-        <div className="text-center py-4">
-          <p className="text-gray-700 font-semibold">
-            You are already an approved instructor.
-          </p>
-          <p className="text-gray-500 mt-2">
-            Start creating courses in the{" "}
-            <a
-              href="/instructor/dashboard"
-              className="text-blue-600 hover:underline"
+        <>
+          <DialogHeader>
+            <DialogTitle className="text-xl font-semibold text-gray-800">
+              Approved Instructor
+            </DialogTitle>
+            <DialogDescription className="text-gray-600">
+              You are already an approved instructor.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="text-center py-4">
+            <p className="text-gray-600 mb-4">Start creating courses now!</p>
+            <Button
+              asChild
+              className="bg-blue-600 hover:bg-blue-700 text-white"
             >
-              Instructor Dashboard
-            </a>
-            .
-          </p>
-        </div>
+              <a href="/instructor/dashboard">Go to Instructor Dashboard</a>
+            </Button>
+          </div>
+        </>
       );
     }
 
-    if (status === "DECLINED") {
+    if (status === "DECLINED" && timeLeft !== null) {
       return (
-        <FormModal
-          open={open}
-          onOpenChange={onOpenChange}
-          onSubmit={onSubmit}
-          schema={instructorSchema}
-          initialData={initialData}
-          title="Reapply as Instructor"
-          submitText="Reapply"
-          fields={fields}
-          description="Your previous application was declined. Update your details and reapply to become an instructor."
-          isSubmitting={isSubmitting}
-        />
+        <>
+          <DialogHeader>
+            <DialogTitle className="text-xl font-semibold text-gray-800">
+              Application Declined
+            </DialogTitle>
+            <DialogDescription className="text-gray-600">
+              Your previous application was declined.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="text-center py-4">
+            <p className="text-gray-600 mb-4">
+              You can reapply after the cooldown period.
+            </p>
+            <div className="flex items-center justify-center gap-2 text-gray-600 mb-4">
+              <Clock className="w-5 h-5" />
+              <p>Time left to reapply: {formatTimeLeft(timeLeft)}</p>
+            </div>
+            <p className="text-gray-500">
+              For questions, please contact{" "}
+              <a
+                href="mailto:support@byway.com"
+                className="text-blue-600 hover:underline"
+              >
+                support@byway.com
+              </a>
+              .
+            </p>
+          </div>
+        </>
       );
     }
 
-    // No application exists, show the form for a new application
     return (
       <FormModal
         open={open}
@@ -163,14 +240,28 @@ export function InstructorFormModal({
         onSubmit={onSubmit}
         schema={instructorSchema}
         initialData={initialData}
-        title="Become an Instructor"
-        submitText="Apply"
+        title={
+          status === "DECLINED"
+            ? "Reapply as Instructor"
+            : "Become an Instructor"
+        }
+        submitText={status === "DECLINED" ? "Reapply" : "Apply"}
         fields={fields}
-        description="Apply to become an instructor by filling out your details."
+        description={
+          status === "DECLINED"
+            ? "Your previous application was declined. Update your details and reapply to become an instructor."
+            : "Apply to become an instructor by filling out your details."
+        }
         isSubmitting={isSubmitting}
       />
     );
   };
 
-  return <div>{renderContent()}</div>;
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="sm:max-w-[425px]">
+        {renderContent()}
+      </DialogContent>
+    </Dialog>
+  );
 }

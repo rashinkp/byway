@@ -43,6 +43,7 @@ export const UpdateUserDtoSchema = z.object({
   address: z.string().optional(),
   dateOfBirth: z.string().optional(),
   gender: z.enum(["MALE", "FEMALE", "OTHER"]).optional(),
+  role: z.enum(['USER', 'INSTRUCTOR', 'ADMIN']).optional(),
 });
 
 export type UpdateUserDto = z.infer<typeof UpdateUserDtoSchema>;
