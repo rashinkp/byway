@@ -70,6 +70,8 @@ function ListPage<T>({
   const [sortBy, setSortBy] = useState<string>(defaultSortBy);
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
 
+  console.log(filterStatus, "filter status ------------->");
+
   const { data, isLoading, error, refetch } = useDataHook({
     page,
     limit: itemsPerPage,

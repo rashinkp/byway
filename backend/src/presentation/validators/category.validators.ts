@@ -1,5 +1,10 @@
 import { z } from "zod";
-import { ICategoryIdInputDTO, ICreateCategoryInputDTO, IGetAllCategoriesInputDTO, IUpdateCategoryInputDTO } from "../../domain/dtos/category/category.dto";
+import {
+  ICategoryIdInputDTO,
+  ICreateCategoryInputDTO,
+  IGetAllCategoriesInputDTO,
+  IUpdateCategoryInputDTO,
+} from "../../domain/dtos/category/category.dto";
 
 export const validateCreateCategory = (
   data: unknown
@@ -37,10 +42,14 @@ export const validateGetAllCategories = (
 ): IGetAllCategoriesInputDTO => {
   return z
     .object({
-      page: z.number().int().positive().default(1).optional(),
-      limit: z.number().int().positive().default(10).optional(),
+      page: z.coerce.number().int().positive().default(1).optional(),
+      limit: z.coerce.number().int().positive().default(10).optional(),
       search: z.string().default("").optional(),
-      includeDeleted: z.boolean().default(false).optional(),
+      includeDeleted: z
+        .string()
+        .default("false")
+        .transform((val) => val === "true")
+        .optional(),
       sortBy: z.string().default("createdAt").optional(),
       sortOrder: z.enum(["asc", "desc"]).default("asc").optional(),
       filterBy: z.string().default("All").optional(),

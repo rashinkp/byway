@@ -1,17 +1,16 @@
 import { api } from "@/api/api";
-import { Category, CategoryFormData, ICategoryListOutput, IGetAllCategoryResponse } from "@/types/category";
-
-
-
+import {
+  Category,
+  CategoryFormData,
+  ICategoryListOutput,
+  IGetAllCategoryResponse,
+} from "@/types/category";
 
 export async function createCategory(
   payload: CategoryFormData
 ): Promise<Category> {
   try {
-    const response = await api.post<Category>(
-      "/category/admin/categories",
-      payload
-    );
+    const response = await api.post<Category>("/category", payload);
     return response.data;
   } catch (error: any) {
     throw new Error(error.response?.data?.message || "Create category failed");
@@ -36,20 +35,17 @@ export async function getAllCategories({
   filterBy?: string;
 } = {}): Promise<ICategoryListOutput> {
   try {
-    const response = await api.get<IGetAllCategoryResponse>(
-      "/category/admin/categories",
-      {
-        params: {
-          page,
-          limit,
-          search,
-          includeDeleted,
-          sortBy,
-          sortOrder,
-          filterBy,
-        },
-      }
-    );
+    const response = await api.get<IGetAllCategoryResponse>("/category/", {
+      params: {
+        page,
+        limit,
+        search,
+        includeDeleted,
+        sortBy,
+        sortOrder,
+        filterBy,
+      },
+    });
     return {
       categories: response.data.data.categories,
       total: response.data.data.total,
@@ -62,9 +58,7 @@ export async function getAllCategories({
 }
 export async function getCategoryById(id: string): Promise<Category> {
   try {
-    const response = await api.get<Category>(
-      `/category/admin/categories/${id}`
-    );
+    const response = await api.get<Category>(`/category/${id}`);
     return response.data;
   } catch (error: any) {
     throw new Error(
@@ -78,10 +72,7 @@ export async function updateCategory(
   payload: CategoryFormData
 ): Promise<Category> {
   try {
-    const response = await api.put<Category>(
-      `/category/admin/categories/${id}`,
-      payload
-    );
+    const response = await api.put<Category>(`/category/${id}`, payload);
     return response.data;
   } catch (error: any) {
     throw new Error(error.response?.data?.message || "Update category failed");
@@ -90,7 +81,7 @@ export async function updateCategory(
 
 export async function deleteCategory(id: string): Promise<void> {
   try {
-    await api.delete(`/category/admin/categories/${id}`);
+    await api.delete(`/category/${id}`);
   } catch (error: any) {
     throw new Error(error.response?.data?.message || "Delete category failed");
   }
@@ -98,9 +89,7 @@ export async function deleteCategory(id: string): Promise<void> {
 
 export async function recoverCategory(id: string): Promise<Category> {
   try {
-    const response = await api.patch<Category>(
-      `/category/admin/categories/${id}/recover`
-    );
+    const response = await api.patch<Category>(`/category/${id}/recover`);
     return response.data;
   } catch (error: any) {
     throw new Error(error.response?.data?.message || "Recover category failed");

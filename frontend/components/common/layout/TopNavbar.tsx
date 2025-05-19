@@ -1,4 +1,3 @@
-
 import { NavItem } from "@/types/nav";
 import { generateBreadcrumbs } from "@/utils/brudcrumbs";
 import Link from "next/link";
@@ -17,7 +16,7 @@ export function TopNavbar({ pathname, navItems }: TopNavbarProps) {
         <nav aria-label="Breadcrumb">
           <ol className="flex items-center space-x-2 text-sm text-gray-600">
             {breadcrumbs.map((crumb, index) => (
-              <li key={crumb.href} className="flex items-center">
+              <li key={index} className="flex items-center">
                 {index < breadcrumbs.length - 1 ? (
                   <>
                     <Link

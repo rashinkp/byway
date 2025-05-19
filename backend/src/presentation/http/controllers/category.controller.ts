@@ -24,7 +24,8 @@ export class CategoryController {
     next: NextFunction
   ): Promise<void> {
     try {
-      const validated = validateCreateCategory(req.body);
+      const createdBy = req.user?.id;
+      const validated = validateCreateCategory({...req.body , createdBy});
       const category = await this.createCategoryUseCase.execute(validated);
       const response: ApiResponse = {
         statusCode: 201,

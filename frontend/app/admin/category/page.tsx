@@ -95,6 +95,12 @@ export default function CategoriesPage() {
               | "createdAt"
               | "updatedAt"
               | `-${"name" | "createdAt" | "updatedAt"}`,
+            filterBy: params.filterBy as
+              | "All"
+              | "Active"
+              | "Inactive"
+              | undefined,
+            includeDeleted: true,
           })
         }
         columns={[

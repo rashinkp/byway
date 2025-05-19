@@ -75,7 +75,7 @@ export function useToggleDeleteCategory() {
         });
 
       toast.success(
-        category.deletedAt ? "Category restored" : "Category deleted"
+        category.deletedAt ? "Category restored" : "Category deleted",{description:'Category soft deleted successfully.'}
       );
     },
     onError: (error: any, category, context: any) => {

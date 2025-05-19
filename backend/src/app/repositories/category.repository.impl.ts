@@ -13,7 +13,7 @@ export class CategoryRepository implements ICategoryRepository {
       createdBy: category.createdBy,
       createdAt: category.createdAt,
       updatedAt: category.updatedAt,
-      deletedAt: category.deletedAt,
+      deletedAt: category.deletedAt ? category.deletedAt : null,
     };
 
     const saved = await this.prisma.category.upsert({
@@ -47,14 +47,22 @@ export class CategoryRepository implements ICategoryRepository {
       includeDeleted = false,
       sortBy = "createdAt",
       sortOrder = "asc",
+      filterBy ='all'
     } = input;
 
-    const where = {
-      ...(search
-        ? { name: { contains: search, mode: "insensitive" as const } }
-        : {}),
-      ...(includeDeleted ? {} : { deletedAt: null }),
-    };
+    const where: any = {};
+    if (!includeDeleted && filterBy !== "Inactive") {
+      where.deletedAt = null;
+    }
+    if (filterBy === "Inactive") {
+      where.deletedAt = { not: null };
+    }
+    if (search) {
+      where.OR = [
+        { name: { contains: search, mode: "insensitive" } },
+        { email: { contains: search, mode: "insensitive" } },
+      ];
+    }
 
     const [categories, total] = await Promise.all([
       this.prisma.category.findMany({

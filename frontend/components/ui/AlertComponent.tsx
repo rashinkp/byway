@@ -66,9 +66,16 @@ export function AlertComponent({
           <AlertDialogTitle className="text-lg font-semibold text-gray-900">
             {title}
           </AlertDialogTitle>
-          <AlertDialogDescription className="mt-2 text-sm text-gray-600">
-            {getDynamicDescription() as string}
-          </AlertDialogDescription>
+
+          {typeof getDynamicDescription() === "string" ? (
+            <AlertDialogDescription className="mt-2 text-sm text-gray-600">
+              {getDynamicDescription() as string}
+            </AlertDialogDescription>
+          ) : (
+            <div className="mt-2 text-sm text-gray-600">
+              {getDynamicDescription() as string}
+            </div>
+          )}
         </AlertDialogHeader>
         <AlertDialogFooter className="mt-4 flex justify-end gap-2">
           {cancelText && (

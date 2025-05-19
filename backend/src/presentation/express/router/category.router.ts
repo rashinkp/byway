@@ -1,12 +1,13 @@
 import { Router } from "express";
 import { CategoryController } from "../../http/controllers/category.controller";
+import { restrictTo } from "../middlewares/auth.middleware";
 
 export default function categoryRouter(
   categoryController: CategoryController
 ): Router {
   const router = Router();
 
-  router.post("/", (req, res, next) =>
+  router.post("/",restrictTo('ADMIN'), (req, res, next) =>
     categoryController.createCategory(req, res, next)
   );
   router.get("/", (req, res, next) =>

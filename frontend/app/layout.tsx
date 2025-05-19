@@ -1,4 +1,3 @@
-// app/layout.tsx
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
@@ -9,6 +8,7 @@ import BywayFooter from "@/components/Footer";
 import { LoadingProvider } from "@/lib/context/LoadingContext";
 import { Loading } from "@/components/GlobalLoading";
 
+// Load fonts
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -19,6 +19,7 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+// Metadata
 export const metadata: Metadata = {
   title: "Byway",
   description: "Learn and Teach Online",
@@ -33,6 +34,7 @@ export default function RootLayout({
     <html lang="en">
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased flex flex-col min-h-screen`}
+        suppressHydrationWarning
       >
         <LoadingProvider>
           <Providers>
