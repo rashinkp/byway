@@ -1,7 +1,7 @@
 import { PrismaClient, Category as PrismaCategory } from "@prisma/client";
-import { Category } from "../../../domain/entities/category.entity";
-import { ICategoryRepository } from "../interfaces/category.repository";
-import { IGetAllCategoriesInputDTO } from "../../../domain/dtos/category/category.dto";
+import { Category } from "../../domain/entities/category.entity";
+import { ICategoryRepository } from "../../app/repositories/category.repository";
+import { IGetAllCategoriesInputDTO } from "../../domain/dtos/category/category.dto";
 export class CategoryRepository implements ICategoryRepository {
   constructor(private prisma: PrismaClient) {}
 
@@ -47,7 +47,7 @@ export class CategoryRepository implements ICategoryRepository {
       includeDeleted = false,
       sortBy = "createdAt",
       sortOrder = "asc",
-      filterBy ='all'
+      filterBy = "all",
     } = input;
 
     const where: any = {};

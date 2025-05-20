@@ -3,8 +3,8 @@ import {
   IGetEnrolledCoursesInputDTO,
 } from "../../../../domain/dtos/course/course.dto";
 import { HttpError } from "../../../../presentation/http/utils/HttpErrors";
-import { ICourseRepository } from "../../../../infra/repositories/interfaces/course.repository.interface";
-import { IUserRepository } from "../../../../infra/repositories/interfaces/user.repository";
+import { ICourseRepository } from "../../../repositories/course.repository.interface";
+import { IUserRepository } from "../../../repositories/user.repository";
 import { IGetEnrolledCoursesUseCase } from "../interfaces/get-enrolled-courses.usecase.interface";
 
 export class GetEnrolledCoursesUseCase implements IGetEnrolledCoursesUseCase {

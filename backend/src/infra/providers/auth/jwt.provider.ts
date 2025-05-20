@@ -1,10 +1,7 @@
 import jwt from "jsonwebtoken";
 import { envConfig } from "../../../presentation/express/configs/env.config";
+import { IJwtProvider } from "../../../app/providers/I.jwt.provider";
 
-export interface IJwtProvider {
-  sign(payload: object): string;
-  verify(token: string): object | null;
-}
 
 export class JwtProvider implements IJwtProvider {
   sign(payload: object): string {

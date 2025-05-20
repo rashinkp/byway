@@ -3,8 +3,8 @@ import {
   InstructorResponseDTO,
 } from "../../../../domain/dtos/instructor/instructor.dto";
 import { APPROVALSTATUS } from "../../../../domain/enum/approval-status.enum";
-import { IInstructorRepository } from "../../../../infra/repositories/interfaces/instructor.repository";
-import { IUserRepository } from "../../../../infra/repositories/interfaces/user.repository";
+import { IInstructorRepository } from "../../../repositories/instructor.repository";
+import { IUserRepository } from "../../../repositories/user.repository";
 import { IGetAllInstructorsUseCase } from "../interfaces/get-all-instructors.usecase.interface";
 
 export class GetAllInstructorsUseCase implements IGetAllInstructorsUseCase {

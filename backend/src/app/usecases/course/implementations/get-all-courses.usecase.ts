@@ -3,7 +3,7 @@ import {
   IGetAllCoursesInputDTO,
 } from "../../../../domain/dtos/course/course.dto";
 import { HttpError } from "../../../../presentation/http/utils/HttpErrors";
-import { ICourseRepository } from "../../../../infra/repositories/interfaces/course.repository.interface";
+import { ICourseRepository } from "../../../repositories/course.repository.interface";
 import { IGetAllCoursesUseCase } from "../interfaces/get-all-courses.usecase.interface";
 
 export class GetAllCoursesUseCase implements IGetAllCoursesUseCase {

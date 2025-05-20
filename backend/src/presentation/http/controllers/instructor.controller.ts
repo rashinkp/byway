@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from "express";
-import { IUserRepository } from "../../../infra/repositories/interfaces/user.repository";
+import { IUserRepository } from "../../../app/repositories/user.repository";
 import {
   validateApproveInstructor,
   validateCreateInstructor,

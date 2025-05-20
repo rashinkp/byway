@@ -1,8 +1,7 @@
 import {
   ICreateEnrollmentInputDTO,
   IEnrollmentOutputDTO,
-} from "../../../domain/dtos/course/course.dto";
-
+} from "../../domain/dtos/course/course.dto";
 
 export interface IEnrollmentRepository {
   create(input: ICreateEnrollmentInputDTO): Promise<IEnrollmentOutputDTO[]>;

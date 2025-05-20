@@ -1,19 +1,19 @@
 import { PrismaClient, Prisma } from "@prisma/client";
-import { Course } from "../../../domain/entities/course.entity";
-import { CourseLevel } from "../../../domain/enum/course-level.enum";
-import { Price } from "../../../domain/value-object/price";
-import { Duration } from "../../../domain/value-object/duration";
-import { Offer } from "../../../domain/value-object/offer";
-import { CourseStatus } from "../../../domain/enum/course-status.enum";
-import { APPROVALSTATUS } from "../../../domain/enum/approval-status.enum";
-import { HttpError } from "../../../presentation/http/utils/HttpErrors";
+import { Course } from "../../domain/entities/course.entity";
+import { CourseLevel } from "../../domain/enum/course-level.enum";
+import { Price } from "../../domain/value-object/price";
+import { Duration } from "../../domain/value-object/duration";
+import { Offer } from "../../domain/value-object/offer";
+import { CourseStatus } from "../../domain/enum/course-status.enum";
+import { APPROVALSTATUS } from "../../domain/enum/approval-status.enum";
+import { HttpError } from "../../presentation/http/utils/HttpErrors";
 import {
   ICourseResponseDTO,
   IGetAllCoursesInputDTO,
   IGetEnrolledCoursesInputDTO,
-} from "../../../domain/dtos/course/course.dto";
+} from "../../domain/dtos/course/course.dto";
 import { Decimal } from "@prisma/client/runtime/library";
-import { ICourseRepository } from "../interfaces/course.repository.interface";
+import { ICourseRepository } from "../../app/repositories/course.repository.interface";
 
 export class CourseRepository implements ICourseRepository {
   constructor(private prisma: PrismaClient) {}
@@ -337,7 +337,7 @@ export class CourseRepository implements ICourseRepository {
     try {
       const updated = await this.prisma.course.update({
         where: { id: course.id },
-        data: { deletedAt: course.deletedAt},
+        data: { deletedAt: course.deletedAt },
         include: { details: true },
       });
 

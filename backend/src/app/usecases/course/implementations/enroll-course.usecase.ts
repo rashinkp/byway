@@ -4,9 +4,9 @@ import {
 } from "../../../../domain/dtos/course/course.dto";
 import { CourseStatus } from "../../../../domain/enum/course-status.enum";
 import { HttpError } from "../../../../presentation/http/utils/HttpErrors";
-import { ICourseRepository } from "../../../../infra/repositories/interfaces/course.repository.interface";
-import { IEnrollmentRepository } from "../../../../infra/repositories/interfaces/enrollment.repository.interface";
-import { IUserRepository } from "../../../../infra/repositories/interfaces/user.repository";
+import { ICourseRepository } from "../../../repositories/course.repository.interface";
+import { IEnrollmentRepository } from "../../../repositories/enrollment.repository.interface";
+import { IUserRepository } from "../../../repositories/user.repository";
 import { IEnrollCourseUseCase } from "../interfaces/enroll-course.usecase.interface";
 
 export class EnrollCourseUseCase implements IEnrollCourseUseCase {

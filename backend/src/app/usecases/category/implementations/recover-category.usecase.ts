@@ -3,7 +3,7 @@ import {
   ICategoryOutputDTO,
 } from "../../../../domain/dtos/category/category.dto";
 import { HttpError } from "../../../../presentation/http/utils/HttpErrors";
-import { ICategoryRepository } from "../../../../infra/repositories/interfaces/category.repository";
+import { ICategoryRepository } from "../../../repositories/category.repository";
 import { IRecoverCategoryUseCase } from "../interfaces/recover-category.usecase.interface";
 
 export class RecoverCategoryUseCase implements IRecoverCategoryUseCase {

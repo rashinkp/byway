@@ -10,7 +10,7 @@ import { HttpError } from "../../../../presentation/http/utils/HttpErrors";
 import {
   IPaginatedResponse,
   IUserRepository,
-} from "../../../../infra/repositories/interfaces/user.repository";
+} from "../../../repositories/user.repository";
 import { IGetAllUsersUseCase } from "../interfaces/get-all-users.usecase.interface";
 import { IToggleDeleteUserUseCase } from "../interfaces/toggle-delete-user.usecase.interface";
 

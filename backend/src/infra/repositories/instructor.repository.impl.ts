@@ -1,7 +1,7 @@
 import { PrismaClient } from "@prisma/client";
-import { Instructor } from "../../../domain/entities/instructor.entity";
-import { APPROVALSTATUS } from "../../../domain/enum/approval-status.enum";
-import { IInstructorRepository } from "../interfaces/instructor.repository";
+import { Instructor } from "../../domain/entities/instructor.entity";
+import { APPROVALSTATUS } from "../../domain/enum/approval-status.enum";
+import { IInstructorRepository } from "../../app/repositories/instructor.repository";
 export class InstructorRepository implements IInstructorRepository {
   constructor(private prisma: PrismaClient) {}
 

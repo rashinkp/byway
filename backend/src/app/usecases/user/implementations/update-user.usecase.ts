@@ -3,7 +3,7 @@ import { User } from "../../../../domain/entities/user.entity";
 import { UserProfile } from "../../../../domain/entities/user-profile.entity";
 import { Role } from "../../../../domain/enum/role.enum";
 import { HttpError } from "../../../../presentation/http/utils/HttpErrors";
-import { IUserRepository } from "../../../../infra/repositories/interfaces/user.repository";
+import { IUserRepository } from "../../../repositories/user.repository";
 import { IUpdateUserUseCase } from "../interfaces/update-user.usecase.interface";
 
 export class UpdateUserUseCase implements IUpdateUserUseCase {

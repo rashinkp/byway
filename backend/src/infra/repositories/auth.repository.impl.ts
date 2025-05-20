@@ -3,9 +3,9 @@ import {
   User as PrismaUser,
   UserVerification as PrismaVerification,
 } from "@prisma/client";
-import { User } from "../../../domain/entities/user.entity";
-import { UserVerification } from "../../../domain/entities/user-verification.entity";
-import { IAuthRepository } from "../interfaces/auth.repository";
+import { User } from "../../domain/entities/user.entity";
+import { UserVerification } from "../../domain/entities/user-verification.entity";
+import { IAuthRepository } from "../../app/repositories/auth.repository";
 
 export class AuthRepository implements IAuthRepository {
   constructor(private prisma: PrismaClient) {}

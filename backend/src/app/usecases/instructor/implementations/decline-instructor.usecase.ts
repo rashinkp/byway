@@ -3,7 +3,7 @@ import { Instructor } from "../../../../domain/entities/instructor.entity";
 import { Role } from "../../../../domain/enum/role.enum";
 import { JwtPayload } from "../../../../presentation/express/middlewares/auth.middleware";
 import { HttpError } from "../../../../presentation/http/utils/HttpErrors";
-import { IInstructorRepository } from "../../../../infra/repositories/interfaces/instructor.repository";
+import { IInstructorRepository } from "../../../repositories/instructor.repository";
 import { IDeclineInstructorUseCase } from "../interfaces/decline-instructor.usecase.interface";
 
 export class DeclineInstructorUseCase implements IDeclineInstructorUseCase {

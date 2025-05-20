@@ -1,5 +1,5 @@
 import { ICreateCategoryUseCase } from "../interfaces/create-category.usecase.interface";
-import { IUserRepository } from "../../../../infra/repositories/interfaces/user.repository";
+import { IUserRepository } from "../../../repositories/user.repository";
 import { Role } from "../../../../domain/enum/role.enum";
 import { HttpError } from "../../../../presentation/http/utils/HttpErrors";
 import {
@@ -7,7 +7,7 @@ import {
   ICreateCategoryInputDTO,
 } from "../../../../domain/dtos/category/category.dto";
 import { Category } from "../../../../domain/entities/category.entity";
-import { ICategoryRepository } from "../../../../infra/repositories/interfaces/category.repository";
+import { ICategoryRepository } from "../../../repositories/category.repository";
 
 export class CreateCategoryUseCase implements ICreateCategoryUseCase {
   constructor(

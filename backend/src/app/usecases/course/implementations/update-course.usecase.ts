@@ -6,8 +6,8 @@ import { Duration } from "../../../../domain/value-object/duration";
 import { Offer } from "../../../../domain/value-object/offer";
 import { Price } from "../../../../domain/value-object/price";
 import { HttpError } from "../../../../presentation/http/utils/HttpErrors";
-import { ICategoryRepository } from "../../../../infra/repositories/interfaces/category.repository";
-import { ICourseRepository } from "../../../../infra/repositories/interfaces/course.repository.interface";
+import { ICategoryRepository } from "../../../repositories/category.repository";
+import { ICourseRepository } from "../../../repositories/course.repository.interface";
 import { IUpdateCourseUseCase } from "../interfaces/update-course.usecase.interface";
 
 export class UpdateCourseUseCase implements IUpdateCourseUseCase {

@@ -1,7 +1,7 @@
 import { ICourseWithEnrollmentStatus } from "../../../../domain/dtos/course/course.dto";
 import { HttpError } from "../../../../presentation/http/utils/HttpErrors";
-import { ICourseRepository } from "../../../../infra/repositories/interfaces/course.repository.interface";
-import { IEnrollmentRepository } from "../../../../infra/repositories/interfaces/enrollment.repository.interface";
+import { ICourseRepository } from "../../../repositories/course.repository.interface";
+import { IEnrollmentRepository } from "../../../repositories/enrollment.repository.interface";
 import { IGetCourseByIdUseCase } from "../interfaces/get-course-by-id.usecase.interface";
 
 export class GetCourseByIdUseCase implements IGetCourseByIdUseCase {

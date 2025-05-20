@@ -1,8 +1,11 @@
 import { PrismaClient, Gender } from "@prisma/client";
-import { User } from "../../../domain/entities/user.entity";
-import { UserProfile } from "../../../domain/entities/user-profile.entity";
-import { GetAllUsersDto } from "../../../domain/dtos/user/user.dto";
-import { IPaginatedResponse, IUserRepository } from "../interfaces/user.repository";
+import { User } from "../../domain/entities/user.entity";
+import { UserProfile } from "../../domain/entities/user-profile.entity";
+import { GetAllUsersDto } from "../../domain/dtos/user/user.dto";
+import {
+  IPaginatedResponse,
+  IUserRepository,
+} from "../../app/repositories/user.repository";
 
 export class UserRepository implements IUserRepository {
   constructor(private prisma: PrismaClient) {}

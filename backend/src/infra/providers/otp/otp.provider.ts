@@ -1,17 +1,11 @@
 import { v4 as uuidv4 } from "uuid";
 import nodemailer from "nodemailer";
 import { UserVerification } from "../../../domain/entities/user-verification.entity";
-import { IAuthRepository } from "../../repositories/interfaces/auth.repository";
+import { IAuthRepository } from "../../../app/repositories/auth.repository";
+import { IOtpProvider } from "../../../app/providers/I.otp-provider";
 
-export interface OtpProvider {
-  generateOtp(
-    email: string,
-    userId: string,
-    type: "VERIFICATION" | "RESET"
-  ): Promise<UserVerification>;
-}
 
-export class OtpProvider implements OtpProvider {
+export class OtpProvider implements IOtpProvider {
   private transporter;
 
   constructor(private authRepository: IAuthRepository) {

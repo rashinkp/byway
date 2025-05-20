@@ -1,4 +1,4 @@
-import { IAuthRepository } from "../../../../infra/repositories/interfaces/auth.repository";
+import { IAuthRepository } from "../../../repositories/auth.repository";
 import { HttpError } from "../../../../presentation/http/utils/HttpErrors";
 import { OtpProvider } from "../../../../infra/providers/otp/otp.provider";
 import { ForgotPasswordDto } from "../../../../domain/dtos/auth/forgot-password.dto";

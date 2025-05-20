@@ -1,5 +1,5 @@
 import { User } from "../../../../domain/entities/user.entity";
-import { IAuthRepository } from "../../../../infra/repositories/interfaces/auth.repository";
+import { IAuthRepository } from "../../../repositories/auth.repository";
 import { IUpdateUserRequestDTO } from "../../../../domain/entities/user.entity";
 import { IFacebookAuthUseCase } from "../interfaces/facebook-auth.usecase.interface";
 import { FacebookAuthDto } from "../../../../domain/dtos/auth/facebook-auth.dto";

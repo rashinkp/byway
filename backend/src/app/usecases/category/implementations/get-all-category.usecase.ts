@@ -1,4 +1,4 @@
-import { ICategoryRepository } from "../../../../infra/repositories/interfaces/category.repository";
+import { ICategoryRepository } from "../../../repositories/category.repository";
 import { HttpError } from "../../../../presentation/http/utils/HttpErrors";
 import { IGetAllCategoriesUseCase } from "../interfaces/get-all-categories.usecases.interface";
 import {

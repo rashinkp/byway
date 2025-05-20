@@ -2,9 +2,8 @@ import {
   ICourseResponseDTO,
   IGetAllCoursesInputDTO,
   IGetEnrolledCoursesInputDTO,
-} from "../../../domain/dtos/course/course.dto";
-import { Course } from "../../../domain/entities/course.entity";
-
+} from "../../domain/dtos/course/course.dto";
+import { Course } from "../../domain/entities/course.entity";
 
 export interface ICourseRepository {
   save(course: Course): Promise<Course>;
