@@ -46,7 +46,6 @@ const courseFieldsSchema = z.object({
     ),
   duration: z
     .number()
-    .positive("Duration must be positive")
     .optional()
     .nullable()
     .transform((val) =>
