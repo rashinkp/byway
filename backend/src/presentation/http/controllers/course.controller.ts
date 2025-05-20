@@ -72,29 +72,9 @@ export class CourseController {
   ): Promise<void> {
     try {
       const input: IGetAllCoursesInputDTO = {
-        page: req.query.page ? Number(req.query.page) : 1,
-        limit: req.query.limit ? Number(req.query.limit) : 10,
-        sortBy: req.query.sortBy
-          ? (String(req.query.sortBy) as any)
-          : "createdAt",
-        sortOrder: req.query.sortOrder
-          ? (String(req.query.sortOrder) as any)
-          : "desc",
-        includeDeleted: req.query.includeDeleted === "true",
-        search: req.query.search ? String(req.query.search) : "",
-        filterBy: req.query.filterBy
-          ? (String(req.query.filterBy) as any)
-          : "All",
-        userId: req.user?.id,
-        myCourses: req.query.myCourses === "true",
-        role: req.user?.role || "USER",
-        level: req.query.level ? (String(req.query.level) as any) : "All",
-        duration: req.query.duration
-          ? (String(req.query.duration) as any)
-          : "All",
-        price: req.query.price ? (String(req.query.price) as any) : "All",
+        ...req.validatedQuery,
+        userId: req.user?.id, 
       };
-
       const result = await this.getAllCoursesUseCase.execute(input);
       const response: ApiResponse<any> = {
         statusCode: StatusCodes.OK,

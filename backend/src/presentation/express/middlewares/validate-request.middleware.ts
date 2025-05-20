@@ -9,23 +9,32 @@ interface ValidationSchema {
   params?: ZodSchema;
 }
 
+// Extend the Express Request interface to include custom properties
+declare module "express" {
+  interface Request {
+    validatedBody?: any;
+    validatedQuery?: any;
+    validatedParams?: any;
+  }
+}
+
 export const validateRequest =
   (schema: ValidationSchema) =>
   async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
       // Validate body if schema is provided
       if (schema.body) {
-        req.body = await schema.body.parseAsync(req.body);
+        req.validatedBody = await schema.body.parseAsync(req.body);
       }
 
       // Validate query if schema is provided
       if (schema.query) {
-        req.query = await schema.query.parseAsync(req.query);
+        req.validatedQuery = await schema.query.parseAsync(req.query);
       }
 
       // Validate params if schema is provided
       if (schema.params) {
-        req.params = await schema.params.parseAsync(req.params);
+        req.validatedParams = await schema.params.parseAsync(req.params);
       }
 
       next();
@@ -37,7 +46,10 @@ export const validateRequest =
           message: err.message,
         }));
 
-        throw new HttpError("Validation failed", StatusCodes.BAD_REQUEST);
+        throw new HttpError(
+          `Validation failed: ${JSON.stringify(errorMessages)}`,
+          StatusCodes.BAD_REQUEST
+        );
       }
 
       // Pass unexpected errors to the error handler
