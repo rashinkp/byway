@@ -12,20 +12,20 @@ export class DeleteCourseUseCase implements IDeleteCourseUseCase {
     role: string
   ): Promise<ICourseOutputDTO> {
     const course = await this.courseRepository.findById(courseId);
-    if (!course || course.deletedAt) {
-      throw new HttpError("Course not found or already deleted", 404);
+    if (!course) {
+      throw new HttpError("Course not found", 404);
     }
 
     if (course.createdBy !== userId && role !== "ADMIN") {
       throw new HttpError(
-        "Only the course creator or admins can delete it",
+        "Only the course creator or admins can delete or restore it",
         403
       );
     }
 
-    course.softDelete();
-    const deletedCourse = await this.courseRepository.softDelete(course);
 
-    return deletedCourse.toJSON();
+    course.softDelete(); 
+    const updatedCourse = await this.courseRepository.softDelete(course);
+    return updatedCourse.toJSON();
   }
 }

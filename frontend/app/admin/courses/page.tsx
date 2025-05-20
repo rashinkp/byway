@@ -156,10 +156,6 @@ export default function CoursesPage() {
         { value: "approvalStatus", label: "Approval Status" },
       ]}
       defaultSortBy="title"
-      addButton={{
-        label: "Add Course",
-        onClick: () => router.push("/admin/courses/new"),
-      }}
     />
   );
 }

@@ -189,7 +189,7 @@ export class CourseRepository implements ICourseRepository {
 
     const where: Prisma.CourseWhereInput = {
       ...(search ? { title: { contains: search, mode: "insensitive" } } : {}),
-      ...(includeDeleted ? {} : { deletedAt: null }),
+      ...(includeDeleted || filterBy === "All" ? {} : { deletedAt: null }),
       ...(filterBy === "Active" ? { status: CourseStatus.PUBLISHED } : {}),
       ...(filterBy === "Inactive" ? { status: CourseStatus.DRAFT } : {}),
       ...(filterBy === "Declined"
@@ -333,7 +333,7 @@ export class CourseRepository implements ICourseRepository {
     try {
       const updated = await this.prisma.course.update({
         where: { id: course.id },
-        data: { deletedAt: course.deletedAt },
+        data: { deletedAt: course.deletedAt},
         include: { details: true },
       });
 
