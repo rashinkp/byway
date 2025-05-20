@@ -1,5 +1,6 @@
-import { Instructor } from "../../domain/entities/instructor.entity";
-import { APPROVALSTATUS } from "../../domain/enum/approval-status.enum";
+import { Instructor } from "../../../domain/entities/instructor.entity";
+import { APPROVALSTATUS } from "../../../domain/enum/approval-status.enum";
+
 
 
 export interface IInstructorRepository {

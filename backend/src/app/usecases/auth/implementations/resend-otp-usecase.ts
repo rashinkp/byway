@@ -1,4 +1,4 @@
-import { IAuthRepository } from "../../../repositories/auth.repository";
+import { IAuthRepository } from "../../../../infra/repositories/interfaces/auth.repository";
 import { HttpError } from "../../../../presentation/http/utils/HttpErrors";
 import { OtpProvider } from "../../../../infra/providers/otp/otp.provider";
 import { IResendOtpUseCase } from "../interfaces/resend-otp.usecase.interface";

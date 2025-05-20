@@ -1,9 +1,4 @@
-import { PrismaClient } from "@prisma/client";
 import { AuthController } from "../presentation/http/controllers/auth.controller";
-import { AuthRepository } from "../app/repositories/auth.repository.impl";
-import { OtpProvider } from "../infra/providers/otp/otp.provider";
-import { GoogleAuthProvider } from "../infra/providers/auth/google-auth.provider";
-import { envConfig } from "../presentation/express/configs/env.config";
 import { FacebookAuthUseCase } from "../app/usecases/auth/implementations/facebook-auth.usecase";
 import { ForgotPasswordUseCase } from "../app/usecases/auth/implementations/forgot-passowrd.usecase";
 import { GoogleAuthUseCase } from "../app/usecases/auth/implementations/google-auth.usecase";
@@ -13,17 +8,16 @@ import { RegisterUseCase } from "../app/usecases/auth/implementations/register.u
 import { ResendOtpUseCase } from "../app/usecases/auth/implementations/resend-otp-usecase";
 import { ResetPasswordUseCase } from "../app/usecases/auth/implementations/reset-password.usecase";
 import { VerifyOtpUseCase } from "../app/usecases/auth/implementations/verify-otp.usecase";
+import { SharedDependencies } from "./shared.dependencies";
 
 export interface AuthDependencies {
   authController: AuthController;
 }
 
-export function createAuthDependencies(): AuthDependencies {
-  // Initialize infrastructure
-  const prisma = new PrismaClient();
-  const authRepository = new AuthRepository(prisma);
-  const otpProvider = new OtpProvider(authRepository);
-  const googleAuthGateway = new GoogleAuthProvider(envConfig.GOOGLE_CLIENT_ID);
+export function createAuthDependencies(
+  deps: SharedDependencies
+): AuthDependencies {
+  const { authRepository, otpProvider, googleAuthProvider } = deps;
 
   // Initialize use cases
   const facebookAuthUseCase = new FacebookAuthUseCase(authRepository);
@@ -33,7 +27,7 @@ export function createAuthDependencies(): AuthDependencies {
   );
   const googleAuthUseCase = new GoogleAuthUseCase(
     authRepository,
-    googleAuthGateway
+    googleAuthProvider
   );
   const loginUseCase = new LoginUseCase(authRepository);
   const logoutUseCase = new LogoutUseCase();

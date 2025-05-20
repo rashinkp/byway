@@ -1,6 +1,6 @@
 import { ICourseOutputDTO } from "../../../../domain/dtos/course/course.dto";
 import { HttpError } from "../../../../presentation/http/utils/HttpErrors";
-import { ICourseRepository } from "../../../repositories/course.repository.interface";
+import { ICourseRepository } from "../../../../infra/repositories/interfaces/course.repository.interface";
 import { IDeleteCourseUseCase } from "../interfaces/delete-course.usecase.interface";
 
 export class DeleteCourseUseCase implements IDeleteCourseUseCase {
@@ -23,8 +23,7 @@ export class DeleteCourseUseCase implements IDeleteCourseUseCase {
       );
     }
 
-
-    course.softDelete(); 
+    course.softDelete();
     const updatedCourse = await this.courseRepository.softDelete(course);
     return updatedCourse.toJSON();
   }

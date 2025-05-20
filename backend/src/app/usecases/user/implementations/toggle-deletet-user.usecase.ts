@@ -1,7 +1,7 @@
 import { ToggleDeleteUserDto } from "../../../../domain/dtos/user/user.dto";
 import { User } from "../../../../domain/entities/user.entity";
 import { HttpError } from "../../../../presentation/http/utils/HttpErrors";
-import { IUserRepository } from "../../../repositories/user.repository";
+import { IUserRepository } from "../../../../infra/repositories/interfaces/user.repository";
 import { IToggleDeleteUserUseCase } from "../interfaces/toggle-delete-user.usecase.interface";
 
 export class ToggleDeleteUserUseCase implements IToggleDeleteUserUseCase {

@@ -1,8 +1,4 @@
-import { PrismaClient } from "@prisma/client";
 import { CourseController } from "../presentation/http/controllers/course.controller";
-import { CourseRepository } from "../app/repositories/course.repository.impl";
-import { UserRepository } from "../app/repositories/user.repository.impl";
-import { CategoryRepository } from "../app/repositories/category.repository.impl";
 import { CreateCourseUseCase } from "../app/usecases/course/implementations/create-course.usecase";
 import { GetAllCoursesUseCase } from "../app/usecases/course/implementations/get-all-courses.usecase";
 import { GetCourseByIdUseCase } from "../app/usecases/course/implementations/get-course-by-Id.usecase";
@@ -12,17 +8,21 @@ import { GetEnrolledCoursesUseCase } from "../app/usecases/course/implementation
 import { ApproveCourseUseCase } from "../app/usecases/course/implementations/approve-course.usecase";
 import { DeclineCourseUseCase } from "../app/usecases/course/implementations/decline-course.usecase";
 import { EnrollCourseUseCase } from "../app/usecases/course/implementations/enroll-course.usecase";
-import { EnrollmentRepository } from "../app/repositories/enrollment.repository.impl";
+import { SharedDependencies } from "./shared.dependencies";
+
 export interface CourseDependencies {
   courseController: CourseController;
 }
 
-export function createCourseDependencies(): CourseDependencies {
-  const prisma = new PrismaClient();
-  const courseRepository = new CourseRepository(prisma);
-  const userRepository = new UserRepository(prisma);
-  const categoryRepository = new CategoryRepository(prisma);
-  const enrollmentRepository = new EnrollmentRepository(prisma);
+export function createCourseDependencies(
+  deps: SharedDependencies
+): CourseDependencies {
+  const {
+    courseRepository,
+    categoryRepository,
+    userRepository,
+    enrollmentRepository,
+  } = deps;
 
   const createCourseUseCase = new CreateCourseUseCase(
     courseRepository,

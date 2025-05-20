@@ -1,6 +1,13 @@
 import { Request, Response, NextFunction } from "express";
-import { IUserRepository } from "../../../app/repositories/user.repository";
-import { validateApproveInstructor, validateCreateInstructor, validateDeclineInstructor, validateGetAllInstructors, validateGetInstructorByUserId, validateUpdateInstructor } from "../../validators/instructor.validators";
+import { IUserRepository } from "../../../infra/repositories/interfaces/user.repository";
+import {
+  validateApproveInstructor,
+  validateCreateInstructor,
+  validateDeclineInstructor,
+  validateGetAllInstructors,
+  validateGetInstructorByUserId,
+  validateUpdateInstructor,
+} from "../../validators/instructor.validators";
 import { JwtPayload } from "../../express/middlewares/auth.middleware";
 import { ApiResponse } from "../interfaces/ApiResponse";
 import { InstructorResponseDTO } from "../../../domain/dtos/instructor/instructor.dto";
@@ -24,11 +31,18 @@ export class InstructorController {
     private userRepository: IUserRepository
   ) {}
 
-  async createInstructor(req: Request, res: Response, next: NextFunction): Promise<void> {
+  async createInstructor(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> {
     try {
       const validated = validateCreateInstructor(req.body);
       const userId = (req.user as JwtPayload).id;
-      const instructor = await this.createInstructorUseCase.execute({ ...validated, userId }, req.user as JwtPayload);
+      const instructor = await this.createInstructorUseCase.execute(
+        { ...validated, userId },
+        req.user as JwtPayload
+      );
       const user = await this.userRepository.findById(userId);
       if (!user) {
         throw new Error("User not found");
@@ -63,11 +77,20 @@ export class InstructorController {
     }
   }
 
-  async updateInstructor(req: Request, res: Response, next: NextFunction): Promise<void> {
+  async updateInstructor(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> {
     try {
       const validated = validateUpdateInstructor(req.body);
-      const instructor = await this.updateInstructorUseCase.execute(validated, req.user as JwtPayload);
-      const user = await this.userRepository.findById((req.user as JwtPayload).id);
+      const instructor = await this.updateInstructorUseCase.execute(
+        validated,
+        req.user as JwtPayload
+      );
+      const user = await this.userRepository.findById(
+        (req.user as JwtPayload).id
+      );
       if (!user) {
         throw new Error("User not found");
       }
@@ -101,10 +124,17 @@ export class InstructorController {
     }
   }
 
-  async approveInstructor(req: Request, res: Response, next: NextFunction): Promise<void> {
+  async approveInstructor(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> {
     try {
       const validated = validateApproveInstructor(req.body);
-      const instructor = await this.approveInstructorUseCase.execute(validated, req.user as JwtPayload);
+      const instructor = await this.approveInstructorUseCase.execute(
+        validated,
+        req.user as JwtPayload
+      );
       const response: ApiResponse<{ id: string; status: string }> = {
         statusCode: 200,
         success: true,
@@ -120,10 +150,17 @@ export class InstructorController {
     }
   }
 
-  async declineInstructor(req: Request, res: Response, next: NextFunction): Promise<void> {
+  async declineInstructor(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> {
     try {
       const validated = validateDeclineInstructor(req.body);
-      const instructor = await this.declineInstructorUseCase.execute(validated, req.user as JwtPayload);
+      const instructor = await this.declineInstructorUseCase.execute(
+        validated,
+        req.user as JwtPayload
+      );
       const response: ApiResponse<{ id: string; status: string }> = {
         statusCode: 200,
         success: true,
@@ -139,37 +176,51 @@ export class InstructorController {
     }
   }
 
-  async getInstructorByUserId(req: Request, res: Response, next: NextFunction): Promise<void> {
+  async getInstructorByUserId(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> {
     try {
-      const validated = validateGetInstructorByUserId({ userId: (req.user as JwtPayload).id });
-      const instructor = await this.getInstructorByUserIdUseCase.execute(validated);
-      const user = await this.userRepository.findById((req.user as JwtPayload).id);
+      const validated = validateGetInstructorByUserId({
+        userId: (req.user as JwtPayload).id,
+      });
+      const instructor = await this.getInstructorByUserIdUseCase.execute(
+        validated
+      );
+      const user = await this.userRepository.findById(
+        (req.user as JwtPayload).id
+      );
       if (!user) {
         throw new Error("User not found");
       }
       const response: ApiResponse<InstructorResponseDTO | null> = {
         statusCode: 200,
         success: true,
-        message: instructor ? "Instructor retrieved successfully" : "Instructor not found",
-        data: instructor ? {
-          id: instructor.id,
-          userId: instructor.userId,
-          areaOfExpertise: instructor.areaOfExpertise,
-          professionalExperience: instructor.professionalExperience,
-          about: instructor.about,
-          website: instructor.website,
-          status: instructor.status as APPROVALSTATUS,
-          totalStudents: instructor.totalStudents,
-          createdAt: instructor.createdAt,
-          updatedAt: instructor.updatedAt,
-          user: {
-            id: user.id,
-            name: user.name,
-            email: user.email,
-            role: user.role,
-            avatar: user.avatar,
-          },
-        } : null,
+        message: instructor
+          ? "Instructor retrieved successfully"
+          : "Instructor not found",
+        data: instructor
+          ? {
+              id: instructor.id,
+              userId: instructor.userId,
+              areaOfExpertise: instructor.areaOfExpertise,
+              professionalExperience: instructor.professionalExperience,
+              about: instructor.about,
+              website: instructor.website,
+              status: instructor.status as APPROVALSTATUS,
+              totalStudents: instructor.totalStudents,
+              createdAt: instructor.createdAt,
+              updatedAt: instructor.updatedAt,
+              user: {
+                id: user.id,
+                name: user.name,
+                email: user.email,
+                role: user.role,
+                avatar: user.avatar,
+              },
+            }
+          : null,
       };
       res.status(200).json(response);
     } catch (error) {
@@ -177,11 +228,19 @@ export class InstructorController {
     }
   }
 
-  async getAllInstructors(req: Request, res: Response, next: NextFunction): Promise<void> {
+  async getAllInstructors(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> {
     try {
       const validated = validateGetAllInstructors(req.query);
       const result = await this.getAllInstructorsUseCase.execute(validated);
-      const response: ApiResponse<{ items: InstructorResponseDTO[]; total: number; totalPages: number }> = {
+      const response: ApiResponse<{
+        items: InstructorResponseDTO[];
+        total: number;
+        totalPages: number;
+      }> = {
         statusCode: 200,
         success: true,
         message: "Instructors retrieved successfully",

@@ -1,7 +1,10 @@
 import { PrismaClient } from "@prisma/client";
-import { IEnrollmentRepository } from "./enrollment.repository.interface";
-import { ICreateEnrollmentInputDTO, IEnrollmentOutputDTO } from "../../domain/dtos/course/course.dto";
-import { HttpError } from "../../presentation/http/utils/HttpErrors";
+import {
+  ICreateEnrollmentInputDTO,
+  IEnrollmentOutputDTO,
+} from "../../../domain/dtos/course/course.dto";
+import { HttpError } from "../../../presentation/http/utils/HttpErrors";
+import { IEnrollmentRepository } from "../interfaces/enrollment.repository.interface";
 
 
 export class EnrollmentRepository implements IEnrollmentRepository {

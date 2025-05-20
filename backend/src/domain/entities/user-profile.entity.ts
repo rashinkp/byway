@@ -1,28 +1,5 @@
-interface ICreateUserProfileRequestDTO {
-  userId: string;
-  bio?: string;
-  education?: string;
-  skills?: string;
-  phoneNumber?: string;
-  country?: string;
-  city?: string;
-  address?: string;
-  dateOfBirth?: Date;
-  gender?: string;
-}
+import { ICreateUserProfileRequestDTO, IUpdateUserProfileRequestDTO } from "../dtos/user/user.dto";
 
-interface IUpdateUserProfileRequestDTO {
-  id: string;
-  bio?: string;
-  education?: string;
-  skills?: string;
-  phoneNumber?: string;
-  country?: string;
-  city?: string;
-  address?: string;
-  dateOfBirth?: Date;
-  gender?: string;
-}
 
 interface UserProfileInterface {
   id: string;

@@ -1,5 +1,5 @@
 import { User } from "../../../../domain/entities/user.entity";
-import { IAuthRepository } from "../../../repositories/auth.repository";
+import { IAuthRepository } from "../../../../infra/repositories/interfaces/auth.repository";
 import {
   GoogleAuthGateway,
   GoogleUserInfo,

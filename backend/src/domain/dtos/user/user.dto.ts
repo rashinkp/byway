@@ -1,5 +1,34 @@
 import { z } from "zod";
 
+
+export interface ICreateUserProfileRequestDTO {
+  userId: string;
+  bio?: string;
+  education?: string;
+  skills?: string;
+  phoneNumber?: string;
+  country?: string;
+  city?: string;
+  address?: string;
+  dateOfBirth?: Date;
+  gender?: string;
+}
+
+export interface IUpdateUserProfileRequestDTO {
+  id: string;
+  bio?: string;
+  education?: string;
+  skills?: string;
+  phoneNumber?: string;
+  country?: string;
+  city?: string;
+  address?: string;
+  dateOfBirth?: Date;
+  gender?: string;
+}
+
+
+
 // Get All Users DTO
 export const GetAllUsersDtoSchema = z.object({
   page: z.coerce.number().int().positive().default(1),

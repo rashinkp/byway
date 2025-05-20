@@ -1,5 +1,5 @@
 import { User } from "../../../../domain/entities/user.entity";
-import { IAuthRepository } from "../../../repositories/auth.repository";
+import { IAuthRepository } from "../../../../infra/repositories/interfaces/auth.repository";
 import { HttpError } from "../../../../presentation/http/utils/HttpErrors";
 import * as bcrypt from "bcrypt";
 import { IRegisterUseCase } from "../interfaces/register.usecase.interface";

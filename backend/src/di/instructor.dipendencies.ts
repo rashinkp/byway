@@ -1,7 +1,4 @@
-import { PrismaClient } from "@prisma/client";
 import { InstructorController } from "../presentation/http/controllers/instructor.controller";
-import { InstructorRepository } from "../app/repositories/instructor.repository.impl";
-import { UserRepository } from "../app/repositories/user.repository.impl";
 import { CreateInstructorUseCase } from "../app/usecases/instructor/implementations/create-instructor.usecase";
 import { UpdateInstructorUseCase } from "../app/usecases/instructor/implementations/update-instructor.usecase";
 import { ApproveInstructorUseCase } from "../app/usecases/instructor/implementations/approve-instructor.usecase";
@@ -9,16 +6,18 @@ import { DeclineInstructorUseCase } from "../app/usecases/instructor/implementat
 import { GetInstructorByUserIdUseCase } from "../app/usecases/instructor/implementations/get-instructor-by-Id.usecase";
 import { GetAllInstructorsUseCase } from "../app/usecases/instructor/implementations/get-all-instructors.usecase";
 import { UpdateUserUseCase } from "../app/usecases/user/implementations/update-user.usecase";
+import { SharedDependencies } from "./shared.dependencies";
 
 export interface InstructorDependencies {
   instructorController: InstructorController;
 }
 
-export function createInstructorDependencies(): InstructorDependencies {
-  const prisma = new PrismaClient();
-  const instructorRepository = new InstructorRepository(prisma);
-  const userRepository = new UserRepository(prisma);
+export function createInstructorDependencies(
+  deps: SharedDependencies
+): InstructorDependencies {
+  const { instructorRepository, userRepository } = deps;
 
+  const updateUserUseCase = new UpdateUserUseCase(userRepository);
   const createInstructorUseCase = new CreateInstructorUseCase(
     instructorRepository,
     userRepository
@@ -27,7 +26,6 @@ export function createInstructorDependencies(): InstructorDependencies {
     instructorRepository,
     userRepository
   );
-  const updateUserUseCase = new UpdateUserUseCase(userRepository);
   const approveInstructorUseCase = new ApproveInstructorUseCase(
     instructorRepository,
     userRepository,

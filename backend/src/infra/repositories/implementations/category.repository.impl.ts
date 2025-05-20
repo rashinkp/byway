@@ -1,7 +1,7 @@
 import { PrismaClient, Category as PrismaCategory } from "@prisma/client";
-import { ICategoryRepository } from "./category.repository";
-import { Category } from "../../domain/entities/category.entity";
-import { IGetAllCategoriesInputDTO } from "../../domain/dtos/category/category.dto";
+import { Category } from "../../../domain/entities/category.entity";
+import { ICategoryRepository } from "../interfaces/category.repository";
+import { IGetAllCategoriesInputDTO } from "../../../domain/dtos/category/category.dto";
 export class CategoryRepository implements ICategoryRepository {
   constructor(private prisma: PrismaClient) {}
 

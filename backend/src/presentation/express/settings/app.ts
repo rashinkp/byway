@@ -5,7 +5,7 @@ import { corsConfig } from "../configs/cors.config";
 import { cookieConfig } from "../configs/cookie.config";
 import { errorMiddleware } from "../middlewares/error.middleware";
 import authRouter from "../router/auth.router";
-import { createAppDependencies } from "../../../di/index.dependencies";
+import { createAppDependencies } from "../../../di/app.dependencies";
 import { userRouter } from "../router/user.router";
 import morgan from "morgan";
 import { instructorRouter } from "../router/instructor.router";

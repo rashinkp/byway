@@ -1,4 +1,7 @@
-import { ICreateEnrollmentInputDTO, IEnrollmentOutputDTO } from "../../domain/dtos/course/course.dto";
+import {
+  ICreateEnrollmentInputDTO,
+  IEnrollmentOutputDTO,
+} from "../../../domain/dtos/course/course.dto";
 
 
 export interface IEnrollmentRepository {

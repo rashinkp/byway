@@ -1,8 +1,10 @@
-
-import { ICategoryRepository } from "../../../repositories/category.repository";
+import { ICategoryRepository } from "../../../../infra/repositories/interfaces/category.repository";
 import { HttpError } from "../../../../presentation/http/utils/HttpErrors";
 import { IGetAllCategoriesUseCase } from "../interfaces/get-all-categories.usecases.interface";
-import { ICategoryListOutputDTO, IGetAllCategoriesInputDTO } from "../../../../domain/dtos/category/category.dto";
+import {
+  ICategoryListOutputDTO,
+  IGetAllCategoriesInputDTO,
+} from "../../../../domain/dtos/category/category.dto";
 
 export class GetAllCategoriesUseCase implements IGetAllCategoriesUseCase {
   constructor(private categoryRepository: ICategoryRepository) {}

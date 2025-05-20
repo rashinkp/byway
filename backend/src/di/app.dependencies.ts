@@ -7,6 +7,7 @@ import { createAuthDependencies } from "./auth.dependencies";
 import { createCategoryDependencies } from "./category.dependencies";
 import { createCourseDependencies } from "./course.dependencies";
 import { createInstructorDependencies } from "./instructor.dipendencies";
+import { createSharedDependencies } from "./shared.dependencies";
 import { createUserDependencies } from "./user.dependencies";
 
 export interface AppDependencies {
@@ -18,11 +19,13 @@ export interface AppDependencies {
 }
 
 export function createAppDependencies(): AppDependencies {
-  const { authController } = createAuthDependencies();
-  const { userController } = createUserDependencies();
-  const { instructorController } = createInstructorDependencies();
-  const { categoryController } = createCategoryDependencies();
-  const { courseController } = createCourseDependencies();
+  const sharedDeps = createSharedDependencies();
+
+  const { authController } = createAuthDependencies(sharedDeps);
+  const { userController } = createUserDependencies(sharedDeps);
+  const { instructorController } = createInstructorDependencies(sharedDeps);
+  const { categoryController } = createCategoryDependencies(sharedDeps);
+  const { courseController } = createCourseDependencies(sharedDeps);
 
   return {
     authController,

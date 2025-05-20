@@ -1,7 +1,10 @@
 import { IDeleteCategoryUseCase } from "../interfaces/delete-category.usecase.interface";
-import { ICategoryRepository } from "../../../repositories/category.repository";
+import { ICategoryRepository } from "../../../../infra/repositories/interfaces/category.repository";
 import { HttpError } from "../../../../presentation/http/utils/HttpErrors";
-import { ICategoryIdInputDTO, ICategoryOutputDTO } from "../../../../domain/dtos/category/category.dto";
+import {
+  ICategoryIdInputDTO,
+  ICategoryOutputDTO,
+} from "../../../../domain/dtos/category/category.dto";
 
 export class DeleteCategoryUseCase implements IDeleteCategoryUseCase {
   constructor(private categoryRepository: ICategoryRepository) {}

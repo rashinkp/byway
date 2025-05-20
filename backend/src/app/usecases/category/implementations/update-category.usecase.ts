@@ -1,7 +1,10 @@
 import { IUpdateCategoryUseCase } from "../interfaces/update-category.usecase.interface";
-import { ICategoryRepository } from "../../../repositories/category.repository";
+import { ICategoryRepository } from "../../../../infra/repositories/interfaces/category.repository";
 import { HttpError } from "../../../../presentation/http/utils/HttpErrors";
-import { ICategoryOutputDTO, IUpdateCategoryInputDTO } from "../../../../domain/dtos/category/category.dto";
+import {
+  ICategoryOutputDTO,
+  IUpdateCategoryInputDTO,
+} from "../../../../domain/dtos/category/category.dto";
 import { Category } from "../../../../domain/entities/category.entity";
 
 export class UpdateCategoryUseCase implements IUpdateCategoryUseCase {

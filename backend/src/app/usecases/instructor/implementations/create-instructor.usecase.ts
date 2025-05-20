@@ -4,8 +4,8 @@ import { User } from "../../../../domain/entities/user.entity";
 import { Role } from "../../../../domain/enum/role.enum";
 import { JwtPayload } from "../../../../presentation/express/middlewares/auth.middleware";
 import { HttpError } from "../../../../presentation/http/utils/HttpErrors";
-import { IInstructorRepository } from "../../../repositories/instructor.repository";
-import { IUserRepository } from "../../../repositories/user.repository";
+import { IInstructorRepository } from "../../../../infra/repositories/interfaces/instructor.repository";
+import { IUserRepository } from "../../../../infra/repositories/interfaces/user.repository";
 import { ICreateInstructorUseCase } from "../interfaces/create-instructor.usecase.interface";
 
 export class CreateInstructorUseCase implements ICreateInstructorUseCase {

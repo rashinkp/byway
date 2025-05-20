@@ -1,5 +1,5 @@
-import { IGetAllCategoriesInputDTO } from "../../domain/dtos/category/category.dto";
-import { Category } from "../../domain/entities/category.entity";
+import { IGetAllCategoriesInputDTO } from "../../../domain/dtos/category/category.dto";
+import { Category } from "../../../domain/entities/category.entity";
 
 
 export interface ICategoryRepository {

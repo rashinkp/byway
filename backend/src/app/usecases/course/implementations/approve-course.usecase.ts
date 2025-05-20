@@ -1,9 +1,11 @@
-import { ICourseOutputDTO, IUpdateCourseApprovalInputDTO } from "../../../../domain/dtos/course/course.dto";
+import {
+  ICourseOutputDTO,
+  IUpdateCourseApprovalInputDTO,
+} from "../../../../domain/dtos/course/course.dto";
 import { APPROVALSTATUS } from "../../../../domain/enum/approval-status.enum";
+import { ICourseRepository } from "../../../../infra/repositories/interfaces/course.repository.interface";
 import { HttpError } from "../../../../presentation/http/utils/HttpErrors";
-import { ICourseRepository } from "../../../repositories/course.repository.interface";
 import { IApproveCourseUseCase } from "../interfaces/approve-course.usecase.interface";
-
 
 export class ApproveCourseUseCase implements IApproveCourseUseCase {
   constructor(private courseRepository: ICourseRepository) {}
