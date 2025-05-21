@@ -15,6 +15,7 @@ export const restrictTo =
     if (!token) {
       throw new HttpError("No token provided", 401);
     }
+    
 
     try {
       const jwtProvider = new JwtProvider();

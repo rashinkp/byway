@@ -7,7 +7,7 @@ export default function lessonRouter(
 ): Router {
   const router = Router();
 
-  router.post("/", restrictTo('ADMIN'), (req, res) =>
+  router.post("/", restrictTo('INSTRUCTOR'), (req, res) =>
     expressAdapter(
       req,
       res,
@@ -15,7 +15,7 @@ export default function lessonRouter(
     )
   );
 
-  router.put("/:lessonId", restrictTo("ADMIN"), (req, res) =>
+  router.put("/:lessonId", restrictTo("INSTRUCTOR"), (req, res) =>
     expressAdapter(
       req,
       res,
@@ -41,7 +41,7 @@ export default function lessonRouter(
   );
 
   router.get(
-    "/courses/:courseId/lessons",
+    "/:courseId/lessons",
     restrictTo("ADMIN", "USER", "INSTRUCTOR"),
     (req, res) =>
       expressAdapter(

@@ -14,9 +14,13 @@ import { ICourseRepository } from "../app/repositories/course.repository.interfa
 import { IInstructorRepository } from "../app/repositories/instructor.repository";
 import { IAuthRepository } from "../app/repositories/auth.repository";
 import { IEnrollmentRepository } from "../app/repositories/enrollment.repository.interface";
+import { ILessonRepository } from "../app/repositories/lesson.repository";
+import { ILessonContentRepository } from "../app/repositories/lesson-content.repository";
 import { HttpErrors } from "../presentation/http/http.errors";
 import { HttpSuccess } from "../presentation/http/http.success";
 import { CookieService } from "../presentation/http/utils/cookie.service";
+import { LessonRepository } from "../infra/repositories/lesson.repository.impl";
+import { LessonContentRepository } from "../infra/repositories/content.repository";
 
 export interface SharedDependencies {
   userRepository: IUserRepository;
@@ -25,6 +29,8 @@ export interface SharedDependencies {
   instructorRepository: IInstructorRepository;
   authRepository: IAuthRepository;
   enrollmentRepository: IEnrollmentRepository;
+  lessonRepository: ILessonRepository;
+  lessonContentRepository: ILessonContentRepository;
   otpProvider: OtpProvider;
   googleAuthProvider: GoogleAuthProvider;
   httpErrors: HttpErrors;
@@ -39,6 +45,8 @@ export function createSharedDependencies(): SharedDependencies {
   const instructorRepository = new InstructorRepository(prismaClient);
   const authRepository = new AuthRepository(prismaClient);
   const enrollmentRepository = new EnrollmentRepository(prismaClient);
+  const lessonRepository = new LessonRepository(prismaClient);
+  const lessonContentRepository = new LessonContentRepository(prismaClient);
   const otpProvider = new OtpProvider(authRepository);
   const googleAuthProvider = new GoogleAuthProvider(envConfig.GOOGLE_CLIENT_ID);
 
@@ -53,6 +61,8 @@ export function createSharedDependencies(): SharedDependencies {
     instructorRepository,
     authRepository,
     enrollmentRepository,
+    lessonRepository,
+    lessonContentRepository,
     otpProvider,
     googleAuthProvider,
     httpErrors,

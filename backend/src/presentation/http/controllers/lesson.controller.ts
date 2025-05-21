@@ -59,6 +59,7 @@ export class LessonController {
       };
       return this.httpSuccess.success_200(response);
     } catch (error) {
+      console.log(error);
       if (error instanceof BadRequestError) {
         return this.httpErrors.error_400();
       }

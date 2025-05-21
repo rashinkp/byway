@@ -14,7 +14,10 @@ import { LessonStatus } from "../../domain/enum/lesson.enum";
 import { ContentStatus, ContentType } from "../../domain/enum/content.enum";
 import { ILessonRepository } from "../../app/repositories/lesson.repository";
 import { Lesson } from "../../domain/entities/lesson.entity";
-import { LessonContent, QuizQuestion } from "../../domain/entities/lesson-content.entity";
+import {
+  LessonContent,
+  QuizQuestion,
+} from "../../domain/entities/lesson-content.entity";
 
 export class LessonRepository implements ILessonRepository {
   constructor(private readonly prisma: PrismaClient) {}
@@ -198,6 +201,11 @@ export class LessonRepository implements ILessonRepository {
     const lessonData = lesson.toJSON();
     const contentData = lessonData.content;
 
+    // Check if LessonContent exists before attempting delete
+    const existingContent = await this.prisma.lessonContent.findUnique({
+      where: { lessonId: lessonData.id },
+    });
+
     const updatedLesson = await this.prisma.lesson.update({
       where: { id: lessonData.id },
       data: {
@@ -264,7 +272,9 @@ export class LessonRepository implements ILessonRepository {
                 },
               },
             }
-          : { delete: { lessonId: lessonData.id } },
+          : existingContent
+          ? { delete: { lessonId: lessonData.id } }
+          : undefined,
       },
       include: { content: { include: { quizQuestions: true } } },
     });

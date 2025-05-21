@@ -1,4 +1,10 @@
-import { GetAllLessonsParams, GetAllLessonsResponse, GetPublicLessonsParams, GetPublicLessonsResponse, ILesson } from "@/types/lesson";
+import {
+  GetAllLessonsParams,
+  GetAllLessonsResponse,
+  GetPublicLessonsParams,
+  GetPublicLessonsResponse,
+  ILesson,
+} from "@/types/lesson";
 import { api } from "./api";
 
 export async function getAllLessonsInCourse({
@@ -32,7 +38,6 @@ export async function getAllLessonsInCourse({
   }
 }
 
-
 export async function createLesson(data: {
   courseId: string;
   title: string;
@@ -60,7 +65,7 @@ export async function updateLesson(
   }
 ): Promise<ILesson> {
   try {
-    const response = await api.patch<{ data: ILesson }>(
+    const response = await api.put<{ data: ILesson }>(
       `/lessons/${lessonId}`,
       data
     );
@@ -70,12 +75,10 @@ export async function updateLesson(
   }
 }
 
-export async function deleteLesson(
-  lessonId: string,
-): Promise<ILesson> {
+export async function deleteLesson(lessonId: string): Promise<ILesson> {
   try {
     const response = await api.delete(`/lessons/${lessonId}`);
-    return response.data; 
+    return response.data;
   } catch (error: any) {
     throw new Error(
       error.response?.data?.message || "Failed to toggle lesson status"
@@ -90,10 +93,7 @@ export async function getLessonById(lessonId: string): Promise<ILesson> {
   } catch (error: any) {
     throw new Error(error.response?.data?.message || "Failed to fetch lesson");
   }
-
 }
-
-
 
 export async function getPublicLessons({
   courseId,
