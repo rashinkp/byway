@@ -18,7 +18,6 @@ export async function expressAdapter(
   const httpResponse = await handler(httpRequest);
 
   if (httpResponse.cookie) {
-    console.log("Cookie action:", httpResponse.cookie);
     if (httpResponse.cookie.action === "set" && httpResponse.cookie.user) {
       CookieService.setAuthCookie(response, httpResponse.cookie.user);
     } else if (httpResponse.cookie.action === "clear") {

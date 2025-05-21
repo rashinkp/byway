@@ -10,16 +10,6 @@ import { IDeclineCourseUseCase } from "../../../app/usecases/course/interfaces/d
 import { IEnrollCourseUseCase } from "../../../app/usecases/course/interfaces/enroll-course.usecase.interface";
 
 import { ApiResponse } from "../interfaces/ApiResponse";
-import {
-  createCourseSchema,
-  createEnrollmentSchema,
-  deleteCourseSchema,
-  getAllCoursesSchema,
-  getCourseByIdSchema,
-  getEnrolledCoursesSchema,
-  updateCourseApprovalSchema,
-  updateCourseSchema,
-} from "../../validators/course.validators";
 import { StatusCodes } from "http-status-codes";
 import { ZodError } from "zod";
 import { IHttpErrors } from "../interfaces/http-errors.interface";
@@ -29,6 +19,7 @@ import { IHttpResponse } from "../interfaces/http-response.interface";
 import { UnauthorizedError } from "../errors/unautherized-error";
 import { BadRequestError } from "../errors/bad-request-error";
 import { HttpError } from "../errors/http-error";
+import { createCourseSchemaDef, createEnrollmentSchemaDef, deleteCourseSchemaDef, getAllCoursesSchemaDef, getCourseByIdSchemaDef, getEnrolledCoursesSchemaDef, updateCourseApprovalSchemaDef, updateCourseSchemaDef } from "../../validators/course.validators";
 
 export class CourseController {
   constructor(
@@ -50,7 +41,7 @@ export class CourseController {
       if (!httpRequest.user?.id) {
         throw new UnauthorizedError("User not authenticated");
       }
-      const validated = createCourseSchema.body!.parse({
+      const validated = createCourseSchemaDef.body!.parse({
         ...httpRequest.body,
         createdBy: httpRequest.user.id,
       });
@@ -92,7 +83,7 @@ export class CourseController {
 
   async getAllCourses(httpRequest: IHttpRequest): Promise<IHttpResponse> {
     try {
-      const validated = getAllCoursesSchema.query!.parse({
+      const validated = getAllCoursesSchemaDef.query!.parse({
         ...httpRequest.query,
         userId: httpRequest.user?.id,
       });
@@ -120,7 +111,7 @@ export class CourseController {
       if (!httpRequest.params.id) {
         throw new BadRequestError("Course ID is required");
       }
-      const validated = getCourseByIdSchema.params!.parse({
+      const validated = getCourseByIdSchemaDef.params!.parse({
         id: httpRequest.params.id,
       });
       const course = await this.getCourseByIdUseCase.execute(
@@ -167,7 +158,7 @@ export class CourseController {
       if (!httpRequest.params.id) {
         throw new BadRequestError("Course ID is required");
       }
-      const validated = updateCourseSchema.body!.parse({
+      const validated = updateCourseSchemaDef.body!.parse({
         ...httpRequest.body,
         createdBy: httpRequest.user.id,
       });
@@ -203,7 +194,7 @@ export class CourseController {
       if (!httpRequest.params.id) {
         throw new BadRequestError("Course ID is required");
       }
-      const validated = deleteCourseSchema.params!.parse({
+      const validated = deleteCourseSchemaDef.params!.parse({
         id: httpRequest.params.id,
       });
       const course = await this.deleteCourseUseCase.execute(
@@ -235,7 +226,7 @@ export class CourseController {
       if (!httpRequest.user?.id) {
         throw new UnauthorizedError("User not authenticated");
       }
-      const validated = getEnrolledCoursesSchema.query!.parse({
+      const validated = getEnrolledCoursesSchemaDef.query!.parse({
         userId: httpRequest.user.id,
         page: httpRequest.query?.page ? Number(httpRequest.query.page) : 1,
         limit: httpRequest.query?.limit ? Number(httpRequest.query.limit) : 10,
@@ -269,7 +260,7 @@ export class CourseController {
 
   async approveCourse(httpRequest: IHttpRequest): Promise<IHttpResponse> {
     try {
-      const validated = updateCourseApprovalSchema.body!.parse(
+      const validated = updateCourseApprovalSchemaDef.body!.parse(
         httpRequest.body
       );
       const course = await this.approveCourseUseCase.execute(validated);
@@ -290,7 +281,7 @@ export class CourseController {
 
   async declineCourse(httpRequest: IHttpRequest): Promise<IHttpResponse> {
     try {
-      const validated = updateCourseApprovalSchema.body!.parse(
+      const validated = updateCourseApprovalSchemaDef.body!.parse(
         httpRequest.body
       );
       const course = await this.declineCourseUseCase.execute(validated);
@@ -314,7 +305,7 @@ export class CourseController {
       if (!httpRequest.user?.id) {
         throw new UnauthorizedError("User not authenticated");
       }
-      const validated = createEnrollmentSchema.body!.parse({
+      const validated = createEnrollmentSchemaDef.body!.parse({
         courseIds: httpRequest.body.courseIds,
       });
       const enrollments = await this.enrollCourseUseCase.execute({

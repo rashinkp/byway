@@ -14,13 +14,11 @@ export const api = axios.create({
 let isLoggingOut = false;
 
 api.interceptors.request.use((config) => {
-  console.log("Request:", config.method, config.url);
   return config;
 });
 
 api.interceptors.response.use(
   (response) => {
-    console.log("Response:", response.status, response.config.url);
     return response;
   },
   async (error) => {

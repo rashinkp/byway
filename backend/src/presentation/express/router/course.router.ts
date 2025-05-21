@@ -1,16 +1,7 @@
 import { Router } from "express";
 import { restrictTo, optionalAuth } from "../middlewares/auth.middleware";
 import { validateRequest } from "../middlewares/validate-request.middleware";
-import {
-  createCourseSchema,
-  createEnrollmentSchema,
-  deleteCourseSchema,
-  getAllCoursesSchema,
-  getCourseByIdSchema,
-  getEnrolledCoursesSchema,
-  updateCourseApprovalSchema,
-  updateCourseSchema,
-} from "../../validators/course.validators";
+
 import { CourseController } from "../../http/controllers/course.controller";
 import { expressAdapter } from "../../adapters/express.adapter";
 
@@ -22,7 +13,6 @@ export default function courseRouter(
   router.post(
     "/",
     restrictTo("INSTRUCTOR", "ADMIN"),
-    validateRequest(createCourseSchema),
     (req, res) =>
       expressAdapter(
         req,
@@ -33,7 +23,6 @@ export default function courseRouter(
   router.get(
     "/",
     optionalAuth,
-    validateRequest(getAllCoursesSchema),
     (req, res) =>
       expressAdapter(
         req,
@@ -44,7 +33,6 @@ export default function courseRouter(
   router.get(
     "/enrolled",
     restrictTo("USER", "INSTRUCTOR", "ADMIN"),
-    validateRequest(getEnrolledCoursesSchema),
     (req, res) =>
       expressAdapter(
         req,
@@ -55,7 +43,6 @@ export default function courseRouter(
   router.get(
     "/:id",
     optionalAuth,
-    validateRequest(getCourseByIdSchema),
     (req, res) =>
       expressAdapter(
         req,
@@ -66,7 +53,6 @@ export default function courseRouter(
   router.put(
     "/:id",
     restrictTo("INSTRUCTOR", "ADMIN"),
-    validateRequest(updateCourseSchema),
     (req, res) =>
       expressAdapter(
         req,
@@ -77,7 +63,6 @@ export default function courseRouter(
   router.delete(
     "/:id",
     restrictTo("INSTRUCTOR", "ADMIN"),
-    validateRequest(deleteCourseSchema),
     (req, res) =>
       expressAdapter(
         req,
@@ -88,7 +73,6 @@ export default function courseRouter(
   router.post(
     "/approve",
     restrictTo("ADMIN"),
-    validateRequest(updateCourseApprovalSchema),
     (req, res) =>
       expressAdapter(
         req,
@@ -99,7 +83,6 @@ export default function courseRouter(
   router.post(
     "/decline",
     restrictTo("ADMIN"),
-    validateRequest(updateCourseApprovalSchema),
     (req, res) =>
       expressAdapter(
         req,
@@ -110,7 +93,6 @@ export default function courseRouter(
   router.post(
     "/enroll",
     restrictTo("USER", "INSTRUCTOR", "ADMIN"),
-    validateRequest(createEnrollmentSchema),
     (req, res) =>
       expressAdapter(
         req,

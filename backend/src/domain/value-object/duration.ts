@@ -2,7 +2,6 @@ export class Duration {
   private constructor(private readonly value: number | null) {}
 
   static create(value: number | null): Duration {
-    console.log(value);
     if (value != null && value < 0) {
       throw new Error("Duration must be positive");
     }
