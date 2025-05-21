@@ -20,4 +20,10 @@ export class HttpErrors implements IHttpErrors {
       body: { success: false, message: "Internal Server Error" },
     };
   }
+  error_404(): IHttpError {
+    return {
+      statusCode: 404,
+        body : {success:false , message:'Not Found Error'}
+      }
+  }
 }
