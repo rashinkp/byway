@@ -40,11 +40,6 @@ export function createAuthDependencies(
   const resetPasswordUseCase = new ResetPasswordUseCase(authRepository);
   const verifyOtpUseCase = new VerifyOtpUseCase(authRepository);
 
-  // Initialize HTTP utilities
-  const httpErrors = new HttpErrors();
-  const httpSuccess = new HttpSuccess();
-  const cookieService = new CookieService(); // Optional: if injecting CookieService
-
   // Initialize controller
   const authController = new AuthController(
     facebookAuthUseCase,
@@ -56,9 +51,8 @@ export function createAuthDependencies(
     resendOtpUseCase,
     resetPasswordUseCase,
     verifyOtpUseCase,
-    httpErrors,
-    httpSuccess
-    // cookieService // Uncomment if injecting CookieService
+    deps.httpErrors,
+    deps.httpSuccess
   );
 
   return {

@@ -1,43 +1,42 @@
 import { Router } from "express";
-import { UserController } from "../../http/controllers/user.controller";
 import { optionalAuth, restrictTo } from "../middlewares/auth.middleware";
+import { UserController } from "../../http/controllers/user.controller";
+import { expressAdapter } from "../../adapters/express.adapter";
 
 export function userRouter(userController: UserController): Router {
   const router = Router();
 
   // Admin routes
-  router.get(
-    "/admin/users",
-    restrictTo("ADMIN"),
-    userController.getAllUsers.bind(userController)
+  router.get("/admin/users", restrictTo("ADMIN"), (req, res) =>
+    expressAdapter(req, res, userController.getAllUsers.bind(userController))
   );
 
-  router.put(
-    "/admin/:id",
-    restrictTo("ADMIN"),
-    userController.toggleDeleteUser.bind(userController)
+  router.put("/admin/:id", restrictTo("ADMIN"), (req, res) =>
+    expressAdapter(
+      req,
+      res,
+      userController.toggleDeleteUser.bind(userController)
+    )
   );
 
   // User routes
-  router.get(
-    "/me",
-    restrictTo("USER", "INSTRUCTOR", "ADMIN"),
-    userController.getCurrentUser.bind(userController)
+  router.get("/me", restrictTo("USER", "INSTRUCTOR", "ADMIN"), (req, res) =>
+    expressAdapter(req, res, userController.getCurrentUser.bind(userController))
   );
+
   router.get(
     "/:userId",
     restrictTo("USER", "INSTRUCTOR", "ADMIN"),
-    userController.getUserById.bind(userController)
+    (req, res) =>
+      expressAdapter(req, res, userController.getUserById.bind(userController))
   );
-  router.put(
-    "/users",
-    restrictTo("USER", "INSTRUCTOR", "ADMIN"),
-    userController.updateUser.bind(userController)
+
+  router.put("/users", restrictTo("USER", "INSTRUCTOR", "ADMIN"), (req, res) =>
+    expressAdapter(req, res, userController.updateUser.bind(userController))
   );
-  router.get(
-    "/:userId/public",
-    optionalAuth,
-    userController.getPublicUser.bind(userController)
+
+  router.get("/:userId/public", optionalAuth, (req, res) =>
+    expressAdapter(req, res, userController.getPublicUser.bind(userController))
   );
 
   return router;

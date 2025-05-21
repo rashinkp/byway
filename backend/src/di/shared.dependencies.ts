@@ -14,6 +14,9 @@ import { ICourseRepository } from "../app/repositories/course.repository.interfa
 import { IInstructorRepository } from "../app/repositories/instructor.repository";
 import { IAuthRepository } from "../app/repositories/auth.repository";
 import { IEnrollmentRepository } from "../app/repositories/enrollment.repository.interface";
+import { HttpErrors } from "../presentation/http/http.errors";
+import { HttpSuccess } from "../presentation/http/http.success";
+import { CookieService } from "../presentation/http/utils/cookie.service";
 
 export interface SharedDependencies {
   userRepository: IUserRepository;
@@ -24,6 +27,9 @@ export interface SharedDependencies {
   enrollmentRepository: IEnrollmentRepository;
   otpProvider: OtpProvider;
   googleAuthProvider: GoogleAuthProvider;
+  httpErrors: HttpErrors;
+  httpSuccess: HttpSuccess;
+  cookieService: CookieService;
 }
 
 export function createSharedDependencies(): SharedDependencies {
@@ -36,6 +42,10 @@ export function createSharedDependencies(): SharedDependencies {
   const otpProvider = new OtpProvider(authRepository);
   const googleAuthProvider = new GoogleAuthProvider(envConfig.GOOGLE_CLIENT_ID);
 
+  const httpErrors = new HttpErrors();
+  const httpSuccess = new HttpSuccess();
+  const cookieService = new CookieService();
+
   return {
     userRepository,
     categoryRepository,
@@ -45,5 +55,8 @@ export function createSharedDependencies(): SharedDependencies {
     enrollmentRepository,
     otpProvider,
     googleAuthProvider,
+    httpErrors,
+    httpSuccess,
+    cookieService,
   };
 }

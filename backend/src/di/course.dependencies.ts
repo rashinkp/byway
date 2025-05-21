@@ -60,7 +60,9 @@ export function createCourseDependencies(
     getEnrolledCoursesUseCase,
     approveCourseUseCase,
     declineCourseUseCase,
-    enrollCourseUseCase
+    enrollCourseUseCase,
+    deps.httpErrors,
+    deps.httpSuccess,
   );
 
   return {

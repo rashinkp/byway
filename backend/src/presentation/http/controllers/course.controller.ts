@@ -1,5 +1,4 @@
-import { Request, Response, NextFunction } from "express";
-import { StatusCodes } from "http-status-codes";
+
 import { ICreateCourseUseCase } from "../../../app/usecases/course/interfaces/create-course.usecase.interface";
 import { IGetAllCoursesUseCase } from "../../../app/usecases/course/interfaces/get-all-courses.usecase.interface";
 import { IGetCourseByIdUseCase } from "../../../app/usecases/course/interfaces/get-course-by-id.usecase.interface";
@@ -9,17 +8,27 @@ import { IGetEnrolledCoursesUseCase } from "../../../app/usecases/course/interfa
 import { IApproveCourseUseCase } from "../../../app/usecases/course/interfaces/approve-course.usecase.interface";
 import { IDeclineCourseUseCase } from "../../../app/usecases/course/interfaces/decline-course.usecase.interface";
 import { IEnrollCourseUseCase } from "../../../app/usecases/course/interfaces/enroll-course.usecase.interface";
-import { ICreateCourseInputDTO, ICreateEnrollmentInputDTO, IGetAllCoursesInputDTO, IGetEnrolledCoursesInputDTO, IUpdateCourseApprovalInputDTO, IUpdateCourseInputDTO } from "../../../domain/dtos/course/course.dto";
+
+import { ApiResponse } from "../interfaces/ApiResponse";
+import {
+  createCourseSchema,
+  createEnrollmentSchema,
+  deleteCourseSchema,
+  getAllCoursesSchema,
+  getCourseByIdSchema,
+  getEnrolledCoursesSchema,
+  updateCourseApprovalSchema,
+  updateCourseSchema,
+} from "../../validators/course.validators";
+import { StatusCodes } from "http-status-codes";
+import { ZodError } from "zod";
+import { IHttpErrors } from "../interfaces/http-errors.interface";
+import { IHttpSuccess } from "../interfaces/http-success.interface";
+import { IHttpRequest } from "../interfaces/http-request.interface";
+import { IHttpResponse } from "../interfaces/http-response.interface";
+import { UnauthorizedError } from "../errors/unautherized-error";
+import { BadRequestError } from "../errors/bad-request-error";
 import { HttpError } from "../errors/http-error";
-
-
-interface ApiResponse<T> {
-  statusCode: number;
-  success: boolean;
-  message: string;
-  data?: T;
-  error?: string;
-}
 
 export class CourseController {
   constructor(
@@ -31,139 +40,176 @@ export class CourseController {
     private getEnrolledCoursesUseCase: IGetEnrolledCoursesUseCase,
     private approveCourseUseCase: IApproveCourseUseCase,
     private declineCourseUseCase: IDeclineCourseUseCase,
-    private enrollCourseUseCase: IEnrollCourseUseCase
+    private enrollCourseUseCase: IEnrollCourseUseCase,
+    private httpErrors: IHttpErrors,
+    private httpSuccess: IHttpSuccess
   ) {}
 
-  async createCourse(
-    req: Request,
-    res: Response,
-    next: NextFunction
-  ): Promise<void> {
+  async createCourse(httpRequest: IHttpRequest): Promise<IHttpResponse> {
     try {
-      if (!req.user?.id) {
-        throw new HttpError(
-          "Unauthorized: User not authenticated",
-          StatusCodes.UNAUTHORIZED
-        );
+      if (!httpRequest.user?.id) {
+        throw new UnauthorizedError("User not authenticated");
       }
-
-      const input: ICreateCourseInputDTO = {
-        ...req.body,
-        createdBy: req.user.id,
-      };
-
-      const course = await this.createCourseUseCase.execute(input);
+      const validated = createCourseSchema.body!.parse({
+        ...httpRequest.body,
+        createdBy: httpRequest.user.id,
+      });
+      const course = await this.createCourseUseCase.execute({
+        ...validated,
+        createdBy: httpRequest.user.id,
+      });
       const response: ApiResponse<any> = {
         statusCode: StatusCodes.CREATED,
         success: true,
         message: "Course created successfully",
         data: course,
       };
-      res.status(StatusCodes.CREATED).json(response);
+      return this.httpSuccess.success_201(response);
     } catch (error) {
-      next(error);
+      if (error instanceof ZodError) {
+        return this.httpErrors.error_400();
+      }
+      if (
+        error instanceof BadRequestError ||
+        error instanceof UnauthorizedError
+      ) {
+        return this.httpErrors.error_400();
+      }
+      if (error instanceof HttpError) {
+        return {
+          statusCode: error.statusCode,
+          body: {
+            statusCode: error.statusCode,
+            success: false,
+            message: error.message,
+            data: null,
+          },
+        };
+      }
+      return this.httpErrors.error_500();
     }
   }
 
-  async getAllCourses(
-    req: Request,
-    res: Response,
-    next: NextFunction
-  ): Promise<void> {
+  async getAllCourses(httpRequest: IHttpRequest): Promise<IHttpResponse> {
     try {
-      const input: IGetAllCoursesInputDTO = {
-        ...req.validatedQuery,
-        userId: req.user?.id, 
-      };
-      const result = await this.getAllCoursesUseCase.execute(input);
+      const validated = getAllCoursesSchema.query!.parse({
+        ...httpRequest.query,
+        userId: httpRequest.user?.id,
+      });
+      const result = await this.getAllCoursesUseCase.execute({
+        ...validated,
+        userId: httpRequest.user?.id,
+      });
       const response: ApiResponse<any> = {
         statusCode: StatusCodes.OK,
         success: true,
         message: "Courses retrieved successfully",
         data: result,
       };
-      res.status(StatusCodes.OK).json(response);
+      return this.httpSuccess.success_200(response);
     } catch (error) {
-      next(error);
+      if (error instanceof ZodError || error instanceof BadRequestError) {
+        return this.httpErrors.error_400();
+      }
+      return this.httpErrors.error_500();
     }
   }
 
-  async getCourseById(
-    req: Request,
-    res: Response,
-    next: NextFunction
-  ): Promise<void> {
+  async getCourseById(httpRequest: IHttpRequest): Promise<IHttpResponse> {
     try {
-      const courseId = req.params.id;
-      const userId = req.user?.id;
-
-      const course = await this.getCourseByIdUseCase.execute(courseId, userId);
+      if (!httpRequest.params.id) {
+        throw new BadRequestError("Course ID is required");
+      }
+      const validated = getCourseByIdSchema.params!.parse({
+        id: httpRequest.params.id,
+      });
+      const course = await this.getCourseByIdUseCase.execute(
+        validated.id,
+        httpRequest.user?.id
+      );
       if (!course) {
         throw new HttpError("Course not found", StatusCodes.NOT_FOUND);
       }
-
       const response: ApiResponse<any> = {
         statusCode: StatusCodes.OK,
         success: true,
         message: "Course retrieved successfully",
         data: course,
       };
-      res.status(StatusCodes.OK).json(response);
+      return this.httpSuccess.success_200(response);
     } catch (error) {
-      next(error);
+      if (error instanceof ZodError || error instanceof BadRequestError) {
+        return this.httpErrors.error_400();
+      }
+      if (
+        error instanceof HttpError &&
+        error.statusCode === StatusCodes.NOT_FOUND
+      ) {
+        return {
+          statusCode: StatusCodes.NOT_FOUND,
+          body: {
+            statusCode: StatusCodes.NOT_FOUND,
+            success: false,
+            message: "Course not found",
+            data: null,
+          },
+        };
+      }
+      return this.httpErrors.error_500();
     }
   }
 
-  async updateCourse(
-    req: Request,
-    res: Response,
-    next: NextFunction
-  ): Promise<void> {
+  async updateCourse(httpRequest: IHttpRequest): Promise<IHttpResponse> {
     try {
-      if (!req.user?.id) {
-        throw new HttpError(
-          "Unauthorized: User not authenticated",
-          StatusCodes.UNAUTHORIZED
-        );
+      if (!httpRequest.user?.id) {
+        throw new UnauthorizedError("User not authenticated");
       }
-
-      const input: IUpdateCourseInputDTO = {
-        id: req.params.id,
-        ...req.body,
-        createdBy: req.user.id,
-      };
-
-      const course = await this.updateCourseUseCase.execute(input);
+      if (!httpRequest.params.id) {
+        throw new BadRequestError("Course ID is required");
+      }
+      const validated = updateCourseSchema.body!.parse({
+        ...httpRequest.body,
+        createdBy: httpRequest.user.id,
+      });
+      const course = await this.updateCourseUseCase.execute({
+        id: httpRequest.params.id,
+        ...validated,
+        createdBy: httpRequest.user.id,
+      });
       const response: ApiResponse<any> = {
         statusCode: StatusCodes.OK,
         success: true,
         message: "Course updated successfully",
         data: course,
       };
-      res.status(StatusCodes.OK).json(response);
+      return this.httpSuccess.success_200(response);
     } catch (error) {
-      next(error);
+      if (
+        error instanceof ZodError ||
+        error instanceof BadRequestError ||
+        error instanceof UnauthorizedError
+      ) {
+        return this.httpErrors.error_400();
+      }
+      return this.httpErrors.error_500();
     }
   }
 
-  async deleteCourse(
-    req: Request,
-    res: Response,
-    next: NextFunction
-  ): Promise<void> {
+  async deleteCourse(httpRequest: IHttpRequest): Promise<IHttpResponse> {
     try {
-      if (!req.user?.id || !req.user?.role) {
-        throw new HttpError(
-          "Unauthorized: User not authenticated",
-          StatusCodes.UNAUTHORIZED
-        );
+      if (!httpRequest.user?.id || !httpRequest.user?.role) {
+        throw new UnauthorizedError("User not authenticated");
       }
-
-      const courseId = req.params.id;
+      if (!httpRequest.params.id) {
+        throw new BadRequestError("Course ID is required");
+      }
+      const validated = deleteCourseSchema.params!.parse({
+        id: httpRequest.params.id,
+      });
       const course = await this.deleteCourseUseCase.execute(
-        courseId,
-        req.user.id,
-        req.user.role
+        validated.id,
+        httpRequest.user.id,
+        httpRequest.user.role
       );
       const response: ApiResponse<any> = {
         statusCode: StatusCodes.OK,
@@ -171,126 +217,126 @@ export class CourseController {
         message: "Course deleted successfully",
         data: course,
       };
-      res.status(StatusCodes.OK).json(response);
+      return this.httpSuccess.success_200(response);
     } catch (error) {
-      next(error);
+      if (
+        error instanceof ZodError ||
+        error instanceof BadRequestError ||
+        error instanceof UnauthorizedError
+      ) {
+        return this.httpErrors.error_400();
+      }
+      return this.httpErrors.error_500();
     }
   }
 
-  async getEnrolledCourses(
-    req: Request,
-    res: Response,
-    next: NextFunction
-  ): Promise<void> {
+  async getEnrolledCourses(httpRequest: IHttpRequest): Promise<IHttpResponse> {
     try {
-      if (!req.user?.id) {
-        throw new HttpError(
-          "Unauthorized: User not authenticated",
-          StatusCodes.UNAUTHORIZED
-        );
+      if (!httpRequest.user?.id) {
+        throw new UnauthorizedError("User not authenticated");
       }
-
-      const input: IGetEnrolledCoursesInputDTO = {
-        userId: req.user.id,
-        page: req.query.page ? Number(req.query.page) : 1,
-        limit: req.query.limit ? Number(req.query.limit) : 10,
-        sortBy: req.query.sortBy
-          ? (String(req.query.sortBy) as any)
-          : "enrolledAt",
-        sortOrder: req.query.sortOrder
-          ? (String(req.query.sortOrder) as any)
-          : "desc",
-        search: req.query.search ? String(req.query.search) : "",
-        level: req.query.level ? (String(req.query.level) as any) : "All",
-      };
-
-      const result = await this.getEnrolledCoursesUseCase.execute(input);
+      const validated = getEnrolledCoursesSchema.query!.parse({
+        userId: httpRequest.user.id,
+        page: httpRequest.query?.page ? Number(httpRequest.query.page) : 1,
+        limit: httpRequest.query?.limit ? Number(httpRequest.query.limit) : 10,
+        sortBy: httpRequest.query?.sortBy || "enrolledAt",
+        sortOrder: httpRequest.query?.sortOrder || "desc",
+        search: httpRequest.query?.search || "",
+        level: httpRequest.query?.level || "All",
+      });
+      const result = await this.getEnrolledCoursesUseCase.execute({
+        ...validated,
+        userId: httpRequest.user.id,
+      });
       const response: ApiResponse<any> = {
         statusCode: StatusCodes.OK,
         success: true,
         message: "Enrolled courses retrieved successfully",
         data: result,
       };
-      res.status(StatusCodes.OK).json(response);
+      return this.httpSuccess.success_200(response);
     } catch (error) {
-      next(error);
+      if (
+        error instanceof ZodError ||
+        error instanceof BadRequestError ||
+        error instanceof UnauthorizedError
+      ) {
+        return this.httpErrors.error_400();
+      }
+      return this.httpErrors.error_500();
     }
   }
 
-  async approveCourse(
-    req: Request,
-    res: Response,
-    next: NextFunction
-  ): Promise<void> {
+  async approveCourse(httpRequest: IHttpRequest): Promise<IHttpResponse> {
     try {
-      const input: IUpdateCourseApprovalInputDTO = {
-        courseId: req.body.courseId,
-      };
-
-      const course = await this.approveCourseUseCase.execute(input);
+      const validated = updateCourseApprovalSchema.body!.parse(
+        httpRequest.body
+      );
+      const course = await this.approveCourseUseCase.execute(validated);
       const response: ApiResponse<any> = {
         statusCode: StatusCodes.OK,
         success: true,
         message: "Course approved successfully",
         data: course,
       };
-      res.status(StatusCodes.OK).json(response);
+      return this.httpSuccess.success_200(response);
     } catch (error) {
-      next(error);
+      if (error instanceof ZodError || error instanceof BadRequestError) {
+        return this.httpErrors.error_400();
+      }
+      return this.httpErrors.error_500();
     }
   }
 
-  async declineCourse(
-    req: Request,
-    res: Response,
-    next: NextFunction
-  ): Promise<void> {
+  async declineCourse(httpRequest: IHttpRequest): Promise<IHttpResponse> {
     try {
-      const input: IUpdateCourseApprovalInputDTO = {
-        courseId: req.body.courseId,
-      };
-
-      const course = await this.declineCourseUseCase.execute(input);
+      const validated = updateCourseApprovalSchema.body!.parse(
+        httpRequest.body
+      );
+      const course = await this.declineCourseUseCase.execute(validated);
       const response: ApiResponse<any> = {
         statusCode: StatusCodes.OK,
         success: true,
         message: "Course declined successfully",
         data: course,
       };
-      res.status(StatusCodes.OK).json(response);
+      return this.httpSuccess.success_200(response);
     } catch (error) {
-      next(error);
+      if (error instanceof ZodError || error instanceof BadRequestError) {
+        return this.httpErrors.error_400();
+      }
+      return this.httpErrors.error_500();
     }
   }
 
-  async enrollCourse(
-    req: Request,
-    res: Response,
-    next: NextFunction
-  ): Promise<void> {
+  async enrollCourse(httpRequest: IHttpRequest): Promise<IHttpResponse> {
     try {
-      if (!req.user?.id) {
-        throw new HttpError(
-          "Unauthorized: User not authenticated",
-          StatusCodes.UNAUTHORIZED
-        );
+      if (!httpRequest.user?.id) {
+        throw new UnauthorizedError("User not authenticated");
       }
-
-      const input: ICreateEnrollmentInputDTO = {
-        userId: req.user.id,
-        courseIds: req.body.courseIds,
-      };
-
-      const enrollments = await this.enrollCourseUseCase.execute(input);
+      const validated = createEnrollmentSchema.body!.parse({
+        courseIds: httpRequest.body.courseIds,
+      });
+      const enrollments = await this.enrollCourseUseCase.execute({
+        userId: httpRequest.user.id,
+        courseIds: validated.courseIds,
+      });
       const response: ApiResponse<any> = {
         statusCode: StatusCodes.CREATED,
         success: true,
         message: "Enrollment successful",
         data: enrollments,
       };
-      res.status(StatusCodes.CREATED).json(response);
+      return this.httpSuccess.success_201(response);
     } catch (error) {
-      next(error);
+      if (
+        error instanceof ZodError ||
+        error instanceof BadRequestError ||
+        error instanceof UnauthorizedError
+      ) {
+        return this.httpErrors.error_400();
+      }
+      return this.httpErrors.error_500();
     }
   }
 }

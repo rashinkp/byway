@@ -1,4 +1,3 @@
-import { Request, Response, NextFunction } from "express";
 import { ICreateCategoryUseCase } from "../../../app/usecases/category/interfaces/create-category.usecase.interface";
 import { IGetAllCategoriesUseCase } from "../../../app/usecases/category/interfaces/get-all-categories.usecases.interface";
 import { IGetCategoryByIdUseCase } from "../../../app/usecases/category/interfaces/get-cateogry-by-Id.usecase.interface";
@@ -6,7 +5,18 @@ import { IUpdateCategoryUseCase } from "../../../app/usecases/category/interface
 import { IDeleteCategoryUseCase } from "../../../app/usecases/category/interfaces/delete-category.usecase.interface";
 import { IRecoverCategoryUseCase } from "../../../app/usecases/category/interfaces/recover-category.usecase.interface";
 import { ApiResponse } from "../interfaces/ApiResponse";
-import { validateCategoryId, validateCreateCategory, validateGetAllCategories, validateUpdateCategory } from "../../validators/category.validators";
+import {
+  validateCategoryId,
+  validateCreateCategory,
+  validateGetAllCategories,
+  validateUpdateCategory,
+} from "../../validators/category.validators";
+import { IHttpErrors } from "../interfaces/http-errors.interface";
+import { IHttpSuccess } from "../interfaces/http-success.interface";
+import { IHttpRequest } from "../interfaces/http-request.interface";
+import { IHttpResponse } from "../interfaces/http-response.interface";
+import { UnauthorizedError } from "../errors/unautherized-error";
+import { BadRequestError } from "../errors/bad-request-error";
 
 export class CategoryController {
   constructor(
@@ -15,17 +25,21 @@ export class CategoryController {
     private getCategoryByIdUseCase: IGetCategoryByIdUseCase,
     private updateCategoryUseCase: IUpdateCategoryUseCase,
     private deleteCategoryUseCase: IDeleteCategoryUseCase,
-    private recoverCategoryUseCase: IRecoverCategoryUseCase
+    private recoverCategoryUseCase: IRecoverCategoryUseCase,
+    private httpErrors: IHttpErrors,
+    private httpSuccess: IHttpSuccess
   ) {}
 
-  async createCategory(
-    req: Request,
-    res: Response,
-    next: NextFunction
-  ): Promise<void> {
+  async createCategory(httpRequest: IHttpRequest): Promise<IHttpResponse> {
     try {
-      const createdBy = req.user?.id;
-      const validated = validateCreateCategory({...req.body , createdBy});
+      const createdBy = httpRequest.user?.id;
+      if (!createdBy) {
+        throw new UnauthorizedError("User not authenticated");
+      }
+      const validated = validateCreateCategory({
+        ...httpRequest.body,
+        createdBy,
+      });
       const category = await this.createCategoryUseCase.execute(validated);
       const response: ApiResponse = {
         statusCode: 201,
@@ -33,19 +47,21 @@ export class CategoryController {
         message: "Category created successfully",
         data: category,
       };
-      res.status(201).json(response);
+      return this.httpSuccess.success_201(response);
     } catch (error) {
-      next(error);
+      if (
+        error instanceof BadRequestError ||
+        error instanceof UnauthorizedError
+      ) {
+        return this.httpErrors.error_400();
+      }
+      return this.httpErrors.error_500();
     }
   }
 
-  async getAllCategories(
-    req: Request,
-    res: Response,
-    next: NextFunction
-  ): Promise<void> {
+  async getAllCategories(httpRequest: IHttpRequest): Promise<IHttpResponse> {
     try {
-      const validated = validateGetAllCategories(req.query);
+      const validated = validateGetAllCategories(httpRequest.query);
       const result = await this.getAllCategoriesUseCase.execute(validated);
       const response: ApiResponse = {
         statusCode: 200,
@@ -53,19 +69,18 @@ export class CategoryController {
         message: "Categories retrieved successfully",
         data: result,
       };
-      res.status(200).json(response);
+      return this.httpSuccess.success_200(response);
     } catch (error) {
-      next(error);
+      if (error instanceof BadRequestError) {
+        return this.httpErrors.error_400();
+      }
+      return this.httpErrors.error_500();
     }
   }
 
-  async getCategoryById(
-    req: Request,
-    res: Response,
-    next: NextFunction
-  ): Promise<void> {
+  async getCategoryById(httpRequest: IHttpRequest): Promise<IHttpResponse> {
     try {
-      const validated = validateCategoryId({ id: req.params.id });
+      const validated = validateCategoryId({ id: httpRequest.params.id });
       const category = await this.getCategoryByIdUseCase.execute(validated);
       const response: ApiResponse = {
         statusCode: 200,
@@ -73,21 +88,20 @@ export class CategoryController {
         message: "Category retrieved successfully",
         data: category,
       };
-      res.status(200).json(response);
+      return this.httpSuccess.success_200(response);
     } catch (error) {
-      next(error);
+      if (error instanceof BadRequestError) {
+        return this.httpErrors.error_400();
+      }
+      return this.httpErrors.error_500();
     }
   }
 
-  async updateCategory(
-    req: Request,
-    res: Response,
-    next: NextFunction
-  ): Promise<void> {
+  async updateCategory(httpRequest: IHttpRequest): Promise<IHttpResponse> {
     try {
       const validated = validateUpdateCategory({
-        ...req.body,
-        id: req.params.id,
+        ...httpRequest.body,
+        id: httpRequest.params.id,
       });
       const category = await this.updateCategoryUseCase.execute(validated);
       const response: ApiResponse = {
@@ -96,19 +110,18 @@ export class CategoryController {
         message: "Category updated successfully",
         data: category,
       };
-      res.status(200).json(response);
+      return this.httpSuccess.success_200(response);
     } catch (error) {
-      next(error);
+      if (error instanceof BadRequestError) {
+        return this.httpErrors.error_400();
+      }
+      return this.httpErrors.error_500();
     }
   }
 
-  async deleteCategory(
-    req: Request,
-    res: Response,
-    next: NextFunction
-  ): Promise<void> {
+  async deleteCategory(httpRequest: IHttpRequest): Promise<IHttpResponse> {
     try {
-      const validated = validateCategoryId({ id: req.params.id });
+      const validated = validateCategoryId({ id: httpRequest.params.id });
       const category = await this.deleteCategoryUseCase.execute(validated);
       const response: ApiResponse = {
         statusCode: 200,
@@ -116,19 +129,18 @@ export class CategoryController {
         message: "Category deleted successfully",
         data: category,
       };
-      res.status(200).json(response);
+      return this.httpSuccess.success_200(response);
     } catch (error) {
-      next(error);
+      if (error instanceof BadRequestError) {
+        return this.httpErrors.error_400();
+      }
+      return this.httpErrors.error_500();
     }
   }
 
-  async recoverCategory(
-    req: Request,
-    res: Response,
-    next: NextFunction
-  ): Promise<void> {
+  async recoverCategory(httpRequest: IHttpRequest): Promise<IHttpResponse> {
     try {
-      const validated = validateCategoryId({ id: req.params.id });
+      const validated = validateCategoryId({ id: httpRequest.params.id });
       const category = await this.recoverCategoryUseCase.execute(validated);
       const response: ApiResponse = {
         statusCode: 200,
@@ -136,9 +148,12 @@ export class CategoryController {
         message: "Category recovered successfully",
         data: category,
       };
-      res.status(200).json(response);
+      return this.httpSuccess.success_200(response);
     } catch (error) {
-      next(error);
+      if (error instanceof BadRequestError) {
+        return this.httpErrors.error_400();
+      }
+      return this.httpErrors.error_500();
     }
   }
 }

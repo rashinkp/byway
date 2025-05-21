@@ -1,4 +1,3 @@
-import jwt from "jsonwebtoken";
 import { ApiResponse, UserResponse } from "../interfaces/ApiResponse";
 import { IFacebookAuthUseCase } from "../../../app/usecases/auth/interfaces/facebook-auth.usecase.interface";
 import { IForgotPasswordUseCase } from "../../../app/usecases/auth/interfaces/forgot-passowrd.usecase.interface";
@@ -23,7 +22,6 @@ import { IHttpErrors } from "../interfaces/http-errors.interface";
 import { IHttpSuccess } from "../interfaces/http-success.interface";
 import { IHttpRequest } from "../interfaces/http-request.interface";
 import { IHttpResponse } from "../interfaces/http-response.interface";
-import { CookieService } from "../utils/cookie.service";
 import { BadRequestError } from "../errors/bad-request-error";
 import { UnauthorizedError } from "../errors/unautherized-error";
 

@@ -11,7 +11,7 @@ export const api = axios.create({
   },
 });
 
-let isLoggingOut = false; // Flag to prevent multiple logout calls
+let isLoggingOut = false;
 
 api.interceptors.request.use((config) => {
   console.log("Request:", config.method, config.url);
@@ -26,20 +26,17 @@ api.interceptors.response.use(
   async (error) => {
     console.error("Response error:", error.response?.status, error.message);
     if (error.response?.status === 401 && !isLoggingOut) {
-      isLoggingOut = true; // Set flag to prevent re-entrant logout
+      isLoggingOut = true;
       try {
-        // Clear auth state
         useAuthStore.getState().clearAuth();
-        // Perform logout API call
-        await logout();
-        // Redirect to login page
-        if (typeof window !== "undefined") {
+        if (!window.location.pathname.includes("/login")) {
+          await logout();
           window.location.href = "/login?clearAuth=true";
         }
       } catch (logoutError) {
         console.error("Logout failed during 401 handling:", logoutError);
       } finally {
-        isLoggingOut = false; // Reset flag
+        isLoggingOut = false;
       }
     }
     return Promise.reject(error);

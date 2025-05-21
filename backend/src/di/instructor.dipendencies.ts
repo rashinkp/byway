@@ -49,7 +49,9 @@ export function createInstructorDependencies(
     declineInstructorUseCase,
     getInstructorByUserIdUseCase,
     getAllInstructorsUseCase,
-    userRepository
+    userRepository,
+    deps.httpErrors,
+    deps.httpSuccess
   );
 
   return {

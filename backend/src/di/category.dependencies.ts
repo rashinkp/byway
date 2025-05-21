@@ -29,6 +29,9 @@ export function createCategoryDependencies(
   const deleteCategoryUseCase = new DeleteCategoryUseCase(categoryRepository);
   const recoverCategoryUseCase = new RecoverCategoryUseCase(categoryRepository);
 
+
+
+
   // Initialize controller
   const categoryController = new CategoryController(
     createCategoryUseCase,
@@ -36,7 +39,9 @@ export function createCategoryDependencies(
     getCategoryByIdUseCase,
     updateCategoryUseCase,
     deleteCategoryUseCase,
-    recoverCategoryUseCase
+    recoverCategoryUseCase,
+    deps.httpErrors,
+    deps.httpSuccess
   );
 
   return {

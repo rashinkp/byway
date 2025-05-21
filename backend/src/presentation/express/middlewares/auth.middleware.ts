@@ -10,7 +10,7 @@ export interface JwtPayload {
 
 export const restrictTo =
   (...roles: string[]) =>
-  async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     const token = req.cookies.jwt;
     if (!token) {
       throw new HttpError("No token provided", 401);

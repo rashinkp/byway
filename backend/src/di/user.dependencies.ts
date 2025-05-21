@@ -31,7 +31,9 @@ export function createUserDependencies(
     getCurrentUserUseCase,
     getUserByIdUseCase,
     updateUserUseCase,
-    getPublicUserUseCase
+    getPublicUserUseCase,
+    deps.httpErrors,
+    deps.httpSuccess
   );
 
   return {

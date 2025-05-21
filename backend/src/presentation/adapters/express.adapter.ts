@@ -13,11 +13,12 @@ export async function expressAdapter(
     body: request.body,
     params: request.params,
     query: request.query as Record<string, string>,
+    user: request.user, // Pass req.user to httpRequest.user
   };
   const httpResponse = await handler(httpRequest);
 
-  // Handle cookies
   if (httpResponse.cookie) {
+    console.log("Cookie action:", httpResponse.cookie);
     if (httpResponse.cookie.action === "set" && httpResponse.cookie.user) {
       CookieService.setAuthCookie(response, httpResponse.cookie.user);
     } else if (httpResponse.cookie.action === "clear") {
@@ -25,12 +26,10 @@ export async function expressAdapter(
     }
   }
 
-  // Handle headers
   if (httpResponse.headers) {
     Object.entries(httpResponse.headers).forEach(([key, value]) => {
       response.setHeader(key, value);
     });
   }
-
   response.status(httpResponse.statusCode).json(httpResponse.body);
 }
