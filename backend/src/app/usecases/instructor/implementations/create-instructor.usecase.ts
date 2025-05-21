@@ -3,7 +3,7 @@ import { Instructor } from "../../../../domain/entities/instructor.entity";
 import { User } from "../../../../domain/entities/user.entity";
 import { Role } from "../../../../domain/enum/role.enum";
 import { JwtPayload } from "../../../../presentation/express/middlewares/auth.middleware";
-import { HttpError } from "../../../../presentation/http/utils/HttpErrors";
+import { HttpError } from "../../../../presentation/http/errors/http-error";
 import { IInstructorRepository } from "../../../repositories/instructor.repository";
 import { IUserRepository } from "../../../repositories/user.repository";
 import { ICreateInstructorUseCase } from "../interfaces/create-instructor.usecase.interface";

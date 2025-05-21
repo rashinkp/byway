@@ -2,7 +2,7 @@ import { ApproveInstructorRequestDTO } from "../../../../domain/dtos/instructor/
 import { Instructor } from "../../../../domain/entities/instructor.entity";
 import { Role } from "../../../../domain/enum/role.enum";
 import { JwtPayload } from "../../../../presentation/express/middlewares/auth.middleware";
-import { HttpError } from "../../../../presentation/http/utils/HttpErrors";
+import { HttpError } from "../../../../presentation/http/errors/http-error";
 import { IUserRepository } from "../../../repositories/user.repository";
 import { IUpdateUserUseCase } from "../../user/interfaces/update-user.usecase.interface";
 import { IApproveInstructorUseCase } from "../interfaces/approve-instructor.usecase.interface";

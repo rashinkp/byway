@@ -1,7 +1,7 @@
 // infra/providers/auth/google-auth.provider.ts
 import { GoogleAuthGateway, GoogleUserInfo } from "../../../app/providers/I.google-auth.provider";
-import { HttpError } from "../../../presentation/http/utils/HttpErrors";
 import axios from "axios";
+import { HttpError } from "../../../presentation/http/errors/http-error";
 
 
 

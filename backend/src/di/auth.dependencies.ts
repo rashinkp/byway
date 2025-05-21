@@ -1,4 +1,4 @@
-import { AuthController } from "../presentation/http/controllers/auth.controller";
+
 import { FacebookAuthUseCase } from "../app/usecases/auth/implementations/facebook-auth.usecase";
 import { ForgotPasswordUseCase } from "../app/usecases/auth/implementations/forgot-passowrd.usecase";
 import { GoogleAuthUseCase } from "../app/usecases/auth/implementations/google-auth.usecase";
@@ -8,6 +8,10 @@ import { RegisterUseCase } from "../app/usecases/auth/implementations/register.u
 import { ResendOtpUseCase } from "../app/usecases/auth/implementations/resend-otp-usecase";
 import { ResetPasswordUseCase } from "../app/usecases/auth/implementations/reset-password.usecase";
 import { VerifyOtpUseCase } from "../app/usecases/auth/implementations/verify-otp.usecase";
+import { AuthController } from "../presentation/http/controllers/auth.controller";
+import { HttpErrors } from "../presentation/http/http.errors";
+import { HttpSuccess } from "../presentation/http/http.success";
+import { CookieService } from "../presentation/http/utils/cookie.service";
 import { SharedDependencies } from "./shared.dependencies";
 
 export interface AuthDependencies {
@@ -36,6 +40,11 @@ export function createAuthDependencies(
   const resetPasswordUseCase = new ResetPasswordUseCase(authRepository);
   const verifyOtpUseCase = new VerifyOtpUseCase(authRepository);
 
+  // Initialize HTTP utilities
+  const httpErrors = new HttpErrors();
+  const httpSuccess = new HttpSuccess();
+  const cookieService = new CookieService(); // Optional: if injecting CookieService
+
   // Initialize controller
   const authController = new AuthController(
     facebookAuthUseCase,
@@ -46,7 +55,10 @@ export function createAuthDependencies(
     registerUseCase,
     resendOtpUseCase,
     resetPasswordUseCase,
-    verifyOtpUseCase
+    verifyOtpUseCase,
+    httpErrors,
+    httpSuccess
+    // cookieService // Uncomment if injecting CookieService
   );
 
   return {

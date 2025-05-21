@@ -2,7 +2,7 @@ import {
   ICourseResponseDTO,
   IGetEnrolledCoursesInputDTO,
 } from "../../../../domain/dtos/course/course.dto";
-import { HttpError } from "../../../../presentation/http/utils/HttpErrors";
+import { HttpError } from "../../../../presentation/http/errors/http-error";
 import { ICourseRepository } from "../../../repositories/course.repository.interface";
 import { IUserRepository } from "../../../repositories/user.repository";
 import { IGetEnrolledCoursesUseCase } from "../interfaces/get-enrolled-courses.usecase.interface";

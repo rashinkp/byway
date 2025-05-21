@@ -1,6 +1,6 @@
 import { User } from "../../../../domain/entities/user.entity";
 import { IAuthRepository } from "../../../repositories/auth.repository";
-import { HttpError } from "../../../../presentation/http/utils/HttpErrors";
+import { HttpError } from "../../../../presentation/http/errors/http-error";
 import { VerifyOtpDto } from "../../../../domain/dtos/auth/verify-otp.dto";
 
 export interface IVerifyOtpUseCase {

@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import { JwtProvider } from "../../../infra/providers/auth/jwt.provider";
-import { HttpError } from "../../http/utils/HttpErrors";
+import { HttpError } from "../../http/errors/http-error";
 
 export interface JwtPayload {
   id: string;

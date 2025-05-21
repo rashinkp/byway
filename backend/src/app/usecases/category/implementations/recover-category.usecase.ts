@@ -2,7 +2,7 @@ import {
   ICategoryIdInputDTO,
   ICategoryOutputDTO,
 } from "../../../../domain/dtos/category/category.dto";
-import { HttpError } from "../../../../presentation/http/utils/HttpErrors";
+import { HttpError } from "../../../../presentation/http/errors/http-error";
 import { ICategoryRepository } from "../../../repositories/category.repository";
 import { IRecoverCategoryUseCase } from "../interfaces/recover-category.usecase.interface";
 

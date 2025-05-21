@@ -3,7 +3,7 @@ import {
   IEnrollmentOutputDTO,
 } from "../../../../domain/dtos/course/course.dto";
 import { CourseStatus } from "../../../../domain/enum/course-status.enum";
-import { HttpError } from "../../../../presentation/http/utils/HttpErrors";
+import { HttpError } from "../../../../presentation/http/errors/http-error";
 import { ICourseRepository } from "../../../repositories/course.repository.interface";
 import { IEnrollmentRepository } from "../../../repositories/enrollment.repository.interface";
 import { IUserRepository } from "../../../repositories/user.repository";

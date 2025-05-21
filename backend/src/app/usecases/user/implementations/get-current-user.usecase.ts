@@ -1,5 +1,5 @@
 import { User } from "../../../../domain/entities/user.entity";
-import { HttpError } from "../../../../presentation/http/utils/HttpErrors";
+import { HttpError } from "../../../../presentation/http/errors/http-error";
 import { IUserRepository } from "../../../repositories/user.repository";
 import { IGetCurrentUserUseCase } from "../interfaces/get-current-user.usecase.interface";
 

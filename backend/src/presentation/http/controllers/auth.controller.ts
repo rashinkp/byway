@@ -1,4 +1,5 @@
-import { Request, Response, NextFunction } from "express";
+import jwt from "jsonwebtoken";
+import { ApiResponse, UserResponse } from "../interfaces/ApiResponse";
 import { IFacebookAuthUseCase } from "../../../app/usecases/auth/interfaces/facebook-auth.usecase.interface";
 import { IForgotPasswordUseCase } from "../../../app/usecases/auth/interfaces/forgot-passowrd.usecase.interface";
 import { IGoogleAuthUseCase } from "../../../app/usecases/auth/interfaces/google-auth.usecase.interface";
@@ -18,8 +19,13 @@ import {
   validateResetPassword,
   validateVerifyOtp,
 } from "../../validators/auth.validators";
-import jwt from "jsonwebtoken";
-import { ApiResponse, UserResponse } from "../interfaces/ApiResponse";
+import { IHttpErrors } from "../interfaces/http-errors.interface";
+import { IHttpSuccess } from "../interfaces/http-success.interface";
+import { IHttpRequest } from "../interfaces/http-request.interface";
+import { IHttpResponse } from "../interfaces/http-response.interface";
+import { CookieService } from "../utils/cookie.service";
+import { BadRequestError } from "../errors/bad-request-error";
+import { UnauthorizedError } from "../errors/unautherized-error";
 
 export class AuthController {
   constructor(
@@ -31,43 +37,15 @@ export class AuthController {
     private registerUseCase: IRegisterUseCase,
     private resendOtpUseCase: IResendOtpUseCase,
     private resetPasswordUseCase: IResetPasswordUseCase,
-    private verifyOtpUseCase: IVerifyOtpUseCase
+    private verifyOtpUseCase: IVerifyOtpUseCase,
+    private httpErrors: IHttpErrors,
+    private httpSuccess: IHttpSuccess
   ) {}
 
-  private generateToken(user: {
-    id: string;
-    email: string;
-    role: string;
-  }): string {
-    return jwt.sign(
-      { id: user.id, email: user.email, role: user.role },
-      process.env.JWT_SECRET || "secret",
-      { expiresIn: "1h" }
-    );
-  }
-
-  private setAuthCookie(
-    res: Response,
-    user: { id: string; email: string; role: string }
-  ): void {
-    const token = this.generateToken(user);
-    res.cookie("jwt", token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "strict",
-      maxAge: 60 * 60 * 1000, // 1 hour
-    });
-  }
-
-  async facebookAuth(
-    req: Request,
-    res: Response,
-    next: NextFunction
-  ): Promise<void> {
+  async facebookAuth(httpRequest: IHttpRequest): Promise<IHttpResponse> {
     try {
-      const validated = validateFacebookAuth(req.body);
+      const validated = validateFacebookAuth(httpRequest.body);
       const user = await this.facebookAuthUseCase.execute(validated);
-      this.setAuthCookie(res, user);
       const response: ApiResponse<UserResponse> = {
         statusCode: 200,
         success: true,
@@ -79,41 +57,41 @@ export class AuthController {
           role: user.role,
         },
       };
-      res.status(200).json(response);
+      return {
+        statusCode: 200,
+        body: response,
+        cookie: { action: 'set', user }
+      };
     } catch (error) {
-      next(error);
+      if (error instanceof BadRequestError) {
+        return this.httpErrors.error_400();
+      }
+      return this.httpErrors.error_500();
     }
   }
 
-  async forgotPassword(
-    req: Request,
-    res: Response,
-    next: NextFunction
-  ): Promise<void> {
+  async forgotPassword(httpRequest: IHttpRequest): Promise<IHttpResponse> {
     try {
-      const validated = validateForgotPassword(req.body);
+      const validated = validateForgotPassword(httpRequest.body);
       await this.forgotPasswordUseCase.execute(validated);
-      const response: ApiResponse<null> = {
+      return this.httpSuccess.success_200({
         statusCode: 200,
         success: true,
         message: "Password reset OTP sent",
         data: null,
-      };
-      res.status(200).json(response);
+      });
     } catch (error) {
-      next(error);
+      if (error instanceof BadRequestError) {
+        return this.httpErrors.error_400();
+      }
+      return this.httpErrors.error_500();
     }
   }
 
-  async googleAuth(
-    req: Request,
-    res: Response,
-    next: NextFunction
-  ): Promise<void> {
+  async googleAuth(httpRequest: IHttpRequest): Promise<IHttpResponse> {
     try {
-      const validated = validateGoogleAuth(req.body);
+      const validated = validateGoogleAuth(httpRequest.body);
       const user = await this.googleAuthUseCase.execute(validated.accessToken);
-      this.setAuthCookie(res, user);
       const response: ApiResponse<UserResponse> = {
         statusCode: 200,
         success: true,
@@ -125,17 +103,23 @@ export class AuthController {
           role: user.role,
         },
       };
-      res.status(200).json(response);
+      return {
+        statusCode: 200,
+        body: response,
+        cookie: { action: "set", user },
+      };
     } catch (error) {
-      next(error);
+      if (error instanceof BadRequestError) {
+        return this.httpErrors.error_400();
+      }
+      return this.httpErrors.error_500();
     }
   }
 
-  async login(req: Request, res: Response, next: NextFunction): Promise<void> {
+  async login(httpRequest: IHttpRequest): Promise<IHttpResponse> {
     try {
-      const validated = validateLogin(req.body);
+      const validated = validateLogin(httpRequest.body);
       const user = await this.loginUseCase.execute(validated);
-      this.setAuthCookie(res, user);
       const response: ApiResponse<UserResponse> = {
         statusCode: 200,
         success: true,
@@ -147,39 +131,44 @@ export class AuthController {
           role: user.role,
         },
       };
-      res.status(200).json(response);
+      return {
+        statusCode: 200,
+        body: response,
+        cookie: { action: "set", user },
+      };
     } catch (error) {
-      next(error);
+      if (
+        error instanceof BadRequestError ||
+        error instanceof UnauthorizedError
+      ) {
+        return this.httpErrors.error_400();
+      }
+      return this.httpErrors.error_500();
     }
   }
 
-  async logout(req: Request, res: Response, next: NextFunction): Promise<void> {
+  async logout(httpRequest: IHttpRequest): Promise<IHttpResponse> {
     try {
       await this.logoutUseCase.execute();
-      res.clearCookie("jwt", {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: "strict",
-      });
       const response: ApiResponse<null> = {
         statusCode: 200,
         success: true,
         message: "Logged out successfully",
         data: null,
       };
-      res.status(200).json(response);
+      return {
+        statusCode: 200,
+        body: response,
+        cookie: { action: "clear"},
+      };
     } catch (error) {
-      next(error);
+      return this.httpErrors.error_500();
     }
   }
 
-  async register(
-    req: Request,
-    res: Response,
-    next: NextFunction
-  ): Promise<void> {
+  async register(httpRequest: IHttpRequest): Promise<IHttpResponse> {
     try {
-      const validated = validateRegister(req.body);
+      const validated = validateRegister(httpRequest.body);
       const user = await this.registerUseCase.execute(validated);
       const response: ApiResponse<UserResponse> = {
         statusCode: 201,
@@ -192,61 +181,55 @@ export class AuthController {
           role: user.role,
         },
       };
-      res.status(201).json(response);
+      return this.httpSuccess.success_201(response);
     } catch (error) {
-      next(error);
+      if (error instanceof BadRequestError) {
+        return this.httpErrors.error_400();
+      }
+      return this.httpErrors.error_500();
     }
   }
 
-  async resendOtp(
-    req: Request,
-    res: Response,
-    next: NextFunction
-  ): Promise<void> {
+  async resendOtp(httpRequest: IHttpRequest): Promise<IHttpResponse> {
     try {
-      const validated = validateResendOtp(req.body);
+      const validated = validateResendOtp(httpRequest.body);
       await this.resendOtpUseCase.execute(validated);
-      const response: ApiResponse<null> = {
+      return this.httpSuccess.success_200({
         statusCode: 200,
         success: true,
         message: "OTP resent successfully",
         data: null,
-      };
-      res.status(200).json(response);
+      });
     } catch (error) {
-      next(error);
+      if (error instanceof BadRequestError) {
+        return this.httpErrors.error_400();
+      }
+      return this.httpErrors.error_500();
     }
   }
 
-  async resetPassword(
-    req: Request,
-    res: Response,
-    next: NextFunction
-  ): Promise<void> {
+  async resetPassword(httpRequest: IHttpRequest): Promise<IHttpResponse> {
     try {
-      const validated = validateResetPassword(req.body);
+      const validated = validateResetPassword(httpRequest.body);
       await this.resetPasswordUseCase.execute(validated);
-      const response: ApiResponse<null> = {
+      return this.httpSuccess.success_200({
         statusCode: 200,
         success: true,
         message: "Password reset successfully",
         data: null,
-      };
-      res.status(200).json(response);
+      });
     } catch (error) {
-      next(error);
+      if (error instanceof BadRequestError) {
+        return this.httpErrors.error_400();
+      }
+      return this.httpErrors.error_500();
     }
   }
 
-  async verifyOtp(
-    req: Request,
-    res: Response,
-    next: NextFunction
-  ): Promise<void> {
+  async verifyOtp(httpRequest: IHttpRequest): Promise<IHttpResponse> {
     try {
-      const validated = validateVerifyOtp(req.body);
+      const validated = validateVerifyOtp(httpRequest.body);
       const user = await this.verifyOtpUseCase.execute(validated);
-      this.setAuthCookie(res, user);
       const response: ApiResponse<UserResponse> = {
         statusCode: 200,
         success: true,
@@ -258,9 +241,16 @@ export class AuthController {
           role: user.role,
         },
       };
-      res.status(200).json(response);
+      return {
+        statusCode: 200,
+        body: response,
+        cookie: { action: "set", user },
+      };
     } catch (error) {
-      next(error);
+      if (error instanceof BadRequestError) {
+        return this.httpErrors.error_400();
+      }
+      return this.httpErrors.error_500();
     }
   }
 }

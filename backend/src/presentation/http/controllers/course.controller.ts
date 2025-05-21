@@ -9,8 +9,8 @@ import { IGetEnrolledCoursesUseCase } from "../../../app/usecases/course/interfa
 import { IApproveCourseUseCase } from "../../../app/usecases/course/interfaces/approve-course.usecase.interface";
 import { IDeclineCourseUseCase } from "../../../app/usecases/course/interfaces/decline-course.usecase.interface";
 import { IEnrollCourseUseCase } from "../../../app/usecases/course/interfaces/enroll-course.usecase.interface";
-import { HttpError } from "../utils/HttpErrors";
 import { ICreateCourseInputDTO, ICreateEnrollmentInputDTO, IGetAllCoursesInputDTO, IGetEnrolledCoursesInputDTO, IUpdateCourseApprovalInputDTO, IUpdateCourseInputDTO } from "../../../domain/dtos/course/course.dto";
+import { HttpError } from "../errors/http-error";
 
 
 interface ApiResponse<T> {

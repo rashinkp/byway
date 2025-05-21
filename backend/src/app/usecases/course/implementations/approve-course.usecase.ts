@@ -4,7 +4,7 @@ import {
 } from "../../../../domain/dtos/course/course.dto";
 import { APPROVALSTATUS } from "../../../../domain/enum/approval-status.enum";
 import { ICourseRepository } from "../../../repositories/course.repository.interface";
-import { HttpError } from "../../../../presentation/http/utils/HttpErrors";
+import { HttpError } from "../../../../presentation/http/errors/http-error";
 import { IApproveCourseUseCase } from "../interfaces/approve-course.usecase.interface";
 
 export class ApproveCourseUseCase implements IApproveCourseUseCase {

@@ -5,7 +5,7 @@ import { IFacebookAuthUseCase } from "../interfaces/facebook-auth.usecase.interf
 import { FacebookAuthDto } from "../../../../domain/dtos/auth/facebook-auth.dto";
 import { AuthProvider } from "../../../../domain/enum/auth-provider.enum";
 import { Role } from "../../../../domain/enum/role.enum";
-import { HttpError } from "../../../../presentation/http/utils/HttpErrors";
+import { HttpError } from "../../../../presentation/http/errors/http-error";
 
 export class FacebookAuthUseCase implements IFacebookAuthUseCase {
   constructor(private authRepository: IAuthRepository) {}

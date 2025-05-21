@@ -1,4 +1,5 @@
-import { IHttpError, IHttpErrors } from "../interfaces/http-errors.interface";
+import { IHttpError, IHttpErrors } from "./interfaces/http-errors.interface";
+
 
 export class HttpErrors implements IHttpErrors {
   error_400(): IHttpError {

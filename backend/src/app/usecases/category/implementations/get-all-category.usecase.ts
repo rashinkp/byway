@@ -1,5 +1,5 @@
 import { ICategoryRepository } from "../../../repositories/category.repository";
-import { HttpError } from "../../../../presentation/http/utils/HttpErrors";
+import { HttpError } from "../../../../presentation/http/errors/http-error";
 import { IGetAllCategoriesUseCase } from "../interfaces/get-all-categories.usecases.interface";
 import {
   ICategoryListOutputDTO,

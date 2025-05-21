@@ -2,7 +2,7 @@ import { DeclineInstructorRequestDTO } from "../../../../domain/dtos/instructor/
 import { Instructor } from "../../../../domain/entities/instructor.entity";
 import { Role } from "../../../../domain/enum/role.enum";
 import { JwtPayload } from "../../../../presentation/express/middlewares/auth.middleware";
-import { HttpError } from "../../../../presentation/http/utils/HttpErrors";
+import { HttpError } from "../../../../presentation/http/errors/http-error";
 import { IInstructorRepository } from "../../../repositories/instructor.repository";
 import { IDeclineInstructorUseCase } from "../interfaces/decline-instructor.usecase.interface";
 

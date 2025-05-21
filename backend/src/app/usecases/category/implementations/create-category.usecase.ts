@@ -1,7 +1,7 @@
 import { ICreateCategoryUseCase } from "../interfaces/create-category.usecase.interface";
 import { IUserRepository } from "../../../repositories/user.repository";
 import { Role } from "../../../../domain/enum/role.enum";
-import { HttpError } from "../../../../presentation/http/utils/HttpErrors";
+import { HttpError } from "../../../../presentation/http/errors/http-error";
 import {
   ICategoryOutputDTO,
   ICreateCategoryInputDTO,

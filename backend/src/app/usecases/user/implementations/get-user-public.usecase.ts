@@ -1,7 +1,7 @@
 import { GetUserDto } from "../../../../domain/dtos/user/user.dto";
 import { User } from "../../../../domain/entities/user.entity";
 import { UserProfile } from "../../../../domain/entities/user-profile.entity";
-import { HttpError } from "../../../../presentation/http/utils/HttpErrors";
+import { HttpError } from "../../../../presentation/http/errors/http-error";
 import { IUserRepository } from "../../../repositories/user.repository";
 
 export interface IGetPublicUserUseCase {

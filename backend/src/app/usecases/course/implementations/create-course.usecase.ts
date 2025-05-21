@@ -3,10 +3,7 @@ import {
   ICreateCourseInputDTO,
 } from "../../../../domain/dtos/course/course.dto";
 import { Course } from "../../../../domain/entities/course.entity";
-import { Duration } from "../../../../domain/value-object/duration";
-import { Offer } from "../../../../domain/value-object/offer";
-import { Price } from "../../../../domain/value-object/price";
-import { HttpError } from "../../../../presentation/http/utils/HttpErrors";
+import { HttpError } from "../../../../presentation/http/errors/http-error";
 import { ICategoryRepository } from "../../../repositories/category.repository";
 import { ICourseRepository } from "../../../repositories/course.repository.interface";
 import { IUserRepository } from "../../../repositories/user.repository";

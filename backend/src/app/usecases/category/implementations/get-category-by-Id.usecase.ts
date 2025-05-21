@@ -1,5 +1,5 @@
 import { ICategoryRepository } from "../../../repositories/category.repository";
-import { HttpError } from "../../../../presentation/http/utils/HttpErrors";
+import { HttpError } from "../../../../presentation/http/errors/http-error";
 import { IGetCategoryByIdUseCase } from "../interfaces/get-cateogry-by-Id.usecase.interface";
 import {
   ICategoryIdInputDTO,

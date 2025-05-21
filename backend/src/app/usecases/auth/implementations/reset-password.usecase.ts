@@ -1,6 +1,6 @@
 import { User } from "../../../../domain/entities/user.entity";
 import { IAuthRepository } from "../../../repositories/auth.repository";
-import { HttpError } from "../../../../presentation/http/utils/HttpErrors";
+import { HttpError } from "../../../../presentation/http/errors/http-error";
 import * as bcrypt from "bcrypt";
 import { IResetPasswordUseCase } from "../interfaces/reset-password.usecase.interface";
 import { ResetPasswordDto } from "../../../../domain/dtos/auth/reset-password.dto";

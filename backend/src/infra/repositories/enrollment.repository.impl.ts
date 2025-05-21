@@ -3,8 +3,8 @@ import {
   ICreateEnrollmentInputDTO,
   IEnrollmentOutputDTO,
 } from "../../domain/dtos/course/course.dto";
-import { HttpError } from "../../presentation/http/utils/HttpErrors";
 import { IEnrollmentRepository } from "../../app/repositories/enrollment.repository.interface";
+import { HttpError } from "../../presentation/http/errors/http-error";
 
 export class EnrollmentRepository implements IEnrollmentRepository {
   constructor(private prisma: PrismaClient) {}

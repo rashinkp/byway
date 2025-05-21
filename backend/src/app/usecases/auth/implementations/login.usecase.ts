@@ -1,6 +1,6 @@
 import { User } from "../../../../domain/entities/user.entity";
 import { IAuthRepository } from "../../../repositories/auth.repository";
-import { HttpError } from "../../../../presentation/http/utils/HttpErrors";
+import { HttpError } from "../../../../presentation/http/errors/http-error";
 import * as bcrypt from "bcrypt";
 import { AuthProvider } from "../../../../domain/enum/auth-provider.enum";
 import { LoginDto } from "../../../../domain/dtos/auth/login.dto";

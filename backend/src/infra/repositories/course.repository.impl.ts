@@ -6,7 +6,6 @@ import { Duration } from "../../domain/value-object/duration";
 import { Offer } from "../../domain/value-object/offer";
 import { CourseStatus } from "../../domain/enum/course-status.enum";
 import { APPROVALSTATUS } from "../../domain/enum/approval-status.enum";
-import { HttpError } from "../../presentation/http/utils/HttpErrors";
 import {
   ICourseResponseDTO,
   IGetAllCoursesInputDTO,
@@ -14,6 +13,7 @@ import {
 } from "../../domain/dtos/course/course.dto";
 import { Decimal } from "@prisma/client/runtime/library";
 import { ICourseRepository } from "../../app/repositories/course.repository.interface";
+import { HttpError } from "../../presentation/http/errors/http-error";
 
 export class CourseRepository implements ICourseRepository {
   constructor(private prisma: PrismaClient) {}

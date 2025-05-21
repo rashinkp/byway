@@ -3,7 +3,7 @@ import {
   IUpdateCourseApprovalInputDTO,
 } from "../../../../domain/dtos/course/course.dto";
 import { APPROVALSTATUS } from "../../../../domain/enum/approval-status.enum";
-import { HttpError } from "../../../../presentation/http/utils/HttpErrors";
+import { HttpError } from "../../../../presentation/http/errors/http-error";
 import { ICourseRepository } from "../../../repositories/course.repository.interface";
 import { IDeclineCourseUseCase } from "../interfaces/decline-course.usecase.interface";
 

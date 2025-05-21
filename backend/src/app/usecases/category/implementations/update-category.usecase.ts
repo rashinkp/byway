@@ -1,6 +1,6 @@
 import { IUpdateCategoryUseCase } from "../interfaces/update-category.usecase.interface";
 import { ICategoryRepository } from "../../../repositories/category.repository";
-import { HttpError } from "../../../../presentation/http/utils/HttpErrors";
+import { HttpError } from "../../../../presentation/http/errors/http-error";
 import {
   ICategoryOutputDTO,
   IUpdateCategoryInputDTO,

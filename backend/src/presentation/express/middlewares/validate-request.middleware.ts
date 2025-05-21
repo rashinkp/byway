@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import { StatusCodes } from "http-status-codes";
 import { z, ZodError, ZodSchema } from "zod";
-import { HttpError } from "../../http/utils/HttpErrors";
+import { HttpError } from "../../http/errors/http-error";
 
 interface ValidationSchema {
   body?: ZodSchema;
@@ -9,7 +9,6 @@ interface ValidationSchema {
   params?: ZodSchema;
 }
 
-// Extend the Express Request interface to include custom properties
 declare module "express" {
   interface Request {
     validatedBody?: any;
