@@ -4,22 +4,14 @@ import { getCurrentUserServer } from "@/api/auth";
 export async function middleware(request: NextRequest) {
   const { pathname, searchParams } = request.nextUrl;
   const cookies = request.headers.get("cookie") || "";
-  const clearAuth = searchParams.get("clearAuth");
 
-  // Handle login page with clearAuth=true
-  if (pathname === "/login" && clearAuth) {
-    const response = NextResponse.next();
-    response.cookies.set("jwt", "", {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "strict",
-      expires: new Date(0),
-      path: "/",
-    });
-    return response;
+  // Cache user data for the request
+  let user = null;
+  try {
+    user = await getCurrentUserServer(cookies);
+  } catch (error) {
+    console.error("Middleware: Failed to fetch user:", error);
   }
-
-  const user = await getCurrentUserServer(cookies);
 
   const publicRoutes = [
     "/login",
@@ -55,15 +47,7 @@ export async function middleware(request: NextRequest) {
   // Handle root route (/)
   if (pathname === "/") {
     if (!user) {
-      const response = NextResponse.next(); // Allow unauthenticated access
-      response.cookies.set("jwt", "", {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: "strict",
-        expires: new Date(0),
-        path: "/",
-      });
-      return response;
+      return NextResponse.next();
     }
   }
 
@@ -74,33 +58,23 @@ export async function middleware(request: NextRequest) {
     pathname.startsWith("/user")
   ) {
     if (!user) {
-      const response = NextResponse.redirect(
-        new URL("/login?clearAuth=true", request.url)
-      );
-      response.cookies.set("jwt", "", {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: "strict",
-        expires: new Date(0),
-        path: "/",
-      });
-      response.headers.set("x-clear-auth", "true");
-      return response;
+      return NextResponse.redirect(new URL("/login", request.url));
     }
     const role = user.role;
     if (pathname.startsWith("/admin") && role !== "ADMIN") {
-      return NextResponse.redirect(
-        new URL("/login?clearAuth=true", request.url)
-      );
+      return NextResponse.redirect(new URL("/login", request.url));
     }
     if (pathname.startsWith("/instructor") && role !== "INSTRUCTOR") {
-      return NextResponse.redirect(
-        new URL("/login?clearAuth=true", request.url)
-      );
+      return NextResponse.redirect(new URL("/login", request.url));
     }
   }
 
-  return NextResponse.next();
+  // Pass user data to client side via headers
+  const response = NextResponse.next();
+  if (user) {
+    response.headers.set("x-user", JSON.stringify(user));
+  }
+  return response;
 }
 
 export const config = {

@@ -1,4 +1,4 @@
-import { api } from "@/api/api";
+import { api, getTokenServer } from "@/api/api";
 import { User } from "@/types/user";
 
 interface ApiResponse<T> {
@@ -121,12 +121,12 @@ export async function getCurrentUser(): Promise<User | null> {
       validateStatus: (status) => status >= 200 && status < 500,
     });
     if (response.status === 401) {
-      return null; 
+      return null;
     }
     return response.data.data;
   } catch (error: any) {
     if (error.response?.status === 401) {
-      return null; 
+      return null;
     }
     throw new Error(
       error.response?.data?.message || "Failed to fetch current user"
@@ -146,9 +146,11 @@ export async function getCurrentUserServer(
   cookies: string
 ): Promise<User | null> {
   try {
+    const token = getTokenServer(cookies);
     const response = await api.get<ApiResponse<User>>("/user/me", {
       headers: {
         Cookie: cookies,
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
       },
     });
     return response.data.data;

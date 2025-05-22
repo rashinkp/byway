@@ -13,23 +13,50 @@ export const api = axios.create({
 
 let isLoggingOut = false;
 
+const getTokenClient = () => {
+  if (typeof document === "undefined") return null;
+  const cookies = document.cookie.split(";");
+  const jwtCookie = cookies.find((cookie) => cookie.trim().startsWith("jwt="));
+  return jwtCookie ? jwtCookie.split("=")[1] : null;
+};
+
+export const getTokenServer = (cookieHeader: string) => {
+  const cookies = cookieHeader.split(";");
+  const jwtCookie = cookies.find((cookie) => cookie.trim().startsWith("jwt="));
+  return jwtCookie ? jwtCookie.split("=")[1] : null;
+};
+
 api.interceptors.request.use((config) => {
+  if (typeof document !== "undefined") {
+    const token = getTokenClient();
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+  }
   return config;
 });
 
 api.interceptors.response.use(
-  (response) => {
-    return response;
-  },
+  (response) => response,
   async (error) => {
-    console.error("Response error:", error.response?.status, error.message);
-    if (error.response?.status === 401 && !isLoggingOut) {
+    if (isLoggingOut || error.config._retry) {
+      return Promise.reject(error);
+    }
+
+    if (
+      error.response?.status === 401 &&
+      !error.config.url?.includes("/auth/login")
+    ) {
       isLoggingOut = true;
       try {
-        useAuthStore.getState().clearAuth();
-        if (!window.location.pathname.includes("/login")) {
+        if (
+          typeof window !== "undefined" &&
+          !window.location.pathname.includes("/login")
+        ) {
+          error.config._retry = true; // Prevent retry loops
+          useAuthStore.getState().clearAuth();
           await logout();
-          window.location.href = "/login?clearAuth=true";
+          window.location.href = "/login";
         }
       } catch (logoutError) {
         console.error("Logout failed during 401 handling:", logoutError);

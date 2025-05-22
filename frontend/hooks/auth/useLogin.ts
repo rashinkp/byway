@@ -10,13 +10,13 @@ export function useLogin() {
   return useMutation({
     mutationFn: ({ email, password }: { email: string; password: string }) =>
       login(email, password),
-    onSuccess: (response) => {
-      console.log("Login success, response:", response);
-      setUser(response);
+    onSuccess: (user) => {
+      console.log("Login success, user:", user);
+      setUser(user);
       const redirectPath =
-        response.role === "ADMIN"
+        user.role === "ADMIN"
           ? "/admin/dashboard"
-          : response.role === "INSTRUCTOR"
+          : user.role === "INSTRUCTOR"
           ? "/instructor/dashboard"
           : "/";
       router.push(redirectPath);

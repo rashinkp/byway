@@ -3,3 +3,4 @@ export enum APPROVALSTATUS {
   APPROVED = "APPROVED",
   DECLINED = "DECLINED",
 }
+
