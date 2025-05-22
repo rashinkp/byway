@@ -1,23 +1,20 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
-import { useLogout } from "@/hooks/auth/useLogout";
+import { useRouter, usePathname } from "next/navigation";
+import { useState, useEffect } from "react";
 import { useAuthStore } from "@/stores/auth.store";
-import { Menu, X } from "lucide-react";
-import { usePathname, useRouter } from "next/navigation";
-import { ReactNode, useEffect, useState } from "react";
+import { useLogout } from "@/hooks/auth/useLogout";
 import { CommonSidebar } from "@/components/common/layout/CommonSidebar";
 import { TopNavbar } from "@/components/common/layout/TopNavbar";
-import { NavItem } from "@/types/nav";
 
 interface CommonLayoutProps {
-  children: ReactNode;
+  children: React.ReactNode;
   sidebarHeaderTitle: string;
   sidebarHeaderSubtitle: string;
-  navItems: NavItem[];
-  role: "ADMIN" | "INSTRUCTOR";
+  navItems: any[];
+  role: string;
   isCollapsible?: boolean;
-  skeleton?: ReactNode;
+  skeleton?: React.ReactNode;
 }
 
 export default function CommonLayout({
@@ -29,21 +26,24 @@ export default function CommonLayout({
   isCollapsible = false,
   skeleton,
 }: CommonLayoutProps) {
-  const { user, isLoading, initializeAuth } = useAuthStore();
+  const { user, isInitialized, initializeAuth } = useAuthStore();
   const { mutate: logout } = useLogout();
   const router = useRouter();
   const pathname = usePathname();
   const [collapsed, setCollapsed] = useState(isCollapsible);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
+  // Initialize auth on mount
   useEffect(() => {
-    console.log("CommonLayout: Initializing auth, pathname:", pathname);
-    initializeAuth().then(() => {
-      console.log(
-        "CommonLayout: Auth initialized, user:",
-        user?.role || "null"
-      );
-    });
+    if (!isInitialized) {
+      initializeAuth();
+    }
+  }, [isInitialized, initializeAuth]);
+
+  console.log("isInitialized", isInitialized , user);
+
+  // Handle screen size for collapsible sidebar
+  useEffect(() => {
     if (isCollapsible) {
       const checkScreenSize = () => {
         setCollapsed(window.innerWidth < 1024);
@@ -52,12 +52,26 @@ export default function CommonLayout({
       window.addEventListener("resize", checkScreenSize);
       return () => window.removeEventListener("resize", checkScreenSize);
     }
-  }, [initializeAuth, isCollapsible, pathname]);
+  }, [isCollapsible]);
+
+  // Handle role-based redirects
+  useEffect(() => {
+    if (isInitialized) {
+      if (!user) {
+        router.replace("/login");
+        return;
+      }
+      if (user.role !== role) {
+        router.replace("/login");
+        return;
+      }
+    }
+  }, [user, role, isInitialized, router]);
 
   const handleLogout = async () => {
     try {
       logout();
-      router.push("/login");
+      router.replace("/login");
     } catch (error) {
       console.error("Logout failed:", error);
     }
@@ -69,45 +83,21 @@ export default function CommonLayout({
     ? "AD"
     : "IN";
 
-  if (isLoading) {
-    console.log("CommonLayout: Showing skeleton, isLoading:", isLoading);
+  // Show skeleton while loading
+  if (!isInitialized) {
     return skeleton || null;
   }
 
+  // Show nothing if not authorized
   if (!user || user.role !== role) {
-    console.log(`Role mismatch: Expected ${role}, Got ${user?.role || "null"}`);
-    setTimeout(() => router.push("/login?clearAuth=true"), 100); // Delay redirect to allow state sync
     return null;
   }
 
-  console.log("CommonLayout: Rendering dashboard, user:", user.role);
   return (
-    <div className="flex min-h-screen bg-gray-50">
-      <div className="lg:hidden fixed top-4 left-4 z-50">
-        <Button
-          variant="outline"
-          size="icon"
-          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-          className="bg-white"
-        >
-          {mobileMenuOpen ? (
-            <X className="h-5 w-5" />
-          ) : (
-            <Menu className="h-5 w-5" />
-          )}
-        </Button>
-      </div>
-      {mobileMenuOpen && (
-        <div
-          className="lg:hidden fixed inset-0 z-40 bg-black/50"
-          onClick={() => setMobileMenuOpen(false)}
-        />
-      )}
+    <div className="flex h-screen bg-gray-100">
       <CommonSidebar
         collapsed={collapsed}
-        toggleCollapse={
-          isCollapsible ? () => setCollapsed(!collapsed) : undefined
-        }
+        toggleCollapse={isCollapsible ? () => setCollapsed(!collapsed) : undefined}
         mobileMenuOpen={mobileMenuOpen}
         setMobileMenuOpen={setMobileMenuOpen}
         pathname={pathname}
@@ -117,15 +107,13 @@ export default function CommonLayout({
         navItems={navItems}
         isCollapsible={isCollapsible}
       />
-      <main
-        className={`flex-1 transition-all duration-300 ease-in-out pt-16 lg:pt-0 ${
-          isCollapsible
-            ? collapsed
-              ? "lg:ml-20"
-              : "lg:ml-64"
-            : "lg:ml-64 lg:[&@media(min-width:1024px)]:ml-[80px] xl:ml-64"
-        }`}
-      >
+      <main className={`flex-1 transition-all duration-300 ease-in-out pt-16 lg:pt-0 ${
+        isCollapsible
+          ? collapsed
+            ? "lg:ml-20"
+            : "lg:ml-64"
+          : "lg:ml-64 lg:[&@media(min-width:1024px)]:ml-[80px] xl:ml-64"
+      }`}>
         <TopNavbar pathname={pathname} navItems={navItems} />
         <div className="p-4 lg:p-6">
           <div className="max-w-7xl mx-auto">{children}</div>

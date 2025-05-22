@@ -1,17 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getCurrentUserServer } from "@/api/auth";
+import { decodeToken, getTokenFromCookies } from "@/utils/jwt";
 
 export async function middleware(request: NextRequest) {
   const { pathname, searchParams } = request.nextUrl;
   const cookies = request.headers.get("cookie") || "";
-
-  // Cache user data for the request
-  let user = null;
-  try {
-    user = await getCurrentUserServer(cookies);
-  } catch (error) {
-    console.error("Middleware: Failed to fetch user:", error);
-  }
+  const token = getTokenFromCookies(cookies);
+  const user = token ? decodeToken(token) : null;
 
   const publicRoutes = [
     "/login",
@@ -60,11 +54,15 @@ export async function middleware(request: NextRequest) {
     if (!user) {
       return NextResponse.redirect(new URL("/login", request.url));
     }
-    const role = user.role;
-    if (pathname.startsWith("/admin") && role !== "ADMIN") {
+
+    // Role-based access control
+    if (pathname.startsWith("/admin") && user.role !== "ADMIN") {
       return NextResponse.redirect(new URL("/login", request.url));
     }
-    if (pathname.startsWith("/instructor") && role !== "INSTRUCTOR") {
+    if (pathname.startsWith("/instructor") && user.role !== "INSTRUCTOR") {
+      return NextResponse.redirect(new URL("/login", request.url));
+    }
+    if (pathname.startsWith("/user") && user.role !== "USER") {
       return NextResponse.redirect(new URL("/login", request.url));
     }
   }

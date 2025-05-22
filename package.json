@@ -1,5 +1,6 @@
 {
   "dependencies": {
-    "git-filter-repo": "^0.0.30"
+    "git-filter-repo": "^0.0.30",
+    "jwt-decode": "^4.0.0"
   }
 }

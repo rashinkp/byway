@@ -4,43 +4,67 @@ import { getCurrentUser } from "@/api/auth";
 
 interface AuthState {
   user: User | null;
-  email: string | null;
-  isLoading: boolean;
   isInitialized: boolean;
+  isLoading: boolean;
   setUser: (user: User | null) => void;
-  setEmail: (email: string | null) => void;
   clearAuth: () => void;
   initializeAuth: () => Promise<void>;
 }
 
 export const useAuthStore = create<AuthState>((set, get) => ({
   user: null,
-  email: null,
-  isLoading: false,
   isInitialized: false,
-  setUser: (user) => set({ user, isInitialized: true, isLoading: false }),
-  setEmail: (email) => set({ email }),
-  clearAuth: () =>
-    set({ user: null, email: null, isLoading: false, isInitialized: true }),
+  isLoading: false,
+  setUser: (user) => set({ user, isInitialized: true }),
+  clearAuth: () => set({ user: null, isInitialized: true }),
   initializeAuth: async () => {
-    if (get().isInitialized || get().isLoading) return;
+    // Skip if already initialized
+    if (get().isInitialized) return;
 
     set({ isLoading: true });
     try {
-      const user = await getCurrentUser();
-      set({
-        user,
-        email: user?.email || get().email,
-        isLoading: false,
-        isInitialized: true,
+      // First try to get user from x-user header
+      const response = await fetch("/api/auth/user-header", {
+        headers: {
+          Accept: "application/json",
+        },
+        credentials: "include", // Important for cookies
       });
+
+      if (response.ok) {
+        const { user: userHeader } = await response.json();
+        if (userHeader) {
+          set({
+            user: userHeader,
+            isInitialized: true,
+            isLoading: false,
+          });
+          return;
+        }
+      }
+
+      // If no user in header, try to fetch from API
+      try {
+        const userData = await getCurrentUser();
+        set({
+          user: userData,
+          isInitialized: true,
+          isLoading: false,
+        });
+      } catch (error) {
+        console.error("Failed to fetch user from API:", error);
+        set({
+          user: null,
+          isInitialized: true,
+          isLoading: false,
+        });
+      }
     } catch (error) {
       console.error("Auth initialization error:", error);
       set({
         user: null,
-        email: get().email,
-        isLoading: false,
         isInitialized: true,
+        isLoading: false,
       });
     }
   },

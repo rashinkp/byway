@@ -147,13 +147,13 @@ export async function resetPassword(
 
 export async function getCurrentUser(): Promise<User | null> {
   try {
-    const response = await api.get<ApiResponse<User>>("/user/me", {
+    const response = await api.get<ApiResponse<{ data: User }>>("/user/me", {
       validateStatus: (status) => status >= 200 && status < 500,
     });
     if (response.status === 401) {
       return null;
     }
-    return response.data.data;
+    return response.data.data.data;
   } catch (error: any) {
     console.error("Get current user error:", {
       status: error.response?.status,

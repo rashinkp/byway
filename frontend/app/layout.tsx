@@ -5,8 +5,6 @@ import { Toaster } from "sonner";
 import { Providers } from "@/components/providers";
 import { GoogleOAuthProvider } from "@react-oauth/google";
 import BywayFooter from "@/components/Footer";
-import { LoadingProvider } from "@/lib/context/LoadingContext";
-import { Loading } from "@/components/GlobalLoading";
 
 // Load fonts
 const geistSans = Geist({
@@ -36,18 +34,15 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased flex flex-col min-h-screen`}
         suppressHydrationWarning
       >
-        <LoadingProvider>
-          <Providers>
-            <GoogleOAuthProvider
-              clientId={process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID!}
-            >
-              <Loading />
-              <div className="flex-1">{children}</div>
-              <BywayFooter />
-            </GoogleOAuthProvider>
-          </Providers>
-          <Toaster richColors position="top-right" />
-        </LoadingProvider>
+        <Providers>
+          <GoogleOAuthProvider
+            clientId={process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID!}
+          >
+            <div className="flex-1">{children}</div>
+            <BywayFooter />
+          </GoogleOAuthProvider>
+        </Providers>
+        <Toaster richColors position="top-right" />
       </body>
     </html>
   );
