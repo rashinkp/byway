@@ -4,7 +4,6 @@ import "./globals.css";
 import { Toaster } from "sonner";
 import { Providers } from "@/components/providers";
 import { GoogleOAuthProvider } from "@react-oauth/google";
-import BywayFooter from "@/components/Footer";
 
 // Load fonts
 const geistSans = Geist({
@@ -31,15 +30,16 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased flex flex-col min-h-screen`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen flex flex-col`}
         suppressHydrationWarning
       >
         <Providers>
           <GoogleOAuthProvider
             clientId={process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID!}
           >
-            <div className="flex-1">{children}</div>
-            <BywayFooter />
+            <div className="flex-1 flex flex-col relative">
+              {children}
+            </div>
           </GoogleOAuthProvider>
         </Providers>
         <Toaster richColors position="top-right" />

@@ -6,6 +6,7 @@ import { useAuthStore } from "@/stores/auth.store";
 import { useLogout } from "@/hooks/auth/useLogout";
 import { CommonSidebar } from "@/components/common/layout/CommonSidebar";
 import { TopNavbar } from "@/components/common/layout/TopNavbar";
+import BywayFooter from "@/components/Footer";
 
 interface CommonLayoutProps {
   children: React.ReactNode;
@@ -94,7 +95,7 @@ export default function CommonLayout({
   }
 
   return (
-    <div className="flex h-screen bg-gray-100">
+    <div className="flex min-h-screen bg-gray-100">
       <CommonSidebar
         collapsed={collapsed}
         toggleCollapse={isCollapsible ? () => setCollapsed(!collapsed) : undefined}
@@ -107,18 +108,29 @@ export default function CommonLayout({
         navItems={navItems}
         isCollapsible={isCollapsible}
       />
-      <main className={`flex-1 transition-all duration-300 ease-in-out pt-16 lg:pt-0 ${
-        isCollapsible
-          ? collapsed
-            ? "lg:ml-20"
-            : "lg:ml-64"
-          : "lg:ml-64 lg:[&@media(min-width:1024px)]:ml-[80px] xl:ml-64"
-      }`}>
+      <div className="flex-1 flex flex-col min-h-screen">
         <TopNavbar pathname={pathname} navItems={navItems} />
-        <div className="p-4 lg:p-6">
-          <div className="max-w-7xl mx-auto">{children}</div>
+        <main className={`flex-1 transition-all duration-300 ease-in-out ${
+          isCollapsible
+            ? collapsed
+              ? "lg:ml-20"
+              : "lg:ml-64"
+            : "lg:ml-64 lg:[&@media(min-width:1024px)]:ml-[80px] xl:ml-64"
+        }`}>
+          <div className="p-4 lg:p-6">
+            <div className="max-w-7xl mx-auto">{children}</div>
+          </div>
+        </main>
+        <div className={`${
+          isCollapsible
+            ? collapsed
+              ? "lg:ml-20"
+              : "lg:ml-64"
+            : "lg:ml-64 lg:[&@media(min-width:1024px)]:ml-[80px] xl:ml-64"
+        }`}>
+          <BywayFooter />
         </div>
-      </main>
+      </div>
     </div>
   );
 }
