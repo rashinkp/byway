@@ -4,8 +4,10 @@ export interface IHttpError {
 }
 
 export interface IHttpErrors {
-  error_400(): IHttpError;
-  error_422(): IHttpError;
-  error_500(): IHttpError;
-  error_404(): IHttpError;
+  error_400(message?: string): IHttpError;
+  error_401(message?: string): IHttpError;
+  error_403(message?: string): IHttpError;
+  error_404(message?: string): IHttpError;
+  error_422(message?: string): IHttpError;
+  error_500(message?: string): IHttpError;
 }

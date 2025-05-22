@@ -28,7 +28,12 @@ export async function signup(data: SignupData): Promise<ApiResponse<User>> {
     const response = await api.post<ApiResponse<User>>("/auth/register", data);
     return response.data;
   } catch (error: any) {
-    throw new Error(error.response?.data?.error || "Signup failed");
+    console.error("Signup error:", {
+      status: error.response?.status,
+      data: error.response?.data,
+      message: error.message
+    });
+    throw new Error(error.response?.data?.message || error.response?.data?.error || "Signup failed");
   }
 }
 
@@ -40,7 +45,12 @@ export async function login(email: string, password: string) {
     });
     return response.data.data;
   } catch (error: any) {
-    throw new Error(error.response?.data?.message || "Login failed");
+    console.error("Login error:", {
+      status: error.response?.status,
+      data: error.response?.data,
+      message: error.message
+    });
+    throw new Error(error.response?.data?.message || error.response?.data?.error || "Login failed");
   }
 }
 
@@ -53,8 +63,13 @@ export async function googleAuth(
     });
     return response.data;
   } catch (error: any) {
+    console.error("Google auth error:", {
+      status: error.response?.status,
+      data: error.response?.data,
+      message: error.message
+    });
     throw new Error(
-      error.response?.data?.message || "Google authentication failed"
+      error.response?.data?.message || error.response?.data?.error || "Google authentication failed"
     );
   }
 }
@@ -72,7 +87,12 @@ export async function verifyOtp(
     });
     return response.data;
   } catch (error: any) {
-    throw new Error(error.response?.data?.error || "OTP verification failed");
+    console.error("OTP verification error:", {
+      status: error.response?.status,
+      data: error.response?.data,
+      message: error.message
+    });
+    throw new Error(error.response?.data?.message || error.response?.data?.error || "OTP verification failed");
   }
 }
 
@@ -80,7 +100,12 @@ export async function resendOtp(email: string): Promise<void> {
   try {
     await api.post<ApiResponse<unknown>>("/auth/resend-otp", { email });
   } catch (error: any) {
-    throw new Error(error.response?.data?.message || "Resend OTP failed");
+    console.error("Resend OTP error:", {
+      status: error.response?.status,
+      data: error.response?.data,
+      message: error.message
+    });
+    throw new Error(error.response?.data?.message || error.response?.data?.error || "Resend OTP failed");
   }
 }
 
@@ -88,13 +113,13 @@ export async function forgotPassword(email: string): Promise<void> {
   try {
     await api.post<ApiResponse<unknown>>("/auth/forgot-password", { email });
   } catch (error: any) {
-    if (error.response?.data?.status === "error") {
-      throw new Error(
-        error.response.data.message || "Forgot password request failed"
-      );
-    }
+    console.error("Forgot password error:", {
+      status: error.response?.status,
+      data: error.response?.data,
+      message: error.message
+    });
     throw new Error(
-      error.response?.data?.message || "Forgot password request failed"
+      error.response?.data?.message || error.response?.data?.error || "Forgot password request failed"
     );
   }
 }
@@ -111,7 +136,12 @@ export async function resetPassword(
       newPassword,
     });
   } catch (error: any) {
-    throw new Error(error.response?.data?.message || "Password reset failed");
+    console.error("Reset password error:", {
+      status: error.response?.status,
+      data: error.response?.data,
+      message: error.message
+    });
+    throw new Error(error.response?.data?.message || error.response?.data?.error || "Password reset failed");
   }
 }
 
@@ -125,11 +155,16 @@ export async function getCurrentUser(): Promise<User | null> {
     }
     return response.data.data;
   } catch (error: any) {
+    console.error("Get current user error:", {
+      status: error.response?.status,
+      data: error.response?.data,
+      message: error.message
+    });
     if (error.response?.status === 401) {
       return null;
     }
     throw new Error(
-      error.response?.data?.message || "Failed to fetch current user"
+      error.response?.data?.message || error.response?.data?.error || "Failed to fetch current user"
     );
   }
 }
@@ -138,7 +173,12 @@ export async function logout(): Promise<void> {
   try {
     await api.post<ApiResponse<unknown>>("/auth/logout");
   } catch (error: any) {
-    throw new Error(error.response?.data?.message || "Logout failed");
+    console.error("Logout error:", {
+      status: error.response?.status,
+      data: error.response?.data,
+      message: error.message
+    });
+    throw new Error(error.response?.data?.message || error.response?.data?.error || "Logout failed");
   }
 }
 
@@ -155,10 +195,14 @@ export async function getCurrentUserServer(
     });
     return response.data.data;
   } catch (error: any) {
+    console.error("Get current user server error:", {
+      status: error.response?.status,
+      data: error.response?.data,
+      message: error.message
+    });
     if (error.response?.status === 401) {
       return null;
     }
-    console.error("Error fetching current user server-side:", error);
     return null;
   }
 }
@@ -170,9 +214,13 @@ export async function facebookAuth(
     const response = await api.post<ApiResponse<User>>("/auth/facebook", data);
     return response.data;
   } catch (error: any) {
-    console.error("Error during Facebook authentication:", error);
+    console.error("Facebook auth error:", {
+      status: error.response?.status,
+      data: error.response?.data,
+      message: error.message
+    });
     throw new Error(
-      error.response?.data?.message || "Failed to authenticate with Facebook"
+      error.response?.data?.message || error.response?.data?.error || "Failed to authenticate with Facebook"
     );
   }
 }

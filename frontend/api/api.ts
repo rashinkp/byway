@@ -1,6 +1,15 @@
-import axios from "axios";
+import axios, { AxiosError, InternalAxiosRequestConfig } from "axios";
 import { logout } from "@/api/auth";
 import { useAuthStore } from "@/stores/auth.store";
+
+interface ApiErrorResponse {
+  message?: string;
+  error?: string;
+}
+
+interface ExtendedAxiosRequestConfig extends InternalAxiosRequestConfig {
+  _retry?: boolean;
+}
 
 export const api = axios.create({
   baseURL:
@@ -38,22 +47,27 @@ api.interceptors.request.use((config) => {
 
 api.interceptors.response.use(
   (response) => response,
-  async (error) => {
-    if (isLoggingOut || error.config._retry) {
-      return Promise.reject(error);
-    }
+  async (error: AxiosError<ApiErrorResponse>) => {
+    // Log the complete error for debugging
+    console.error("API Error:", {
+      status: error.response?.status,
+      data: error.response?.data,
+      message: error.message,
+      url: error.config?.url
+    });
 
-    if (
-      error.response?.status === 401 &&
-      !error.config.url?.includes("/auth/login")
-    ) {
+    // Handle 401 Unauthorized errors
+    if (error.response?.status === 401 && !error.config?.url?.includes("/auth/login")) {
+      if (isLoggingOut) {
+        return Promise.reject(error);
+      }
+
       isLoggingOut = true;
       try {
-        if (
-          typeof window !== "undefined" &&
-          !window.location.pathname.includes("/login")
-        ) {
-          error.config._retry = true; // Prevent retry loops
+        if (typeof window !== "undefined" && !window.location.pathname.includes("/login")) {
+          if (error.config) {
+            (error.config as ExtendedAxiosRequestConfig)._retry = true;
+          }
           useAuthStore.getState().clearAuth();
           await logout();
           window.location.href = "/login";
@@ -64,6 +78,18 @@ api.interceptors.response.use(
         isLoggingOut = false;
       }
     }
-    return Promise.reject(error);
+
+    // Extract error message from response
+    const errorMessage = error.response?.data?.message || 
+                        error.response?.data?.error || 
+                        error.message || 
+                        "An unexpected error occurred";
+
+    // Create a new error with the extracted message
+    const enhancedError = new Error(errorMessage) as AxiosError<ApiErrorResponse>;
+    enhancedError.response = error.response;
+    enhancedError.config = error.config;
+
+    return Promise.reject(enhancedError);
   }
 );

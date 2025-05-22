@@ -35,9 +35,9 @@ export function createCategoryDependencies(
   // Initialize controller
   const categoryController = new CategoryController(
     createCategoryUseCase,
-    getAllCategoriesUseCase,
-    getCategoryByIdUseCase,
     updateCategoryUseCase,
+    getCategoryByIdUseCase,
+    getAllCategoriesUseCase,
     deleteCategoryUseCase,
     recoverCategoryUseCase,
     deps.httpErrors,

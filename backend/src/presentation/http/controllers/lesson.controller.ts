@@ -12,8 +12,11 @@ import { IDeleteLessonUseCase } from "../../../app/usecases/lesson/interfaces/de
 import { IGetPublicLessonsUseCase } from "../../../app/usecases/lesson/interfaces/get-public-lessons.usecase.interface";
 import { ILessonListOutputDTO, ILessonOutputDTO, IPublicLessonListOutputDTO } from "../../../domain/dtos/lesson/lesson.dto";
 import { validateCreateLesson, validateDeleteLesson, validateGetAllLessons, validateGetLessonById, validateGetPublicLessons, validateUpdateLesson } from "../../validators/lesson.validators";
+import { ZodError } from "zod";
+import { HttpError } from "../errors/http-error";
+import { BaseController } from "./base.controller";
 
-export class LessonController {
+export class LessonController extends BaseController {
   constructor(
     private createLessonUseCase: ICreateLessonUseCase,
     private updateLessonUseCase: IUpdateLessonUseCase,
@@ -21,13 +24,15 @@ export class LessonController {
     private getAllLessonsUseCase: IGetAllLessonsUseCase,
     private deleteLessonUseCase: IDeleteLessonUseCase,
     private getPublicLessonsUseCase: IGetPublicLessonsUseCase,
-    private httpErrors: IHttpErrors,
-    private httpSuccess: IHttpSuccess
-  ) {}
+    httpErrors: IHttpErrors,
+    httpSuccess: IHttpSuccess
+  ) {
+    super(httpErrors, httpSuccess);
+  }
 
   async createLesson(httpRequest: IHttpRequest): Promise<IHttpResponse> {
-    try {
-      const validated = validateCreateLesson(httpRequest.body);
+    return this.handleRequest(httpRequest, async (request) => {
+      const validated = validateCreateLesson(request.body);
       const lesson = await this.createLessonUseCase.execute(validated);
       const response: ApiResponse<ILessonOutputDTO> = {
         statusCode: 201,
@@ -35,20 +40,15 @@ export class LessonController {
         message: "Lesson created successfully",
         data: lesson,
       };
-      return this.httpSuccess.success_201(response);
-    } catch (error) {
-      if (error instanceof BadRequestError) {
-        return this.httpErrors.error_400();
-      }
-      return this.httpErrors.error_500();
-    }
+      return this.success_201(response, "Lesson created successfully");
+    });
   }
 
   async updateLesson(httpRequest: IHttpRequest): Promise<IHttpResponse> {
-    try {
+    return this.handleRequest(httpRequest, async (request) => {
       const validated = validateUpdateLesson({
-        ...httpRequest.body,
-        lessonId: httpRequest.params.lessonId,
+        ...request.body,
+        lessonId: request.params.lessonId,
       });
       const lesson = await this.updateLessonUseCase.execute(validated);
       const response: ApiResponse<ILessonOutputDTO> = {
@@ -57,24 +57,16 @@ export class LessonController {
         message: "Lesson updated successfully",
         data: lesson,
       };
-      return this.httpSuccess.success_200(response);
-    } catch (error) {
-      console.log(error);
-      if (error instanceof BadRequestError) {
-        return this.httpErrors.error_400();
-      }
-      return this.httpErrors.error_500();
-    }
+      return this.success_200(response, "Lesson updated successfully");
+    });
   }
 
   async getLessonById(httpRequest: IHttpRequest): Promise<IHttpResponse> {
-    try {
-      const validated = validateGetLessonById(httpRequest.params);
-      const lesson = await this.getLessonByIdUseCase.execute(
-        validated.lessonId
-      );
+    return this.handleRequest(httpRequest, async (request) => {
+      const validated = validateGetLessonById(request.params);
+      const lesson = await this.getLessonByIdUseCase.execute(validated.lessonId);
       if (!lesson) {
-        return this.httpErrors.error_404();
+        throw new BadRequestError("Lesson not found");
       }
       const response: ApiResponse<ILessonOutputDTO> = {
         statusCode: 200,
@@ -82,20 +74,15 @@ export class LessonController {
         message: "Lesson retrieved successfully",
         data: lesson,
       };
-      return this.httpSuccess.success_200(response);
-    } catch (error) {
-      if (error instanceof BadRequestError) {
-        return this.httpErrors.error_400();
-      }
-      return this.httpErrors.error_500();
-    }
+      return this.success_200(response, "Lesson retrieved successfully");
+    });
   }
 
   async getAllLessons(httpRequest: IHttpRequest): Promise<IHttpResponse> {
-    try {
+    return this.handleRequest(httpRequest, async (request) => {
       const validated = validateGetAllLessons({
-        ...httpRequest.query,
-        courseId: httpRequest.params.courseId,
+        ...request.query,
+        courseId: request.params.courseId,
       });
       const result = await this.getAllLessonsUseCase.execute(validated);
       const response: ApiResponse<ILessonListOutputDTO> = {
@@ -104,18 +91,13 @@ export class LessonController {
         message: "Lessons retrieved successfully",
         data: result,
       };
-      return this.httpSuccess.success_200(response);
-    } catch (error) {
-      if (error instanceof BadRequestError) {
-        return this.httpErrors.error_400();
-      }
-      return this.httpErrors.error_500();
-    }
+      return this.success_200(response, "Lessons retrieved successfully");
+    });
   }
 
   async deleteLesson(httpRequest: IHttpRequest): Promise<IHttpResponse> {
-    try {
-      const validated = validateDeleteLesson(httpRequest.params);
+    return this.handleRequest(httpRequest, async (request) => {
+      const validated = validateDeleteLesson(request.params);
       await this.deleteLessonUseCase.execute(validated.lessonId);
       const response: ApiResponse<null> = {
         statusCode: 200,
@@ -123,20 +105,15 @@ export class LessonController {
         message: "Lesson deleted successfully",
         data: null,
       };
-      return this.httpSuccess.success_200(response);
-    } catch (error) {
-      if (error instanceof BadRequestError) {
-        return this.httpErrors.error_400();
-      }
-      return this.httpErrors.error_500();
-    }
+      return this.success_200(response, "Lesson deleted successfully");
+    });
   }
 
   async getPublicLessons(httpRequest: IHttpRequest): Promise<IHttpResponse> {
-    try {
+    return this.handleRequest(httpRequest, async (request) => {
       const validated = validateGetPublicLessons({
-        ...httpRequest.query,
-        courseId: httpRequest.params.courseId,
+        ...request.query,
+        courseId: request.params.courseId,
       });
       const result = await this.getPublicLessonsUseCase.execute(validated);
       const response: ApiResponse<IPublicLessonListOutputDTO> = {
@@ -145,12 +122,7 @@ export class LessonController {
         message: "Public lessons retrieved successfully",
         data: result,
       };
-      return this.httpSuccess.success_200(response);
-    } catch (error) {
-      if (error instanceof BadRequestError) {
-        return this.httpErrors.error_400();
-      }
-      return this.httpErrors.error_500();
-    }
+      return this.success_200(response, "Public lessons retrieved successfully");
+    });
   }
 }

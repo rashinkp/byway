@@ -9,7 +9,7 @@ export default function lessonContentRouter(
   const router = Router();
 
   // Admin-only endpoints
-  router.post("/", restrictTo("ADMIN"), (req, res) =>
+  router.post("/", restrictTo("INSTRUCTOR"), (req, res) =>
     expressAdapter(
       req,
       res,
@@ -17,7 +17,7 @@ export default function lessonContentRouter(
     )
   );
 
-  router.put("/:contentId", restrictTo("ADMIN"), (req, res) =>
+  router.put("/:contentId", restrictTo("INSTRUCTOR"), (req, res) =>
     expressAdapter(
       req,
       res,
@@ -25,7 +25,7 @@ export default function lessonContentRouter(
     )
   );
 
-  router.delete("/:contentId", restrictTo("ADMIN"), (req, res) =>
+  router.delete("/:contentId", restrictTo("ADMIN", "INSTRUCTOR"), (req, res) =>
     expressAdapter(
       req,
       res,

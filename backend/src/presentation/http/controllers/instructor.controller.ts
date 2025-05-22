@@ -1,4 +1,3 @@
-
 import { IUserRepository } from "../../../app/repositories/user.repository";
 import {
   validateApproveInstructor,
@@ -18,16 +17,15 @@ import { IDeclineInstructorUseCase } from "../../../app/usecases/instructor/inte
 import { IGetInstructorByUserIdUseCase } from "../../../app/usecases/instructor/interfaces/get-instructor-by-Id.usecase.interface";
 import { IGetAllInstructorsUseCase } from "../../../app/usecases/instructor/interfaces/get-all-instructors.usecase.interface";
 import { StatusCodes } from "http-status-codes";
-import { ZodError } from "zod";
 import { IHttpErrors } from "../interfaces/http-errors.interface";
 import { IHttpSuccess } from "../interfaces/http-success.interface";
 import { IHttpRequest } from "../interfaces/http-request.interface";
 import { IHttpResponse } from "../interfaces/http-response.interface";
 import { UnauthorizedError } from "../errors/unautherized-error";
 import { HttpError } from "../errors/http-error";
-import { BadRequestError } from "../errors/bad-request-error";
+import { BaseController } from "./base.controller";
 
-export class InstructorController {
+export class InstructorController extends BaseController {
   constructor(
     private createInstructorUseCase: ICreateInstructorUseCase,
     private updateInstructorUseCase: IUpdateInstructorUseCase,
@@ -36,29 +34,28 @@ export class InstructorController {
     private getInstructorByUserIdUseCase: IGetInstructorByUserIdUseCase,
     private getAllInstructorsUseCase: IGetAllInstructorsUseCase,
     private userRepository: IUserRepository,
-    private httpErrors: IHttpErrors,
-    private httpSuccess: IHttpSuccess
-  ) {}
+    httpErrors: IHttpErrors,
+    httpSuccess: IHttpSuccess
+  ) {
+    super(httpErrors, httpSuccess);
+  }
 
   async createInstructor(httpRequest: IHttpRequest): Promise<IHttpResponse> {
-    try {
-      if (!httpRequest.user?.id) {
+    return this.handleRequest(httpRequest, async (request) => {
+      if (!request.user?.id) {
         throw new UnauthorizedError("User not authenticated");
       }
-      const validated = validateCreateInstructor(httpRequest.body);
+      const validated = validateCreateInstructor(request.body);
       const instructor = await this.createInstructorUseCase.execute(
-        { ...validated, userId: httpRequest.user.id },
-        httpRequest.user
+        { ...validated, userId: request.user.id },
+        request.user
       );
-      const user = await this.userRepository.findById(httpRequest.user.id);
+      const user = await this.userRepository.findById(request.user.id);
       if (!user) {
         throw new HttpError("User not found", StatusCodes.NOT_FOUND);
       }
-      const response: ApiResponse<InstructorResponseDTO> = {
-        statusCode: StatusCodes.CREATED,
-        success: true,
-        message: "Instructor application submitted successfully",
-        data: {
+      return this.success_201(
+        {
           id: instructor.id,
           userId: instructor.userId,
           areaOfExpertise: instructor.areaOfExpertise,
@@ -77,50 +74,27 @@ export class InstructorController {
             avatar: user.avatar,
           },
         },
-      };
-      return this.httpSuccess.success_201(response);
-    } catch (error) {
-      if (
-        error instanceof ZodError ||
-        error instanceof BadRequestError ||
-        error instanceof UnauthorizedError
-      ) {
-        return this.httpErrors.error_400();
-      }
-      if (error instanceof HttpError) {
-        return {
-          statusCode: error.statusCode,
-          body: {
-            statusCode: error.statusCode,
-            success: false,
-            message: error.message,
-            data: null,
-          },
-        };
-      }
-      return this.httpErrors.error_500();
-    }
+        "Instructor application submitted successfully"
+      );
+    });
   }
 
   async updateInstructor(httpRequest: IHttpRequest): Promise<IHttpResponse> {
-    try {
-      if (!httpRequest.user?.id) {
+    return this.handleRequest(httpRequest, async (request) => {
+      if (!request.user?.id) {
         throw new UnauthorizedError("User not authenticated");
       }
-      const validated = validateUpdateInstructor(httpRequest.body);
+      const validated = validateUpdateInstructor(request.body);
       const instructor = await this.updateInstructorUseCase.execute(
         validated,
-        httpRequest.user
+        request.user
       );
-      const user = await this.userRepository.findById(httpRequest.user.id);
+      const user = await this.userRepository.findById(request.user.id);
       if (!user) {
         throw new HttpError("User not found", StatusCodes.NOT_FOUND);
       }
-      const response: ApiResponse<InstructorResponseDTO> = {
-        statusCode: StatusCodes.OK,
-        success: true,
-        message: "Instructor updated successfully",
-        data: {
+      return this.success_200(
+        {
           id: instructor.id,
           userId: instructor.userId,
           areaOfExpertise: instructor.areaOfExpertise,
@@ -139,119 +113,66 @@ export class InstructorController {
             avatar: user.avatar,
           },
         },
-      };
-      return this.httpSuccess.success_200(response);
-    } catch (error) {
-      if (
-        error instanceof ZodError ||
-        error instanceof BadRequestError ||
-        error instanceof UnauthorizedError
-      ) {
-        return this.httpErrors.error_400();
-      }
-      if (error instanceof HttpError) {
-        return {
-          statusCode: error.statusCode,
-          body: {
-            statusCode: error.statusCode,
-            success: false,
-            message: error.message,
-            data: null,
-          },
-        };
-      }
-      return this.httpErrors.error_500();
-    }
+        "Instructor updated successfully"
+      );
+    });
   }
 
   async approveInstructor(httpRequest: IHttpRequest): Promise<IHttpResponse> {
-    try {
-      if (!httpRequest.user?.id) {
+    return this.handleRequest(httpRequest, async (request) => {
+      if (!request.user?.id) {
         throw new UnauthorizedError("User not authenticated");
       }
-      const validated = validateApproveInstructor(httpRequest.body);
+      const validated = validateApproveInstructor(request.body);
       const instructor = await this.approveInstructorUseCase.execute(
         validated,
-        httpRequest.user
+        request.user
       );
-      const response: ApiResponse<{ id: string; status: string }> = {
-        statusCode: StatusCodes.OK,
-        success: true,
-        message: "Instructor approved successfully",
-        data: {
+      return this.success_200(
+        {
           id: instructor.id,
           status: instructor.status,
         },
-      };
-      return this.httpSuccess.success_200(response);
-    } catch (error) {
-      if (
-        error instanceof ZodError ||
-        error instanceof BadRequestError ||
-        error instanceof UnauthorizedError
-      ) {
-        return this.httpErrors.error_400();
-      }
-      return this.httpErrors.error_500();
-    }
+        "Instructor approved successfully"
+      );
+    });
   }
 
   async declineInstructor(httpRequest: IHttpRequest): Promise<IHttpResponse> {
-    try {
-      if (!httpRequest.user?.id) {
+    return this.handleRequest(httpRequest, async (request) => {
+      if (!request.user?.id) {
         throw new UnauthorizedError("User not authenticated");
       }
-      const validated = validateDeclineInstructor(httpRequest.body);
+      const validated = validateDeclineInstructor(request.body);
       const instructor = await this.declineInstructorUseCase.execute(
         validated,
-        httpRequest.user
+        request.user
       );
-      const response: ApiResponse<{ id: string; status: string }> = {
-        statusCode: StatusCodes.OK,
-        success: true,
-        message: "Instructor declined successfully",
-        data: {
+      return this.success_200(
+        {
           id: instructor.id,
           status: instructor.status,
         },
-      };
-      return this.httpSuccess.success_200(response);
-    } catch (error) {
-      if (
-        error instanceof ZodError ||
-        error instanceof BadRequestError ||
-        error instanceof UnauthorizedError
-      ) {
-        return this.httpErrors.error_400();
-      }
-      return this.httpErrors.error_500();
-    }
+        "Instructor declined successfully"
+      );
+    });
   }
 
-  async getInstructorByUserId(
-    httpRequest: IHttpRequest
-  ): Promise<IHttpResponse> {
-    try {
-      if (!httpRequest.user?.id) {
+  async getInstructorByUserId(httpRequest: IHttpRequest): Promise<IHttpResponse> {
+    return this.handleRequest(httpRequest, async (request) => {
+      if (!request.user?.id) {
         throw new UnauthorizedError("User not authenticated");
       }
       const validated = validateGetInstructorByUserId({
-        userId: httpRequest.user.id,
+        userId: request.user.id,
       });
-      const instructor = await this.getInstructorByUserIdUseCase.execute(
-        validated
-      );
-      const user = await this.userRepository.findById(httpRequest.user.id);
+      const instructor = await this.getInstructorByUserIdUseCase.execute(validated);
+      const user = await this.userRepository.findById(request.user.id);
       if (!user) {
         throw new HttpError("User not found", StatusCodes.NOT_FOUND);
       }
-      const response: ApiResponse<InstructorResponseDTO | null> = {
-        statusCode: StatusCodes.OK,
-        success: true,
-        message: instructor
-          ? "Instructor retrieved successfully"
-          : "Instructor not found",
-        data: instructor
+      return this.success_200(
+        instructor
           ? {
               id: instructor.id,
               userId: instructor.userId,
@@ -272,51 +193,16 @@ export class InstructorController {
               },
             }
           : null,
-      };
-      return this.httpSuccess.success_200(response);
-    } catch (error) {
-      if (
-        error instanceof ZodError ||
-        error instanceof BadRequestError ||
-        error instanceof UnauthorizedError
-      ) {
-        return this.httpErrors.error_400();
-      }
-      if (error instanceof HttpError) {
-        return {
-          statusCode: error.statusCode,
-          body: {
-            statusCode: error.statusCode,
-            success: false,
-            message: error.message,
-            data: null,
-          },
-        };
-      }
-      return this.httpErrors.error_500();
-    }
+        "Instructor retrieved successfully"
+      );
+    });
   }
 
   async getAllInstructors(httpRequest: IHttpRequest): Promise<IHttpResponse> {
-    try {
-      const validated = validateGetAllInstructors(httpRequest.query);
+    return this.handleRequest(httpRequest, async (request) => {
+      const validated = validateGetAllInstructors(request.query);
       const result = await this.getAllInstructorsUseCase.execute(validated);
-      const response: ApiResponse<{
-        items: InstructorResponseDTO[];
-        total: number;
-        totalPages: number;
-      }> = {
-        statusCode: StatusCodes.OK,
-        success: true,
-        message: "Instructors retrieved successfully",
-        data: result,
-      };
-      return this.httpSuccess.success_200(response);
-    } catch (error) {
-      if (error instanceof ZodError || error instanceof BadRequestError) {
-        return this.httpErrors.error_400();
-      }
-      return this.httpErrors.error_500();
-    }
+      return this.success_200(result, "Instructors retrieved successfully");
+    });
   }
 }

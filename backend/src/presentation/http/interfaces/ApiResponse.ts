@@ -31,4 +31,8 @@ export interface PublicUserResponse {
   name: string;
   avatar?: string | null;
   bio?: string | null;
+  education?: string | null;
+  skills?: string | null;
+  country?: string | null;
+  city?: string | null;
 }

@@ -12,6 +12,7 @@ import { instructorRouter } from "../router/instructor.router";
 import categoryRouter from "../router/category.router";
 import courseRouter from "../router/course.router";
 import lessonRouter from "../router/lesson.router";
+import lessonContentRouter from "../router/content.router";
 
 export const createApp = (): Application => {
   const app = express();
@@ -29,7 +30,8 @@ export const createApp = (): Application => {
     instructorController,
     categoryController,
     courseController,
-    lessonController
+    lessonController,
+    lessonContentController,
   } = createAppDependencies();
 
   // Routers
@@ -43,6 +45,7 @@ export const createApp = (): Application => {
   app.use("/api/v1/category", categoryRouter(categoryController));
   app.use("/api/v1/courses", courseRouter(courseController));
   app.use("/api/v1/lessons", lessonRouter(lessonController));
+  app.use("/api/v1/lessons", lessonContentRouter(lessonContentController));
   // app.use("/api/cart", cartRouter);
   // app.use("/api/orders", orderRouter);
   // app.use("/api/payments", paymentRouter);

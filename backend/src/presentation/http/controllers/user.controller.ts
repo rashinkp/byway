@@ -1,4 +1,3 @@
-
 import { IGetAllUsersUseCase } from "../../../app/usecases/user/interfaces/get-all-users.usecase.interface";
 import { IToggleDeleteUserUseCase } from "../../../app/usecases/user/interfaces/toggle-delete-user.usecase.interface";
 import { IGetCurrentUserUseCase } from "../../../app/usecases/user/interfaces/get-current-user.usecase.interface";
@@ -25,8 +24,9 @@ import { IHttpResponse } from "../interfaces/http-response.interface";
 import { UnauthorizedError } from "../errors/unautherized-error";
 import { BadRequestError } from "../errors/bad-request-error";
 import { HttpError } from "../errors/http-error";
+import { BaseController } from "./base.controller";
 
-export class UserController {
+export class UserController extends BaseController {
   constructor(
     private getAllUsersUseCase: IGetAllUsersUseCase,
     private toggleDeleteUserUseCase: IToggleDeleteUserUseCase,
@@ -34,16 +34,18 @@ export class UserController {
     private getUserByIdUseCase: IGetUserByIdUseCase,
     private updateUserUseCase: IUpdateUserUseCase,
     private getPublicUserUseCase: IGetPublicUserUseCase,
-    private httpErrors: IHttpErrors,
-    private httpSuccess: IHttpSuccess
-  ) {}
+    httpErrors: IHttpErrors,
+    httpSuccess: IHttpSuccess
+  ) {
+    super(httpErrors, httpSuccess);
+  }
 
   async getAllUsers(httpRequest: IHttpRequest): Promise<IHttpResponse> {
-    try {
-      if (!httpRequest.user?.id) {
+    return this.handleRequest(httpRequest, async (request) => {
+      if (!request.user?.id) {
         throw new UnauthorizedError("User not authenticated");
       }
-      const validated = validateGetAllUsers(httpRequest.query);
+      const validated = validateGetAllUsers(request.query);
       const result = await this.getAllUsersUseCase.execute(validated);
       const response: ApiResponse<{
         items: UserResponse[];
@@ -68,34 +70,25 @@ export class UserController {
           totalPages: result.totalPages,
         },
       };
-      return this.httpSuccess.success_200(response);
-    } catch (error) {
-      if (
-        error instanceof ZodError ||
-        error instanceof BadRequestError ||
-        error instanceof UnauthorizedError
-      ) {
-        return this.httpErrors.error_400();
-      }
-      return this.httpErrors.error_500();
-    }
+      return this.success_200(response, "Users retrieved successfully");
+    });
   }
 
   async toggleDeleteUser(httpRequest: IHttpRequest): Promise<IHttpResponse> {
-    try {
-      if (!httpRequest.user?.id) {
+    return this.handleRequest(httpRequest, async (request) => {
+      if (!request.user?.id) {
         throw new UnauthorizedError("User not authenticated");
       }
-      if (!httpRequest.params.id) {
+      if (!request.params.id) {
         throw new BadRequestError("User ID is required");
       }
       const validated = validateToggleDeleteUser({
-        id: httpRequest.params.id,
-        deletedAt: httpRequest.body.deletedAt,
+        id: request.params.id,
+        deletedAt: request.body.deletedAt,
       });
       const user = await this.toggleDeleteUserUseCase.execute(
         validated,
-        httpRequest.user
+        request.user
       );
       const response: ApiResponse<UserResponse> = {
         statusCode: StatusCodes.OK,
@@ -115,26 +108,17 @@ export class UserController {
           updatedAt: user.updatedAt,
         },
       };
-      return this.httpSuccess.success_200(response);
-    } catch (error) {
-      if (
-        error instanceof ZodError ||
-        error instanceof BadRequestError ||
-        error instanceof UnauthorizedError
-      ) {
-        return this.httpErrors.error_400();
-      }
-      return this.httpErrors.error_500();
-    }
+      return this.success_200(response, validated.deletedAt === "true" ? "User deleted successfully" : "User restored successfully");
+    });
   }
 
   async getCurrentUser(httpRequest: IHttpRequest): Promise<IHttpResponse> {
-    try {
-      if (!httpRequest.user?.id) {
+    return this.handleRequest(httpRequest, async (request) => {
+      if (!request.user?.id) {
         throw new UnauthorizedError("User not authenticated");
       }
       const user = await this.getCurrentUserUseCase.execute(
-        httpRequest.user.id
+        request.user.id
       );
       const { user: fetchedUser, profile } =
         await this.getUserByIdUseCase.execute({ userId: user.id });
@@ -162,28 +146,19 @@ export class UserController {
           updatedAt: fetchedUser.updatedAt,
         },
       };
-      return this.httpSuccess.success_200(response);
-    } catch (error) {
-      if (
-        error instanceof ZodError ||
-        error instanceof BadRequestError ||
-        error instanceof UnauthorizedError
-      ) {
-        return this.httpErrors.error_400();
-      }
-      return this.httpErrors.error_500();
-    }
+      return this.success_200(response, "User retrieved successfully");
+    });
   }
 
   async getUserById(httpRequest: IHttpRequest): Promise<IHttpResponse> {
-    try {
-      if (!httpRequest.user?.id) {
+    return this.handleRequest(httpRequest, async (request) => {
+      if (!request.user?.id) {
         throw new UnauthorizedError("User not authenticated");
       }
-      if (!httpRequest.params.userId) {
+      if (!request.params.userId) {
         throw new BadRequestError("User ID is required");
       }
-      const validated = validateGetUser({ userId: httpRequest.params.userId });
+      const validated = validateGetUser({ userId: request.params.userId });
       const { user, profile } = await this.getUserByIdUseCase.execute(
         validated
       );
@@ -214,39 +189,19 @@ export class UserController {
           updatedAt: user.updatedAt,
         },
       };
-      return this.httpSuccess.success_200(response);
-    } catch (error) {
-      if (
-        error instanceof ZodError ||
-        error instanceof BadRequestError ||
-        error instanceof UnauthorizedError
-      ) {
-        return this.httpErrors.error_400();
-      }
-      if (error instanceof HttpError) {
-        return {
-          statusCode: error.statusCode,
-          body: {
-            statusCode: error.statusCode,
-            success: false,
-            message: error.message,
-            data: null,
-          },
-        };
-      }
-      return this.httpErrors.error_500();
-    }
+      return this.success_200(response, "User retrieved successfully");
+    });
   }
 
   async updateUser(httpRequest: IHttpRequest): Promise<IHttpResponse> {
-    try {
-      if (!httpRequest.user?.id) {
+    return this.handleRequest(httpRequest, async (request) => {
+      if (!request.user?.id) {
         throw new UnauthorizedError("User not authenticated");
       }
-      const validated = validateUpdateUser(httpRequest.body);
+      const validated = validateUpdateUser(request.body);
       const { user, profile } = await this.updateUserUseCase.execute(
         validated,
-        httpRequest.user.id
+        request.user.id
       );
       const response: ApiResponse<UserResponse> = {
         statusCode: StatusCodes.OK,
@@ -272,25 +227,16 @@ export class UserController {
           updatedAt: user.updatedAt,
         },
       };
-      return this.httpSuccess.success_200(response);
-    } catch (error) {
-      if (
-        error instanceof ZodError ||
-        error instanceof BadRequestError ||
-        error instanceof UnauthorizedError
-      ) {
-        return this.httpErrors.error_400();
-      }
-      return this.httpErrors.error_500();
-    }
+      return this.success_200(response, "User updated successfully");
+    });
   }
 
   async getPublicUser(httpRequest: IHttpRequest): Promise<IHttpResponse> {
-    try {
-      if (!httpRequest.params.userId) {
+    return this.handleRequest(httpRequest, async (request) => {
+      if (!request.params.userId) {
         throw new BadRequestError("User ID is required");
       }
-      const validated = validateGetUser({ userId: httpRequest.params.userId });
+      const validated = validateGetUser({ userId: request.params.userId });
       const { user, profile } = await this.getPublicUserUseCase.execute(
         validated
       );
@@ -306,25 +252,13 @@ export class UserController {
           name: user.name,
           avatar: user.avatar,
           bio: profile?.bio,
+          education: profile?.education,
+          skills: profile?.skills,
+          country: profile?.country,
+          city: profile?.city,
         },
       };
-      return this.httpSuccess.success_200(response);
-    } catch (error) {
-      if (error instanceof ZodError || error instanceof BadRequestError) {
-        return this.httpErrors.error_400();
-      }
-      if (error instanceof HttpError) {
-        return {
-          statusCode: error.statusCode,
-          body: {
-            statusCode: error.statusCode,
-            success: false,
-            message: error.message,
-            data: null,
-          },
-        };
-      }
-      return this.httpErrors.error_500();
-    }
+      return this.success_200(response, "Public user retrieved successfully");
+    });
   }
 }
