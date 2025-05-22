@@ -27,19 +27,15 @@ export abstract class BaseController {
 
   protected success_200<T>(data: T, message: string): IHttpResponse {
     return this.httpSuccess.success_200({
-      statusCode: 200,
-      success: true,
-      message,
       data,
+      message,
     });
   }
 
   protected success_201<T>(data: T, message: string): IHttpResponse {
     return this.httpSuccess.success_201({
-      statusCode: 201,
-      success: true,
-      message,
       data,
+      message,
     });
   }
 } 

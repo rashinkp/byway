@@ -47,30 +47,20 @@ export class UserController extends BaseController {
       }
       const validated = validateGetAllUsers(request.query);
       const result = await this.getAllUsersUseCase.execute(validated);
-      const response: ApiResponse<{
-        items: UserResponse[];
-        total: number;
-        totalPages: number;
-      }> = {
-        statusCode: StatusCodes.OK,
-        success: true,
-        message: "Users retrieved successfully",
-        data: {
-          items: result.items.map((user) => ({
-            id: user.id,
-            name: user.name,
-            email: user.email,
-            role: user.role,
-            avatar: user.avatar,
-            deletedAt: user.deletedAt,
-            createdAt: user.createdAt,
-            updatedAt: user.updatedAt,
-          })),
-          total: result.total,
-          totalPages: result.totalPages,
-        },
-      };
-      return this.success_200(response, "Users retrieved successfully");
+      return this.success_200({
+        items: result.items.map((user) => ({
+          id: user.id,
+          name: user.name,
+          email: user.email,
+          role: user.role,
+          avatar: user.avatar,
+          deletedAt: user.deletedAt,
+          createdAt: user.createdAt,
+          updatedAt: user.updatedAt,
+        })),
+        total: result.total,
+        totalPages: result.totalPages,
+      }, "Users retrieved successfully");
     });
   }
 
@@ -90,25 +80,16 @@ export class UserController extends BaseController {
         validated,
         request.user
       );
-      const response: ApiResponse<UserResponse> = {
-        statusCode: StatusCodes.OK,
-        success: true,
-        message:
-          validated.deletedAt === "true"
-            ? "User deleted successfully"
-            : "User restored successfully",
-        data: {
-          id: user.id,
-          name: user.name,
-          email: user.email,
-          role: user.role,
-          avatar: user.avatar,
-          deletedAt: user.deletedAt,
-          createdAt: user.createdAt,
-          updatedAt: user.updatedAt,
-        },
-      };
-      return this.success_200(response, validated.deletedAt === "true" ? "User deleted successfully" : "User restored successfully");
+      return this.success_200({
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        avatar: user.avatar,
+        deletedAt: user.deletedAt,
+        createdAt: user.createdAt,
+        updatedAt: user.updatedAt,
+      }, validated.deletedAt === "true" ? "User deleted successfully" : "User restored successfully");
     });
   }
 
@@ -117,36 +98,27 @@ export class UserController extends BaseController {
       if (!request.user?.id) {
         throw new UnauthorizedError("User not authenticated");
       }
-      const user = await this.getCurrentUserUseCase.execute(
-        request.user.id
-      );
-      const { user: fetchedUser, profile } =
-        await this.getUserByIdUseCase.execute({ userId: user.id });
-      const response: ApiResponse<UserResponse> = {
-        statusCode: StatusCodes.OK,
-        success: true,
-        message: "User retrieved successfully",
-        data: {
-          id: fetchedUser.id,
-          name: fetchedUser.name,
-          email: fetchedUser.email,
-          role: fetchedUser.role,
-          avatar: fetchedUser.avatar,
-          bio: profile?.bio,
-          education: profile?.education,
-          skills: profile?.skills,
-          phoneNumber: profile?.phoneNumber,
-          country: profile?.country,
-          city: profile?.city,
-          address: profile?.address,
-          dateOfBirth: profile?.dateOfBirth,
-          gender: profile?.gender,
-          deletedAt: fetchedUser.deletedAt,
-          createdAt: fetchedUser.createdAt,
-          updatedAt: fetchedUser.updatedAt,
-        },
-      };
-      return this.success_200(response, "User retrieved successfully");
+      const user = await this.getCurrentUserUseCase.execute(request.user.id);
+      const { user: fetchedUser, profile } = await this.getUserByIdUseCase.execute({ userId: user.id });
+      return this.success_200({
+        id: fetchedUser.id,
+        name: fetchedUser.name,
+        email: fetchedUser.email,
+        role: fetchedUser.role,
+        avatar: fetchedUser.avatar,
+        bio: profile?.bio,
+        education: profile?.education,
+        skills: profile?.skills,
+        phoneNumber: profile?.phoneNumber,
+        country: profile?.country,
+        city: profile?.city,
+        address: profile?.address,
+        dateOfBirth: profile?.dateOfBirth,
+        gender: profile?.gender,
+        deletedAt: fetchedUser.deletedAt,
+        createdAt: fetchedUser.createdAt,
+        updatedAt: fetchedUser.updatedAt,
+      }, "User retrieved successfully");
     });
   }
 
@@ -159,37 +131,29 @@ export class UserController extends BaseController {
         throw new BadRequestError("User ID is required");
       }
       const validated = validateGetUser({ userId: request.params.userId });
-      const { user, profile } = await this.getUserByIdUseCase.execute(
-        validated
-      );
+      const { user, profile } = await this.getUserByIdUseCase.execute(validated);
       if (!user) {
-        throw new HttpError("User not found", StatusCodes.NOT_FOUND);
+        throw new HttpError("User not found", 404);
       }
-      const response: ApiResponse<UserResponse> = {
-        statusCode: StatusCodes.OK,
-        success: true,
-        message: "User retrieved successfully",
-        data: {
-          id: user.id,
-          name: user.name,
-          email: user.email,
-          role: user.role,
-          avatar: user.avatar,
-          bio: profile?.bio,
-          education: profile?.education,
-          skills: profile?.skills,
-          phoneNumber: profile?.phoneNumber,
-          country: profile?.country,
-          city: profile?.city,
-          address: profile?.address,
-          dateOfBirth: profile?.dateOfBirth,
-          gender: profile?.gender,
-          deletedAt: user.deletedAt,
-          createdAt: user.createdAt,
-          updatedAt: user.updatedAt,
-        },
-      };
-      return this.success_200(response, "User retrieved successfully");
+      return this.success_200({
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        avatar: user.avatar,
+        bio: profile?.bio,
+        education: profile?.education,
+        skills: profile?.skills,
+        phoneNumber: profile?.phoneNumber,
+        country: profile?.country,
+        city: profile?.city,
+        address: profile?.address,
+        dateOfBirth: profile?.dateOfBirth,
+        gender: profile?.gender,
+        deletedAt: user.deletedAt,
+        createdAt: user.createdAt,
+        updatedAt: user.updatedAt,
+      }, "User retrieved successfully");
     });
   }
 
@@ -203,31 +167,25 @@ export class UserController extends BaseController {
         validated,
         request.user.id
       );
-      const response: ApiResponse<UserResponse> = {
-        statusCode: StatusCodes.OK,
-        success: true,
-        message: "User updated successfully",
-        data: {
-          id: user.id,
-          name: user.name,
-          email: user.email,
-          role: user.role,
-          avatar: user.avatar,
-          bio: profile?.bio,
-          education: profile?.education,
-          skills: profile?.skills,
-          phoneNumber: profile?.phoneNumber,
-          country: profile?.country,
-          city: profile?.city,
-          address: profile?.address,
-          dateOfBirth: profile?.dateOfBirth,
-          gender: profile?.gender,
-          deletedAt: user.deletedAt,
-          createdAt: user.createdAt,
-          updatedAt: user.updatedAt,
-        },
-      };
-      return this.success_200(response, "User updated successfully");
+      return this.success_200({
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        avatar: user.avatar,
+        bio: profile?.bio,
+        education: profile?.education,
+        skills: profile?.skills,
+        phoneNumber: profile?.phoneNumber,
+        country: profile?.country,
+        city: profile?.city,
+        address: profile?.address,
+        dateOfBirth: profile?.dateOfBirth,
+        gender: profile?.gender,
+        deletedAt: user.deletedAt,
+        createdAt: user.createdAt,
+        updatedAt: user.updatedAt,
+      }, "User updated successfully");
     });
   }
 
@@ -237,28 +195,20 @@ export class UserController extends BaseController {
         throw new BadRequestError("User ID is required");
       }
       const validated = validateGetUser({ userId: request.params.userId });
-      const { user, profile } = await this.getPublicUserUseCase.execute(
-        validated
-      );
+      const { user, profile } = await this.getPublicUserUseCase.execute(validated);
       if (!user) {
-        throw new HttpError("User not found", StatusCodes.NOT_FOUND);
+        throw new HttpError("User not found", 404);
       }
-      const response: ApiResponse<PublicUserResponse> = {
-        statusCode: StatusCodes.OK,
-        success: true,
-        message: "Public user retrieved successfully",
-        data: {
-          id: user.id,
-          name: user.name,
-          avatar: user.avatar,
-          bio: profile?.bio,
-          education: profile?.education,
-          skills: profile?.skills,
-          country: profile?.country,
-          city: profile?.city,
-        },
-      };
-      return this.success_200(response, "Public user retrieved successfully");
+      return this.success_200({
+        id: user.id,
+        name: user.name,
+        avatar: user.avatar,
+        bio: profile?.bio,
+        education: profile?.education,
+        skills: profile?.skills,
+        country: profile?.country,
+        city: profile?.city,
+      }, "Public user retrieved successfully");
     });
   }
 }
