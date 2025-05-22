@@ -3,7 +3,6 @@ import { IHttpResponse } from "../interfaces/http-response.interface";
 import { IHttpErrors } from "../interfaces/http-errors.interface";
 import { IHttpSuccess } from "../interfaces/http-success.interface";
 import { BadRequestError } from "../errors/bad-request-error";
-import { ApiResponse } from "../interfaces/ApiResponse";
 import { ICreateLessonUseCase } from "../../../app/usecases/lesson/interfaces/create-lesson.usecase.interface";
 import { IUpdateLessonUseCase } from "../../../app/usecases/lesson/interfaces/update-lesson.usecase.interface";
 import { IGetLessonByIdUseCase } from "../../../app/usecases/lesson/interfaces/get-lesson-by-id.usecase.interface";
@@ -12,7 +11,6 @@ import { IDeleteLessonUseCase } from "../../../app/usecases/lesson/interfaces/de
 import { IGetPublicLessonsUseCase } from "../../../app/usecases/lesson/interfaces/get-public-lessons.usecase.interface";
 import { ILessonListOutputDTO, ILessonOutputDTO, IPublicLessonListOutputDTO } from "../../../domain/dtos/lesson/lesson.dto";
 import { validateCreateLesson, validateDeleteLesson, validateGetAllLessons, validateGetLessonById, validateGetPublicLessons, validateUpdateLesson } from "../../validators/lesson.validators";
-import { ZodError } from "zod";
 import { HttpError } from "../errors/http-error";
 import { BaseController } from "./base.controller";
 
@@ -34,13 +32,7 @@ export class LessonController extends BaseController {
     return this.handleRequest(httpRequest, async (request) => {
       const validated = validateCreateLesson(request.body);
       const lesson = await this.createLessonUseCase.execute(validated);
-      const response: ApiResponse<ILessonOutputDTO> = {
-        statusCode: 201,
-        success: true,
-        message: "Lesson created successfully",
-        data: lesson,
-      };
-      return this.success_201(response, "Lesson created successfully");
+      return this.success_201(lesson, "Lesson created successfully");
     });
   }
 
@@ -51,13 +43,7 @@ export class LessonController extends BaseController {
         lessonId: request.params.lessonId,
       });
       const lesson = await this.updateLessonUseCase.execute(validated);
-      const response: ApiResponse<ILessonOutputDTO> = {
-        statusCode: 200,
-        success: true,
-        message: "Lesson updated successfully",
-        data: lesson,
-      };
-      return this.success_200(response, "Lesson updated successfully");
+      return this.success_200(lesson, "Lesson updated successfully");
     });
   }
 
@@ -68,13 +54,7 @@ export class LessonController extends BaseController {
       if (!lesson) {
         throw new BadRequestError("Lesson not found");
       }
-      const response: ApiResponse<ILessonOutputDTO> = {
-        statusCode: 200,
-        success: true,
-        message: "Lesson retrieved successfully",
-        data: lesson,
-      };
-      return this.success_200(response, "Lesson retrieved successfully");
+      return this.success_200(lesson, "Lesson retrieved successfully");
     });
   }
 
@@ -85,13 +65,7 @@ export class LessonController extends BaseController {
         courseId: request.params.courseId,
       });
       const result = await this.getAllLessonsUseCase.execute(validated);
-      const response: ApiResponse<ILessonListOutputDTO> = {
-        statusCode: 200,
-        success: true,
-        message: "Lessons retrieved successfully",
-        data: result,
-      };
-      return this.success_200(response, "Lessons retrieved successfully");
+      return this.success_200(result, "Lessons retrieved successfully");
     });
   }
 
@@ -99,13 +73,7 @@ export class LessonController extends BaseController {
     return this.handleRequest(httpRequest, async (request) => {
       const validated = validateDeleteLesson(request.params);
       await this.deleteLessonUseCase.execute(validated.lessonId);
-      const response: ApiResponse<null> = {
-        statusCode: 200,
-        success: true,
-        message: "Lesson deleted successfully",
-        data: null,
-      };
-      return this.success_200(response, "Lesson deleted successfully");
+      return this.success_200(null, "Lesson deleted successfully");
     });
   }
 
@@ -116,13 +84,7 @@ export class LessonController extends BaseController {
         courseId: request.params.courseId,
       });
       const result = await this.getPublicLessonsUseCase.execute(validated);
-      const response: ApiResponse<IPublicLessonListOutputDTO> = {
-        statusCode: 200,
-        success: true,
-        message: "Public lessons retrieved successfully",
-        data: result,
-      };
-      return this.success_200(response, "Public lessons retrieved successfully");
+      return this.success_200(result, "Public lessons retrieved successfully");
     });
   }
 }
