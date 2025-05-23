@@ -103,7 +103,7 @@ export async function updateUser(data: {
  export async function getPublicUser(userId: string): Promise<PublicUser> {
    try {
      const response = await api.get<{ data: PublicUser }>(
-       `/user/users/${userId}/public`
+       `/user/${userId}/public`
      );
      return response.data.data;
    } catch (error: any) {

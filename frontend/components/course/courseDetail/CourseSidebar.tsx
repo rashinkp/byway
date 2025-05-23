@@ -25,6 +25,12 @@ export default function CourseSidebar({
     }
   };
 
+  const formatPrice = (price: number | string | null | undefined) => {
+    if (!price) return "Free";
+    const numPrice = typeof price === 'number' ? price : Number(price);
+    return `$${numPrice.toFixed(2)}`;
+  };
+
   if (isLoading) {
     return (
       <div className="sticky top-4 border rounded-lg overflow-hidden shadow-md">
@@ -55,14 +61,12 @@ export default function CourseSidebar({
           <div className="flex items-baseline gap-2">
             <span className="text-2xl font-bold">
               {course?.offer
-                ? `$${course.offer.toFixed(2)}`
-                : course?.price
-                ? `$${course.price.toFixed(2)}`
-                : "Free"}
+                ? formatPrice(course.offer)
+                : formatPrice(course?.price)}
             </span>
-            {course?.offer && course?.price && course.offer < course.price && (
-              <span className="text-gray-500 line-through">
-                ${course.price.toFixed(2)}
+            {course?.offer && course?.price && (
+              <span className="ml-2 text-gray-500 line-through">
+                {formatPrice(course.price)}
               </span>
             )}
           </div>

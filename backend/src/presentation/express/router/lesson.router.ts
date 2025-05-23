@@ -51,7 +51,7 @@ export default function lessonRouter(
       )
   );
 
-  router.get("/courses/:courseId/public-lessons", (req, res) =>
+  router.get("/:courseId/public-lessons", (req, res) =>
     expressAdapter(
       req,
       res,
