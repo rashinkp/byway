@@ -57,18 +57,18 @@ export interface AddCourseParams {
 
 export interface CourseFormData {
   title: string;
-  description?: string;
-  longDescription?: string;
+  description?: string | null;
+  longDescription?: string | null;
   status?: "DRAFT" | "PUBLISHED" | "ARCHIVED";
   categoryId: string;
-  price?: number;
-  offer?: number;
-  duration: number | null | undefined;
+  price?: number | null;
+  offer?: number | null;
+  duration?: number | null;
   level: "BEGINNER" | "MEDIUM" | "ADVANCED";
-  prerequisites?: string;
-  objectives?: string;
-  targetAudience?: string;
-  thumbnail?: string | File;
+  prerequisites?: string | null;
+  objectives?: string | null;
+  targetAudience?: string | null;
+  thumbnail?: string | File | null;
 }
 
 export interface CourseApiResponse {

@@ -181,10 +181,10 @@ export class LessonContentRepository implements ILessonContentRepository {
     });
   }
 
+
   async delete(id: string): Promise<void> {
-    await this.prisma.lessonContent.update({
+    await this.prisma.lessonContent.delete({
       where: { id },
-      data: { deletedAt: new Date() },
     });
   }
 }

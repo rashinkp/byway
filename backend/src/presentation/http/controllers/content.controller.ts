@@ -22,6 +22,7 @@ export class LessonContentController extends BaseController {
   }
 
   async createLessonContent(httpRequest: IHttpRequest): Promise<IHttpResponse> {
+    console.log("Creating lesson content with data:", httpRequest.body);
     return this.handleRequest(httpRequest, async (request) => {
       const validated = validateCreateLessonContent(request.body);
       const content = await this.createLessonContentUseCase.execute(validated);

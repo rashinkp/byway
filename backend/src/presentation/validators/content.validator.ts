@@ -13,7 +13,7 @@ interface ValidationSchema {
 
 // QuizQuestion schema
 const quizQuestionSchema = z.object({
-  id: z.string().uuid("Invalid quiz question ID"),
+  id: z.string().uuid("Invalid quiz question ID").optional(),
   question: z.string().min(1, "Question is required"),
   options: z.array(z.string()).min(2, "At least two options are required"),
   correctAnswer: z.string().min(1, "Correct answer is required"),

@@ -62,7 +62,7 @@ export function validateToggleDeleteUser(data: unknown): ToggleDeleteUserDto {
 // Update User DTO
 export const UpdateUserDtoSchema = z.object({
   name: z.string().min(1).optional(),
-  avatar: z.string().url().optional(),
+  avatar: z.string().url().optional().or(z.literal("")),
   bio: z.string().optional(),
   education: z.string().optional(),
   skills: z.string().optional(),

@@ -3,7 +3,7 @@ import { ContentStatus, ContentType } from "../enum/content.enum";
 import { FileUrl } from "../value-object/file-url";
 
 export interface QuizQuestion {
-  id: string;
+  id?: string;
   question: string;
   options: string[];
   correctAnswer: string;
