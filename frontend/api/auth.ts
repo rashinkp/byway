@@ -151,6 +151,7 @@ export async function getCurrentUser(): Promise<User | null> {
       validateStatus: (status) => status >= 200 && status < 500,
     });
     if (response.status === 401) {
+      logout();
       return null;
     }
     return response.data.data;

@@ -16,7 +16,11 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   isInitialized: false,
   isLoading: false,
   setUser: (user) => set({ user, isInitialized: true }),
-  clearAuth: () => set({ user: null, isInitialized: true }),
+  clearAuth: () => set({ 
+    user: null, 
+    isInitialized: false, 
+    isLoading: false 
+  }),
   initializeAuth: async () => {
     // Skip if already initialized
     if (get().isInitialized) return;

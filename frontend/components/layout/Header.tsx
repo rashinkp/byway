@@ -41,6 +41,8 @@ export function Header({ client }: HeaderProps = {}) {
   const [scrolled, setScrolled] = useState(false);
   const router = useRouter();
 
+  console.log("Header user", user);
+
   useEffect(() => {
     const handleScroll = () => {
       setScrolled(window.scrollY > 10);

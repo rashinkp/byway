@@ -131,7 +131,16 @@ export class AuthController extends BaseController {
           message: "Logout successful",
           data: null,
         },
-        cookie: { action: "clear" },
+        cookie: { 
+          action: "clear",
+          name: "jwt",
+          options: {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === "production",
+            sameSite: process.env.NODE_ENV === "production" ? "strict" : "lax",
+            path: "/",
+          }
+        },
       };
     });
   }

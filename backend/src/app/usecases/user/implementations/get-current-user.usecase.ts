@@ -11,6 +11,10 @@ export class GetCurrentUserUseCase implements IGetCurrentUserUseCase {
     if (!user) {
       throw new HttpError("User not found", 404);
     }
+
+    if (user.deletedAt) {
+      throw new HttpError("User not found", 401);
+    }
     return user;
   }
 }

@@ -36,11 +36,9 @@ export const getTokenServer = (cookieHeader: string) => {
 };
 
 api.interceptors.request.use((config) => {
-  if (typeof document !== "undefined") {
-    const token = getTokenClient();
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
+  const token = getTokenClient();
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
   }
   return config;
 });
@@ -48,7 +46,6 @@ api.interceptors.request.use((config) => {
 api.interceptors.response.use(
   (response) => response,
   async (error: AxiosError<ApiErrorResponse>) => {
-
     if (error.response?.status === 401 && !error.config?.url?.includes("/auth/login")) {
       if (isLoggingOut) {
         return Promise.reject(error);
@@ -57,9 +54,6 @@ api.interceptors.response.use(
       isLoggingOut = true;
       try {
         if (typeof window !== "undefined" && !window.location.pathname.includes("/login")) {
-          if (error.config) {
-            (error.config as ExtendedAxiosRequestConfig)._retry = true;
-          }
           useAuthStore.getState().clearAuth();
           await logout();
           window.location.href = "/login";
@@ -71,13 +65,11 @@ api.interceptors.response.use(
       }
     }
 
-    // Extract error message from response
     const errorMessage = error.response?.data?.message || 
                         error.response?.data?.error || 
                         error.message || 
                         "An unexpected error occurred";
 
-    // Create a new error with the extracted message
     const enhancedError = new Error(errorMessage) as AxiosError<ApiErrorResponse>;
     enhancedError.response = error.response;
     enhancedError.config = error.config;

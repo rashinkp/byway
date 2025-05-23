@@ -41,7 +41,7 @@ export class LoginUseCase implements ILoginUseCase {
         throw new HttpError("Email not verified", 403);
       }
       if (user.deletedAt) {
-        throw new HttpError("Email not verified", 403);
+        throw new HttpError("This user is not available right now", 403);
       }
 
       return user;
