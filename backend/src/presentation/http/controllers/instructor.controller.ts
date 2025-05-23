@@ -7,8 +7,6 @@ import {
   validateGetInstructorByUserId,
   validateUpdateInstructor,
 } from "../../validators/instructor.validators";
-import { ApiResponse } from "../interfaces/ApiResponse";
-import { InstructorResponseDTO } from "../../../domain/dtos/instructor/instructor.dto";
 import { APPROVALSTATUS } from "../../../domain/enum/approval-status.enum";
 import { ICreateInstructorUseCase } from "../../../app/usecases/instructor/interfaces/create-instructor.usecase.interface";
 import { IUpdateInstructorUseCase } from "../../../app/usecases/instructor/interfaces/update-instructor.usecase.interface";
