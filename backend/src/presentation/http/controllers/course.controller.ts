@@ -55,10 +55,12 @@ export class CourseController extends BaseController {
       const validated = getAllCoursesSchemaDef.query!.parse({
         ...request.query,
         userId: request.user?.id,
+        role: request.user?.role || "USER",
       });
       const result = await this.getAllCoursesUseCase.execute({
         ...validated,
         userId: request.user?.id,
+        role: request.user?.role || "USER",
       });
       return this.success_200(result, "Courses retrieved successfully");
     });

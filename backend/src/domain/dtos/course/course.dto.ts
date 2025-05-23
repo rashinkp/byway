@@ -45,7 +45,7 @@ export interface IGetAllCoursesInputDTO {
   filterBy?: "All" | "Active" | "Inactive" | "Declined";
   userId?: string;
   myCourses?: boolean;
-  role?: string;
+  role?: "USER" | "INSTRUCTOR" | "ADMIN";
   level?: CourseLevel | "All";
   duration?: "All" | "Under5" | "5to10" | "Over10";
   price?: "All" | "Free" | "Paid";

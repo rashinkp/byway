@@ -10,7 +10,7 @@ interface CourseCardProps {
   rating: number;
   reviewCount: number;
   lessons: number;
-  price: number;
+  price: number | string;
   bestSeller?: boolean;
   className?: string;
   formattedDuration: string;
@@ -32,7 +32,7 @@ export function CourseCard({
   
 
   // Format price to display with 2 decimal places
-  const formattedPrice = price.toFixed(2);
+  const formattedPrice = typeof price === 'number' ? price.toFixed(2) : Number(price).toFixed(2);
 
   // Function to render star rating
   const renderStars = (rating: number) => {

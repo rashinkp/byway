@@ -48,7 +48,7 @@ export const optionalAuth = async (
         req.user = payload;
       }
     } catch (error) {
-      // Ignore invalid tokens, proceed without req.user
+      
     }
   }
   next();

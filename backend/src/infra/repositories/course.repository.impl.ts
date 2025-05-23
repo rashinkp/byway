@@ -193,12 +193,18 @@ export class CourseRepository implements ICourseRepository {
 
     const where: Prisma.CourseWhereInput = {
       ...(search ? { title: { contains: search, mode: "insensitive" } } : {}),
-      ...(includeDeleted || filterBy === "All" ? {} : { deletedAt: null }),
+      // Admin can see all courses including deleted ones if includeDeleted is true
+      ...(role === "ADMIN" 
+        ? (includeDeleted ? {} : { deletedAt: null })
+        // Instructor can only see their own courses
+        : role === "INSTRUCTOR"
+        ? { createdBy: userId, ...(includeDeleted ? {} : { deletedAt: null }) }
+        // Regular users can only see published and non-deleted courses
+        : { deletedAt: null, status: CourseStatus.PUBLISHED }
+      ),
       ...(filterBy === "Active" ? { status: CourseStatus.PUBLISHED } : {}),
       ...(filterBy === "Inactive" ? { status: CourseStatus.DRAFT } : {}),
-      ...(filterBy === "Declined"
-        ? { approvalStatus: APPROVALSTATUS.DECLINED }
-        : {}),
+      ...(filterBy === "Declined" ? { approvalStatus: APPROVALSTATUS.DECLINED } : {}),
       ...(myCourses && userId ? { createdBy: userId } : {}),
       ...(level !== "All" ? { level } : {}),
       ...(duration === "Under5" ? { duration: { lte: 5 } } : {}),
