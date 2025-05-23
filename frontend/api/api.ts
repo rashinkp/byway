@@ -48,15 +48,7 @@ api.interceptors.request.use((config) => {
 api.interceptors.response.use(
   (response) => response,
   async (error: AxiosError<ApiErrorResponse>) => {
-    // Log the complete error for debugging
-    console.error("API Error:", {
-      status: error.response?.status,
-      data: error.response?.data,
-      message: error.message,
-      url: error.config?.url
-    });
 
-    // Handle 401 Unauthorized errors
     if (error.response?.status === 401 && !error.config?.url?.includes("/auth/login")) {
       if (isLoggingOut) {
         return Promise.reject(error);

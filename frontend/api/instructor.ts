@@ -13,8 +13,6 @@ export const createInstructor = async (
     );
     return response.data;
   } catch (error: any) {
-    console.error("Error creating instructor:", error);
-    // Forward the full error object with response data
     throw {
       response: error.response
         ? {

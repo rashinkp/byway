@@ -14,12 +14,6 @@ export async function createContent(
     console.log("Content creation response:", response.data);
     return response.data.data;
   } catch (error: any) {
-    console.error("Content creation error:", {
-      status: error.response?.status,
-      data: error.response?.data,
-      message: error.message,
-      headers: error.response?.headers
-    });
     
     if (error.response?.status === 401) {
       throw new Error("Authentication required. Please log in again.");
@@ -92,11 +86,6 @@ export async function getContentByLessonId(
     console.log("Content fetch response:", response.data);
     return response.data.data;
   } catch (error: any) {
-    console.error("Content fetch error:", {
-      status: error.response?.status,
-      data: error.response?.data,
-      message: error.message
-    });
     
     if (error.response?.status === 401) {
       throw new Error("Authentication required. Please log in again.");
