@@ -382,4 +382,23 @@ export class LessonRepository implements ILessonRepository {
       deletedAt: lesson.deletedAt?.toISOString() ?? null,
     };
   }
+
+  async findByCourseIdAndOrder(
+    courseId: string,
+    order: number
+  ): Promise<Lesson | null> {
+    const lesson = await this.prisma.lesson.findFirst({
+      where: {
+        courseId,
+        order,
+      },
+      include: { content: { include: { quizQuestions: true } } },
+    });
+
+    if (!lesson) {
+      return null;
+    }
+
+    return this.mapToLessonEntity(lesson);
+  }
 }

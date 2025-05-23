@@ -25,11 +25,11 @@ export interface IUpdateCourseInputDTO {
   title?: string;
   description?: string | null;
   categoryId?: string;
-  price?: number | null;
-  duration?: number | null;
+  price?: Price | null;
+  duration?: Duration | null;
   level?: CourseLevel;
   thumbnail?: string | null;
-  offer?: number | null;
+  offer?: Offer | null;
   status?: CourseStatus;
   createdBy: string;
   details?: CourseDetails | null;

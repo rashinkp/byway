@@ -7,7 +7,7 @@ export class DeleteLessonContentUseCase implements IDeleteLessonContentUseCase {
 
   async execute(id: string): Promise<void> {
     try {
-      const content = await this.contentRepository.findByLessonId(id);
+      const content = await this.contentRepository.findById(id);
       if (!content || !content.isActive()) {
         throw new HttpError("Content not found or already deleted", 404);
       }

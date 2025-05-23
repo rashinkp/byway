@@ -8,9 +8,6 @@ import { IApproveCourseUseCase } from "../../../app/usecases/course/interfaces/a
 import { IDeclineCourseUseCase } from "../../../app/usecases/course/interfaces/decline-course.usecase.interface";
 import { IEnrollCourseUseCase } from "../../../app/usecases/course/interfaces/enroll-course.usecase.interface";
 
-import { ApiResponse } from "../interfaces/ApiResponse";
-import { StatusCodes } from "http-status-codes";
-import { ZodError } from "zod";
 import { IHttpErrors } from "../interfaces/http-errors.interface";
 import { IHttpSuccess } from "../interfaces/http-success.interface";
 import { IHttpRequest } from "../interfaces/http-request.interface";

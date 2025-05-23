@@ -42,16 +42,17 @@ export class UpdateCourseUseCase implements IUpdateCourseUseCase {
       }
     }
 
+    console.log("Updating course:", input);
+
     course.update({
       title: input.title,
       description: input.description,
       categoryId: input.categoryId,
-      price: input.price != null ? Price.create(input.price) : undefined,
-      duration:
-        input.duration != null ? Duration.create(input.duration) : undefined,
+      price: input.price,
+      duration: input.duration,
       level: input.level,
       thumbnail: input.thumbnail,
-      offer: input.offer != null ? Offer.create(input.offer) : undefined,
+      offer: input.offer,
       status: input.status,
       details: input.details,
     });

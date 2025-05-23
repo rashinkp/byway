@@ -10,6 +10,19 @@ export class CreateLessonUseCase implements ICreateLessonUseCase {
 
   async execute(dto: ICreateLessonInputDTO): Promise<ILessonOutputDTO> {
     try {
+
+      const existingLesson = await this.lessonRepository.findByCourseIdAndOrder(
+        dto.courseId,
+        dto.order
+      );
+      if (existingLesson) {
+        throw new HttpError(
+          `A lesson with order ${dto.order} already exists for course ${dto.title}`,
+          400
+        );
+      }
+
+
       const lesson = Lesson.create(dto);
       const createdLesson = await this.lessonRepository.create(lesson);
       return createdLesson.toJSON();

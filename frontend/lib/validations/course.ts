@@ -2,7 +2,13 @@ import { z } from "zod";
 
 export const courseEditSchema = z
   .object({
-    title: z.string().min(1, "Title is required"),
+    title: z
+      .string()
+      .min(1, "Title is required")
+      .refine((value) => value.trim().length > 0, {
+        message: "Title cannot contain only whitespace",
+        path: ["title"],
+      }),
     description: z.string().optional().nullable(),
     level: z.enum(["BEGINNER", "MEDIUM", "ADVANCED"]),
     price: z.number().min(0, "Price cannot be negative").optional().nullable(),
@@ -10,7 +16,7 @@ export const courseEditSchema = z
       .number()
       .min(0, "Duration cannot be negative")
       .optional()
-      .nullable(), // Allow duration to be optional and nullable
+      .nullable(),
     offer: z
       .number()
       .min(0, "Offer price cannot be negative")
@@ -79,9 +85,14 @@ export const courseSchema = z
   .object({
     title: z
       .string()
+      .trim()
       .min(3, "Title must be at least 3 characters")
       .max(100, "Title cannot exceed 100 characters")
-      .nonempty("Title is required"),
+      .nonempty("Title is required")
+      .refine((value) => value.trim().length > 0, {
+        message: "Title cannot contain only whitespace",
+        path: ["title"],
+      }),
     description: z
       .string()
       .max(1000, "Description cannot exceed 1000 characters")
@@ -99,7 +110,7 @@ export const courseSchema = z
       .number()
       .min(0, "Duration cannot be negative")
       .optional()
-      .nullable(), // Allow duration to be optional and nullable
+      .nullable(),
     offer: z
       .number()
       .min(0, "Offer price cannot be negative")

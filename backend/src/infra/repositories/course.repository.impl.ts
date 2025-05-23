@@ -262,21 +262,16 @@ export class CourseRepository implements ICourseRepository {
 
   async update(course: Course): Promise<Course> {
     try {
-      const data: Prisma.CourseUpdateInput = {
+      const data = {
         title: course.title,
         description: course.description,
         level: course.level,
-        price: course.price?.getValue() ?? null,
+        price: course.price?.getValue(),
         thumbnail: course.thumbnail,
-        duration: course.duration?.getValue() ?? null,
-        offer: course.offer?.getValue() ?? null,
+        duration: course.duration?.getValue(),
+        offer: course.offer?.getValue(),
         status: course.status,
-        category: {
-          connect: { id: course.categoryId }, // Already fixed from previous issue
-        },
-        updatedAt: course.updatedAt,
-        deletedAt: course.deletedAt,
-        approvalStatus: course.approvalStatus,
+        categoryId: course.categoryId,
         details: course.details
           ? {
               upsert: {
@@ -313,8 +308,8 @@ export class CourseRepository implements ICourseRepository {
         duration: updated.duration ? Duration.create(updated.duration) : null,
         offer: updated.offer ? Offer.create(updated.offer.toNumber()) : null,
         status: updated.status as CourseStatus,
-        categoryId: updated.categoryId, // Assuming your Course entity uses categoryId
-        createdBy: updated.createdBy, // Assuming your Course entity uses createdBy
+        categoryId: updated.categoryId,
+        createdBy: updated.createdBy,
         createdAt: updated.createdAt,
         updatedAt: updated.updatedAt,
         deletedAt: updated.deletedAt,
