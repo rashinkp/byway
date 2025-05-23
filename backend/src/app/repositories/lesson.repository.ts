@@ -10,5 +10,5 @@ export interface ILessonRepository {
   findById(id: string): Promise<Lesson | null>;
   create(lesson: Lesson): Promise<Lesson>;
   update(lesson: Lesson): Promise<Lesson>;
-  delete(id: string): Promise<void>;
+  deletePermanently(id: string): Promise<void>;
 }

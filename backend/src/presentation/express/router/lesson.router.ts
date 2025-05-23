@@ -23,7 +23,7 @@ export default function lessonRouter(
     )
   );
 
-  router.delete("/:lessonId", restrictTo("ADMIN"), (req, res) =>
+  router.delete("/:lessonId", restrictTo("INSTRUCTOR"), (req, res) =>
     expressAdapter(
       req,
       res,

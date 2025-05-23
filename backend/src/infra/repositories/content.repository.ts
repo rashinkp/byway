@@ -6,6 +6,39 @@ import { ILessonContentRepository } from "../../app/repositories/lesson-content.
 export class LessonContentRepository implements ILessonContentRepository {
   constructor(private readonly prisma: PrismaClient) {}
 
+  async findById(id: string): Promise<LessonContent | null> {
+    const content = await this.prisma.lessonContent.findUnique({
+      where: { id, deletedAt: null }, // Only return non-soft-deleted content
+      include: { quizQuestions: true },
+    });
+
+    if (!content) {
+      return null;
+    }
+
+    return LessonContent.fromPersistence({
+      id: content.id,
+      lessonId: content.lessonId,
+      type: content.type as ContentType,
+      status: content.status as ContentStatus,
+      title: content.title,
+      description: content.description,
+      fileUrl: content.fileUrl,
+      thumbnailUrl: content.thumbnailUrl,
+      quizQuestions: content.quizQuestions
+        ? content.quizQuestions.map((q) => ({
+            id: q.id,
+            question: q.question,
+            options: q.options,
+            correctAnswer: q.correctAnswer,
+          }))
+        : null,
+      createdAt: content.createdAt,
+      updatedAt: content.updatedAt,
+      deletedAt: content.deletedAt,
+    });
+  }
+
   async findByLessonId(lessonId: string): Promise<LessonContent | null> {
     const content = await this.prisma.lessonContent.findUnique({
       where: { lessonId },
@@ -64,7 +97,9 @@ export class LessonContentRepository implements ILessonContentRepository {
           : undefined,
         createdAt: new Date(contentData.createdAt),
         updatedAt: new Date(contentData.updatedAt),
-        deletedAt: contentData.deletedAt ? new Date(contentData.deletedAt) : null,
+        deletedAt: contentData.deletedAt
+          ? new Date(contentData.deletedAt)
+          : null,
       },
       include: { quizQuestions: true },
     });
@@ -116,7 +151,9 @@ export class LessonContentRepository implements ILessonContentRepository {
             }
           : { deleteMany: {} },
         updatedAt: new Date(contentData.updatedAt),
-        deletedAt: contentData.deletedAt ? new Date(contentData.deletedAt) : null,
+        deletedAt: contentData.deletedAt
+          ? new Date(contentData.deletedAt)
+          : null,
       },
       include: { quizQuestions: true },
     });

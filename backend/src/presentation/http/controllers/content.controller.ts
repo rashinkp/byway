@@ -45,7 +45,9 @@ export class LessonContentController extends BaseController {
       const validated = validateGetLessonContentByLessonId({
         lessonId: request.params.lessonId,
       });
-      const content = await this.getLessonContentByLessonIdUseCase.execute(validated.lessonId);
+      const content = await this.getLessonContentByLessonIdUseCase.execute(
+        validated.lessonId
+      );
       return this.success_200(content, "Lesson content retrieved successfully");
     });
   }

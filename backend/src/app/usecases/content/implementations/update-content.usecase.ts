@@ -11,7 +11,8 @@ export class UpdateLessonContentUseCase implements IUpdateLessonContentUseCase {
     dto: IUpdateLessonContentInputDTO
   ): Promise<ILessonContentOutputDTO> {
     try {
-      const content = await this.contentRepository.findByLessonId(dto.id);
+      const content = await this.contentRepository.findById(dto.id);
+      console.log("Content found:", content , dto);
       if (!content || !content.isActive()) {
         throw new HttpError("Content not found or deleted", 404);
       }

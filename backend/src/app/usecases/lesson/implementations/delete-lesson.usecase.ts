@@ -8,11 +8,10 @@ export class DeleteLessonUseCase implements IDeleteLessonUseCase {
   async execute(id: string): Promise<void> {
     try {
       const lesson = await this.lessonRepository.findById(id);
-      if (!lesson || !lesson.isActive()) {
-        throw new HttpError("Lesson not found or already deleted", 404);
+      if (!lesson) {
+        throw new HttpError("Lesson not found", 404);
       }
-      lesson.softDelete();
-      await this.lessonRepository.update(lesson);
+      await this.lessonRepository.deletePermanently(id);
     } catch (error) {
       if (error instanceof Error) {
         throw new HttpError(

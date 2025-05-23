@@ -35,7 +35,7 @@ export default function lessonContentRouter(
 
 
   router.get(
-    "/lessons/:lessonId/content",
+    "/:lessonId",
     restrictTo("ADMIN", "USER", "INSTRUCTOR"),
     (req, res) =>
       expressAdapter(

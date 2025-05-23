@@ -45,7 +45,7 @@ export const createApp = (): Application => {
   app.use("/api/v1/category", categoryRouter(categoryController));
   app.use("/api/v1/courses", courseRouter(courseController));
   app.use("/api/v1/lessons", lessonRouter(lessonController));
-  app.use("/api/v1/lessons", lessonContentRouter(lessonContentController));
+  app.use("/api/v1/content", lessonContentRouter(lessonContentController));
   // app.use("/api/cart", cartRouter);
   // app.use("/api/orders", orderRouter);
   // app.use("/api/payments", paymentRouter);

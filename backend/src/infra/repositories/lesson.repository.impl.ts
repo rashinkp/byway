@@ -289,6 +289,18 @@ export class LessonRepository implements ILessonRepository {
     });
   }
 
+  async deletePermanently(id: string): Promise<void> {
+    await this.prisma.$transaction(async (prisma) => {
+      await prisma.lessonContent.deleteMany({
+        where: { lessonId: id },
+      });
+
+      await prisma.lesson.delete({
+        where: { id },
+      });
+    });
+  }
+
   private mapToLessonEntity(
     lesson: PrismaLesson & {
       content?: (PrismaLessonContent & { quizQuestions: any[] }) | null;

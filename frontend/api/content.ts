@@ -44,7 +44,7 @@ export async function updateContent(
 ): Promise<LessonContent> {
   try {
     console.log("Updating content with data:", data);
-    const response = await api.patch<{ data: LessonContent }>(
+    const response = await api.put<{ data: LessonContent }>(
       `/content/${data.id}`,
       data
     );
