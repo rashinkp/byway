@@ -401,4 +401,15 @@ export class LessonRepository implements ILessonRepository {
 
     return this.mapToLessonEntity(lesson);
   }
+
+  async hasPublishedLessons(courseId: string): Promise<boolean> {
+    const count = await this.prisma.lesson.count({
+      where: {
+        courseId,
+        status: LessonStatus.PUBLISHED,
+        deletedAt: null
+      }
+    });
+    return count > 0;
+  }
 }

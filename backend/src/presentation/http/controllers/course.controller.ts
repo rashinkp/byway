@@ -7,14 +7,12 @@ import { IGetEnrolledCoursesUseCase } from "../../../app/usecases/course/interfa
 import { IApproveCourseUseCase } from "../../../app/usecases/course/interfaces/approve-course.usecase.interface";
 import { IDeclineCourseUseCase } from "../../../app/usecases/course/interfaces/decline-course.usecase.interface";
 import { IEnrollCourseUseCase } from "../../../app/usecases/course/interfaces/enroll-course.usecase.interface";
-
 import { IHttpErrors } from "../interfaces/http-errors.interface";
 import { IHttpSuccess } from "../interfaces/http-success.interface";
 import { IHttpRequest } from "../interfaces/http-request.interface";
 import { IHttpResponse } from "../interfaces/http-response.interface";
 import { UnauthorizedError } from "../errors/unautherized-error";
 import { BadRequestError } from "../errors/bad-request-error";
-import { HttpError } from "../errors/http-error";
 import { createCourseSchemaDef, createEnrollmentSchemaDef, deleteCourseSchemaDef, getAllCoursesSchemaDef, getCourseByIdSchemaDef, getEnrolledCoursesSchemaDef, updateCourseApprovalSchemaDef, updateCourseSchemaDef } from "../../validators/course.validators";
 import { BaseController } from "./base.controller";
 
@@ -153,14 +151,11 @@ export class CourseController extends BaseController {
       if (!request.user?.id) {
         throw new UnauthorizedError("User not authenticated");
       }
-      if (!request.params.id) {
+      if (!request.body.courseId) {
         throw new BadRequestError("Course ID is required");
       }
-      const validated = updateCourseApprovalSchemaDef.params!.parse({
-        id: request.params.id,
-      });
       const course = await this.approveCourseUseCase.execute({
-        courseId: validated.id
+        courseId: request.body.courseId
       });
       return this.success_200(course, "Course approved successfully");
     });
@@ -171,14 +166,11 @@ export class CourseController extends BaseController {
       if (!request.user?.id) {
         throw new UnauthorizedError("User not authenticated");
       }
-      if (!request.params.id) {
+      if (!request.body.courseId) {
         throw new BadRequestError("Course ID is required");
       }
-      const validated = updateCourseApprovalSchemaDef.params!.parse({
-        id: request.params.id,
-      });
       const course = await this.declineCourseUseCase.execute({
-        courseId: validated.id
+        courseId: request.body.courseId,
       });
       return this.success_200(course, "Course declined successfully");
     });

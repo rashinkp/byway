@@ -1,6 +1,6 @@
 import { ILessonContentOutputDTO } from "../../../../domain/dtos/lesson/lesson.dto";
 import { HttpError } from "../../../../presentation/http/errors/http-error";
-import { ILessonContentRepository } from "../../../repositories/lesson-content.repository";
+import { ILessonContentRepository } from "../../../repositories/content.repository";
 import { IGetContentByLessonIdUseCase } from "../interfaces/get-content-by-lesson-id.usecase.interface";
 
 

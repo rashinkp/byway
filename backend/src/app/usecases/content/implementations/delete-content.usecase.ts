@@ -1,5 +1,5 @@
 import { HttpError } from "../../../../presentation/http/errors/http-error";
-import { ILessonContentRepository } from "../../../repositories/lesson-content.repository";
+import { ILessonContentRepository } from "../../../repositories/content.repository";
 import { IDeleteLessonContentUseCase } from "../interfaces/delete-content.usecase.interface";
 
 export class DeleteLessonContentUseCase implements IDeleteLessonContentUseCase {

@@ -14,12 +14,12 @@ export interface LessonDependencies {
 export function createLessonDependencies(
   deps: SharedDependencies
 ): LessonDependencies {
-  const { lessonRepository } = deps;
+  const { lessonRepository, lessonContentRepository } = deps;
 
   const createLessonUseCase = new CreateLessonUseCase(
     lessonRepository,
   );
-  const updateLessonUseCase = new UpdateLessonUseCase(lessonRepository);
+  const updateLessonUseCase = new UpdateLessonUseCase(lessonRepository , deps.lessonContentRepository);
   const getLessonByIdUseCase = new GetLessonByIdUseCase(lessonRepository);
   const getAllLessonsUseCase = new GetAllLessonsUseCase(lessonRepository);
   const deleteLessonUseCase = new DeleteLessonUseCase(lessonRepository);

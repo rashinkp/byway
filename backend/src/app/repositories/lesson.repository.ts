@@ -16,4 +16,5 @@ export interface ILessonRepository {
   create(lesson: Lesson): Promise<Lesson>;
   update(lesson: Lesson): Promise<Lesson>;
   deletePermanently(id: string): Promise<void>;
+  hasPublishedLessons(courseId: string): Promise<boolean>;
 }

@@ -1,7 +1,7 @@
 import { ILessonContentOutputDTO, IUpdateLessonContentInputDTO } from "../../../../domain/dtos/lesson/lesson.dto";
 import { LessonContent } from "../../../../domain/entities/lesson-content.entity";
 import { HttpError } from "../../../../presentation/http/errors/http-error";
-import { ILessonContentRepository } from "../../../repositories/lesson-content.repository";
+import { ILessonContentRepository } from "../../../repositories/content.repository";
 import { IUpdateLessonContentUseCase } from "../interfaces/update-content.usecase.interface";
 
 export class UpdateLessonContentUseCase implements IUpdateLessonContentUseCase {

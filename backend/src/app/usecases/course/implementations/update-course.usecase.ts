@@ -2,18 +2,18 @@ import {
   ICourseOutputDTO,
   IUpdateCourseInputDTO,
 } from "../../../../domain/dtos/course/course.dto";
-import { Duration } from "../../../../domain/value-object/duration";
-import { Offer } from "../../../../domain/value-object/offer";
-import { Price } from "../../../../domain/value-object/price";
 import { HttpError } from "../../../../presentation/http/errors/http-error";
 import { ICategoryRepository } from "../../../repositories/category.repository";
 import { ICourseRepository } from "../../../repositories/course.repository.interface";
 import { IUpdateCourseUseCase } from "../interfaces/update-course.usecase.interface";
+import { ILessonRepository } from "../../../repositories/lesson.repository";
+import { CourseStatus } from "../../../../domain/enum/course-status.enum";
 
 export class UpdateCourseUseCase implements IUpdateCourseUseCase {
   constructor(
     private courseRepository: ICourseRepository,
-    private categoryRepository: ICategoryRepository
+    private categoryRepository: ICategoryRepository,
+    private lessonRepository: ILessonRepository
   ) {}
 
   async execute(input: IUpdateCourseInputDTO): Promise<ICourseOutputDTO> {
@@ -39,6 +39,14 @@ export class UpdateCourseUseCase implements IUpdateCourseUseCase {
       );
       if (existingCourse && !existingCourse.deletedAt) {
         throw new HttpError("A course with this title already exists", 400);
+      }
+    }
+
+    // Check if course has published lessons when publishing
+    if (input.status === CourseStatus.PUBLISHED) {
+      const hasPublishedLessons = await this.lessonRepository.hasPublishedLessons(input.id);
+      if (!hasPublishedLessons) {
+        throw new HttpError("Cannot publish course without at least one published lesson", 400);
       }
     }
 

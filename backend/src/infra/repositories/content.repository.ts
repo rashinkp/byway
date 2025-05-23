@@ -1,7 +1,7 @@
 import { PrismaClient, LessonContent as PrismaLessonContent } from "@prisma/client";
 import { ContentStatus, ContentType } from "../../domain/enum/content.enum";
 import { LessonContent, QuizQuestion } from "../../domain/entities/lesson-content.entity";
-import { ILessonContentRepository } from "../../app/repositories/lesson-content.repository";
+import { ILessonContentRepository } from "../../app/repositories/content.repository";
 
 export class LessonContentRepository implements ILessonContentRepository {
   constructor(private readonly prisma: PrismaClient) {}

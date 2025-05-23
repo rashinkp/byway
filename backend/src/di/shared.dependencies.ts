@@ -15,12 +15,12 @@ import { IInstructorRepository } from "../app/repositories/instructor.repository
 import { IAuthRepository } from "../app/repositories/auth.repository";
 import { IEnrollmentRepository } from "../app/repositories/enrollment.repository.interface";
 import { ILessonRepository } from "../app/repositories/lesson.repository";
-import { ILessonContentRepository } from "../app/repositories/lesson-content.repository";
 import { HttpErrors } from "../presentation/http/http.errors";
 import { HttpSuccess } from "../presentation/http/http.success";
 import { CookieService } from "../presentation/http/utils/cookie.service";
 import { LessonRepository } from "../infra/repositories/lesson.repository.impl";
 import { LessonContentRepository } from "../infra/repositories/content.repository";
+import { ILessonContentRepository } from "../app/repositories/content.repository";
 
 export interface SharedDependencies {
   userRepository: IUserRepository;
