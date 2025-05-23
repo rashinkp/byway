@@ -8,6 +8,8 @@ import { Badge } from "../ui/badge";
 
 
 export const DetailsSection = ({ course }: { course?: Course }) => {
+
+  console.log(course);
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
       <div className="space-y-4">
@@ -28,13 +30,13 @@ export const DetailsSection = ({ course }: { course?: Course }) => {
         <div>
           <h3 className="text-sm font-medium text-gray-600">Price</h3>
           <p className="mt-1 text-gray-900">
-            ${course?.price?.toFixed(2) || "0.00"}
+            ${Number(course?.price)?.toFixed(2) || "0.00"}
           </p>
         </div>
         <div>
           <h3 className="text-sm font-medium text-gray-600">Offer Price</h3>
           <p className="mt-1 text-gray-900">
-            ${course?.offer?.toFixed(2) || "0.00"}
+            ${Number(course?.offer)?.toFixed(2) || "0.00"}
           </p>
         </div>
       </div>

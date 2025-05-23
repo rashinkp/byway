@@ -294,9 +294,9 @@ export function CourseFormModal({
               title: initialData.title,
               description: initialData.description,
               level: initialData.level,
-              price: initialData.price,
-              duration: initialData.duration,
-              offer: initialData.offer,
+              price: initialData.price ?? undefined,
+              duration: initialData.duration ?? undefined,
+              offer: initialData.offer ?? undefined,
               thumbnail: initialData.thumbnail,
               categoryId: initialData.categoryId,
               prerequisites: initialData.prerequisites,
@@ -309,7 +309,7 @@ export function CourseFormModal({
       }
       title={isEditing ? "Edit Course" : "Create New Course"}
       submitText="Save"
-      fields={dynamicFields}
+      fields={dynamicFields as FormFieldConfig<z.infer<typeof courseSchema>>[]}
       description={
         isEditing
           ? "Update your course details."

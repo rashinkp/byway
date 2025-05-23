@@ -11,7 +11,7 @@ export const courseEditSchema = z
       }),
     description: z.string().optional().nullable(),
     level: z.enum(["BEGINNER", "MEDIUM", "ADVANCED"]),
-    price: z.number().min(0, "Price cannot be negative").optional().nullable(),
+    price: z.number().min(0, "Price cannot be negative"),
     duration: z
       .number()
       .min(0, "Duration cannot be negative")
@@ -19,9 +19,7 @@ export const courseEditSchema = z
       .nullable(),
     offer: z
       .number()
-      .min(0, "Offer price cannot be negative")
-      .optional()
-      .nullable(),
+      .min(0, "Offer price cannot be negative"),
     status: z.enum(["DRAFT", "PUBLISHED", "ARCHIVED"], {
       errorMap: () => ({ message: "Status is required" }),
     }),
@@ -101,7 +99,7 @@ export const courseSchema = z
     level: z
       .enum(["BEGINNER", "MEDIUM", "ADVANCED"])
       .refine((val) => val !== undefined, "Level is required"),
-    price: z.number().min(0, "Price cannot be negative").optional().nullable(),
+    price: z.number().min(0, "Price cannot be negative"),
     thumbnail: z
       .union([z.instanceof(File), z.string().url()])
       .optional()
@@ -113,9 +111,7 @@ export const courseSchema = z
       .nullable(),
     offer: z
       .number()
-      .min(0, "Offer price cannot be negative")
-      .optional()
-      .nullable(),
+      .min(0, "Offer price cannot be negative"),
     categoryId: z.string().nonempty("Category is required"),
     prerequisites: z
       .string()
