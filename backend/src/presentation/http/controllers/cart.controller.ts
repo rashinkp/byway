@@ -79,8 +79,12 @@ export class CartController extends BaseController {
         throw new UnauthorizedError("User not authenticated");
       }
 
-      const validated = validateRemoveFromCart(request.body);
-      await this.removeFromCartUseCase.execute(request.user.id, validated);
+      const courseId = request.params.courseId;
+      if (!courseId) {
+        throw new HttpError("Course ID is required", 400);
+      }
+
+      await this.removeFromCartUseCase.execute(request.user.id, { courseId });
 
       return this.success_200(null, "Course removed from cart successfully");
     });

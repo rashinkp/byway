@@ -1,4 +1,3 @@
-
 import { ICart } from "@/types/cart";
 import { CartItem } from "./CartItem";
 import { CartItemSkeleton } from "./CartSkeleton";
@@ -20,7 +19,7 @@ export function CartItems({
   return (
     <div className="bg-white rounded-lg shadow-sm overflow-hidden">
       {cart.map((item) => (
-        <div key={item.courseId}>
+        <div key={item.id}>
           {isRemoving && removingCourseId === item.courseId ? (
             <CartItemSkeleton />
           ) : (

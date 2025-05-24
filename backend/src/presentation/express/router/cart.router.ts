@@ -15,13 +15,13 @@ export function cartRouter(cartController: CartController): Router {
   router.get("/", (req, res) => 
     expressAdapter(req, res, cartController.getCart.bind(cartController))
   );
-  router.delete("/", (req, res) => 
+  router.delete("/:courseId", (req, res) => 
     expressAdapter(req, res, cartController.removeFromCart.bind(cartController))
   );
   router.post("/apply-coupon", (req, res) => 
     expressAdapter(req, res, cartController.applyCoupon.bind(cartController))
   );
-  router.delete("/clear", (req, res) => 
+  router.delete("/", (req, res) => 
     expressAdapter(req, res, cartController.clearCart.bind(cartController))
   );
 

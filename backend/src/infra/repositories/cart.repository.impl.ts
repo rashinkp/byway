@@ -56,7 +56,6 @@ export class CartRepository implements ICartRepository {
       where: {
         userId,
         courseId,
-        deletedAt: null
       },
       include: {
         course: true
@@ -113,22 +112,15 @@ export class CartRepository implements ICartRepository {
   }
 
   async delete(id: string): Promise<void> {
-    await this.prisma.cart.update({
-      where: { id },
-      data: {
-        deletedAt: new Date()
-      }
+    await this.prisma.cart.delete({
+      where: { id }
     });
   }
 
   async clearUserCart(userId: string): Promise<void> {
-    await this.prisma.cart.updateMany({
+    await this.prisma.cart.deleteMany({
       where: {
-        userId,
-        deletedAt: null
-      },
-      data: {
-        deletedAt: new Date()
+        userId
       }
     });
   }
