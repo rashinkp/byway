@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Clock, Loader2 } from "lucide-react";
@@ -12,6 +12,7 @@ import { useResendOtp } from "@/hooks/auth/useResendOtp";
 import { useVerifyOtp } from "@/hooks/auth/useVerifyOtp";
 import { useAuthStore } from "@/stores/auth.store";
 import { useRoleRedirect } from "@/hooks/useRoleRedirects";
+import { useVerificationStatus } from "@/hooks/auth/useVerificationStatus";
 
 export function VerifyOtpForm() {
   const router = useRouter();
@@ -21,7 +22,16 @@ export function VerifyOtpForm() {
   const { mutate: verifyOtp, isPending: isSubmitting, error } = useVerifyOtp();
   const { mutate: resendOtp, isPending: isResending } = useResendOtp();
   const { redirectByRole } = useRoleRedirect();
-  const [resendCooldown, setResendCooldown] = useState(60);
+  const { 
+    resendCooldown, 
+    isLoading: isStatusLoading,
+    formatTime, 
+    refreshStatus,
+    setResendCooldown 
+  } = useVerificationStatus({ 
+    email,
+    onError: console.error 
+  });
 
   // Handle OTP submission
   const handleSubmit = (otp: string) => {
@@ -36,11 +46,9 @@ export function VerifyOtpForm() {
       {
         onSuccess: (user) => {
           if (type === "forgot-password") {
-            router.push(
-              `/reset-password?email=${encodeURIComponent(email)}&otp=${otp}`
-            );
+            router.push(`/reset-password?otp=${otp}`);
           } else {
-            redirectByRole(user.role);
+            redirectByRole(user.data.role);
           }
         },
       }
@@ -51,32 +59,15 @@ export function VerifyOtpForm() {
   const handleResend = () => {
     if (!email || resendCooldown > 0 || isResending) return;
     resendOtp(email, {
-      onSuccess: () => setResendCooldown(60),
+      onSuccess: () => {
+        setResendCooldown(60);
+        refreshStatus();
+      },
     });
   };
 
-  // Cooldown timer for resend
-  useEffect(() => {
-    if (resendCooldown > 0) {
-      const timer = setTimeout(
-        () => setResendCooldown(resendCooldown - 1),
-        1000
-      );
-      return () => clearTimeout(timer);
-    }
-  }, [resendCooldown]);
-
-  // Format cooldown time
-  const formatTime = (seconds: number) => {
-    const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
-    return `${mins.toString().padStart(2, "0")}:${secs
-      .toString()
-      .padStart(2, "0")}`;
-  };
-
   // Show loading state during submission or resend
-  if (isSubmitting || isResending) {
+  if (isSubmitting || isResending || isStatusLoading) {
     return (
       <SplitScreenLayout
         title={

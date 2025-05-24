@@ -1,4 +1,3 @@
-
 import { FacebookAuthUseCase } from "../app/usecases/auth/implementations/facebook-auth.usecase";
 import { ForgotPasswordUseCase } from "../app/usecases/auth/implementations/forgot-passowrd.usecase";
 import { GoogleAuthUseCase } from "../app/usecases/auth/implementations/google-auth.usecase";
@@ -8,6 +7,7 @@ import { RegisterUseCase } from "../app/usecases/auth/implementations/register.u
 import { ResendOtpUseCase } from "../app/usecases/auth/implementations/resend-otp-usecase";
 import { ResetPasswordUseCase } from "../app/usecases/auth/implementations/reset-password.usecase";
 import { VerifyOtpUseCase } from "../app/usecases/auth/implementations/verify-otp.usecase";
+import { GetVerificationStatusUseCase } from "../app/usecases/auth/get-verification-status.usecase";
 import { AuthController } from "../presentation/http/controllers/auth.controller";
 import { HttpErrors } from "../presentation/http/http.errors";
 import { HttpSuccess } from "../presentation/http/http.success";
@@ -39,6 +39,7 @@ export function createAuthDependencies(
   const resendOtpUseCase = new ResendOtpUseCase(authRepository, otpProvider);
   const resetPasswordUseCase = new ResetPasswordUseCase(authRepository);
   const verifyOtpUseCase = new VerifyOtpUseCase(authRepository);
+  const getVerificationStatusUseCase = new GetVerificationStatusUseCase(authRepository);
 
   // Initialize controller
   const authController = new AuthController(
@@ -51,6 +52,7 @@ export function createAuthDependencies(
     resendOtpUseCase,
     resetPasswordUseCase,
     verifyOtpUseCase,
+    getVerificationStatusUseCase,
     deps.httpErrors,
     deps.httpSuccess
   );

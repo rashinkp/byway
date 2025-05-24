@@ -13,11 +13,12 @@ export function useForgotPassword() {
   return useMutation({
     mutationFn: (email: string) => forgotPassword(email),
     onSuccess: (_, email) => {
-      setEmail(email); 
+      setEmail(email);
       toast.success("Reset OTP Sent", {
         description: "A verification code has been sent to your email.",
         duration: 5000,
       });
+      router.push(`/verify-otp?type=forgot-password`);
     },
     onError: (error: any) => {
       toast.error("Error", {

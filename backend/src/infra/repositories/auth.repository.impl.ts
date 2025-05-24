@@ -77,12 +77,11 @@ export class AuthRepository implements IAuthRepository {
     return UserVerification.fromPrisma(created);
   }
 
-  async findVerificationByEmail(
-    email: string
-  ): Promise<UserVerification | null> {
+  async findVerificationByEmail(email: string): Promise<UserVerification | null> {
     const verification = await this.prisma.userVerification.findUnique({
-      where: { email },
+      where: { email }
     });
+
     if (!verification) return null;
     return UserVerification.fromPrisma(verification);
   }

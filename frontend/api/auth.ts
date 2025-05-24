@@ -151,7 +151,6 @@ export async function getCurrentUser(): Promise<User | null> {
       validateStatus: (status) => status >= 200 && status < 500,
     });
     if (response.status === 401) {
-      logout();
       return null;
     }
     return response.data.data;
@@ -223,5 +222,18 @@ export async function facebookAuth(
     throw new Error(
       error.response?.data?.message || error.response?.data?.error || "Failed to authenticate with Facebook"
     );
+  }
+}
+
+export async function getVerificationStatus(email: string): Promise<{
+  cooldownTime: number;
+  isExpired: boolean;
+}> {
+  try {
+    const response = await api.get(`/auth/verification-status?email=${encodeURIComponent(email)}`);
+    return response.data.data;
+  } catch (error: any) {
+    console.error("Get verification status error:", error);
+    throw new Error(error.response?.data?.message || "Failed to get verification status");
   }
 }

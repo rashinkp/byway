@@ -6,7 +6,9 @@ interface AuthState {
   user: User | null;
   isInitialized: boolean;
   isLoading: boolean;
+  email: string | null;
   setUser: (user: User | null) => void;
+  setEmail: (email: string) => void;
   clearAuth: () => void;
   initializeAuth: () => Promise<void>;
 }
@@ -15,18 +17,39 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   user: null,
   isInitialized: false,
   isLoading: false,
+  email: null,
   setUser: (user) => set({ user, isInitialized: true }),
-  clearAuth: () => set({ 
-    user: null, 
-    isInitialized: false, 
-    isLoading: false 
-  }),
+  setEmail: (email) => {
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('auth_email', email);
+    }
+    set({ email });
+  },
+  clearAuth: () => {
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('auth_email');
+    }
+    set({ 
+      user: null, 
+      isInitialized: false, 
+      isLoading: false,
+      email: null
+    });
+  },
   initializeAuth: async () => {
     // Skip if already initialized
     if (get().isInitialized) return;
 
     set({ isLoading: true });
     try {
+      // Initialize email from localStorage
+      if (typeof window !== 'undefined') {
+        const storedEmail = localStorage.getItem('auth_email');
+        if (storedEmail) {
+          set({ email: storedEmail });
+        }
+      }
+
       // First try to get user from x-user header
       const response = await fetch("/api/auth/user-header", {
         headers: {

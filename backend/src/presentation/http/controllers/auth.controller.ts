@@ -8,6 +8,7 @@ import { IRegisterUseCase } from "../../../app/usecases/auth/interfaces/register
 import { IResendOtpUseCase } from "../../../app/usecases/auth/interfaces/resend-otp.usecase.interface";
 import { IResetPasswordUseCase } from "../../../app/usecases/auth/interfaces/reset-password.usecase.interface";
 import { IVerifyOtpUseCase } from "../../../app/usecases/auth/interfaces/verify-otp.usecase.interface";
+import { IGetVerificationStatusUseCase } from "../../../app/usecases/auth/interfaces/get-verification-status.usecase.interface";
 import {
   validateFacebookAuth,
   validateForgotPassword,
@@ -37,6 +38,7 @@ export class AuthController extends BaseController {
     private resendOtpUseCase: IResendOtpUseCase,
     private resetPasswordUseCase: IResetPasswordUseCase,
     private verifyOtpUseCase: IVerifyOtpUseCase,
+    private getVerificationStatusUseCase: IGetVerificationStatusUseCase,
     httpErrors: IHttpErrors,
     httpSuccess: IHttpSuccess
   ) {
@@ -199,6 +201,28 @@ export class AuthController extends BaseController {
         statusCode: 200,
         body: response,
         cookie: { action: "set", user },
+      };
+    });
+  }
+
+  async getVerificationStatus(httpRequest: IHttpRequest): Promise<IHttpResponse> {
+    return this.handleRequest(httpRequest, async (request) => {
+      const email = request.query?.email as string;
+      
+      if (!email) {
+        throw new BadRequestError("Email is required");
+      }
+
+      const result = await this.getVerificationStatusUseCase.execute(email);
+      const response: ApiResponse<typeof result> = {
+        statusCode: 200,
+        success: true,
+        message: "Verification status retrieved successfully",
+        data: result
+      };
+      return {
+        statusCode: 200,
+        body: response
       };
     });
   }

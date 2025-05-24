@@ -32,6 +32,9 @@ export default function authRouter(authController: AuthController): Router {
   router.post("/verify-otp", (req, res) =>
     expressAdapter(req, res, authController.verifyOtp.bind(authController))
   );
+  router.get("/verification-status", (req, res) =>
+    expressAdapter(req, res, authController.getVerificationStatus.bind(authController))
+  );
 
   return router;
 }

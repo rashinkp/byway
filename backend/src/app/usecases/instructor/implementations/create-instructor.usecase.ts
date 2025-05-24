@@ -63,7 +63,6 @@ export class CreateInstructorUseCase implements ICreateInstructorUseCase {
     // Update user role to INSTRUCTOR
     const updatedUser = User.update(user, {
       id: user.id,
-      role: Role.INSTRUCTOR,
     });
     await this.userRepository.updateUser(updatedUser);
 
