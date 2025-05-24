@@ -197,4 +197,25 @@ export class Course {
       bestSeller: this._bestSeller,
     };
   }
+
+  static fromPrisma(data: any): Course {
+    return new Course({
+      id: data.id,
+      title: data.title,
+      description: data.description,
+      level: data.level,
+      price: data.price ? Price.create(data.price.toNumber()) : null,
+      thumbnail: data.thumbnail,
+      duration: data.duration ? Duration.create(data.duration) : null,
+      offer: data.offer ? Offer.create(data.offer.toNumber()) : null,
+      status: data.status,
+      categoryId: data.categoryId,
+      createdBy: data.createdBy,
+      createdAt: data.createdAt,
+      updatedAt: data.updatedAt,
+      deletedAt: data.deletedAt,
+      approvalStatus: data.approvalStatus,
+      details: data.details,
+    });
+  }
 }

@@ -8,6 +8,7 @@ import { CartItemSkeleton } from "@/components/cart/CartSkeleton";
 import { CartItems } from "@/components/cart/CartItems";
 import { OrderSummary } from "@/components/cart/OrderSummery";
 import { EmptyCart } from "@/components/cart/EmptyCart";
+import ErrorDisplay from "@/components/ErrorDisplay";
 
 interface CartPageProps {
   page?: number;
@@ -15,14 +16,11 @@ interface CartPageProps {
 }
 
 export default function CartPage({ page = 1, limit = 10 }: CartPageProps) {
-  const { data, isLoading, error } = useCart({ page, limit });
+  const { data, isLoading, error , refetch } = useCart({ page, limit });
   const removeFromCartMutation = useRemoveFromCart();
   const clearCartMutation = useClearCart();
 
   const cart = data?.items;
-
-  console.log(cart);
-
 
   const handleRemoveCourse = useCallback(
     (courseId: string) => {
@@ -35,6 +33,12 @@ export default function CartPage({ page = 1, limit = 10 }: CartPageProps) {
     clearCartMutation.mutate();
   }, [clearCartMutation]);
 
+  if (error) {
+    return (
+      <ErrorDisplay error={error} title="Cart Error" description={error.message} onRetry={refetch}/>
+    )
+  }
+
   return (
     <div className="min-h-screen pb-10">
       <main className="container mx-auto px-4 max-w-6xl">
@@ -45,12 +49,6 @@ export default function CartPage({ page = 1, limit = 10 }: CartPageProps) {
             {[...Array(3)].map((_, index) => (
               <CartItemSkeleton key={index} />
             ))}
-          </div>
-        ) : error ? (
-          <div className="bg-white p-12 rounded-lg shadow-sm text-center">
-            <p className="text-red-500">
-              Error: {error.message || "Failed to load cart"}
-            </p>
           </div>
         ) : (cart?.length ?? 0) > 0 ? (
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">

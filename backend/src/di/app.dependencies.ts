@@ -13,6 +13,8 @@ import { createUserDependencies } from "./user.dependencies";
 import { LessonContentController } from "../presentation/http/controllers/content.controller";
 import { createLessonDependencies } from "./lesson.depenedencies";
 import { createLessonContentDependencies } from "./content.dependencies";
+import { CartController } from "../presentation/http/controllers/cart.controller";
+import { createCartDependencies } from "./cart.dependencies";
 
 export interface AppDependencies {
   authController: AuthController;
@@ -22,6 +24,7 @@ export interface AppDependencies {
   courseController: CourseController;
   lessonController: LessonController;
   lessonContentController: LessonContentController;
+  cartController: CartController;
 }
 
 export function createAppDependencies(): AppDependencies {
@@ -35,6 +38,7 @@ export function createAppDependencies(): AppDependencies {
   const { lessonController } = createLessonDependencies(sharedDeps);
   const { lessonContentController } =
     createLessonContentDependencies(sharedDeps);
+  const { cartController } = createCartDependencies(sharedDeps);
 
   return {
     authController,
@@ -44,5 +48,6 @@ export function createAppDependencies(): AppDependencies {
     courseController,
     lessonController,
     lessonContentController,
+    cartController,
   };
 }

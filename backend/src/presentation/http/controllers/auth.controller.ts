@@ -214,16 +214,7 @@ export class AuthController extends BaseController {
       }
 
       const result = await this.getVerificationStatusUseCase.execute(email);
-      const response: ApiResponse<typeof result> = {
-        statusCode: 200,
-        success: true,
-        message: "Verification status retrieved successfully",
-        data: result
-      };
-      return {
-        statusCode: 200,
-        body: response
-      };
+      return this.success_200(result, "Verification status retrieved successfully");
     });
   }
 }

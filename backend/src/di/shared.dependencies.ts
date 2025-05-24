@@ -21,6 +21,8 @@ import { CookieService } from "../presentation/http/utils/cookie.service";
 import { LessonRepository } from "../infra/repositories/lesson.repository.impl";
 import { LessonContentRepository } from "../infra/repositories/content.repository";
 import { ILessonContentRepository } from "../app/repositories/content.repository";
+import { CartRepository } from "../infra/repositories/cart.repository.impl";
+import { ICartRepository } from "../app/repositories/cart.repository";
 
 export interface SharedDependencies {
   userRepository: IUserRepository;
@@ -31,6 +33,7 @@ export interface SharedDependencies {
   enrollmentRepository: IEnrollmentRepository;
   lessonRepository: ILessonRepository;
   lessonContentRepository: ILessonContentRepository;
+  cartRepository: ICartRepository;
   otpProvider: OtpProvider;
   googleAuthProvider: GoogleAuthProvider;
   httpErrors: HttpErrors;
@@ -47,6 +50,7 @@ export function createSharedDependencies(): SharedDependencies {
   const enrollmentRepository = new EnrollmentRepository(prismaClient);
   const lessonRepository = new LessonRepository(prismaClient);
   const lessonContentRepository = new LessonContentRepository(prismaClient);
+  const cartRepository = new CartRepository(prismaClient);
   const otpProvider = new OtpProvider(authRepository);
   const googleAuthProvider = new GoogleAuthProvider(envConfig.GOOGLE_CLIENT_ID);
 
@@ -63,6 +67,7 @@ export function createSharedDependencies(): SharedDependencies {
     enrollmentRepository,
     lessonRepository,
     lessonContentRepository,
+    cartRepository,
     otpProvider,
     googleAuthProvider,
     httpErrors,
