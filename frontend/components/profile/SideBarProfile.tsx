@@ -13,6 +13,7 @@ export default function Sidebar({
   const sidebarItems = [
     { id: "profile", label: "Profile", icon: User },
     { id: "courses", label: "My Courses", icon: BookOpen },
+    { id: "orders", label: "My Orders", icon: BookOpen },
     { id: "wallet", label: "My Wallet", icon: Wallet },
     { id: "transactions", label: "Transactions", icon: Receipt },
     { id: "certificates", label: "Certificates", icon: Award },

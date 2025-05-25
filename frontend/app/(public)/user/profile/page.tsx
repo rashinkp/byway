@@ -9,6 +9,7 @@ import EditProfileForm from "@/components/profile/EditProfileForm";
 import MyCoursesPage from "../my-courses/page";
 import WalletTransactionPage from "../wallet/page";
 import TransactionsPage from "../transactions/page";
+import OrderListing from "../my-orders/page";
 
 export default function ProfilePage() {
   const { data: user, isLoading, error } = useUserData();
@@ -50,6 +51,9 @@ export default function ProfilePage() {
         )}
         {activeSection === 'transactions' && (
           <TransactionsPage />
+        )}
+        {activeSection === 'orders' && (
+          <OrderListing />
         )}
         {["certificates", "settings"].map(
           (section) =>

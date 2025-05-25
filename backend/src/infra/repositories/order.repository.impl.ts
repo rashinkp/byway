@@ -18,7 +18,7 @@ export class OrderRepository implements IOrderRepository {
       prismaOrder.paymentId,
       prismaOrder.paymentGateway as PaymentGateway,
       Number(prismaOrder.amount),
-      null, // couponCode
+      null, 
       prismaOrder.createdAt,
       prismaOrder.updatedAt
     );
@@ -33,6 +33,23 @@ export class OrderRepository implements IOrderRepository {
     });
     if (!order) return null;
     return this.mapToOrder(order);
+  }
+
+  async getAllOrders(userId: string): Promise<Order[]> {
+    const orders = await this.prisma.order.findMany({
+      where: { userId },
+      include: {
+        items: {
+          include: {
+            course: true
+          }
+        }
+      },
+      orderBy: {
+        createdAt: 'desc'
+      }
+    });
+    return orders.map(order => this.mapToOrder(order));
   }
 
   async createOrder(
@@ -110,5 +127,50 @@ export class OrderRepository implements IOrderRepository {
     });
 
     return this.mapToOrder(order);
+  }
+
+  async findMany(params: { where: any; skip: number; take: number; orderBy: any; include?: any }): Promise<Order[]> {
+    const orders = await this.prisma.order.findMany(params);
+    return orders.map(order => this.mapToOrder(order));
+  }
+
+  async count(where: any): Promise<number> {
+    return this.prisma.order.count({ where });
+  }
+
+  async create(data: Partial<Order>): Promise<Order> {
+    if (!data.userId) throw new Error("userId is required");
+    
+    const order = await this.prisma.order.create({
+      data: {
+        id: uuidv4(),
+        userId: data.userId,
+        orderStatus: (data as any).orderStatus || "PENDING",
+        paymentStatus: (data as any).paymentStatus || "PENDING",
+        paymentId: (data as any).paymentId || null,
+        paymentGateway: (data as any).paymentGateway || null,
+        amount: (data as any).amount || 0,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+      include: { items: true }
+    });
+    return this.mapToOrder(order);
+  }
+
+  async update(id: string, data: Partial<Order>): Promise<Order> {
+    const order = await this.prisma.order.update({
+      where: { id },
+      data: {
+        ...data,
+        updatedAt: new Date(),
+      },
+      include: { items: true }
+    });
+    return this.mapToOrder(order);
+  }
+
+  async delete(id: string): Promise<void> {
+    await this.prisma.order.delete({ where: { id } });
   }
 }

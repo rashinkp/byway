@@ -16,6 +16,7 @@ import lessonContentRouter from "../router/content.router";
 import { cartRouter } from "../router/cart.router";
 import { stripeRouter } from "../router/stripe.router";
 import { transactionRouter } from "../router/transaction.router";
+import { orderRouter } from "../router/order.router";
 import { expressAdapter } from "../../adapters/express.adapter";
 
 export const createApp = (): Application => {
@@ -31,7 +32,8 @@ export const createApp = (): Application => {
     lessonContentController,
     cartController,
     stripeController,
-    transactionController
+    transactionController,
+    orderController,
   } = createAppDependencies();
 
   // Stripe webhook route - must be before any middleware
@@ -63,6 +65,7 @@ export const createApp = (): Application => {
   app.use('/api/v1/cart', cartRouter(cartController));
   app.use('/api/v1/stripe', stripeRouter(stripeController));
   app.use('/api/v1/transactions', transactionRouter(transactionController));
+  app.use('/api/v1/orders', orderRouter(orderController));
   // app.use("/api/cart", cartRouter);
   // app.use("/api/orders", orderRouter);
   // app.use("/api/payments", paymentRouter);
