@@ -27,6 +27,9 @@ export class OrderRepository implements IOrderRepository {
   async findById(id: string): Promise<Order | null> {
     const order = await this.prisma.order.findUnique({
       where: { id },
+      include: {
+        items: true,
+      },
     });
     if (!order) return null;
     return this.mapToOrder(order);
@@ -42,18 +45,46 @@ export class OrderRepository implements IOrderRepository {
       0
     );
 
-    const order = await this.prisma.order.create({
-      data: {
-        id: uuidv4(),
-        userId,
-        orderStatus: "PENDING",
-        paymentStatus: "PENDING",
-        paymentId: null,
-        paymentGateway: null,
-        amount: totalAmount,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      },
+    // Create order with items in a transaction
+    const order = await this.prisma.$transaction(async (prisma) => {
+      // Create the order
+      const newOrder = await prisma.order.create({
+        data: {
+          id: uuidv4(),
+          userId,
+          orderStatus: "PENDING",
+          paymentStatus: "PENDING",
+          paymentId: null,
+          paymentGateway: null,
+          amount: totalAmount,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
+      });
+
+      // Create order items for each course
+      const orderItems = await Promise.all(
+        courses.map((course) =>
+          prisma.orderItem.create({
+            data: {
+              id: uuidv4(),
+              orderId: newOrder.id,
+              courseId: course.id,
+              coursePrice: course.offer || course.price,
+              courseTitle: course.title,
+              discount: course.offer ? course.price - course.offer : null,
+              couponId: couponCode || null,
+              createdAt: new Date(),
+              updatedAt: new Date(),
+            },
+          })
+        )
+      );
+
+      return {
+        ...newOrder,
+        items: orderItems,
+      };
     });
 
     return this.mapToOrder(order);
@@ -63,7 +94,7 @@ export class OrderRepository implements IOrderRepository {
     orderId: string,
     status: string,
     paymentIntentId: string,
-    paymentGateway: 'STRIPE' | 'RAZORPAY' | null
+    paymentGateway: "STRIPE" | "RAZORPAY" | null
   ): Promise<Order> {
     const order = await this.prisma.order.update({
       where: { id: orderId },
@@ -73,8 +104,11 @@ export class OrderRepository implements IOrderRepository {
         paymentGateway,
         updatedAt: new Date(),
       },
+      include: {
+        items: true,
+      },
     });
 
     return this.mapToOrder(order);
   }
-} 
+}

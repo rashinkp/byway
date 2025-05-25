@@ -37,7 +37,7 @@ export class StripeController extends BaseController {
         throw new BadRequestError("Missing stripe-signature header");
       }
       const response = await this.handleWebhookUseCase.execute({
-        event: Buffer.from(JSON.stringify(req.body)),
+        event: req.body,
         signature: req.headers["stripe-signature"],
       });
       return this.success_200(response.data, response.message);

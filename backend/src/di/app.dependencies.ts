@@ -1,32 +1,26 @@
-import { AuthController } from "../presentation/http/controllers/auth.controller";
-import { CategoryController } from "../presentation/http/controllers/category.controller";
-import { CourseController } from "../presentation/http/controllers/course.controller";
-import { InstructorController } from "../presentation/http/controllers/instructor.controller";
-import { UserController } from "../presentation/http/controllers/user.controller";
-import { LessonController } from "../presentation/http/controllers/lesson.controller";
+import { createSharedDependencies } from "./shared.dependencies";
 import { createAuthDependencies } from "./auth.dependencies";
+import { createUserDependencies } from "./user.dependencies";
+import { createInstructorDependencies } from "./instructor.dipendencies";
 import { createCategoryDependencies } from "./category.dependencies";
 import { createCourseDependencies } from "./course.dependencies";
-import { createSharedDependencies } from "./shared.dependencies";
-import { createUserDependencies } from "./user.dependencies";
-import { LessonContentController } from "../presentation/http/controllers/content.controller";
-import { CartController } from "../presentation/http/controllers/cart.controller";
-import { createCartDependencies } from "./cart.dependencies";
-import { createStripeDependencies } from "./stripe.dependencies";
-import { createInstructorDependencies } from "./instructor.dipendencies";
 import { createLessonDependencies } from "./lesson.depenedencies";
 import { createLessonContentDependencies } from "./content.dependencies";
+import { createCartDependencies } from "./cart.dependencies";
+import { createStripeDependencies } from "./stripe.dependencies";
+import { createTransactionDependencies } from "./transaction.dependencies";
 
 export interface AppDependencies {
-  authController: AuthController;
-  userController: UserController;
-  instructorController: InstructorController;
-  categoryController: CategoryController;
-  courseController: CourseController;
-  lessonController: LessonController;
-  lessonContentController: LessonContentController;
-  cartController: CartController;
+  authController: any;
+  userController: any;
+  instructorController: any;
+  categoryController: any;
+  courseController: any;
+  lessonController: any;
+  lessonContentController: any;
+  cartController: any;
   stripeController: any;
+  transactionController: any;
 }
 
 export function createAppDependencies(): AppDependencies {
@@ -41,6 +35,7 @@ export function createAppDependencies(): AppDependencies {
   const lessonContentDeps = createLessonContentDependencies(sharedDeps);
   const cartDeps = createCartDependencies(sharedDeps);
   const stripeDeps = createStripeDependencies(sharedDeps);
+  const transactionDeps = createTransactionDependencies(sharedDeps);
 
   return {
     authController: authDeps.authController,
@@ -52,5 +47,6 @@ export function createAppDependencies(): AppDependencies {
     lessonContentController: lessonContentDeps.lessonContentController,
     cartController: cartDeps.cartController,
     stripeController: stripeDeps.stripeController,
+    transactionController: transactionDeps.transactionController
   };
 }

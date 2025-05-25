@@ -3,32 +3,20 @@ import { CreateCheckoutSessionDto } from "../../../../domain/dtos/stripe/create-
 import { ApiResponse } from "../../../../presentation/http/interfaces/ApiResponse";
 import { IUserRepository } from "../../../repositories/user.repository";
 import { IOrderRepository } from "../../../repositories/order.repository";
-import { StripeCheckout } from "../../../../domain/entities/stripe-checkout.entity";
+import { IEnrollmentRepository } from "../../../repositories/enrollment.repository.interface";
+import { ICartRepository } from "../../../repositories/cart.repository";
 import { HttpError } from "../../../../presentation/http/errors/http-error";
 import { StatusCodes } from "http-status-codes";
 import Stripe from "stripe";
-import { v4 as uuidv4 } from "uuid";
-import { PaymentStatus } from "../../../../domain/enum/payment-status.enum";
-
-const mapStripePaymentStatus = (status: Stripe.Checkout.Session.PaymentStatus): PaymentStatus => {
-  switch (status) {
-    case 'paid':
-      return PaymentStatus.COMPLETED;
-    case 'unpaid':
-      return PaymentStatus.PENDING;
-    case 'no_payment_required':
-      return PaymentStatus.COMPLETED;
-    default:
-      return PaymentStatus.PENDING;
-  }
-};
 
 export class CreateCheckoutSessionUseCase implements ICreateCheckoutSessionUseCase {
   private stripe: Stripe;
 
   constructor(
     private userRepository: IUserRepository,
-    private orderRepository: IOrderRepository
+    private orderRepository: IOrderRepository,
+    private enrollmentRepository: IEnrollmentRepository,
+    private cartRepository: ICartRepository
   ) {
     this.stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
       apiVersion: "2025-04-30.basil",
@@ -44,8 +32,28 @@ export class CreateCheckoutSessionUseCase implements ICreateCheckoutSessionUseCa
       throw new HttpError("User not found", StatusCodes.NOT_FOUND);
     }
 
+    // Check if user is already enrolled in any of the courses
+    const courseIds = courses.map(course => course.id);
+    const existingEnrollments = await this.enrollmentRepository.findByUserIdAndCourseIds(userId, courseIds);
+    
+    if (existingEnrollments.length > 0) {
+      const enrolledCourseIds = existingEnrollments.map((enrollment: { courseId: string }) => enrollment.courseId);
+      const enrolledCourses = courses.filter(course => enrolledCourseIds.includes(course.id));
+      const courseTitles = enrolledCourses.map(course => course.title).join(", ");
+      
+      throw new HttpError(
+        `You are already enrolled in the following courses: ${courseTitles}`,
+        StatusCodes.BAD_REQUEST
+      );
+    }
+
     // Create pending order
     const order = await this.orderRepository.createOrder(userId, courses, couponCode);
+
+    // Remove courses from cart after order creation
+    for (const course of courses) {
+      await this.cartRepository.deleteByUserAndCourse(userId, course.id);
+    }
 
     // Validate FRONTEND_URL
     const frontendUrl = process.env.FRONTEND_URL;
@@ -92,22 +100,6 @@ export class CreateCheckoutSessionUseCase implements ICreateCheckoutSessionUseCa
         },
         discounts: couponCode ? [{ coupon: couponCode }] : undefined,
       });
-
-      // Create checkout session record
-      const checkoutSession = new StripeCheckout(
-        uuidv4(),
-        userId,
-        order.id,
-        session.id,
-        session.payment_intent as string,
-        mapStripePaymentStatus(session.payment_status),
-        session.amount_total!,
-        session.currency || 'usd',
-        new Date(),
-        new Date()
-      );
-
-      
 
       return {
         success: true,

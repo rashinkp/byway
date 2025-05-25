@@ -1,52 +1,136 @@
-import { TransactionType } from "../enum/transaction-type.enum";
-import { TransactionStatus } from "../enum/transaction-status.enum";
 import { PaymentGateway } from "../enum/payment-gateway.enum";
+import { TransactionStatus } from "../enum/transaction-status.enum";
+import { TransactionType } from "../enum/transaction-type.enum";
 
 export class Transaction {
-  constructor(
-    public readonly id: string,
-    public readonly orderId: string,
-    public readonly userId: string,
-    public readonly courseId: string,
-    public readonly amount: number,
-    public readonly type: TransactionType,
-    public readonly status: TransactionStatus,
-    public readonly paymentGateway: PaymentGateway,
-    public readonly transactionId: string,
-    public readonly createdAt: Date,
-    public readonly updatedAt: Date
-  ) {}
+  private readonly _id: string;
+  private readonly _orderId: string;
+  private readonly _userId: string;
+  private readonly _amount: number;
+  private readonly _type: TransactionType;
+  private readonly _status: TransactionStatus;
+  private readonly _paymentGateway: PaymentGateway;
+  private readonly _paymentMethod?: string;
+  private readonly _paymentDetails?: Record<string, any>;
+  private readonly _courseId?: string;
+  private readonly _transactionId?: string;
+  private readonly _metadata?: Record<string, any>;
+  private readonly _createdAt: Date;
+  private readonly _updatedAt: Date;
 
-  // Domain methods
-  public isCompleted(): boolean {
-    return this.status === TransactionStatus.COMPLETED;
+  constructor(params: {
+    id?: string;
+    orderId: string;
+    userId: string;
+    amount: number;
+    type: TransactionType;
+    status: TransactionStatus;
+    paymentGateway: PaymentGateway;
+    paymentMethod?: string;
+    paymentDetails?: Record<string, any>;
+    courseId?: string;
+    transactionId?: string;
+    metadata?: Record<string, any>;
+    createdAt?: Date;
+    updatedAt?: Date;
+  }) {
+    this._id = params.id || crypto.randomUUID();
+    this._orderId = params.orderId;
+    this._userId = params.userId;
+    this._amount = params.amount;
+    this._type = params.type;
+    this._status = params.status;
+    this._paymentGateway = params.paymentGateway;
+    this._paymentMethod = params.paymentMethod;
+    this._paymentDetails = params.paymentDetails;
+    this._courseId = params.courseId;
+    this._transactionId = params.transactionId;
+    this._metadata = params.metadata;
+    this._createdAt = params.createdAt || new Date();
+    this._updatedAt = params.updatedAt || new Date();
   }
 
-  public isPending(): boolean {
-    return this.status === TransactionStatus.PENDING;
+  get id(): string {
+    return this._id;
   }
 
-  public isFailed(): boolean {
-    return this.status === TransactionStatus.FAILED;
+  get orderId(): string {
+    return this._orderId;
   }
 
-  public isPayment(): boolean {
-    return this.type === TransactionType.PAYMENT;
+  get userId(): string {
+    return this._userId;
   }
 
-  public isRefund(): boolean {
-    return this.type === TransactionType.REFUND;
+  get amount(): number {
+    return this._amount;
   }
 
-  public getAmount(): number {
-    return this.amount;
+  get type(): TransactionType {
+    return this._type;
   }
 
-  public getTransactionId(): string {
-    return this.transactionId;
+  get status(): TransactionStatus {
+    return this._status;
   }
 
-  public getPaymentGateway(): PaymentGateway {
-    return this.paymentGateway;
+  get paymentGateway(): PaymentGateway {
+    return this._paymentGateway;
   }
-} 
+
+  get paymentMethod(): string | undefined {
+    return this._paymentMethod;
+  }
+
+  get paymentDetails(): Record<string, any> | undefined {
+    return this._paymentDetails;
+  }
+
+  get courseId(): string | undefined {
+    return this._courseId;
+  }
+
+  get transactionId(): string | undefined {
+    return this._transactionId;
+  }
+
+  get metadata(): Record<string, any> | undefined {
+    return this._metadata;
+  }
+
+  get createdAt(): Date {
+    return this._createdAt;
+  }
+
+  get updatedAt(): Date {
+    return this._updatedAt;
+  }
+
+  get isCompleted(): boolean {
+    return this._status === TransactionStatus.COMPLETED;
+  }
+
+  get isPending(): boolean {
+    return this._status === TransactionStatus.PENDING;
+  }
+
+  get isFailed(): boolean {
+    return this._status === TransactionStatus.FAILED;
+  }
+
+  get isRefunded(): boolean {
+    return this._status === TransactionStatus.REFUNDED;
+  }
+
+  get isCancelled(): boolean {
+    return this._status === TransactionStatus.CANCELLED;
+  }
+
+  get isPayment(): boolean {
+    return this._type === TransactionType.PURCHASE;
+  }
+
+  get isRefund(): boolean {
+    return this._type === TransactionType.REFUND;
+  }
+}

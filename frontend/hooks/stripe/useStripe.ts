@@ -5,7 +5,7 @@ import {
   IStripeCheckoutSession,
   StripeApiResponse,
 } from "@/types/stripe.types";
-import { createStripeCheckoutSession } from "@/api/stripe.api";
+import { createStripeCheckoutSession, verifyPaymentStatus } from "@/api/stripe.api";
 
 export function useStripe() {
   const createCheckoutSessionMutation = useMutation<
@@ -13,26 +13,29 @@ export function useStripe() {
     Error,
     ICreateStripeCheckoutSessionInput
   >({
-    mutationFn: (data) =>
-      createStripeCheckoutSession(data).then((res) => {
-        console.log("Raw Stripe response:", JSON.stringify(res, null, 2));
-        if (!res.data?.session) {
-          throw new Error(res.message || "No session data received");
-        }
-        return {
-          statusCode: res.statusCode,
-          status: res.status,
-          message: res.message,
-          data: { session: res.data.session },
-        };
-      }),
+    mutationFn: async (data) => {
+      const res = await createStripeCheckoutSession(data);
+      console.log("Raw Stripe response:", JSON.stringify(res, null, 2));
+      if (!res.data?.session) {
+        throw new Error(res.message || "No session data received");
+      }
+      return {
+        statusCode: res.statusCode,
+        status: res.status,
+        message: res.message,
+        data: { session: res.data.session },
+      };
+    },
     onMutate: async () => {
       toast.loading("Creating Stripe checkout session...");
     },
-    onSuccess: (data) => {
+    onSuccess: async (data) => {
       console.log("Stripe checkout session success:", data);
       toast.success("Stripe checkout session created successfully!");
+      
       if (data.data?.session?.url) {
+        // Store session ID in localStorage for verification
+        localStorage.setItem('stripe_session_id', data.data.session.id);
         console.log("Redirecting to Stripe checkout:", data.data.session.url);
         window.location.href = data.data.session.url;
       } else {
@@ -51,8 +54,30 @@ export function useStripe() {
     },
   });
 
+  const verifyPaymentMutation = useMutation({
+    mutationFn: async (sessionId: string) => {
+      return verifyPaymentStatus(sessionId);
+    },
+    onSuccess: (data) => {
+      if (data.status === "success") {
+        toast.success("Payment verified successfully!");
+        // Clear session ID from localStorage
+        localStorage.removeItem('stripe_session_id');
+      } else {
+        toast.error("Payment verification failed");
+      }
+    },
+    onError: (error) => {
+      toast.error("Failed to verify payment", {
+        description: error.message || "Please contact support if this persists.",
+      });
+    },
+  });
+
   return {
     createStripeCheckoutSession: createCheckoutSessionMutation.mutateAsync,
+    verifyPayment: verifyPaymentMutation.mutateAsync,
     isCreatingSession: createCheckoutSessionMutation.isPending,
+    isVerifyingPayment: verifyPaymentMutation.isPending,
   };
 }

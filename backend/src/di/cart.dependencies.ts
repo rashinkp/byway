@@ -15,10 +15,10 @@ export interface CartDependencies {
 export function createCartDependencies(
   deps: SharedDependencies
 ): CartDependencies {
-  const { cartRepository } = deps;
+  const { cartRepository, enrollmentRepository } = deps;
 
   // Initialize use cases
-  const addToCartUseCase = new AddToCartUseCase(cartRepository);
+  const addToCartUseCase = new AddToCartUseCase(cartRepository, enrollmentRepository);
   const getCartUseCase = new GetCartUseCase(cartRepository);
   const removeFromCartUseCase = new RemoveFromCartUseCase(cartRepository);
   const applyCouponUseCase = new ApplyCouponUseCase(cartRepository);

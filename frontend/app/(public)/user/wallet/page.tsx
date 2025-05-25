@@ -35,14 +35,13 @@ export default function WalletTransactionPage() {
       if (t.type === "DEPOSIT") description = "Funds added to wallet";
       else if (t.type === "WITHDRAWAL") description = "Funds withdrawn";
       else if (t.type === "PURCHASE") description = "Course purchase";
-      else if (t.type === "REFUND")
-        description = `Refund for order ${t.orderId}`;
+      else if (t.type === "REFUND") description = `Refund for order ${t.orderId}`;
       else if (t.type === "PAYMENT") description = "Payment for course";
 
       return {
         id: t.id,
         type:
-          t.type === "DEPOSIT" || t.type === "PURCHASE" 
+          t.type === "DEPOSIT" || t.type === "REFUND" 
             ? "deposit"
             : "withdrawal",
         amount: typeof t.amount === "string" ? parseFloat(t.amount) : t.amount,

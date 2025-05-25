@@ -12,10 +12,5 @@ export const stripeRouter = (stripeController: StripeController): Router => {
     (req, res) => expressAdapter(req, res, stripeController.createCheckoutSession.bind(stripeController))
   );
 
-  router.post(
-    "/webhook",
-    (req, res) => expressAdapter(req, res, stripeController.handleWebhook.bind(stripeController))
-  );
-
   return router;
 }; 

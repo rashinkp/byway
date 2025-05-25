@@ -9,4 +9,6 @@ export interface ICartRepository {
   update(cart: Cart): Promise<Cart>;
   delete(id: string): Promise<void>;
   clearUserCart(userId: string): Promise<void>;
+  deleteByUserAndCourse(userId: string, courseId: string): Promise<void>;
+  deleteByUserId(userId: string): Promise<void>;
 } 

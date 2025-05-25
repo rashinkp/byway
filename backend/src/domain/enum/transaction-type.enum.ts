@@ -1,4 +1,6 @@
 export enum TransactionType {
-  PAYMENT = 'PAYMENT',
-  REFUND = 'REFUND'
+  PURCHASE = 'PURCHASE',
+  REFUND = 'REFUND',
+  WITHDRAWAL = 'WITHDRAWAL',
+  DEPOSIT = 'DEPOSIT'
 } 

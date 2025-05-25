@@ -15,16 +15,11 @@ import lessonRouter from "../router/lesson.router";
 import lessonContentRouter from "../router/content.router";
 import { cartRouter } from "../router/cart.router";
 import { stripeRouter } from "../router/stripe.router";
+import { transactionRouter } from "../router/transaction.router";
+import { expressAdapter } from "../../adapters/express.adapter";
 
 export const createApp = (): Application => {
   const app = express();
-
-  // Middlewares
-  app.use(cors(corsConfig));
-  app.use(cookieParser(cookieConfig.secret));
-  app.use(express.json());
-  app.use(express.urlencoded({ extended: true }));
-  app.use(morgan("dev"));
 
   const {
     authController,
@@ -35,8 +30,23 @@ export const createApp = (): Application => {
     lessonController,
     lessonContentController,
     cartController,
-    stripeController
+    stripeController,
+    transactionController
   } = createAppDependencies();
+
+  // Stripe webhook route - must be before any middleware
+  app.post(
+    "/api/v1/stripe/webhook",
+    express.raw({ type: "application/json" }),
+    (req, res) => expressAdapter(req, res, stripeController.handleWebhook.bind(stripeController))
+  );
+
+  // Middlewares
+  app.use(cors(corsConfig));
+  app.use(cookieParser(cookieConfig.secret));
+  app.use(express.json());
+  app.use(express.urlencoded({ extended: true }));
+  app.use(morgan("dev"));
 
   // Routers
   // app.use("/api/admin", adminRouter);
@@ -52,6 +62,7 @@ export const createApp = (): Application => {
   app.use("/api/v1/content", lessonContentRouter(lessonContentController));
   app.use('/api/v1/cart', cartRouter(cartController));
   app.use('/api/v1/stripe', stripeRouter(stripeController));
+  app.use('/api/v1/transactions', transactionRouter(transactionController));
   // app.use("/api/cart", cartRouter);
   // app.use("/api/orders", orderRouter);
   // app.use("/api/payments", paymentRouter);

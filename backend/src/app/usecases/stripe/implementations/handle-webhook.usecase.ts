@@ -1,6 +1,8 @@
-import { IHandleWebhookUseCase, IWebhookInput } from "../interfaces/handle-webhook.usecase.interface";
+import {
+  IHandleWebhookUseCase,
+  IWebhookInput,
+} from "../interfaces/handle-webhook.usecase.interface";
 import { ApiResponse } from "../../../../presentation/http/interfaces/ApiResponse";
-import { IStripeRepository } from "../../../repositories/stripe.repository";
 import { IUserRepository } from "../../../repositories/user.repository";
 import { IOrderRepository } from "../../../repositories/order.repository";
 import { IEnrollmentRepository } from "../../../repositories/enrollment.repository.interface";
@@ -9,6 +11,10 @@ import { HttpError } from "../../../../presentation/http/errors/http-error";
 import { StatusCodes } from "http-status-codes";
 import Stripe from "stripe";
 import { z } from "zod";
+import { TransactionType } from "../../../../domain/enum/transaction-type.enum";
+import { TransactionStatus } from "../../../../domain/enum/transaction-status.enum";
+import { PaymentGateway } from "../../../../domain/enum/payment-gateway.enum";
+import { Transaction } from "../../../../domain/entities/transaction.entity";
 
 const checkoutSessionSchema = z.object({
   id: z.string(),
@@ -36,7 +42,19 @@ export class HandleWebhookUseCase implements IHandleWebhookUseCase {
     const { event, signature } = input;
 
     try {
+      console.log("Received webhook event:", {
+        type: event.toString().slice(0, 100), // Log first 100 chars of event
+        signature: signature.slice(0, 10) + "...", // Log part of signature
+      });
+
       const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET!;
+      if (!webhookSecret) {
+        console.error("Missing STRIPE_WEBHOOK_SECRET");
+        throw new HttpError(
+          "Webhook secret not configured",
+          StatusCodes.INTERNAL_SERVER_ERROR
+        );
+      }
 
       // Verify signature with raw body
       const constructedEvent = this.stripe.webhooks.constructEvent(
@@ -45,36 +63,22 @@ export class HandleWebhookUseCase implements IHandleWebhookUseCase {
         webhookSecret
       );
 
-      // Parse event for further processing
-      const parsedEvent = JSON.parse(event.toString());
+      console.log("Constructed event type:", constructedEvent.type);
 
-      // Validate Checkout Session events
-      if (
-        [
-          "checkout.session.completed",
-          "checkout.session.expired",
-          "checkout.session.async_payment_succeeded",
-          "checkout.session.async_payment_failed",
-        ].includes(constructedEvent.type)
-      ) {
-        const sessionParse = checkoutSessionSchema.safeParse(
-          constructedEvent.data.object
-        );
-        if (!sessionParse.success) {
-          throw new HttpError(
-            `Checkout session validation failed: ${sessionParse.error.message}`,
-            StatusCodes.BAD_REQUEST
-          );
-        }
-      }
-
+      // Handle different event types
       switch (constructedEvent.type) {
         case "checkout.session.completed": {
           const session = constructedEvent.data.object;
+          console.log("Processing checkout.session.completed:", {
+            sessionId: session.id,
+            metadata: session.metadata,
+          });
+
           const metadata = session.metadata || {};
           const { userId, orderId, courses } = metadata;
 
           if (!userId || !orderId) {
+            console.log("Missing metadata:", { userId, orderId });
             return {
               success: true,
               data: null,
@@ -86,12 +90,17 @@ export class HandleWebhookUseCase implements IHandleWebhookUseCase {
           // Validate user exists
           const user = await this.userRepository.findById(userId);
           if (!user) {
+            console.error("User not found:", userId);
             throw new HttpError("User not found", StatusCodes.NOT_FOUND);
           }
 
           // Check for idempotency
           const order = await this.orderRepository.findById(orderId);
-          if (order?.paymentStatus === "COMPLETED") {
+          if (!order) {
+            throw new HttpError("Order not found", StatusCodes.NOT_FOUND);
+          }
+          if (order.paymentStatus === "COMPLETED") {
+            console.log("Order already processed:", orderId);
             return {
               success: true,
               data: null,
@@ -99,6 +108,11 @@ export class HandleWebhookUseCase implements IHandleWebhookUseCase {
               statusCode: StatusCodes.OK,
             };
           }
+
+          console.log("Updating order status:", {
+            orderId,
+            paymentIntent: session.payment_intent,
+          });
 
           // Update order status
           await this.orderRepository.updateOrderStatus(
@@ -117,10 +131,15 @@ export class HandleWebhookUseCase implements IHandleWebhookUseCase {
             }[] = JSON.parse(courses);
             const courseIds = parsedCourses.map((course) => course.id);
 
+            console.log("Enrolling user in courses:", {
+              userId,
+              courseIds,
+            });
+
             // Enroll user in courses
             await this.enrollmentRepository.create({
               userId,
-              courseIds
+              courseIds,
             });
 
             // Store transaction history for each course
@@ -128,16 +147,18 @@ export class HandleWebhookUseCase implements IHandleWebhookUseCase {
               const coursePrice = course.offer ?? course.price ?? 0;
               if (coursePrice <= 0) continue;
 
-              await this.transactionRepository.createTransaction({
-                orderId,
-                userId,
+              const transaction = new Transaction({
+                orderId: order.id,
+                userId: order.userId,
                 courseId: course.id,
                 amount: coursePrice,
-                type: "PAYMENT",
-                status: "COMPLETED",
-                paymentGateway: "STRIPE",
+                type: TransactionType.PURCHASE,
+                status: TransactionStatus.COMPLETED,
+                paymentGateway: PaymentGateway.STRIPE,
                 transactionId: session.payment_intent as string,
               });
+
+              await this.transactionRepository.create(transaction);
             }
           }
 
@@ -159,6 +180,7 @@ export class HandleWebhookUseCase implements IHandleWebhookUseCase {
         case "payment_intent.succeeded":
         case "payment_intent.created":
         case "charge.updated":
+          console.log(`Processing ${constructedEvent.type} event`);
           return {
             success: true,
             data: null,
@@ -167,16 +189,30 @@ export class HandleWebhookUseCase implements IHandleWebhookUseCase {
           };
 
         default:
+          console.log("Unhandled event type:", constructedEvent.type);
           return {
-           success: true,
+            success: true,
             data: null,
             message: "Webhook received but not processed",
             statusCode: StatusCodes.OK,
           };
       }
-    } catch (error) {
+    } catch (error: unknown) {
+      console.error("Webhook error details:", {
+        name: error instanceof Error ? error.name : "Unknown",
+        message: error instanceof Error ? error.message : String(error),
+        stack: error instanceof Error ? error.stack : undefined,
+      });
+
       if (error instanceof Stripe.errors.StripeSignatureVerificationError) {
-        throw new HttpError("Invalid webhook signature", StatusCodes.BAD_REQUEST);
+        console.error("Stripe signature verification failed:", {
+          signature: signature.slice(0, 10) + "...",
+          eventType: event.toString().slice(0, 100),
+        });
+        throw new HttpError(
+          "Invalid webhook signature",
+          StatusCodes.BAD_REQUEST
+        );
       }
       throw error instanceof HttpError
         ? error
@@ -186,4 +222,4 @@ export class HandleWebhookUseCase implements IHandleWebhookUseCase {
           );
     }
   }
-} 
+}

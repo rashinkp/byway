@@ -124,4 +124,25 @@ export class CartRepository implements ICartRepository {
       }
     });
   }
+
+  async deleteByUserAndCourse(userId: string, courseId: string): Promise<void> {
+    await this.prisma.cart.deleteMany({
+      where: {
+        userId,
+        courseId,
+      },
+    });
+  }
+
+  async deleteByUserId(userId: string): Promise<void> {
+    await this.prisma.cart.updateMany({
+      where: {
+        userId,
+        deletedAt: null,
+      },
+      data: {
+        deletedAt: new Date(),
+      },
+    });
+  }
 } 

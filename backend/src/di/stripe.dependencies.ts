@@ -14,7 +14,9 @@ export function createStripeDependencies(
   // Initialize use cases
   const createCheckoutSessionUseCase = new CreateCheckoutSessionUseCase(
     deps.userRepository,
-    deps.orderRepository
+    deps.orderRepository,
+    deps.enrollmentRepository,
+    deps.cartRepository
   );
 
   const handleWebhookUseCase = new HandleWebhookUseCase(
