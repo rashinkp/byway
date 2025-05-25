@@ -225,7 +225,7 @@ export function Header({ client }: HeaderProps = {}) {
                         </DropdownMenuItem>
                         <DropdownMenuItem>
                           <Link
-                            href="/my-courses"
+                            href="/user/my-courses"
                             className="flex items-center w-full"
                           >
                             <BookOpen className="mr-2 h-4 w-4" />
@@ -341,7 +341,7 @@ export function Header({ client }: HeaderProps = {}) {
                       Profile
                     </Link>
                     <Link
-                      href="/my-courses"
+                      href="/user/my-courses"
                       className="block px-2 py-1 text-gray-700 hover:text-blue-600 text-base"
                     >
                       My Courses

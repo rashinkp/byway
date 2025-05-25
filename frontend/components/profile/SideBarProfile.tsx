@@ -1,5 +1,5 @@
 import { cn } from "@/utils/cn";
-import { User, BookOpen, Award, Settings, Wallet } from "lucide-react";
+import { User, BookOpen, Award, Settings, Wallet, Receipt } from "lucide-react";
 
 interface SidebarProps {
   activeSection: string;
@@ -13,7 +13,8 @@ export default function Sidebar({
   const sidebarItems = [
     { id: "profile", label: "Profile", icon: User },
     { id: "courses", label: "My Courses", icon: BookOpen },
-    {id:'wallet' , label:'My Wallet' , icon:Wallet},
+    { id: "wallet", label: "My Wallet", icon: Wallet },
+    { id: "transactions", label: "Transactions", icon: Receipt },
     { id: "certificates", label: "Certificates", icon: Award },
     { id: "settings", label: "Settings", icon: Settings },
   ];
