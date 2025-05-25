@@ -7,14 +7,15 @@ import { LessonController } from "../presentation/http/controllers/lesson.contro
 import { createAuthDependencies } from "./auth.dependencies";
 import { createCategoryDependencies } from "./category.dependencies";
 import { createCourseDependencies } from "./course.dependencies";
-import { createInstructorDependencies } from "./instructor.dipendencies";
 import { createSharedDependencies } from "./shared.dependencies";
 import { createUserDependencies } from "./user.dependencies";
 import { LessonContentController } from "../presentation/http/controllers/content.controller";
-import { createLessonDependencies } from "./lesson.depenedencies";
-import { createLessonContentDependencies } from "./content.dependencies";
 import { CartController } from "../presentation/http/controllers/cart.controller";
 import { createCartDependencies } from "./cart.dependencies";
+import { createStripeDependencies } from "./stripe.dependencies";
+import { createInstructorDependencies } from "./instructor.dipendencies";
+import { createLessonDependencies } from "./lesson.depenedencies";
+import { createLessonContentDependencies } from "./content.dependencies";
 
 export interface AppDependencies {
   authController: AuthController;
@@ -25,29 +26,31 @@ export interface AppDependencies {
   lessonController: LessonController;
   lessonContentController: LessonContentController;
   cartController: CartController;
+  stripeController: any;
 }
 
 export function createAppDependencies(): AppDependencies {
   const sharedDeps = createSharedDependencies();
 
-  const { authController } = createAuthDependencies(sharedDeps);
-  const { userController } = createUserDependencies(sharedDeps);
-  const { instructorController } = createInstructorDependencies(sharedDeps);
-  const { categoryController } = createCategoryDependencies(sharedDeps);
-  const { courseController } = createCourseDependencies(sharedDeps);
-  const { lessonController } = createLessonDependencies(sharedDeps);
-  const { lessonContentController } =
-    createLessonContentDependencies(sharedDeps);
-  const { cartController } = createCartDependencies(sharedDeps);
+  const authDeps = createAuthDependencies(sharedDeps);
+  const userDeps = createUserDependencies(sharedDeps);
+  const instructorDeps = createInstructorDependencies(sharedDeps);
+  const categoryDeps = createCategoryDependencies(sharedDeps);
+  const courseDeps = createCourseDependencies(sharedDeps);
+  const lessonDeps = createLessonDependencies(sharedDeps);
+  const lessonContentDeps = createLessonContentDependencies(sharedDeps);
+  const cartDeps = createCartDependencies(sharedDeps);
+  const stripeDeps = createStripeDependencies(sharedDeps);
 
   return {
-    authController,
-    userController,
-    instructorController,
-    categoryController,
-    courseController,
-    lessonController,
-    lessonContentController,
-    cartController,
+    authController: authDeps.authController,
+    userController: userDeps.userController,
+    instructorController: instructorDeps.instructorController,
+    categoryController: categoryDeps.categoryController,
+    courseController: courseDeps.courseController,
+    lessonController: lessonDeps.lessonController,
+    lessonContentController: lessonContentDeps.lessonContentController,
+    cartController: cartDeps.cartController,
+    stripeController: stripeDeps.stripeController,
   };
 }

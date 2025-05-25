@@ -23,8 +23,13 @@ import { LessonContentRepository } from "../infra/repositories/content.repositor
 import { ILessonContentRepository } from "../app/repositories/content.repository";
 import { CartRepository } from "../infra/repositories/cart.repository.impl";
 import { ICartRepository } from "../app/repositories/cart.repository";
+import { OrderRepository } from "../infra/repositories/order.repository.impl";
+import { IOrderRepository } from "../app/repositories/order.repository";
+import { TransactionRepository } from "../infra/repositories/transaction.repository.impl";
+import { ITransactionRepository } from "../app/repositories/transaction.repository";
 
 export interface SharedDependencies {
+  prisma: typeof prismaClient;
   userRepository: IUserRepository;
   categoryRepository: ICategoryRepository;
   courseRepository: ICourseRepository;
@@ -34,6 +39,8 @@ export interface SharedDependencies {
   lessonRepository: ILessonRepository;
   lessonContentRepository: ILessonContentRepository;
   cartRepository: ICartRepository;
+  orderRepository: IOrderRepository;
+  transactionRepository: ITransactionRepository;
   otpProvider: OtpProvider;
   googleAuthProvider: GoogleAuthProvider;
   httpErrors: HttpErrors;
@@ -51,6 +58,8 @@ export function createSharedDependencies(): SharedDependencies {
   const lessonRepository = new LessonRepository(prismaClient);
   const lessonContentRepository = new LessonContentRepository(prismaClient);
   const cartRepository = new CartRepository(prismaClient);
+  const orderRepository = new OrderRepository(prismaClient);
+  const transactionRepository = new TransactionRepository(prismaClient);
   const otpProvider = new OtpProvider(authRepository);
   const googleAuthProvider = new GoogleAuthProvider(envConfig.GOOGLE_CLIENT_ID);
 
@@ -59,6 +68,7 @@ export function createSharedDependencies(): SharedDependencies {
   const cookieService = new CookieService();
 
   return {
+    prisma: prismaClient,
     userRepository,
     categoryRepository,
     courseRepository,
@@ -68,6 +78,8 @@ export function createSharedDependencies(): SharedDependencies {
     lessonRepository,
     lessonContentRepository,
     cartRepository,
+    orderRepository,
+    transactionRepository,
     otpProvider,
     googleAuthProvider,
     httpErrors,
