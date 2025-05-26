@@ -10,13 +10,11 @@ import { Button } from "@/components/ui/button";
 
 interface OrderCardProps {
   order: Order;
-  onRetryPayment: (orderId: string) => void;
   isRetrying: boolean;
 }
 
 export const OrderCard: React.FC<OrderCardProps> = ({
   order,
-  onRetryPayment,
   isRetrying,
 }) => {
   const { createStripeCheckoutSession } = useStripe();
@@ -133,7 +131,7 @@ export const OrderCard: React.FC<OrderCardProps> = ({
             <Button
               variant="outline"
               size="sm"
-              onClick={() => onRetryPayment(order.id)}
+              onClick={handleRetryPayment}
               disabled={isRetrying}
               className="text-blue-600 hover:text-blue-700"
             >
