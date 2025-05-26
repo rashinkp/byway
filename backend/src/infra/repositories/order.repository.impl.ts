@@ -1,26 +1,114 @@
 import { PrismaClient } from "@prisma/client";
 import { IOrderRepository } from "../../app/repositories/order.repository";
 import { Order } from "../../domain/entities/order.entity";
+import { OrderItem } from "../../domain/entities/order-item.entity";
+import { Course } from "../../domain/entities/course.entity";
 import { v4 as uuidv4 } from "uuid";
 import { OrderStatus } from "../../domain/enum/order-status.enum";
 import { PaymentStatus } from "../../domain/enum/payment-status.enum";
 import { PaymentGateway } from "../../domain/enum/payment-gateway.enum";
+import { GetAllOrdersDto } from "../../domain/dtos/order/order.dto";
+import { Price } from "../../domain/value-object/price";
+import { Duration } from "../../domain/value-object/duration";
+import { Offer } from "../../domain/value-object/offer";
 
 export class OrderRepository implements IOrderRepository {
   constructor(private prisma: PrismaClient) {}
 
-  private mapToOrder(prismaOrder: any): Order {
+  async findAll(userId: string, filters: GetAllOrdersDto): Promise<{
+    orders: Order[];
+    total: number;
+    page: number;
+    limit: number;
+    totalPages: number;
+  }> {
+    const { page = 1, limit = 10, sortBy = "createdAt", sortOrder = "desc" } = filters;
+
+    const where = {
+      userId,
+      ...(filters.status && filters.status !== "ALL"
+        ? { orderStatus: filters.status as OrderStatus }
+        : {}),
+      ...(filters.startDate && filters.endDate
+        ? {
+            createdAt: {
+              gte: new Date(filters.startDate),
+              lte: new Date(filters.endDate),
+            },
+          }
+        : {}),
+      ...(filters.minAmount && filters.maxAmount
+        ? {
+            amount: {
+              gte: filters.minAmount,
+              lte: filters.maxAmount,
+            },
+          }
+        : {}),
+    };
+
+    const [orders, total] = await Promise.all([
+      this.prisma.order.findMany({
+        where,
+        skip: (page - 1) * limit,
+        take: limit,
+        orderBy: { [sortBy]: sortOrder },
+        include: {
+          items: {
+            include: {
+              course: true,
+            },
+          },
+        },
+      }),
+      this.prisma.order.count({ where }),
+    ]);
+
+    const totalPages = Math.ceil(total / limit);
+
+    return {
+      orders: orders.map((order) => this.mapToOrderEntity(order)),
+      total,
+      page,
+      limit,
+      totalPages,
+    };
+  }
+
+  private mapToOrderEntity(order: any): Order {
     return new Order(
-      prismaOrder.id,
-      prismaOrder.userId,
-      prismaOrder.orderStatus as OrderStatus,
-      prismaOrder.paymentStatus as PaymentStatus,
-      prismaOrder.paymentId,
-      prismaOrder.paymentGateway as PaymentGateway,
-      Number(prismaOrder.amount),
-      null, 
-      prismaOrder.createdAt,
-      prismaOrder.updatedAt
+      order.id,
+      order.userId,
+      order.orderStatus as OrderStatus,
+      order.paymentStatus as PaymentStatus,
+      order.paymentId,
+      order.paymentGateway as PaymentGateway,
+      Number(order.amount),
+      order.couponCode,
+      order.items.map((item: any) => ({
+        id: item.id,
+        orderId: item.orderId,
+        courseId: item.courseId,
+        courseTitle: item.courseTitle,
+        coursePrice: Number(item.coursePrice),
+        discount: item.discount ? Number(item.discount) : null,
+        couponId: item.couponId,
+        title: item.course.title,
+        description: item.course.description,
+        level: item.course.level,
+        price: item.course.price ? Number(item.course.price) : null,
+        thumbnail: item.course.thumbnail,
+        status: item.course.status,
+        categoryId: item.course.categoryId,
+        createdBy: item.course.createdBy,
+        deletedAt: item.course.deletedAt ? new Date(item.course.deletedAt).toISOString() : null,
+        approvalStatus: item.course.approvalStatus,
+        details: item.course.details,
+        createdAt: new Date(item.createdAt).toISOString(),
+        updatedAt: new Date(item.updatedAt).toISOString(),
+      })),
+      new Date(order.createdAt),
+      new Date(order.updatedAt)
     );
   }
 
@@ -28,11 +116,15 @@ export class OrderRepository implements IOrderRepository {
     const order = await this.prisma.order.findUnique({
       where: { id },
       include: {
-        items: true,
+        items: {
+          include: {
+            course: true,
+          },
+        },
       },
     });
-    if (!order) return null;
-    return this.mapToOrder(order);
+
+    return order ? this.mapToOrderEntity(order) : null;
   }
 
   async getAllOrders(userId: string): Promise<Order[]> {
@@ -49,7 +141,7 @@ export class OrderRepository implements IOrderRepository {
         createdAt: 'desc'
       }
     });
-    return orders.map(order => this.mapToOrder(order));
+    return orders.map(order => this.mapToOrderEntity(order));
   }
 
   async createOrder(
@@ -104,7 +196,7 @@ export class OrderRepository implements IOrderRepository {
       };
     });
 
-    return this.mapToOrder(order);
+    return this.mapToOrderEntity(order);
   }
 
   async updateOrderStatus(
@@ -126,51 +218,76 @@ export class OrderRepository implements IOrderRepository {
       },
     });
 
-    return this.mapToOrder(order);
+    return this.mapToOrderEntity(order);
   }
 
   async findMany(params: { where: any; skip: number; take: number; orderBy: any; include?: any }): Promise<Order[]> {
     const orders = await this.prisma.order.findMany(params);
-    return orders.map(order => this.mapToOrder(order));
+    return orders.map(order => this.mapToOrderEntity(order));
   }
 
   async count(where: any): Promise<number> {
     return this.prisma.order.count({ where });
   }
 
-  async create(data: Partial<Order>): Promise<Order> {
-    if (!data.userId) throw new Error("userId is required");
-    
-    const order = await this.prisma.order.create({
+  async create(order: Order): Promise<Order> {
+    const createdOrder = await this.prisma.order.create({
       data: {
-        id: uuidv4(),
-        userId: data.userId,
-        orderStatus: (data as any).orderStatus || "PENDING",
-        paymentStatus: (data as any).paymentStatus || "PENDING",
-        paymentId: (data as any).paymentId || null,
-        paymentGateway: (data as any).paymentGateway || null,
-        amount: (data as any).amount || 0,
-        createdAt: new Date(),
-        updatedAt: new Date(),
+        id: order.id,
+        userId: order.userId,
+        orderStatus: order.status,
+        paymentStatus: order.paymentStatus,
+        paymentId: order.paymentIntentId,
+        paymentGateway: order.paymentGateway,
+        amount: order.totalAmount,
+        items: {
+          create: order.items.map((item) => ({
+            id: item.id,
+            courseId: item.courseId,
+            courseTitle: item.courseTitle,
+            coursePrice: item.coursePrice,
+            discount: item.discount,
+            couponId: item.couponId,
+          })),
+        },
       },
-      include: { items: true }
+      include: {
+        items: {
+          include: {
+            course: true,
+          },
+        },
+      },
     });
-    return this.mapToOrder(order);
+
+    return this.mapToOrderEntity(createdOrder);
   }
 
-  async update(id: string, data: Partial<Order>): Promise<Order> {
-    const order = await this.prisma.order.update({
-      where: { id },
+  async update(order: Order): Promise<Order> {
+    const updatedOrder = await this.prisma.order.update({
+      where: { id: order.id },
       data: {
-        ...data,
-        updatedAt: new Date(),
+        orderStatus: order.status,
+        paymentStatus: order.paymentStatus,
+        paymentId: order.paymentIntentId,
+        paymentGateway: order.paymentGateway,
+        amount: order.totalAmount,
       },
-      include: { items: true }
+      include: {
+        items: {
+          include: {
+            course: true,
+          },
+        },
+      },
     });
-    return this.mapToOrder(order);
+
+    return this.mapToOrderEntity(updatedOrder);
   }
 
   async delete(id: string): Promise<void> {
-    await this.prisma.order.delete({ where: { id } });
+    await this.prisma.order.delete({
+      where: { id },
+    });
   }
 }

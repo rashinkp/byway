@@ -1,6 +1,6 @@
 import { api } from "@/api/api";
 import { ApiResponse } from "@/types/apiResponse";
-import { Order } from "@/types/order";
+import { Order, OrdersResponse, GetOrdersParams } from "@/types/order";
 
 export const createOrder = async (data: {
   courseIds: string[];
@@ -31,3 +31,30 @@ export const updateOrderStatus = async (data: {
     );
   }
 };
+
+export interface OrderItem {
+  id: string;
+  courseId: string;
+  courseTitle: string;
+  coursePrice: number;
+  discount: number | null;
+  course: {
+    id: string;
+    title: string;
+    thumbnail: string;
+  };
+}
+
+export async function getOrders(params: GetOrdersParams = {}): Promise<OrdersResponse> {
+  try {
+    const response = await api.get<{ data: OrdersResponse }>("/orders", { params });
+    return response.data.data;
+  } catch (error: any) {
+    console.error("Get orders error:", {
+      status: error.response?.status,
+      data: error.response?.data,
+      message: error.message
+    });
+    throw new Error(error.response?.data?.message || "Failed to fetch orders");
+  }
+}

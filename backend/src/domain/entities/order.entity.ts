@@ -2,6 +2,29 @@ import { OrderStatus } from "../enum/order-status.enum";
 import { PaymentGateway } from "../enum/payment-gateway.enum";
 import { PaymentStatus } from "../enum/payment-status.enum";
 
+export interface OrderItem {
+  id: string;
+  orderId: string;
+  courseId: string;
+  courseTitle: string;
+  coursePrice: number;
+  discount: number | null;
+  couponId: string | null;
+  title: string;
+  description: string | null;
+  level: string;
+  price: number | null;
+  thumbnail: string | null;
+  status: string;
+  categoryId: string;
+  createdBy: string;
+  deletedAt: string | null;
+  approvalStatus: string;
+  details: any | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export class Order {
   constructor(
     public readonly id: string,
@@ -12,6 +35,7 @@ export class Order {
     public readonly paymentGateway: PaymentGateway | null,
     public readonly totalAmount: number,
     public readonly couponCode: string | null,
+    public readonly items: OrderItem[],
     public readonly createdAt: Date,
     public readonly updatedAt: Date
   ) {}
@@ -47,5 +71,24 @@ export class Order {
 
   public getCouponCode(): string | null {
     return this.couponCode;
+  }
+
+  public getItems(): OrderItem[] {
+    return this.items;
+  }
+
+  toJSON(): any {
+    return {
+      id: this.id,
+      userId: this.userId,
+      amount: this.totalAmount,
+      paymentStatus: this.paymentStatus,
+      orderStatus: this.status,
+      paymentId: this.paymentIntentId,
+      paymentGateway: this.paymentGateway,
+      createdAt: this.createdAt.toISOString(),
+      updatedAt: this.updatedAt.toISOString(),
+      items: this.items,
+    };
   }
 } 
