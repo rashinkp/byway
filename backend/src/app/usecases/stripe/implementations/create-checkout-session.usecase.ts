@@ -7,21 +7,16 @@ import { IEnrollmentRepository } from "../../../repositories/enrollment.reposito
 import { ICartRepository } from "../../../repositories/cart.repository";
 import { HttpError } from "../../../../presentation/http/errors/http-error";
 import { StatusCodes } from "http-status-codes";
-import Stripe from "stripe";
+import { PaymentGateway } from "../../../providers/payment-gateway.interface";
 
 export class CreateCheckoutSessionUseCase implements ICreateCheckoutSessionUseCase {
-  private stripe: Stripe;
-
   constructor(
     private userRepository: IUserRepository,
     private orderRepository: IOrderRepository,
     private enrollmentRepository: IEnrollmentRepository,
-    private cartRepository: ICartRepository
-  ) {
-    this.stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-      apiVersion: "2025-04-30.basil",
-    });
-  }
+    private cartRepository: ICartRepository,
+    private paymentGateway: PaymentGateway
+  ) {}
 
   async execute(input: CreateCheckoutSessionDto): Promise<ApiResponse> {
     const { userId, courses, couponCode } = input;
@@ -35,6 +30,7 @@ export class CreateCheckoutSessionUseCase implements ICreateCheckoutSessionUseCa
     // Check if user is already enrolled in any of the courses
     const courseIds = courses.map(course => course.id);
     const existingEnrollments = await this.enrollmentRepository.findByUserIdAndCourseIds(userId, courseIds);
+
     
     if (existingEnrollments.length > 0) {
       const enrolledCourseIds = existingEnrollments.map((enrollment: { courseId: string }) => enrollment.courseId);
@@ -50,78 +46,33 @@ export class CreateCheckoutSessionUseCase implements ICreateCheckoutSessionUseCa
     // Create pending order
     const order = await this.orderRepository.createOrder(userId, courses, couponCode);
 
+
     // Remove courses from cart after order creation
     for (const course of courses) {
       await this.cartRepository.deleteByUserAndCourse(userId, course.id);
     }
 
-    // Validate FRONTEND_URL
-    const frontendUrl = process.env.FRONTEND_URL;
-    if (!frontendUrl) {
-      throw new HttpError(
-        "Server configuration error: FRONTEND_URL is missing",
-        StatusCodes.INTERNAL_SERVER_ERROR
-      );
-    }
 
-    try {
-      // Create line items from course details
-      const lineItems: Stripe.Checkout.SessionCreateParams.LineItem[] = courses.map(
-        (course) => ({
-          price_data: {
-            currency: "usd",
-            product_data: {
-              name: course.title,
-              description: course.description || undefined,
-              images: course.thumbnail ? [course.thumbnail] : undefined,
-              metadata: {
-                courseId: course.id,
-                ...(course.duration && { duration: course.duration }),
-                ...(course.level && { level: course.level }),
-              },
-            },
-            unit_amount: Math.round((course.offer || course.price) * 100),
-          },
-          quantity: 1,
-        })
-      );
+    // Create checkout session using payment gateway
+    // console.log("Creating checkout session with input:", input , user.email, order.id);
+    const session = await this.paymentGateway.createCheckoutSession(
+      input,
+      user.email,
+      order.id
+    );
 
-      const session = await this.stripe.checkout.sessions.create({
-        payment_method_types: ["card"],
-        line_items: lineItems,
-        mode: "payment",
-        success_url: `${frontendUrl}/success?session_id={CHECKOUT_SESSION_ID}`,
-        cancel_url: `${frontendUrl}/cancel`,
-        customer_email: user.email,
-        metadata: {
-          userId,
-          orderId: order.id,
-          courses: JSON.stringify(courses),
+    return {
+      success: true,
+      data: {
+        session: {
+          id: session.id,
+          url: session.url,
+          payment_status: session.payment_status,
+          amount_total: session.amount_total,
         },
-        discounts: couponCode ? [{ coupon: couponCode }] : undefined,
-      });
-
-      return {
-        success: true,
-        data: {
-          session: {
-            id: session.id,
-            url: session.url!,
-            payment_status: session.payment_status,
-            amount_total: session.amount_total!,
-          },
-        },
-        message: "Stripe checkout session created successfully",
-        statusCode: StatusCodes.CREATED,
-      };
-    } catch (error) {
-      if (error instanceof Stripe.errors.StripeInvalidRequestError) {
-        throw new HttpError(error.message, StatusCodes.BAD_REQUEST);
-      }
-      throw new HttpError(
-        "Failed to create Stripe checkout session",
-        StatusCodes.INTERNAL_SERVER_ERROR
-      );
-    }
+      },
+      message: "Checkout session created successfully",
+      statusCode: StatusCodes.CREATED,
+    };
   }
 } 

@@ -186,6 +186,9 @@ export class OrderRepository implements IOrderRepository {
               createdAt: new Date(),
               updatedAt: new Date(),
             },
+            include: {
+              course: true
+            }
           })
         )
       );

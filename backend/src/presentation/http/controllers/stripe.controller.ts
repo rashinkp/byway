@@ -25,7 +25,10 @@ export class StripeController extends BaseController {
       if (!req.user?.id) {
         throw new UnauthorizedError("User not authenticated");
       }
+
+      
       const validatedData = createCheckoutSessionSchema.parse(req.body);
+
       const response = await this.createCheckoutSessionUseCase.execute(validatedData);
       return this.success_201(response.data, response.message);
     });

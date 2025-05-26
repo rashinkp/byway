@@ -2,6 +2,7 @@ import { CreateCheckoutSessionUseCase } from "../app/usecases/stripe/implementat
 import { HandleWebhookUseCase } from "../app/usecases/stripe/implementations/handle-webhook.usecase";
 import { StripeController } from "../presentation/http/controllers/stripe.controller";
 import { SharedDependencies } from "./shared.dependencies";
+import { StripePaymentGateway } from "../infra/providers/stripe-payment.gateway";
 
 export interface StripeDependencies {
   stripeController: StripeController;
@@ -10,13 +11,15 @@ export interface StripeDependencies {
 export function createStripeDependencies(
   deps: SharedDependencies
 ): StripeDependencies {
+  const stripeGateway = new StripePaymentGateway();
 
   // Initialize use cases
   const createCheckoutSessionUseCase = new CreateCheckoutSessionUseCase(
     deps.userRepository,
     deps.orderRepository,
     deps.enrollmentRepository,
-    deps.cartRepository
+    deps.cartRepository,
+    stripeGateway
   );
 
   const handleWebhookUseCase = new HandleWebhookUseCase(

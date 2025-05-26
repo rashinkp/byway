@@ -1,19 +1,19 @@
 import { z } from "zod";
 
+const courseSchema = z.object({
+  id: z.string().min(1, "Course ID is required"),
+  title: z.string().min(1, "Course title is required"),
+  description: z.string().nullable().optional(),
+  price: z.number().min(0).optional(),
+  offer: z.number().min(0).optional(),
+  thumbnail: z.string().nullable().optional(),
+  duration: z.string().optional(),
+  level: z.string().optional(),
+});
+
 export const createCheckoutSessionSchema = z.object({
-  userId: z.string().uuid(),
-  courses: z.array(
-    z.object({
-      id: z.string().uuid(),
-      title: z.string(),
-      description: z.string().optional(),
-      price: z.number().positive(),
-      offer: z.number().positive().optional(),
-      thumbnail: z.string().url().optional(),
-      duration: z.string().optional(),
-      level: z.string().optional(),
-    })
-  ),
+  userId: z.string().min(1, "User ID is required"),
+  courses: z.array(courseSchema).min(1, "At least one course is required"),
   couponCode: z.string().optional(),
 });
 

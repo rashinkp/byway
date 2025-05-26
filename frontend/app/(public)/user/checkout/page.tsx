@@ -82,20 +82,6 @@ const CheckoutPage: FC<CheckoutPageProps> = memo(({ page = 1, limit = 10 }) => {
         "offer",
         singleCourse.id
       );
-      if (price === 0 || offer === 0) {
-        console.error(
-          "Invalid price or offer for single course:",
-          singleCourse
-        );
-        toast.error("Unable to process course due to invalid price");
-        return {
-          totalOriginalPrice: 0,
-          totalDiscountedPrice: 0,
-          tax: 0,
-          finalAmount: 0,
-          courseDetails: [],
-        };
-      }
       const calculatedTax = offer * TAX_RATE;
       const finalAmount = offer + calculatedTax;
       return {
