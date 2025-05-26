@@ -7,6 +7,11 @@ export class WebhookEvent {
         payment_status: string;
         payment_intent: string;
         metadata: Record<string, string>;
+        failure_message?: string;
+        last_payment_error?: {
+          message: string;
+        };
+        amount?: number;
       };
     }
   ) {}

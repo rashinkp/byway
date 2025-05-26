@@ -41,7 +41,10 @@ export class StripeWebhookGateway implements WebhookGateway {
       return WebhookEvent.create(constructedEvent.type, constructedEvent.data);
     } catch (error) {
       if (error instanceof Stripe.errors.StripeSignatureVerificationError) {
-        throw new HttpError("Invalid webhook signature", StatusCodes.BAD_REQUEST);
+        throw new HttpError(
+          "Invalid webhook signature",
+          StatusCodes.BAD_REQUEST
+        );
       }
       throw error;
     }
@@ -56,6 +59,57 @@ export class StripeWebhookGateway implements WebhookGateway {
   }
 
   getPaymentIntentId(event: WebhookEvent): string {
-    return event.data.object.payment_intent;
+    if (
+      event.type === "payment_intent.payment_failed" ||
+      event.type === "payment_intent.created"
+    ) {
+      return event.data.object.id; // PaymentIntent ID for payment_intent events
+    } else if (event.type === "charge.failed") {
+      return event.data.object.payment_intent; // PaymentIntent ID in charge events
+    }
+    return event.data.object.payment_intent || ""; // For checkout.session.completed
+  }
+
+  isPaymentFailed(event: WebhookEvent): boolean {
+    return (
+      event.type === "payment_intent.payment_failed" ||
+      event.type === "charge.failed"
+    );
+  }
+
+  isCheckoutSessionExpired(event: WebhookEvent): boolean {
+    return event.type === "checkout.session.expired";
+  }
+
+  async getCheckoutSessionMetadata(
+    paymentIntentId: string
+  ): Promise<WebhookMetadata> {
+    try {
+      const sessions = await this.stripe.checkout.sessions.list({
+        payment_intent: paymentIntentId,
+        limit: 1,
+      });
+
+      if (!sessions.data.length || !sessions.data[0].metadata) {
+        console.warn(
+          "No checkout session found for payment intent:",
+          paymentIntentId
+        );
+        return WebhookMetadata.create({
+          paymentIntentId,
+          status: "failed",
+        });
+      }
+
+      return this.parseMetadata(
+        sessions.data[0].metadata as Record<string, string>
+      );
+    } catch (error) {
+      console.error("Error fetching checkout session metadata:", error);
+      return WebhookMetadata.create({
+        paymentIntentId,
+        status: "failed",
+      });
+    }
   }
 } 

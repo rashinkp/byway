@@ -73,7 +73,7 @@ export class StripePaymentGateway implements PaymentGateway {
         line_items: lineItems,
         mode: "payment",
         success_url: `${frontendUrl}/success?session_id={CHECKOUT_SESSION_ID}`,
-        cancel_url: `${frontendUrl}/cancel`,
+        cancel_url: `${frontendUrl}/payment-failed?session_id={CHECKOUT_SESSION_ID}`,
         customer_email: customerEmail,
         metadata: {
           userId: input.userId,

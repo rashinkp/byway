@@ -19,3 +19,8 @@ export const createStripeCheckoutSession = async (
     );
   }
 };
+
+export const verifyPaymentStatus = async (sessionId: string) => {
+  const response = await api.get(`/stripe/verify-payment/${sessionId}`);
+  return response.data;
+};

@@ -32,11 +32,13 @@ export class HandleWebhookUseCase implements IHandleWebhookUseCase {
         input.signature
       );
 
+      console.log(event, "event received");
+
       if (this.webhookGateway.isCheckoutSessionCompleted(event)) {
         return await this.handleCheckoutSessionCompleted(event);
       }
 
-      return this.handleOtherEvent(event.type);
+      return await this.handleOtherEvent(event.type, event);
     } catch (error) {
       return this.handleError(error);
     }
@@ -45,19 +47,19 @@ export class HandleWebhookUseCase implements IHandleWebhookUseCase {
   private async handleCheckoutSessionCompleted(
     event: WebhookEvent
   ): Promise<ApiResponse> {
-    console.log('Processing checkout session:', {
+    console.log("Processing checkout session:", {
       eventId: event.data.object.id,
-      metadata: event.data.object.metadata
+      metadata: event.data.object.metadata,
     });
 
     try {
-      const metadata = this.webhookGateway.parseMetadata(event.data.object.metadata);
+      const metadata = this.webhookGateway.parseMetadata(
+        event.data.object.metadata
+      );
       const { userId, orderId, courses } = metadata;
 
-      console.log('Parsed metadata:', { userId, orderId, coursesCount: courses.length });
-
       if (!userId || !orderId || !courses || !Array.isArray(courses)) {
-        console.error('Invalid metadata format:', { userId, orderId, courses });
+        console.error("Invalid metadata format:", { userId, orderId, courses });
         throw new HttpError(
           "Invalid webhook metadata format",
           StatusCodes.BAD_REQUEST
@@ -67,35 +69,43 @@ export class HandleWebhookUseCase implements IHandleWebhookUseCase {
       // Validate user exists
       const user = await this.userRepository.findById(userId);
       if (!user) {
-        console.error('User not found:', userId);
+        console.error("User not found:", userId);
         throw new HttpError("User not found", StatusCodes.NOT_FOUND);
       }
 
       // Check for idempotency
       const order = await this.orderRepository.findById(orderId);
       if (!order) {
-        console.error('Order not found:', orderId);
+        console.error("Order not found:", orderId);
         throw new HttpError("Order not found", StatusCodes.NOT_FOUND);
       }
       if (order.paymentStatus === "COMPLETED") {
-        console.log('Order already processed:', orderId);
+        console.log("Order already processed:", orderId);
         return this.createSuccessResponse("Order already processed");
       }
 
-      console.log('Updating order status:', {
+      console.log("Updating order status:", {
         orderId,
-        paymentIntent: this.webhookGateway.getPaymentIntentId(event)
+        paymentIntent: this.webhookGateway.getPaymentIntentId(event),
       });
 
       // Update order status
+      const paymentIntentId = this.webhookGateway.getPaymentIntentId(event);
+      if (!paymentIntentId) {
+        throw new HttpError(
+          "Payment intent ID not found",
+          StatusCodes.BAD_REQUEST
+        );
+      }
+
       await this.orderRepository.updateOrderStatus(
         orderId,
         "COMPLETED",
-        this.webhookGateway.getPaymentIntentId(event),
+        paymentIntentId,
         "STRIPE"
       );
 
-      console.log('Processing enrollments and transactions');
+      console.log("Processing enrollments and transactions");
       // Process enrollments and transactions
       await this.processEnrollmentsAndTransactions(userId, courses, order);
 
@@ -107,10 +117,10 @@ export class HandleWebhookUseCase implements IHandleWebhookUseCase {
         },
       });
     } catch (error) {
-      console.error('Error in handleCheckoutSessionCompleted:', {
+      console.error("Error in handleCheckoutSessionCompleted:", {
         error: error instanceof Error ? error.message : String(error),
         stack: error instanceof Error ? error.stack : undefined,
-        metadata: event.data.object.metadata
+        metadata: event.data.object.metadata,
       });
       throw error;
     }
@@ -121,10 +131,10 @@ export class HandleWebhookUseCase implements IHandleWebhookUseCase {
     courses: any[],
     order: any
   ): Promise<void> {
-    console.log('Starting enrollment process:', {
+    console.log("Starting enrollment process:", {
       userId,
       courseCount: courses.length,
-      orderId: order.id
+      orderId: order.id,
     });
 
     try {
@@ -133,21 +143,21 @@ export class HandleWebhookUseCase implements IHandleWebhookUseCase {
         userId,
         courseIds: courses.map((course) => course.id),
       });
-      console.log('Enrollment completed successfully');
+      console.log("Enrollment completed successfully");
 
       // Create transaction records
-      console.log('Creating transaction records');
+      console.log("Creating transaction records");
       await Promise.all(
         courses.map(async (course) => {
           const coursePrice = course.offer ?? course.price ?? 0;
           if (coursePrice <= 0) {
-            console.log('Skipping transaction for free course:', course.id);
+            console.log("Skipping transaction for free course:", course.id);
             return;
           }
 
-          console.log('Creating transaction for course:', {
+          console.log("Creating transaction for course:", {
             courseId: course.id,
-            price: coursePrice
+            price: coursePrice,
           });
 
           const transaction = new Transaction({
@@ -162,20 +172,30 @@ export class HandleWebhookUseCase implements IHandleWebhookUseCase {
           });
 
           await this.transactionRepository.create(transaction);
-          console.log('Transaction created successfully:', course.id);
+          console.log("Transaction created successfully:", course.id);
         })
       );
-      console.log('All transactions processed successfully');
+      console.log("All transactions processed successfully");
     } catch (error) {
-      console.error('Error in processEnrollmentsAndTransactions:', {
+      console.error("Error in processEnrollmentsAndTransactions:", {
         error: error instanceof Error ? error.message : String(error),
-        stack: error instanceof Error ? error.stack : undefined
+        stack: error instanceof Error ? error.stack : undefined,
       });
       throw error;
     }
   }
 
-  private handleOtherEvent(eventType: string): ApiResponse {
+  private async handleOtherEvent(
+    eventType: string,
+    event: WebhookEvent
+  ): Promise<ApiResponse> {
+    if (eventType === "payment_intent.payment_failed") {
+      return await this.handlePaymentFailed(event);
+    } else if (eventType === "checkout.session.expired") {
+      // Handle session expiration (user abandoned checkout)
+      console.log("Checkout session expired:", event.data.object.id);
+      return this.createSuccessResponse("Checkout session expired");
+    }
     return this.createSuccessResponse(`${eventType} processed successfully`);
   }
 
@@ -204,5 +224,114 @@ export class HandleWebhookUseCase implements IHandleWebhookUseCase {
           "Failed to process webhook",
           StatusCodes.INTERNAL_SERVER_ERROR
         );
+  }
+
+  private async handlePaymentFailed(event: WebhookEvent): Promise<ApiResponse> {
+    console.log("Processing payment failed event:", {
+      eventId: event.data.object.id,
+      paymentIntent: this.webhookGateway.getPaymentIntentId(event),
+    });
+
+    try {
+      const paymentIntentId = this.webhookGateway.getPaymentIntentId(event);
+      if (!paymentIntentId) {
+        throw new HttpError(
+          "Payment intent ID not found",
+          StatusCodes.BAD_REQUEST
+        );
+      }
+
+      // Get metadata from the webhook gateway
+      const metadata = await this.webhookGateway.getCheckoutSessionMetadata(
+        paymentIntentId
+      );
+      const { userId, orderId, courses } = metadata;
+
+      // Get failure reason
+      const failureReason =
+        event.data.object.failure_message ||
+        event.data.object.last_payment_error?.message ||
+        "Payment failed";
+
+      // If metadata is missing, return a basic response
+      if (!userId || !orderId) {
+        console.warn("Metadata missing, processing without order update:", {
+          userId,
+          orderId,
+        });
+        return this.createSuccessResponse("Payment failure processed", {
+          webhook: {
+            status: "failed",
+            transactionId: paymentIntentId,
+            failureReason,
+            redirectUrl: "/payment-failed",
+          },
+        });
+      }
+
+      // Validate user exists
+      const user = await this.userRepository.findById(userId);
+      if (!user) {
+        console.error("User not found:", userId);
+        throw new HttpError("User not found", StatusCodes.NOT_FOUND);
+      }
+
+      // Find order by orderId
+      const order = await this.orderRepository.findById(orderId);
+      if (!order) {
+        console.error("Order not found:", orderId);
+        throw new HttpError("Order not found", StatusCodes.NOT_FOUND);
+      }
+
+      // Check for idempotency
+      if (order.paymentStatus === "FAILED") {
+        console.log("Payment failure already processed:", orderId);
+        return this.createSuccessResponse("Payment failure already processed", {
+          webhook: {
+            orderId: order.id,
+            status: "failed",
+            transactionId: paymentIntentId,
+            failureReason,
+            redirectUrl: "/payment-failed",
+          },
+        });
+      }
+
+      // Update order status to FAILED
+      await this.orderRepository.updateOrderStatus(
+        orderId,
+        "FAILED",
+        paymentIntentId,
+        "STRIPE"
+      );
+
+      // Create transaction record for the failed payment
+      const transaction = new Transaction({
+        orderId: order.id,
+        userId: order.userId,
+        amount: (event.data.object?.amount ?? 0) / 100 || order.totalAmount,
+        type: TransactionType.PURCHASE,
+        status: TransactionStatus.FAILED,
+        paymentGateway: PaymentGateway.STRIPE,
+        transactionId: paymentIntentId,
+      });
+      await this.transactionRepository.create(transaction);
+
+      return this.createSuccessResponse("Payment failure processed", {
+        webhook: {
+          orderId: order.id,
+          status: "failed",
+          transactionId: paymentIntentId,
+          failureReason,
+          redirectUrl: "/payment-failed",
+        },
+      });
+    } catch (error) {
+      console.error("Error in handlePaymentFailed:", {
+        error: error instanceof Error ? error.message : String(error),
+        stack: error instanceof Error ? error.stack : undefined,
+      });
+      throw error;
+    }
   }
 }

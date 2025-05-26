@@ -293,4 +293,19 @@ export class OrderRepository implements IOrderRepository {
       where: { id },
     });
   }
+
+  async findByPaymentId(paymentId: string): Promise<Order | null> {
+    const order = await this.prisma.order.findFirst({
+      where: { paymentId },
+      include: {
+        items: {
+          include: {
+            course: true,
+          },
+        },
+      },
+    });
+
+    return order ? this.mapToOrderEntity(order) : null;
+  }
 }
