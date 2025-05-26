@@ -15,6 +15,7 @@ export const createCheckoutSessionSchema = z.object({
   userId: z.string().min(1, "User ID is required"),
   courses: z.array(courseSchema).min(1, "At least one course is required"),
   couponCode: z.string().optional(),
+  orderId: z.string().optional(),
 });
 
 export type CreateCheckoutSessionDto = z.infer<typeof createCheckoutSessionSchema>; 

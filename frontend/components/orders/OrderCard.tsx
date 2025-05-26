@@ -3,6 +3,8 @@ import { RefreshCw, Clock, Calendar, DollarSign, XCircle } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { StatusBadge } from "./StatusBadge";
 import { Order } from "@/types/order";
+import { useStripe } from "@/hooks/stripe/useStripe";
+import { toast } from "sonner";
 
 interface OrderCardProps {
   order: Order;
@@ -15,6 +17,33 @@ export const OrderCard: React.FC<OrderCardProps> = ({
   onRetryPayment,
   isRetrying,
 }) => {
+  const { createStripeCheckoutSession } = useStripe();
+
+  const handleRetryPayment = async () => {
+    try {
+      // Prepare course details for retry
+      const coursesInput = order.items.map(item => ({
+        id: item.courseId,
+        title: item.title || 'Unknown Course',
+        description: item.description || 'No description available',
+        price: item.price || 0,
+        offer: item.coursePrice,
+        thumbnail: item.thumbnail || '',
+        level: item.level || 'BEGINNER',
+      }));
+
+      // Create new checkout session with existing order ID
+      await createStripeCheckoutSession({
+        courses: coursesInput,
+        userId: order.userId,
+        orderId: order.id // Pass the existing order ID
+      });
+    } catch (error) {
+      console.error("Failed to retry payment:", error);
+      toast.error("Failed to retry payment. Please try again later.");
+    }
+  };
+
   const formatDate = (dateString: string): string => {
     return new Date(dateString).toLocaleDateString("en-US", {
       year: "numeric",
@@ -91,9 +120,9 @@ export const OrderCard: React.FC<OrderCardProps> = ({
               )}
             </div>
 
-            {order.orderStatus === "FAILED" && (
+            {order.paymentStatus === "FAILED" && (
               <button
-                onClick={() => onRetryPayment(order.id)}
+                onClick={handleRetryPayment}
                 disabled={isRetrying}
                 className="inline-flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-blue-600 bg-blue-50 hover:bg-blue-100 rounded-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >

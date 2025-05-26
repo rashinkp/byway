@@ -17,7 +17,7 @@ export default function TransactionsPage() {
           Transaction History
         </h2>
         <TransactionList
-          transactions={transactions}
+          transactions={transactions || []}
           isLoading={isTransactionsLoading}
           error={transactionsError}
           onRetry={transactionsRefetch}

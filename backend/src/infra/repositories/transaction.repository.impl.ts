@@ -162,6 +162,7 @@ export class TransactionRepository implements ITransactionRepository {
       where: { userId },
       skip: page ? (page - 1) * (limit || 10) : undefined,
       take: limit,
+      orderBy: { createdAt: "desc" },
     });
     return transactions.map((t) => this.mapToTransaction(t));
   }

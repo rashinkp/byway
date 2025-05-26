@@ -10,9 +10,10 @@ export interface ICourseInput {
 }
 
 export interface ICreateStripeCheckoutSessionInput {
-  userId: string;
   courses: ICourseInput[];
+  userId: string;
   couponCode?: string;
+  orderId?: string;
 }
 
 export interface IStripeCheckoutSession {
