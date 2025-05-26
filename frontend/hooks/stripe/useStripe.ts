@@ -14,7 +14,17 @@ export function useStripe() {
     ICreateStripeCheckoutSessionInput
   >({
     mutationFn: async (data) => {
-      const res = await createStripeCheckoutSession(data);
+      // Minimize course data to reduce metadata size
+      const minimalData = {
+        ...data,
+        courses: data.courses.map(course => ({
+          id: course.id,
+          title: course.title,
+          price: course.price,
+          offer: course.offer
+        }))
+      };
+      const res = await createStripeCheckoutSession(minimalData);
       console.log("Raw Stripe response:", JSON.stringify(res, null, 2));
       if (!res.data?.session) {
         throw new Error(res.message || "No session data received");

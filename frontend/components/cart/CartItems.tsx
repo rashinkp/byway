@@ -18,8 +18,8 @@ export function CartItems({
 }: CartItemsProps) {
   return (
     <div className="bg-white rounded-lg shadow-sm overflow-hidden">
-      {cart.map((item) => (
-        <div key={item.id}>
+      {cart.map((item, index) => (
+        <div key={index}>
           {isRemoving && removingCourseId === item.courseId ? (
             <CartItemSkeleton />
           ) : (

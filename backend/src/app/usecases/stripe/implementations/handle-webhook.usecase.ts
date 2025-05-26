@@ -143,39 +143,26 @@ export class HandleWebhookUseCase implements IHandleWebhookUseCase {
         userId,
         courseIds: courses.map((course) => course.id),
       });
-      console.log("Enrollment completed successfully");
 
-      // Create transaction records
-      console.log("Creating transaction records");
-      await Promise.all(
-        courses.map(async (course) => {
-          const coursePrice = course.offer ?? course.price ?? 0;
-          if (coursePrice <= 0) {
-            console.log("Skipping transaction for free course:", course.id);
-            return;
-          }
+      // Calculate total amount from courses
+      const totalAmount = courses.reduce((sum, course) => {
+        const coursePrice = course.offer ?? course.price ?? 0;
+        return sum + coursePrice;
+      }, 0);
 
-          console.log("Creating transaction for course:", {
-            courseId: course.id,
-            price: coursePrice,
-          });
+      // Create a single transaction for the total amount
+      const transaction = new Transaction({
+        orderId: order.id,
+        userId: order.userId,
+        amount: totalAmount,
+        type: TransactionType.PURCHASE,
+        status: TransactionStatus.COMPLETED,
+        paymentGateway: PaymentGateway.STRIPE,
+        transactionId: order.paymentId,
+      });
 
-          const transaction = new Transaction({
-            orderId: order.id,
-            userId: order.userId,
-            courseId: course.id,
-            amount: coursePrice,
-            type: TransactionType.PURCHASE,
-            status: TransactionStatus.COMPLETED,
-            paymentGateway: PaymentGateway.STRIPE,
-            transactionId: order.paymentId,
-          });
-
-          await this.transactionRepository.create(transaction);
-          console.log("Transaction created successfully:", course.id);
-        })
-      );
-      console.log("All transactions processed successfully");
+      await this.transactionRepository.create(transaction);
+      console.log("Transaction created successfully for order:", order.id);
     } catch (error) {
       console.error("Error in processEnrollmentsAndTransactions:", {
         error: error instanceof Error ? error.message : String(error),

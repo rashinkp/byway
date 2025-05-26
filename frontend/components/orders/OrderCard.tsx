@@ -5,6 +5,8 @@ import { StatusBadge } from "./StatusBadge";
 import { Order } from "@/types/order";
 import { useStripe } from "@/hooks/stripe/useStripe";
 import { toast } from "sonner";
+import { formatDate, formatPrice } from "@/utils/formatters";
+import { Button } from "@/components/ui/button";
 
 interface OrderCardProps {
   order: Order;
@@ -44,23 +46,6 @@ export const OrderCard: React.FC<OrderCardProps> = ({
     }
   };
 
-  const formatDate = (dateString: string): string => {
-    return new Date(dateString).toLocaleDateString("en-US", {
-      year: "numeric",
-      month: "short",
-      day: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-    });
-  };
-
-  const formatPrice = (price: number): string => {
-    return new Intl.NumberFormat("en-US", {
-      style: "currency",
-      currency: "USD",
-    }).format(price);
-  };
-
   const getLevelColor = (level: string): string => {
     switch (level) {
       case "BEGINNER":
@@ -75,80 +60,98 @@ export const OrderCard: React.FC<OrderCardProps> = ({
   };
 
   return (
-    <div className="bg-white rounded-lg border border-gray-200 p-6 hover:shadow-md transition-shadow">
-      <div className="flex gap-4">
-        {/* Course Thumbnail */}
-        <div className="w-24 h-24 flex-shrink-0">
-          <img
-            src={order.items[0]?.thumbnail || ''}
-            alt={order.items[0]?.title || 'Course'}
-            className="w-full h-full object-cover rounded-lg"
-            onError={(e) => {
-              e.currentTarget.src = `https://via.placeholder.com/96x96/f3f4f6/9ca3af?text=${order.items[0]?.title?.charAt(0) || 'C'}`;
-            }}
-          />
-        </div>
-
-        {/* Course Details */}
-        <div className="flex-1 min-w-0">
-          <div className="flex items-start justify-between mb-2">
-            <h3 className="text-lg font-semibold text-gray-900 truncate pr-4">
-              {order.items[0]?.title || 'Untitled Course'}
+    <div className="bg-white border border-gray-200 rounded-lg overflow-hidden">
+      <div className="p-4 border-b border-gray-200">
+        <div className="flex justify-between items-start">
+          <div>
+            <h3 className="text-sm font-medium text-gray-900">
+              Order #{order.id.slice(0, 8)}
             </h3>
-            <div className="flex gap-2 flex-shrink-0">
-              <StatusBadge status={order.paymentStatus} type="payment" />
-            </div>
-          </div>
-
-          <div className="flex items-center gap-4 text-sm text-gray-500 mb-3">
-            <span className="flex items-center gap-1">
-              <Calendar className="w-4 h-4" />
+            <p className="text-sm text-gray-500 mt-1">
               {formatDate(order.createdAt)}
-            </span>
+            </p>
           </div>
-
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4 text-sm text-gray-600">
-              <span>
-                Order ID: <span className="font-mono">{order.id.slice(-8)}</span>
-              </span>
-              {order.paymentId && (
-                <span>
-                  Payment ID:{" "}
-                  <span className="font-mono">{order.paymentId.slice(-8)}</span>
-                </span>
-              )}
-            </div>
-
-            {order.paymentStatus === "FAILED" && (
-              <button
-                onClick={handleRetryPayment}
-                disabled={isRetrying}
-                className="inline-flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-blue-600 bg-blue-50 hover:bg-blue-100 rounded-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                <RefreshCw className={`w-4 h-4 ${isRetrying ? "animate-spin" : ""}`} />
-                {isRetrying ? "Retrying..." : "Retry Payment"}
-              </button>
-            )}
-          </div>
-        </div>
-
-        {/* Price */}
-        <div className="text-right flex-shrink-0">
-          <div className="text-xl font-bold text-gray-900 flex items-center gap-1">
-            {formatPrice(order.amount)}
+          <div className="flex items-center gap-2">
+            {/* <StatusBadge status={order.orderStatus} type="order" /> */}
+            <StatusBadge status={order.paymentStatus} type="payment" />
           </div>
         </div>
       </div>
 
-      {order.orderStatus === "FAILED" && (
-        <Alert className="mt-4 border-red-200 bg-red-50">
-          <XCircle className="h-4 w-4 text-red-600" />
-          <AlertDescription className="text-red-800">
-            Payment failed. Please retry the payment or contact support if the issue persists.
-          </AlertDescription>
-        </Alert>
-      )}
+      <div className="divide-y divide-gray-200">
+        {order.items.map((item) => (
+          <div key={item.id} className="p-4 flex items-start justify-between">
+            <div className="flex gap-4">
+              <div className="w-16 h-16 flex-shrink-0">
+                <img
+                  src={item.thumbnail || "/placeholder-course.jpg"}
+                  alt={item.title}
+                  className="w-full h-full object-cover rounded-md"
+                />
+              </div>
+              <div>
+                <h4 className="text-sm font-medium text-gray-900">{item.title}</h4>
+                <p className="text-xs text-gray-500 mt-1">
+                  Level: {item.level}
+                </p>
+                <div className="mt-2 flex items-center gap-2">
+                  <span className="text-sm text-gray-500 line-through">
+                    {formatPrice(item.price || 0)}
+                  </span>
+                  <span className="text-sm font-medium text-green-600">
+                    {formatPrice(item.coursePrice)}
+                  </span>
+                  {item.discount && item.discount > 0 && (
+                    <span className="text-xs text-green-600">
+                      (-{item.discount}%)
+                    </span>
+                  )}
+                </div>
+              </div>
+            </div>
+            <div className="text-right">
+              <p className="text-sm font-medium text-gray-900">
+                {formatPrice(item.coursePrice)}
+              </p>
+              <p className="text-xs text-gray-500 mt-1">
+                {item.approvalStatus === "APPROVED" ? "Approved" : "Pending Approval"}
+              </p>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <div className="p-4 bg-gray-50 border-t border-gray-200">
+        <div className="flex justify-between items-center">
+          <div>
+            <p className="text-sm text-gray-500">Total Amount</p>
+            <p className="text-lg font-semibold text-gray-900">
+              {formatPrice(order.amount)}
+            </p>
+          </div>
+          {order.paymentStatus === "FAILED" && (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => onRetryPayment(order.id)}
+              disabled={isRetrying}
+              className="text-blue-600 hover:text-blue-700"
+            >
+              {isRetrying ? (
+                <>
+                  <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
+                  Retrying...
+                </>
+              ) : (
+                <>
+                  <RefreshCw className="w-4 h-4 mr-2" />
+                  Retry Payment
+                </>
+              )}
+            </Button>
+          )}
+        </div>
+      </div>
     </div>
   );
 }; 
