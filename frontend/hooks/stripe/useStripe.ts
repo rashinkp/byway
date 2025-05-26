@@ -61,8 +61,12 @@ export function useStripe() {
     onSuccess: (data) => {
       if (data.status === "success") {
         toast.success("Payment verified successfully!");
-        // Clear session ID from localStorage
         localStorage.removeItem('stripe_session_id');
+      } else if (data.webhook?.status === "failed") {
+        toast.error(data.webhook.failureReason || "Payment failed");
+        localStorage.removeItem('stripe_session_id');
+        // Redirect to failure page with error details
+        window.location.href = `/payment-failed?error=${encodeURIComponent(data.webhook.failureReason || "Payment failed")}`;
       } else {
         toast.error("Payment verification failed");
       }
@@ -71,6 +75,8 @@ export function useStripe() {
       toast.error("Failed to verify payment", {
         description: error.message || "Please contact support if this persists.",
       });
+      // Redirect to failure page on error
+      window.location.href = `/payment-failed?error=${encodeURIComponent(error.message || "Payment verification failed")}`;
     },
   });
 

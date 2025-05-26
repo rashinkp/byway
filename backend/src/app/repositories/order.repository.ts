@@ -15,10 +15,10 @@ export interface IOrderRepository {
   createOrder(userId: string, courses: any[], couponCode?: string): Promise<Order>;
   updateOrderStatus(
     orderId: string,
-    status: string,
-    paymentIntentId: string,
-    paymentGateway: "STRIPE" | "RAZORPAY" | null
-  ): Promise<Order>;
+    status: "PENDING" | "COMPLETED" | "FAILED" | "CANCELLED",
+    paymentId: string,
+    paymentGateway: string
+  ): Promise<void>;
   findMany(params: { where: any; skip: number; take: number; orderBy: any; include?: any }): Promise<Order[]>;
   count(where: any): Promise<number>;
   create(order: Order): Promise<Order>;

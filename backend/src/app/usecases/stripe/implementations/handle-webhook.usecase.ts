@@ -235,71 +235,56 @@ export class HandleWebhookUseCase implements IHandleWebhookUseCase {
     try {
       const paymentIntentId = this.webhookGateway.getPaymentIntentId(event);
       if (!paymentIntentId) {
-        throw new HttpError(
-          "Payment intent ID not found",
-          StatusCodes.BAD_REQUEST
-        );
+        throw new HttpError("Payment intent ID not found", StatusCodes.BAD_REQUEST);
       }
 
-      // Get metadata from the webhook gateway
-      const metadata = await this.webhookGateway.getCheckoutSessionMetadata(
-        paymentIntentId
-      );
-      const { userId, orderId, courses } = metadata;
-
       // Get failure reason
-      const failureReason =
-        event.data.object.failure_message ||
-        event.data.object.last_payment_error?.message ||
-        "Payment failed";
+      const failureReason = event.data.object.failure_message || 
+                          event.data.object.last_payment_error?.message || 
+                          "Payment failed";
 
+      // Get metadata from the webhook gateway
+      const metadata = await this.webhookGateway.getCheckoutSessionMetadata(paymentIntentId);
+      
       // If metadata is missing, return a basic response
-      if (!userId || !orderId) {
+      if (!metadata.userId || !metadata.orderId) {
         console.warn("Metadata missing, processing without order update:", {
-          userId,
-          orderId,
+          userId: metadata.userId,
+          orderId: metadata.orderId,
         });
         return this.createSuccessResponse("Payment failure processed", {
           webhook: {
             status: "failed",
             transactionId: paymentIntentId,
             failureReason,
-            redirectUrl: "/payment-failed",
+            redirectUrl: "/payment-failed"
           },
         });
       }
 
-      // Validate user exists
-      const user = await this.userRepository.findById(userId);
-      if (!user) {
-        console.error("User not found:", userId);
-        throw new HttpError("User not found", StatusCodes.NOT_FOUND);
-      }
-
       // Find order by orderId
-      const order = await this.orderRepository.findById(orderId);
+      const order = await this.orderRepository.findById(metadata.orderId);
       if (!order) {
-        console.error("Order not found:", orderId);
+        console.error("Order not found:", metadata.orderId);
         throw new HttpError("Order not found", StatusCodes.NOT_FOUND);
       }
 
       // Check for idempotency
       if (order.paymentStatus === "FAILED") {
-        console.log("Payment failure already processed:", orderId);
+        console.log("Payment failure already processed:", metadata.orderId);
         return this.createSuccessResponse("Payment failure already processed", {
           webhook: {
-            orderId: order.id,
             status: "failed",
             transactionId: paymentIntentId,
             failureReason,
-            redirectUrl: "/payment-failed",
+            redirectUrl: "/payment-failed"
           },
         });
       }
 
       // Update order status to FAILED
       await this.orderRepository.updateOrderStatus(
-        orderId,
+        metadata.orderId,
         "FAILED",
         paymentIntentId,
         "STRIPE"
@@ -319,11 +304,10 @@ export class HandleWebhookUseCase implements IHandleWebhookUseCase {
 
       return this.createSuccessResponse("Payment failure processed", {
         webhook: {
-          orderId: order.id,
           status: "failed",
           transactionId: paymentIntentId,
           failureReason,
-          redirectUrl: "/payment-failed",
+          redirectUrl: "/payment-failed"
         },
       });
     } catch (error) {

@@ -204,24 +204,19 @@ export class OrderRepository implements IOrderRepository {
 
   async updateOrderStatus(
     orderId: string,
-    status: string,
-    paymentIntentId: string,
-    paymentGateway: "STRIPE" | "RAZORPAY" | null
-  ): Promise<Order> {
-    const order = await this.prisma.order.update({
+    status: "PENDING" | "COMPLETED" | "FAILED" | "CANCELLED",
+    paymentId: string,
+    paymentGateway: "STRIPE" | "RAZORPAY"
+  ): Promise<void> {
+    await this.prisma.order.update({
       where: { id: orderId },
       data: {
-        paymentStatus: "COMPLETED",
-        paymentId: paymentIntentId,
-        paymentGateway,
+        paymentStatus: status as any,
+        paymentId,
+        paymentGateway: paymentGateway as any,
         updatedAt: new Date(),
       },
-      include: {
-        items: true,
-      },
     });
-
-    return this.mapToOrderEntity(order);
   }
 
   async findMany(params: { where: any; skip: number; take: number; orderBy: any; include?: any }): Promise<Order[]> {
