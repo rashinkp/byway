@@ -39,5 +39,9 @@ export function userRouter(userController: UserController): Router {
     expressAdapter(req, res, userController.getPublicUser.bind(userController))
   );
 
+  router.get("/admin/:userId", restrictTo("ADMIN"), (req, res) =>
+    expressAdapter(req, res, userController.getUserAdminDetails.bind(userController))
+  );
+
   return router;
 }

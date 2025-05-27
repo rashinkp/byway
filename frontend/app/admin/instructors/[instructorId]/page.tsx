@@ -19,110 +19,77 @@ import {
   ChevronDown,
   ChevronUp,
 } from "lucide-react";
-
-interface User {
-  id: string;
-  name: string;
-  email: string;
-  avatar?: string;
-  role: "USER" | "INSTRUCTOR" | "ADMIN";
-  authProvider: "EMAIL_PASSWORD" | "GOOGLE" | "FACEBOOK";
-  isVerified: boolean;
-  createdAt: string;
-  updatedAt: string;
-}
-
-interface InstructorDetails {
-  id: string;
-  userId: string;
-  totalStudents: number;
-  areaOfExpertise: string;
-  professionalExperience: string;
-  about?: string;
-  website?: string;
-  education: string;
-  certifications: string;
-  cv: string; // PDF URL
-  status: "PENDING" | "APPROVED" | "REJECTED";
-  createdAt: string;
-  updatedAt: string;
-}
-
-interface InstructorProfile {
-  user: User;
-  instructorDetails: InstructorDetails;
-  totalCourses: number;
-  totalReviews: number;
-  averageRating: number;
-}
+import { useParams, useRouter } from "next/navigation";
+import { useGetUserAdminDetails } from "@/hooks/user/useGetUserAdminDetails";
+import { useToggleDeleteUser } from "@/hooks/user/useToggleDeleteUser";
+import { approveInstructor, declineInstructor } from "@/api/instructor";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
+import { toast } from "sonner";
 
 const InstructorProfilePage: React.FC = () => {
+  const params = useParams();
+  const router = useRouter();
+  const { data: userData, isLoading, error, refetch } = useGetUserAdminDetails(params.instructorId as string);
+  const { mutate: toggleDeleteUser } = useToggleDeleteUser();
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [expandedSections, setExpandedSections] = useState({
-    about: true,
-    expertise: true,
-    experience: true,
-    education: true,
-    certifications: true,
+    about: false,
+    expertise: false,
+    experience: false,
+    education: false,
+    certifications: false,
   });
 
-  // Sample data - replace with actual data from your API
-  const instructorProfile: InstructorProfile = {
-    user: {
-      id: "1",
-      name: "Ronald Richards",
-      email: "ronald.richards@example.com",
-      avatar:
-        "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face",
-      role: "INSTRUCTOR",
-      authProvider: "EMAIL_PASSWORD",
-      isVerified: true,
-      createdAt: "2023-01-15T10:00:00Z",
-      updatedAt: "2024-01-20T15:30:00Z",
-    },
-    instructorDetails: {
-      id: "inst-1",
-      userId: "1",
-      totalStudents: 1000,
-      areaOfExpertise:
-        "User Experience (UX) Design, User Interface (UI) Design, Information Architecture, Interaction Design, Visual Design, Usability Testing, Wireframing and Prototyping, Design Thinking",
-      professionalExperience:
-        "Ronald Richards has an extensive professional background in UX/UI design, having worked with renowned companies such as Google, Apple, and Microsoft. His portfolio includes a diverse range of projects spanning web applications, mobile apps, and e-commerce platforms. With over 10 years of industry experience, Ronald has led design teams and collaborated with cross-functional teams to deliver user-centered solutions that drive business growth.",
-      about:
-        "Ronald Richard is a highly skilled UX/UI Designer with over a decade of experience in crafting user-centric digital solutions. With a background in graphic design and a keen eye for detail, Ronald specializes in creating intuitive interfaces that delight users and drive business results.",
-      website: "https://ronaldrichards.design",
-      education:
-        "Master of Fine Arts in Graphic Design - Stanford University (2010-2012), Bachelor of Arts in Visual Communication - University of California, Berkeley (2006-2010)",
-      certifications:
-        "Certified Usability Analyst (CUA) - Human Factors International, Google UX Design Professional Certificate, Adobe Certified Expert (ACE) in Adobe XD, Scrum Master Certification (CSM)",
-      cv: "https://example.com/ronald-richards-cv.pdf",
-      status: "PENDING",
-      createdAt: "2023-01-15T10:00:00Z",
-      updatedAt: "2024-01-20T15:30:00Z",
-    },
-    totalCourses: 154,
-    totalReviews: 154,
-    averageRating: 4.8,
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
+
+  if (error || !userData) {
+    return <div>Error loading instructor profile</div>;
+  }
+
+  const instructorProfile = userData.instructor;
+  if (!instructorProfile) {
+    return <div>Not an instructor</div>;
+  }
+
+  const handleApprove = async () => {
+    try {
+      await approveInstructor(instructorProfile.id);
+      // Refresh data after approval
+      window.location.reload();
+    } catch (error) {
+      console.error("Error approving instructor:", error);
+    }
   };
 
-  const handleApprove = () => {
-    console.log("Approving instructor:", instructorProfile.user.id);
-    // Implement approval logic
-  };
-
-  const handleDecline = () => {
-    console.log("Declining instructor:", instructorProfile.user.id);
-    // Implement decline logic
+  const handleDecline = async () => {
+    try {
+      await declineInstructor(instructorProfile.id);
+      // Refresh data after decline
+      window.location.reload();
+    } catch (error) {
+      console.error("Error declining instructor:", error);
+    }
   };
 
   const handleDelete = () => {
-    console.log("Deleting instructor:", instructorProfile.user.id);
-    setShowDeleteModal(false);
-    // Implement delete logic
+    if (userData) {
+      toggleDeleteUser(userData, {
+        onSuccess: () => {
+          setShowDeleteModal(false);
+          refetch();
+        }
+      });
+    }
   };
 
   const handleDownloadCV = () => {
-    window.open(instructorProfile.instructorDetails.cv, "_blank");
+    if (instructorProfile.cv && instructorProfile.cv !== "No CV provided") {
+      window.open(instructorProfile.cv, "_blank");
+    } else {
+      toast.error("No CV available for download");
+    }
   };
 
   const toggleSection = (section: keyof typeof expandedSections) => {
@@ -137,6 +104,8 @@ const InstructorProfilePage: React.FC = () => {
       PENDING: { bg: "bg-yellow-100", text: "text-yellow-800", icon: Clock },
       APPROVED: { bg: "bg-green-100", text: "text-green-800", icon: Check },
       REJECTED: { bg: "bg-red-100", text: "text-red-800", icon: X },
+      ENABLED: { bg: "bg-green-100", text: "text-green-800", icon: Check },
+      DISABLED: { bg: "bg-red-100", text: "text-red-800", icon: X },
     };
 
     const config = statusConfig[status as keyof typeof statusConfig];
@@ -183,7 +152,11 @@ const InstructorProfilePage: React.FC = () => {
       </button>
       {expandedSections[sectionKey] && (
         <div className="px-6 py-4">
-          <p className="text-gray-700 leading-relaxed">{content}</p>
+          {content ? (
+            <p className="text-gray-700 leading-relaxed">{content}</p>
+          ) : (
+            <p className="text-gray-500 italic">No {title.toLowerCase()} information provided</p>
+          )}
         </div>
       )}
     </div>
@@ -199,72 +172,33 @@ const InstructorProfilePage: React.FC = () => {
               <div className="flex items-start space-x-6">
                 <div className="relative">
                   <img
-                    src={
-                      instructorProfile.user.avatar ||
-                      "/api/placeholder/120/120"
-                    }
-                    alt={instructorProfile.user.name}
+                    src={userData.avatar || "/api/placeholder/120/120"}
+                    alt={userData.name}
                     className="w-24 h-24 rounded-full object-cover border-4 border-white shadow-lg"
                   />
-                  {instructorProfile.user.isVerified && (
-                    <div className="absolute -bottom-2 -right-2 bg-green-500 rounded-full p-1">
-                      <Check className="w-4 h-4 text-white" />
-                    </div>
-                  )}
                 </div>
                 <div className="flex-1">
                   <div className="flex items-center space-x-3 mb-2">
                     <h1 className="text-3xl font-bold text-gray-900">
-                      {instructorProfile.user.name}
+                      {userData.name}
                     </h1>
-                    {getStatusBadge(instructorProfile.instructorDetails.status)}
+                    {getStatusBadge(instructorProfile.status)}
+                    {getStatusBadge(userData.deletedAt ? "DISABLED" : "ENABLED")}
                   </div>
                   <p className="text-gray-600 mb-4">
-                    Web Developer, UX/UI Designer, and Teacher
+                    {instructorProfile.areaOfExpertise.split(',')[0]}
                   </p>
-
-                  <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-4">
-                    <div className="text-center">
-                      <div className="text-2xl font-bold text-gray-900">
-                        {instructorProfile.instructorDetails.totalStudents}
-                      </div>
-                      <div className="text-sm text-gray-500">
-                        Total Students
-                      </div>
-                    </div>
-                    <div className="text-center">
-                      <div className="text-2xl font-bold text-gray-900">
-                        {instructorProfile.totalReviews}
-                      </div>
-                      <div className="text-sm text-gray-500">Reviews</div>
-                    </div>
-                    <div className="text-center">
-                      <div className="text-2xl font-bold text-gray-900">
-                        {instructorProfile.totalCourses}
-                      </div>
-                      <div className="text-sm text-gray-500">Courses</div>
-                    </div>
-                    <div className="text-center">
-                      <div className="flex items-center justify-center space-x-1">
-                        <Star className="w-5 h-5 text-yellow-400 fill-current" />
-                        <span className="text-2xl font-bold text-gray-900">
-                          {instructorProfile.averageRating}
-                        </span>
-                      </div>
-                      <div className="text-sm text-gray-500">Rating</div>
-                    </div>
-                  </div>
 
                   <div className="flex items-center space-x-6 text-sm text-gray-600">
                     <div className="flex items-center">
                       <Mail className="w-4 h-4 mr-2" />
-                      {instructorProfile.user.email}
+                      {userData.email}
                     </div>
-                    {instructorProfile.instructorDetails.website && (
+                    {instructorProfile.website && (
                       <div className="flex items-center">
                         <Globe className="w-4 h-4 mr-2" />
                         <a
-                          href={instructorProfile.instructorDetails.website}
+                          href={instructorProfile.website}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="text-blue-600 hover:text-blue-800"
@@ -275,7 +209,7 @@ const InstructorProfilePage: React.FC = () => {
                     )}
                     <div className="flex items-center">
                       <Calendar className="w-4 h-4 mr-2" />
-                      Joined {formatDate(instructorProfile.user.createdAt)}
+                      Joined {formatDate(userData.createdAt)}
                     </div>
                   </div>
                 </div>
@@ -283,7 +217,7 @@ const InstructorProfilePage: React.FC = () => {
 
               {/* Admin Actions */}
               <div className="flex flex-col space-y-3">
-                {instructorProfile.instructorDetails.status === "PENDING" && (
+                {instructorProfile.status === "PENDING" && (
                   <>
                     <button
                       onClick={handleApprove}
@@ -303,17 +237,30 @@ const InstructorProfilePage: React.FC = () => {
                 )}
                 <button
                   onClick={handleDownloadCV}
-                  className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                  className={`flex items-center px-4 py-2 ${
+                    instructorProfile.cv && instructorProfile.cv !== "No CV provided"
+                      ? "bg-blue-600 hover:bg-blue-700"
+                      : "bg-gray-400 cursor-not-allowed"
+                  } text-white rounded-lg transition-colors`}
+                  disabled={!instructorProfile.cv || instructorProfile.cv === "No CV provided"}
                 >
                   <Download className="w-4 h-4 mr-2" />
-                  Download CV
+                  {instructorProfile.cv && instructorProfile.cv !== "No CV provided" ? "Download CV" : "No CV Available"}
                 </button>
                 <button
                   onClick={() => setShowDeleteModal(true)}
-                  className="flex items-center px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
+                  className={`flex items-center px-4 py-2 ${
+                    userData.deletedAt 
+                      ? "bg-green-600 hover:bg-green-700" 
+                      : "bg-red-600 hover:bg-red-700"
+                  } text-white rounded-lg transition-colors`}
                 >
-                  <Trash2 className="w-4 h-4 mr-2" />
-                  Delete
+                  {userData.deletedAt ? (
+                    <Check className="w-4 h-4 mr-2" />
+                  ) : (
+                    <X className="w-4 h-4 mr-2" />
+                  )}
+                  {userData.deletedAt ? "Enable" : "Disable"}
                 </button>
               </div>
             </div>
@@ -322,10 +269,10 @@ const InstructorProfilePage: React.FC = () => {
 
         {/* Content Sections */}
         <div className="space-y-6">
-          {instructorProfile.instructorDetails.about && (
+          {instructorProfile.about && (
             <ExpandableSection
-              title="About Ronald Richards"
-              content={instructorProfile.instructorDetails.about}
+              title="About"
+              content={instructorProfile.about}
               sectionKey="about"
               icon={User}
             />
@@ -333,31 +280,180 @@ const InstructorProfilePage: React.FC = () => {
 
           <ExpandableSection
             title="Areas of Expertise"
-            content={instructorProfile.instructorDetails.areaOfExpertise}
+            content={instructorProfile.areaOfExpertise}
             sectionKey="expertise"
             icon={Award}
           />
 
           <ExpandableSection
             title="Professional Experience"
-            content={instructorProfile.instructorDetails.professionalExperience}
+            content={instructorProfile.professionalExperience}
             sectionKey="experience"
             icon={BookOpen}
           />
 
           <ExpandableSection
             title="Education"
-            content={instructorProfile.instructorDetails.education}
+            content={instructorProfile.education}
             sectionKey="education"
             icon={Award}
           />
 
           <ExpandableSection
             title="Certifications"
-            content={instructorProfile.instructorDetails.certifications}
+            content={instructorProfile.certifications}
             sectionKey="certifications"
             icon={FileText}
           />
+
+          {/* Personal Information */}
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+            <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+              <User className="w-5 h-5 text-blue-600 mr-3" />
+              Personal Information
+            </h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {userData.bio ? (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Bio
+                  </label>
+                  <p className="text-gray-900">{userData.bio}</p>
+                </div>
+              ) : (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Bio
+                  </label>
+                  <p className="text-gray-500 italic">No bio provided</p>
+                </div>
+              )}
+              {userData.skills ? (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Skills
+                  </label>
+                  <div className="flex flex-wrap gap-2">
+                    {userData.skills.split(',').map((skill, index) => (
+                      <span
+                        key={index}
+                        className="px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-sm"
+                      >
+                        {skill.trim()}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              ) : (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Skills
+                  </label>
+                  <p className="text-gray-500 italic">No skills provided</p>
+                </div>
+              )}
+              {userData.phoneNumber ? (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Phone Number
+                  </label>
+                  <p className="text-gray-900">{userData.phoneNumber}</p>
+                </div>
+              ) : (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Phone Number
+                  </label>
+                  <p className="text-gray-500 italic">No phone number provided</p>
+                </div>
+              )}
+              {userData.dateOfBirth ? (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Date of Birth
+                  </label>
+                  <p className="text-gray-900">{formatDate(userData.dateOfBirth)}</p>
+                </div>
+              ) : (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Date of Birth
+                  </label>
+                  <p className="text-gray-500 italic">No date of birth provided</p>
+                </div>
+              )}
+              {userData.gender ? (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Gender
+                  </label>
+                  <p className="text-gray-900">{userData.gender}</p>
+                </div>
+              ) : (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Gender
+                  </label>
+                  <p className="text-gray-500 italic">No gender provided</p>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Location Information */}
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+            <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+              <Globe className="w-5 h-5 text-blue-600 mr-3" />
+              Location Information
+            </h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {userData.country ? (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Country
+                  </label>
+                  <p className="text-gray-900">{userData.country}</p>
+                </div>
+              ) : (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Country
+                  </label>
+                  <p className="text-gray-500 italic">No country provided</p>
+                </div>
+              )}
+              {userData.city ? (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    City
+                  </label>
+                  <p className="text-gray-900">{userData.city}</p>
+                </div>
+              ) : (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    City
+                  </label>
+                  <p className="text-gray-500 italic">No city provided</p>
+                </div>
+              )}
+              {userData.address ? (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Address
+                  </label>
+                  <p className="text-gray-900">{userData.address}</p>
+                </div>
+              ) : (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Address
+                  </label>
+                  <p className="text-gray-500 italic">No address provided</p>
+                </div>
+              )}
+            </div>
+          </div>
 
           {/* Account Information */}
           <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
@@ -371,47 +467,21 @@ const InstructorProfilePage: React.FC = () => {
                   User ID
                 </label>
                 <p className="text-gray-900 font-mono text-sm">
-                  {instructorProfile.user.id}
-                </p>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Auth Provider
-                </label>
-                <p className="text-gray-900">
-                  {instructorProfile.user.authProvider.replace("_", " ")}
+                  {userData.id}
                 </p>
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Role
                 </label>
-                <p className="text-gray-900">{instructorProfile.user.role}</p>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Verification Status
-                </label>
-                <p className="text-gray-900">
-                  {instructorProfile.user.isVerified ? (
-                    <span className="inline-flex items-center text-green-600">
-                      <Check className="w-4 h-4 mr-1" />
-                      Verified
-                    </span>
-                  ) : (
-                    <span className="inline-flex items-center text-red-600">
-                      <X className="w-4 h-4 mr-1" />
-                      Not Verified
-                    </span>
-                  )}
-                </p>
+                <p className="text-gray-900">{userData.role}</p>
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Created At
                 </label>
                 <p className="text-gray-900">
-                  {formatDate(instructorProfile.user.createdAt)}
+                  {formatDate(userData.createdAt)}
                 </p>
               </div>
               <div>
@@ -419,7 +489,7 @@ const InstructorProfilePage: React.FC = () => {
                   Last Updated
                 </label>
                 <p className="text-gray-900">
-                  {formatDate(instructorProfile.user.updatedAt)}
+                  {formatDate(userData.updatedAt)}
                 </p>
               </div>
             </div>
@@ -427,43 +497,22 @@ const InstructorProfilePage: React.FC = () => {
         </div>
 
         {/* Delete Modal */}
-        {showDeleteModal && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
-              <div className="flex items-center mb-4">
-                <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center mr-4">
-                  <AlertCircle className="w-6 h-6 text-red-600" />
-                </div>
-                <div>
-                  <h3 className="text-lg font-semibold text-gray-900">
-                    Delete Instructor
-                  </h3>
-                  <p className="text-gray-600">This action cannot be undone.</p>
-                </div>
-              </div>
-              <p className="text-gray-700 mb-6">
-                Are you sure you want to delete{" "}
-                <strong>{instructorProfile.user.name}</strong>? This will
-                permanently remove their profile, courses, and all associated
-                data.
-              </p>
-              <div className="flex space-x-3">
-                <button
-                  onClick={handleDelete}
-                  className="flex-1 bg-red-600 text-white py-2 px-4 rounded-lg hover:bg-red-700 transition-colors"
-                >
-                  Delete
-                </button>
-                <button
-                  onClick={() => setShowDeleteModal(false)}
-                  className="flex-1 bg-gray-300 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-400 transition-colors"
-                >
-                  Cancel
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
+        <AlertDialog open={showDeleteModal} onOpenChange={setShowDeleteModal}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Delete Instructor</AlertDialogTitle>
+              <AlertDialogDescription>
+                Are you sure you want to {userData?.deletedAt ? "enable" : "disable"} the instructor "{userData?.name || userData?.email}"?
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Cancel</AlertDialogCancel>
+              <AlertDialogAction onClick={handleDelete}>
+                {userData?.deletedAt ? "Enable" : "Disable"}
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       </div>
     </div>
   );

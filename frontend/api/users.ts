@@ -1,6 +1,7 @@
 import { api } from "@/api/api";
 import { ApiResponse, IPaginatedResponse } from "@/types/apiResponse";
 import { PublicUser, User } from "@/types/user";
+import { IInstructorWithUserDetails } from "@/types/instructor";
 
 export const getAllUsers = async ({
   page = 1,
@@ -100,15 +101,26 @@ export async function updateUser(data: {
 }
 
 
- export async function getPublicUser(userId: string): Promise<PublicUser> {
-   try {
-     const response = await api.get<{ data: PublicUser }>(
-       `/user/${userId}/public`
-     );
-     return response.data.data;
-   } catch (error: any) {
-     throw new Error(
-       error.response?.data?.message || "Failed to fetch public user data"
-     );
-   }
- }
+export async function getPublicUser(userId: string): Promise<PublicUser> {
+  try {
+    const response = await api.get<{ data: PublicUser }>(
+      `/user/${userId}/public`
+    );
+    return response.data.data;
+  } catch (error: any) {
+    throw new Error(
+      error.response?.data?.message || "Failed to fetch public user data"
+    );
+  }
+}
+
+export async function getUserAdminDetails(userId: string): Promise<User & { instructor: IInstructorWithUserDetails | null }> {
+  try {
+    const response = await api.get(`/user/admin/${userId}`);
+    return response.data.data;
+  } catch (error: any) {
+    throw new Error(
+      error.response?.data?.message || "Failed to fetch user admin details"
+    );
+  }
+}

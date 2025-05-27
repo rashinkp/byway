@@ -5,6 +5,7 @@ import { ToggleDeleteUserUseCase } from "../app/usecases/user/implementations/to
 import { GetUserByIdUseCase } from "../app/usecases/user/implementations/get-user-by-id.usecase";
 import { UpdateUserUseCase } from "../app/usecases/user/implementations/update-user.usecase";
 import { GetPublicUserUseCase } from "../app/usecases/user/implementations/get-user-public.usecase";
+import { GetUserAdminDetailsUseCase } from "../app/usecases/user/implementations/get-user-admin-details.usecase";
 import { SharedDependencies } from "./shared.dependencies";
 
 export interface UserDependencies {
@@ -14,7 +15,7 @@ export interface UserDependencies {
 export function createUserDependencies(
   deps: SharedDependencies
 ): UserDependencies {
-  const { userRepository } = deps;
+  const { userRepository, instructorRepository } = deps;
 
   // Initialize use cases
   const getAllUsersUseCase = new GetAllUsersUseCase(userRepository);
@@ -23,6 +24,7 @@ export function createUserDependencies(
   const getUserByIdUseCase = new GetUserByIdUseCase(userRepository);
   const updateUserUseCase = new UpdateUserUseCase(userRepository);
   const getPublicUserUseCase = new GetPublicUserUseCase(userRepository);
+  const getUserAdminDetailsUseCase = new GetUserAdminDetailsUseCase(userRepository, instructorRepository);
 
   // Initialize controller
   const userController = new UserController(
@@ -32,6 +34,7 @@ export function createUserDependencies(
     getUserByIdUseCase,
     updateUserUseCase,
     getPublicUserUseCase,
+    getUserAdminDetailsUseCase,
     deps.httpErrors,
     deps.httpSuccess
   );

@@ -16,17 +16,23 @@ export function useToggleDeleteUser() {
         return result;
       } else {
         await deleteUser(user.id);
-        return user;
+        return {
+          ...user,
+          deletedAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+        };
       }
     },
     onMutate: async (user) => {
       // Cancel any outgoing refetches
       await queryClient.cancelQueries({ queryKey: ["users"] });
+      await queryClient.cancelQueries({ queryKey: ["user-admin-details", user.id] });
       
       // Get the current data
-      const previousData = queryClient.getQueryData<ApiResponse<IPaginatedResponse<User>>>(["users"]);
+      const previousUsersData = queryClient.getQueryData<ApiResponse<IPaginatedResponse<User>>>(["users"]);
+      const previousUserDetails = queryClient.getQueryData<User>(["user-admin-details", user.id]);
       
-      // Optimistically update the cache
+      // Optimistically update the users list cache
       queryClient.setQueryData<ApiResponse<IPaginatedResponse<User>>>(["users"], (old) => {
         if (!old || !old.data || !old.data.items) {
           return old;
@@ -40,8 +46,8 @@ export function useToggleDeleteUser() {
               u.id === user.id
                 ? {
                     ...u,
-                    deletedAt: !u.deletedAt ? new Date() : null,
-                    updatedAt: new Date(),
+                    deletedAt: !u.deletedAt ? new Date().toISOString() : null,
+                    updatedAt: new Date().toISOString(),
                   }
                 : u
             ),
@@ -49,25 +55,40 @@ export function useToggleDeleteUser() {
         };
       });
 
-      return { previousData };
+      // Optimistically update the user details cache
+      queryClient.setQueryData<User>(["user-admin-details", user.id], (old) => {
+        if (!old) return old;
+        return {
+          ...old,
+          deletedAt: !old.deletedAt ? new Date().toISOString() : null,
+          updatedAt: new Date().toISOString(),
+        };
+      });
+
+      return { previousUsersData, previousUserDetails };
     },
     onSuccess: (updatedUser, user) => {
-      // Update the cache with the actual response
+      // Update the users list cache with the actual response
       queryClient.setQueryData<ApiResponse<IPaginatedResponse<User>>>(["users"], (old) => {
         if (!old || !old.data || !old.data.items) {
           return old;
         }
         
+        const updatedItems = old.data.items.map((u) =>
+          u.id === user.id ? updatedUser as User : u
+        );
+        
         return {
           ...old,
           data: {
             ...old.data,
-            items: old.data.items.map((u) =>
-              u.id === user.id ? updatedUser : u
-            ),
+            items: updatedItems,
           },
         };
       });
+
+      // Update the user details cache
+      queryClient.setQueryData<User>(["user-admin-details", user.id], updatedUser as User);
       
       toast.success(
         user.deletedAt ? "User unblocked successfully" : "User blocked successfully", {
@@ -79,8 +100,11 @@ export function useToggleDeleteUser() {
     },
     onError: (error: any, user, context: any) => {
       // Revert to the previous state on error
-      if (context?.previousData) {
-        queryClient.setQueryData(["users"], context.previousData);
+      if (context?.previousUsersData) {
+        queryClient.setQueryData(["users"], context.previousUsersData);
+      }
+      if (context?.previousUserDetails) {
+        queryClient.setQueryData(["user-admin-details", user.id], context.previousUserDetails);
       }
       
       toast.error(
@@ -91,8 +115,9 @@ export function useToggleDeleteUser() {
       );
     },
     onSettled: () => {
-      // Invalidate and refetch
+      // Invalidate and refetch both queries
       queryClient.invalidateQueries({ queryKey: ["users"] });
+      queryClient.invalidateQueries({ queryKey: ["user-admin-details"] });
     },
   });
 }

@@ -55,7 +55,7 @@ export default function InstructorsPage() {
       actions={[
         {
           label: "View Details",
-          onClick: (instructor) => router.push(`/admin/instructor/${instructor.id}`),
+          onClick: (instructor) => router.push(`/admin/instructors/${instructor.id}`),
           variant: "outline",
           Icon: Info,
         },

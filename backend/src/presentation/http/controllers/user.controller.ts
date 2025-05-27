@@ -4,6 +4,7 @@ import { IGetCurrentUserUseCase } from "../../../app/usecases/user/interfaces/ge
 import { IGetUserByIdUseCase } from "../../../app/usecases/user/interfaces/get-user-by-id.usecase.interface";
 import { IUpdateUserUseCase } from "../../../app/usecases/user/interfaces/update-user.usecase.interface";
 import { IGetPublicUserUseCase } from "../../../app/usecases/user/interfaces/get-user-public.usecase.interface";
+import { IGetUserAdminDetailsUseCase } from "../../../app/usecases/user/interfaces/get-user-admin-details.usecase.interface";
 import {
   ApiResponse,
   PublicUserResponse,
@@ -34,6 +35,7 @@ export class UserController extends BaseController {
     private getUserByIdUseCase: IGetUserByIdUseCase,
     private updateUserUseCase: IUpdateUserUseCase,
     private getPublicUserUseCase: IGetPublicUserUseCase,
+    private getUserAdminDetailsUseCase: IGetUserAdminDetailsUseCase,
     httpErrors: IHttpErrors,
     httpSuccess: IHttpSuccess
   ) {
@@ -209,6 +211,48 @@ export class UserController extends BaseController {
         country: profile?.country,
         city: profile?.city,
       }, "Public user retrieved successfully");
+    });
+  }
+
+  async getUserAdminDetails(httpRequest: IHttpRequest): Promise<IHttpResponse> {
+    return this.handleRequest(httpRequest, async (request) => {
+      if (!request.params.userId) {
+        throw new BadRequestError("User ID is required");
+      }
+      const validated = validateGetUser({ userId: request.params.userId });
+      const { user, profile, instructor } = await this.getUserAdminDetailsUseCase.execute(validated);
+      if (!user) {
+        throw new HttpError("User not found", 404);
+      }
+      return this.success_200({
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        avatar: user.avatar,
+        bio: profile?.bio,
+        education: profile?.education,
+        skills: profile?.skills,
+        phoneNumber: profile?.phoneNumber,
+        country: profile?.country,
+        city: profile?.city,
+        address: profile?.address,
+        dateOfBirth: profile?.dateOfBirth,
+        gender: profile?.gender,
+        deletedAt: user.deletedAt,
+        createdAt: user.createdAt,
+        updatedAt: user.updatedAt,
+        instructor: instructor ? {
+          id: instructor.id,
+          areaOfExpertise: instructor.areaOfExpertise,
+          professionalExperience: instructor.professionalExperience,
+          about: instructor.about,
+          website: instructor.website,
+          cv: instructor.cv,
+          status: instructor.status,
+          totalStudents: instructor.totalStudents,
+        } : null,
+      }, "User admin details retrieved successfully");
     });
   }
 }
