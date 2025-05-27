@@ -14,6 +14,7 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog";
 import { Clock } from "lucide-react";
+import { useFileUpload } from "@/hooks/file/useFileUpload";
 
 export const instructorSchema = z.object({
   
@@ -47,7 +48,7 @@ export const instructorSchema = z.object({
 
 export type InstructorFormData = z.infer<typeof instructorSchema>;
 
-type InstructorSubmitData = Omit<InstructorFormData, 'cv'> & {
+export type InstructorSubmitData = Omit<InstructorFormData, 'cv'> & {
   cv: string;
 };
 
@@ -128,6 +129,7 @@ export function InstructorFormModal({
   const { data: instructorData, isLoading: isInstructorLoading } =
     useGetInstructorByUserId(open);
   const [timeLeft, setTimeLeft] = useState<number | null>(null);
+  const { uploadFile, isUploading } = useFileUpload();
 
   useEffect(() => {
     if (
@@ -161,17 +163,14 @@ export function InstructorFormModal({
 
   const handleSubmit = async (data: InstructorFormData) => {
     try {
-      // Convert File to base64 string before submitting
-      const cvBase64 = await new Promise<string>((resolve) => {
-        const reader = new FileReader();
-        reader.onloadend = () => resolve(reader.result as string);
-        reader.readAsDataURL(data.cv);
-      });
+      // Upload the file first
+      const fileUrl = await uploadFile(data.cv);
 
+      // Submit the form with the file URL
       await onSubmit({
         ...data,
-        cv: cvBase64,
-      } as InstructorSubmitData);
+        cv: fileUrl,
+      });
     } catch (error: any) {
       console.error("Error submitting form:", error);
     }
@@ -248,7 +247,7 @@ export function InstructorFormModal({
       submitText="Submit Application"
       fields={fields}
       description="Fill out the form below to apply as an instructor."
-      isSubmitting={isSubmitting || isInstructorLoading}
+      isSubmitting={isSubmitting || isInstructorLoading || isUploading}
     />
   );
 }

@@ -21,8 +21,8 @@ import {
 } from "lucide-react";
 import { useState, useCallback, useEffect } from "react";
 import {
-  InstructorFormData,
   InstructorFormModal,
+  InstructorSubmitData,
 } from "@/components/instructor/InstructorAdd";
 import {
   DropdownMenu,
@@ -35,6 +35,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/utils/cn";
 import { useRouter } from "next/navigation";
+import { getPresignedUrl, uploadFileToS3 } from "@/api/file";
 
 interface HeaderProps {
   client?: { id: string; name: string };
@@ -53,7 +54,7 @@ export function Header({ client }: HeaderProps = {}) {
   const router = useRouter();
 
   const handleInstructorSubmit = useCallback(
-    async (data: InstructorFormData): Promise<void> => {
+    async (data: InstructorSubmitData): Promise<void> => {
       return new Promise((resolve) => {
         createInstructor(data, {
           onSuccess: () => {
