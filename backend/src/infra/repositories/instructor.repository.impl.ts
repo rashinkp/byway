@@ -2,13 +2,14 @@ import { PrismaClient } from "@prisma/client";
 import { Instructor } from "../../domain/entities/instructor.entity";
 import { APPROVALSTATUS } from "../../domain/enum/approval-status.enum";
 import { IInstructorRepository } from "../../app/repositories/instructor.repository";
+
 export class InstructorRepository implements IInstructorRepository {
   constructor(private prisma: PrismaClient) {}
 
   async createInstructor(instructor: Instructor): Promise<Instructor> {
     const upserted = await this.prisma.instructorDetails.upsert({
       where: {
-        userId: instructor.userId, // Use instructor.userId instead of instructor.id
+        userId: instructor.userId,
       },
       update: {
         userId: instructor.userId,
@@ -16,6 +17,9 @@ export class InstructorRepository implements IInstructorRepository {
         professionalExperience: instructor.professionalExperience,
         about: instructor.about,
         website: instructor.website,
+        education: instructor.education,
+        certifications: instructor.certifications,
+        cv: instructor.cv,
         status: instructor.status,
         totalStudents: instructor.totalStudents,
         updatedAt: new Date(),
@@ -26,10 +30,13 @@ export class InstructorRepository implements IInstructorRepository {
         professionalExperience: instructor.professionalExperience,
         about: instructor.about,
         website: instructor.website,
+        education: instructor.education,
+        certifications: instructor.certifications,
+        cv: instructor.cv,
         status: instructor.status,
         totalStudents: instructor.totalStudents,
-        createdAt: instructor.createdAt || new Date(), // Provide default if null
-        updatedAt: instructor.updatedAt || new Date(), // Provide default if null
+        createdAt: instructor.createdAt || new Date(),
+        updatedAt: instructor.updatedAt || new Date(),
       },
     });
 
@@ -44,6 +51,9 @@ export class InstructorRepository implements IInstructorRepository {
         professionalExperience: instructor.professionalExperience,
         about: instructor.about,
         website: instructor.website,
+        education: instructor.education,
+        certifications: instructor.certifications,
+        cv: instructor.cv,
         status: instructor.status,
         totalStudents: instructor.totalStudents,
         updatedAt: instructor.updatedAt,
@@ -89,7 +99,7 @@ export class InstructorRepository implements IInstructorRepository {
     const totalPages = Math.ceil(total / limit);
 
     return {
-      items: instructors.map(Instructor.fromPrisma),
+      items: instructors.map((instructor) => Instructor.fromPrisma(instructor)),
       total,
       totalPages,
     };

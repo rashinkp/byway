@@ -6,6 +6,9 @@ export interface CreateInstructorRequestDTO {
   professionalExperience: string;
   about?: string;
   website?: string;
+  education: string;
+  certifications: string;
+  cv: string;
 }
 
 export interface UpdateInstructorRequestDTO {
@@ -14,6 +17,9 @@ export interface UpdateInstructorRequestDTO {
   professionalExperience?: string;
   about?: string;
   website?: string;
+  education?: string;
+  certifications?: string;
+  cv?: string;
   status?: APPROVALSTATUS;
 }
 
@@ -42,6 +48,9 @@ export interface InstructorResponseDTO {
   professionalExperience: string;
   about?: string;
   website?: string;
+  education: string;
+  certifications: string;
+  cv: string;
   status: APPROVALSTATUS;
   totalStudents: number;
   createdAt: Date;
@@ -61,6 +70,8 @@ export interface PublicInstructorResponseDTO {
   areaOfExpertise: string;
   about?: string;
   website?: string;
+  education: string;
+  certifications: string;
   user: {
     id: string;
     name: string;

@@ -74,12 +74,14 @@ model InstructorDetails {
   areaOfExpertise        String
   professionalExperience String
   about                  String?
-  status                APPROVALSTATUS @default(PENDING)
   website                String?
+  education              String   // Education details as text
+  certifications         String   // Certifications as text
+  cv                     String   // URL to CV file
+  status                APPROVALSTATUS @default(PENDING)
   createdAt              DateTime @default(now())
   updatedAt              DateTime @updatedAt
   user                   User     @relation("UserToInstructorDetails", fields: [userId], references: [id], onDelete: Cascade)
- 
 }
 
 

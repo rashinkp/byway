@@ -10,6 +10,7 @@ import { createCartDependencies } from "./cart.dependencies";
 import { createStripeDependencies } from "./stripe.dependencies";
 import { createTransactionDependencies } from "./transaction.dependencies";
 import { createOrderDependencies } from "./order.dependencies";
+import { createFileDependencies } from "./file.dependencies";
 
 export interface AppDependencies {
   authController: any;
@@ -23,6 +24,7 @@ export interface AppDependencies {
   stripeController: any;
   transactionController: any;
   orderController: any;
+  fileController: any;
 }
 
 export function createAppDependencies(): AppDependencies {
@@ -39,6 +41,7 @@ export function createAppDependencies(): AppDependencies {
   const stripeDeps = createStripeDependencies(sharedDeps);
   const transactionDeps = createTransactionDependencies(sharedDeps);
   const orderDeps = createOrderDependencies(sharedDeps);
+  const fileDeps = createFileDependencies(sharedDeps);
 
   return {
     authController: authDeps.authController,
@@ -51,6 +54,7 @@ export function createAppDependencies(): AppDependencies {
     cartController: cartDeps.cartController,
     stripeController: stripeDeps.stripeController,
     transactionController: transactionDeps.transactionController,
-    orderController: orderDeps.orderController
+    orderController: orderDeps.orderController,
+    fileController: fileDeps.fileController
   };
 }

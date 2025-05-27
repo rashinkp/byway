@@ -1,4 +1,4 @@
-import { WebhookGateway } from "../../domain/interfaces/webhook-gateway.interface";
+import { WebhookGateway } from "../../app/providers/webhook-gateway.interface";
 import { WebhookEvent } from "../../domain/value-object/webhook-event.value-object";
 import { WebhookMetadata } from "../../domain/value-object/webhook-metadata.value-object";
 import Stripe from "stripe";
@@ -112,4 +112,4 @@ export class StripeWebhookGateway implements WebhookGateway {
       });
     }
   }
-} 
+}

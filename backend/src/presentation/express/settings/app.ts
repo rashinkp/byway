@@ -18,6 +18,7 @@ import { stripeRouter } from "../router/stripe.router";
 import { transactionRouter } from "../router/transaction.router";
 import { orderRouter } from "../router/order.router";
 import { expressAdapter } from "../../adapters/express.adapter";
+import { fileRouter } from "../router/file.router";
 
 export const createApp = (): Application => {
   const app = express();
@@ -34,13 +35,20 @@ export const createApp = (): Application => {
     stripeController,
     transactionController,
     orderController,
+    fileController
   } = createAppDependencies();
+
 
   // Stripe webhook route - must be before any middleware
   app.post(
     "/api/v1/stripe/webhook",
     express.raw({ type: "application/json" }),
-    (req, res) => expressAdapter(req, res, stripeController.handleWebhook.bind(stripeController))
+    (req, res) =>
+      expressAdapter(
+        req,
+        res,
+        stripeController.handleWebhook.bind(stripeController)
+      )
   );
 
   // Middlewares
@@ -50,11 +58,6 @@ export const createApp = (): Application => {
   app.use(express.urlencoded({ extended: true }));
   app.use(morgan("dev"));
 
-  // Routers
-  // app.use("/api/admin", adminRouter);
-  // app.use("/api/tutor", tutorRouter);
-  // app.use("/api/learner", learnerRouter);
-  // app.use("/api/courses", courseRouter);
   app.use("/api/v1/auth", authRouter(authController));
   app.use("/api/v1/user", userRouter(userController));
   app.use("/api/v1/instructor", instructorRouter(instructorController));
@@ -62,13 +65,11 @@ export const createApp = (): Application => {
   app.use("/api/v1/courses", courseRouter(courseController));
   app.use("/api/v1/lessons", lessonRouter(lessonController));
   app.use("/api/v1/content", lessonContentRouter(lessonContentController));
-  app.use('/api/v1/cart', cartRouter(cartController));
-  app.use('/api/v1/stripe', stripeRouter(stripeController));
-  app.use('/api/v1/transactions', transactionRouter(transactionController));
-  app.use('/api/v1/orders', orderRouter(orderController));
-  // app.use("/api/cart", cartRouter);
-  // app.use("/api/orders", orderRouter);
-  // app.use("/api/payments", paymentRouter);
+  app.use("/api/v1/cart", cartRouter(cartController));
+  app.use("/api/v1/stripe", stripeRouter(stripeController));
+  app.use("/api/v1/transactions", transactionRouter(transactionController));
+  app.use("/api/v1/orders", orderRouter(orderController));
+  app.use("/api/v1/files", fileRouter(fileController));
 
   // Error Middleware
   app.use(errorMiddleware);

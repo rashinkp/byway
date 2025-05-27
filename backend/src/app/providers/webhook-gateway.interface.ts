@@ -1,5 +1,5 @@
-import { WebhookEvent } from "../value-object/webhook-event.value-object";
-import { WebhookMetadata } from "../value-object/webhook-metadata.value-object";
+import { WebhookEvent } from "../../domain/value-object/webhook-event.value-object";
+import { WebhookMetadata } from "../../domain/value-object/webhook-metadata.value-object";
 
 export interface WebhookGateway {
   verifySignature(event: Buffer, signature: string): Promise<WebhookEvent>;
@@ -7,4 +7,4 @@ export interface WebhookGateway {
   isCheckoutSessionCompleted(event: WebhookEvent): boolean;
   getPaymentIntentId(event: WebhookEvent): string | undefined;
   getCheckoutSessionMetadata(paymentIntentId: string): Promise<WebhookMetadata>;
-} 
+}

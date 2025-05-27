@@ -60,4 +60,10 @@ export const envConfig = {
   // Stripe
   STRIPE_SECRET_KEY: process.env.STRIPE_SECRET_KEY || "",
   STRIPE_WEBHOOK_SECRET: process.env.STRIPE_WEBHOOK_SECRET || "",
+
+  // AWS S3
+  AWS_ACCESS_KEY_ID: process.env.AWS_ACCESS_KEY_ID || "",
+  AWS_SECRET_ACCESS_KEY: process.env.AWS_SECRET_ACCESS_KEY || "",
+  AWS_REGION: process.env.AWS_REGION || "us-east-1",
+  AWS_BUCKET_NAME: process.env.AWS_BUCKET_NAME || "",
 };

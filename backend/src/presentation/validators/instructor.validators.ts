@@ -21,6 +21,9 @@ const createInstructorSchema = z.object({
   professionalExperience: z.string().min(1, "Professional experience is required"),
   about: z.string().optional(),
   website: z.string().url().optional(),
+  education: z.string().min(1, "Education details are required"),
+  certifications: z.string().min(1, "Certifications are required"),
+  cv: z.string().min(1, "CV is required"),
 });
 
 const updateInstructorSchema = z.object({
@@ -29,6 +32,9 @@ const updateInstructorSchema = z.object({
   professionalExperience: z.string().min(1).optional(),
   about: z.string().optional(),
   website: z.string().url().optional(),
+  education: z.string().min(1).optional(),
+  certifications: z.string().optional(),
+  cv: z.string().min(1).optional(),
   status: z
     .enum([APPROVALSTATUS.PENDING, APPROVALSTATUS.APPROVED, APPROVALSTATUS.DECLINED])
     .optional(),

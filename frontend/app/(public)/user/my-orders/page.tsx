@@ -120,30 +120,6 @@ const OrderListing: React.FC = () => {
     });
   }, [fetchOrders]);
 
-  const handleRetryPayment = async (orderId: string) => {
-    setRetryingOrder(orderId);
-    // TODO: Implement retry payment logic
-    setTimeout(() => {
-      setRetryingOrder(null);
-    }, 2000);
-  };
-
-  const formatDate = (dateString: string): string => {
-    return new Date(dateString).toLocaleDateString("en-US", {
-      year: "numeric",
-      month: "short",
-      day: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-    });
-  };
-
-  const formatPrice = (price: number): string => {
-    return new Intl.NumberFormat("en-US", {
-      style: "currency",
-      currency: "USD",
-    }).format(price);
-  };
 
   if (isLoading) {
     return (
@@ -196,7 +172,6 @@ const OrderListing: React.FC = () => {
             <OrderCard
               key={order.id}
               order={order}
-              onRetryPayment={handleRetryPayment}
               isRetrying={retryingOrder === order.id}
             />
           ))}

@@ -1,7 +1,7 @@
 "use client";
 
 import { z } from "zod";
-import { FormModal } from "@/components/ui/FormModal";
+import { FormModal, FormFieldConfig } from "@/components/ui/FormModal";
 import { Path } from "react-hook-form";
 import { useGetInstructorByUserId } from "@/hooks/instructor/useGetInstructorByUserId";
 import { useAuthStore } from "@/stores/auth.store";
@@ -13,10 +13,11 @@ import {
   DialogTitle,
   DialogDescription,
 } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
 import { Clock } from "lucide-react";
 
 export const instructorSchema = z.object({
+  
+  // Professional Information
   areaOfExpertise: z
     .string()
     .min(1, "Area of expertise is required")
@@ -31,50 +32,87 @@ export const instructorSchema = z.object({
     .url("Invalid URL format")
     .max(200, "Website URL is too long")
     .optional(),
+  
+  // Education
+  education: z.string().min(1, "Education details are required"),
+  
+  // Certifications
+  certifications: z.string().min(1, "Certifications are required"),
+  
+  // Documents
+  cv: z.instanceof(File, { message: "CV is required" })
+    .refine((file) => file.size <= 5 * 1024 * 1024, "File size must be less than 5MB")
+    .refine((file) => file.type === "application/pdf", "File must be a PDF"),
 });
 
 export type InstructorFormData = z.infer<typeof instructorSchema>;
 
-const fields: {
-  name: Path<InstructorFormData>;
-  label: string;
-  type: "input" | "textarea";
-  fieldType?: "text" | "number" | "file" | "date";
-  placeholder: string;
-  description?: string;
-  maxLength?: number;
-}[] = [
+type InstructorSubmitData = Omit<InstructorFormData, 'cv'> & {
+  cv: string;
+};
+
+const fields: FormFieldConfig<InstructorFormData>[] = [
+  
   {
     name: "areaOfExpertise",
     label: "Area of Expertise",
     type: "input",
     fieldType: "text",
-    placeholder: "e.g., Web Development",
-    description: "Specify your primary area of expertise.",
-    maxLength: 100,
+    placeholder: "e.g., Web Development, Data Science",
+    description: "Your primary area of expertise",
   },
   {
     name: "professionalExperience",
     label: "Professional Experience",
     type: "textarea",
-    placeholder: "e.g., 10+ years as a Full-Stack Developer",
-    description: "Describe your professional background.",
-    maxLength: 500,
+    placeholder: "Describe your professional experience",
+    description: "Your work experience and achievements",
   },
   {
     name: "about",
     label: "About",
     type: "textarea",
-    placeholder: "e.g., Experienced developer in MERN stack",
-    description: "Provide a brief bio (optional).",
-    maxLength: 1000,
+    placeholder: "Tell us about yourself",
+    description: "A brief introduction about yourself",
+  },
+  {
+    name: "website",
+    label: "Website",
+    type: "input",
+    fieldType: "text",
+    placeholder: "https://your-website.com",
+    description: "Your personal or professional website (optional)",
+  },
+  {
+    name: "education",
+    label: "Education",
+    type: "textarea",
+    placeholder: "List your educational qualifications",
+    description: "Include your degrees, institutions, and graduation years",
+  },
+  {
+    name: "certifications",
+    label: "Certifications",
+    type: "textarea",
+    placeholder: "List your professional certifications",
+    description: "Enter your certifications (one per line)",
+  },
+  {
+    name: "cv",
+    label: "CV/Resume",
+    type: "input",
+    fieldType: "file",
+    description: "Upload your CV/Resume (PDF, max 5MB)",
+    accept: "application/pdf",
+    maxSize: 5 * 1024 * 1024,
+    fileTypeLabel: "PDF",
   },
 ];
 
 interface InstructorFormModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onSubmit: (data: InstructorFormData) => Promise<void>;
+  onSubmit: (data: InstructorSubmitData) => Promise<void>;
   initialData?: Partial<InstructorFormData>;
   isSubmitting?: boolean;
 }
@@ -113,7 +151,6 @@ export function InstructorFormModal({
             return prev - 1;
           });
         }, 1000);
-        return () => clearInterval(interval);
       } else {
         setTimeLeft(null);
       }
@@ -122,149 +159,96 @@ export function InstructorFormModal({
     }
   }, [instructorData]);
 
+  const handleSubmit = async (data: InstructorFormData) => {
+    try {
+      // Convert File to base64 string before submitting
+      const cvBase64 = await new Promise<string>((resolve) => {
+        const reader = new FileReader();
+        reader.onloadend = () => resolve(reader.result as string);
+        reader.readAsDataURL(data.cv);
+      });
+
+      await onSubmit({
+        ...data,
+        cv: cvBase64,
+      } as InstructorSubmitData);
+    } catch (error: any) {
+      console.error("Error submitting form:", error);
+    }
+  };
+
   if (user?.role === "ADMIN") {
     return null;
   }
 
-  const formatTimeLeft = (seconds: number) => {
-    const minutes = Math.floor(seconds / 60);
-    const remainingSeconds = seconds % 60;
-    return `${minutes}:${remainingSeconds.toString().padStart(2, "0")}`;
-  };
-
-  const renderContent = () => {
-    if (isInstructorLoading) {
-      return (
-        <div className="text-center py-8">
-          <div className="inline-block animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-500"></div>
-          <p className="text-gray-600 mt-2">Loading...</p>
-        </div>
-      );
-    }
-
-    const status = instructorData?.data?.status;
-
-    if (status === "PENDING") {
-      return (
-        <>
-          <DialogHeader>
-            <DialogTitle className="text-xl font-semibold text-gray-800">
-              Application Pending
-            </DialogTitle>
-            <DialogDescription className="text-gray-600">
-              Your instructor application is under review.
-            </DialogDescription>
-          </DialogHeader>
-          <div className="text-center py-4">
-            <p className="text-gray-600 mb-4">
-              Your application is currently under review. We'll notify you once
-              a decision is made.
-            </p>
-            <p className="text-gray-500">
-              For questions, please contact{" "}
-              <a
-                href="mailto:support@byway.com"
-                className="text-blue-600 hover:underline"
-              >
-                support@byway.com
-              </a>
-              .
-            </p>
-          </div>
-        </>
-      );
-    }
-
-    if (status === "APPROVED") {
-      return (
-        <>
-          <DialogHeader>
-            <DialogTitle className="text-xl font-semibold text-gray-800">
-              Approved Instructor
-            </DialogTitle>
-            <DialogDescription className="text-gray-600">
-              You are already an approved instructor.
-            </DialogDescription>
-          </DialogHeader>
-          <div className="text-center py-4">
-            <p className="text-gray-600 mb-4">Start creating courses now!</p>
-            <Button
-              asChild
-              className="bg-blue-600 hover:bg-blue-700 text-white"
-            >
-              <a href="/instructor/dashboard">Go to Instructor Dashboard</a>
-            </Button>
-          </div>
-        </>
-      );
-    }
-
-    if (status === "DECLINED" && timeLeft !== null) {
-      return (
-        <>
-          <DialogHeader>
-            <DialogTitle className="text-xl font-semibold text-gray-800">
-              Application Declined
-            </DialogTitle>
-            <DialogDescription className="text-gray-600">
-              Your previous application was declined.
-            </DialogDescription>
-          </DialogHeader>
-          <div className="text-center py-4">
-            <p className="text-gray-600 mb-4">
-              You can reapply after the cooldown period.
-            </p>
-            <div className="flex items-center justify-center gap-2 text-gray-600 mb-4">
-              <Clock className="w-5 h-5" />
-              <p>Time left to reapply: {formatTimeLeft(timeLeft)}</p>
-            </div>
-            <p className="text-gray-500">
-              For questions, please contact{" "}
-              <a
-                href="mailto:support@byway.com"
-                className="text-blue-600 hover:underline"
-              >
-                support@byway.com
-              </a>
-              .
-            </p>
-          </div>
-        </>
-      );
-    }
-
+  if (instructorData?.data?.status === "PENDING") {
     return (
-      <FormModal
-        open={open}
-        onOpenChange={onOpenChange}
-        onSubmit={onSubmit}
-        schema={instructorSchema}
-        initialData={initialData}
-        title={
-          status === "DECLINED"
-            ? "Reapply as Instructor"
-            : "Become an Instructor"
-        }
-        submitText={status === "DECLINED" ? "Reapply" : "Apply"}
-        fields={fields}
-        description={
-          status === "DECLINED"
-            ? "Your previous application was declined. Update your details and reapply to become an instructor."
-            : "Apply to become an instructor by filling out your details."
-        }
-        isSubmitting={isSubmitting}
-      />
+      <Dialog open={open} onOpenChange={onOpenChange}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Application Pending</DialogTitle>
+            <DialogDescription>
+              Your instructor application is currently under review. We will notify
+              you once it has been processed.
+            </DialogDescription>
+          </DialogHeader>
+        </DialogContent>
+      </Dialog>
     );
-  };
+  }
+
+  if (instructorData?.data?.status === "APPROVED") {
+    return (
+      <Dialog open={open} onOpenChange={onOpenChange}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Application Approved</DialogTitle>
+            <DialogDescription>
+              Your instructor application has been approved. You can now start
+              creating courses.
+            </DialogDescription>
+          </DialogHeader>
+        </DialogContent>
+      </Dialog>
+    );
+  }
+
+  if (instructorData?.data?.status === "DECLINED") {
+    return (
+      <Dialog open={open} onOpenChange={onOpenChange}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Application Declined</DialogTitle>
+            <DialogDescription>
+              {timeLeft ? (
+                <div className="flex items-center gap-2">
+                  <Clock className="h-4 w-4" />
+                  <span>
+                    You can submit a new application in {timeLeft} seconds.
+                  </span>
+                </div>
+              ) : (
+                "You can now submit a new application."
+              )}
+            </DialogDescription>
+          </DialogHeader>
+        </DialogContent>
+      </Dialog>
+    );
+  }
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[425px]">
-        <DialogHeader>
-          <DialogTitle>Become an Instructor</DialogTitle>
-        </DialogHeader>
-        {renderContent()}
-      </DialogContent>
-    </Dialog>
+    <FormModal
+      open={open}
+      onOpenChange={onOpenChange}
+      onSubmit={handleSubmit}
+      schema={instructorSchema}
+      initialData={initialData}
+      title="Apply as Instructor"
+      submitText="Submit Application"
+      fields={fields}
+      description="Fill out the form below to apply as an instructor."
+      isSubmitting={isSubmitting || isInstructorLoading}
+    />
   );
 }

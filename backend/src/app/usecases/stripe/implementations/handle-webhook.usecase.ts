@@ -13,7 +13,7 @@ import { TransactionType } from "../../../../domain/enum/transaction-type.enum";
 import { TransactionStatus } from "../../../../domain/enum/transaction-status.enum";
 import { PaymentGateway } from "../../../../domain/enum/payment-gateway.enum";
 import { Transaction } from "../../../../domain/entities/transaction.entity";
-import { WebhookGateway } from "../../../../domain/interfaces/webhook-gateway.interface";
+import { WebhookGateway } from "../../../providers/webhook-gateway.interface";
 import { WebhookEvent } from "../../../../domain/value-object/webhook-event.value-object";
 
 export class HandleWebhookUseCase implements IHandleWebhookUseCase {
@@ -222,17 +222,23 @@ export class HandleWebhookUseCase implements IHandleWebhookUseCase {
     try {
       const paymentIntentId = this.webhookGateway.getPaymentIntentId(event);
       if (!paymentIntentId) {
-        throw new HttpError("Payment intent ID not found", StatusCodes.BAD_REQUEST);
+        throw new HttpError(
+          "Payment intent ID not found",
+          StatusCodes.BAD_REQUEST
+        );
       }
 
       // Get failure reason
-      const failureReason = event.data.object.failure_message || 
-                          event.data.object.last_payment_error?.message || 
-                          "Payment failed";
+      const failureReason =
+        event.data.object.failure_message ||
+        event.data.object.last_payment_error?.message ||
+        "Payment failed";
 
       // Get metadata from the webhook gateway
-      const metadata = await this.webhookGateway.getCheckoutSessionMetadata(paymentIntentId);
-      
+      const metadata = await this.webhookGateway.getCheckoutSessionMetadata(
+        paymentIntentId
+      );
+
       // If metadata is missing, return a basic response
       if (!metadata.userId || !metadata.orderId) {
         console.warn("Metadata missing, processing without order update:", {
@@ -244,7 +250,7 @@ export class HandleWebhookUseCase implements IHandleWebhookUseCase {
             status: "failed",
             transactionId: paymentIntentId,
             failureReason,
-            redirectUrl: "/payment-failed"
+            redirectUrl: "/payment-failed",
           },
         });
       }
@@ -264,7 +270,7 @@ export class HandleWebhookUseCase implements IHandleWebhookUseCase {
             status: "failed",
             transactionId: paymentIntentId,
             failureReason,
-            redirectUrl: "/payment-failed"
+            redirectUrl: "/payment-failed",
           },
         });
       }
@@ -294,7 +300,7 @@ export class HandleWebhookUseCase implements IHandleWebhookUseCase {
           status: "failed",
           transactionId: paymentIntentId,
           failureReason,
-          redirectUrl: "/payment-failed"
+          redirectUrl: "/payment-failed",
         },
       });
     } catch (error) {
