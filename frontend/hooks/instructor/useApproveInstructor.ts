@@ -22,6 +22,10 @@ export function useApproveInstructor() {
     onSuccess: (response) => {
       queryClient.invalidateQueries({ queryKey: ["instructors"] });
       queryClient.invalidateQueries({ queryKey: ["users"], exact: false });
+      queryClient.invalidateQueries({ 
+        queryKey: ["user-admin-details"],
+        exact: false 
+      });
       toast.success("Instructor approved successfully!", {
         description: `Instructor with ID ${response.data.id} has been approved.`,
       });

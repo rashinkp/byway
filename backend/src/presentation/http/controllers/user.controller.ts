@@ -248,6 +248,8 @@ export class UserController extends BaseController {
           professionalExperience: instructor.professionalExperience,
           about: instructor.about,
           website: instructor.website,
+          education: instructor.education,
+          certifications: instructor.certifications,
           cv: instructor.cv,
           status: instructor.status,
           totalStudents: instructor.totalStudents,

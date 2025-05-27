@@ -21,6 +21,11 @@ export function useDeclineInstructor() {
     },
     onSuccess: (response) => {
       queryClient.invalidateQueries({ queryKey: ["instructors"] });
+      queryClient.invalidateQueries({ queryKey: ["users"], exact: false });
+      queryClient.invalidateQueries({ 
+        queryKey: ["user-admin-details"],
+        exact: false 
+      });
       toast.success("Instructor declined successfully!", {
         description: `Instructor with ID ${response.data.id} has been declined.`,
       });

@@ -56,20 +56,22 @@ const InstructorProfilePage: React.FC = () => {
   const handleApprove = async () => {
     try {
       await approveInstructor(instructorProfile.id);
-      // Refresh data after approval
-      window.location.reload();
+      await refetch();
+      toast.success("Instructor approved successfully!");
     } catch (error) {
       console.error("Error approving instructor:", error);
+      toast.error("Failed to approve instructor");
     }
   };
 
   const handleDecline = async () => {
     try {
       await declineInstructor(instructorProfile.id);
-      // Refresh data after decline
-      window.location.reload();
+      await refetch();
+      toast.success("Instructor declined successfully!");
     } catch (error) {
       console.error("Error declining instructor:", error);
+      toast.error("Failed to decline instructor");
     }
   };
 
@@ -108,7 +110,11 @@ const InstructorProfilePage: React.FC = () => {
       DISABLED: { bg: "bg-red-100", text: "text-red-800", icon: X },
     };
 
-    const config = statusConfig[status as keyof typeof statusConfig];
+    const config = statusConfig[status as keyof typeof statusConfig] || {
+      bg: "bg-gray-100",
+      text: "text-gray-800",
+      icon: AlertCircle,
+    };
     const Icon = config.icon;
 
     return (
@@ -234,6 +240,15 @@ const InstructorProfilePage: React.FC = () => {
                       Decline
                     </button>
                   </>
+                )}
+                {instructorProfile.status === "DECLINED" && (
+                  <button
+                    onClick={handleApprove}
+                    className="flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+                  >
+                    <Check className="w-4 h-4 mr-2" />
+                    Approve
+                  </button>
                 )}
                 <button
                   onClick={handleDownloadCV}
