@@ -1,20 +1,17 @@
 "use client";
-
-import { useState } from "react";
 import { User } from "@/types/user";
 import { useGetAllUsers } from "@/hooks/user/useGetAllUsers";
 import { useToggleDeleteUser } from "@/hooks/user/useToggleDeleteUser";
 import { StatusBadge } from "@/components/ui/StatusBadge";
 import ListPage from "@/components/ListingPage";
 import { InstructorApprovalModal } from "@/components/instructor/InstructorApprovalModal";
+import { Info } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { useRouter } from "next/navigation";
 
 export default function InstructorsPage() {
-  const [isEditOpen, setIsEditOpen] = useState(false);
-  const [editInstructor, setEditInstructor] = useState<User | undefined>(
-    undefined
-  );
-
   const { mutate: toggleDeleteUser } = useToggleDeleteUser();
+  const router = useRouter();
 
   return (
     <ListPage<User>
@@ -56,6 +53,12 @@ export default function InstructorsPage() {
         },
       ]}
       actions={[
+        {
+          label: "View Details",
+          onClick: (instructor) => router.push(`/admin/instructor/${instructor.id}`),
+          variant: "outline",
+          Icon: Info,
+        },
         {
           label: (instructor) => (instructor.deletedAt ? "Enable" : "Disable"),
           onClick: (instructor) => toggleDeleteUser(instructor),
