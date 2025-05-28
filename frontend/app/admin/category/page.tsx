@@ -103,6 +103,11 @@ export default function CategoriesPage() {
             includeDeleted: true,
           })
         }
+        filterOptions={[
+          { label: "All", value: "All" },
+          { label: "Active", value: "Active" },
+          { label: "Inactive", value: "Inactive" },
+        ]}
         columns={[
           {
             header: "Name",

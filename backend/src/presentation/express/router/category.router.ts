@@ -36,14 +36,14 @@ export default function categoryRouter(
       categoryController.updateCategory.bind(categoryController)
     )
   );
-  router.delete("/:id", (req, res) =>
+  router.delete("/:categoryId", (req, res) =>
     expressAdapter(
       req,
       res,
       categoryController.deleteCategory.bind(categoryController)
     )
   );
-  router.patch("/:id/recover", (req, res) =>
+  router.patch("/:categoryId/recover", (req, res) =>
     expressAdapter(
       req,
       res,
