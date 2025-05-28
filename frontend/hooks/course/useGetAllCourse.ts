@@ -56,6 +56,7 @@ export function useGetAllCourses({
       level,
       duration,
       price,
+      includeDeleted,
     ],
     queryFn: async () => {
       const response = await getAllCourses({

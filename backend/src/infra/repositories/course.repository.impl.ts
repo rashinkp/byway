@@ -202,8 +202,8 @@ export class CourseRepository implements ICourseRepository {
         // Regular users can only see published and non-deleted courses
         : { deletedAt: null, status: CourseStatus.PUBLISHED }
       ),
-      ...(filterBy === "Active" ? { status: CourseStatus.PUBLISHED } : {}),
-      ...(filterBy === "Inactive" ? { status: CourseStatus.DRAFT } : {}),
+      ...(filterBy === "Active" ? { deletedAt: null } : {}),
+      ...(filterBy === "Inactive" ? { deletedAt: { not: null } } : {}),
       ...(filterBy === "Declined" ? { approvalStatus: APPROVALSTATUS.DECLINED } : {}),
       ...(myCourses && userId ? { createdBy: userId } : {}),
       ...(level !== "All" ? { level } : {}),

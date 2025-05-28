@@ -29,6 +29,8 @@ export default function CoursesPage() {
             | "duration",
           role: user?.role as "ADMIN" | "USER" | "INSTRUCTOR" | undefined,
           filterBy: params.filterBy as "All" | "Active" | "Inactive" | "Declined",
+          includeDeleted: true,
+          myCourses: false,
         })
       }
       columns={[

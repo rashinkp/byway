@@ -29,7 +29,7 @@ export interface User {
   id: string;
   name: string;
   email: string;
-  role: string;
+  role: UserRoleType;
   avatar?: string;
   bio?: string;
   education?: string;
@@ -39,7 +39,8 @@ export interface User {
   city?: string;
   address?: string;
   dateOfBirth?: string;
-  gender?: string;
+  gender?: GenderType;
+  isVerified: boolean;
   deletedAt?: string;
   createdAt: string;
   updatedAt: string;
@@ -122,7 +123,7 @@ export const transformUserData = (user: User): UserProfileType => {
     city: user?.city,
     address: user?.address,
     dateOfBirth: user?.dateOfBirth,
-    gender: user?.gender,
+    gender: user?.gender as GenderType,
     isVerified: user.isVerified || false,
     createdAt: user.createdAt,
     updatedAt: user.updatedAt,
@@ -132,10 +133,11 @@ export const transformUserData = (user: User): UserProfileType => {
 
 export interface PublicUser {
   id: string;
-  name?: string;
-  email?: string;
-  gender?: string;
-  skills?: string;
+  name: string;
   avatar?: string;
   bio?: string;
+  education?: string;
+  skills?: string;
+  country?: string;
+  city?: string;
 }
