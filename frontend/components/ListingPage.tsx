@@ -1,8 +1,26 @@
 "use client";
 
 import { JSX, useState } from "react";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { Plus } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Loader2, Plus } from "lucide-react";
 import { StatsCards } from "@/components/ui/StatsCard";
 import { TableControls } from "@/components/ui/TableControls";
 import { StatusBadge } from "@/components/ui/StatusBadge";
@@ -25,7 +43,7 @@ interface ListPageProps<T> {
     sortBy: string;
     sortOrder: "asc" | "desc";
     includeDeleted: boolean;
-    filterBy: "All" | "Active" | "Inactive" | "Declined";
+    filterBy: string;
     role?: string;
   }) => {
     data: { items: T[]; total: number; totalPages: number } | undefined;
@@ -45,6 +63,7 @@ interface ListPageProps<T> {
   defaultSortBy: Extract<keyof T, string> | `-${string}`;
   itemsPerPage?: number;
   role?: string;
+  filterOptions: Array<{ value: string; label: string }>;
 }
 
 function ListPage<T>({
@@ -61,12 +80,11 @@ function ListPage<T>({
   defaultSortBy,
   itemsPerPage = 10,
   role,
+  filterOptions,
 }: ListPageProps<T>) {
   const [page, setPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
-  const [filterStatus, setFilterStatus] = useState<
-    "All" | "Active" | "Inactive" | "Declined"
-  >("All");
+  const [filterStatus, setFilterStatus] = useState<string>("All");
   const [sortBy, setSortBy] = useState<string>(defaultSortBy);
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
 
@@ -138,6 +156,7 @@ function ListPage<T>({
         setSortOrder={setSortOrder}
         sortOptions={sortOptions}
         onRefresh={refetch}
+        filterTabs={filterOptions}
       />
 
       {isLoading ? (

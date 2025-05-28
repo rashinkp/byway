@@ -52,20 +52,23 @@ const getInstructorByUserIdSchema = z.object({
   userId: z.string().min(1, "User ID is required"),
 });
 
-const getAllInstructorsSchema = z.object({
-  page: z
+export const getAllInstructorsSchema = z.object({
+  page: z.coerce.number().min(1).default(1),
+  limit: z.coerce.number().min(1).max(100).default(10),
+  search: z.string().optional(),
+  sortBy: z.enum([
+    "createdAt",
+    "status",
+    "areaOfExpertise",
+    "user.name",
+    "user.email"
+  ]).default("createdAt"),
+  sortOrder: z.enum(["asc", "desc"]).default("desc"),
+  filterBy: z.enum(["All", "Pending", "Approved", "Declined"]).default("All"),
+  includeDeleted: z
     .string()
-    .regex(/^\d+$/)
-    .optional()
-    .transform((val) => (val ? Number(val) : undefined)),
-  limit: z
-    .string()
-    .regex(/^\d+$/)
-    .optional()
-    .transform((val) => (val ? Number(val) : undefined)),
-  status: z
-    .enum([APPROVALSTATUS.PENDING, APPROVALSTATUS.APPROVED, APPROVALSTATUS.DECLINED])
-    .optional(),
+    .transform((val) => val === "true")
+    .default("false"),
 });
 
 // Validation schemas for endpoints

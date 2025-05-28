@@ -23,16 +23,14 @@ export interface UserProfile {
   gender?: GenderType;
 }
 
+import { IInstructorWithUserDetails } from "./instructor";
+
 export interface User {
   id: string;
+  name: string;
   email: string;
-  role: UserRoleType;
-  name?: string;
+  role: string;
   avatar?: string;
-  isVerified?: boolean;
-  createdAt: string; // Changed to string to match API response format
-  updatedAt: string; // Changed to string to match API response format
-  deletedAt?: string | null; // Changed to string to match API response format
   bio?: string;
   education?: string;
   skills?: string;
@@ -41,11 +39,12 @@ export interface User {
   city?: string;
   address?: string;
   dateOfBirth?: string;
-  gender?: GenderType;
+  gender?: string;
+  deletedAt?: string;
+  createdAt: string;
+  updatedAt: string;
+  instructor?: IInstructorWithUserDetails;
 }
-
-
-
 
 export interface IGetAllUsersResponse {
   users: User[];
@@ -130,7 +129,6 @@ export const transformUserData = (user: User): UserProfileType => {
     deletedAt: user.deletedAt,
   };
 };
-
 
 export interface PublicUser {
   id: string;

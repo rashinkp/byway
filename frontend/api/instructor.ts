@@ -57,13 +57,31 @@ export const declineInstructor = async (
   }
 };
 
-
-export const getAllInstructors = async (): Promise<
-  ApiResponse<{ items: IInstructorWithUserDetails[]; total: number; totalPages: number }>
-> => {
+export const getAllInstructors = async (params?: {
+  page?: number;
+  limit?: number;
+  search?: string;
+  sortBy?: string;
+  sortOrder?: "asc" | "desc";
+  filterBy?: "All" | "Pending" | "Approved" | "Declined";
+  includeDeleted?: boolean;
+}): Promise<ApiResponse<{ items: IInstructorWithUserDetails[]; total: number; totalPages: number }>> => {
   try {
+    const queryParams = new URLSearchParams();
+    if (params) {
+      Object.entries(params).forEach(([key, value]) => {
+        if (value !== undefined) {
+          // Convert boolean to string for URL params
+          if (typeof value === "boolean") {
+            queryParams.append(key, value.toString());
+          } else {
+            queryParams.append(key, value.toString());
+          }
+        }
+      });
+    }
     const response = await api.get<ApiResponse<{ items: IInstructorWithUserDetails[]; total: number; totalPages: number }>>(
-      "/instructor/admin/instructors"
+      `/instructor/admin/instructors?${queryParams.toString()}`
     );
     return response.data;
   } catch (error: any) {
@@ -73,8 +91,6 @@ export const getAllInstructors = async (): Promise<
     );
   }
 };
-
-
 
 export const getInstructorByUserId = async (): Promise<
   ApiResponse<IInstructorWithUserDetails | null>

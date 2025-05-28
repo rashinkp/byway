@@ -3,8 +3,8 @@ import { getUserAdminDetails } from "@/api/users";
 import { User } from "@/types/user";
 import { IInstructorWithUserDetails } from "@/types/instructor";
 
-interface UserAdminDetails extends User {
-  instructor: IInstructorWithUserDetails | null;
+interface UserAdminDetails extends Omit<User, 'instructor'> {
+  instructor?: IInstructorWithUserDetails;
 }
 
 export const useGetUserAdminDetails = (userId: string) => {

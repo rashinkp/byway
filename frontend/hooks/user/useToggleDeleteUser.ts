@@ -46,7 +46,7 @@ export function useToggleDeleteUser() {
               u.id === user.id
                 ? {
                     ...u,
-                    deletedAt: !u.deletedAt ? new Date().toISOString() : null,
+                    deletedAt: !u.deletedAt ? new Date().toISOString() : undefined,
                     updatedAt: new Date().toISOString(),
                   }
                 : u
@@ -60,7 +60,7 @@ export function useToggleDeleteUser() {
         if (!old) return old;
         return {
           ...old,
-          deletedAt: !old.deletedAt ? new Date().toISOString() : null,
+          deletedAt: !old.deletedAt ? new Date().toISOString() : undefined,
           updatedAt: new Date().toISOString(),
         };
       });

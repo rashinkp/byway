@@ -22,7 +22,13 @@ export class GetAllInstructorsUseCase implements IGetAllInstructorsUseCase {
       await this.instructorRepository.findAllInstructors(
         dto.page || 1,
         dto.limit || 10,
-        dto.status
+        {
+          search: dto.search,
+          sortBy: dto.sortBy,
+          sortOrder: dto.sortOrder,
+          filterBy: dto.filterBy,
+          includeDeleted: dto.includeDeleted,
+        }
       );
 
     const instructorResponses: InstructorResponseDTO[] = [];

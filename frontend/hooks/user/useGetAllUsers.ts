@@ -3,7 +3,20 @@
 import { useQuery } from "@tanstack/react-query";
 import { getAllUsers } from "@/api/users";
 import { ApiResponse, IPaginatedResponse } from "@/types/apiResponse";
-import { User, IGetAllUsersInput } from "@/types/user";
+import { User, IGetAllUsersInput, SortByField, NegativeSortByField, UserRoleType } from "@/types/user";
+
+type FilterBy = "All" | "Active" | "Inactive" | "Pending" | "Approved" | "Declined";
+
+interface GetAllUsersParams {
+  page?: number;
+  limit?: number;
+  search?: string;
+  sortBy?: SortByField | NegativeSortByField;
+  sortOrder?: "asc" | "desc";
+  role?: UserRoleType;
+  filterBy?: FilterBy;
+  includeDeleted?: boolean;
+}
 
 interface UseUsersReturn {
   data: { items: User[]; total: number; totalPages: number } | undefined;
@@ -12,57 +25,48 @@ interface UseUsersReturn {
   refetch: () => void;
 }
 
-export function useGetAllUsers({
-  page = 1,
-  limit = 10,
-  search = "",
-  includeDeleted = false,
-  sortOrder = "asc",
-  sortBy = "name",
-  filterBy = "All",
-  role,
-}: IGetAllUsersInput = {}): UseUsersReturn {
+export function useGetAllUsers(params: GetAllUsersParams): UseUsersReturn {
   // Handle negative sort orders
-  let adjustedSortBy: IGetAllUsersInput["sortBy"] = sortBy;
-  let adjustedSortOrder: IGetAllUsersInput["sortOrder"] = sortOrder;
+  let adjustedSortBy: IGetAllUsersInput["sortBy"] = params.sortBy as IGetAllUsersInput["sortBy"];
+  let adjustedSortOrder: IGetAllUsersInput["sortOrder"] = params.sortOrder;
 
-  if (sortBy?.startsWith("-")) {
-    adjustedSortBy = sortBy.slice(1) as IGetAllUsersInput["sortBy"];
-    adjustedSortOrder = sortOrder === "asc" ? "desc" : "asc";
+  if (params.sortBy?.startsWith("-")) {
+    adjustedSortBy = params.sortBy.slice(1) as IGetAllUsersInput["sortBy"];
+    adjustedSortOrder = params.sortOrder === "asc" ? "desc" : "asc";
   }
 
   // Adjust includeDeleted based on filterBy
   const shouldIncludeDeleted =
-    filterBy === "Inactive"
+    params.filterBy === "Inactive"
       ? true
-      : filterBy === "Active"
+      : params.filterBy === "Active"
       ? false
-      : includeDeleted;
+      : params.includeDeleted;
 
   const { data, isLoading, error, refetch } = useQuery<
     ApiResponse<IPaginatedResponse<User>>
   >({
     queryKey: [
       "users",
-      page,
-      limit,
-      sortBy,
-      sortOrder,
-      includeDeleted,
-      search,
-      filterBy,
-      role,
+      params.page,
+      params.limit,
+      params.sortBy,
+      params.sortOrder,
+      shouldIncludeDeleted,
+      params.search,
+      params.filterBy,
+      params.role,
     ],
     queryFn: () =>
       getAllUsers({
-        page,
-        limit,
-        search,
+        page: params.page,
+        limit: params.limit,
+        search: params.search,
         includeDeleted: shouldIncludeDeleted,
         sortOrder: adjustedSortOrder,
         sortBy: adjustedSortBy,
-        filterBy,
-        role,
+        filterBy: params.filterBy,
+        role: params.role,
       }),
   });
 

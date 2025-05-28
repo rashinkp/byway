@@ -5,11 +5,12 @@ export type SortOption<T> = {
   label: string;
 };
 
-export type Stat<T> = {
+export interface Stat<T> {
   title: string;
-  value: number;
+  value: number | string;
   color?: string;
-};
+  description?: string;
+}
 
 export type Column<T> = {
   header: string;

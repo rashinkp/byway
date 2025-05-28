@@ -75,9 +75,9 @@ export function TableControls({
         onValueChange={setFilterStatus}
         className="w-full"
       >
-        <TabsList className="grid grid-cols-3 w-64">
+        <TabsList className={`grid w-64 ${filterTabs.length > 3 ? 'grid-cols-4' : 'grid-cols-3'}`}>
           {filterTabs.map((tab) => (
-            <TabsTrigger key={tab.value} value={tab.value}>
+            <TabsTrigger key={tab.value} value={tab.value} className="text-xs">
               {tab.label}
             </TabsTrigger>
           ))}
@@ -93,7 +93,7 @@ export function TableControls({
             onChange={(e) => setInputSearchTerm(e.target.value)}
           />
         </div>
-        <div className="flex space-x-2">
+        <div className="flex items-center gap-2">
           <Button
             variant="outline"
             size="sm"

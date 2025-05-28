@@ -79,29 +79,76 @@ export class InstructorRepository implements IInstructorRepository {
   }
 
   async findAllInstructors(
-    page: number = 1,
-    limit: number = 10,
-    status?: APPROVALSTATUS
+    page: number,
+    limit: number,
+    options: {
+      search?: string;
+      sortBy?: string;
+      sortOrder?: "asc" | "desc";
+      filterBy?: "All" | "Pending" | "Approved" | "Declined";
+      includeDeleted?: boolean;
+    }
   ): Promise<{ items: Instructor[]; total: number; totalPages: number }> {
-    const skip = (page - 1) * limit;
-    const where = status ? { status: { equals: status } } : {};
+    const { search, sortBy, sortOrder, filterBy, includeDeleted } = options;
 
-    const [instructors, total] = await Promise.all([
-      this.prisma.instructorDetails.findMany({
-        where,
-        skip,
-        take: limit,
-        include: { user: true },
-      }),
-      this.prisma.instructorDetails.count({ where }),
-    ]);
+    // Build where clause
+    const where: any = {
+      user: {
+        deletedAt: includeDeleted ? undefined : null,
+      },
+    };
 
-    const totalPages = Math.ceil(total / limit);
+    // Add status filter
+    if (filterBy && filterBy !== "All") {
+      where.status = filterBy.toUpperCase() as APPROVALSTATUS;
+    }
+
+    // Add search condition if provided
+    if (search) {
+      where.OR = [
+        { user: { name: { contains: search, mode: "insensitive" } } },
+        { user: { email: { contains: search, mode: "insensitive" } } },
+        { areaOfExpertise: { contains: search, mode: "insensitive" } },
+      ];
+    }
+
+    // Build order by clause
+    let orderBy: any = {};
+    if (sortBy) {
+      if (sortBy.startsWith("user.")) {
+        const field = sortBy.split(".")[1];
+        orderBy = { user: { [field]: sortOrder } };
+      } else {
+        orderBy = { [sortBy]: sortOrder };
+      }
+    }
+
+    // Get total count
+    const total = await this.prisma.instructorDetails.count({ where });
+
+    // Get paginated results
+    const instructors = await this.prisma.instructorDetails.findMany({
+      where,
+      orderBy,
+      skip: (page - 1) * limit,
+      take: limit,
+      include: {
+        user: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            role: true,
+            avatar: true,
+          },
+        },
+      },
+    });
 
     return {
-      items: instructors.map((instructor) => Instructor.fromPrisma(instructor)),
+      items: instructors.map(instructor => Instructor.fromPrisma(instructor)),
       total,
-      totalPages,
+      totalPages: Math.ceil(total / limit),
     };
   }
 }

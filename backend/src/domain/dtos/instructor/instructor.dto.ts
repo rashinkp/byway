@@ -38,7 +38,15 @@ export interface GetInstructorByUserIdRequestDTO {
 export interface GetAllInstructorsRequestDTO {
   page?: number;
   limit?: number;
-  status?: APPROVALSTATUS;
+  search?: string;
+  sortBy?: string;
+  sortOrder?: "asc" | "desc";
+  filterBy?: "All" | "Pending" | "Approved" | "Declined";
+  includeDeleted?: boolean;
+  user?: {
+    id: string;
+    role: Role;
+  };
 }
 
 export interface InstructorResponseDTO {
