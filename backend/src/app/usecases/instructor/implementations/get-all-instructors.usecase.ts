@@ -55,6 +55,7 @@ export class GetAllInstructorsUseCase implements IGetAllInstructorsUseCase {
             email: user.email,
             role: user.role,
             avatar: user.avatar,
+            deletedAt: user.deletedAt,
           },
         });
       }

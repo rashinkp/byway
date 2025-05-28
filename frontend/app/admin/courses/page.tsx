@@ -1,43 +1,23 @@
 "use client";
-
 import { Course } from "@/types/course";
-import { useSoftDeleteCourse } from "@/hooks/course/useSoftDeleteCourse";
 import { StatusBadge } from "@/components/ui/StatusBadge";
 import ListPage from "@/components/ListingPage";
 import { useGetAllCourses } from "@/hooks/course/useGetAllCourse";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/hooks/auth/useAuth";
-import { CourseApprovalModal } from "@/components/course/CourseApprovalModal";
-import { useApproveCourse, useDeclineCourse } from "@/hooks/course/useApproveCourse";
-
-interface CourseAction {
-  label: string | ((course: Course) => string);
-  onClick: (course: Course) => void;
-  variant:
-    | "outline"
-    | "default"
-    | "destructive"
-    | ((course: Course) => "outline" | "default" | "destructive");
-  confirmationMessage?: (course: Course) => string;
-  hidden?: (course: Course) => boolean;
-}
+import { Info } from "lucide-react";
 
 export default function CoursesPage() {
-  const { mutate: toggleDeleteCourse } = useSoftDeleteCourse();
-  const { mutate: approveCourse } = useApproveCourse();
-  const { mutate: declineCourse } = useDeclineCourse();
   const { user } = useAuth();
   const router = useRouter();
-  const isAdmin = user?.role === "ADMIN";
 
   return (
     <ListPage<Course>
       title="Course Management"
       description="Manage courses and their visibility"
       entityName="Course"
-      role={user?.role}
+      role={user?.role as "ADMIN" | "USER" | "INSTRUCTOR" | undefined}
       useDataHook={(params) =>
         useGetAllCourses({
           ...params,
@@ -47,7 +27,8 @@ export default function CoursesPage() {
             | "updatedAt"
             | "price"
             | "duration",
-          role: user?.role,
+          role: user?.role as "ADMIN" | "USER" | "INSTRUCTOR" | undefined,
+          filterBy: params.filterBy as "All" | "Active" | "Inactive" | "Declined",
         })
       }
       columns={[
@@ -75,17 +56,17 @@ export default function CoursesPage() {
           header: "Approval Status",
           accessor: "approvalStatus",
           render: (course) => (
-            <Badge
-              variant={
-                course.approvalStatus === "APPROVED"
-                  ? "default"
-                  : course.approvalStatus === "PENDING"
-                  ? "secondary"
-                  : "destructive"
-              }
-            >
+            <div className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+              course.approvalStatus === "APPROVED" 
+                ? "bg-green-100 text-green-800" 
+                : course.approvalStatus === "PENDING"
+                ? "bg-yellow-100 text-yellow-800"
+                : course.approvalStatus === "DECLINED"
+                ? "bg-red-100 text-red-800"
+                : "bg-gray-100 text-gray-800"
+            }`}>
               {course.approvalStatus}
-            </Badge>
+            </div>
           ),
         },
         {
@@ -96,34 +77,12 @@ export default function CoursesPage() {
       ]}
       actions={[
         {
-          label: "View",
-          onClick: (course) => {
-            interface CourseAction {
-              label: string | ((course: Course) => string);
-              onClick: (course: Course) => void;
-              variant: string | ((course: Course) => string);
-              confirmationMessage?: (course: Course) => string;
-              hidden?: (course: Course) => boolean;
-            }
-
-                        router.push(`/admin/courses/${course.id}`);
-                      },
-                      variant: "outline",
-                    } as CourseAction,
-                    {
-                      label: (course: Course) => (course.deletedAt ? "Enable" : "Disable"),
-                      onClick: (course: Course) => toggleDeleteCourse(course),
-                      variant: (course: Course) => (course.deletedAt ? "default" : "destructive"),
-                      confirmationMessage: (course: Course) =>
-                        course.deletedAt
-                          ? `Are you sure you want to enable the course "${course.title}"?`
-                          : `Are you sure you want to disable the course "${course.title}"?`,
-                    } as CourseAction,
-                    
+          label: "View Details",
+          onClick: (course) => router.push(`/admin/courses/${course.id}`),
+          variant: "outline",
+          Icon: Info,
+        },
       ]}
-      extraButtons={
-        isAdmin ? [<CourseApprovalModal key="course-approval-modal" />] : []
-      }
       stats={(courses, total) => [
         { title: "Total Courses", value: total },
         {
@@ -138,15 +97,12 @@ export default function CoursesPage() {
         },
         {
           title: "Pending Approvals",
-          value: courses.filter((course) => course.approvalStatus === "PENDING")
-            .length,
+          value: courses.filter((course) => course.approvalStatus === "PENDING").length,
           color: "text-yellow-600",
         },
         {
           title: "Declined Courses",
-          value: courses.filter(
-            (course) => course.approvalStatus === "DECLINED"
-          ).length,
+          value: courses.filter((course) => course.approvalStatus === "DECLINED").length,
           color: "text-red-600",
         },
       ]}
@@ -156,6 +112,12 @@ export default function CoursesPage() {
         { value: "approvalStatus", label: "Approval Status" },
       ]}
       defaultSortBy="title"
+      filterOptions={[
+        { label: "All", value: "All" },
+        { label: "Active", value: "Active" },
+        { label: "Inactive", value: "Inactive" },
+        { label: "Declined", value: "Declined" },
+      ]}
     />
   );
 }

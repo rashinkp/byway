@@ -42,6 +42,7 @@ export interface IUserDetails {
   email: string;
   role: 'USER' | 'INSTRUCTOR' | 'ADMIN';
   avatar?: string;
+  deletedAt?: string | Date | null;
   createdAt: string;
 }
 

@@ -69,6 +69,7 @@ export interface InstructorResponseDTO {
     email: string;
     role: Role;
     avatar?: string;
+    deletedAt?: Date | string | null;
   };
 }
 

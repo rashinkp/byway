@@ -10,6 +10,7 @@ export interface Stat<T> {
   value: number | string;
   color?: string;
   description?: string;
+  icon?: string;
 }
 
 export type Column<T> = {

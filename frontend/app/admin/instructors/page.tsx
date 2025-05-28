@@ -6,7 +6,9 @@ import { useRouter } from "next/navigation";
 import { useApproveInstructor } from "@/hooks/instructor/useApproveInstructor";
 import { useDeclineInstructor } from "@/hooks/instructor/useDeclineInstructor";
 import { toast } from "sonner";
-import { useState } from "react";
+import { Badge } from "@/components/ui/badge";
+import { StatusBadge } from "@/components/ui/StatusBadge";
+
 import ListPage from "@/components/ListingPage";
 import { Column, SortOption, Action } from "@/types/common";
 
@@ -15,27 +17,6 @@ export default function InstructorsPage() {
   const { mutate: approveInstructor } = useApproveInstructor();
   const { mutate: declineInstructor } = useDeclineInstructor();
 
-  const handleApprove = async (instructorId: string) => {
-    approveInstructor(instructorId, {
-      onSuccess: () => {
-        toast.success("Instructor approved successfully");
-      },
-      onError: (error) => {
-        toast.error(error.message || "Failed to approve instructor");
-      },
-    });
-  };
-
-  const handleDecline = async (instructorId: string) => {
-    declineInstructor(instructorId, {
-      onSuccess: () => {
-        toast.success("Instructor declined successfully");
-      },
-      onError: (error) => {
-        toast.error(error.message || "Failed to decline instructor");
-      },
-    });
-  };
 
   const columns: Column<IInstructorWithUserDetails>[] = [
     {
@@ -53,7 +34,7 @@ export default function InstructorsPage() {
       accessor: "areaOfExpertise",
     },
     {
-      header: "Status",
+      header: "Approval Status",
       accessor: "status",
       render: (instructor) => (
         <div className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
@@ -69,6 +50,11 @@ export default function InstructorsPage() {
         </div>
       ),
     },
+    {
+      header: "Account Status",
+      accessor: "user",
+      render: (instructor) => <StatusBadge isActive={!instructor.user.deletedAt} />,
+    },
   ];
 
   const actions: Action<IInstructorWithUserDetails>[] = [
@@ -78,7 +64,6 @@ export default function InstructorsPage() {
       variant: "outline",
       Icon: Info,
     },
-   
   ];
 
   const sortOptions: SortOption<IInstructorWithUserDetails>[] = [
@@ -88,7 +73,6 @@ export default function InstructorsPage() {
     { label: "Name", value: "user" },
     { label: "Email", value: "user" },
   ];
-
 
   return (
     <ListPage<IInstructorWithUserDetails>
@@ -103,7 +87,7 @@ export default function InstructorsPage() {
           sortBy: params.sortBy,
           sortOrder: params.sortOrder,
           filterBy: params.filterBy as "All" | "Pending" | "Approved" | "Declined",
-          includeDeleted: params.includeDeleted,
+          includeDeleted: true,
         });
         return {
           data: data?.data,
@@ -117,14 +101,19 @@ export default function InstructorsPage() {
       stats={(instructors, total) => [
         { title: "Total Instructors", value: total },
         {
-          title: "Pending Requests",
-          value: instructors.filter((instructor) => instructor.status === "PENDING").length,
-          color: "text-yellow-600",
+          title: "Active Instructors",
+          value: instructors.filter((instructor) => !instructor.user.deletedAt).length,
+          color: "text-green-600",
         },
         {
-          title: "Approved Instructors",
-          value: instructors.filter((instructor) => instructor.status === "APPROVED").length,
-          color: "text-green-600",
+          title: "Inactive Instructors",
+          value: instructors.filter((instructor) => instructor.user.deletedAt).length,
+          color: "text-red-600",
+        },
+        {
+          title: "Pending Approvals",
+          value: instructors.filter((instructor) => instructor.status === "PENDING").length,
+          color: "text-yellow-600",
         },
         {
           title: "Declined Requests",
