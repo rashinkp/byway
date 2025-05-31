@@ -20,31 +20,30 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   email: null,
   setUser: (user) => set({ user, isInitialized: true }),
   setEmail: (email) => {
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('auth_email', email);
+    if (typeof window !== "undefined") {
+      localStorage.setItem("auth_email", email);
     }
     set({ email });
   },
   clearAuth: () => {
-    if (typeof window !== 'undefined') {
-      localStorage.removeItem('auth_email');
+    if (typeof window !== "undefined") {
+      localStorage.removeItem("auth_email");
     }
-    set({ 
-      user: null, 
-      isInitialized: false, 
+    set({
+      user: null,
+      isInitialized: true, // Keep initialized to avoid re-fetching
       isLoading: false,
-      email: null
+      email: null,
     });
   },
   initializeAuth: async () => {
-    // Skip if already initialized
     if (get().isInitialized) return;
 
     set({ isLoading: true });
     try {
       // Initialize email from localStorage
-      if (typeof window !== 'undefined') {
-        const storedEmail = localStorage.getItem('auth_email');
+      if (typeof window !== "undefined") {
+        const storedEmail = localStorage.getItem("auth_email");
         if (storedEmail) {
           set({ email: storedEmail });
         }
@@ -55,7 +54,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         headers: {
           Accept: "application/json",
         },
-        credentials: "include", // Important for cookies
+        credentials: "include",
       });
 
       if (response.ok) {
@@ -70,7 +69,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         }
       }
 
-      // If no user in header, try to fetch from API
+      // Fetch user from API
       try {
         const userData = await getCurrentUser();
         set({

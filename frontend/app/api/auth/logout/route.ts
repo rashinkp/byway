@@ -7,12 +7,11 @@ export async function POST(request: NextRequest) {
       message: "Logged out successfully",
     });
 
-    // Clear the JWT cookie
     response.cookies.set("jwt", "", {
       path: "/",
-      expires: new Date(0),
+      expires: new Date(0), 
       httpOnly: true,
-      sameSite: "lax",
+      sameSite: process.env.NODE_ENV === "production" ? "strict" : "lax",
       secure: process.env.NODE_ENV === "production",
     });
 

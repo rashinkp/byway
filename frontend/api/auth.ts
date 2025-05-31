@@ -147,28 +147,27 @@ export async function resetPassword(
 
 export async function getCurrentUser(): Promise<User | null> {
   try {
-    const response = await api.get<ApiResponse<User >>("/user/me", {
-      validateStatus: (status) => status >= 200 && status < 500,
-    });
-    if (response.status === 401) {
-      return null;
-      
-    }
+    const response = await api.get<ApiResponse<User>>("/user/me");
     return response.data.data;
   } catch (error: any) {
     console.error("Get current user error:", {
       status: error.response?.status,
       data: error.response?.data,
-      message: error.message
+      message: error.message,
     });
     if (error.response?.status === 401) {
-      return null;
+      console.log("401 detected in getCurrentUser, returning null");
+      return null; // Interceptor will handle logout and redirect
     }
     throw new Error(
-      error.response?.data?.message || error.response?.data?.error || "Failed to fetch current user"
+      error.response?.data?.message ||
+        error.response?.data?.error ||
+        "Failed to fetch current user"
     );
   }
 }
+
+
 
 export async function logout(): Promise<void> {
   try {
@@ -194,17 +193,17 @@ export async function getCurrentUserServer(
         ...(token ? { Authorization: `Bearer ${token}` } : {}),
       },
     });
+    console.log("getCurrentUserServer success:", {
+      userId: response.data.data.id,
+    });
     return response.data.data;
   } catch (error: any) {
     console.error("Get current user server error:", {
       status: error.response?.status,
       data: error.response?.data,
-      message: error.message
+      message: error.message,
     });
-    if (error.response?.status === 401) {
-      return null;
-    }
-    return null;
+    return null; // Middleware will handle cookie clearing and redirect
   }
 }
 

@@ -40,37 +40,86 @@ api.interceptors.request.use((config) => {
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
+  console.log("Request sent:", { url: config.url, method: config.method });
   return config;
 });
 
 api.interceptors.response.use(
-  (response) => response,
+  (response) => {
+    console.log("Response received:", {
+      url: response.config.url,
+      status: response.status,
+    });
+    return response;
+  },
   async (error: AxiosError<ApiErrorResponse>) => {
-    if (error.response?.status === 401 && !error.config?.url?.includes("/auth/login")) {
+    const originalRequest = error.config as ExtendedAxiosRequestConfig;
+
+    console.log("Interceptor error:", {
+      status: error.response?.status,
+      url: error.config?.url,
+      retry: originalRequest._retry,
+      isLoggingOut,
+    });
+
+    if (
+      error.response?.status === 401 &&
+      !originalRequest._retry &&
+      !error.config?.url?.includes("/auth/logout")
+    ) {
+      console.log("Handling 401 for:", error.config?.url);
       if (isLoggingOut) {
+        console.log("Already logging out, rejecting error");
         return Promise.reject(error);
       }
 
       isLoggingOut = true;
+      originalRequest._retry = true;
+
       try {
-        if (typeof window !== "undefined" && !window.location.pathname.includes("/login")) {
+        if (typeof window !== "undefined") {
+          console.log("Clearing auth state");
           useAuthStore.getState().clearAuth();
+          console.log("Calling /auth/logout");
           await logout();
-          window.location.href = "/login";
+          console.log("Logout successful, redirecting to /login");
+          if (!window.location.pathname.includes("/login")) {
+            window.location.href = "/login";
+          } else {
+            console.log("Already on /login, no redirect needed");
+          }
+        } else {
+          console.log("Skipping logout/redirect: SSR context");
         }
       } catch (logoutError) {
         console.error("Logout failed during 401 handling:", logoutError);
       } finally {
         isLoggingOut = false;
+        console.log("Reset isLoggingOut flag");
       }
+
+      const errorMessage =
+        error.response?.data?.message ||
+        error.response?.data?.error ||
+        "Session invalidated. Please log in again.";
+      const enhancedError = new Error(
+        errorMessage
+      ) as AxiosError<ApiErrorResponse>;
+      enhancedError.response = error.response;
+      enhancedError.config = error.config;
+      return Promise.reject(enhancedError);
     }
 
-    const errorMessage = error.response?.data?.message || 
-                        error.response?.data?.error || 
-                        error.message || 
-                        "An unexpected error occurred";
+    const errorMessage =
+      error.response?.data?.message ||
+      error.response?.data?.error ||
+      error.message ||
+      "An unexpected error occurred";
 
-    const enhancedError = new Error(errorMessage) as AxiosError<ApiErrorResponse>;
+    console.log("Non-401 error:", errorMessage);
+    const enhancedError = new Error(
+      errorMessage
+    ) as AxiosError<ApiErrorResponse>;
     enhancedError.response = error.response;
     enhancedError.config = error.config;
 
