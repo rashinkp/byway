@@ -28,9 +28,12 @@ export class GetCourseByIdUseCase implements IGetCourseByIdUseCase {
       isEnrolled = !!enrollment;
     }
 
+    const courseData = course.toJSON();
     return {
-      ...course.toJSON(),
+      ...courseData,
       isEnrolled,
+      category: courseData.category || null,
+      instructor: courseData.creator || null,
     };
   }
 }

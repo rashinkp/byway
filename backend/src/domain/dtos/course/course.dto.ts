@@ -101,6 +101,17 @@ export interface IEnrollmentOutputDTO {
 
 export interface ICourseWithEnrollmentStatus extends ICourseOutputDTO {
   isEnrolled: boolean;
+  category?: {
+    id: string;
+    name: string;
+    description: string | null;
+  } | null;
+  instructor?: {
+    id: string;
+    name: string;
+    email: string;
+    avatar: string | null;
+  } | null;
 }
 
 export interface ICourseResponseDTO {

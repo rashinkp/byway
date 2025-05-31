@@ -11,7 +11,7 @@ export const useGetCourseById = (courseId: string) => {
   return useQuery<Course, Error>({
     queryKey: ["course", courseId],
     queryFn: () => getCourseById(courseId),
-    enabled: !!user?.id && !!courseId,
+    enabled: !!courseId,
     retry: 1,
     staleTime: 5 * 60 * 1000, 
   });

@@ -92,7 +92,18 @@ export class CourseRepository implements ICourseRepository {
     try {
       const course = await this.prisma.course.findUnique({
         where: { id },
-        include: { details: true },
+        include: { 
+          details: true,
+          category: true,
+          creator: {
+            select: {
+              id: true,
+              name: true,
+              email: true,
+              avatar: true
+            }
+          }
+        },
       });
 
       if (!course) return null;
