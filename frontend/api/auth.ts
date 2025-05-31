@@ -152,6 +152,7 @@ export async function getCurrentUser(): Promise<User | null> {
     });
     if (response.status === 401) {
       return null;
+      
     }
     return response.data.data;
   } catch (error: any) {
