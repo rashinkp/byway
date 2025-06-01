@@ -17,9 +17,16 @@ export function useSignup() {
       email: string;
       password: string;
     }) => signup({ name, email, password }),
-    onSuccess: (data) => {
-      const userEmail = data?.data?.email;
-      console.log("Signup response:", data);
+    onSuccess: (response) => {
+    
+      if (!response?.success) {
+        toast.error("Signup failed", {
+          description: response?.message || "Something went wrong",
+        });
+        return;
+      }
+
+      const userEmail = response.data?.email;
       if (userEmail) {
         setEmail(userEmail);
         toast.success("Signed up successfully", {
@@ -33,6 +40,7 @@ export function useSignup() {
       }
     },
     onError: (error: any) => {
+      console.error("Signup error:", error);
       toast.error("Signup failed", {
         description: error.message || "Something went wrong",
       });

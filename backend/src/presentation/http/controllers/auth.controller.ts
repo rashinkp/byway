@@ -151,16 +151,11 @@ export class AuthController extends BaseController {
     return this.handleRequest(httpRequest, async (request) => {
       const validated = validateRegister(request.body);
       const user = await this.registerUseCase.execute(validated);
-      const response: ApiResponse<UserResponse> = {
-        statusCode: 201,
-        success: true,
-        message: "Registration successful",
-        data: {
+      const response = {
           id: user.id,
           name: user.name,
           email: user.email,
           role: user.role,
-        },
       };
       return this.success_201(response, "Registration successful");
     });
@@ -186,23 +181,14 @@ export class AuthController extends BaseController {
     return this.handleRequest(httpRequest, async (request) => {
       const validated = validateVerifyOtp(request.body);
       const user = await this.verifyOtpUseCase.execute(validated);
-      const response: ApiResponse<UserResponse> = {
-        statusCode: 200,
-        success: true,
-        message: "OTP verified successfully",
-        data: {
-          id: user.id,
-          name: user.name,
-          email: user.email,
-          role: user.role,
-        },
+      const response = {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
       };
-      return {
-        statusCode: 200,
-        body: response,
-        cookie: { action: "set", user },
-      };
-    });
+      return this.success_200(response, "OTP verification successful");
+    })
   }
 
   async getVerificationStatus(httpRequest: IHttpRequest): Promise<IHttpResponse> {

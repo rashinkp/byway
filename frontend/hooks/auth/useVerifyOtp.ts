@@ -7,7 +7,7 @@ import { useAuthStore } from "@/stores/auth.store";
 import { useRouter } from "next/navigation";
 
 export function useVerifyOtp() {
-  const { setUser, setEmail } = useAuthStore();
+  const { clearAuth } = useAuthStore();
   const queryClient = useQueryClient();
   const router = useRouter();
 
@@ -22,19 +22,27 @@ export function useVerifyOtp() {
       type?: "signup" | "password-reset";
     }) => verifyOtp(otp, email, type),
     onSuccess: (data, variables) => {
-      const user = data.data;
+      queryClient.invalidateQueries({ queryKey: ["auth"] });
 
-      // Only set user for signup verification
-      if (variables.type !== "password-reset") {
-        setUser(user);
-        router.push("/dashboard");
+      if (variables.type === "password-reset") {
+        toast.success("OTP verified", {
+          description: "Please set your new password.",
+        });
+
+        const params = new URLSearchParams({
+          email: variables.email,
+          otp: variables.otp
+        });
+        router.push(`/reset-password?${params.toString()}`);
+      } else {
+        toast.success("Email verified", {
+          description:
+            "Your email has been successfully verified. Please log in.",
+        });
+        router.push("/login");
       }
 
-      queryClient.invalidateQueries({ queryKey: ["auth"] });
-      toast.success("Email verified", {
-        description: "Your email has been successfully verified.",
-      });
-      setEmail(null);
+      clearAuth();
     },
     onError: (error: any) => {
       toast.error("Invalid OTP", {

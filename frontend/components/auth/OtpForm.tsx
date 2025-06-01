@@ -43,15 +43,6 @@ export function VerifyOtpForm() {
 
     verifyOtp(
       { email, otp, type: verificationType },
-      {
-        onSuccess: (user) => {
-          if (type === "forgot-password") {
-            router.push(`/reset-password?otp=${otp}`);
-          } else {
-            redirectByRole(user.data.role);
-          }
-        },
-      }
     );
   };
 

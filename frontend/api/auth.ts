@@ -150,11 +150,6 @@ export async function getCurrentUser(): Promise<User | null> {
     const response = await api.get<ApiResponse<User>>("/user/me");
     return response.data.data;
   } catch (error: any) {
-    console.error("Get current user error:", {
-      status: error.response?.status,
-      data: error.response?.data,
-      message: error.message,
-    });
     if (error.response?.status === 401) {
       console.log("401 detected in getCurrentUser, returning null");
       return null; // Interceptor will handle logout and redirect
@@ -166,8 +161,6 @@ export async function getCurrentUser(): Promise<User | null> {
     );
   }
 }
-
-
 
 export async function logout(): Promise<void> {
   try {
@@ -198,11 +191,6 @@ export async function getCurrentUserServer(
     });
     return response.data.data;
   } catch (error: any) {
-    console.error("Get current user server error:", {
-      status: error.response?.status,
-      data: error.response?.data,
-      message: error.message,
-    });
     return null; // Middleware will handle cookie clearing and redirect
   }
 }

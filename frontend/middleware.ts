@@ -12,6 +12,7 @@ export async function middleware(request: NextRequest) {
     pathname,
     user: !!user,
     token: !!token,
+    searchParams: Object.fromEntries(searchParams.entries()),
   });
 
   // If token exists, verify user status
@@ -56,41 +57,39 @@ export async function middleware(request: NextRequest) {
     "/reset-password",
   ];
 
-  if (publicRoutes.includes(pathname)) {
+  // Check if current path is a public route
+  const isPublicRoute = publicRoutes.some(route => pathname.startsWith(route));
+
+  if (isPublicRoute) {
+    // Handle specific public route validations
     if (pathname === "/verify-otp" && !searchParams.get("email")) {
       console.log("Missing email for /verify-otp, redirecting to /signup");
       return NextResponse.redirect(new URL("/signup", request.url));
     }
-    if (
-      pathname === "/reset-password" &&
-      (!searchParams.get("email") || !searchParams.get("otp"))
-    ) {
-      console.log(
-        "Missing params for /reset-password, redirecting to /forgot-password"
-      );
-      return NextResponse.redirect(new URL("/forgot-password", request.url));
-    }
-    if (user) {
-      console.log(
-        "Authenticated user, redirecting from public route:",
-        pathname
-      );
-      const roleRedirects: Record<string, string> = {
-        ADMIN: "/admin/dashboard",
-        INSTRUCTOR: "/instructor/dashboard",
-        USER: "/",
-      };
-      const redirectPath = roleRedirects[user.role] || "/";
-      return NextResponse.redirect(new URL(redirectPath, request.url));
-    }
+
+    // For reset-password, only validate if directly accessing without parameters
+    // if (
+    //   pathname === "/reset-password" &&
+    //   !searchParams.get("email") &&
+    //   !searchParams.get("otp")
+    // ) {
+    //   console.log(
+    //     "Missing params for /reset-password, redirecting to /forgot-password"
+    //   );
+    //   return NextResponse.redirect(new URL("/forgot-password", request.url));
+    // }
+
+    // Allow access to public routes without redirection
     console.log("Allowing access to public route:", pathname);
     return NextResponse.next();
   }
 
+  // Protected routes handling
   if (
     pathname.startsWith("/admin") ||
     pathname.startsWith("/instructor") ||
-    pathname.startsWith("/user")
+    pathname.startsWith("/user") ||
+    pathname === "/"
   ) {
     if (!user) {
       console.log("No user, redirecting to /login from:", pathname);
