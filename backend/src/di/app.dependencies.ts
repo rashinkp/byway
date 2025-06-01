@@ -11,6 +11,7 @@ import { createStripeDependencies } from "./stripe.dependencies";
 import { createTransactionDependencies } from "./transaction.dependencies";
 import { createOrderDependencies } from "./order.dependencies";
 import { createFileDependencies } from "./file.dependencies";
+import { createProgressDependencies } from "./progress.dependencies";
 
 export interface AppDependencies {
   authController: any;
@@ -25,6 +26,7 @@ export interface AppDependencies {
   transactionController: any;
   orderController: any;
   fileController: any;
+  progressController: any;
 }
 
 export function createAppDependencies(): AppDependencies {
@@ -42,6 +44,7 @@ export function createAppDependencies(): AppDependencies {
   const transactionDeps = createTransactionDependencies(sharedDeps);
   const orderDeps = createOrderDependencies(sharedDeps);
   const fileDeps = createFileDependencies(sharedDeps);
+  const progressDeps = createProgressDependencies(sharedDeps);
 
   return {
     authController: authDeps.authController,
@@ -55,6 +58,7 @@ export function createAppDependencies(): AppDependencies {
     stripeController: stripeDeps.stripeController,
     transactionController: transactionDeps.transactionController,
     orderController: orderDeps.orderController,
-    fileController: fileDeps.fileController
+    fileController: fileDeps.fileController,
+    progressController: progressDeps.progressController
   };
 }
