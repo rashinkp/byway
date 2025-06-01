@@ -50,6 +50,7 @@ export class EnrollCourseUseCase implements IEnrollCourseUseCase {
       const newEnrollments = await this.enrollmentRepository.create({
         userId: input.userId,
         courseIds: [courseId],
+        orderItemId: input.orderItemId,
       });
 
       enrollments.push(...newEnrollments);

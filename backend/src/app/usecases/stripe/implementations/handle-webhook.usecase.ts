@@ -142,6 +142,7 @@ export class HandleWebhookUseCase implements IHandleWebhookUseCase {
       await this.enrollmentRepository.create({
         userId,
         courseIds: courses.map((course) => course.id),
+        orderItemId: order.id,
       });
 
       // Calculate total amount from courses

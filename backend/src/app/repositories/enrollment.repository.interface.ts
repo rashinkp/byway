@@ -14,4 +14,6 @@ export interface IEnrollmentRepository {
   findByUserId(userId: string): Promise<Enrollment[]>;
   findByCourseId(courseId: string): Promise<Enrollment[]>;
   delete(userId: string, courseId: string): Promise<void>;
+  updateProgress(userId: string, courseId: string, progress: number, lastLessonId?: string): Promise<void>;
+  updateAccessStatus(userId: string, courseId: string, status: 'ACTIVE' | 'BLOCKED' | 'EXPIRED'): Promise<void>;
 }

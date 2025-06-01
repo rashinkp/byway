@@ -1,4 +1,3 @@
-
 import { CreateLessonContentUseCase } from "../app/usecases/content/implementations/create-content.usecase";
 import { DeleteLessonContentUseCase } from "../app/usecases/content/implementations/delete-content.usecase";
 import { GetContentByLessonIdUseCase } from "../app/usecases/content/implementations/get-content-by-lesson-id.usecase";
@@ -22,7 +21,11 @@ export function createLessonContentDependencies(
     lessonContentRepository
   );
   const getLessonContentByLessonIdUseCase =
-    new GetContentByLessonIdUseCase(lessonContentRepository);
+    new GetContentByLessonIdUseCase(
+      lessonContentRepository,
+      lessonRepository,
+      deps.enrollmentRepository
+    );
   const deleteLessonContentUseCase = new DeleteLessonContentUseCase(
     lessonContentRepository
   );

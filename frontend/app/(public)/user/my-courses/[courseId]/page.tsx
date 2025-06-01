@@ -2,13 +2,15 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { ILesson } from "@/types/lesson";
 import { useGetAllLessonsInCourse } from "@/hooks/lesson/useGetAllLesson";
 import { useGetContentByLessonId } from "@/hooks/content/useGetContentByLessonId";
 import { LessonNavigation } from "@/components/course/enrolledCourse/EnrolledCourseLessonNavigation";
 import { LessonContent } from "@/components/course/enrolledCourse/EnrolledLessonContent";
 import { EnrolledCourseSidebar } from "@/components/course/enrolledCourse/EnrolledCourseSideBar";
+import { toast } from "sonner";
+import { AxiosError } from "axios";
 
 interface LessonWithCompletion extends ILesson {
   completed: boolean;
@@ -25,6 +27,7 @@ export default function CourseContent() {
 
   const params = useParams();
   const courseId = params.courseId as string;
+  const router = useRouter();
 
   // Fetch lessons
   const { data, isLoading, isError, error } = useGetAllLessonsInCourse({
@@ -44,6 +47,27 @@ export default function CourseContent() {
     isError: isContentError,
     error: contentError,
   } = useGetContentByLessonId(selectedLesson?.id || "");
+
+  // Handle content errors
+  useEffect(() => {
+    if (isContentError && contentError) {
+      console.log("contentError", contentError);
+      const axiosError = contentError as AxiosError<{ message: string }>;
+      const errorMessage = axiosError.response?.data?.message || axiosError.message || "Unknown error";
+      console.log("errorMessage", errorMessage);
+
+      if (errorMessage.toLowerCase().includes("not enrolled") || 
+          errorMessage.toLowerCase().includes("don't have permission") ||
+          errorMessage.toLowerCase().includes("not active")) {
+        toast.error("You need to enroll in this course to access the content");
+        setTimeout(() => {
+          router.push(`/courses/${courseId}`);
+        }, 2000);
+      } else {
+        toast.error("Failed to load lesson content. Please try again.");
+      }
+    }
+  }, [isContentError, contentError, courseId, router]);
 
   // Initialize lessons with completion status
   useEffect(() => {
@@ -128,11 +152,17 @@ export default function CourseContent() {
       <div className="flex-1 p-6 lg:p-10">
         {isLoading ? (
           <div className="flex items-center justify-center h-full">
-            <p className="text-gray-500 text-lg">Loading...</p>
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
           </div>
         ) : isError ? (
-          <div className="flex items-center justify-center h-full">
-            <p className="text-red-600 text-lg">Error: {error?.message}</p>
+          <div className="flex flex-col items-center justify-center h-full space-y-4">
+            <p className="text-red-600 text-lg">Unable to load course content</p>
+            <button 
+              onClick={() => router.push("/user/my-courses")}
+              className="px-4 py-2 bg-primary text-white rounded-md hover:bg-primary/90 transition-colors"
+            >
+              Return to My Courses
+            </button>
           </div>
         ) : selectedLesson ? (
           <div className="max-w-4xl mx-auto">

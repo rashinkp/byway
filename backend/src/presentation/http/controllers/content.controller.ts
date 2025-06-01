@@ -8,6 +8,7 @@ import { IGetContentByLessonIdUseCase } from "../../../app/usecases/content/inte
 import { IDeleteLessonContentUseCase } from "../../../app/usecases/content/interfaces/delete-content.usecase.interface";
 import { validateCreateLessonContent, validateDeleteLessonContent, validateGetLessonContentByLessonId, validateUpdateLessonContent } from "../../validators/content.validator";
 import { BaseController } from "./base.controller";
+import { HttpError } from "../errors/http-error";
 
 export class LessonContentController extends BaseController {
   constructor(
@@ -43,11 +44,16 @@ export class LessonContentController extends BaseController {
 
   async getLessonContentByLessonId(httpRequest: IHttpRequest): Promise<IHttpResponse> {
     return this.handleRequest(httpRequest, async (request) => {
+      if (!request.user?.id) {
+        throw new HttpError("Unauthorized", 401);
+      }
+
       const validated = validateGetLessonContentByLessonId({
         lessonId: request.params.lessonId,
       });
       const content = await this.getLessonContentByLessonIdUseCase.execute(
-        validated.lessonId
+        validated.lessonId,
+        request.user.id
       );
       return this.success_200(content, "Lesson content retrieved successfully");
     });

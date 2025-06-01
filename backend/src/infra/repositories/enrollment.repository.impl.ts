@@ -23,6 +23,11 @@ export class EnrollmentRepository implements IEnrollmentRepository {
         userId: enrollment.userId,
         courseId: enrollment.courseId,
         enrolledAt: enrollment.enrolledAt.toISOString(),
+        orderItemId: enrollment.orderItemId || undefined,
+        accessStatus: enrollment.accessStatus,
+        progress: enrollment.progress,
+        lastLessonId: enrollment.lastLessonId || undefined,
+        completedAt: enrollment.completedAt?.toISOString(),
       };
     } catch (error) {
       console.error("Error finding enrollment", { error, userId, courseId });
@@ -38,16 +43,54 @@ export class EnrollmentRepository implements IEnrollmentRepository {
             userId: input.userId,
             courseId,
             enrolledAt: new Date(),
+            orderItemId: input.orderItemId,
+            accessStatus: 'ACTIVE',
+            progress: 0,
           },
         });
         return {
           userId: enrollment.userId,
           courseId: enrollment.courseId,
           enrolledAt: enrollment.enrolledAt.toISOString(),
+          orderItemId: enrollment.orderItemId || undefined,
+          accessStatus: enrollment.accessStatus,
+          progress: enrollment.progress,
+          lastLessonId: enrollment.lastLessonId || undefined,
+          completedAt: enrollment.completedAt?.toISOString(),
         };
       })
     );
     return enrollments;
+  }
+
+  async updateProgress(userId: string, courseId: string, progress: number, lastLessonId?: string): Promise<void> {
+    await this.prisma.enrollment.update({
+      where: {
+        userId_courseId: {
+          userId,
+          courseId,
+        },
+      },
+      data: {
+        progress,
+        lastLessonId,
+        completedAt: progress === 100 ? new Date() : undefined,
+      },
+    });
+  }
+
+  async updateAccessStatus(userId: string, courseId: string, status: 'ACTIVE' | 'BLOCKED' | 'EXPIRED'): Promise<void> {
+    await this.prisma.enrollment.update({
+      where: {
+        userId_courseId: {
+          userId,
+          courseId,
+        },
+      },
+      data: {
+        accessStatus: status,
+      },
+    });
   }
 
   async findByUserIdAndCourseIds(userId: string, courseIds: string[]): Promise<Enrollment[]> {
@@ -61,7 +104,12 @@ export class EnrollmentRepository implements IEnrollmentRepository {
       `${enrollment.userId}-${enrollment.courseId}`,
       enrollment.userId,
       enrollment.courseId,
-      enrollment.enrolledAt
+      enrollment.enrolledAt,
+      enrollment.orderItemId || undefined,
+      enrollment.accessStatus,
+      enrollment.progress,
+      enrollment.lastLessonId || undefined,
+      enrollment.completedAt || undefined
     ));
   }
 
@@ -73,7 +121,12 @@ export class EnrollmentRepository implements IEnrollmentRepository {
       `${enrollment.userId}-${enrollment.courseId}`,
       enrollment.userId,
       enrollment.courseId,
-      enrollment.enrolledAt
+      enrollment.enrolledAt,
+      enrollment.orderItemId || undefined,
+      enrollment.accessStatus,
+      enrollment.progress,
+      enrollment.lastLessonId || undefined,
+      enrollment.completedAt || undefined
     ));
   }
 
@@ -85,7 +138,12 @@ export class EnrollmentRepository implements IEnrollmentRepository {
       `${enrollment.userId}-${enrollment.courseId}`,
       enrollment.userId,
       enrollment.courseId,
-      enrollment.enrolledAt
+      enrollment.enrolledAt,
+      enrollment.orderItemId || undefined,
+      enrollment.accessStatus,
+      enrollment.progress,
+      enrollment.lastLessonId || undefined,
+      enrollment.completedAt || undefined
     ));
   }
 

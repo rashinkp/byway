@@ -64,6 +64,7 @@ export interface IGetEnrolledCoursesInputDTO {
 export interface ICreateEnrollmentInputDTO {
   userId: string;
   courseIds: string[];
+  orderItemId?: string;
 }
 
 export interface IUpdateCourseApprovalInputDTO {
@@ -97,6 +98,11 @@ export interface IEnrollmentOutputDTO {
   userId: string;
   courseId: string;
   enrolledAt: string;
+  orderItemId?: string;
+  accessStatus: 'ACTIVE' | 'BLOCKED' | 'EXPIRED';
+  progress: number;
+  lastLessonId?: string;
+  completedAt?: string;
 }
 
 export interface ICourseWithEnrollmentStatus extends ICourseOutputDTO {

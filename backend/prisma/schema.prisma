@@ -188,8 +188,7 @@ model Lesson {
   createdAt   DateTime    @default(now())
   updatedAt   DateTime    @updatedAt
   deletedAt   DateTime?
-  progress    UserLessonProgress[] @relation("LessonProgress")
-  content     LessonContent?       @relation("LessonToContent")
+  content     LessonContent? @relation("LessonToContent")
   @@unique([courseId, order])
   @@index([order])
 }
@@ -200,12 +199,14 @@ model Enrollment {
   orderItemId   String?       @unique
   enrolledAt    DateTime      @default(now())
   accessStatus  AccessStatus  @default(ACTIVE)
-  createdAt     DateTime      @default(now())
-  updatedAt     DateTime      @updatedAt
-  user          User          @relation("UserEnrollments", fields: [userId], references: [id], onDelete: Cascade)
-  course        Course        @relation("CourseEnrollments", fields: [courseId], references: [id], onDelete: Cascade)
-  orderItem     OrderItem?    @relation("OrderItemToEnrollment", fields: [orderItemId], references: [id], onDelete: SetNull)
-  progress      UserLessonProgress[] @relation("EnrollmentProgress")
+  progress      Int          @default(0)  // Store progress as percentage (0-100)
+  lastLessonId  String?      // Track the last accessed lesson
+  completedAt   DateTime?    // When the course was completed
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+  user          User         @relation("UserEnrollments", fields: [userId], references: [id], onDelete: Cascade)
+  course        Course       @relation("CourseEnrollments", fields: [courseId], references: [id], onDelete: Cascade)
+  orderItem     OrderItem?   @relation("OrderItemToEnrollment", fields: [orderItemId], references: [id], onDelete: SetNull)
   @@id([userId, courseId])
 }
 
@@ -213,19 +214,6 @@ enum AccessStatus {
   ACTIVE
   BLOCKED
   EXPIRED
-}
-
-model UserLessonProgress {
-  userId      String
-  courseId    String
-  lessonId    String
-  enrollment  Enrollment @relation("EnrollmentProgress", fields: [userId, courseId], references: [userId, courseId])
-  lesson      Lesson     @relation("LessonProgress", fields: [lessonId], references: [id], onDelete: Cascade)
-  completed   Boolean    @default(false)
-  completedAt DateTime?
-  createdAt   DateTime   @default(now())
-  updatedAt   DateTime   @updatedAt
-  @@id([userId, courseId, lessonId])
 }
 
 model LessonContent {
