@@ -88,8 +88,7 @@ export async function middleware(request: NextRequest) {
   if (
     pathname.startsWith("/admin") ||
     pathname.startsWith("/instructor") ||
-    pathname.startsWith("/user") ||
-    pathname === "/"
+    pathname.startsWith("/user") 
   ) {
     if (!user) {
       console.log("No user, redirecting to /login from:", pathname);

@@ -2,6 +2,7 @@ import React from "react";
 import { Transaction } from "@/types/transaction";
 import { ArrowUp, ArrowDown, AlertCircle, RefreshCw } from "lucide-react";
 import { formatDate, formatPrice } from "@/utils/formatters";
+import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
 
 interface TransactionListProps {
   transactions: Transaction[];
@@ -96,10 +97,8 @@ export const TransactionList: React.FC<TransactionListProps> = ({
 
   if (isLoading) {
     return (
-      <div className="animate-pulse space-y-4">
-        {[1, 2, 3].map((i) => (
-          <div key={i} className="h-20 bg-gray-100 rounded-lg" />
-        ))}
+      <div className="py-8">
+        <LoadingSpinner text="Loading transactions..." />
       </div>
     );
   }

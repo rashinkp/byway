@@ -1,4 +1,5 @@
 import { Skeleton } from "@/components/ui/skeleton";
+import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
 
 interface CourseTabsProps {
   activeTab: string;
@@ -13,12 +14,8 @@ export default function CourseTabs({
 }: CourseTabsProps) {
   if (isLoading) {
     return (
-      <div className="border-b mb-6">
-        <div className="flex gap-6">
-          {["Description", "Instructor", "Syllabus", "Reviews"].map((tab) => (
-            <Skeleton key={tab} className="h-6 w-24 py-3" />
-          ))}
-        </div>
+      <div className="py-4">
+        <LoadingSpinner size="sm" text="Loading course content..." />
       </div>
     );
   }

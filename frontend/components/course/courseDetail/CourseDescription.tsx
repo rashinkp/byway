@@ -1,4 +1,5 @@
 import { Skeleton } from "@/components/ui/skeleton";
+import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
 
 interface CourseDescriptionProps {
   course: any;
@@ -11,13 +12,8 @@ export default function CourseDescription({
 }: CourseDescriptionProps) {
   if (isLoading) {
     return (
-      <div>
-        <Skeleton className="h-6 w-40 mb-4" />
-        <Skeleton className="h-4 w-full mb-2" />
-        <Skeleton className="h-4 w-5/6 mb-6" />
-        <Skeleton className="h-6 w-40 mb-4" />
-        <Skeleton className="h-4 w-full mb-2" />
-        <Skeleton className="h-4 w-5/6" />
+      <div className="py-4">
+        <LoadingSpinner size="sm" text="Loading description..." />
       </div>
     );
   }

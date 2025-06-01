@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import dynamic from "next/dynamic";
 import { useAuth } from "@/hooks/auth/useAuth";
 import { ROUTES } from "@/constants/routes";
+import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
 
 const LoginForm = dynamic(
   () => import("@/components/auth/LoginForm").then((mod) => mod.LoginForm),
@@ -27,7 +28,7 @@ export default function LoginPage() {
   }, [isAuthenticated, isLoading, user, router]);
 
   if (isLoading) {
-    return <p>Loading...</p>;
+    return <LoadingSpinner fullScreen text="Loading..." />;
   }
 
   if (isAuthenticated) {

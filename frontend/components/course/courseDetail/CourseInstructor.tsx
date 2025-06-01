@@ -1,6 +1,7 @@
 import UserProfile from "@/public/UserProfile.jpg";
 import { Star, Users, BookOpen } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
+import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
 
 interface CourseInstructorProps {
   instructor: any;
@@ -13,22 +14,8 @@ export default function CourseInstructor({
 }: CourseInstructorProps) {
   if (isLoading) {
     return (
-      <div>
-        <h2 className="text-xl font-bold mb-4">Instructor</h2>
-        <div className="flex items-start gap-4 mb-6">
-          <Skeleton className="h-16 w-16 rounded-full" />
-          <div className="space-y-2">
-            <Skeleton className="h-5 w-40" />
-            <Skeleton className="h-4 w-32" />
-            <div className="flex gap-4">
-              <Skeleton className="h-4 w-24" />
-              <Skeleton className="h-4 w-24" />
-              <Skeleton className="h-4 w-24" />
-            </div>
-            <Skeleton className="h-4 w-full" />
-            <Skeleton className="h-4 w-5/6" />
-          </div>
-        </div>
+      <div className="py-4">
+        <LoadingSpinner size="sm" text="Loading instructor details..." />
       </div>
     );
   }

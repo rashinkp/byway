@@ -1,4 +1,5 @@
 import { Skeleton } from "@/components/ui/skeleton";
+import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
 
 interface CourseBreadcrumbsProps {
   course: any;
@@ -11,12 +12,8 @@ export default function CourseBreadcrumbs({
 }: CourseBreadcrumbsProps) {
   if (isLoading) {
     return (
-      <div className="flex text-sm text-gray-500 mb-4">
-        <Skeleton className="h-4 w-20" />
-        <span className="mx-2">›</span>
-        <Skeleton className="h-4 w-24" />
-        <span className="mx-2">›</span>
-        <Skeleton className="h-4 w-32" />
+      <div className="py-4">
+        <LoadingSpinner size="sm" text="Loading course details..." />
       </div>
     );
   }

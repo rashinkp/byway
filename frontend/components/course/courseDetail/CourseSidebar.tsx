@@ -3,6 +3,7 @@ import { useRouter } from "next/navigation";
 import { Skeleton } from "@/components/ui/skeleton";
 import Link from "next/link";
 import { Course } from "@/types/course"; // Ensure Course type includes isEnrolled
+import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
 
 interface CourseSidebarProps {
   course: Course | undefined;
@@ -33,16 +34,8 @@ export default function CourseSidebar({
 
   if (isLoading) {
     return (
-      <div className="sticky top-4 border rounded-lg overflow-hidden shadow-md">
-        <Skeleton className="w-full h-48" />
-        <div className="p-6">
-          <Skeleton className="h-6 w-24 mb-4" />
-          <Skeleton className="h-10 w-full mb-2" />
-          <Skeleton className="h-10 w-full mb-6" />
-          <Skeleton className="h-4 w-full mb-2" />
-          <Skeleton className="h-4 w-full mb-2" />
-          <Skeleton className="h-4 w-full" />
-        </div>
+      <div className="py-4">
+        <LoadingSpinner size="sm" text="Loading course details..." />
       </div>
     );
   }

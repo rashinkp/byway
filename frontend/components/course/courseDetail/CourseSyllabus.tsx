@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { ChevronDown } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
+import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
 
 interface CourseSyllabusProps {
   lessons: any[] | undefined;
@@ -25,21 +26,8 @@ export default function CourseSyllabus({
 
   if (isLoading) {
     return (
-      <div>
-        <h2 className="text-xl font-bold mb-4">Syllabus</h2>
-        <div className="space-y-4">
-          {[1, 2, 3].map((_, index) => (
-            <div key={index} className="border rounded-lg p-4">
-              <div className="flex justify-between items-center">
-                <div className="flex items-center gap-2">
-                  <Skeleton className="h-5 w-5" />
-                  <Skeleton className="h-4 w-40" />
-                </div>
-                <Skeleton className="h-4 w-12" />
-              </div>
-            </div>
-          ))}
-        </div>
+      <div className="py-4">
+        <LoadingSpinner size="sm" text="Loading syllabus..." />
       </div>
     );
   }
