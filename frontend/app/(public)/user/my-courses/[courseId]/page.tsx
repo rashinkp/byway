@@ -6,9 +6,12 @@ import { useParams, useRouter } from "next/navigation";
 import { ILesson } from "@/types/lesson";
 import { useGetAllLessonsInCourse } from "@/hooks/lesson/useGetAllLesson";
 import { useGetContentByLessonId } from "@/hooks/content/useGetContentByLessonId";
+import { useProgress } from "@/hooks/progress/useProgress";
+import { useUpdateProgress } from "@/hooks/progress/useUpdateProgress";
 import { LessonNavigation } from "@/components/course/enrolledCourse/EnrolledCourseLessonNavigation";
 import { LessonContent } from "@/components/course/enrolledCourse/EnrolledLessonContent";
 import { EnrolledCourseSidebar } from "@/components/course/enrolledCourse/EnrolledCourseSideBar";
+import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
 import { toast } from "sonner";
 import { AxiosError } from "axios";
 
@@ -39,6 +42,10 @@ export default function CourseContent() {
     filterBy: "PUBLISHED",
     includeDeleted: false,
   });
+
+  // Fetch progress
+  const { data: progressData, isLoading: isProgressLoading } = useProgress({ courseId });
+  const { mutate: updateProgress, isLoading: isUpdatingProgress } = useUpdateProgress();
 
   // Fetch content for the selected lesson
   const {
@@ -75,17 +82,26 @@ export default function CourseContent() {
       const initializedLessons: LessonWithCompletion[] = data.lessons.map(
         (lesson) => ({
           ...lesson,
-          completed: false,
+          completed: progressData?.lastLessonId === lesson.id || false,
         })
       );
       setLessonsWithCompletion(initializedLessons);
-      if (initializedLessons.length > 0) {
+      
+      // If there's a last lesson ID in progress, select that lesson
+      if (progressData?.lastLessonId) {
+        const lastLesson = initializedLessons.find(
+          lesson => lesson.id === progressData.lastLessonId
+        );
+        if (lastLesson) {
+          setSelectedLesson(lastLesson);
+        } else if (initializedLessons.length > 0) {
+          setSelectedLesson(initializedLessons[0]);
+        }
+      } else if (initializedLessons.length > 0) {
         setSelectedLesson(initializedLessons[0]);
-      } else {
-        setSelectedLesson(null);
       }
     }
-  }, [data]);
+  }, [data, progressData]);
 
   const allLessons = lessonsWithCompletion;
   const currentLessonIndex = allLessons.findIndex(
@@ -97,14 +113,31 @@ export default function CourseContent() {
   };
 
   const markLessonComplete = () => {
-    // Implementation remains commented as in original
+    if (!selectedLesson || !courseId) return;
+
+    const completedLessons = allLessons.filter(lesson => lesson.completed).length + 1;
+    const totalLessons = allLessons.length;
+    const progressPercentage = Math.round((completedLessons / totalLessons) * 100);
+
+    // Update progress in the backend
+    updateProgress({
+      courseId: courseId,
+      progress: progressPercentage,
+      lastLessonId: selectedLesson.id
+    });
+
+    // Update local state
+    setLessonsWithCompletion(prevLessons =>
+      prevLessons.map(lesson =>
+        lesson.id === selectedLesson.id
+          ? { ...lesson, completed: true }
+          : lesson
+      )
+    );
   };
 
   const goToNextLesson = () => {
-    if (
-      currentLessonIndex < allLessons.length - 1 &&
-      selectedLesson?.completed
-    ) {
+    if (currentLessonIndex < allLessons.length - 1) {
       setSelectedLesson(allLessons[currentLessonIndex + 1]);
     }
   };
@@ -127,18 +160,16 @@ export default function CourseContent() {
     }
   };
 
-  const completedLessons = allLessons.filter(
-    (lesson) => lesson.completed
-  ).length;
-  const progressPercentage =
-    allLessons.length > 0 ? (completedLessons / allLessons.length) * 100 : 0;
+  const completedLessons = allLessons.filter(lesson => lesson.completed).length;
+  const progressPercentage = progressData?.progress || 
+    (allLessons.length > 0 ? (completedLessons / allLessons.length) * 100 : 0);
 
   return (
     <div className="flex flex-col lg:flex-row w-full bg-gray-100 min-h-screen">
       <EnrolledCourseSidebar
         courseTitle="Introduction to User Experience Design"
         progressPercentage={progressPercentage}
-        isLoading={isLoading}
+        isLoading={isLoading || isProgressLoading}
         isError={isError}
         error={error}
         allLessons={allLessons}
@@ -150,10 +181,12 @@ export default function CourseContent() {
         goToNextPage={goToNextPage}
       />
       <div className="flex-1 p-6 lg:p-10">
-        {isLoading ? (
-          <div className="flex items-center justify-center h-full">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
-          </div>
+        {isLoading || isProgressLoading ? (
+          <LoadingSpinner 
+            size="lg" 
+            text="Loading course content..." 
+            className="h-[50vh]"
+          />
         ) : isError ? (
           <div className="flex flex-col items-center justify-center h-full space-y-4">
             <p className="text-red-600 text-lg">Unable to load course content</p>

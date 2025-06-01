@@ -26,6 +26,7 @@ export class ProgressController extends BaseController {
 
       const validatedData = UpdateProgressSchema.parse({
         ...req.body,
+        courseId: req.params.courseId,
         userId: req.user.id,
       });
 

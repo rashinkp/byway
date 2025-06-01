@@ -2,6 +2,7 @@
 
 import { FileText, CheckCircle, Clock } from "lucide-react";
 import { ILesson } from "@/types/lesson";
+import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
 
 interface LessonWithCompletion extends ILesson {
   completed: boolean;
@@ -76,7 +77,13 @@ export function LessonContent({
           </p>
         </div>
         {isContentLoading ? (
-          <div className="p-6 text-gray-600">Loading content...</div>
+          <div className="p-6">
+            <LoadingSpinner 
+              size="md" 
+              text="Loading lesson content..." 
+              className="h-[300px]"
+            />
+          </div>
         ) : isContentError ? (
           <div className="p-6 text-red-600">Error: {contentError?.message}</div>
         ) : !content ? (
@@ -143,7 +150,7 @@ export function LessonContent({
                             }}
                           />
                           <p className="text-gray-500 text-sm mt-2">
-                            If the PDF doesn’t load, use the download button
+                            If the PDF doesn't load, use the download button
                             above.
                           </p>
                         </>

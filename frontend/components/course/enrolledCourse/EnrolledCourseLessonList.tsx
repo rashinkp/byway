@@ -1,5 +1,6 @@
 import { ILesson } from "@/types/lesson";
 import { CheckCircle, Clock } from "lucide-react";
+import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
 
 interface LessonWithCompletion extends ILesson {
   completed: boolean;
@@ -25,7 +26,13 @@ export function LessonList({
   return (
     <div className="space-y-2">
       {isLoading ? (
-        <div className="p-4 text-gray-600">Loading lessons...</div>
+        <div className="p-4">
+          <LoadingSpinner 
+            size="sm" 
+            text="Loading lessons..." 
+            className="h-[100px]"
+          />
+        </div>
       ) : isError ? (
         <div className="p-4 text-red-600">Error: {error?.message}</div>
       ) : allLessons.length === 0 ? (
