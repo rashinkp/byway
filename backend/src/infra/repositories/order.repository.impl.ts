@@ -303,4 +303,25 @@ export class OrderRepository implements IOrderRepository {
 
     return order ? this.mapToOrderEntity(order) : null;
   }
+
+  async createOrderItems(orderId: string, courses: any[]): Promise<{ id: string; orderId: string; courseId: string }[]> {
+    const orderItems = await Promise.all(
+      courses.map(async (course) => {
+        const orderItem = await this.prisma.orderItem.create({
+          data: {
+            orderId,
+            courseId: course.id,
+            coursePrice: course.offer ?? course.price ?? 0,
+            courseTitle: course.title,
+          },
+        });
+        return {
+          id: orderItem.id,
+          orderId: orderItem.orderId,
+          courseId: orderItem.courseId,
+        };
+      })
+    );
+    return orderItems;
+  }
 }

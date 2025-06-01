@@ -1,3 +1,4 @@
+import { PrismaClient } from "@prisma/client";
 import {
   IHandleWebhookUseCase,
   IWebhookInput,
@@ -22,7 +23,7 @@ export class HandleWebhookUseCase implements IHandleWebhookUseCase {
     private readonly userRepository: IUserRepository,
     private readonly orderRepository: IOrderRepository,
     private readonly enrollmentRepository: IEnrollmentRepository,
-    private readonly transactionRepository: ITransactionRepository
+    private readonly transactionRepository: ITransactionRepository,
   ) {}
 
   async execute(input: IWebhookInput): Promise<ApiResponse> {
@@ -138,11 +139,11 @@ export class HandleWebhookUseCase implements IHandleWebhookUseCase {
     });
 
     try {
-      // Enroll user in courses
+
+      // Enroll user in courses using OrderItem IDs
       await this.enrollmentRepository.create({
         userId,
         courseIds: courses.map((course) => course.id),
-        orderItemId: order.id,
       });
 
       // Calculate total amount from courses
@@ -159,16 +160,11 @@ export class HandleWebhookUseCase implements IHandleWebhookUseCase {
         type: TransactionType.PURCHASE,
         status: TransactionStatus.COMPLETED,
         paymentGateway: PaymentGateway.STRIPE,
-        transactionId: order.paymentId,
       });
 
       await this.transactionRepository.create(transaction);
-      console.log("Transaction created successfully for order:", order.id);
     } catch (error) {
-      console.error("Error in processEnrollmentsAndTransactions:", {
-        error: error instanceof Error ? error.message : String(error),
-        stack: error instanceof Error ? error.stack : undefined,
-      });
+      console.error("Error in processEnrollmentsAndTransactions:", error);
       throw error;
     }
   }
