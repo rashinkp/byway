@@ -68,16 +68,16 @@ export async function middleware(request: NextRequest) {
     }
 
     // For reset-password, only validate if directly accessing without parameters
-    // if (
-    //   pathname === "/reset-password" &&
-    //   !searchParams.get("email") &&
-    //   !searchParams.get("otp")
-    // ) {
-    //   console.log(
-    //     "Missing params for /reset-password, redirecting to /forgot-password"
-    //   );
-    //   return NextResponse.redirect(new URL("/forgot-password", request.url));
-    // }
+    if (
+      pathname === "/reset-password" &&
+      !searchParams.get("email") &&
+      !searchParams.get("otp")
+    ) {
+      console.log(
+        "Missing params for /reset-password, redirecting to /forgot-password"
+      );
+      return NextResponse.redirect(new URL("/forgot-password", request.url));
+    }
 
     // Allow access to public routes without redirection
     console.log("Allowing access to public route:", pathname);
