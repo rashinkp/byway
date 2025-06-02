@@ -20,7 +20,7 @@ export const createRouter = (deps: AppDependencies): Router => {
   router.use("/auth", authRouter(deps.authController));
   router.use("/user", userRouter(deps.userController));
   router.use("/instructor", instructorRouter(deps.instructorController));
-  router.use("/categories", categoryRouter(deps.categoryController));
+  router.use("/category", categoryRouter(deps.categoryController));
   router.use("/courses", courseRouter(deps.courseController));
   router.use("/lessons", lessonRouter(deps.lessonController));
   router.use("/content", lessonContentRouter(deps.lessonContentController));

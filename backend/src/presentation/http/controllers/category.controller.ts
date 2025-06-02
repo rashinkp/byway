@@ -28,7 +28,10 @@ export class CategoryController extends BaseController {
 
   async createCategory(httpRequest: IHttpRequest): Promise<IHttpResponse> {
     return this.handleRequest(httpRequest, async (request) => {
-      const validated = validateCreateCategory(request.body);
+      const validated = validateCreateCategory({
+        ...request.body,
+        createdBy: request.user?.id
+      });
       const category = await this.createCategoryUseCase.execute(validated);
       return this.success_201(category, "Category created successfully");
     });
