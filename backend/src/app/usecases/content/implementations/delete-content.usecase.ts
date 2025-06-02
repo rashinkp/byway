@@ -11,7 +11,6 @@ export class DeleteLessonContentUseCase implements IDeleteLessonContentUseCase {
       if (!content) {
         throw new HttpError("Content not found", 404);
       }
-
       await this.contentRepository.delete(id);
     } catch (error) {
       if (error instanceof Error) {
