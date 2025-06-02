@@ -1,9 +1,10 @@
 import { ILesson } from "@/types/lesson";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, Lock } from "lucide-react";
 import { LessonList } from "./EnrolledCourseLessonList";
 
 interface LessonWithCompletion extends ILesson {
   completed: boolean;
+  isLocked?: boolean;
 }
 
 interface CourseSidebarProps {
@@ -55,7 +56,10 @@ export function EnrolledCourseSidebar({
         isLoading={isLoading}
         isError={isError}
         error={error}
-        allLessons={allLessons}
+        allLessons={allLessons.map(lesson => ({
+          ...lesson,
+          isLocked: lesson.isLocked
+        }))}
         selectedLesson={selectedLesson}
         handleLessonSelect={handleLessonSelect}
       />

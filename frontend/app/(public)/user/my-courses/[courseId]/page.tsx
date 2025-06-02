@@ -14,9 +14,11 @@ import { EnrolledCourseSidebar } from "@/components/course/enrolledCourse/Enroll
 import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
 import { toast } from "sonner";
 import { AxiosError } from "axios";
+import { LockOverlay } from "@/components/ui/LockOverlay";
 
 interface LessonWithCompletion extends ILesson {
   completed: boolean;
+  isLocked?: boolean;
 }
 
 export default function CourseContent() {
@@ -84,31 +86,47 @@ export default function CourseContent() {
     }
   }, [isContentError, contentError, courseId, router]);
 
-  // Initialize lessons with completion status
+  // Initialize lessons with completion status and locked state
   useEffect(() => {
     if (data?.lessons) {
-      const initializedLessons: LessonWithCompletion[] = data.lessons.map(
-        (lesson) => ({
-          ...lesson,
-          completed:
-            progressData?.lessonProgress?.find((p) => p.lessonId === lesson.id)
-              ?.completed || false,
-        })
+      // First, create the array with completion status
+      const lessonsWithCompletion: LessonWithCompletion[] = data.lessons.map(
+        (lesson) => {
+          const isCompleted = progressData?.lessonProgress?.find(
+            (p) => p.lessonId === lesson.id
+          )?.completed || false;
+
+          return {
+            ...lesson,
+            completed: isCompleted,
+            isLocked: false // Initialize as false, we'll update this in the next step
+          };
+        }
       );
-      setLessonsWithCompletion(initializedLessons);
+
+      // Then, update the locked state based on previous lesson completion
+      const lessonsWithLockedState = lessonsWithCompletion.map((lesson, index) => {
+        const isLocked = index > 0 && !lessonsWithCompletion[index - 1].completed;
+        return {
+          ...lesson,
+          isLocked
+        };
+      });
+
+      setLessonsWithCompletion(lessonsWithLockedState);
 
       // If there's a last lesson ID in progress, select that lesson
       if (progressData?.lastLessonId) {
-        const lastLesson = initializedLessons.find(
+        const lastLesson = lessonsWithLockedState.find(
           (lesson) => lesson.id === progressData.lastLessonId
         );
         if (lastLesson) {
           setSelectedLesson(lastLesson);
-        } else if (initializedLessons.length > 0) {
-          setSelectedLesson(initializedLessons[0]);
+        } else if (lessonsWithLockedState.length > 0) {
+          setSelectedLesson(lessonsWithLockedState[0]);
         }
-      } else if (initializedLessons.length > 0) {
-        setSelectedLesson(initializedLessons[0]);
+      } else if (lessonsWithLockedState.length > 0) {
+        setSelectedLesson(lessonsWithLockedState[0]);
       }
     }
   }, [data, progressData]);
@@ -224,7 +242,7 @@ export default function CourseContent() {
             </button>
           </div>
         ) : selectedLesson ? (
-          <div className="max-w-4xl mx-auto">
+          <div className="max-w-4xl mx-auto relative">
             <LessonContent
               selectedLesson={selectedLesson}
               content={content}
@@ -237,13 +255,9 @@ export default function CourseContent() {
               goToNextLesson={goToNextLesson}
               markLessonComplete={markLessonComplete}
             />
-            <LessonNavigation
-              currentLessonIndex={currentLessonIndex}
-              allLessons={allLessons}
-              selectedLesson={selectedLesson}
-              goToPrevLesson={goToPrevLesson}
-              goToNextLesson={goToNextLesson}
-            />
+            {selectedLesson.isLocked && (
+              <LockOverlay message="Complete the previous lesson to unlock this content" />
+            )}
           </div>
         ) : (
           <div className="flex items-center justify-center h-full">

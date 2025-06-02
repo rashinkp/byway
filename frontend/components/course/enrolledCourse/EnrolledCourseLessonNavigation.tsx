@@ -1,17 +1,18 @@
-import {
-  ChevronUp,
-  ChevronDown,
-} from "lucide-react";
-import { ILesson } from "@/types/lesson";
-
-interface LessonWithCompletion extends ILesson {
-  completed: boolean;
-}
+import { Button } from "@/components/ui/button";
+import { Lock, ChevronLeft, ChevronRight } from "lucide-react";
 
 interface LessonNavigationProps {
   currentLessonIndex: number;
-  allLessons: LessonWithCompletion[];
-  selectedLesson: LessonWithCompletion | null;
+  allLessons: Array<{
+    id: string;
+    title: string;
+    isLocked?: boolean;
+  }>;
+  selectedLesson: {
+    id: string;
+    title: string;
+    isLocked?: boolean;
+  } | null;
   goToPrevLesson: () => void;
   goToNextLesson: () => void;
 }
@@ -23,37 +24,36 @@ export function LessonNavigation({
   goToPrevLesson,
   goToNextLesson,
 }: LessonNavigationProps) {
+  const isFirstLesson = currentLessonIndex === 0;
+  const isLastLesson = currentLessonIndex === allLessons.length - 1;
+  const nextLesson = allLessons[currentLessonIndex + 1];
+  const isNextLessonLocked = nextLesson?.isLocked;
+
   return (
-    <div className="mt-10 flex justify-between">
-      {currentLessonIndex > 0 ? (
-        <div
-          className="flex items-center text-gray-700 hover:text-blue-600 cursor-pointer transition-colors"
+    <div className="flex justify-end items-center mt-8 pt-4 border-t">
+      {!isFirstLesson ? (
+        <Button
+          variant="outline"
           onClick={goToPrevLesson}
+          className="flex items-center gap-2"
         >
-          <ChevronUp className="rotate-90 mr-2" size={20} />
-          <span className="font-medium truncate">
-            Previous: {allLessons[currentLessonIndex - 1].title}
-          </span>
+          <ChevronLeft className="w-4 h-4" />
+          Previous Lesson
+        </Button>
+      ) : !isLastLesson && (
+        <div className="flex items-center gap-2">
+          {isNextLessonLocked && (
+            <Lock className="w-4 h-4 text-muted-foreground" />
+          )}
+          <Button
+            variant="default"
+            onClick={goToNextLesson}
+            disabled={isNextLessonLocked}
+          >
+            {isNextLessonLocked ? "Complete Current Lesson to Unlock" : "Next Lesson"}
+            <ChevronRight className="w-4 h-4 ml-2" />
+          </Button>
         </div>
-      ) : (
-        <div></div>
-      )}
-      {currentLessonIndex < allLessons.length - 1 ? (
-        <div
-          className={`flex items-center ${
-            selectedLesson?.completed
-              ? "text-gray-700 hover:text-blue-600 cursor-pointer"
-              : "text-gray-400 cursor-not-allowed"
-          } transition-colors`}
-          onClick={selectedLesson?.completed ? goToNextLesson : undefined}
-        >
-          <span className="font-medium truncate">
-            Next: {allLessons[currentLessonIndex + 1].title}
-          </span>
-          <ChevronDown className="-rotate-90 ml-2" size={20} />
-        </div>
-      ) : (
-        <div></div>
       )}
     </div>
   );

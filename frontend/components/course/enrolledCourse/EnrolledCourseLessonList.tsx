@@ -1,9 +1,10 @@
 import { ILesson } from "@/types/lesson";
-import { CheckCircle, Clock } from "lucide-react";
+import { CheckCircle, Clock, Lock } from "lucide-react";
 import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
 
 interface LessonWithCompletion extends ILesson {
   completed: boolean;
+  isLocked?: boolean;
 }
 
 interface LessonListProps {
@@ -23,49 +24,53 @@ export function LessonList({
   selectedLesson,
   handleLessonSelect,
 }: LessonListProps) {
+  if (isLoading) {
+    return (
+      <div className="animate-pulse space-y-3">
+        {[...Array(5)].map((_, i) => (
+          <div key={i} className="h-8 bg-gray-200 rounded" />
+        ))}
+      </div>
+    );
+  }
+
+  if (isError) {
+    return (
+      <div className="text-red-500 text-sm">
+        {error?.message || "Failed to load lessons"}
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-2">
-      {isLoading ? (
-        <div className="p-4">
-          <LoadingSpinner 
-            size="sm" 
-            text="Loading lessons..." 
-            className="h-[100px]"
-          />
-        </div>
-      ) : isError ? (
-        <div className="p-4 text-red-600">Error: {error?.message}</div>
-      ) : allLessons.length === 0 ? (
-        <div className="p-4 text-gray-600">No lessons found.</div>
-      ) : (
-        allLessons.map((lesson) => (
+      {allLessons.map((lesson) => {
+        const isSelected = selectedLesson?.id === lesson.id;
+        const isLocked = lesson.isLocked;
+
+        return (
           <button
             key={lesson.id}
-            className={`w-full flex items-center p-4 text-left hover:bg-gray-50 border-l-4 transition-colors ${
-              selectedLesson?.id === lesson.id
-                ? "border-blue-600 bg-blue-50"
-                : "border-transparent"
+            onClick={() => !isLocked && handleLessonSelect(lesson)}
+            className={`w-full text-left px-4 py-3 rounded-lg transition-colors flex items-center gap-3 ${
+              isSelected
+                ? "bg-blue-50 text-blue-700 border border-blue-200"
+                : isLocked
+                ? "bg-gray-50 text-gray-400 cursor-not-allowed border border-gray-200"
+                : "hover:bg-gray-50 border border-transparent"
             }`}
-            onClick={() => handleLessonSelect(lesson)}
+            disabled={isLocked}
           >
-            <div className="mr-3">
-              {lesson.completed ? (
-                <CheckCircle size={20} className="text-green-600" />
-              ) : (
-                <Clock size={20} className="text-gray-400" />
-              )}
-            </div>
-            <div className="flex-1 min-w-0">
-              <div className="text-sm font-medium text-gray-800 truncate max-w-[220px]">
-                {lesson.title}
-              </div>
-              <div className="text-xs text-gray-500 mt-1 line-clamp-2">
-                {lesson.description || "No description available."}
-              </div>
-            </div>
+            {isLocked && <Lock className="w-4 h-4 flex-shrink-0" />}
+            <span className="truncate flex-1">{lesson.title}</span>
+            {lesson.completed && !isLocked && (
+              <span className="ml-2 text-xs bg-green-100 text-green-800 px-2 py-1 rounded-full">
+                Completed
+              </span>
+            )}
           </button>
-        ))
-      )}
+        );
+      })}
     </div>
   );
 }
