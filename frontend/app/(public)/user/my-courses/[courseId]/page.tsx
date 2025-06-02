@@ -44,8 +44,11 @@ export default function CourseContent() {
   });
 
   // Fetch progress
-  const { data: progressData, isLoading: isProgressLoading } = useProgress({ courseId });
-  const { mutate: updateProgress, isLoading: isUpdatingProgress } = useUpdateProgress();
+  const { data: progressData, isLoading: isProgressLoading } = useProgress({
+    courseId,
+  });
+  const { mutate: updateProgress, isLoading: isUpdatingProgress } =
+    useUpdateProgress();
 
   // Fetch content for the selected lesson
   const {
@@ -60,12 +63,17 @@ export default function CourseContent() {
     if (isContentError && contentError) {
       console.log("contentError", contentError);
       const axiosError = contentError as AxiosError<{ message: string }>;
-      const errorMessage = axiosError.response?.data?.message || axiosError.message || "Unknown error";
+      const errorMessage =
+        axiosError.response?.data?.message ||
+        axiosError.message ||
+        "Unknown error";
       console.log("errorMessage", errorMessage);
 
-      if (errorMessage.toLowerCase().includes("not enrolled") || 
-          errorMessage.toLowerCase().includes("don't have permission") ||
-          errorMessage.toLowerCase().includes("not active")) {
+      if (
+        errorMessage.toLowerCase().includes("not enrolled") ||
+        errorMessage.toLowerCase().includes("don't have permission") ||
+        errorMessage.toLowerCase().includes("not active")
+      ) {
         toast.error("You need to enroll in this course to access the content");
         setTimeout(() => {
           router.push(`/courses/${courseId}`);
@@ -82,15 +90,17 @@ export default function CourseContent() {
       const initializedLessons: LessonWithCompletion[] = data.lessons.map(
         (lesson) => ({
           ...lesson,
-          completed: progressData?.lastLessonId === lesson.id || false,
+          completed:
+            progressData?.lessonProgress?.find((p) => p.lessonId === lesson.id)
+              ?.completed || false,
         })
       );
       setLessonsWithCompletion(initializedLessons);
-      
+
       // If there's a last lesson ID in progress, select that lesson
       if (progressData?.lastLessonId) {
         const lastLesson = initializedLessons.find(
-          lesson => lesson.id === progressData.lastLessonId
+          (lesson) => lesson.id === progressData.lastLessonId
         );
         if (lastLesson) {
           setSelectedLesson(lastLesson);
@@ -102,6 +112,23 @@ export default function CourseContent() {
       }
     }
   }, [data, progressData]);
+
+  // Handle access status
+  useEffect(() => {
+    if (progressData?.accessStatus === "BLOCKED") {
+      toast.error("Access Denied", {
+        description:
+          "Your access to this course has been blocked. Please contact support.",
+      });
+      router.push("/user/my-courses");
+    } else if (progressData?.accessStatus === "EXPIRED") {
+      toast.error("Access Expired", {
+        description:
+          "Your access to this course has expired. Please renew your enrollment.",
+      });
+      router.push("/user/my-courses");
+    }
+  }, [progressData?.accessStatus, router]);
 
   const allLessons = lessonsWithCompletion;
   const currentLessonIndex = allLessons.findIndex(
@@ -115,20 +142,16 @@ export default function CourseContent() {
   const markLessonComplete = () => {
     if (!selectedLesson || !courseId) return;
 
-    const completedLessons = allLessons.filter(lesson => lesson.completed).length + 1;
-    const totalLessons = allLessons.length;
-    const progressPercentage = Math.round((completedLessons / totalLessons) * 100);
-
     // Update progress in the backend
     updateProgress({
       courseId: courseId,
-      progress: progressPercentage,
-      lastLessonId: selectedLesson.id
+      lessonId: selectedLesson.id,
+      completed: true,
     });
 
     // Update local state
-    setLessonsWithCompletion(prevLessons =>
-      prevLessons.map(lesson =>
+    setLessonsWithCompletion((prevLessons) =>
+      prevLessons.map((lesson) =>
         lesson.id === selectedLesson.id
           ? { ...lesson, completed: true }
           : lesson
@@ -160,9 +183,10 @@ export default function CourseContent() {
     }
   };
 
-  const completedLessons = allLessons.filter(lesson => lesson.completed).length;
-  const progressPercentage = progressData?.progress || 
-    (allLessons.length > 0 ? (completedLessons / allLessons.length) * 100 : 0);
+  const completedLessons = progressData?.completedLessons || 0;
+  const totalLessons = progressData?.totalLessons || allLessons.length;
+  const progressPercentage =
+    totalLessons > 0 ? Math.round((completedLessons / totalLessons) * 100) : 0;
 
   return (
     <div className="flex flex-col lg:flex-row w-full bg-gray-100 min-h-screen">
@@ -182,15 +206,17 @@ export default function CourseContent() {
       />
       <div className="flex-1 p-6 lg:p-10">
         {isLoading || isProgressLoading ? (
-          <LoadingSpinner 
-            size="lg" 
-            text="Loading course content..." 
+          <LoadingSpinner
+            size="lg"
+            text="Loading course content..."
             className="h-[50vh]"
           />
         ) : isError ? (
           <div className="flex flex-col items-center justify-center h-full space-y-4">
-            <p className="text-red-600 text-lg">Unable to load course content</p>
-            <button 
+            <p className="text-red-600 text-lg">
+              Unable to load course content
+            </p>
+            <button
               onClick={() => router.push("/user/my-courses")}
               className="px-4 py-2 bg-primary text-white rounded-md hover:bg-primary/90 transition-colors"
             >
@@ -253,5 +279,3 @@ export default function CourseContent() {
     </div>
   );
 }
-
-

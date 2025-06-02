@@ -6,8 +6,8 @@ export async function updateProgress(data: IUpdateProgressInput): Promise<IProgr
     const response = await api.patch<IProgressResponse>(
       `/progress/${data.courseId}/progress`,
       {
-        progress: data.progress,
-        lastLessonId: data.lastLessonId,
+        lessonId: data.lessonId,
+        completed: data.completed,
       }
     );
     return response.data.data;

@@ -25,9 +25,6 @@ export class EnrollmentRepository implements IEnrollmentRepository {
         enrolledAt: enrollment.enrolledAt.toISOString(),
         orderItemId: enrollment.orderItemId || undefined,
         accessStatus: enrollment.accessStatus,
-        progress: enrollment.progress,
-        lastLessonId: enrollment.lastLessonId || undefined,
-        completedAt: enrollment.completedAt?.toISOString(),
       };
     } catch (error) {
       console.error("Error finding enrollment", { error, userId, courseId });
@@ -45,7 +42,6 @@ export class EnrollmentRepository implements IEnrollmentRepository {
             enrolledAt: new Date(),
             orderItemId: input.orderItemId,
             accessStatus: 'ACTIVE',
-            progress: 0,
           },
         });
         return {
@@ -54,29 +50,10 @@ export class EnrollmentRepository implements IEnrollmentRepository {
           enrolledAt: enrollment.enrolledAt.toISOString(),
           orderItemId: enrollment.orderItemId || undefined,
           accessStatus: enrollment.accessStatus,
-          progress: enrollment.progress,
-          lastLessonId: enrollment.lastLessonId || undefined,
-          completedAt: enrollment.completedAt?.toISOString(),
         };
       })
     );
     return enrollments;
-  }
-
-  async updateProgress(userId: string, courseId: string, progress: number, lastLessonId?: string): Promise<void> {
-    await this.prisma.enrollment.update({
-      where: {
-        userId_courseId: {
-          userId,
-          courseId,
-        },
-      },
-      data: {
-        progress,
-        lastLessonId,
-        completedAt: progress === 100 ? new Date() : undefined,
-      },
-    });
   }
 
   async updateAccessStatus(userId: string, courseId: string, status: 'ACTIVE' | 'BLOCKED' | 'EXPIRED'): Promise<void> {
@@ -106,10 +83,7 @@ export class EnrollmentRepository implements IEnrollmentRepository {
       enrollment.courseId,
       enrollment.enrolledAt,
       enrollment.orderItemId || undefined,
-      enrollment.accessStatus,
-      enrollment.progress,
-      enrollment.lastLessonId || undefined,
-      enrollment.completedAt || undefined
+      enrollment.accessStatus
     ));
   }
 
@@ -123,10 +97,7 @@ export class EnrollmentRepository implements IEnrollmentRepository {
       enrollment.courseId,
       enrollment.enrolledAt,
       enrollment.orderItemId || undefined,
-      enrollment.accessStatus,
-      enrollment.progress,
-      enrollment.lastLessonId || undefined,
-      enrollment.completedAt || undefined
+      enrollment.accessStatus
     ));
   }
 
@@ -140,10 +111,7 @@ export class EnrollmentRepository implements IEnrollmentRepository {
       enrollment.courseId,
       enrollment.enrolledAt,
       enrollment.orderItemId || undefined,
-      enrollment.accessStatus,
-      enrollment.progress,
-      enrollment.lastLessonId || undefined,
-      enrollment.completedAt || undefined
+      enrollment.accessStatus
     ));
   }
 

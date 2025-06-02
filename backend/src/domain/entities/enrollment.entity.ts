@@ -5,10 +5,7 @@ export class Enrollment {
     public readonly courseId: string,
     public readonly enrolledAt: Date,
     public readonly orderItemId?: string,
-    public readonly accessStatus: 'ACTIVE' | 'BLOCKED' | 'EXPIRED' = 'ACTIVE',
-    public readonly progress: number = 0,
-    public readonly lastLessonId?: string,
-    public readonly completedAt?: Date
+    public readonly accessStatus: 'ACTIVE' | 'BLOCKED' | 'EXPIRED' = 'ACTIVE'
   ) {}
 
   static create(userId: string, courseId: string, orderItemId?: string): Enrollment {

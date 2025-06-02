@@ -12,7 +12,7 @@ export interface ILessonRepository {
     courseId: string,
     order: number
   ): Promise<Lesson | null>;
-
+  findByCourseId(courseId: string): Promise<Lesson[]>;
   create(lesson: Lesson): Promise<Lesson>;
   update(lesson: Lesson): Promise<Lesson>;
   deletePermanently(id: string): Promise<void>;

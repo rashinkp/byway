@@ -412,4 +412,18 @@ export class LessonRepository implements ILessonRepository {
     });
     return count > 0;
   }
+
+  async findByCourseId(courseId: string): Promise<Lesson[]> {
+    const lessons = await this.prisma.lesson.findMany({
+      where: {
+        courseId,
+        deletedAt: null,
+        status: LessonStatus.PUBLISHED
+      },
+      include: { content: { include: { quizQuestions: true } } },
+      orderBy: { order: 'asc' }
+    });
+
+    return lessons.map(this.mapToLessonEntity);
+  }
 }

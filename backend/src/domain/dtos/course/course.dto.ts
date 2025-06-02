@@ -100,9 +100,6 @@ export interface IEnrollmentOutputDTO {
   enrolledAt: string;
   orderItemId?: string;
   accessStatus: 'ACTIVE' | 'BLOCKED' | 'EXPIRED';
-  progress: number;
-  lastLessonId?: string;
-  completedAt?: string;
 }
 
 export interface ICourseWithEnrollmentStatus extends ICourseOutputDTO {

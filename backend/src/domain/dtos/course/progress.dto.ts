@@ -3,8 +3,8 @@ import { z } from "zod";
 export const UpdateProgressSchema = z.object({
   userId: z.string().uuid(),
   courseId: z.string().uuid(),
-  progress: z.number().min(0).max(100),
-  lastLessonId: z.string().uuid().optional(),
+  lessonId: z.string().uuid(),
+  completed: z.boolean().optional(),
 });
 
 export const GetProgressSchema = z.object({
@@ -15,11 +15,20 @@ export const GetProgressSchema = z.object({
 export type UpdateProgressDto = z.infer<typeof UpdateProgressSchema>;
 export type GetProgressDto = z.infer<typeof GetProgressSchema>;
 
+export interface ILessonProgress {
+  lessonId: string;
+  completed: boolean;
+  completedAt?: Date;
+}
+
 export interface IProgressOutputDTO {
   userId: string;
   courseId: string;
-  progress: number;
   lastLessonId?: string;
-  completedAt?: string;
+  completedAt?: Date;
+  enrolledAt: Date;
   accessStatus: 'ACTIVE' | 'BLOCKED' | 'EXPIRED';
+  completedLessons: number;
+  totalLessons: number;
+  lessonProgress: ILessonProgress[];
 } 
