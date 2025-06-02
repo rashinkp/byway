@@ -60,7 +60,7 @@ export class CategoryRepository implements ICategoryRepository {
     if (search) {
       where.OR = [
         { name: { contains: search, mode: "insensitive" } },
-        { email: { contains: search, mode: "insensitive" } },
+        { description: { contains: search, mode: "insensitive" } }
       ];
     }
 

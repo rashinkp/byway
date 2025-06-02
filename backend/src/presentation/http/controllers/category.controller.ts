@@ -41,7 +41,7 @@ export class CategoryController extends BaseController {
     return this.handleRequest(httpRequest, async (request) => {
       const validated = validateUpdateCategory({
         ...request.body,
-        categoryId: request.params.categoryId,
+        id: request.params.categoryId,
       });
       const category = await this.updateCategoryUseCase.execute(validated);
       return this.success_200(category, "Category updated successfully");

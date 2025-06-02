@@ -29,7 +29,7 @@ export default function categoryRouter(
       categoryController.getCategoryById.bind(categoryController)
     )
   );
-  router.put("/:id", (req, res) =>
+  router.put("/:categoryId", (req, res) =>
     expressAdapter(
       req,
       res,
