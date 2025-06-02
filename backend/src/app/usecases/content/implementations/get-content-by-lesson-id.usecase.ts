@@ -4,12 +4,14 @@ import { ILessonContentRepository } from "../../../repositories/content.reposito
 import { IEnrollmentRepository } from "../../../repositories/enrollment.repository.interface";
 import { ILessonRepository } from "../../../repositories/lesson.repository";
 import { IGetContentByLessonIdUseCase } from "../interfaces/get-content-by-lesson-id.usecase.interface";
+import { ICourseRepository } from "../../../repositories/course.repository.interface";
 
 export class GetContentByLessonIdUseCase implements IGetContentByLessonIdUseCase {
   constructor(
     private readonly contentRepository: ILessonContentRepository,
     private readonly lessonRepository: ILessonRepository,
-    private readonly enrollmentRepository: IEnrollmentRepository
+    private readonly enrollmentRepository: IEnrollmentRepository,
+    private readonly courseRepository: ICourseRepository
   ) {}
 
   async execute(lessonId: string, userId: string): Promise<ILessonContentOutputDTO | null> {
@@ -20,7 +22,19 @@ export class GetContentByLessonIdUseCase implements IGetContentByLessonIdUseCase
         throw new HttpError("Lesson not found", 404);
       }
 
-      // Check enrollment
+      // Get course to check if user is instructor
+      const course = await this.courseRepository.findById(lesson.courseId);
+      if (!course) {
+        throw new HttpError("Course not found", 404);
+      }
+
+      // If user is the course instructor, allow access without enrollment check
+      if (course.createdBy === userId) {
+        const content = await this.contentRepository.findByLessonId(lessonId);
+        return content && content.isActive() ? content.toJSON() : null;
+      }
+
+      // For non-instructors, check enrollment
       const enrollment = await this.enrollmentRepository.findByUserAndCourse(userId, lesson.courseId);
       if (!enrollment) {
         throw new HttpError("You are not enrolled in this course", 403);

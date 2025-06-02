@@ -8,7 +8,6 @@ export default function lessonContentRouter(
 ): Router {
   const router = Router();
 
-  // Admin-only endpoints
   router.post("/", restrictTo("INSTRUCTOR"), (req, res) =>
     expressAdapter(
       req,

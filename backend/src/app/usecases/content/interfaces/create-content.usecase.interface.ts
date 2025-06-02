@@ -2,5 +2,5 @@ import { ICreateLessonContentInputDTO, ILessonContentOutputDTO } from "../../../
 
 
 export interface ICreateLessonContentUseCase {
-  execute(dto: ICreateLessonContentInputDTO): Promise<ILessonContentOutputDTO>;
+  execute(dto: ICreateLessonContentInputDTO & { userId: string }): Promise<ILessonContentOutputDTO>;
 }

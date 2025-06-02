@@ -16,7 +16,6 @@ export const restrictTo =
       throw new HttpError("No token provided", 401);
     }
     
-
     try {
       const jwtProvider = new JwtProvider();
       const payload = (await jwtProvider.verify(token)) as JwtPayload;
@@ -24,6 +23,7 @@ export const restrictTo =
         throw new HttpError("Invalid token", 401);
       }
       if (!roles.includes(payload.role)) {
+        console.error("Unauthorized access attempt")
         throw new HttpError("Insufficient permissions", 403);
       }
       req.user = payload;

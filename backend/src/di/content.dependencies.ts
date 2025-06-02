@@ -12,10 +12,12 @@ export interface LessonContentDependencies {
 export function createLessonContentDependencies(
   deps: SharedDependencies
 ): LessonContentDependencies {
-  const { lessonContentRepository, lessonRepository } = deps;
+  const { lessonContentRepository, lessonRepository, courseRepository } = deps;
 
   const createLessonContentUseCase = new CreateLessonContentUseCase(
     lessonContentRepository,
+    lessonRepository,
+    courseRepository
   );
   const updateLessonContentUseCase = new UpdateLessonContentUseCase(
     lessonContentRepository
@@ -24,7 +26,8 @@ export function createLessonContentDependencies(
     new GetContentByLessonIdUseCase(
       lessonContentRepository,
       lessonRepository,
-      deps.enrollmentRepository
+      deps.enrollmentRepository,
+      courseRepository
     );
   const deleteLessonContentUseCase = new DeleteLessonContentUseCase(
     lessonContentRepository

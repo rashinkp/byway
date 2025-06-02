@@ -28,11 +28,6 @@ export async function signup(data: SignupData): Promise<ApiResponse<User>> {
     const response = await api.post<ApiResponse<User>>("/auth/register", data);
     return response.data;
   } catch (error: any) {
-    console.error("Signup error:", {
-      status: error.response?.status,
-      data: error.response?.data,
-      message: error.message
-    });
     throw new Error(error.response?.data?.message || error.response?.data?.error || "Signup failed");
   }
 }
@@ -45,11 +40,6 @@ export async function login(email: string, password: string) {
     });
     return response.data.data;
   } catch (error: any) {
-    console.error("Login error:", {
-      status: error.response?.status,
-      data: error.response?.data,
-      message: error.message
-    });
     throw new Error(error.response?.data?.message || error.response?.data?.error || "Login failed");
   }
 }
@@ -63,11 +53,6 @@ export async function googleAuth(
     });
     return response.data;
   } catch (error: any) {
-    console.error("Google auth error:", {
-      status: error.response?.status,
-      data: error.response?.data,
-      message: error.message
-    });
     throw new Error(
       error.response?.data?.message || error.response?.data?.error || "Google authentication failed"
     );
@@ -87,11 +72,6 @@ export async function verifyOtp(
     });
     return response.data;
   } catch (error: any) {
-    console.error("OTP verification error:", {
-      status: error.response?.status,
-      data: error.response?.data,
-      message: error.message
-    });
     throw new Error(error.response?.data?.message || error.response?.data?.error || "OTP verification failed");
   }
 }
@@ -100,11 +80,6 @@ export async function resendOtp(email: string): Promise<void> {
   try {
     await api.post<ApiResponse<unknown>>("/auth/resend-otp", { email });
   } catch (error: any) {
-    console.error("Resend OTP error:", {
-      status: error.response?.status,
-      data: error.response?.data,
-      message: error.message
-    });
     throw new Error(error.response?.data?.message || error.response?.data?.error || "Resend OTP failed");
   }
 }
@@ -113,11 +88,6 @@ export async function forgotPassword(email: string): Promise<void> {
   try {
     await api.post<ApiResponse<unknown>>("/auth/forgot-password", { email });
   } catch (error: any) {
-    console.error("Forgot password error:", {
-      status: error.response?.status,
-      data: error.response?.data,
-      message: error.message
-    });
     throw new Error(
       error.response?.data?.message || error.response?.data?.error || "Forgot password request failed"
     );
@@ -136,11 +106,6 @@ export async function resetPassword(
       newPassword,
     });
   } catch (error: any) {
-    console.error("Reset password error:", {
-      status: error.response?.status,
-      data: error.response?.data,
-      message: error.message
-    });
     throw new Error(error.response?.data?.message || error.response?.data?.error || "Password reset failed");
   }
 }
@@ -151,8 +116,7 @@ export async function getCurrentUser(): Promise<User | null> {
     return response.data.data;
   } catch (error: any) {
     if (error.response?.status === 401) {
-      console.log("401 detected in getCurrentUser, returning null");
-      return null; // Interceptor will handle logout and redirect
+      return null; 
     }
     throw new Error(
       error.response?.data?.message ||
@@ -166,11 +130,6 @@ export async function logout(): Promise<void> {
   try {
     await api.post<ApiResponse<unknown>>("/auth/logout");
   } catch (error: any) {
-    console.error("Logout error:", {
-      status: error.response?.status,
-      data: error.response?.data,
-      message: error.message
-    });
     throw new Error(error.response?.data?.message || error.response?.data?.error || "Logout failed");
   }
 }
@@ -185,9 +144,6 @@ export async function getCurrentUserServer(
         Cookie: cookies,
         ...(token ? { Authorization: `Bearer ${token}` } : {}),
       },
-    });
-    console.log("getCurrentUserServer success:", {
-      userId: response.data.data.id,
     });
     return response.data.data;
   } catch (error: any) {

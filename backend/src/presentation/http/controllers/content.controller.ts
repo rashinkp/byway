@@ -25,8 +25,15 @@ export class LessonContentController extends BaseController {
   async createLessonContent(httpRequest: IHttpRequest): Promise<IHttpResponse> {
     console.log("Creating lesson content with data:", httpRequest.body);
     return this.handleRequest(httpRequest, async (request) => {
+      if (!request.user?.id) {
+        throw new HttpError("Unauthorized", 401);
+      }
+
       const validated = validateCreateLessonContent(request.body);
-      const content = await this.createLessonContentUseCase.execute(validated);
+      const content = await this.createLessonContentUseCase.execute({
+        ...validated,
+        userId: request.user.id
+      });
       return this.success_201(content, "Lesson content created successfully");
     });
   }
