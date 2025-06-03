@@ -22,6 +22,7 @@ export async function getAllCourses({
   level = "All",
   duration = "All",
   price = "All",
+  categoryId,
 }: IGetAllCoursesInput): Promise<CourseApiResponse> {
   try {
     const response = await api.get<{ data: CourseApiResponse }>("/courses/", {
@@ -38,6 +39,7 @@ export async function getAllCourses({
         level,
         duration,
         price,
+        categoryId,
       },
     });
     return response.data.data;

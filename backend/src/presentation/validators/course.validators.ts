@@ -95,6 +95,7 @@ const getAllCoursesSchema = z.object({
   level: z.enum([...courseLevelValues, "All"]).default("All").optional(),
   duration: z.enum(["All", "Under5", "5to10", "Over10"]).default("All").optional(),
   price: z.enum(["All", "Free", "Paid"]).default("All").optional(),
+  categoryId: uuidSchema.optional(),
 });
 const createEnrollmentSchema = z.object({
   courseIds: z.array(uuidSchema).min(1, "At least one course ID is required"),

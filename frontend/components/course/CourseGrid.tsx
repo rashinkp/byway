@@ -7,6 +7,7 @@ import { motion } from "framer-motion";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Course } from "@/types/course";
 import Link from "next/link";
+import { CourseCardSkeleton } from "@/components/course/CourseCardSkeleton";
 
 type GridCourse = Course & {
   rating: number;
@@ -121,6 +122,16 @@ export function CourseGrid({
         <p className="text-gray-500 text-center">
           Try adjusting your filters or search criteria
         </p>
+      </div>
+    );
+  }
+
+  if (isLoading) {
+    return (
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {Array.from({ length: 6 }).map((_, index) => (
+          <CourseCardSkeleton key={index} />
+        ))}
       </div>
     );
   }

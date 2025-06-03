@@ -85,17 +85,18 @@ export type NegativeSortByField = `-${SortByField}`;
 export interface IGetAllCoursesInput {
   page?: number;
   limit?: number;
-  sortBy?: "title" | "createdAt" | "updatedAt" | "price" | "duration";
+  search?: string;
+  sortBy?: "title" | "price" | "createdAt";
   sortOrder?: "asc" | "desc";
   includeDeleted?: boolean;
-  search?: string;
-  filterBy?: "All" | "Active" | "Inactive" | "Declined";
+  filterBy?: "All" | "Active" | "Inactive";
   userId?: string;
   myCourses?: boolean;
   role?: "USER" | "INSTRUCTOR" | "ADMIN";
-  level?: "BEGINNER" | "MEDIUM" | "ADVANCED" | "All";
+  level?: "All" | "BEGINNER" | "MEDIUM" | "ADVANCED";
   duration?: "All" | "Under5" | "5to10" | "Over10";
   price?: "All" | "Free" | "Paid";
+  categoryId?: string;
 }
 
 export interface IGetEnrolledCoursesInput {

@@ -200,6 +200,7 @@ export class CourseRepository implements ICourseRepository {
       level = "All",
       duration = "All",
       price = "All",
+      categoryId,
     } = input;
 
     const where: Prisma.CourseWhereInput = {
@@ -223,6 +224,7 @@ export class CourseRepository implements ICourseRepository {
       ...(duration === "Over10" ? { duration: { gt: 10 } } : {}),
       ...(price === "Free" ? { price: { equals: new Decimal(0) } } : {}),
       ...(price === "Paid" ? { price: { gt: new Decimal(0) } } : {}),
+      ...(categoryId ? { categoryId } : {}),
     };
 
     try {

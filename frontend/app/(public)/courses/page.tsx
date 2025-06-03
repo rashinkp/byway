@@ -7,6 +7,7 @@ import { Pagination } from "@/components/ui/Pagination";
 import ErrorDisplay from "@/components/ErrorDisplay";
 import { Course, IGetAllCoursesInput } from "@/types/course";
 import { useGetAllCourses } from "@/hooks/course/useGetAllCourse";
+import { FilterSidebarSkeleton } from "@/components/course/FilterSidebarSkeleton";
 
 interface GridCourse extends Course {
   rating: number;
@@ -23,15 +24,19 @@ export default function CourseListingPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [filters, setFilters] = useState<Record<string, any>>({
     search: "",
-    category: "all", // Maps to categoryId or "all"
-    level: "all", // Maps to BEGINNER, MEDIUM, ADVANCED, or All
-    price: "all", // Maps to All, Free, Paid
-    rating: "all", // Placeholder: Not yet supported by backend
-    duration: "all", // Maps to All, Under5, 5to10, Over10
-    sort: "title-asc", // Maps to sortBy and sortOrder
+    category: "all",
+    level: "all",
+    price: "all",
+    rating: "all",
+    duration: "all",
+    sort: "title-asc",
   });
 
-  // Map frontend filter values to backend-compatible IGetAllCoursesInput
+  const handleFilterChange = (newFilters: Record<string, any>) => {
+    setFilters(newFilters);
+    setCurrentPage(1);
+  };
+
   const getAllCoursesInput: IGetAllCoursesInput = {
     page: currentPage,
     limit: itemsPerPage,
@@ -68,33 +73,24 @@ export default function CourseListingPage() {
         : filters.price === "paid"
         ? "Paid"
         : "All",
-    // Placeholder for category: Not yet supported by backend
-    // You can add categoryId here when backend supports category filtering
-    // categoryId: filters.category !== "all" ? filters.category : undefined,
+    categoryId: filters.category && filters.category !== "all" ? filters.category : undefined,
   };
 
   const { data, isLoading, error } = useGetAllCourses(getAllCoursesInput);
 
-  const totalPages = data?.totalPages;
-
   const courses: GridCourse[] =
     data?.items?.map((course: Course) => ({
       ...course,
-      rating: 4.5, // Placeholder: Replace with actual rating from API when available
-      reviewCount: 100, // Placeholder: Replace with actual review count
+      rating: 4.5,
+      reviewCount: 100,
       formattedDuration: course.duration
-        ? `${course.duration} hours` // Assumes duration in hours; adjust if in minutes
+        ? `${course.duration} hours`
         : "Unknown",
-      lessons: 10, // Placeholder: Replace with actual lesson count
-      bestSeller: false, // Placeholder: Set based on logic or API data
+      lessons: 10,
+      bestSeller: false,
       thumbnail: course.thumbnail || "/default-thumbnail.png",
-      price: course.offer || course.price || 0, // Use offer if available, else price
+      price: course.offer || course.price || 0,
     })) || [];
-
-  const handleFilterChange = (newFilters: Record<string, any>) => {
-    setFilters(newFilters);
-    setCurrentPage(1); // Reset to first page on filter change
-  };
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
@@ -111,11 +107,18 @@ export default function CourseListingPage() {
   }
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="container mx-auto px-4 py-2">
       <h1 className="text-2xl font-bold text-gray-800 mb-6">All Courses</h1>
       <div className="flex flex-col lg:flex-row gap-6">
         <div className="lg:w-1/5">
-          <FilterSidebar onFilterChange={handleFilterChange} />
+          {isLoading ? (
+            <FilterSidebarSkeleton />
+          ) : (
+            <FilterSidebar 
+              onFilterChange={handleFilterChange} 
+              currentFilters={filters}
+            />
+          )}
         </div>
         <div className="lg:w-4/5">
           <CourseGrid courses={courses} isLoading={isLoading} />

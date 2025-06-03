@@ -24,6 +24,7 @@ export function useGetAllCourses({
   level = "All",
   duration = "All",
   price = "All",
+  categoryId,
 }: IGetAllCoursesInput = {}): UseCoursesReturn {
   let adjustedSortBy: IGetAllCoursesInput["sortBy"] = sortBy;
   let adjustedSortOrder: IGetAllCoursesInput["sortOrder"] = sortOrder;
@@ -45,18 +46,21 @@ export function useGetAllCourses({
   const { data, isLoading, error, refetch } = useQuery<CourseApiResponse>({
     queryKey: [
       "courses",
-      page,
-      limit,
-      search,
-      sortBy,
-      sortOrder,
-      filterBy,
-      myCourses,
-      role,
-      level,
-      duration,
-      price,
-      includeDeleted,
+      {
+        page,
+        limit,
+        search,
+        sortBy,
+        sortOrder,
+        filterBy,
+        myCourses,
+        role,
+        level,
+        duration,
+        price,
+        includeDeleted,
+        categoryId,
+      },
     ],
     queryFn: async () => {
       const response = await getAllCourses({
@@ -72,6 +76,7 @@ export function useGetAllCourses({
         level,
         duration,
         price,
+        categoryId,
       });
       return response;
     },

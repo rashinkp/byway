@@ -38,7 +38,7 @@ export interface IUpdateCourseInputDTO {
 export interface IGetAllCoursesInputDTO {
   page?: number;
   limit?: number;
-  sortBy?: "title" | "createdAt" | "updatedAt" | "price" | "duration";
+  sortBy?: string;
   sortOrder?: "asc" | "desc";
   includeDeleted?: boolean;
   search?: string;
@@ -46,9 +46,10 @@ export interface IGetAllCoursesInputDTO {
   userId?: string;
   myCourses?: boolean;
   role?: "USER" | "INSTRUCTOR" | "ADMIN";
-  level?: CourseLevel | "All";
+  level?: "BEGINNER" | "MEDIUM" | "ADVANCED" | "All";
   duration?: "All" | "Under5" | "5to10" | "Over10";
   price?: "All" | "Free" | "Paid";
+  categoryId?: string;
 }
 
 export interface IGetEnrolledCoursesInputDTO {
