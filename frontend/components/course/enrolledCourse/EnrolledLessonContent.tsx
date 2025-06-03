@@ -3,6 +3,7 @@
 import { FileText, CheckCircle, Clock } from "lucide-react";
 import { ILesson } from "@/types/lesson";
 import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
+import { QuizQuestion } from "@/types/content";
 
 interface LessonWithCompletion extends ILesson {
   completed: boolean;
@@ -76,15 +77,7 @@ export function LessonContent({
             {selectedLesson.description || "No description available."}
           </p>
         </div>
-        {isContentLoading ? (
-          <div className="p-6">
-            <LoadingSpinner
-              size="md"
-              text="Loading lesson content..."
-              className="h-[300px]"
-            />
-          </div>
-        ) : isContentError ? (
+        {isContentError ? (
           <div className="p-6 text-red-600">Error: {contentError?.message}</div>
         ) : !content ? (
           <div className="p-6 text-gray-600">No content available.</div>
@@ -192,35 +185,32 @@ export function LessonContent({
                 <h3 className="text-xl font-semibold text-gray-800 mb-4">
                   Quiz: {content.title}
                 </h3>
-                <div className="space-y-4">
-                  <div className="border border-gray-200 rounded-lg p-5">
-                    <p className="font-medium text-gray-800 mb-3">
-                      Sample Question: What is a key principle of UX design?
-                    </p>
-                    <div className="space-y-3">
-                      {[
-                        "Focus on aesthetics only",
-                        "Prioritize user needs and usability",
-                        "Minimize development time",
-                        "Increase server performance",
-                      ].map((option, idx) => (
-                        <div key={idx} className="flex items-center">
-                          <input
-                            type="radio"
-                            id={`option-${idx}`}
-                            name="sample-question"
-                            className="mr-2 accent-blue-600"
-                          />
-                          <label
-                            htmlFor={`option-${idx}`}
-                            className="text-gray-700"
-                          >
-                            {option}
-                          </label>
-                        </div>
-                      ))}
+                <div className="space-y-6">
+                  {content.quizQuestions.map((question: QuizQuestion, index: number) => (
+                    <div key={question.id} className="border border-gray-200 rounded-lg p-5">
+                      <p className="font-medium text-gray-800 mb-3">
+                        Question {index + 1}: {question.question}
+                      </p>
+                      <div className="space-y-3">
+                        {question.options.map((option: string, idx: number) => (
+                          <div key={idx} className="flex items-center">
+                            <input
+                              type="radio"
+                              id={`question-${question.id}-option-${idx}`}
+                              name={`question-${question.id}`}
+                              className="mr-2 accent-blue-600"
+                            />
+                            <label
+                              htmlFor={`question-${question.id}-option-${idx}`}
+                              className="text-gray-700"
+                            >
+                              {option}
+                            </label>
+                          </div>
+                        ))}
+                      </div>
                     </div>
-                  </div>
+                  ))}
                 </div>
               </div>
             )}

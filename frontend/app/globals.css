@@ -1,10 +1,6 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 
-
-
-
-
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
@@ -141,5 +137,23 @@
   }
   .auth-text {
     @apply text-sm text-center text-muted-foreground;
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+  50% {
+    transform: translateX(100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+@layer utilities {
+  .animate-shimmer {
+    animation: shimmer 1.5s ease-in-out infinite;
   }
 }

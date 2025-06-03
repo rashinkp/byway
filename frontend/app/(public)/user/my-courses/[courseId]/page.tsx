@@ -8,10 +8,9 @@ import { useGetAllLessonsInCourse } from "@/hooks/lesson/useGetAllLesson";
 import { useGetContentByLessonId } from "@/hooks/content/useGetContentByLessonId";
 import { useProgress } from "@/hooks/progress/useProgress";
 import { useUpdateProgress } from "@/hooks/progress/useUpdateProgress";
-import { LessonNavigation } from "@/components/course/enrolledCourse/EnrolledCourseLessonNavigation";
 import { LessonContent } from "@/components/course/enrolledCourse/EnrolledLessonContent";
 import { EnrolledCourseSidebar } from "@/components/course/enrolledCourse/EnrolledCourseSideBar";
-import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
+import { LessonContentSkeleton } from "@/components/course/enrolledCourse/skeletons/LessonContentSkeleton";
 import { toast } from "sonner";
 import { AxiosError } from "axios";
 import { LockOverlay } from "@/components/ui/LockOverlay";
@@ -115,8 +114,14 @@ export default function CourseContent() {
 
       setLessonsWithCompletion(lessonsWithLockedState);
 
-      // If there's a last lesson ID in progress, select that lesson
-      if (progressData?.lastLessonId) {
+      // Find the next lesson to learn
+      const nextLessonToLearn = lessonsWithLockedState.find(lesson => !lesson.completed && !lesson.isLocked);
+      
+      if (nextLessonToLearn) {
+        // If there's a lesson to learn, select it
+        setSelectedLesson(nextLessonToLearn);
+      } else if (progressData?.lastLessonId) {
+        // If all lessons are completed, select the last lesson
         const lastLesson = lessonsWithLockedState.find(
           (lesson) => lesson.id === progressData.lastLessonId
         );
@@ -223,13 +228,7 @@ export default function CourseContent() {
         goToNextPage={goToNextPage}
       />
       <div className="flex-1 p-6 lg:p-10">
-        {isLoading || isProgressLoading ? (
-          <LoadingSpinner
-            size="lg"
-            text="Loading course content..."
-            className="h-[50vh]"
-          />
-        ) : isError ? (
+        {isError ? (
           <div className="flex flex-col items-center justify-center h-full space-y-4">
             <p className="text-red-600 text-lg">
               Unable to load course content
@@ -241,6 +240,8 @@ export default function CourseContent() {
               Return to My Courses
             </button>
           </div>
+        ) : isLoading || isProgressLoading ? (
+          <LessonContentSkeleton />
         ) : selectedLesson ? (
           <div className="max-w-4xl mx-auto relative">
             <LessonContent

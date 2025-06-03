@@ -1,6 +1,6 @@
 import { ILesson } from "@/types/lesson";
-import { CheckCircle, Clock, Lock } from "lucide-react";
-import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
+import {  Lock } from "lucide-react";
+import { LessonListSkeleton } from "./skeletons/LessonListSkeleton";
 
 interface LessonWithCompletion extends ILesson {
   completed: boolean;
@@ -25,13 +25,7 @@ export function LessonList({
   handleLessonSelect,
 }: LessonListProps) {
   if (isLoading) {
-    return (
-      <div className="animate-pulse space-y-3">
-        {[...Array(5)].map((_, i) => (
-          <div key={i} className="h-8 bg-gray-200 rounded" />
-        ))}
-      </div>
-    );
+    return <LessonListSkeleton />;
   }
 
   if (isError) {
