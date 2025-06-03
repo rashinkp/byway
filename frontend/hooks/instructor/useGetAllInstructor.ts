@@ -1,7 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { getAllInstructors } from "@/api/instructor";
 import { IInstructorWithUserDetails } from "@/types/instructor";
-import { useAuthStore } from "@/stores/auth.store";
 import { ApiResponse } from "@/types/apiResponse";
 
 interface UseGetAllInstructorsParams {
@@ -15,8 +14,6 @@ interface UseGetAllInstructorsParams {
 }
 
 export const useGetAllInstructors = (params: UseGetAllInstructorsParams = {}) => {
-  const { user } = useAuthStore();
-
   return useQuery<
     ApiResponse<{ items: IInstructorWithUserDetails[]; total: number; totalPages: number }>,
     Error,
@@ -25,6 +22,5 @@ export const useGetAllInstructors = (params: UseGetAllInstructorsParams = {}) =>
   >({
     queryKey: ["instructors", params],
     queryFn: () => getAllInstructors(params),
-    enabled: !!user && user.role === "ADMIN",
   });
 };

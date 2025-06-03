@@ -1,6 +1,6 @@
 import { api } from "@/api/api";
 import { ApiResponse } from "@/types/apiResponse";
-import { IInstructorDetails, IInstructorWithUserDetails, InstructorFormData } from "@/types/instructor";
+import {  IInstructorWithUserDetails, InstructorFormData } from "@/types/instructor";
 import { User } from "@/types/user";
 
 export const createInstructor = async (
@@ -81,7 +81,7 @@ export const getAllInstructors = async (params?: {
       });
     }
     const response = await api.get<ApiResponse<{ items: IInstructorWithUserDetails[]; total: number; totalPages: number }>>(
-      `/instructor/admin/instructors?${queryParams.toString()}`
+      `/instructor/instructors?${queryParams.toString()}`
     );
     return response.data;
   } catch (error: any) {
@@ -104,6 +104,34 @@ export const getInstructorByUserId = async (): Promise<
     console.error("Error fetching instructor by user ID:", error);
     throw new Error(
       error.response?.data?.message || "Failed to fetch instructor"
+    );
+  }
+};
+
+export const getPublicInstructors = async (params?: {
+  page?: number;
+  limit?: number;
+  search?: string;
+  sortBy?: string;
+  sortOrder?: "asc" | "desc";
+}): Promise<ApiResponse<{ items: IInstructorWithUserDetails[]; total: number; totalPages: number }>> => {
+  try {
+    const queryParams = new URLSearchParams();
+    if (params) {
+      Object.entries(params).forEach(([key, value]) => {
+        if (value !== undefined) {
+          queryParams.append(key, value.toString());
+        }
+      });
+    }
+    const response = await api.get<ApiResponse<{ items: IInstructorWithUserDetails[]; total: number; totalPages: number }>>(
+      `/instructor/public/instructors?${queryParams.toString()}`
+    );
+    return response.data;
+  } catch (error: any) {
+    console.error("Error fetching public instructors:", error);
+    throw new Error(
+      error.response?.data?.message || "Failed to fetch instructors"
     );
   }
 };

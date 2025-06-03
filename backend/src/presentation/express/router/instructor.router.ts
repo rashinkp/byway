@@ -8,8 +8,8 @@ export function instructorRouter(
 ): Router {
   const router = Router();
 
-  // Admin routes
-  router.get("/admin/instructors", restrictTo("ADMIN"), (req, res) =>
+  // Get instructors (public with optional admin access)
+  router.get("/instructors", (req, res) =>
     expressAdapter(
       req,
       res,
@@ -17,6 +17,7 @@ export function instructorRouter(
     )
   );
 
+  // Admin routes
   router.post("/approve", restrictTo("ADMIN"), (req, res) =>
     expressAdapter(
       req,
