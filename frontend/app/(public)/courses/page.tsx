@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { FilterSidebar } from "@/components/FilterSidebar";
 import { CourseGrid } from "@/components/course/CourseGrid";
 import { Pagination } from "@/components/ui/Pagination";
@@ -8,6 +8,7 @@ import ErrorDisplay from "@/components/ErrorDisplay";
 import { Course, IGetAllCoursesInput } from "@/types/course";
 import { useGetAllCourses } from "@/hooks/course/useGetAllCourse";
 import { FilterSidebarSkeleton } from "@/components/course/FilterSidebarSkeleton";
+import { useSearchParams } from "next/navigation";
 
 interface GridCourse extends Course {
   rating: number;
@@ -20,6 +21,7 @@ interface GridCourse extends Course {
 }
 
 export default function CourseListingPage() {
+  const searchParams = useSearchParams();
   const itemsPerPage = 6;
   const [currentPage, setCurrentPage] = useState(1);
   const [filters, setFilters] = useState<Record<string, any>>({
@@ -31,6 +33,17 @@ export default function CourseListingPage() {
     duration: "all",
     sort: "title-asc",
   });
+
+  // Update filters when URL parameters change
+  useEffect(() => {
+    const categoryParam = searchParams.get("category");
+    if (categoryParam) {
+      setFilters(prev => ({
+        ...prev,
+        category: categoryParam
+      }));
+    }
+  }, [searchParams]);
 
   const handleFilterChange = (newFilters: Record<string, any>) => {
     setFilters(newFilters);

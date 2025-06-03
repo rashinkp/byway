@@ -3,18 +3,11 @@
 import { useState } from "react";
 import { useCategories } from "@/hooks/category/useCategories";
 import { CategoryList } from "@/components/category/CategoryList";
-import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Search } from "lucide-react";
 import { Pagination } from "@/components/ui/Pagination";
+import { useRouter } from "next/navigation";
 
 export default function CategoriesPage() {
+  const router = useRouter();
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState("");
   const [filterBy, setFilterBy] = useState<"All" | "Active" | "Inactive">("All");
@@ -27,9 +20,8 @@ export default function CategoriesPage() {
     filterBy,
   });
 
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
-    setPage(1);
+  const handleCategoryClick = (categoryId: string) => {
+    router.push(`/courses?category=${categoryId}`);
   };
 
   if (error) {
@@ -49,6 +41,7 @@ export default function CategoriesPage() {
       <CategoryList
         categories={data?.items || []}
         isLoading={isLoading}
+        onCategoryClick={handleCategoryClick}
       />
 
       {data && data.totalPages > 1 && (
