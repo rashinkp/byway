@@ -36,6 +36,7 @@ import { Badge } from "@/components/ui/badge";
 import { cn } from "@/utils/cn";
 import { useRouter } from "next/navigation";
 import { getPresignedUrl, uploadFileToS3 } from "@/api/file";
+import { useCategories } from "@/hooks/category/useCategories";
 
 interface HeaderProps {
   client?: { id: string; name: string };
@@ -47,7 +48,13 @@ export function Header({ client }: HeaderProps = {}) {
   const { mutate: createInstructor, isPending: isCreatingInstructor } =
     useCreateInstructor();
   const { data: instructorData, isLoading: isInstructorLoading } =
-    useGetInstructorByUserId(false); // Disable query in Header
+    useGetInstructorByUserId(false);
+  const { data: categoriesData } = useCategories({
+    page: 1,
+    limit: 4,
+    sortBy: "name",
+    sortOrder: "asc"
+  });
   const [isInstructorModalOpen, setIsInstructorModalOpen] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
@@ -111,26 +118,13 @@ export function Header({ client }: HeaderProps = {}) {
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="start" className="w-56">
-                  <DropdownMenuItem>
-                    <Link href="/categories/development" className="w-full">
-                      Development
-                    </Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem>
-                    <Link href="/categories/business" className="w-full">
-                      Business
-                    </Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem>
-                    <Link href="/categories/design" className="w-full">
-                      Design
-                    </Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem>
-                    <Link href="/categories/marketing" className="w-full">
-                      Marketing
-                    </Link>
-                  </DropdownMenuItem>
+                  {categoriesData?.items.map((category) => (
+                    <DropdownMenuItem key={category.id}>
+                      <Link href={`/courses?category=${category.id}`} className="w-full">
+                        {category.name}
+                      </Link>
+                    </DropdownMenuItem>
+                  ))}
                   <DropdownMenuSeparator />
                   <DropdownMenuItem>
                     <Link
