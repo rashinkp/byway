@@ -2,39 +2,58 @@ import { PrismaClient } from "@prisma/client";
 import { LessonProgress } from "../../domain/entities/lesson-progress.entity";
 import { ILessonProgressRepository } from "../../app/repositories/lesson-progress.repository.interface";
 import { HttpError } from "../../presentation/http/errors/http-error";
+import { QuizAnswer } from "../../domain/entities/quiz-answer.entity";
 
 export class LessonProgressRepository implements ILessonProgressRepository {
   constructor(private readonly prisma: PrismaClient) {}
 
   async save(progress: LessonProgress): Promise<LessonProgress> {
-    try {
-      const saved = await this.prisma.lessonProgress.create({
-        data: {
-          id: progress.id,
-          enrollmentId: progress.enrollmentId,
-          courseId: progress.courseId,
-          lessonId: progress.lessonId,
-          completed: progress.completed,
-          completedAt: progress.completedAt,
-          createdAt: progress.createdAt,
-          updatedAt: progress.updatedAt,
+    const data = progress.toJSON();
+    const created = await this.prisma.lessonProgress.create({
+      data: {
+        id: data.id,
+        enrollmentId: data.enrollmentId,
+        courseId: data.courseId,
+        lessonId: data.lessonId,
+        completed: data.completed,
+        completedAt: data.completedAt,
+        score: data.score ?? undefined,
+        totalQuestions: data.totalQuestions ?? undefined,
+        createdAt: data.createdAt,
+        updatedAt: data.updatedAt,
+      },
+      include: {
+        answers: {
+          include: {
+            quizQuestion: true,
+          },
         },
-      });
+      },
+    });
 
-      return LessonProgress.fromPersistence({
-        id: saved.id,
-        enrollmentId: saved.enrollmentId,
-        courseId: saved.courseId,
-        lessonId: saved.lessonId,
-        completed: saved.completed,
-        completedAt: saved.completedAt,
-        createdAt: saved.createdAt,
-        updatedAt: saved.updatedAt,
-      });
-    } catch (error) {
-      console.error("Error saving lesson progress:", error);
-      throw new HttpError("Failed to save lesson progress", 500);
-    }
+    return LessonProgress.fromPersistence({
+      id: created.id,
+      enrollmentId: created.enrollmentId,
+      courseId: created.courseId,
+      lessonId: created.lessonId,
+      completed: created.completed,
+      completedAt: created.completedAt,
+      score: created.score ?? undefined,
+      totalQuestions: created.totalQuestions ?? undefined,
+      answers: created.answers.map(answer => 
+        QuizAnswer.fromPersistence({
+          id: answer.id,
+          lessonProgressId: answer.lessonProgressId,
+          quizQuestionId: answer.quizQuestionId,
+          selectedAnswer: answer.selectedAnswer,
+          isCorrect: answer.isCorrect,
+          createdAt: answer.createdAt,
+          updatedAt: answer.updatedAt,
+        })
+      ),
+      createdAt: created.createdAt,
+      updatedAt: created.updatedAt,
+    });
   }
 
   async findByEnrollmentAndLesson(
@@ -42,94 +61,142 @@ export class LessonProgressRepository implements ILessonProgressRepository {
     courseId: string,
     lessonId: string
   ): Promise<LessonProgress | null> {
-    try {
-      const progress = await this.prisma.lessonProgress.findUnique({
-        where: {
-          enrollmentId_courseId_lessonId: {
-            enrollmentId,
-            courseId,
-            lessonId,
+    const progress = await this.prisma.lessonProgress.findUnique({
+      where: {
+        enrollmentId_courseId_lessonId: {
+          enrollmentId,
+          courseId,
+          lessonId,
+        },
+      },
+      include: {
+        answers: {
+          include: {
+            quizQuestion: true,
           },
         },
-      });
+      },
+    });
 
-      if (!progress) {
-        return null;
-      }
-
-      return LessonProgress.fromPersistence({
-        id: progress.id,
-        enrollmentId: progress.enrollmentId,
-        courseId: progress.courseId,
-        lessonId: progress.lessonId,
-        completed: progress.completed,
-        completedAt: progress.completedAt,
-        createdAt: progress.createdAt,
-        updatedAt: progress.updatedAt,
-      });
-    } catch (error) {
-      console.error("Error finding lesson progress:", error);
-      throw new HttpError("Failed to find lesson progress", 500);
+    if (!progress) {
+      return null;
     }
+
+    return LessonProgress.fromPersistence({
+      id: progress.id,
+      enrollmentId: progress.enrollmentId,
+      courseId: progress.courseId,
+      lessonId: progress.lessonId,
+      completed: progress.completed,
+      completedAt: progress.completedAt,
+      score: progress.score ?? undefined,
+      totalQuestions: progress.totalQuestions ?? undefined,
+      answers: progress.answers.map(answer => 
+        QuizAnswer.fromPersistence({
+          id: answer.id,
+          lessonProgressId: answer.lessonProgressId,
+          quizQuestionId: answer.quizQuestionId,
+          selectedAnswer: answer.selectedAnswer,
+          isCorrect: answer.isCorrect,
+          createdAt: answer.createdAt,
+          updatedAt: answer.updatedAt,
+        })
+      ),
+      createdAt: progress.createdAt,
+      updatedAt: progress.updatedAt,
+    });
   }
 
   async findByEnrollment(
     enrollmentId: string,
     courseId: string
   ): Promise<LessonProgress[]> {
-    try {
-      const progress = await this.prisma.lessonProgress.findMany({
-        where: {
-          enrollmentId,
-          courseId,
+    const progress = await this.prisma.lessonProgress.findMany({
+      where: {
+        enrollmentId,
+        courseId,
+      },
+      include: {
+        answers: {
+          include: {
+            quizQuestion: true,
+          },
         },
-      });
+      },
+    });
 
-      return progress.map((p) =>
-        LessonProgress.fromPersistence({
-          id: p.id,
-          enrollmentId: p.enrollmentId,
-          courseId: p.courseId,
-          lessonId: p.lessonId,
-          completed: p.completed,
-          completedAt: p.completedAt,
-          createdAt: p.createdAt,
-          updatedAt: p.updatedAt,
-        })
-      );
-    } catch (error) {
-      console.error("Error finding lesson progress:", error);
-      throw new HttpError("Failed to find lesson progress", 500);
-    }
+    return progress.map(p => 
+      LessonProgress.fromPersistence({
+        id: p.id,
+        enrollmentId: p.enrollmentId,
+        courseId: p.courseId,
+        lessonId: p.lessonId,
+        completed: p.completed,
+        completedAt: p.completedAt,
+        score: p.score ?? undefined,
+        totalQuestions: p.totalQuestions ?? undefined,
+        answers: p.answers.map(answer => 
+          QuizAnswer.fromPersistence({
+            id: answer.id,
+            lessonProgressId: answer.lessonProgressId,
+            quizQuestionId: answer.quizQuestionId,
+            selectedAnswer: answer.selectedAnswer,
+            isCorrect: answer.isCorrect,
+            createdAt: answer.createdAt,
+            updatedAt: answer.updatedAt,
+          })
+        ),
+        createdAt: p.createdAt,
+        updatedAt: p.updatedAt,
+      })
+    );
   }
 
   async update(progress: LessonProgress): Promise<LessonProgress> {
-    try {
-      const updated = await this.prisma.lessonProgress.update({
-        where: {
-          id: progress.id,
+    const data = progress.toJSON();
+    const updated = await this.prisma.lessonProgress.update({
+      where: {
+        id: data.id,
+      },
+      data: {
+        completed: data.completed,
+        completedAt: data.completedAt,
+        score: data.score ?? undefined,
+        totalQuestions: data.totalQuestions ?? undefined,
+        updatedAt: data.updatedAt,
+      },
+      include: {
+        answers: {
+          include: {
+            quizQuestion: true,
+          },
         },
-        data: {
-          completed: progress.completed,
-          completedAt: progress.completedAt,
-          updatedAt: progress.updatedAt,
-        },
-      });
+      },
+    });
 
-      return LessonProgress.fromPersistence({
-        id: updated.id,
-        enrollmentId: updated.enrollmentId,
-        courseId: updated.courseId,
-        lessonId: updated.lessonId,
-        completed: updated.completed,
-        completedAt: updated.completedAt,
-        createdAt: updated.createdAt,
-        updatedAt: updated.updatedAt,
-      });
-    } catch (error) {
-      console.error("Error updating lesson progress:", error);
-      throw new HttpError("Failed to update lesson progress", 500);
-    }
+    return LessonProgress.fromPersistence({
+      id: updated.id,
+      enrollmentId: updated.enrollmentId,
+      courseId: updated.courseId,
+      lessonId: updated.lessonId,
+      completed: updated.completed,
+      completedAt: updated.completedAt,
+      score: updated.score ?? undefined,
+      totalQuestions: updated.totalQuestions ?? undefined,
+      answers: updated.answers.map(answer => 
+        QuizAnswer.fromPersistence({
+          id: answer.id,
+          lessonProgressId: answer.lessonProgressId,
+          quizQuestionId: answer.quizQuestionId,
+          selectedAnswer: answer.selectedAnswer,
+          isCorrect: answer.isCorrect,
+          createdAt: answer.createdAt,
+          updatedAt: answer.updatedAt,
+        })
+      ),
+      createdAt: updated.createdAt,
+      updatedAt: updated.updatedAt,
+    });
   }
 
   async calculateCourseProgress(
@@ -162,5 +229,46 @@ export class LessonProgressRepository implements ILessonProgressRepository {
       console.error("Error calculating course progress:", error);
       throw new HttpError("Failed to calculate course progress", 500);
     }
+  }
+
+  async saveQuizAnswers(progressId: string, answers: QuizAnswer[]): Promise<void> {
+    await this.prisma.$transaction(async (prisma) => {
+      // Delete existing answers
+      await prisma.quizAnswer.deleteMany({
+        where: { lessonProgressId: progressId },
+      });
+
+      // Create new answers
+      await prisma.quizAnswer.createMany({
+        data: answers.map(answer => ({
+          id: answer.id,
+          lessonProgressId: progressId,
+          quizQuestionId: answer.quizQuestionId,
+          selectedAnswer: answer.selectedAnswer,
+          isCorrect: answer.isCorrect,
+          createdAt: answer.createdAt,
+          updatedAt: answer.updatedAt,
+        })),
+      });
+    });
+  }
+
+  async findQuizAnswers(progressId: string): Promise<QuizAnswer[]> {
+    const answers = await this.prisma.quizAnswer.findMany({
+      where: { lessonProgressId: progressId },
+      include: { quizQuestion: true },
+    });
+
+    return answers.map(answer => 
+      QuizAnswer.fromPersistence({
+        id: answer.id,
+        lessonProgressId: answer.lessonProgressId,
+        quizQuestionId: answer.quizQuestionId,
+        selectedAnswer: answer.selectedAnswer,
+        isCorrect: answer.isCorrect,
+        createdAt: answer.createdAt,
+        updatedAt: answer.updatedAt,
+      })
+    );
   }
 } 

@@ -6,6 +6,7 @@ import { ILessonProgressRepository } from "../../../repositories/lesson-progress
 import { ILessonRepository } from "../../../repositories/lesson.repository";
 import { HttpError } from "../../../../presentation/http/errors/http-error";
 import { StatusCodes } from "http-status-codes";
+import { AccessStatus } from "../../../../domain/enum/access-status.enum";
 
 export class GetProgressUseCase implements IGetProgressUseCase {
   constructor(
@@ -43,14 +44,28 @@ export class GetProgressUseCase implements IGetProgressUseCase {
         data: {
           userId: enrollment.userId,
           courseId: enrollment.courseId,
+          lastLessonId: lessonProgress.find(p => p.completed)?.lessonId ?? allLessons[0]?.id,
           enrolledAt: new Date(enrollment.enrolledAt),
-          accessStatus: enrollment.accessStatus,
+          accessStatus: enrollment.accessStatus as AccessStatus,
           completedLessons,
           totalLessons,
-          lessonProgress: lessonProgress.map(p => ({
-            lessonId: p.lessonId,
-            completed: p.completed,
-            completedAt: p.completedAt ? new Date(p.completedAt) : undefined
+          lessonProgress: await Promise.all(lessonProgress.map(async p => {
+            if (!p.id) {
+              throw new HttpError("Progress ID is required", StatusCodes.INTERNAL_SERVER_ERROR);
+            }
+            const answers = await this.lessonProgressRepository.findQuizAnswers(p.id);
+            return {
+              lessonId: p.lessonId,
+              completed: p.completed,
+              completedAt: p.completedAt ? new Date(p.completedAt) : undefined,
+              score: p.score,
+              totalQuestions: p.totalQuestions,
+              answers: answers.map(a => ({
+                questionId: a.quizQuestionId,
+                selectedAnswer: a.selectedAnswer,
+                isCorrect: a.isCorrect
+              }))
+            };
           }))
         },
         message: "Progress retrieved successfully",

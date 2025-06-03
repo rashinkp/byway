@@ -24,11 +24,15 @@ export class ProgressController extends BaseController {
         throw new UnauthorizedError("User not authenticated");
       }
 
+      console.log(req.body);
+
       const validatedData = UpdateProgressSchema.parse({
         ...req.body,
         courseId: req.params.courseId,
         userId: req.user.id,
       });
+
+      console.log("Validated Data:", validatedData);
 
       const response = await this.updateProgressUseCase.execute(validatedData);
       return this.success_200(response.data, response.message);

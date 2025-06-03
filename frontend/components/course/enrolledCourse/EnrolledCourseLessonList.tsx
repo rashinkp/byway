@@ -1,10 +1,14 @@
 import { ILesson } from "@/types/lesson";
-import {  Lock } from "lucide-react";
+import {  Lock, CheckCircle } from "lucide-react";
 import { LessonListSkeleton } from "./skeletons/LessonListSkeleton";
+import { IQuizAnswer } from "@/types/progress";
 
 interface LessonWithCompletion extends ILesson {
   completed: boolean;
   isLocked?: boolean;
+  score?: number;
+  totalQuestions?: number;
+  answers?: IQuizAnswer[];
 }
 
 interface LessonListProps {
@@ -14,6 +18,7 @@ interface LessonListProps {
   allLessons: LessonWithCompletion[];
   selectedLesson: LessonWithCompletion | null;
   handleLessonSelect: (lesson: LessonWithCompletion) => void;
+  children?: (lesson: LessonWithCompletion) => React.ReactNode;
 }
 
 export function LessonList({
@@ -23,6 +28,7 @@ export function LessonList({
   allLessons,
   selectedLesson,
   handleLessonSelect,
+  children
 }: LessonListProps) {
   if (isLoading) {
     return <LessonListSkeleton />;
@@ -37,34 +43,30 @@ export function LessonList({
   }
 
   return (
-    <div className="space-y-2">
-      {allLessons.map((lesson) => {
-        const isSelected = selectedLesson?.id === lesson.id;
-        const isLocked = lesson.isLocked;
-
-        return (
-          <button
-            key={lesson.id}
-            onClick={() => !isLocked && handleLessonSelect(lesson)}
-            className={`w-full text-left px-4 py-3 rounded-lg transition-colors flex items-center gap-3 ${
-              isSelected
-                ? "bg-blue-50 text-blue-700 border border-blue-200"
-                : isLocked
-                ? "bg-gray-50 text-gray-400 cursor-not-allowed border border-gray-200"
-                : "hover:bg-gray-50 border border-transparent"
-            }`}
-            disabled={isLocked}
-          >
-            {isLocked && <Lock className="w-4 h-4 flex-shrink-0" />}
-            <span className="truncate flex-1">{lesson.title}</span>
-            {lesson.completed && !isLocked && (
-              <span className="ml-2 text-xs bg-green-100 text-green-800 px-2 py-1 rounded-full">
-                Completed
+    <div className="space-y-1">
+      {allLessons.map((lesson) => (
+        <button
+          key={lesson.id}
+          onClick={() => handleLessonSelect(lesson)}
+          disabled={lesson.isLocked}
+          className={`w-full text-left px-4 py-2 rounded-lg transition-colors ${
+            selectedLesson?.id === lesson.id
+              ? "bg-blue-50 text-blue-700"
+              : "hover:bg-gray-50"
+          } ${lesson.isLocked ? "opacity-50 cursor-not-allowed" : ""}`}
+        >
+          {children ? children(lesson) : (
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-gray-600 truncate">
+                {lesson.title}
               </span>
-            )}
-          </button>
-        );
-      })}
+              {lesson.completed && (
+                <CheckCircle className="w-4 h-4 text-green-500" />
+              )}
+            </div>
+          )}
+        </button>
+      ))}
     </div>
   );
 }

@@ -8,6 +8,9 @@ export async function updateProgress(data: IUpdateProgressInput): Promise<IProgr
       {
         lessonId: data.lessonId,
         completed: data.completed,
+        quizAnswers: data.quizAnswers,
+        score: data.score,
+        totalQuestions: data.totalQuestions,
       }
     );
     return response.data.data;

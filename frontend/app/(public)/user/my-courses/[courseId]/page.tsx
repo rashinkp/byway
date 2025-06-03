@@ -14,10 +14,14 @@ import { LessonContentSkeleton } from "@/components/course/enrolledCourse/skelet
 import { toast } from "sonner";
 import { AxiosError } from "axios";
 import { LockOverlay } from "@/components/ui/LockOverlay";
+import { IQuizAnswer } from "@/types/progress";
 
 interface LessonWithCompletion extends ILesson {
   completed: boolean;
   isLocked?: boolean;
+  score?: number;
+  totalQuestions?: number;
+  answers?: IQuizAnswer[];
 }
 
 export default function CourseContent() {
@@ -91,13 +95,16 @@ export default function CourseContent() {
       // First, create the array with completion status
       const lessonsWithCompletion: LessonWithCompletion[] = data.lessons.map(
         (lesson) => {
-          const isCompleted = progressData?.lessonProgress?.find(
+          const lessonProgress = progressData?.lessonProgress?.find(
             (p) => p.lessonId === lesson.id
-          )?.completed || false;
+          );
 
           return {
             ...lesson,
-            completed: isCompleted,
+            completed: lessonProgress?.completed || false,
+            score: lessonProgress?.score,
+            totalQuestions: lessonProgress?.totalQuestions,
+            answers: lessonProgress?.answers,
             isLocked: false // Initialize as false, we'll update this in the next step
           };
         }
@@ -120,8 +127,11 @@ export default function CourseContent() {
       if (nextLessonToLearn) {
         // If there's a lesson to learn, select it
         setSelectedLesson(nextLessonToLearn);
-      } else if (progressData?.lastLessonId) {
+      } else if (lessonsWithLockedState.every(lesson => lesson.completed)) {
         // If all lessons are completed, select the last lesson
+        setSelectedLesson(lessonsWithLockedState[lessonsWithLockedState.length - 1]);
+      } else if (progressData?.lastLessonId) {
+        // If not all completed, try to select the last lesson from progress
         const lastLesson = lessonsWithLockedState.find(
           (lesson) => lesson.id === progressData.lastLessonId
         );
@@ -162,7 +172,11 @@ export default function CourseContent() {
     setSelectedLesson(lesson);
   };
 
-  const markLessonComplete = () => {
+  const markLessonComplete = (quizData?: { 
+    answers: IQuizAnswer[], 
+    score: number, 
+    totalQuestions: number 
+  }) => {
     if (!selectedLesson || !courseId) return;
 
     // Update progress in the backend
@@ -170,13 +184,26 @@ export default function CourseContent() {
       courseId: courseId,
       lessonId: selectedLesson.id,
       completed: true,
+      ...(quizData && {
+        quizAnswers: quizData.answers,
+        score: quizData.score,
+        totalQuestions: quizData.totalQuestions,
+      }),
     });
 
     // Update local state
     setLessonsWithCompletion((prevLessons) =>
       prevLessons.map((lesson) =>
         lesson.id === selectedLesson.id
-          ? { ...lesson, completed: true }
+          ? { 
+              ...lesson, 
+              completed: true,
+              ...(quizData && {
+                score: quizData.score,
+                totalQuestions: quizData.totalQuestions,
+                answers: quizData.answers,
+              }),
+            }
           : lesson
       )
     );

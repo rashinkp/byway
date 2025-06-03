@@ -1,10 +1,11 @@
 import { ILesson } from "@/types/lesson";
-import { ChevronLeft, ChevronRight, Lock } from "lucide-react";
+import { ChevronLeft, ChevronRight, Lock, CheckCircle } from "lucide-react";
 import { LessonList } from "./EnrolledCourseLessonList";
 
 interface LessonWithCompletion extends ILesson {
   completed: boolean;
   isLocked?: boolean;
+  score?: number;
 }
 
 interface CourseSidebarProps {
@@ -62,7 +63,25 @@ export function EnrolledCourseSidebar({
         }))}
         selectedLesson={selectedLesson}
         handleLessonSelect={handleLessonSelect}
-      />
+      >
+        {lesson => (
+          <div className="flex items-center justify-between w-full">
+            <span className="text-sm text-gray-600 truncate">
+              {lesson.title}
+            </span>
+            {lesson.completed && (
+              <div className="flex items-center gap-2">
+                {lesson.score !== undefined && (
+                  <span className="text-xs font-medium px-2 py-1 rounded-full bg-green-100 text-green-800">
+                    {lesson.score}%
+                  </span>
+                )}
+                <CheckCircle className="w-4 h-4 text-green-500 flex-shrink-0" />
+              </div>
+            )}
+          </div>
+        )}
+      </LessonList>
       {data && data.totalPages > 1 && (
         <div className="mt-4 flex justify-between items-center">
           <button

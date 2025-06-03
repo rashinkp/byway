@@ -4,9 +4,15 @@ import { FileText, CheckCircle, Clock } from "lucide-react";
 import { ILesson } from "@/types/lesson";
 import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
 import { QuizQuestion } from "@/types/content";
+import { useState } from "react";
+import { IQuizAnswer } from "@/types/progress";
 
 interface LessonWithCompletion extends ILesson {
   completed: boolean;
+  isLocked?: boolean;
+  score?: number;
+  totalQuestions?: number;
+  answers?: IQuizAnswer[];
 }
 
 interface LessonContentProps {
@@ -19,7 +25,11 @@ interface LessonContentProps {
   allLessons: LessonWithCompletion[];
   goToPrevLesson: () => void;
   goToNextLesson: () => void;
-  markLessonComplete: () => void;
+  markLessonComplete: (quizData?: { 
+    answers: IQuizAnswer[], 
+    score: number, 
+    totalQuestions: number 
+  }) => void;
 }
 
 export function LessonContent({
@@ -34,6 +44,40 @@ export function LessonContent({
   goToNextLesson,
   markLessonComplete,
 }: LessonContentProps) {
+  const [selectedAnswers, setSelectedAnswers] = useState<Record<string, string>>({});
+
+  const handleAnswerSelect = (questionId: string, answer: string) => {
+    setSelectedAnswers(prev => ({
+      ...prev,
+      [questionId]: answer
+    }));
+  };
+
+  const handleQuizSubmit = () => {
+    if (!content.quizQuestions) return;
+
+    const answers: IQuizAnswer[] = content.quizQuestions.map((question: QuizQuestion) => {
+      const selectedAnswer = selectedAnswers[question.id];
+      const isCorrect = selectedAnswer === question.correctAnswer;
+      
+      return {
+        questionId: question.id,
+        selectedAnswer: selectedAnswer || '',
+        isCorrect
+      };
+    });
+
+    const correctAnswers = answers.filter(a => a.isCorrect).length;
+    const totalQuestions = content.quizQuestions.length;
+    const score = Math.round((correctAnswers / totalQuestions) * 100);
+
+    markLessonComplete({
+      answers,
+      score,
+      totalQuestions
+    });
+  };
+
   // Helper to detect file type based on URL extension
   const getFileType = (url: string) => {
     const extension = url.split(".").pop()?.toLowerCase();
@@ -185,32 +229,106 @@ export function LessonContent({
                 <h3 className="text-xl font-semibold text-gray-800 mb-4">
                   Quiz: {content.title}
                 </h3>
-                <div className="space-y-6">
-                  {content.quizQuestions.map((question: QuizQuestion, index: number) => (
-                    <div key={question.id} className="border border-gray-200 rounded-lg p-5">
-                      <p className="font-medium text-gray-800 mb-3">
-                        Question {index + 1}: {question.question}
-                      </p>
-                      <div className="space-y-3">
-                        {question.options.map((option: string, idx: number) => (
-                          <div key={idx} className="flex items-center">
-                            <input
-                              type="radio"
-                              id={`question-${question.id}-option-${idx}`}
-                              name={`question-${question.id}`}
-                              className="mr-2 accent-blue-600"
-                            />
-                            <label
-                              htmlFor={`question-${question.id}-option-${idx}`}
-                              className="text-gray-700"
-                            >
-                              {option}
-                            </label>
-                          </div>
-                        ))}
+                {selectedLesson.completed && selectedLesson.score !== undefined && (
+                  <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <h4 className="text-lg font-medium text-green-800">Quiz Results</h4>
+                        <p className="text-green-600">
+                          Score: {selectedLesson.score}% ({selectedLesson.score * (selectedLesson.totalQuestions || 0) / 100} out of {selectedLesson.totalQuestions || 0} correct)
+                        </p>
+                      </div>
+                      <div className="text-2xl font-bold text-green-700">
+                        {selectedLesson.score}%
                       </div>
                     </div>
-                  ))}
+                  </div>
+                )}
+                <div className="space-y-6">
+                  {content.quizQuestions.map((question: QuizQuestion, index: number) => {
+                    const submittedAnswer = selectedLesson.answers?.find(
+                      a => a.questionId === question.id
+                    );
+                    const isUserAnswer = submittedAnswer?.selectedAnswer === question.correctAnswer;
+                    const isWrongAnswer = isUserAnswer && !question.correctAnswer;
+                    
+                    return (
+                      <div key={question.id} className="bg-blue-50 p-6 rounded-xl border border-blue-200">
+                        <h3 className="text-lg font-medium text-gray-800 mb-4">
+                          Question {index + 1}: {question.question}
+                        </h3>
+                        <ul className="space-y-3 mb-4">
+                          {question.options.map((option: string, idx: number) => {
+                            const isSelected = selectedAnswers[question.id] === option;
+                            const isCorrect = option === question.correctAnswer;
+                            const showResult = selectedLesson.completed;
+                            const submittedAnswer = selectedLesson.answers?.find(
+                              a => a.questionId === question.id
+                            );
+                            const isUserAnswer = submittedAnswer?.selectedAnswer === option;
+                            const isWrongAnswer = isUserAnswer && !isCorrect;
+                            
+                            return (
+                              <li
+                                key={idx}
+                                className={`flex items-center p-3 rounded-lg ${
+                                  showResult
+                                    ? isCorrect
+                                      ? "bg-green-100 border border-green-200"
+                                      : isWrongAnswer
+                                      ? "bg-red-100 border border-red-200"
+                                      : "bg-white border border-gray-200"
+                                    : isSelected
+                                    ? "bg-blue-100 border border-blue-200"
+                                    : "bg-white border border-gray-200"
+                                }`}
+                              >
+                                <input
+                                  type="radio"
+                                  id={`question-${question.id}-option-${idx}`}
+                                  name={`question-${question.id}`}
+                                  className="mr-3 accent-blue-600"
+                                  checked={isSelected}
+                                  onChange={() => handleAnswerSelect(question.id, option)}
+                                  disabled={selectedLesson.completed}
+                                />
+                                <label
+                                  htmlFor={`question-${question.id}-option-${idx}`}
+                                  className={`${
+                                    showResult
+                                      ? isCorrect
+                                        ? "text-green-800 font-medium"
+                                        : isWrongAnswer
+                                        ? "text-red-800 font-medium"
+                                        : "text-gray-600"
+                                      : isSelected
+                                      ? "text-gray-800 font-medium"
+                                      : "text-gray-600"
+                                  }`}
+                                >
+                                  {option}
+                                </label>
+                                {showResult && (
+                                  <div className="ml-auto flex gap-2">
+                                    {isCorrect && (
+                                      <span className="text-xs bg-green-100 text-green-800 px-2 py-1 rounded">
+                                        Correct Answer
+                                      </span>
+                                    )}
+                                    {isWrongAnswer && (
+                                      <span className="text-xs bg-red-100 text-red-800 px-2 py-1 rounded">
+                                        Your Answer
+                                      </span>
+                                    )}
+                                  </div>
+                                )}
+                              </li>
+                            );
+                          })}
+                        </ul>
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
             )}
@@ -230,17 +348,31 @@ export function LessonContent({
               </>
             )}
           </div>
-          <button
-            className={`px-5 py-2 rounded-lg font-medium transition-colors ${
-              selectedLesson.completed
-                ? "bg-gray-200 text-gray-700 cursor-not-allowed"
-                : "bg-green-600 text-white hover:bg-green-700"
-            }`}
-            onClick={markLessonComplete}
-            disabled={selectedLesson.completed}
-          >
-            {selectedLesson.completed ? "Completed" : "Mark as Complete"}
-          </button>
+          {content && content.type === "QUIZ" ? (
+            <button
+              className={`px-5 py-2 rounded-lg font-medium transition-colors ${
+                selectedLesson.completed
+                  ? "bg-gray-200 text-gray-700 cursor-not-allowed"
+                  : "bg-green-600 text-white hover:bg-green-700"
+              }`}
+              onClick={handleQuizSubmit}
+              disabled={selectedLesson.completed || Object.keys(selectedAnswers).length !== content.quizQuestions.length}
+            >
+              {selectedLesson.completed ? "Completed" : "Submit Quiz"}
+            </button>
+          ) : (
+            <button
+              className={`px-5 py-2 rounded-lg font-medium transition-colors ${
+                selectedLesson.completed
+                  ? "bg-gray-200 text-gray-700 cursor-not-allowed"
+                  : "bg-green-600 text-white hover:bg-green-700"
+              }`}
+              onClick={() => markLessonComplete()}
+              disabled={selectedLesson.completed}
+            >
+              {selectedLesson.completed ? "Completed" : "Mark as Complete"}
+            </button>
+          )}
         </div>
       </div>
     </>

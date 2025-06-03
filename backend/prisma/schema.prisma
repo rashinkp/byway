@@ -150,6 +150,7 @@ model Course {
   transactions   TransactionHistory[] @relation("CourseToTransactionHistory")
   orderItems     OrderItem[]   @relation("CourseToOrderItem")
   refunds        Refund[]      @relation("CourseToRefund")
+  lessonProgress LessonProgress[] @relation("CourseToLessonProgress")
 }
 
 model CourseDetails {
@@ -212,20 +213,51 @@ model Enrollment {
 
 // New model to track lesson progress
 model LessonProgress {
-  id           String      @id @default(uuid())
-  enrollmentId String
-  courseId     String
-  lessonId     String
-  completed    Boolean     @default(false)
-  completedAt  DateTime?
-  createdAt    DateTime    @default(now())
-  updatedAt    DateTime    @updatedAt
-  enrollment   Enrollment  @relation("EnrollmentToLessonProgress", fields: [enrollmentId, courseId], references: [userId, courseId], onDelete: Cascade)
-  lesson       Lesson      @relation("LessonToProgress", fields: [lessonId], references: [id], onDelete: Cascade)
+  id            String       @id @default(uuid())
+  enrollmentId  String
+  courseId      String
+  lessonId      String
+  completed     Boolean      @default(false)
+  completedAt   DateTime?
+  score         Int?
+  totalQuestions Int?
+  answers       QuizAnswer[]
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+
+  enrollment    Enrollment   @relation("EnrollmentToLessonProgress", fields: [enrollmentId, courseId], references: [userId, courseId])
+  course        Course       @relation("CourseToLessonProgress", fields: [courseId], references: [id])
+  lesson        Lesson       @relation("LessonToProgress", fields: [lessonId], references: [id])
 
   @@unique([enrollmentId, courseId, lessonId])
-  @@index([enrollmentId, courseId])
-  @@index([lessonId])
+}
+
+model QuizAnswer {
+  id               String         @id @default(uuid())
+  lessonProgressId String
+  quizQuestionId   String
+  selectedAnswer   String
+  isCorrect        Boolean
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @updatedAt
+
+  lessonProgress   LessonProgress @relation(fields: [lessonProgressId], references: [id])
+  quizQuestion     QuizQuestion   @relation("QuizQuestionToQuizAnswer", fields: [quizQuestionId], references: [id])
+
+  @@unique([lessonProgressId, quizQuestionId])
+}
+
+// Update QuizQuestion model to include the relation
+model QuizQuestion {
+  id             String        @id @default(uuid())
+  lessonContentId String
+  lessonContent  LessonContent @relation("LessonContentToQuizQuestions", fields: [lessonContentId], references: [id], onDelete: Cascade)
+  question       String
+  options        String[]
+  correctAnswer  String
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+  answers        QuizAnswer[]  @relation("QuizQuestionToQuizAnswer")
 }
 
 enum AccessStatus {
@@ -249,19 +281,6 @@ model LessonContent {
   updatedAt     DateTime         @updatedAt
   deletedAt     DateTime?
 }
-
-model QuizQuestion {
-  id             String        @id @default(uuid())
-  lessonContentId String
-  lessonContent  LessonContent @relation("LessonContentToQuizQuestions", fields: [lessonContentId], references: [id], onDelete: Cascade)
-  question       String
-  options        String[]
-  correctAnswer  String
-  createdAt      DateTime      @default(now())
-  updatedAt      DateTime      @updatedAt
-}
-
-
 
 enum ContentType {
   VIDEO

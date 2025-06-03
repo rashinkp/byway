@@ -7,6 +7,8 @@ import { ILessonRepository } from "../../../repositories/lesson.repository";
 import { HttpError } from "../../../../presentation/http/errors/http-error";
 import { StatusCodes } from "http-status-codes";
 import { LessonProgress } from "../../../../domain/entities/lesson-progress.entity";
+import { AccessStatus } from "../../../../domain/enum/access-status.enum";
+import { QuizAnswer } from "../../../../domain/entities/quiz-answer.entity";
 
 export class UpdateProgressUseCase implements IUpdateProgressUseCase {
   constructor(
@@ -57,15 +59,40 @@ export class UpdateProgressUseCase implements IUpdateProgressUseCase {
           courseId: input.courseId,
           lessonId: input.lessonId,
           completed: input.completed ?? false,
+          score: input.score,
+          totalQuestions: input.totalQuestions,
         });
-        await this.lessonProgressRepository.save(progress);
+        progress = await this.lessonProgressRepository.save(progress);
       } else {
         if (input.completed) {
           progress.markAsCompleted();
         } else {
           progress.markAsIncomplete();
         }
-        await this.lessonProgressRepository.update(progress);
+        if (input.score !== undefined) {
+          progress.updateScore(input.score);
+        }
+        if (input.totalQuestions !== undefined) {
+          progress.updateTotalQuestions(input.totalQuestions);
+        }
+        progress = await this.lessonProgressRepository.update(progress);
+      }
+
+      // Handle quiz answers if provided
+      if (input.quizAnswers && input.quizAnswers.length > 0) {
+        if (!progress.id) {
+          throw new HttpError("Progress ID is required", StatusCodes.INTERNAL_SERVER_ERROR);
+        }
+        const progressId = progress.id;
+        const quizAnswers = input.quizAnswers.map(answer => 
+          QuizAnswer.create({
+            lessonProgressId: progressId,
+            quizQuestionId: answer.questionId,
+            selectedAnswer: answer.selectedAnswer,
+            isCorrect: answer.isCorrect,  
+          })
+        );
+        await this.lessonProgressRepository.saveQuizAnswers(progressId, quizAnswers);
       }
 
       // Get all lesson progress for this enrollment
@@ -88,13 +115,26 @@ export class UpdateProgressUseCase implements IUpdateProgressUseCase {
           courseId: enrollment.courseId,
           lastLessonId: input.lessonId,
           enrolledAt: new Date(enrollment.enrolledAt),
-          accessStatus: enrollment.accessStatus,
+          accessStatus: enrollment.accessStatus as AccessStatus,
           completedLessons,
           totalLessons,
-          lessonProgress: lessonProgress.map(p => ({
-            lessonId: p.lessonId,
-            completed: p.completed,
-            completedAt: p.completedAt ? new Date(p.completedAt) : undefined
+          lessonProgress: await Promise.all(lessonProgress.map(async p => {
+            if (!p.id) {
+              throw new HttpError("Progress ID is required", StatusCodes.INTERNAL_SERVER_ERROR);
+            }
+            const answers = await this.lessonProgressRepository.findQuizAnswers(p.id);
+            return {
+              lessonId: p.lessonId,
+              completed: p.completed,
+              completedAt: p.completedAt ? new Date(p.completedAt) : undefined,
+              score: p.score,
+              totalQuestions: p.totalQuestions,
+              answers: answers.map(a => ({
+                questionId: a.quizQuestionId,
+                selectedAnswer: a.selectedAnswer,
+                isCorrect: a.isCorrect
+              }))
+            };
           }))
         },
         message: "Lesson progress updated successfully",
