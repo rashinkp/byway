@@ -2,10 +2,9 @@
 
 import { useState } from "react";
 import { Pagination } from "@/components/ui/Pagination";
-import { Input } from "@/components/ui/input";
-import { Search } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useGetAllInstructors } from "@/hooks/instructor/useGetAllInstructor";
+import Link from "next/link";
 
 export default function InstructorsPage() {
   const [page, setPage] = useState(1);
@@ -59,8 +58,9 @@ export default function InstructorsPage() {
         <>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {data?.data.items.map((instructor) => (
-              <div
+              <Link
                 key={instructor.id}
+                href={`/instructors/${instructor.id}`}
                 className="bg-white rounded-lg shadow-sm p-6 hover:shadow-md transition-shadow"
               >
                 <div className="flex items-center gap-4">
@@ -79,7 +79,7 @@ export default function InstructorsPage() {
                 <p className="mt-4 text-gray-600 text-sm line-clamp-2">
                   {instructor.about || "No bio available"}
                 </p>
-              </div>
+              </Link>
             ))}
           </div>
 
