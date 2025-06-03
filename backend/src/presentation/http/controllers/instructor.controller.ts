@@ -22,6 +22,7 @@ import { IHttpResponse } from "../interfaces/http-response.interface";
 import { UnauthorizedError } from "../errors/unautherized-error";
 import { HttpError } from "../errors/http-error";
 import { BaseController } from "./base.controller";
+import { GetInstructorDetailsUseCase } from "../../../app/usecases/instructor/interfaces/get-instructor-details.usecase.interface";
 
 export class InstructorController extends BaseController {
   constructor(
@@ -32,8 +33,9 @@ export class InstructorController extends BaseController {
     private getInstructorByUserIdUseCase: IGetInstructorByUserIdUseCase,
     private getAllInstructorsUseCase: IGetAllInstructorsUseCase,
     private userRepository: IUserRepository,
+    private getInstructorDetailsUseCase: GetInstructorDetailsUseCase,
     httpErrors: IHttpErrors,
-    httpSuccess: IHttpSuccess
+    httpSuccess: IHttpSuccess,
   ) {
     super(httpErrors, httpSuccess);
   }
@@ -210,6 +212,14 @@ export class InstructorController extends BaseController {
       const validated = validateGetAllInstructors(request.query);
       const result = await this.getAllInstructorsUseCase.execute(validated);
       return this.success_200(result, "Instructors retrieved successfully");
+    });
+  }
+
+  async getInstructorDetails(httpRequest: IHttpRequest): Promise<IHttpResponse> {
+    return this.handleRequest(httpRequest, async (request) => {
+      const { instructorId } = request.params;
+      const result = await this.getInstructorDetailsUseCase.execute(instructorId);
+      return this.success_200(result, "Instructor details retrieved successfully");
     });
   }
 }

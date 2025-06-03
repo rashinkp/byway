@@ -2,6 +2,7 @@ import { Router } from "express";
 import { restrictTo } from "../middlewares/auth.middleware";
 import { InstructorController } from "../../http/controllers/instructor.controller";
 import { expressAdapter } from "../../adapters/express.adapter";
+import { optionalAuth } from "../middlewares/auth.middleware";
 
 export function instructorRouter(
   instructorController: InstructorController
@@ -14,6 +15,15 @@ export function instructorRouter(
       req,
       res,
       instructorController.getAllInstructors.bind(instructorController)
+    )
+  );
+
+  // Get instructor details (public with optional auth)
+  router.get("/instructors/:instructorId", optionalAuth, (req, res) =>
+    expressAdapter(
+      req,
+      res,
+      instructorController.getInstructorDetails.bind(instructorController)
     )
   );
 

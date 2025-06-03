@@ -7,6 +7,7 @@ import { GetInstructorByUserIdUseCase } from "../app/usecases/instructor/impleme
 import { GetAllInstructorsUseCase } from "../app/usecases/instructor/implementations/get-all-instructors.usecase";
 import { UpdateUserUseCase } from "../app/usecases/user/implementations/update-user.usecase";
 import { SharedDependencies } from "./shared.dependencies";
+import { GetInstructorDetailsUseCaseImpl } from "../app/usecases/instructor/implementations/get-instructor-details.usecase";
 
 export interface InstructorDependencies {
   instructorController: InstructorController;
@@ -42,6 +43,11 @@ export function createInstructorDependencies(
     userRepository
   );
 
+  const getInstructorDetailsUseCase = new GetInstructorDetailsUseCaseImpl(
+    instructorRepository,
+    userRepository
+  );
+
   const instructorController = new InstructorController(
     createInstructorUseCase,
     updateInstructorUseCase,
@@ -50,6 +56,7 @@ export function createInstructorDependencies(
     getInstructorByUserIdUseCase,
     getAllInstructorsUseCase,
     userRepository,
+    getInstructorDetailsUseCase,
     deps.httpErrors,
     deps.httpSuccess
   );
