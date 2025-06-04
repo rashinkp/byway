@@ -22,6 +22,43 @@ export const TransactionList: React.FC<TransactionListProps> = ({
   const getStatusInfo = (transaction: Transaction) => {
     const { status, type } = transaction;
 
+    if (type === "WALLET_TOPUP") {
+      switch (status) {
+        case "COMPLETED":
+          return {
+            icon: <ArrowUp className="h-5 w-5 text-green-600" />,
+            bgColor: "bg-green-100",
+            textColor: "text-green-600",
+            label: "Wallet Top-up",
+            amountPrefix: "+",
+          };
+        case "FAILED":
+          return {
+            icon: <AlertCircle className="h-5 w-5 text-red-600" />,
+            bgColor: "bg-red-100",
+            textColor: "text-red-600",
+            label: transaction.failureReason || "Top-up Failed",
+            amountPrefix: "",
+          };
+        case "PENDING":
+          return {
+            icon: <AlertCircle className="h-5 w-5 text-yellow-600" />,
+            bgColor: "bg-yellow-100",
+            textColor: "text-yellow-600",
+            label: "Top-up Pending",
+            amountPrefix: "",
+          };
+        default:
+          return {
+            icon: <AlertCircle className="h-5 w-5 text-gray-600" />,
+            bgColor: "bg-gray-100",
+            textColor: "text-gray-600",
+            label: "Unknown Status",
+            amountPrefix: "",
+          };
+      }
+    }
+
     if (type === "PURCHASE") {
       switch (status) {
         case "COMPLETED":

@@ -68,9 +68,9 @@ export default function ProfileSection({ user, setIsModalOpen }: ProfileSectionP
                     />
                   </div>
                 ) : (
-                  <div className="w-20 h-20 rounded-xl bg-blue-50 flex items-center justify-center text-blue-600 text-2xl font-bold">
-                    {user.name ? getInitials(user.name) : "U"}
-                  </div>
+                <div className="w-20 h-20 rounded-xl bg-blue-50 flex items-center justify-center text-blue-600 text-2xl font-bold">
+                  {user.name ? getInitials(user.name) : "U"}
+                </div>
                 )}
                 {user.isVerified && (
                   <div className="absolute -bottom-2 -right-2 bg-green-500 rounded-full p-1.5">

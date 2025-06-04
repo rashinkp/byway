@@ -395,7 +395,7 @@ enum RefundStatus {
 
 model TransactionHistory {
   id            String          @id @default(uuid())
-  orderId       String
+  orderId       String?         // Make orderId optional
   userId        String
   walletId      String?         // Make walletId optional
   courseId      String?
@@ -406,9 +406,9 @@ model TransactionHistory {
   transactionId String?
   createdAt     DateTime        @default(now())
   updatedAt     DateTime        @updatedAt
-  order         Order           @relation("OrderToTransactionHistory", fields: [orderId], references: [id], onDelete: Cascade)
+  order         Order?          @relation("OrderToTransactionHistory", fields: [orderId], references: [id], onDelete: Cascade) // Make order relation optional
   user          User            @relation("UserToTransactionHistory", fields: [userId], references: [id], onDelete: Cascade)
-  wallet        Wallet?         @relation("WalletToTransactionHistory", fields: [walletId], references: [id], onDelete: SetNull) // Make wallet relation optional
+  wallet        Wallet?         @relation("WalletToTransactionHistory", fields: [walletId], references: [id], onDelete: SetNull)
   course        Course?         @relation("CourseToTransactionHistory", fields: [courseId], references: [id], onDelete: SetNull)
   @@index([orderId])
   @@index([userId])
@@ -417,8 +417,11 @@ model TransactionHistory {
 }
 
 enum TransactionType {
+  PURCHASE
   PAYMENT
   REFUND
+  WALLET_TOPUP
+  WALLET_WITHDRAWAL
 }
 
 enum TransactionStatus {

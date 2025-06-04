@@ -30,6 +30,7 @@ export function createStripeDependencies(
     deps.orderRepository,
     deps.enrollmentRepository,
     deps.transactionRepository,
+    deps.walletRepository
   );
 
   // Initialize controller

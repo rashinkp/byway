@@ -17,7 +17,7 @@ export class TransactionRepository implements ITransactionRepository {
   private mapToTransaction(prismaTransaction: TransactionHistory): Transaction {
     return new Transaction({
       id: prismaTransaction.id,
-      orderId: prismaTransaction.orderId,
+      orderId: prismaTransaction.orderId || undefined,
       userId: prismaTransaction.userId,
       amount: Number(prismaTransaction.amount),
       type: this.mapPrismaTransactionType(prismaTransaction.type),
@@ -27,6 +27,7 @@ export class TransactionRepository implements ITransactionRepository {
       ),
       courseId: prismaTransaction.courseId || undefined,
       transactionId: prismaTransaction.transactionId || undefined,
+      walletId: prismaTransaction.walletId || undefined,
       createdAt: prismaTransaction.createdAt,
       updatedAt: prismaTransaction.updatedAt,
     });
@@ -36,10 +37,16 @@ export class TransactionRepository implements ITransactionRepository {
     type: PrismaTransactionType
   ): TransactionType {
     switch (type) {
-      case "PAYMENT":
+      case "PURCHASE":
         return TransactionType.PURCHASE;
+      case "PAYMENT":
+        return TransactionType.PAYMENT;
       case "REFUND":
         return TransactionType.REFUND;
+      case "WALLET_TOPUP":
+        return TransactionType.WALLET_TOPUP;
+      case "WALLET_WITHDRAWAL":
+        return TransactionType.WALLET_WITHDRAWAL;
       default:
         throw new Error(`Unknown transaction type: ${type}`);
     }
@@ -83,9 +90,15 @@ export class TransactionRepository implements ITransactionRepository {
   ): PrismaTransactionType {
     switch (type) {
       case TransactionType.PURCHASE:
+        return "PURCHASE";
+      case TransactionType.PAYMENT:
         return "PAYMENT";
       case TransactionType.REFUND:
         return "REFUND";
+      case TransactionType.WALLET_TOPUP:
+        return "WALLET_TOPUP";
+      case TransactionType.WALLET_WITHDRAWAL:
+        return "WALLET_WITHDRAWAL";
       default:
         throw new Error(`Unknown transaction type: ${type}`);
     }
@@ -122,21 +135,52 @@ export class TransactionRepository implements ITransactionRepository {
   }
 
   async create(transaction: Transaction): Promise<Transaction> {
-    const created = await this.prisma.transactionHistory.create({
-      data: {
-        orderId: transaction.orderId,
-        userId: transaction.userId,
-        amount: transaction.amount,
-        type: this.mapToPrismaTransactionType(transaction.type),
-        status: this.mapToPrismaTransactionStatus(transaction.status),
-        paymentGateway: this.mapToPrismaPaymentGateway(
-          transaction.paymentGateway
-        ),
-        courseId: transaction.courseId,
-        transactionId: transaction.transactionId,
-      },
+    console.log("TransactionRepository.create - Input:", {
+      orderId: transaction.orderId,
+      userId: transaction.userId,
+      amount: transaction.amount,
+      type: transaction.type,
+      status: transaction.status,
+      paymentGateway: transaction.paymentGateway,
     });
-    return this.mapToTransaction(created);
+
+    try {
+      const created = await this.prisma.transactionHistory.create({
+        data: {
+          orderId: transaction.orderId || null,
+          userId: transaction.userId,
+          amount: transaction.amount,
+          type: this.mapToPrismaTransactionType(transaction.type),
+          status: this.mapToPrismaTransactionStatus(transaction.status),
+          paymentGateway: this.mapToPrismaPaymentGateway(
+            transaction.paymentGateway
+          ),
+          courseId: transaction.courseId,
+          transactionId: transaction.transactionId,
+          walletId: transaction.walletId,
+        },
+      });
+
+      console.log("TransactionRepository.create - Success:", {
+        id: created.id,
+        orderId: created.orderId,
+        amount: created.amount,
+        status: created.status,
+      });
+
+      return this.mapToTransaction(created);
+    } catch (error) {
+      console.error("TransactionRepository.create - Error:", {
+        error: error instanceof Error ? error.message : String(error),
+        stack: error instanceof Error ? error.stack : undefined,
+        transaction: {
+          orderId: transaction.orderId,
+          userId: transaction.userId,
+          amount: transaction.amount,
+        },
+      });
+      throw error;
+    }
   }
 
   async findById(id: string): Promise<Transaction | null> {

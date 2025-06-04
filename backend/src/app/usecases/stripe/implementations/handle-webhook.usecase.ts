@@ -8,6 +8,7 @@ import { IUserRepository } from "../../../repositories/user.repository";
 import { IOrderRepository } from "../../../repositories/order.repository";
 import { IEnrollmentRepository } from "../../../repositories/enrollment.repository.interface";
 import { ITransactionRepository } from "../../../repositories/transaction.repository";
+import { IWalletRepository } from "../../../repositories/wallet.repository.interface";
 import { HttpError } from "../../../../presentation/http/errors/http-error";
 import { StatusCodes } from "http-status-codes";
 import { TransactionType } from "../../../../domain/enum/transaction-type.enum";
@@ -16,6 +17,7 @@ import { PaymentGateway } from "../../../../domain/enum/payment-gateway.enum";
 import { Transaction } from "../../../../domain/entities/transaction.entity";
 import { WebhookGateway } from "../../../providers/webhook-gateway.interface";
 import { WebhookEvent } from "../../../../domain/value-object/webhook-event.value-object";
+import { Wallet } from "../../../../domain/entities/wallet.entity";
 
 export class HandleWebhookUseCase implements IHandleWebhookUseCase {
   constructor(
@@ -24,6 +26,7 @@ export class HandleWebhookUseCase implements IHandleWebhookUseCase {
     private readonly orderRepository: IOrderRepository,
     private readonly enrollmentRepository: IEnrollmentRepository,
     private readonly transactionRepository: ITransactionRepository,
+    private readonly walletRepository: IWalletRepository,
   ) {}
 
   async execute(input: IWebhookInput): Promise<ApiResponse> {
@@ -57,10 +60,10 @@ export class HandleWebhookUseCase implements IHandleWebhookUseCase {
       const metadata = this.webhookGateway.parseMetadata(
         event.data.object.metadata
       );
-      const { userId, orderId, courses } = metadata;
+      const { userId, orderId, courses, isWalletTopUp } = metadata;
 
-      if (!userId || !orderId || !courses || !Array.isArray(courses)) {
-        console.error("Invalid metadata format:", { userId, orderId, courses });
+      if (!userId) {
+        console.error("Invalid metadata format: userId missing");
         throw new HttpError(
           "Invalid webhook metadata format",
           StatusCodes.BAD_REQUEST
@@ -72,6 +75,24 @@ export class HandleWebhookUseCase implements IHandleWebhookUseCase {
       if (!user) {
         console.error("User not found:", userId);
         throw new HttpError("User not found", StatusCodes.NOT_FOUND);
+      }
+
+      // Handle wallet top-up
+      if (isWalletTopUp) {
+        return await this.handleWalletTopUp(event, userId);
+      }
+
+      // Handle course purchase
+      if (!orderId || !courses || !Array.isArray(courses)) {
+        console.error("Invalid metadata format for course purchase:", { 
+          orderId, 
+          courses,
+          metadata: event.data.object.metadata 
+        });
+        throw new HttpError(
+          "Invalid webhook metadata format",
+          StatusCodes.BAD_REQUEST
+        );
       }
 
       // Check for idempotency
@@ -114,7 +135,7 @@ export class HandleWebhookUseCase implements IHandleWebhookUseCase {
         webhook: {
           orderId: event.data.object.id,
           status: "completed",
-          transactionId: this.webhookGateway.getPaymentIntentId(event),
+          transactionId: paymentIntentId,
         },
       });
     } catch (error) {
@@ -122,6 +143,93 @@ export class HandleWebhookUseCase implements IHandleWebhookUseCase {
         error: error instanceof Error ? error.message : String(error),
         stack: error instanceof Error ? error.stack : undefined,
         metadata: event.data.object.metadata,
+        eventType: event.type,
+        eventId: event.data.object.id,
+      });
+      throw error;
+    }
+  }
+
+  private async handleWalletTopUp(
+    event: WebhookEvent,
+    userId: string
+  ): Promise<ApiResponse> {
+    try {
+      console.log("Starting wallet top-up processing:", {
+        userId,
+        eventId: event.data.object.id,
+        amount: event.data.object.amount_total,
+      });
+
+      if (!event.data.object.amount_total) {
+        throw new HttpError("Amount not found in webhook data", StatusCodes.BAD_REQUEST);
+      }
+      const amount = event.data.object.amount_total / 100; // Convert from cents to dollars
+      const paymentIntentId = this.webhookGateway.getPaymentIntentId(event);
+
+      if (!paymentIntentId) {
+        throw new HttpError(
+          "Payment intent ID not found",
+          StatusCodes.BAD_REQUEST
+        );
+      }
+
+      console.log("Fetching wallet for user:", userId);
+      // Get or create wallet
+      let wallet = await this.walletRepository.findByUserId(userId);
+      if (!wallet) {
+        console.log("Creating new wallet for user:", userId);
+        wallet = Wallet.create(userId);
+        wallet = await this.walletRepository.create(wallet);
+      }
+
+      console.log("Updating wallet balance:", {
+        walletId: wallet.id,
+        currentBalance: wallet.balance,
+        amountToAdd: amount,
+      });
+
+      // Add money to wallet
+      wallet.addAmount(amount);
+      await this.walletRepository.update(wallet);
+
+      console.log("Creating transaction record:", {
+        userId,
+        walletId: wallet.id,
+        amount,
+        paymentIntentId,
+      });
+
+      // Create transaction record
+      const transaction = new Transaction({
+        userId,
+        walletId: wallet.id,
+        amount,
+        type: TransactionType.WALLET_TOPUP,
+        status: TransactionStatus.COMPLETED,
+        paymentGateway: PaymentGateway.STRIPE,
+        transactionId: paymentIntentId,
+      });
+
+      const createdTransaction = await this.transactionRepository.create(transaction);
+      console.log("Transaction created successfully:", {
+        transactionId: createdTransaction.id,
+        status: createdTransaction.status,
+      });
+
+      return this.createSuccessResponse("Wallet top-up successful", {
+        webhook: {
+          status: "completed",
+          transactionId: paymentIntentId,
+          amount,
+        },
+      });
+    } catch (error) {
+      console.error("Error in handleWalletTopUp:", {
+        error: error instanceof Error ? error.message : String(error),
+        stack: error instanceof Error ? error.stack : undefined,
+        userId,
+        eventId: event.data.object.id,
       });
       throw error;
     }
@@ -136,23 +244,35 @@ export class HandleWebhookUseCase implements IHandleWebhookUseCase {
       userId,
       courseCount: courses.length,
       orderId: order.id,
+      orderAmount: order.amount,
     });
 
     try {
-
       // Enroll user in courses using OrderItem IDs
+      console.log("Creating enrollments for courses:", courses.map(c => c.id));
       await this.enrollmentRepository.create({
         userId,
         courseIds: courses.map((course) => course.id),
       });
+      console.log("Enrollments created successfully");
 
       // Calculate total amount from courses
       const totalAmount = courses.reduce((sum, course) => {
         const coursePrice = course.offer ?? course.price ?? 0;
         return sum + coursePrice;
       }, 0);
+      console.log("Calculated total amount:", totalAmount);
 
       // Create a single transaction for the total amount
+      console.log("Creating transaction record:", {
+        orderId: order.id,
+        userId: order.userId,
+        amount: totalAmount,
+        type: TransactionType.PURCHASE,
+        status: TransactionStatus.COMPLETED,
+        paymentGateway: PaymentGateway.STRIPE,
+      });
+
       const transaction = new Transaction({
         orderId: order.id,
         userId: order.userId,
@@ -162,9 +282,21 @@ export class HandleWebhookUseCase implements IHandleWebhookUseCase {
         paymentGateway: PaymentGateway.STRIPE,
       });
 
-      await this.transactionRepository.create(transaction);
+      console.log("Transaction object created, attempting to save...");
+      const createdTransaction = await this.transactionRepository.create(transaction);
+      console.log("Transaction saved successfully:", {
+        transactionId: createdTransaction.id,
+        status: createdTransaction.status,
+        amount: createdTransaction.amount,
+      });
     } catch (error) {
-      console.error("Error in processEnrollmentsAndTransactions:", error);
+      console.error("Error in processEnrollmentsAndTransactions:", {
+        error: error instanceof Error ? error.message : String(error),
+        stack: error instanceof Error ? error.stack : undefined,
+        userId,
+        orderId: order.id,
+        courses: courses.map(c => c.id),
+      });
       throw error;
     }
   }

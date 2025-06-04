@@ -8,7 +8,7 @@ export interface Transaction {
   status: "COMPLETED" | "FAILED" | "PENDING";
   paymentGateway: string | null;
   createdAt: string;
-  type: "PURCHASE" | "REFUND" | "PAYMENT" | "DEPOSIT" | "WITHDRAWAL";
+  type: "PURCHASE" | "PAYMENT" | "REFUND" | "WALLET_TOPUP" | "WALLET_WITHDRAWAL";
   failureReason?: string;
   courseId?: string | null;
   order?: {

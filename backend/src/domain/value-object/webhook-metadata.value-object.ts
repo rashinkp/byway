@@ -7,7 +7,8 @@ export class WebhookMetadata {
     public readonly courses?: any[],
     public readonly paymentIntentId?: string,
     public readonly status?: string,
-    public readonly failureReason?: string
+    public readonly failureReason?: string,
+    public readonly isWalletTopUp?: boolean
   ) {}
 
   static create(metadata: Record<string, string>): WebhookMetadata {
@@ -23,19 +24,24 @@ export class WebhookMetadata {
       );
     }
 
-    // For successful payments, require the standard fields
-    const { userId, orderId, courses } = metadata;
-    if (!userId || !orderId || !courses) {
-      throw new Error("Missing required metadata fields");
+    // Parse courses if they exist
+    let courses: any[] | undefined;
+    if (metadata.courses) {
+      try {
+        courses = JSON.parse(metadata.courses);
+      } catch (error) {
+        console.error('Error parsing courses from metadata:', error);
+      }
     }
 
     return new WebhookMetadata(
-      userId,
-      orderId,
-      JSON.parse(courses),
+      metadata.userId,
+      metadata.orderId,
+      courses,
       metadata.paymentIntentId,
       metadata.status,
-      metadata.failureReason
+      metadata.failureReason,
+      metadata.isWalletTopUp === 'true'
     );
   }
 

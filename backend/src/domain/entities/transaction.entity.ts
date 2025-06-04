@@ -17,25 +17,37 @@ export class Transaction {
   private readonly _metadata?: Record<string, any>;
   private readonly _createdAt: Date;
   private readonly _updatedAt: Date;
+  private readonly _walletId?: string;
 
   constructor(params: {
     id?: string;
-    orderId: string;
+    orderId?: string;
     userId: string;
+    walletId?: string;
+    courseId?: string;
     amount: number;
     type: TransactionType;
     status: TransactionStatus;
     paymentGateway: PaymentGateway;
     paymentMethod?: string;
     paymentDetails?: Record<string, any>;
-    courseId?: string;
     transactionId?: string;
     metadata?: Record<string, any>;
     createdAt?: Date;
     updatedAt?: Date;
   }) {
+    console.log("Creating Transaction entity with params:", {
+      orderId: params.orderId,
+      userId: params.userId,
+      amount: params.amount,
+      type: params.type,
+      status: params.status,
+      paymentGateway: params.paymentGateway,
+      transactionId: params.transactionId,
+    });
+
     this._id = params.id || crypto.randomUUID();
-    this._orderId = params.orderId;
+    this._orderId = params.orderId || '';
     this._userId = params.userId;
     this._amount = params.amount;
     this._type = params.type;
@@ -46,8 +58,16 @@ export class Transaction {
     this._courseId = params.courseId;
     this._transactionId = params.transactionId;
     this._metadata = params.metadata;
+    this._walletId = params.walletId;
     this._createdAt = params.createdAt || new Date();
     this._updatedAt = params.updatedAt || new Date();
+
+    console.log("Transaction entity created:", {
+      id: this._id,
+      orderId: this._orderId,
+      amount: this._amount,
+      status: this._status,
+    });
   }
 
   get id(): string {
@@ -132,5 +152,39 @@ export class Transaction {
 
   get isRefund(): boolean {
     return this._type === TransactionType.REFUND;
+  }
+
+  get walletId(): string | undefined {
+    return this._walletId;
+  }
+
+  static create(data: {
+    id?: string;
+    orderId?: string;
+    userId: string;
+    walletId?: string;
+    courseId?: string;
+    amount: number;
+    type: TransactionType;
+    status: TransactionStatus;
+    paymentGateway: PaymentGateway;
+    transactionId?: string;
+    createdAt?: Date;
+    updatedAt?: Date;
+  }): Transaction {
+    return new Transaction({
+      id: data.id,
+      orderId: data.orderId,
+      userId: data.userId,
+      walletId: data.walletId,
+      courseId: data.courseId,
+      amount: data.amount,
+      type: data.type,
+      status: data.status,
+      paymentGateway: data.paymentGateway,
+      transactionId: data.transactionId,
+      createdAt: data.createdAt,
+      updatedAt: data.updatedAt
+    });
   }
 }

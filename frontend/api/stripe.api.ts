@@ -7,7 +7,7 @@ import {
 
 export const createStripeCheckoutSession = async (
   data: ICreateStripeCheckoutSessionInput
-): Promise<StripeApiResponse<IStripeCheckoutSession>> => {
+): Promise<StripeApiResponse<{ session: IStripeCheckoutSession }>> => {
   try {
     const response = await api.post("/stripe/create-checkout-session", data);
     return response.data;

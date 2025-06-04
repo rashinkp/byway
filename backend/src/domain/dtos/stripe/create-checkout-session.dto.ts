@@ -13,7 +13,10 @@ const courseSchema = z.object({
 
 export const createCheckoutSessionSchema = z.object({
   userId: z.string().min(1, "User ID is required"),
-  courses: z.array(courseSchema).min(1, "At least one course is required"),
+  amount: z.number().min(0).optional(),
+  currency: z.string().optional(),
+  isWalletTopUp: z.boolean().optional(),
+  courses: z.array(courseSchema).min(1, "At least one course is required").optional(),
   couponCode: z.string().optional(),
   orderId: z.string().optional(),
 });

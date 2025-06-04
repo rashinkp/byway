@@ -10,8 +10,10 @@ export interface ICourseInput {
 }
 
 export interface ICreateStripeCheckoutSessionInput {
-  courses: ICourseInput[];
   userId: string;
+  amount?: number;
+  isWalletTopUp?: boolean;
+  courses?: ICourseInput[];
   couponCode?: string;
   orderId?: string;
 }
@@ -30,8 +32,8 @@ export interface IStripeWebhookResponse {
 }
 
 export interface StripeApiResponse<T> {
-  status: "success" | "error";
-  data: { session: T } | null;
+  success: boolean;
+  data: T;
   message: string;
   statusCode: number;
 }

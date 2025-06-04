@@ -8,7 +8,12 @@ export class StripePaymentGateway implements PaymentGateway {
   private stripe: Stripe;
 
   constructor() {
-    this.stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
+    const stripeKey = process.env.STRIPE_SECRET_KEY;
+    if (!stripeKey) {
+      throw new Error("STRIPE_SECRET_KEY is not defined");
+    }
+
+    this.stripe = new Stripe(stripeKey, {
       apiVersion: "2025-04-30.basil",
     });
   }
@@ -18,24 +23,7 @@ export class StripePaymentGateway implements PaymentGateway {
     customerEmail: string,
     orderId: string
   ): Promise<CheckoutSession> {
-    const { courses, couponCode } = input;
-
-    if (!courses || !Array.isArray(courses) || courses.length === 0) {
-      throw new HttpError(
-        "No courses provided for checkout",
-        StatusCodes.BAD_REQUEST
-      );
-    }
-
-    // Validate each course has required fields
-    for (const course of courses) {
-      if (!course || !course.id || !course.title) {
-        throw new HttpError(
-          "Invalid course data provided",
-          StatusCodes.BAD_REQUEST
-        );
-      }
-    }
+    const { courses, couponCode, isWalletTopUp, amount } = input;
 
     // Validate FRONTEND_URL
     const frontendUrl = process.env.FRONTEND_URL;
@@ -47,9 +35,47 @@ export class StripePaymentGateway implements PaymentGateway {
     }
 
     try {
-      // Create line items from course details
-      const lineItems: Stripe.Checkout.SessionCreateParams.LineItem[] = courses.map(
-        (course) => ({
+      let lineItems: Stripe.Checkout.SessionCreateParams.LineItem[] = [];
+
+      if (isWalletTopUp) {
+        if (!amount || amount <= 0) {
+          throw new HttpError(
+            "Invalid amount for wallet top-up",
+            StatusCodes.BAD_REQUEST
+          );
+        }
+        // Create a single line item for wallet top-up
+        lineItems = [{
+          price_data: {
+            currency: "usd",
+            product_data: {
+              name: "Wallet Top-up",
+              description: "Adding funds to your wallet",
+            },
+            unit_amount: Math.round(amount * 100), // Convert to cents
+          },
+          quantity: 1,
+        }];
+      } else {
+        // Create line items from course details
+        if (!courses || !Array.isArray(courses) || courses.length === 0) {
+          throw new HttpError(
+            "No courses provided for checkout",
+            StatusCodes.BAD_REQUEST
+          );
+        }
+
+        // Validate each course has required fields
+        for (const course of courses) {
+          if (!course || !course.id || !course.title) {
+            throw new HttpError(
+              "Invalid course data provided",
+              StatusCodes.BAD_REQUEST
+            );
+          }
+        }
+
+        lineItems = courses.map((course) => ({
           price_data: {
             currency: "usd",
             product_data: {
@@ -65,8 +91,8 @@ export class StripePaymentGateway implements PaymentGateway {
             unit_amount: Math.round((course?.offer || course?.price || 0) * 100),
           },
           quantity: 1,
-        })
-      );
+        }));
+      }
 
       const session = await this.stripe.checkout.sessions.create({
         payment_method_types: ["card"],
@@ -78,7 +104,8 @@ export class StripePaymentGateway implements PaymentGateway {
         metadata: {
           userId: input.userId,
           orderId,
-          courses: JSON.stringify(courses),
+          ...(courses && { courses: JSON.stringify(courses) }),
+          ...(isWalletTopUp && { isWalletTopUp: "true" }),
         },
         discounts: couponCode ? [{ coupon: couponCode }] : undefined,
       });

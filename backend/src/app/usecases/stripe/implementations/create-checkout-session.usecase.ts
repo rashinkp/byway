@@ -19,7 +19,7 @@ export class CreateCheckoutSessionUseCase implements ICreateCheckoutSessionUseCa
   ) {}
 
   async execute(input: CreateCheckoutSessionDto): Promise<ApiResponse> {
-    const { userId, courses, couponCode, orderId } = input;
+    const { userId, courses, couponCode, orderId, isWalletTopUp, amount } = input;
 
     // Validate user exists
     const user = await this.userRepository.findById(userId);
@@ -27,42 +27,56 @@ export class CreateCheckoutSessionUseCase implements ICreateCheckoutSessionUseCa
       throw new HttpError("User not found", StatusCodes.NOT_FOUND);
     }
 
-    let order;
+    let orderIdForSession = orderId;
 
-    // If orderId is provided, use existing order for retry
-    if (orderId) {
-      order = await this.orderRepository.findById(orderId);
-      if (!order) {
-        throw new HttpError("Order not found", StatusCodes.NOT_FOUND);
+    // Handle wallet top-up
+    if (isWalletTopUp) {
+      if (!amount || amount <= 0) {
+        throw new HttpError("Invalid amount for wallet top-up", StatusCodes.BAD_REQUEST);
       }
-      if (order.userId !== userId) {
-        throw new HttpError("Unauthorized access to order", StatusCodes.FORBIDDEN);
-      }
-      if (order.paymentStatus !== "FAILED") {
-        throw new HttpError("Can only retry failed orders", StatusCodes.BAD_REQUEST);
-      }
+      // No need to create an order for wallet top-up
     } else {
-      // Check if user is already enrolled in any of the courses
-      const courseIds = courses.map(course => course.id);
-      const existingEnrollments = await this.enrollmentRepository.findByUserIdAndCourseIds(userId, courseIds);
-
-      if (existingEnrollments.length > 0) {
-        const enrolledCourseIds = existingEnrollments.map((enrollment: { courseId: string }) => enrollment.courseId);
-        const enrolledCourses = courses.filter(course => enrolledCourseIds.includes(course.id));
-        const courseTitles = enrolledCourses.map(course => course.title).join(", ");
-        
-        throw new HttpError(
-          `You are already enrolled in the following courses: ${courseTitles}`,
-          StatusCodes.BAD_REQUEST
-        );
+      // Handle course purchase
+      if (!courses) {
+        throw new HttpError("Courses are required for course purchase", StatusCodes.BAD_REQUEST);
       }
 
-      // Create new order only if no orderId provided
-      order = await this.orderRepository.createOrder(userId, courses, couponCode);
+      // If orderId is provided, use existing order for retry
+      if (orderId) {
+        const order = await this.orderRepository.findById(orderId);
+        if (!order) {
+          throw new HttpError("Order not found", StatusCodes.NOT_FOUND);
+        }
+        if (order.userId !== userId) {
+          throw new HttpError("Unauthorized access to order", StatusCodes.FORBIDDEN);
+        }
+        if (order.paymentStatus !== "FAILED") {
+          throw new HttpError("Can only retry failed orders", StatusCodes.BAD_REQUEST);
+        }
+      } else {
+        // Check if user is already enrolled in any of the courses
+        const courseIds = courses.map(course => course.id);
+        const existingEnrollments = await this.enrollmentRepository.findByUserIdAndCourseIds(userId, courseIds);
 
-      // Remove courses from cart after order creation
-      for (const course of courses) {
-        await this.cartRepository.deleteByUserAndCourse(userId, course.id);
+        if (existingEnrollments.length > 0) {
+          const enrolledCourseIds = existingEnrollments.map((enrollment: { courseId: string }) => enrollment.courseId);
+          const enrolledCourses = courses.filter(course => enrolledCourseIds.includes(course.id));
+          const courseTitles = enrolledCourses.map(course => course.title).join(", ");
+          
+          throw new HttpError(
+            `You are already enrolled in the following courses: ${courseTitles}`,
+            StatusCodes.BAD_REQUEST
+          );
+        }
+
+        // Create new order for course purchase
+        const order = await this.orderRepository.createOrder(userId, courses, couponCode);
+        orderIdForSession = order.id;
+
+        // Remove courses from cart after order creation
+        for (const course of courses) {
+          await this.cartRepository.deleteByUserAndCourse(userId, course.id);
+        }
       }
     }
 
@@ -70,7 +84,7 @@ export class CreateCheckoutSessionUseCase implements ICreateCheckoutSessionUseCa
     const session = await this.paymentGateway.createCheckoutSession(
       input,
       user.email,
-      order.id
+      orderIdForSession || "wallet-topup" // Use a placeholder for wallet top-ups
     );
 
     return {

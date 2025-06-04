@@ -9,15 +9,15 @@ import { createStripeCheckoutSession, verifyPaymentStatus } from "@/api/stripe.a
 
 export function useStripe() {
   const createCheckoutSessionMutation = useMutation<
-    StripeApiResponse<IStripeCheckoutSession>,
+    StripeApiResponse<{ session: IStripeCheckoutSession }>,
     Error,
     ICreateStripeCheckoutSessionInput
   >({
     mutationFn: async (data) => {
-      // Minimize course data to reduce metadata size
+      // Minimize data to reduce metadata size
       const minimalData = {
         ...data,
-        courses: data.courses.map(course => ({
+        courses: data.courses?.map(course => ({
           id: course.id,
           title: course.title,
           price: course.price,
@@ -29,12 +29,7 @@ export function useStripe() {
       if (!res.data?.session) {
         throw new Error(res.message || "No session data received");
       }
-      return {
-        statusCode: res.statusCode,
-        status: res.status,
-        message: res.message,
-        data: { session: res.data.session },
-      };
+      return res;
     },
     onMutate: async () => {
       toast.loading("Creating Stripe checkout session...");

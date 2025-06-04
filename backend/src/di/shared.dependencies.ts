@@ -27,6 +27,8 @@ import { OrderRepository } from "../infra/repositories/order.repository.impl";
 import { IOrderRepository } from "../app/repositories/order.repository";
 import { TransactionRepository } from "../infra/repositories/transaction.repository.impl";
 import { ITransactionRepository } from "../app/repositories/transaction.repository";
+import { IWalletRepository } from "../app/repositories/wallet.repository.interface";
+import { WalletRepository } from "../infra/repositories/wallet.repository";
 
 export interface SharedDependencies {
   prisma: typeof prismaClient;
@@ -46,6 +48,7 @@ export interface SharedDependencies {
   httpErrors: HttpErrors;
   httpSuccess: HttpSuccess;
   cookieService: CookieService;
+  walletRepository: IWalletRepository;
 }
 
 export function createSharedDependencies(): SharedDependencies {
@@ -62,6 +65,7 @@ export function createSharedDependencies(): SharedDependencies {
   const transactionRepository = new TransactionRepository(prismaClient);
   const otpProvider = new OtpProvider(authRepository);
   const googleAuthProvider = new GoogleAuthProvider(envConfig.GOOGLE_CLIENT_ID);
+  const walletRepository = new WalletRepository(prismaClient);
 
   const httpErrors = new HttpErrors();
   const httpSuccess = new HttpSuccess();
@@ -85,5 +89,6 @@ export function createSharedDependencies(): SharedDependencies {
     httpErrors,
     httpSuccess,
     cookieService,
+    walletRepository,
   };
 }

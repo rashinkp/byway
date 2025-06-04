@@ -51,7 +51,24 @@ export class StripeWebhookGateway implements WebhookGateway {
   }
 
   parseMetadata(metadata: Record<string, string>): WebhookMetadata {
-    return WebhookMetadata.create(metadata);
+    try {
+      // Ensure all metadata values are strings
+      const stringifiedMetadata: Record<string, string> = {};
+      for (const [key, value] of Object.entries(metadata)) {
+        if (typeof value === 'object') {
+          stringifiedMetadata[key] = JSON.stringify(value);
+        } else {
+          stringifiedMetadata[key] = String(value);
+        }
+      }
+      return WebhookMetadata.create(stringifiedMetadata);
+    } catch (error) {
+      console.error('Error parsing webhook metadata:', error);
+      throw new HttpError(
+        'Failed to parse webhook metadata',
+        StatusCodes.BAD_REQUEST
+      );
+    }
   }
 
   isCheckoutSessionCompleted(event: WebhookEvent): boolean {
