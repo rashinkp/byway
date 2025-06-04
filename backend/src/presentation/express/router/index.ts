@@ -13,6 +13,7 @@ import { transactionRouter } from "./transaction.router";
 import { orderRouter } from "./order.router";
 import { fileRouter } from "./file.router";
 import { progressRouter } from "./progress.router";
+import { walletRouter } from "./wallet.routes";
 
 export const createRouter = (deps: AppDependencies): Router => {
   const router = Router();
@@ -30,6 +31,7 @@ export const createRouter = (deps: AppDependencies): Router => {
   router.use("/orders", orderRouter(deps.orderController));
   router.use("/files", fileRouter(deps.fileController));
   router.use("/progress", progressRouter(deps.progressController));
+  router.use("/wallet", walletRouter(deps.walletController));
   router.use("/search", deps.searchRouter);
 
   return router;
