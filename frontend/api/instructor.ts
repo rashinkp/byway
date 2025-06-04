@@ -1,6 +1,6 @@
 import { api } from "@/api/api";
 import { ApiResponse } from "@/types/apiResponse";
-import {  IInstructorWithUserDetails, InstructorFormData } from "@/types/instructor";
+import {  IInstructorWithUserDetails, InstructorFormData, IInstructorDetails } from "@/types/instructor";
 import { User } from "@/types/user";
 
 export const createInstructor = async (
@@ -132,6 +132,22 @@ export const getPublicInstructors = async (params?: {
     console.error("Error fetching public instructors:", error);
     throw new Error(
       error.response?.data?.message || "Failed to fetch instructors"
+    );
+  }
+};
+
+export const getInstructorDetails = async (
+  instructorId: string
+): Promise<ApiResponse<IInstructorDetails | null>> => {
+  try {
+    const response = await api.get<
+      ApiResponse<IInstructorDetails | null>
+    >(`/instructor/instructors/${instructorId}`);
+    return response.data;
+  } catch (error: any) {
+    console.error("Error fetching instructor details:", error);
+    throw new Error(
+      error.response?.data?.message || "Failed to fetch instructor details"
     );
   }
 };

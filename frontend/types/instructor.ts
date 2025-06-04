@@ -61,6 +61,10 @@ export interface IInstructorDetails {
   totalStudents: number;
   createdAt: string;
   updatedAt: string;
+  name: string;
+  email: string;
+  avatar: string | null;
+  
 }
 
 // Response structure for useGetInstructorByUserId hook
