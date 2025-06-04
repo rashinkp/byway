@@ -154,34 +154,14 @@ export function Header({ client }: HeaderProps = {}) {
               >
                 Byway
               </Link>
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    className="flex items-center gap-1 text-gray-700 hover:text-blue-600 hover:bg-gray-50 text-base font-medium"
-                  >
-                    Categories <ChevronDown className="w-4 h-4 ml-1" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="start" className="w-56">
-                  {categoriesData?.items.map((category) => (
-                    <DropdownMenuItem key={category.id}>
-                      <Link href={`/courses?category=${category.id}`} className="w-full">
-                        {category.name}
-                      </Link>
-                    </DropdownMenuItem>
-                  ))}
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem>
-                    <Link
-                      href="/categories"
-                      className="w-full font-medium text-blue-600"
-                    >
-                      View All Categories
-                    </Link>
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
+              <Link href="/categories">
+                <Button
+                  variant="ghost"
+                  className="flex items-center gap-1 text-gray-700 hover:text-blue-600 hover:bg-gray-50 text-base font-medium"
+                >
+                  Categories
+                </Button>
+              </Link>
             </div>
             
             {/* Enhanced Search Bar */}
@@ -274,9 +254,20 @@ export function Header({ client }: HeaderProps = {}) {
                                     {course.title}
                                   </p>
                                   <div className="flex items-center gap-2 mt-1">
-                                    <span className="text-sm font-semibold text-green-600">
-                                      ${course.price}
-                                    </span>
+                                    {course.offer ? (
+                                      <>
+                                        <span className="text-sm font-semibold text-green-600">
+                                          ${course.offer}
+                                        </span>
+                                        <span className="text-sm text-gray-400 line-through">
+                                          ${course.price}
+                                        </span>
+                                      </>
+                                    ) : (
+                                      <span className="text-sm font-semibold text-green-600">
+                                        ${course.price}
+                                      </span>
+                                    )}
                                     {/* {course.rating && (
                                       <div className="flex items-center gap-1">
                                         <Star className="w-3 h-3 text-yellow-400 fill-current" />

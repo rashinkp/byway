@@ -18,6 +18,7 @@ export interface ISearchResult {
       title: string;
       thumbnail: string | null;
       price: number;
+      offer?: number;
     }[];
     total: number;
     page: number;
