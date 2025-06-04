@@ -137,6 +137,8 @@ export class UserController extends BaseController {
       if (!user) {
         throw new HttpError("User not found", 404);
       }
+
+      console.log(user , profile);
       return this.success_200({
         id: user.id,
         name: user.name,
@@ -144,6 +146,7 @@ export class UserController extends BaseController {
         role: user.role,
         avatar: user.avatar,
         bio: profile?.bio,
+        isVerified: user.isVerified,
         education: profile?.education,
         skills: profile?.skills,
         phoneNumber: profile?.phoneNumber,

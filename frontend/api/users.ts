@@ -1,7 +1,8 @@
 import { api } from "@/api/api";
 import { ApiResponse, IPaginatedResponse } from "@/types/apiResponse";
-import { PublicUser, User } from "@/types/user";
+import { PublicUser, User, UserProfileType } from "@/types/user";
 import { IInstructorWithUserDetails } from "@/types/instructor";
+import { useAuthStore } from "@/stores/auth.store";
 
 export const getAllUsers = async ({
   page = 1,
@@ -124,3 +125,18 @@ export async function getUserAdminDetails(userId: string): Promise<User & { inst
     );
   }
 }
+
+
+export async function getDetailedUserData(): Promise<UserProfileType> {
+  try {
+    const userId = useAuthStore.getState().user?.id;
+    if (!userId) throw new Error("User not authenticated");
+    
+    const detailedResponse = await api.get<{ data: UserProfileType }>(`/user/${userId}`);
+    return detailedResponse.data.data;
+  } catch (error: any) {
+    throw new Error(
+      error.response?.data?.message || error.response?.data?.error || "Failed to get user data"
+    );
+  }
+} 

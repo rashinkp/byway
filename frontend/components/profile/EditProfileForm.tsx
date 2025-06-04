@@ -2,7 +2,7 @@ import { z } from "zod";
 import { FormFieldConfig, FormModal } from "@/components/ui/FormModal";
 import { useUpdateUser } from "@/hooks/user/useUpdateUser";
 import { uploadToCloudinary } from "@/lib/cloudinary";
-import { User } from "@/types/user";
+import { User, UserProfileType } from "@/types/user";
 
 // Zod schema for profile validation (unchanged)
 const profileSchema = z.object({
@@ -155,7 +155,7 @@ const formFields: FormFieldConfig<z.infer<typeof profileSchema>>[] = [
 interface EditProfileFormProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  user: User | undefined;
+  user: UserProfileType | undefined;
 }
 
 export default function EditProfileForm({
