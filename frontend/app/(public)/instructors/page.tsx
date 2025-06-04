@@ -60,7 +60,7 @@ export default function InstructorsPage() {
             {data?.data.items.map((instructor) => (
               <Link
                 key={instructor.id}
-                href={`/instructors/${instructor.id}`}
+                href={`/instructors/${instructor.userId}`}
                 className="bg-white rounded-lg shadow-sm p-6 hover:shadow-md transition-shadow"
               >
                 <div className="flex items-center gap-4">

@@ -19,7 +19,7 @@ export function instructorRouter(
   );
 
   // Get instructor details (public with optional auth)
-  router.get("/instructors/:instructorId", optionalAuth, (req, res) =>
+  router.get("/instructors/:userId", optionalAuth, (req, res) =>
     expressAdapter(
       req,
       res,

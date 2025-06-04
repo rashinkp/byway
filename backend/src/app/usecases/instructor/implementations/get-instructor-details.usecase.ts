@@ -9,23 +9,28 @@ export class GetInstructorDetailsUseCaseImpl implements GetInstructorDetailsUseC
     private readonly userRepository: IUserRepository
   ) {}
 
-  async execute(instructorId: string) {
-    const instructor = await this.instructorRepository.findInstructorById(instructorId);
+  async execute(userId: string) {
 
-    if (!instructor) {
-      throw new HttpError("Instructor not found" , 404);
-    }
 
-    const userId = instructor.userId;
-    if (!userId) {
-      throw new HttpError("User ID not found for instructor", 404);
-    }
     const user = await this.userRepository.findById(userId);
     if (!user) {
       throw new HttpError("User not found for instructor", 404);
-    };
+    }
+
+    if (user.role !== "INSTRUCTOR") {
+      throw new HttpError("User is not an instructor", 403);
+    }
 
 
+    const instructor = await this.instructorRepository.findInstructorByUserId(
+      userId
+    );
+
+    const instructorId = instructor?.id;
+
+    if (!instructor) {
+      throw new HttpError("Instructor not found", 404);
+    }
 
     return {
       id: instructor.id,

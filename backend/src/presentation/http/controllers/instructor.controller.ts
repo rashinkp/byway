@@ -217,8 +217,8 @@ export class InstructorController extends BaseController {
 
   async getInstructorDetails(httpRequest: IHttpRequest): Promise<IHttpResponse> {
     return this.handleRequest(httpRequest, async (request) => {
-      const { instructorId } = request.params;
-      const result = await this.getInstructorDetailsUseCase.execute(instructorId);
+      const { userId } = request.params;
+      const result = await this.getInstructorDetailsUseCase.execute(userId);
       return this.success_200(result, "Instructor details retrieved successfully");
     });
   }
