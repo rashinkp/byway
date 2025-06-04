@@ -1,6 +1,5 @@
 import { getTransactionsByUser } from "@/api/transaction";
-import { getTransactionsByUserSchema } from "@/lib/validations/transactions.validator";
-import { Transaction } from "@/types/transactions";
+import { Transaction } from "@/types/transaction";
 import { useQuery } from "@tanstack/react-query";
 
 

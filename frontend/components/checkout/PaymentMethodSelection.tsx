@@ -6,9 +6,10 @@ import { useStripe } from "@/hooks/stripe/useStripe";
 import { useAuth } from "@/hooks/auth/useAuth";
 import { toast } from "sonner";
 import { ICourseInput } from "@/types/stripe.types";
+import { useWallet } from "@/hooks/wallet/useWallet";
 
 interface PaymentMethod {
-  id: "razorpay" | "paypal" | "stripe";
+  id: "razorpay" | "paypal" | "stripe" | "wallet";
   name: string;
 }
 
@@ -30,6 +31,7 @@ interface PaymentMethodSelectionProps {
 }
 
 const paymentMethods: PaymentMethod[] = [
+  { id: "wallet", name: "Wallet" },
   { id: "paypal", name: "PayPal" },
   { id: "razorpay", name: "Razorpay" },
   { id: "stripe", name: "Stripe" },
@@ -50,6 +52,7 @@ const PaymentMethodSelection: FC<PaymentMethodSelectionProps> = memo(
   }) => {
     const { createStripeCheckoutSession, isCreatingSession } = useStripe();
     const { user } = useAuth();
+    const { wallet } = useWallet();
 
     useEffect(() => {
       console.log("PaymentMethodSelection inputs:", {
@@ -82,9 +85,40 @@ const PaymentMethodSelection: FC<PaymentMethodSelectionProps> = memo(
                 className="h-5 w-5 text-blue-600 focus:ring-blue-500"
               />
               <span className="ml-3 text-gray-700">{method.name}</span>
+              {method.id === "wallet" && wallet && (
+                <span className="ml-auto text-sm text-gray-500">
+                  Balance: ${wallet.balance.toFixed(2)}
+                </span>
+              )}
             </div>
           ))}
         </div>
+
+        {selectedMethod === "wallet" && (
+          <div className="space-y-4">
+            <p className="text-gray-700">
+              Pay using your wallet balance. {wallet && wallet.balance < finalAmount && (
+                <span className="text-red-500">
+                  Insufficient balance. Please top up your wallet.
+                </span>
+              )}
+            </p>
+            <div className="flex justify-end">
+              <button
+                type="button"
+                onClick={onSubmit}
+                disabled={isPending || isDisabled || !wallet || wallet.balance < finalAmount}
+                className={`inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-white ${
+                  isPending || isDisabled || !wallet || wallet.balance < finalAmount
+                    ? "bg-gray-400 cursor-not-allowed"
+                    : "bg-green-600 hover:bg-green-700"
+                } focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500`}
+              >
+                {isPending ? "Processing..." : "Pay with Wallet"}
+              </button>
+            </div>
+          </div>
+        )}
 
         {selectedMethod === "paypal" && (
           <PayPalPayment

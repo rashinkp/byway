@@ -1,6 +1,6 @@
 import { api } from "@/api/api";
 import { ApiResponse } from "@/types/apiResponse";
-import { Transaction } from "@/types/transactions";
+import { Transaction } from "@/types/transaction";
 
 export const createTransaction = async (data: {
   orderId: string;

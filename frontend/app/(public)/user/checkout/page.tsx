@@ -14,9 +14,10 @@ import PaymentMethodSelection from "@/components/checkout/PaymentMethodSelection
 import { useAuth } from "@/hooks/auth/useAuth";
 import { OrderSummary } from "@/components/checkout/OrderSummery";
 import OrderSummarySkeleton from "@/components/checkout/OrderSummerySkeleton";
+import { useWallet } from "@/hooks/wallet/useWallet";
 
 interface PaymentMethod {
-  id: "razorpay" | "paypal" | "stripe";
+  id: "razorpay" | "paypal" | "stripe" | "wallet";
   name: string;
 }
 
@@ -34,6 +35,7 @@ const CheckoutPage: FC<CheckoutPageProps> = memo(({ page = 1, limit = 10 }) => {
   );
   const { createStripeCheckoutSession, isCreatingSession } = useStripe();
   const [activeStep, setActiveStep] = useState(1);
+  const { wallet, isLoading: walletLoading } = useWallet();
   const [selectedPaymentMethod, setSelectedPaymentMethod] =
     useState<PaymentMethod["id"]>("stripe");
   const [couponCode, setCouponCode] = useState<string>("");
@@ -234,23 +236,36 @@ const CheckoutPage: FC<CheckoutPageProps> = memo(({ page = 1, limit = 10 }) => {
         return;
       }
 
-      if (selectedPaymentMethod === "stripe") {
+      if (selectedPaymentMethod === "wallet") {
+        if (!wallet) {
+          toast.error("Wallet not found");
+          return;
+        }
+        if (wallet.balance < finalAmount) {
+          toast.error("Insufficient wallet balance");
+          return;
+        }
+        try {
+          // TODO: Implement wallet payment
+          toast.error("Wallet payment not implemented yet");
+        } catch (error) {
+          console.error("Error processing wallet payment:", error);
+          toast.error("Failed to process wallet payment");
+        }
+      } else if (selectedPaymentMethod === "stripe") {
         try {
           await createStripeCheckoutSession({
             courses: coursesInput,
             userId: user.id,
             couponCode,
           });
-          // No need to set activeStep, as Stripe will redirect to the success page
         } catch (error) {
           console.error("Error creating Stripe checkout session:", error);
           toast.error("Failed to initiate Stripe checkout");
         }
       } else if (selectedPaymentMethod === "paypal") {
-        // Handle PayPal payment (existing logic)
         toast.error("PayPal is not implemented yet");
       } else {
-        // Handle other payment methods (e.g., Razorpay)
         toast.error("Selected payment method is not supported");
       }
     },
@@ -262,10 +277,11 @@ const CheckoutPage: FC<CheckoutPageProps> = memo(({ page = 1, limit = 10 }) => {
       finalAmount,
       user,
       coursesInput,
+      wallet,
     ]
   );
 
-  const isLoading = cartLoading || courseLoading;
+  const isLoading = cartLoading || courseLoading || walletLoading;
 
   return (
     <div className="min-h-screen bg-gray-50 py-8">
