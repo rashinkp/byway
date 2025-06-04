@@ -1,0 +1,14 @@
+import {
+  ISearchResult,
+  SearchParams,
+} from "../../../../domain/dtos/search/search.dto";
+import { ISearchRepository } from "../../../repositories/search.repository";
+import { IGlobalSearchUseCase } from "../interfaces/global-search.usecase.interface";
+
+export class GlobalSearchUseCase implements IGlobalSearchUseCase {
+  constructor(private searchRepository: ISearchRepository) {}
+
+  async execute(params: SearchParams): Promise<ISearchResult> {
+    return this.searchRepository.search(params);
+  }
+}

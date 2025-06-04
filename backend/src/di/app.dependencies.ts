@@ -12,6 +12,11 @@ import { createTransactionDependencies } from "./transaction.dependencies";
 import { createOrderDependencies } from "./order.dependencies";
 import { createFileDependencies } from "./file.dependencies";
 import { createProgressDependencies } from "./progress.dependencies";
+import { SearchRepository } from "../infra/repositories/search.repository.impl";
+import { GlobalSearchUseCase } from "../app/usecases/search/implementation/global-search.usecase";
+import { SearchController } from "../presentation/http/controllers/search.controller";
+import { searchRouter } from "../presentation/express/router/search.router";
+import { SharedDependencies } from "./shared.dependencies";
 
 export interface AppDependencies {
   authController: any;
@@ -27,10 +32,13 @@ export interface AppDependencies {
   orderController: any;
   fileController: any;
   progressController: any;
+  searchController: any;
+  searchRouter: any;
 }
 
 export function createAppDependencies(): AppDependencies {
   const sharedDeps = createSharedDependencies();
+  const { prisma, httpErrors, httpSuccess } = sharedDeps;
 
   const authDeps = createAuthDependencies(sharedDeps);
   const userDeps = createUserDependencies(sharedDeps);
@@ -46,6 +54,16 @@ export function createAppDependencies(): AppDependencies {
   const fileDeps = createFileDependencies(sharedDeps);
   const progressDeps = createProgressDependencies(sharedDeps);
 
+  const searchRepository = new SearchRepository(prisma);
+  const globalSearchUseCase = new GlobalSearchUseCase(searchRepository);
+  const searchController = new SearchController(
+    globalSearchUseCase,
+    httpErrors,
+    httpSuccess
+  );
+
+  const searchRouterInstance = searchRouter(searchController);
+
   return {
     authController: authDeps.authController,
     userController: userDeps.userController,
@@ -59,6 +77,8 @@ export function createAppDependencies(): AppDependencies {
     transactionController: transactionDeps.transactionController,
     orderController: orderDeps.orderController,
     fileController: fileDeps.fileController,
-    progressController: progressDeps.progressController
+    progressController: progressDeps.progressController,
+    searchController,
+    searchRouter: searchRouterInstance,
   };
 }

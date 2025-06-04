@@ -30,6 +30,7 @@ export const createRouter = (deps: AppDependencies): Router => {
   router.use("/orders", orderRouter(deps.orderController));
   router.use("/files", fileRouter(deps.fileController));
   router.use("/progress", progressRouter(deps.progressController));
+  router.use("/search", deps.searchRouter);
 
   return router;
 }; 

@@ -37,6 +37,8 @@ import { cn } from "@/utils/cn";
 import { useRouter } from "next/navigation";
 import { getPresignedUrl, uploadFileToS3 } from "@/api/file";
 import { useCategories } from "@/hooks/category/useCategories";
+import { useGlobalSearch } from "@/hooks/search/useGlobalSearch";
+import { useDebounce } from "@/hooks/useDebounce";
 
 interface HeaderProps {
   client?: { id: string; name: string };
@@ -59,6 +61,13 @@ export function Header({ client }: HeaderProps = {}) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const router = useRouter();
+  const [searchQuery, setSearchQuery] = useState("");
+  const debouncedSearchQuery = useDebounce(searchQuery, 500);
+  const { data: searchResults, isLoading: isSearching } = useGlobalSearch({
+    query: debouncedSearchQuery,
+    page: 1,
+    limit: 5,
+  });
 
   const handleInstructorSubmit = useCallback(
     async (data: InstructorSubmitData): Promise<void> => {
@@ -141,10 +150,78 @@ export function Header({ client }: HeaderProps = {}) {
               <div className="relative">
                 <input
                   type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder="Search for courses, topics, instructors..."
                   className="w-full py-2.5 px-4 pl-10 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent text-gray-700 placeholder-gray-400 transition-all duration-300"
                 />
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+                {isSearching && (
+                  <Loader2 className="absolute right-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 animate-spin" />
+                )}
+                {searchResults && searchQuery && (
+                  <div className="absolute top-full left-0 right-0 mt-1 bg-white rounded-md shadow-lg border border-gray-200 max-h-96 overflow-y-auto">
+                    {searchResults.instructors.items.length > 0 && (
+                      <div className="p-2">
+                        <h3 className="text-sm font-semibold text-gray-700 mb-2">Instructors</h3>
+                        {searchResults.instructors.items.map((instructor) => (
+                          <Link
+                            key={instructor.id}
+                            href={`/instructors/${instructor.id}`}
+                            className="flex items-center gap-2 p-2 hover:bg-gray-50 rounded-md"
+                          >
+                            <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-600">
+                              {instructor.name.charAt(0)}
+                            </div>
+                            <div>
+                              <p className="text-sm font-medium text-gray-900">{instructor.name}</p>
+                              <p className="text-xs text-gray-500">{instructor.shortBio}</p>
+                            </div>
+                          </Link>
+                        ))}
+                      </div>
+                    )}
+                    {searchResults.courses.items.length > 0 && (
+                      <div className="p-2">
+                        <h3 className="text-sm font-semibold text-gray-700 mb-2">Courses</h3>
+                        {searchResults.courses.items.map((course) => (
+                          <Link
+                            key={course.id}
+                            href={`/courses/${course.id}`}
+                            className="flex items-center gap-2 p-2 hover:bg-gray-50 rounded-md"
+                          >
+                            <div className="w-12 h-8 rounded bg-gray-100 flex items-center justify-center">
+                              {course.thumbnail ? (
+                                <img src={course.thumbnail} alt={course.title} className="w-full h-full object-cover rounded" />
+                              ) : (
+                                <BookOpen className="w-5 h-5 text-gray-500" />
+                              )}
+                            </div>
+                            <div>
+                              <p className="text-sm font-medium text-gray-900">{course.title}</p>
+                              <p className="text-xs text-gray-500">${course.price}</p>
+                            </div>
+                          </Link>
+                        ))}
+                      </div>
+                    )}
+                    {searchResults.categories.items.length > 0 && (
+                      <div className="p-2">
+                        <h3 className="text-sm font-semibold text-gray-700 mb-2">Categories</h3>
+                        {searchResults.categories.items.map((category) => (
+                          <Link
+                            key={category.id}
+                            href={`/courses?category=${category.id}`}
+                            className="block p-2 hover:bg-gray-50 rounded-md"
+                          >
+                            <p className="text-sm font-medium text-gray-900">{category.title}</p>
+                            <p className="text-xs text-gray-500">{category.description}</p>
+                          </Link>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
             </div>
             <nav className="flex items-center gap-4">
@@ -311,10 +388,15 @@ export function Header({ client }: HeaderProps = {}) {
               <div className="relative">
                 <input
                   type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder="Search courses"
                   className="w-full py-2.5 px-4 pl-10 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent text-gray-700 placeholder-gray-400 transition-all duration-300"
                 />
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+                {isSearching && (
+                  <Loader2 className="absolute right-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 animate-spin" />
+                )}
               </div>
               <div className="space-y-3">
                 <Link
