@@ -5,10 +5,12 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
 import { CheckCircleIcon, WalletIcon } from "lucide-react";
+import { useAuth } from "@/hooks/auth/useAuth";
 
 const SuccessPage = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const { user } = useAuth();
   const sessionId = searchParams.get("session_id");
   const isWalletTopUp = searchParams.get("type") === "wallet-topup";
   const [isLoading, setIsLoading] = useState(true);
@@ -41,7 +43,21 @@ const SuccessPage = () => {
   };
 
   const handleGoToWallet = () => {
-    router.push("/user/wallet");
+    if (!user) return;
+    
+    switch (user.role) {
+      case "ADMIN":
+        router.push("/admin/wallet");
+        break;
+      case "INSTRUCTOR":
+        router.push("/instructor/wallet");
+        break;
+      case "USER":
+        router.push("/user/wallet");
+        break;
+      default:
+        router.push("/user/wallet");
+    }
   };
 
   if (isLoading) {

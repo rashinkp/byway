@@ -1,126 +1,73 @@
 "use client";
 
+import { FC } from "react";
+import { User, BookOpen, Wallet, History, ShoppingBag, Settings, BarChart2, LogOut } from "lucide-react";
 import { cn } from "@/utils/cn";
-import {
-  User,
-  BookOpen,
-  Wallet,
-  Receipt,
-  ShoppingBag,
-  Award,
-  Settings,
-  LogOut,
-} from "lucide-react";
 import { useLogout } from "@/hooks/auth/useLogout";
 import { useRouter } from "next/navigation";
 
 interface SidebarProps {
   activeSection: string;
   setActiveSection: (section: string) => void;
+  isInstructor?: boolean;
 }
 
-const menuItems = [
-  {
-    id: "profile",
-    label: "Profile",
-    icon: User,
-    color: "text-blue-600",
-    bgColor: "bg-blue-50",
-    hoverColor: "hover:bg-blue-50",
-  },
-  {
-    id: "courses",
-    label: "My Courses",
-    icon: BookOpen,
-    color: "text-green-600",
-    bgColor: "bg-green-50",
-    hoverColor: "hover:bg-green-50",
-  },
-  {
-    id: "wallet",
-    label: "Wallet",
-    icon: Wallet,
-    color: "text-purple-600",
-    bgColor: "bg-purple-50",
-    hoverColor: "hover:bg-purple-50",
-  },
-  {
-    id: "transactions",
-    label: "Transactions",
-    icon: Receipt,
-    color: "text-orange-600",
-    bgColor: "bg-orange-50",
-    hoverColor: "hover:bg-orange-50",
-  },
-  {
-    id: "orders",
-    label: "My Orders",
-    icon: ShoppingBag,
-    color: "text-pink-600",
-    bgColor: "bg-pink-50",
-    hoverColor: "hover:bg-pink-50",
-  },
-  {
-    id: "certificates",
-    label: "Certificates",
-    icon: Award,
-    color: "text-yellow-600",
-    bgColor: "bg-yellow-50",
-    hoverColor: "hover:bg-yellow-50",
-  },
-  {
-    id: "settings",
-    label: "Settings",
-    icon: Settings,
-    color: "text-gray-600",
-    bgColor: "bg-gray-50",
-    hoverColor: "hover:bg-gray-50",
-  },
-];
-
-export default function Sidebar({ activeSection, setActiveSection }: SidebarProps) {
+const Sidebar: FC<SidebarProps> = ({ activeSection, setActiveSection, isInstructor = false }) => {
   const { mutate: logout, isPending: isLoggingOut } = useLogout();
   const router = useRouter();
 
+  const navigationItems = isInstructor
+    ? [
+        { id: "profile", label: "Profile", icon: User },
+        { id: "courses", label: "My Courses", icon: BookOpen },
+        { id: "earnings", label: "Earnings", icon: Wallet },
+        { id: "analytics", label: "Analytics", icon: BarChart2 },
+        { id: "settings", label: "Settings", icon: Settings },
+      ]
+    : [
+        { id: "profile", label: "Profile", icon: User },
+        { id: "courses", label: "My Courses", icon: BookOpen },
+        { id: "wallet", label: "Wallet", icon: Wallet },
+        { id: "transactions", label: "Transactions", icon: History },
+        { id: "orders", label: "Orders", icon: ShoppingBag },
+        { id: "settings", label: "Settings", icon: Settings },
+      ];
+
   return (
-    <div className="w-64 min-h-screen bg-white border-r border-gray-200 p-6 flex flex-col">
-      <div className="mb-8">
-        <h2 className="text-xl font-bold text-gray-800">My Account</h2>
-        <p className="text-sm text-gray-500 mt-1">Manage your account settings</p>
+    <div className="w-64 bg-white border-r border-gray-200 min-h-screen">
+      <div className="p-6">
+        <h2 className="text-xl font-semibold text-gray-800">
+          {isInstructor ? "Instructor Dashboard" : "My Account"}
+        </h2>
       </div>
-
-      <nav className="flex-1 space-y-1">
-        {menuItems.map((item) => {
+      <nav className="space-y-1 px-3">
+        {navigationItems.map((item) => {
           const Icon = item.icon;
-          const isActive = activeSection === item.id;
-
           return (
             <button
               key={item.id}
               onClick={() => setActiveSection(item.id)}
               className={cn(
-                "w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200",
-                isActive
-                  ? `${item.bgColor} ${item.color} font-medium`
-                  : "text-gray-600 hover:text-gray-900",
-                item.hoverColor
+                "w-full flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-lg transition-colors",
+                activeSection === item.id
+                  ? "bg-blue-50 text-blue-700"
+                  : "text-gray-600 hover:bg-gray-50"
               )}
             >
-              <Icon className={cn("w-5 h-5", isActive ? item.color : "text-gray-400")} />
-              <span className="text-sm">{item.label}</span>
-              {isActive && (
-                <div className={cn("w-1 h-6 rounded-full ml-auto", item.bgColor)} />
-              )}
+              <Icon className="w-5 h-5" />
+              {item.label}
             </button>
           );
         })}
       </nav>
-
-      <div className="pt-6 mt-6 border-t border-gray-200">
+      <div className="pt-6 mt-6 border-t border-gray-200 px-3">
         <button
           onClick={() => {
-            logout();
-            router.push("/login");
+            logout(undefined, {
+              onSuccess: () => {
+                router.push("/login");
+              },
+            });
           }}
           disabled={isLoggingOut}
           className="w-full flex items-center gap-3 px-4 py-3 text-red-600 hover:bg-red-50 rounded-lg transition-colors duration-200"
@@ -133,4 +80,6 @@ export default function Sidebar({ activeSection, setActiveSection }: SidebarProp
       </div>
     </div>
   );
-}
+};
+
+export default Sidebar;

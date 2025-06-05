@@ -23,9 +23,10 @@ import { UserProfileType } from "@/types/user";
 interface ProfileSectionProps {
   user: UserProfileType;
   setIsModalOpen: (open: boolean) => void;
+  isInstructor?: boolean;
 }
 
-export default function ProfileSection({ user, setIsModalOpen }: ProfileSectionProps) {
+export default function ProfileSection({ user, setIsModalOpen, isInstructor = false }: ProfileSectionProps) {
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('en-US', {
       year: 'numeric',

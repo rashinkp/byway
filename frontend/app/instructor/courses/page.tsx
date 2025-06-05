@@ -19,13 +19,16 @@ export default function CoursesPage() {
         title="Course Management"
         description="Manage your courses and their content"
         entityName="Course"
+        filterOptions={[
+          { value: "All", label: "All Courses" },
+          { value: "Active", label: "Active" },
+          { value: "Inactive", label: "Inactive" }
+        ]}
         useDataHook={(params) =>
           useGetAllCourses({
             ...params,
-            sortBy: params.sortBy as
-              | "title"
-              | "createdAt"
-              | `updatedAt`,
+            sortBy: params.sortBy as "title" | "price" | "createdAt" | undefined,
+            filterBy: params.filterBy as "All" | "Active" | "Inactive" | undefined,
             role: "INSTRUCTOR",
             myCourses:true,
           })
@@ -87,7 +90,8 @@ export default function CoursesPage() {
         ]}
         sortOptions={[
           { value: "title", label: "Title" },
-          { value: "createdAt", label: "Newest first" },
+          { value: "price", label: "Price" },
+          { value: "createdAt", label: "Newest first" }
         ]}
         addButton={{
           label: "Create Course",

@@ -156,12 +156,14 @@ interface EditProfileFormProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   user: UserProfileType | undefined;
+  isInstructor?: boolean;
 }
 
 export default function EditProfileForm({
   open,
   onOpenChange,
   user,
+  isInstructor = false,
 }: EditProfileFormProps) {
   const { mutate: updateUser, isLoading: isUpdating } = useUpdateUser();
 

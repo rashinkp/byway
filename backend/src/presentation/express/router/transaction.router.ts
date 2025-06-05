@@ -25,20 +25,20 @@ export function transactionRouter(transactionController: TransactionController):
   // Get transactions by user
   router.get(
     "/user",
-    restrictTo("USER"),
+    restrictTo("USER", 'INSTRUCTOR', 'ADMIN'),
     (req, res) => expressAdapter(req, res, transactionController.getTransactionsByUser.bind(transactionController))
   );
   
   // Update transaction status
   router.patch(
     "/status",
-    restrictTo("USER"),
+    restrictTo("USER", 'INSTRUCTOR', 'ADMIN'),
     (req, res) => expressAdapter(req, res, transactionController.updateTransactionStatus.bind(transactionController))
   );
   
   router.get(
     "/:id",
-    restrictTo("USER"),
+    restrictTo("USER",'INSTRUCTOR', 'ADMIN'),
     (req, res) => expressAdapter(req, res, transactionController.getTransactionById.bind(transactionController))
   );
 

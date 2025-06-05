@@ -7,6 +7,9 @@ import {
   School,
   Settings,
   Users,
+  DollarSign,
+  User,
+  Wallet,
 } from "lucide-react";
 
 export interface NavItem {
@@ -42,9 +45,19 @@ export const ADMIN_NAV_ITEMS: NavItem[] = [
     icon: FolderTree,
   },
   {
+    href: "/admin/wallet",
+    label: "Wallet",
+    icon: Wallet,
+  },
+  {
     href: "/admin/analytics",
     label: "Analytics",
     icon: BarChart,
+  },
+  {
+    href: "/admin/profile",
+    label: "Profile",
+    icon: User,
   },
   {
     href: "/admin/settings",
@@ -55,28 +68,38 @@ export const ADMIN_NAV_ITEMS: NavItem[] = [
 
 export const INSTRUCTOR_NAV_ITEMS: NavItem[] = [
   {
-    href: "/instructor/dashboard",
     label: "Dashboard",
+    href: "/instructor",
     icon: LayoutDashboard,
   },
   {
-    href: "/instructor/courses",
     label: "Courses",
+    href: "/instructor/courses",
     icon: BookOpen,
   },
   {
-    href: "/instructor/students",
-    label: "Students",
-    icon: Users,
+    label: "Earnings",
+    href: "/instructor/earnings",
+    icon: DollarSign,
   },
   {
-    href: "/instructor/analytics",
+    label: "Wallet",
+    href: "/instructor/wallet",
+    icon: Wallet,
+  },
+  {
     label: "Analytics",
+    href: "/instructor/analytics",
     icon: BarChart,
   },
   {
-    href: "/instructor/settings",
+    label: "Profile",
+    href: "/instructor/profile",
+    icon: User,
+  },
+  {
     label: "Settings",
+    href: "/instructor/settings",
     icon: Settings,
   },
 ];
