@@ -29,7 +29,7 @@ export interface Order {
   paymentStatus: "PENDING" | "COMPLETED" | "FAILED" | "REFUNDED";
   orderStatus: "PENDING" | "CONFIRMED" | "CANCELLED" | "FAILED" | "COMPLETED";
   paymentId: string | null;
-  paymentGateway: "STRIPE" | "PAYPAL" | "RAZORPAY" | null;
+  paymentGateway: "STRIPE" | "PAYPAL" | "RAZORPAY" | "WALLET" | null;
   createdAt: string;
   updatedAt: string;
   items: OrderItem[];

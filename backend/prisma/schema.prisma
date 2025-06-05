@@ -434,7 +434,7 @@ enum PaymentGateway {
   STRIPE
   PAYPAL
   RAZORPAY
-  // Add other gateways as needed
+  WALLET
 }
 
 

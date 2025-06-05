@@ -98,7 +98,7 @@ export class StripePaymentGateway implements PaymentGateway {
         payment_method_types: ["card"],
         line_items: lineItems,
         mode: "payment",
-        success_url: `${frontendUrl}/success?session_id={CHECKOUT_SESSION_ID}`,
+        success_url: `${frontendUrl}/success?session_id={CHECKOUT_SESSION_ID}${isWalletTopUp ? '&type=wallet-topup' : ''}`,
         cancel_url: `${frontendUrl}/payment-failed?session_id={CHECKOUT_SESSION_ID}`,
         customer_email: customerEmail,
         metadata: {

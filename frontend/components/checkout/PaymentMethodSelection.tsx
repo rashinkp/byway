@@ -99,7 +99,7 @@ const PaymentMethodSelection: FC<PaymentMethodSelectionProps> = memo(
             <p className="text-gray-700">
               Pay using your wallet balance. {wallet && wallet.balance < finalAmount && (
                 <span className="text-red-500">
-                  Insufficient balance. Please top up your wallet.
+                  Insufficient balance. Please top up your wallet. 
                 </span>
               )}
             </p>
@@ -153,10 +153,15 @@ const PaymentMethodSelection: FC<PaymentMethodSelectionProps> = memo(
                   }
                   createStripeCheckoutSession({
                     userId: user.id,
-                    courses,
+                    courses: courses.map(course => ({
+                      ...course,
+                      description: course.description || "",
+                      thumbnail: course.thumbnail || "",
+                      duration: course.duration || "",
+                      level: course.level || "",
+                      offer: course.offer || course.price
+                    })),
                     couponCode: couponCode || undefined,
-                  }).catch((error) => {
-                    // Error handling is managed by useStripe
                   });
                 }}
                 disabled={isPending || isDisabled || isCreatingSession}

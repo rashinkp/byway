@@ -1,11 +1,28 @@
 import { api } from "@/api/api";
 import { ApiResponse } from "@/types/apiResponse";
 import { Order, OrdersResponse, GetOrdersParams } from "@/types/order";
+import { Course } from "@/types/cart";
 
-export const createOrder = async (data: {
-  courseIds: string[];
+export interface CreateOrderRequest {
+  courses: {
+    id: string;
+    title: string;
+    description: string;
+    thumbnail: string;
+    price: number;
+    offer: number;
+    duration: string;
+    lectures: number;
+    level: string;
+    creator: {
+      name: string;
+    };
+  }[];
+  paymentMethod: "WALLET" | "STRIPE" | "PAYPAL" | "RAZORPAY";
   couponCode?: string;
-}): Promise<ApiResponse<Order>> => {
+}
+
+export const createOrder = async (data: CreateOrderRequest): Promise<ApiResponse<Order>> => {
   try {
     const response = await api.post("/orders", data);
     return response.data;

@@ -11,11 +11,22 @@ export interface ICourseInput {
 
 export interface ICreateStripeCheckoutSessionInput {
   userId: string;
+  courses?: {
+    id: string;
+    title: string;
+    description: string;
+    price: number;
+    offer: number;
+    thumbnail: string;
+    duration: string;
+    level: string;
+  }[];
   amount?: number;
   isWalletTopUp?: boolean;
-  courses?: ICourseInput[];
   couponCode?: string;
   orderId?: string;
+  successUrl?: string;
+  cancelUrl?: string;
 }
 
 export interface IStripeCheckoutSession {

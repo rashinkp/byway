@@ -15,5 +15,14 @@ export function orderRouter(orderController: OrderController): Router {
     )
   );
 
+  // Create a new order
+  router.post("/", restrictTo("USER"), (req, res) =>
+    expressAdapter(
+      req,
+      res,
+      orderController.createOrder.bind(orderController)
+    )
+  );
+
   return router;
 } 

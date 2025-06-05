@@ -20,8 +20,12 @@ export function useStripe() {
         courses: data.courses?.map(course => ({
           id: course.id,
           title: course.title,
+          description: course.description || "",
           price: course.price,
-          offer: course.offer
+          offer: course.offer || course.price,
+          thumbnail: course.thumbnail || "",
+          duration: course.duration || "",
+          level: course.level || ""
         }))
       };
       const res = await createStripeCheckoutSession(minimalData);

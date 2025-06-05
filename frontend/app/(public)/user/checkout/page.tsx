@@ -1,10 +1,11 @@
 "use client";
 
 import { useState, useMemo, useCallback, memo, FC } from "react";
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
 import { useCart } from "@/hooks/cart/useCart";
 import { useGetCourseById } from "@/hooks/course/useGetCourseById";
 import { useStripe } from "@/hooks/stripe/useStripe"; // Import the custom Stripe hook
+import { useCreateOrder } from "@/hooks/order/useCreateOrder";
 import { toast } from "sonner";
 import { Course, ICart } from "@/types/cart";
 import OrderDetailsSkeleton from "@/components/checkout/OrderDetailsSkeleton";
@@ -41,6 +42,8 @@ const CheckoutPage: FC<CheckoutPageProps> = memo(({ page = 1, limit = 10 }) => {
   const [couponCode, setCouponCode] = useState<string>("");
 
   const { user } = useAuth();
+  const { mutate: createOrder, isPending: isCreatingOrder } = useCreateOrder();
+  const router = useRouter();
 
   const paypalOptions = useMemo(
     () => ({
@@ -246,8 +249,26 @@ const CheckoutPage: FC<CheckoutPageProps> = memo(({ page = 1, limit = 10 }) => {
           return;
         }
         try {
-          // TODO: Implement wallet payment
-          toast.error("Wallet payment not implemented yet");
+          await createOrder({
+            courses: courseDetails.map(course => ({
+              id: course.id,
+              title: course.title,
+              description: course.description,
+              thumbnail: course.thumbnail,
+              price: course.price,
+              offer: course.offer || course.price,
+              duration: course.duration,
+              lectures: course.lectures,
+              level: course.level,
+              creator: {
+                name: course.creator?.name || "Unknown"
+              }
+            })),
+            paymentMethod: "WALLET",
+            couponCode: couponCode || undefined,
+          });
+          toast.success("Payment successful!");
+          router.push("/success");
         } catch (error) {
           console.error("Error processing wallet payment:", error);
           toast.error("Failed to process wallet payment");
@@ -278,10 +299,12 @@ const CheckoutPage: FC<CheckoutPageProps> = memo(({ page = 1, limit = 10 }) => {
       user,
       coursesInput,
       wallet,
+      createOrder,
+      router,
     ]
   );
 
-  const isLoading = cartLoading || courseLoading || walletLoading;
+  const isLoading = cartLoading || courseLoading || walletLoading || isCreatingOrder;
 
   return (
     <div className="min-h-screen bg-gray-50 py-8">

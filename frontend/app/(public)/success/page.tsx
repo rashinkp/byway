@@ -4,20 +4,19 @@ import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
-import { CheckCircleIcon } from "lucide-react";
+import { CheckCircleIcon, WalletIcon } from "lucide-react";
 
 const SuccessPage = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
   const sessionId = searchParams.get("session_id");
+  const isWalletTopUp = searchParams.get("type") === "wallet-topup";
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const verifySession = async () => {
       if (!sessionId) {
-        toast.error("Invalid session ID");
-        setError("Invalid session ID");
         setIsLoading(false);
         return;
       }
@@ -31,7 +30,6 @@ const SuccessPage = () => {
           "Payment completed, but verification encountered an issue"
         );
         setIsLoading(false);
-        // Allow success page to display despite verification issues
       }
     };
 
@@ -40,6 +38,10 @@ const SuccessPage = () => {
 
   const handleGoToCourses = () => {
     router.push("/user/my-courses");
+  };
+
+  const handleGoToWallet = () => {
+    router.push("/user/wallet");
   };
 
   if (isLoading) {
@@ -88,22 +90,27 @@ const SuccessPage = () => {
             damping: 20,
           }}
         >
-          <CheckCircleIcon className="h-16 w-16 text-green-500 mx-auto" />
+          {isWalletTopUp ? (
+            <WalletIcon className="h-16 w-16 text-green-500 mx-auto" />
+          ) : (
+            <CheckCircleIcon className="h-16 w-16 text-green-500 mx-auto" />
+          )}
         </motion.div>
         <h1 className="mt-4 text-2xl font-bold text-gray-900">
-          Payment Successful!
+          {isWalletTopUp ? "Wallet Top-up Successful!" : "Payment Successful!"}
         </h1>
         <p className="mt-2 text-gray-600">
-          Thank you for your purchase. Your courses are now available in your
-          account.
+          {isWalletTopUp
+            ? "Your wallet has been topped up successfully. You can now use your wallet balance for purchases."
+            : "Thank you for your purchase. Your courses are now available in your account."}
         </p>
         <motion.button
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
-          onClick={handleGoToCourses}
+          onClick={isWalletTopUp ? handleGoToWallet : handleGoToCourses}
           className="mt-6 px-6 py-3 bg-blue-700 text-white rounded-lg hover:bg-blue-800 transition-colors"
         >
-          Go to My Courses
+          {isWalletTopUp ? "Go to Wallet" : "Go to My Courses"}
         </motion.button>
       </motion.div>
     </div>
