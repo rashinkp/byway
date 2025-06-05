@@ -143,6 +143,7 @@ model Course {
   updatedAt      DateTime      @updatedAt
   deletedAt      DateTime?  
   approvalStatus APPROVALSTATUS @default(PENDING)
+  adminSharePercentage Decimal @default(20.00)
   details        CourseDetails? @relation("CourseToDetails")
   lessons        Lesson[]      @relation("CourseLessons") 
   enrollments    Enrollment[]  @relation("CourseEnrollments") 

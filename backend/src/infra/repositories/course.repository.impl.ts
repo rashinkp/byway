@@ -211,8 +211,12 @@ export class CourseRepository implements ICourseRepository {
         // Instructor can only see their own courses
         : role === "INSTRUCTOR"
         ? { createdBy: userId, ...(includeDeleted ? {} : { deletedAt: null }) }
-        // Regular users can only see published and non-deleted courses
-        : { deletedAt: null, status: CourseStatus.PUBLISHED }
+        // Regular users can only see published, verified and non-deleted courses
+        : { 
+            deletedAt: null, 
+            status: CourseStatus.PUBLISHED,
+            approvalStatus: APPROVALSTATUS.APPROVED
+          }
       ),
       ...(filterBy === "Active" ? { deletedAt: null } : {}),
       ...(filterBy === "Inactive" ? { deletedAt: { not: null } } : {}),
