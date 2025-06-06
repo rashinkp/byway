@@ -52,6 +52,11 @@ const courseFieldsSchema = z.object({
     .nullable()
     .transform((val) => (val !== null && val !== undefined ? Offer.create(val) : val)),
   status: z.enum(courseStatusValues).default(CourseStatus.DRAFT),
+  adminSharePercentage: z
+    .number()
+    .min(0.01, "Admin share must be at least 0.01%")
+    .max(100, "Admin share cannot exceed 100%")
+    .default(20),
   details: z
     .object({
       prerequisites: z.string().optional().nullable(),

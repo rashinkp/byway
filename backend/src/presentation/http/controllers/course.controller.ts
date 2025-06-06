@@ -13,7 +13,16 @@ import { IHttpRequest } from "../interfaces/http-request.interface";
 import { IHttpResponse } from "../interfaces/http-response.interface";
 import { UnauthorizedError } from "../errors/unautherized-error";
 import { BadRequestError } from "../errors/bad-request-error";
-import { createCourseSchemaDef, createEnrollmentSchemaDef, deleteCourseSchemaDef, getAllCoursesSchemaDef, getCourseByIdSchemaDef, getEnrolledCoursesSchemaDef, updateCourseApprovalSchemaDef, updateCourseSchemaDef } from "../../validators/course.validators";
+import {
+  createCourseSchemaDef,
+  createEnrollmentSchemaDef,
+  deleteCourseSchemaDef,
+  getAllCoursesSchemaDef,
+  getCourseByIdSchemaDef,
+  getEnrolledCoursesSchemaDef,
+  updateCourseApprovalSchemaDef,
+  updateCourseSchemaDef,
+} from "../../validators/course.validators";
 import { BaseController } from "./base.controller";
 
 export class CourseController extends BaseController {
@@ -144,7 +153,10 @@ export class CourseController extends BaseController {
         ...validated,
         userId: request.user.id,
       });
-      return this.success_200(result, "Enrolled courses retrieved successfully");
+      return this.success_200(
+        result,
+        "Enrolled courses retrieved successfully"
+      );
     });
   }
 
@@ -157,7 +169,7 @@ export class CourseController extends BaseController {
         throw new BadRequestError("Course ID is required");
       }
       const course = await this.approveCourseUseCase.execute({
-        courseId: request.body.courseId
+        courseId: request.body.courseId,
       });
       return this.success_200(course, "Course approved successfully");
     });

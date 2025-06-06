@@ -19,6 +19,7 @@ export interface Course {
   updatedAt: Date;
   deletedAt?: Date | null;
   approvalStatus: "PENDING" | "APPROVED" | "DECLINED"; // New field
+  adminSharePercentage: number;
   details?: {
     prerequisites?: string | null;
     longDescription?: string | null;
@@ -47,6 +48,7 @@ export interface AddCourseParams {
   thumbnail?: string | null;
   offer?: number | null;
   status: "DRAFT" | "PUBLISHED" | "ARCHIVED";
+  adminSharePercentage: number;
   details?: {
     prerequisites?: string | null;
     longDescription?: string | null;
@@ -65,6 +67,7 @@ export interface CourseFormData {
   offer?: number | null;
   duration?: number | null;
   level: "BEGINNER" | "MEDIUM" | "ADVANCED";
+  adminSharePercentage: number;
   prerequisites?: string | null;
   objectives?: string | null;
   targetAudience?: string | null;

@@ -74,6 +74,17 @@ export const baseFields: FormFieldConfig<CourseFormData>[] = [
     description: "Specify the total duration of the course in hours.",
   },
   {
+    name: "adminSharePercentage",
+    label: "Admin Share Percentage *",
+    type: "input",
+    fieldType: "number",
+    placeholder: "Enter percentage (0.01-100)",
+    description: "Required: Set the percentage of revenue that goes to the platform (must be between 0.01% and 100%).",
+    min: 0.01,
+    max: 100,
+    step: 0.01,
+  },
+  {
     name: "level",
     label: "Difficulty Level",
     type: "select",
@@ -225,8 +236,6 @@ export function CourseFormModal({
         });
         thumbnailUrl = uploadResult.secure_url;
         setThumbnailUploadStatus(FileUploadStatus.SUCCESS);
-      } else {
-        // thumbnailUrl = data.thumbnail; // Use existing URL if provided
       }
 
       // Prepare data for submission
@@ -243,6 +252,7 @@ export function CourseFormModal({
         longDescription: data.longDescription,
         objectives: data.objectives,
         targetAudience: data.targetAudience,
+        adminSharePercentage: data.adminSharePercentage,
       };
 
       if (isEditing && initialData?.id) {
@@ -258,7 +268,6 @@ export function CourseFormModal({
             },
             id: initialData.id,
           },
-          
         );
       } else {
         // Create new course
@@ -267,7 +276,6 @@ export function CourseFormModal({
             ...submitData,
             status: "DRAFT",
           },
-          
         );
       }
     } catch (error: any) {

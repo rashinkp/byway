@@ -29,6 +29,7 @@ export interface CourseProps {
   updatedAt?: Date;
   deletedAt?: Date | null;
   approvalStatus?: APPROVALSTATUS;
+  adminSharePercentage?: number;
   details?: CourseDetails | null;
   rating?: number;
   reviewCount?: number;
@@ -52,6 +53,7 @@ export class Course {
   private _updatedAt: Date;
   private _deletedAt: Date | null;
   private _approvalStatus: APPROVALSTATUS;
+  private _adminSharePercentage: number;
   private _details: CourseDetails | null;
   private _rating?: number;
   private _reviewCount?: number;
@@ -74,6 +76,7 @@ export class Course {
     this._updatedAt = props.updatedAt || new Date();
     this._deletedAt = props.deletedAt ?? null;
     this._approvalStatus = props.approvalStatus || APPROVALSTATUS.PENDING;
+    this._adminSharePercentage = props.adminSharePercentage ?? 20.00;
     this._details = props.details ?? null;
     this._rating = props.rating;
     this._reviewCount = props.reviewCount;
@@ -127,6 +130,9 @@ export class Course {
   get approvalStatus(): APPROVALSTATUS {
     return this._approvalStatus;
   }
+  get adminSharePercentage(): number {
+    return this._adminSharePercentage;
+  }
   get details(): CourseDetails | null {
     return this._details;
   }
@@ -156,6 +162,7 @@ export class Course {
     if (props.offer !== undefined) this._offer = props.offer ?? null;
     if (props.status) this._status = props.status;
     if (props.categoryId) this._categoryId = props.categoryId;
+    if (props.adminSharePercentage !== undefined) this._adminSharePercentage = props.adminSharePercentage;
     if (props.details !== undefined) this._details = props.details ?? null;
     this._updatedAt = new Date();
   }
@@ -190,6 +197,7 @@ export class Course {
       updatedAt: this._updatedAt.toISOString(),
       deletedAt: this._deletedAt?.toISOString() ?? null,
       approvalStatus: this._approvalStatus,
+      adminSharePercentage: this._adminSharePercentage,
       details: this._details,
       rating: this._rating,
       reviewCount: this._reviewCount,
@@ -215,6 +223,7 @@ export class Course {
       updatedAt: data.updatedAt,
       deletedAt: data.deletedAt,
       approvalStatus: data.approvalStatus,
+      adminSharePercentage: data.adminSharePercentage,
       details: data.details,
     });
   }

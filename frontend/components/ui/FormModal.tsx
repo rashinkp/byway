@@ -38,21 +38,23 @@ import FileUploadComponent, {
 } from "@/components/FileUploadComponent";
 
 export interface FormFieldConfig<T> {
-  name: Path<T>;
+  name: keyof T;
   label: string;
-  type: "input" | "textarea" | "select";
-  fieldType?: "text" | "number" | "file" | "date";
+  type: "input" | "textarea" | "select" | "checkbox" | "radio" | "file";
+  fieldType?: "text" | "number" | "email" | "password" | "file" | "date";
   placeholder?: string;
   description?: string;
-  maxLength?: number;
   options?: { value: string; label: string }[];
-  size?: "small" | "large";
+  maxLength?: number;
+  disabled?: boolean;
   accept?: string;
   maxSize?: number;
   fileTypeLabel?: string;
-  disabled?: boolean;
   uploadStatus?: FileUploadStatus;
   uploadProgress?: number;
+  min?: number;
+  max?: number;
+  step?: number;
 }
 
 interface FormModalProps<T extends z.ZodType<any, any>> {
@@ -203,9 +205,9 @@ export function FormModal<T extends z.ZodType<any, any>>({
                   <div key={colIndex} className="space-y-6">
                     {columnFields.map((field) => (
                       <FormField
-                        key={field.name}
+                        key={String(field.name)}
                         control={form.control}
-                        name={field.name}
+                        name={field.name as Path<z.infer<T>>}
                         render={({ field: formField }) => (
                           <FormItem>
                             <FormLabel className="text-sm font-normal">
@@ -298,9 +300,9 @@ export function FormModal<T extends z.ZodType<any, any>>({
               <div className="space-y-6 mb-6">
                 {textareaFields.map((field) => (
                   <FormField
-                    key={field.name}
+                    key={String(field.name)}
                     control={form.control}
-                    name={field.name}
+                    name={field.name as Path<z.infer<T>>}
                     render={({ field: formField }) => (
                       <FormItem>
                         <FormLabel className="text-sm font-normal">
@@ -329,9 +331,9 @@ export function FormModal<T extends z.ZodType<any, any>>({
               <div className="space-y-6 mb-6">
                 {fileFields.map((field) => (
                   <FormField
-                    key={field.name}
+                    key={String(field.name)}
                     control={form.control}
-                    name={field.name}
+                    name={field.name as Path<z.infer<T>>}
                     render={({ field: formField }) => (
                       <FormItem>
                         <FormLabel className="text-sm font-normal">
@@ -356,9 +358,9 @@ export function FormModal<T extends z.ZodType<any, any>>({
                             onFileChange={(file, error) => {
                               formField.onChange(file || formField.value);
                               if (error) {
-                                form.setError(field.name, { message: error });
+                                form.setError(field.name as Path<z.infer<T>>, { message: error });
                               } else {
-                                form.clearErrors(field.name);
+                                form.clearErrors(field.name as Path<z.infer<T>>);
                               }
                             }}
                             error={form.formState.errors[

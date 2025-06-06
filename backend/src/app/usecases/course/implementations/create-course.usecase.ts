@@ -50,8 +50,10 @@ export class CreateCourseUseCase implements ICreateCourseUseCase {
       offer: input.offer != null ? input.offer : null,
       status: input.status,
       createdBy: input.createdBy,
+      adminSharePercentage: input.adminSharePercentage,
       details: input.details,
     });
+
 
     // Persist course
     const savedCourse = await this.courseRepository.save(course);

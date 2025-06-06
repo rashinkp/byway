@@ -344,6 +344,7 @@ model OrderItem {
   courseTitle   String
   discount      Decimal?      // Discount applied (if any)
   couponId      String?       // Reference to applied coupon
+  adminSharePercentage Decimal @default(20.00) // Admin share percentage at time of purchase
   createdAt     DateTime      @default(now())
   updatedAt     DateTime      @updatedAt
   order         Order         @relation("OrderToOrderItem", fields: [orderId], references: [id], onDelete: Cascade)

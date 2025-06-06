@@ -17,6 +17,7 @@ export interface ICreateCourseInputDTO {
   status: CourseStatus;
   categoryId: string;
   createdBy: string;
+  adminSharePercentage?: number;
   details?: CourseDetails | null;
 }
 
@@ -32,6 +33,7 @@ export interface IUpdateCourseInputDTO {
   offer?: Offer | null;
   status?: CourseStatus;
   createdBy: string;
+  adminSharePercentage?: number;
   details?: CourseDetails | null;
 }
 
@@ -88,6 +90,7 @@ export interface ICourseOutputDTO {
   updatedAt: string;
   deletedAt?: string | null;
   approvalStatus: APPROVALSTATUS;
+  adminSharePercentage: number;
   details?: CourseDetails | null;
   rating?: number;
   reviewCount?: number;

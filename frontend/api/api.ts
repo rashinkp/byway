@@ -78,9 +78,7 @@ api.interceptors.response.use(
 
       try {
         if (typeof window !== "undefined") {
-          console.log("Clearing auth state");
           useAuthStore.getState().clearAuth();
-          console.log("Calling /auth/logout");
           await logout();
           console.log("Logout successful, redirecting to /login");
           if (!window.location.pathname.includes("/login")) {

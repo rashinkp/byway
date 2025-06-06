@@ -48,11 +48,12 @@ export const courseEditSchema = z
       .max(2000, "Target audience cannot exceed 2000 characters")
       .optional()
       .nullable(),
+    adminSharePercentage: z.number().min(0, "Admin share must be positive").max(100, "Admin share cannot exceed 100%").default(20),
   })
   .refine(
     (data) => {
       if (data.thumbnail instanceof File) {
-        return data.thumbnail.size <= 5 * 1024 * 1024; // 5MB
+        return data.thumbnail.size <= 5 * 1024 * 1024; // 5MB 
       }
       return true;
     },
@@ -133,6 +134,12 @@ export const courseSchema = z
       .max(2000, "Target audience cannot exceed 2000 characters")
       .optional()
       .nullable(),
+    adminSharePercentage: z.number({
+      required_error: "Admin share percentage is required",
+      invalid_type_error: "Admin share percentage must be a number",
+    })
+      .min(0.01, "Admin share must be at least 0.01%")
+      .max(100, "Admin share cannot exceed 100%"),
   })
   .refine(
     (data) => {

@@ -30,6 +30,7 @@ export class CourseRepository implements ICourseRepository {
         duration: course.duration?.getValue() ?? null,
         offer: course.offer?.getValue() ?? null,
         status: course.status,
+        adminSharePercentage: course.adminSharePercentage,
         category: {
           connect: { id: course.categoryId }, // Already fixed from previous issue
         },
@@ -68,12 +69,13 @@ export class CourseRepository implements ICourseRepository {
         duration: saved.duration ? Duration.create(saved.duration) : null,
         offer: saved.offer ? Offer.create(saved.offer.toNumber()) : null,
         status: saved.status as CourseStatus,
-        categoryId: saved.categoryId, // Assuming your Course entity uses categoryId
-        createdBy: saved.createdBy, // Assuming your Course entity uses createdBy
+        categoryId: saved.categoryId,
+        createdBy: saved.createdBy,
         createdAt: saved.createdAt,
         updatedAt: saved.updatedAt,
         deletedAt: saved.deletedAt,
         approvalStatus: saved.approvalStatus as APPROVALSTATUS,
+        adminSharePercentage: saved.adminSharePercentage.toNumber(),
         details: saved.details
           ? {
               prerequisites: saved.details.prerequisites,
