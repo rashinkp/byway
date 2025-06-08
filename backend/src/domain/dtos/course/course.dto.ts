@@ -91,6 +91,7 @@ export interface ICourseOutputDTO {
   deletedAt?: string | null;
   approvalStatus: APPROVALSTATUS;
   adminSharePercentage: number;
+  instructorSharePercentage: number;
   details?: CourseDetails | null;
   rating?: number;
   reviewCount?: number;

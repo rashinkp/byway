@@ -126,6 +126,7 @@ export class CourseRepository implements ICourseRepository {
         updatedAt: course.updatedAt,
         deletedAt: course.deletedAt,
         approvalStatus: course.approvalStatus as APPROVALSTATUS,
+        adminSharePercentage: course.adminSharePercentage.toNumber(),
         details: course.details
           ? {
               prerequisites: course.details.prerequisites,

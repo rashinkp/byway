@@ -68,10 +68,26 @@ export default function CourseDetailPage() {
         <TabsContent value="overview" className="mt-0">
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
             {[
-              { icon: TrendingUp, value: "$1K", label: "Lifetime Commission" },
-              { icon: Users, value: "1K", label: "Students" },
-              { icon: TrendingUp, value: "$800", label: "Received Commission" },
-              { icon: TrendingUp, value: "$200", label: "Pending Commission" },
+              { 
+                icon: TrendingUp, 
+                value: `${100 - (course?.instructorSharePercentage ?? 0)}%`, 
+                label: "Your Share" 
+              },
+              { 
+                icon: Users, 
+                value: `${course?.adminSharePercentage || 0}%`, 
+                label: "Admin Share" 
+              },
+              { 
+                icon: TrendingUp, 
+                value: course?.price ? `$${course.price}` : "$0", 
+                label: "Course Price" 
+              },
+              { 
+                icon: TrendingUp, 
+                value: course?.offer ? `$${course.offer}` : "$0", 
+                label: "Offer Price" 
+              },
             ].map((stat, index) => (
               <div
                 key={index}

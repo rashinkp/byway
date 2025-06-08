@@ -34,6 +34,7 @@ export class GetCourseByIdUseCase implements IGetCourseByIdUseCase {
       isEnrolled,
       category: courseData.category || null,
       instructor: courseData.creator || null,
+      instructorSharePercentage: Number(courseData.adminSharePercentage)
     };
   }
 }

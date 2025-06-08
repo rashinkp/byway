@@ -20,6 +20,7 @@ export interface Course {
   deletedAt?: Date | null;
   approvalStatus: "PENDING" | "APPROVED" | "DECLINED"; // New field
   adminSharePercentage: number;
+  instructorSharePercentage: number;
   details?: {
     prerequisites?: string | null;
     longDescription?: string | null;
