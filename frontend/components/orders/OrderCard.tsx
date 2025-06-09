@@ -3,7 +3,7 @@ import { RefreshCw, Clock, Calendar, DollarSign, XCircle } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { StatusBadge } from "./StatusBadge";
 import { Order } from "@/types/order";
-import { useStripe } from "@/hooks/stripe/useStripe";
+import { useCreateOrder } from "@/hooks/order/useCreateOrder";
 import { toast } from "sonner";
 import { formatDate, formatPrice } from "@/utils/formatters";
 import { Button } from "@/components/ui/button";
@@ -17,11 +17,10 @@ export const OrderCard: React.FC<OrderCardProps> = ({
   order,
   isRetrying,
 }) => {
-  const { createStripeCheckoutSession } = useStripe();
+  const { mutateAsync: createOrder } = useCreateOrder();
 
   const handleRetryPayment = async () => {
     try {
-      // Prepare course details for retry
       const coursesInput = order.items.map(item => ({
         id: item.courseId,
         title: item.title || 'Unknown Course',
@@ -29,15 +28,22 @@ export const OrderCard: React.FC<OrderCardProps> = ({
         price: item.price || 0,
         offer: item.coursePrice,
         thumbnail: item.thumbnail || '',
+        duration: '',
         level: item.level || 'BEGINNER',
+        lectures: 0,
+        creator: {
+          name: 'Unknown'
+        }
       }));
 
-      // Create new checkout session with existing order ID
-      await createStripeCheckoutSession({
+      const response = await createOrder({
         courses: coursesInput,
-        userId: order.userId,
-        orderId: order.id // Pass the existing order ID
+        paymentMethod: "STRIPE"
       });
+
+      if (response.data.session?.url) {
+        window.location.href = response.data.session.url;
+      }
     } catch (error) {
       console.error("Failed to retry payment:", error);
       toast.error("Failed to retry payment. Please try again later.");

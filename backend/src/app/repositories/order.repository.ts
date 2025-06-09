@@ -1,5 +1,6 @@
 import { Order } from "../../domain/entities/order.entity";
 import { GetAllOrdersDto } from "../../domain/dtos/order/order.dto";
+import { PaymentGateway } from "../../domain/enum/payment-gateway.enum";
 
 export interface IOrderRepository {
   findAll(userId: string, filters: GetAllOrdersDto): Promise<{
@@ -12,7 +13,7 @@ export interface IOrderRepository {
   findById(id: string): Promise<Order | null>;
   findByPaymentId(paymentId: string): Promise<Order | null>;
   getAllOrders(userId: string): Promise<Order[]>;
-  createOrder(userId: string, courses: any[], couponCode?: string): Promise<Order>;
+  createOrder(userId: string, courses: any[], paymentMethod: PaymentGateway, couponCode?: string): Promise<Order>;
   updateOrderStatus(
     orderId: string,
     status: "PENDING" | "COMPLETED" | "FAILED" | "CANCELLED",

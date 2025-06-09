@@ -18,5 +18,10 @@ export function walletRouter(walletController: WalletController): Router {
     expressAdapter(req, res, walletController.reduceMoney.bind(walletController))
   );
 
+
+  router.post("/top-up", restrictTo("USER", "INSTRUCTOR", "ADMIN"), (req, res) =>
+    expressAdapter(req, res, walletController.topUp.bind(walletController))
+  );
+
   return router;
 } 

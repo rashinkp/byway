@@ -4,7 +4,6 @@ import { useState, useMemo, useCallback, memo, FC } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { useCart } from "@/hooks/cart/useCart";
 import { useGetCourseById } from "@/hooks/course/useGetCourseById";
-import { useStripe } from "@/hooks/stripe/useStripe"; // Import the custom Stripe hook
 import { useCreateOrder } from "@/hooks/order/useCreateOrder";
 import { toast } from "sonner";
 import { Course, ICart } from "@/types/cart";
@@ -34,7 +33,6 @@ const CheckoutPage: FC<CheckoutPageProps> = memo(({ page = 1, limit = 10 }) => {
   const { data: singleCourse, isLoading: courseLoading } = useGetCourseById(
     courseId as string
   );
-  const { createStripeCheckoutSession, isCreatingSession } = useStripe();
   const [activeStep, setActiveStep] = useState(1);
   const { wallet, isLoading: walletLoading } = useWallet();
   const [selectedPaymentMethod, setSelectedPaymentMethod] =
@@ -42,7 +40,7 @@ const CheckoutPage: FC<CheckoutPageProps> = memo(({ page = 1, limit = 10 }) => {
   const [couponCode, setCouponCode] = useState<string>("");
 
   const { user } = useAuth();
-  const { mutate: createOrder, isPending: isCreatingOrder } = useCreateOrder();
+  const { mutateAsync: createOrder, isPending: isCreatingOrder } = useCreateOrder();
   const router = useRouter();
 
   const paypalOptions = useMemo(
@@ -248,58 +246,48 @@ const CheckoutPage: FC<CheckoutPageProps> = memo(({ page = 1, limit = 10 }) => {
           toast.error("Insufficient wallet balance");
           return;
         }
-        try {
-          await createOrder({
-            courses: courseDetails.map(course => ({
-              id: course.id,
-              title: course.title,
-              description: course.description,
-              thumbnail: course.thumbnail,
-              price: course.price,
-              offer: course.offer || course.price,
-              duration: course.duration,
-              lectures: course.lectures,
-              level: course.level,
-              creator: {
-                name: course.creator?.name || "Unknown"
-              }
-            })),
-            paymentMethod: "WALLET",
-            couponCode: couponCode || undefined,
-          });
-          toast.success("Payment successful!");
+      }
+
+      try {
+        const orderData = {
+          courses: courseDetails.map(course => ({
+            id: course.id,
+            title: course.title,
+            description: course.description,
+            thumbnail: course.thumbnail,
+            price: course.price,
+            offer: course.offer || course.price,
+            duration: course.duration,
+            lectures: course.lectures,
+            level: course.level,
+            creator: {
+              name: course.creator?.name || "Unknown"
+            }
+          })),
+          paymentMethod: selectedPaymentMethod.toUpperCase() as "WALLET" | "STRIPE" | "PAYPAL" | "RAZORPAY",
+          couponCode: couponCode || undefined,
+        };
+        console.log("Sending order data:", orderData);
+        const response = await createOrder(orderData);
+
+        if (selectedPaymentMethod === "wallet") {
           router.push("/success");
-        } catch (error) {
-          console.error("Error processing wallet payment:", error);
-          toast.error("Failed to process wallet payment");
+        } else if (selectedPaymentMethod === "stripe" && response.data.session?.url) {
+          window.location.href = response.data.session.url;
         }
-      } else if (selectedPaymentMethod === "stripe") {
-        try {
-          await createStripeCheckoutSession({
-            courses: coursesInput,
-            userId: user.id,
-            couponCode,
-          });
-        } catch (error) {
-          console.error("Error creating Stripe checkout session:", error);
-          toast.error("Failed to initiate Stripe checkout");
-        }
-      } else if (selectedPaymentMethod === "paypal") {
-        toast.error("PayPal is not implemented yet");
-      } else {
-        toast.error("Selected payment method is not supported");
+      } catch (error) {
+        console.error("Error processing payment:", error);
+        toast.error("Failed to process payment");
       }
     },
     [
       courseDetails,
       couponCode,
-      createStripeCheckoutSession,
+      createOrder,
       selectedPaymentMethod,
       finalAmount,
       user,
-      coursesInput,
       wallet,
-      createOrder,
       router,
     ]
   );
@@ -367,7 +355,7 @@ const CheckoutPage: FC<CheckoutPageProps> = memo(({ page = 1, limit = 10 }) => {
                 onProceed={handleProceedToPayment}
                 isDisabled={!courseDetails.length || finalAmount <= 0}
               />
-            ) : isCreatingSession ? (
+            ) : isCreatingOrder ? (
               <PaymentMethodSkeleton />
             ) : (
               <PaymentMethodSelection
@@ -376,7 +364,7 @@ const CheckoutPage: FC<CheckoutPageProps> = memo(({ page = 1, limit = 10 }) => {
                 couponCode={couponCode}
                 onCouponChange={setCouponCode}
                 onSubmit={handleSubmit}
-                isPending={isCreatingSession}
+                isPending={isCreatingOrder}
                 isDisabled={!courseDetails.length || finalAmount <= 0}
                 paypalOptions={paypalOptions}
                 finalAmount={finalAmount}

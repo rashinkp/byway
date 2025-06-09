@@ -7,7 +7,8 @@ import { IEnrollmentRepository } from "../../../repositories/enrollment.reposito
 import { ICartRepository } from "../../../repositories/cart.repository";
 import { HttpError } from "../../../../presentation/http/errors/http-error";
 import { StatusCodes } from "http-status-codes";
-import { PaymentGateway } from "../../../providers/payment-gateway.interface";
+import { PaymentGateway } from "../../../../domain/enum/payment-gateway.enum";
+import { PaymentGateway as PaymentGatewayInterface } from "../../../providers/payment-gateway.interface";
 
 export class CreateCheckoutSessionUseCase implements ICreateCheckoutSessionUseCase {
   constructor(
@@ -15,7 +16,7 @@ export class CreateCheckoutSessionUseCase implements ICreateCheckoutSessionUseCa
     private orderRepository: IOrderRepository,
     private enrollmentRepository: IEnrollmentRepository,
     private cartRepository: ICartRepository,
-    private paymentGateway: PaymentGateway
+    private paymentGateway: PaymentGatewayInterface
   ) {}
 
   async execute(input: CreateCheckoutSessionDto): Promise<ApiResponse> {
@@ -70,7 +71,7 @@ export class CreateCheckoutSessionUseCase implements ICreateCheckoutSessionUseCa
         }
 
         // Create new order for course purchase
-        const order = await this.orderRepository.createOrder(userId, courses, couponCode);
+        const order = await this.orderRepository.createOrder(userId, courses, PaymentGateway.STRIPE, couponCode);
         orderIdForSession = order.id;
 
         // Remove courses from cart after order creation

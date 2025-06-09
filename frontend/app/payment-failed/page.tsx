@@ -1,18 +1,19 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { AlertCircle, ArrowLeft, RefreshCw, ShoppingBag } from "lucide-react";
 import Link from "next/link";
-import { useStripe } from "@/hooks/stripe/useStripe";
+import { useCreateOrder } from "@/hooks/order/useCreateOrder";
 
 export default function PaymentFailedPage() {
   const searchParams = useSearchParams();
+  const router = useRouter();
   const [error, setError] = useState<string>("");
-  const { verifyPayment } = useStripe();
-  const sessionId = searchParams.get("session_id");
+  const { mutateAsync: createOrder } = useCreateOrder();
+  const orderId = searchParams.get("order_id");
 
   useEffect(() => {
     const errorMessage = searchParams.get("error");
@@ -22,11 +23,17 @@ export default function PaymentFailedPage() {
   }, [searchParams]);
 
   const handleRetry = async () => {
-    if (sessionId) {
+    if (orderId) {
       try {
-        await verifyPayment(sessionId);
+        const response = await createOrder({
+          courses: [],
+          paymentMethod: "STRIPE"
+        });
+        if (response.data.session?.url) {
+          window.location.href = response.data.session.url;
+        }
       } catch (error) {
-        console.error("Failed to verify payment:", error);
+        console.error("Failed to retry payment:", error);
       }
     }
   };

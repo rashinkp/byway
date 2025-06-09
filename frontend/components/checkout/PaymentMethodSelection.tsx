@@ -2,7 +2,6 @@
 
 import { FC, memo, useEffect } from "react";
 import PayPalPayment from "../PayPalPayment";
-import { useStripe } from "@/hooks/stripe/useStripe";
 import { useAuth } from "@/hooks/auth/useAuth";
 import { toast } from "sonner";
 import { ICourseInput } from "@/types/stripe.types";
@@ -50,7 +49,6 @@ const PaymentMethodSelection: FC<PaymentMethodSelectionProps> = memo(
     finalAmount,
     courses,
   }) => {
-    const { createStripeCheckoutSession, isCreatingSession } = useStripe();
     const { user } = useAuth();
     const { wallet } = useWallet();
 
@@ -142,36 +140,15 @@ const PaymentMethodSelection: FC<PaymentMethodSelectionProps> = memo(
             <div className="flex justify-end">
               <button
                 type="button"
-                onClick={() => {
-                  if (!user?.id) {
-                    toast.error("Please log in to proceed with payment");
-                    return;
-                  }
-                  if (!courses.length) {
-                    toast.error("No courses selected for payment");
-                    return;
-                  }
-                  createStripeCheckoutSession({
-                    userId: user.id,
-                    courses: courses.map(course => ({
-                      ...course,
-                      description: course.description || "",
-                      thumbnail: course.thumbnail || "",
-                      duration: course.duration || "",
-                      level: course.level || "",
-                      offer: course.offer || course.price
-                    })),
-                    couponCode: couponCode || undefined,
-                  });
-                }}
-                disabled={isPending || isDisabled || isCreatingSession}
+                onClick={onSubmit}
+                disabled={isPending || isDisabled}
                 className={`inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-white ${
-                  isPending || isDisabled || isCreatingSession
+                  isPending || isDisabled
                     ? "bg-gray-400 cursor-not-allowed"
                     : "bg-blue-600 hover:bg-blue-700"
                 } focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500`}
               >
-                {isCreatingSession ? "Processing..." : "Pay with Stripe"}
+                {isPending ? "Processing..." : "Pay with Stripe"}
               </button>
             </div>
           </div>

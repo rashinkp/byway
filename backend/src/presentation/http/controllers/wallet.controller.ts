@@ -10,12 +10,15 @@ import { IHttpErrors } from "../interfaces/http-errors.interface";
 import { IHttpSuccess } from "../interfaces/http-success.interface";
 import { UnauthorizedError } from "../errors/unautherized-error";
 import { HttpError } from "../errors/http-error";
+import { ITopUpWalletUseCase } from "../../../app/usecases/wallet/interfaces/top-up-wallet.usecase.interface";
+import { TopUpWalletDtoSchema } from "../../../domain/dtos/wallet/top-up.dto";
 
 export class WalletController extends BaseController {
   constructor(
     private readonly getWalletUseCase: IGetWalletUseCase,
     private readonly addMoneyUseCase: IAddMoneyUseCase,
     private readonly reduceMoneyUseCase: IReduceMoneyUseCase,
+    private topUpWalletUseCase: ITopUpWalletUseCase,
     protected httpErrors: IHttpErrors,
     protected httpSuccess: IHttpSuccess
   ) {
@@ -64,6 +67,19 @@ export class WalletController extends BaseController {
       const data: ReduceMoneyDto = { amount, currency };
       const wallet = await this.reduceMoneyUseCase.execute(request.user.id, data);
       return this.success_200(wallet, "Money reduced successfully");
+    });
+  }
+
+  async topUp(httpRequest: IHttpRequest): Promise<IHttpResponse> {
+    return this.handleRequest(httpRequest, async (request) => {
+      if (!request.user?.id) {
+        throw new UnauthorizedError("User not authenticated");
+      }
+
+      const validatedData = TopUpWalletDtoSchema.parse(request.body);
+      const result = await this.topUpWalletUseCase.execute(request.user.id, validatedData);
+
+      return this.success_200(result, "Wallet top-up successful");
     });
   }
 } 

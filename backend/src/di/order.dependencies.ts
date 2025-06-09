@@ -1,7 +1,10 @@
-import { GetAllOrdersUseCase } from "../app/usecases/order/implementations/get-all-orders.use-case";
 import { CreateOrderUseCase } from "../app/usecases/order/implementations/create-order.usecase";
 import { OrderController } from "../presentation/http/controllers/order.controller";
 import { SharedDependencies } from "./shared.dependencies";
+import { PaymentService } from "../app/services/payment/implementations/payment.service";
+import { StripePaymentGateway } from "../infra/providers/stripe-payment.gateway";
+import { StripeWebhookGateway } from "../infra/providers/stripe-webhook.gateway";
+import { GetAllOrdersUseCase } from "../app/usecases/order/implementations/get-all-orders.use-case";
 
 export interface OrderDependencies {
   orderController: OrderController;
@@ -10,17 +13,27 @@ export interface OrderDependencies {
 export function createOrderDependencies(
   deps: SharedDependencies
 ): OrderDependencies {
-  const { orderRepository, userRepository, enrollmentRepository, transactionRepository, walletRepository } = deps;
+  const stripeGateway = new StripePaymentGateway();
+  const webhookGateway = new StripeWebhookGateway();
+
+  // Initialize payment service
+  const paymentService = new PaymentService(
+    deps.walletRepository,
+    deps.orderRepository,
+    deps.transactionRepository,
+    deps.enrollmentRepository,
+    stripeGateway,
+    webhookGateway,
+    deps.userRepository
+  );
 
   // Initialize use cases
-  const getAllOrdersUseCase = new GetAllOrdersUseCase(orderRepository);
   const createOrderUseCase = new CreateOrderUseCase(
-    userRepository,
-    orderRepository,
-    enrollmentRepository,
-    transactionRepository,
-    walletRepository
+    deps.orderRepository,
+    paymentService
   );
+
+  const getAllOrdersUseCase = new GetAllOrdersUseCase(deps.orderRepository);
 
   // Initialize controller
   const orderController = new OrderController(
@@ -33,4 +46,4 @@ export function createOrderDependencies(
   return {
     orderController,
   };
-} 
+}

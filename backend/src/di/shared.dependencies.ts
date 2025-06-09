@@ -29,6 +29,10 @@ import { TransactionRepository } from "../infra/repositories/transaction.reposit
 import { ITransactionRepository } from "../app/repositories/transaction.repository";
 import { IWalletRepository } from "../app/repositories/wallet.repository.interface";
 import { WalletRepository } from "../infra/repositories/wallet.repository";
+import { PaymentService } from "../app/services/payment/implementations/payment.service";
+import { IPaymentService } from "../app/services/payment/interfaces/payment.service.interface";
+import { StripePaymentGateway } from "../infra/providers/stripe-payment.gateway";
+import { StripeWebhookGateway } from "../infra/providers/stripe-webhook.gateway";
 
 export interface SharedDependencies {
   prisma: typeof prismaClient;
@@ -49,6 +53,7 @@ export interface SharedDependencies {
   httpSuccess: HttpSuccess;
   cookieService: CookieService;
   walletRepository: IWalletRepository;
+  paymentService: IPaymentService;
 }
 
 export function createSharedDependencies(): SharedDependencies {
@@ -66,6 +71,17 @@ export function createSharedDependencies(): SharedDependencies {
   const otpProvider = new OtpProvider(authRepository);
   const googleAuthProvider = new GoogleAuthProvider(envConfig.GOOGLE_CLIENT_ID);
   const walletRepository = new WalletRepository(prismaClient);
+  const paymentGateway = new StripePaymentGateway();
+  const webhookGateway = new StripeWebhookGateway();
+  const paymentService = new PaymentService(
+    walletRepository,
+    orderRepository,
+    transactionRepository,
+    enrollmentRepository,
+    paymentGateway,
+    webhookGateway,
+    userRepository
+  );
 
   const httpErrors = new HttpErrors();
   const httpSuccess = new HttpSuccess();
@@ -90,5 +106,6 @@ export function createSharedDependencies(): SharedDependencies {
     httpSuccess,
     cookieService,
     walletRepository,
+    paymentService,
   };
 }

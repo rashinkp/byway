@@ -4,6 +4,7 @@ import { StripeController } from "../presentation/http/controllers/stripe.contro
 import { SharedDependencies } from "./shared.dependencies";
 import { StripePaymentGateway } from "../infra/providers/stripe-payment.gateway";
 import { StripeWebhookGateway } from "../infra/providers/stripe-webhook.gateway";
+import { PaymentService } from "../app/services/payment/implementations/payment.service";
 
 export interface StripeDependencies {
   stripeController: StripeController;
@@ -14,6 +15,17 @@ export function createStripeDependencies(
 ): StripeDependencies {
   const stripeGateway = new StripePaymentGateway();
   const webhookGateway = new StripeWebhookGateway();
+
+  // Initialize payment service
+  const paymentService = new PaymentService(
+    deps.walletRepository,
+    deps.orderRepository,
+    deps.transactionRepository,
+    deps.enrollmentRepository,
+    stripeGateway,
+    webhookGateway,
+    deps.userRepository
+  );
 
   // Initialize use cases
   const createCheckoutSessionUseCase = new CreateCheckoutSessionUseCase(
@@ -26,11 +38,7 @@ export function createStripeDependencies(
 
   const handleWebhookUseCase = new HandleWebhookUseCase(
     webhookGateway,
-    deps.userRepository,
-    deps.orderRepository,
-    deps.enrollmentRepository,
-    deps.transactionRepository,
-    deps.walletRepository
+    paymentService
   );
 
   // Initialize controller

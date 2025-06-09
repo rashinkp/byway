@@ -147,6 +147,7 @@ export class OrderRepository implements IOrderRepository {
   async createOrder(
     userId: string,
     courses: any[],
+    paymentMethod: PaymentGateway,
     couponCode?: string
   ): Promise<Order> {
     const totalAmount = courses.reduce(
@@ -164,7 +165,7 @@ export class OrderRepository implements IOrderRepository {
           orderStatus: "PENDING",
           paymentStatus: "PENDING",
           paymentId: null,
-          paymentGateway: null,
+          paymentGateway: paymentMethod,
           amount: totalAmount,
           createdAt: new Date(),
           updatedAt: new Date(),

@@ -22,7 +22,17 @@ export interface CreateOrderRequest {
   couponCode?: string;
 }
 
-export const createOrder = async (data: CreateOrderRequest): Promise<ApiResponse<Order>> => {
+interface OrderResponse {
+  order: Order;
+  session?: {
+    id: string;
+    url: string;
+    payment_status: string;
+    amount_total: number;
+  };
+}
+
+export const createOrder = async (data: CreateOrderRequest): Promise<ApiResponse<OrderResponse>> => {
   try {
     const response = await api.post("/orders", data);
     return response.data;

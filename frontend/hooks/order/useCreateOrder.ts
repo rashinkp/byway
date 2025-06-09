@@ -8,14 +8,14 @@ export const useCreateOrder = () => {
   return useMutation({
     mutationFn: async (data: CreateOrderRequest) => {
       const response = await createOrder(data);
-      return response.data;
+      return response;
     },
     onSuccess: (data) => {
       // Invalidate orders query to refetch the list
       queryClient.invalidateQueries({ queryKey: ["orders"] });
       
       // Show success message
-      if (data.paymentGateway === "WALLET") {
+      if (data.data.order.paymentGateway === "WALLET") {
         toast.success("Order created and paid successfully");
       } else {
         toast.success("Order created successfully. Proceed with payment.");
