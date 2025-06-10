@@ -204,7 +204,7 @@ export default function MyCoursesPage() {
                   reviewCount={course.reviewCount}
                   formattedDuration={course.formattedDuration}
                   lessons={course.lessons}
-                  price={course.price}
+                  price={course.offer || course.price}
                   bestSeller={course.bestSeller}
                   className="w-full"
                 />

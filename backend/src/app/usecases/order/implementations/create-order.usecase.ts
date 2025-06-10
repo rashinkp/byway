@@ -28,7 +28,7 @@ export class CreateOrderUseCase implements ICreateOrderUseCase {
     // Handle payment based on method
     if (paymentMethod === "WALLET") {
       // Calculate total amount for wallet payment
-      const totalAmount = courses.reduce((sum, course) => sum + course.price, 0);
+      const totalAmount = courses.reduce((sum, course) => sum + (course.offer || course.price), 0);
       
       // Process wallet payment
       const paymentResult = await this.paymentService.handleWalletPayment(userId, order.id, totalAmount);
