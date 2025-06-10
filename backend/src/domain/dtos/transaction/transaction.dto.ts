@@ -3,7 +3,7 @@ import { TransactionStatus } from "../../enum/transaction-status.enum";
 import { TransactionType } from "../../enum/transaction-type.enum";
 
 export interface ICreateTransactionInputDTO {
-  orderId: string;
+  orderId?: string;
   userId: string;
   amount: number;
   type?: TransactionType;
@@ -18,7 +18,7 @@ export interface ICreateTransactionInputDTO {
 
 export interface ITransactionOutputDTO {
   id: string;
-  orderId: string;
+  orderId?: string;
   userId: string;
   amount: number;
   type: TransactionType;

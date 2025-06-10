@@ -11,25 +11,58 @@ export class HandleWebhookUseCase implements IHandleWebhookUseCase {
   ) {}
 
   async execute(input: IWebhookInput): Promise<WebhookResponse> {
+    console.log('Webhook received:', typeof input.event);
+    
     // Verify webhook signature
     const event = await this.webhookGateway.verifySignature(input.event, input.signature);
     if (!event) {
+      console.error('Invalid webhook signature');
       throw new HttpError("Invalid webhook signature", StatusCodes.UNAUTHORIZED);
     }
 
-    // Handle different event types
-    if (this.webhookGateway.isCheckoutSessionCompleted(event)) {
-      return this.paymentService.handleStripeWebhook(event);
-    } else if (event.type === "checkout.session.expired") {
-      return {
-        data: {
-          status: "expired",
-          message: "Checkout session expired"
-        },
-        message: "Checkout session expired"
-      };
-    }
+    console.log('Webhook verified, type:', event.type);
 
-    throw new HttpError("Unhandled webhook event type", StatusCodes.BAD_REQUEST);
+    // Handle different event types
+    switch (event.type) {
+      case 'checkout.session.completed':
+        console.log('Processing completed checkout session');
+        return this.paymentService.handleStripeWebhook(event);
+      
+      case 'payment_intent.succeeded':
+      case 'charge.succeeded':
+        console.log('Processing successful payment');
+        return this.paymentService.handleStripeWebhook(event);
+      
+      case 'checkout.session.expired':
+        console.log('Checkout session expired');
+        return {
+          data: {
+            status: "expired",
+            message: "Checkout session expired"
+          },
+          message: "Checkout session expired"
+        };
+      
+      case 'payment_intent.payment_failed':
+      case 'charge.failed':
+        console.log('Payment failed');
+        return {
+          data: {
+            status: "failed",
+            message: "Payment failed"
+          },
+          message: "Payment failed"
+        };
+      
+      default:
+        console.log('Unhandled webhook event type:', event.type);
+        return {
+          data: {
+            status: "ignored",
+            message: "Event type not handled"
+          },
+          message: "Event type not handled"
+        };
+    }
   }
 }

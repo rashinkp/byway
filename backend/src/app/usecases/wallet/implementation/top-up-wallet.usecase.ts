@@ -20,7 +20,7 @@ export class TopUpWalletUseCase implements ITopUpWalletUseCase {
   async execute(userId: string, input: TopUpWalletDto): Promise<TopUpWalletResponse> {
     const { amount, paymentMethod } = input;
 
-    // Create a pending transaction
+    // Create a pending transaction without an orderId for wallet top-ups
     const transaction = await this.transactionRepository.create(
       new Transaction({
         userId,
@@ -31,6 +31,7 @@ export class TopUpWalletUseCase implements ITopUpWalletUseCase {
         paymentMethod,
         metadata: {
           description: "Wallet top-up",
+          isWalletTopUp: true
         },
       })
     );
@@ -55,6 +56,7 @@ export class TopUpWalletUseCase implements ITopUpWalletUseCase {
         userId,
         transaction.id,
         {
+          userId,
           courses: [{
             id: transaction.id,
             title: "Wallet Top-up",
@@ -62,6 +64,9 @@ export class TopUpWalletUseCase implements ITopUpWalletUseCase {
           }],
           paymentMethod,
           couponCode: undefined,
+          amount,
+          isWalletTopUp: true,
+          orderId: transaction.id
         }
       );
 

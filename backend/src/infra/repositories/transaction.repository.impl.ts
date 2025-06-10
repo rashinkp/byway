@@ -135,50 +135,49 @@ export class TransactionRepository implements ITransactionRepository {
   }
 
   async create(transaction: Transaction): Promise<Transaction> {
-    console.log("TransactionRepository.create - Input:", {
+    console.log('TransactionRepository.create - Input:', {
       orderId: transaction.orderId,
       userId: transaction.userId,
       amount: transaction.amount,
       type: transaction.type,
       status: transaction.status,
-      paymentGateway: transaction.paymentGateway,
+      paymentGateway: transaction.paymentGateway
     });
 
     try {
+      const data: any = {
+        id: transaction.id,
+        userId: transaction.userId,
+        amount: transaction.amount,
+        type: this.mapToPrismaTransactionType(transaction.type),
+        status: this.mapToPrismaTransactionStatus(transaction.status),
+        paymentGateway: this.mapToPrismaPaymentGateway(transaction.paymentGateway),
+        paymentMethod: transaction.paymentMethod,
+        paymentDetails: transaction.paymentDetails,
+        courseId: transaction.courseId,
+        transactionId: transaction.transactionId,
+        metadata: transaction.metadata
+      };
+
+      // Only add orderId if it exists
+      if (transaction.orderId) {
+        data.orderId = transaction.orderId;
+      }
+
       const created = await this.prisma.transactionHistory.create({
-        data: {
-          orderId: transaction.orderId || null,
-          userId: transaction.userId,
-          amount: transaction.amount,
-          type: this.mapToPrismaTransactionType(transaction.type),
-          status: this.mapToPrismaTransactionStatus(transaction.status),
-          paymentGateway: this.mapToPrismaPaymentGateway(
-            transaction.paymentGateway
-          ),
-          courseId: transaction.courseId,
-          transactionId: transaction.transactionId,
-          walletId: transaction.walletId,
-        },
+        data
       });
 
-      console.log("TransactionRepository.create - Success:", {
+      console.log('TransactionRepository.create - Success:', {
         id: created.id,
         orderId: created.orderId,
         amount: created.amount,
-        status: created.status,
+        status: created.status
       });
 
       return this.mapToTransaction(created);
     } catch (error) {
-      console.error("TransactionRepository.create - Error:", {
-        error: error instanceof Error ? error.message : String(error),
-        stack: error instanceof Error ? error.stack : undefined,
-        transaction: {
-          orderId: transaction.orderId,
-          userId: transaction.userId,
-          amount: transaction.amount,
-        },
-      });
+      console.error('TransactionRepository.create - Error:', error);
       throw error;
     }
   }
@@ -190,11 +189,12 @@ export class TransactionRepository implements ITransactionRepository {
     return transaction ? this.mapToTransaction(transaction) : null;
   }
 
-  async findByOrderId(orderId: string): Promise<Transaction[]> {
-    const transactions = await this.prisma.transactionHistory.findMany({
+  async findByOrderId(orderId: string): Promise<Transaction | null> {
+    const transaction = await this.prisma.transactionHistory.findFirst({
       where: { orderId },
+      orderBy: { createdAt: 'desc' }
     });
-    return transactions.map((t) => this.mapToTransaction(t));
+    return transaction ? this.mapToTransaction(transaction) : null;
   }
 
   async findByUserId(

@@ -77,6 +77,7 @@ export class WalletController extends BaseController {
       }
 
       const validatedData = TopUpWalletDtoSchema.parse(request.body);
+      console.log(validatedData , 'validatedData');
       const result = await this.topUpWalletUseCase.execute(request.user.id, validatedData);
 
       return this.success_200(result, "Wallet top-up successful");

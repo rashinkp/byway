@@ -1,5 +1,5 @@
 import { IPaymentService } from "../interfaces/payment.service.interface";
-import { CreateOrderDto } from "../../../../domain/dtos/order/create-order.dto";
+import { CreateCheckoutSessionDto } from "../../../../domain/dtos/stripe/create-checkout-session.dto";
 import { HttpError } from "../../../../presentation/http/errors/http-error";
 import { StatusCodes } from "http-status-codes";
 import { TransactionType } from "../../../../domain/enum/transaction-type.enum";
@@ -14,6 +14,8 @@ import { IEnrollmentRepository } from "../../../repositories/enrollment.reposito
 import { PaymentGateway } from "../../../providers/payment-gateway.interface";
 import { StripeWebhookGateway } from "../../../../infra/providers/stripe-webhook.gateway";
 import { IUserRepository } from "../../../repositories/user.repository";
+import Stripe from "stripe";
+import { OrderStatus } from "../../../../domain/enum/order-status.enum";
 
 interface ServiceResponse<T> {
   data: T;
@@ -74,7 +76,7 @@ export class PaymentService implements IPaymentService {
   async createStripeCheckoutSession(
     userId: string,
     orderId: string,
-    input: CreateOrderDto
+    input: CreateCheckoutSessionDto
   ): Promise<ServiceResponse<{ session: { id: string; url: string; payment_status: string; amount_total: number } }>> {
     const user = await this.userRepository.findById(userId);
     if (!user) {
@@ -87,7 +89,8 @@ export class PaymentService implements IPaymentService {
         courses: input.courses,
         couponCode: input.couponCode,
         orderId,
-        isWalletTopUp: input.courses.length === 1 && input.courses[0].title === "Wallet Top-up",
+        amount: input.amount,
+        isWalletTopUp: input.isWalletTopUp,
       },
       user.email,
       orderId
@@ -106,75 +109,74 @@ export class PaymentService implements IPaymentService {
     };
   }
 
-  async handleStripeWebhook(event: WebhookEvent): Promise<ServiceResponse<{ order: any; transaction?: Transaction }>> {
-    const metadata = this.webhookGateway.parseMetadata(event.data.object.metadata);
-    const { userId, orderId, courses, isWalletTopUp } = metadata;
+  async handleStripeWebhook(event: WebhookEvent): Promise<ServiceResponse<{ order?: any; transaction?: Transaction }>> {
+    try {
+      if (event.type === 'checkout.session.completed') {
+        const session = event.data.object as Stripe.Checkout.Session;
+        const orderId = session.metadata?.orderId;
+        const isWalletTopUp = session.metadata?.isWalletTopUp === 'true';
 
-    if (!userId || !orderId) {
-      throw new HttpError("Invalid webhook metadata", StatusCodes.BAD_REQUEST);
-    }
+        if (!orderId) {
+          throw new HttpError("No order ID found in session metadata", StatusCodes.BAD_REQUEST);
+        }
 
-    const order = await this.orderRepository.findById(orderId);
-    if (!order) {
-      throw new HttpError("Order not found", StatusCodes.NOT_FOUND);
-    }
+        console.log('Processing webhook for orderId:', orderId);
 
-    if (order.paymentStatus === "COMPLETED") {
+        // For wallet top-ups, use the orderId as transactionId
+        let transaction;
+        if (isWalletTopUp) {
+          transaction = await this.transactionRepository.findById(orderId);
+        } else {
+          transaction = await this.transactionRepository.findByOrderId(orderId);
+        }
+
+        if (!transaction) {
+          console.error('Transaction not found for orderId:', orderId);
+          throw new HttpError("Transaction not found", StatusCodes.NOT_FOUND);
+        }
+
+        console.log('Found transaction:', transaction);
+
+        // Update transaction status
+        await this.transactionRepository.updateStatus(transaction.id, TransactionStatus.COMPLETED);
+
+        if (isWalletTopUp) {
+          // For wallet top-ups, update the wallet balance
+          const wallet = await this.walletRepository.findByUserId(transaction.userId);
+          if (!wallet) {
+            throw new HttpError("Wallet not found", StatusCodes.NOT_FOUND);
+          }
+          wallet.addAmount(transaction.amount);
+          await this.walletRepository.update(wallet);
+          console.log('Wallet updated with amount:', transaction.amount);
+          return {
+            data: { transaction },
+            message: "Wallet top-up completed successfully"
+          };
+        } else {
+          // For regular orders, handle order completion
+          const order = await this.orderRepository.findById(orderId);
+          if (!order) {
+            throw new HttpError("Order not found", StatusCodes.NOT_FOUND);
+          }
+          await this.orderRepository.updateOrderStatus(orderId, "COMPLETED", session.payment_intent as string, "STRIPE");
+          return {
+            data: { order, transaction },
+            message: "Payment completed successfully"
+          };
+        }
+      }
+
       return {
-        data: { order },
-        message: "Order already processed",
+        data: {},
+        message: "Webhook processed successfully"
       };
+    } catch (error) {
+      console.error('Error processing webhook:', error);
+      throw new HttpError(
+        error instanceof Error ? error.message : "Error processing webhook",
+        StatusCodes.INTERNAL_SERVER_ERROR
+      );
     }
-
-    const paymentIntentId = this.webhookGateway.getPaymentIntentId(event);
-    if (!paymentIntentId) {
-      throw new HttpError("Payment intent ID not found", StatusCodes.BAD_REQUEST);
-    }
-
-    // Update order status
-    await this.orderRepository.updateOrderStatus(
-      orderId,
-      "COMPLETED",
-      paymentIntentId,
-      "STRIPE"
-    );
-
-    // Create transaction
-    const transaction = new Transaction({
-      orderId,
-      userId,
-      amount: order.totalAmount,
-      type: isWalletTopUp ? TransactionType.WALLET_TOPUP : TransactionType.PURCHASE,
-      status: TransactionStatus.COMPLETED,
-      paymentGateway: PaymentGatewayEnum.STRIPE,
-      transactionId: paymentIntentId,
-    });
-    await this.transactionRepository.create(transaction);
-
-    // If it's a wallet top-up, update the wallet balance
-    if (isWalletTopUp) {
-      const wallet = await this.walletRepository.findByUserId(userId);
-      if (!wallet) {
-        throw new HttpError("Wallet not found", StatusCodes.NOT_FOUND);
-      }
-      wallet.addAmount(order.totalAmount);
-      await this.walletRepository.update(wallet);
-    } else {
-      // Create enrollments if courses are provided
-      if (courses && Array.isArray(courses)) {
-        await this.enrollmentRepository.create({
-          userId,
-          courseIds: courses.map(course => course.id),
-        });
-      }
-    }
-
-    return {
-      data: {
-        order,
-        transaction,
-      },
-      message: "Payment processed successfully",
-    };
   }
 } 

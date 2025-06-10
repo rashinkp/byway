@@ -4,7 +4,7 @@ import { TransactionType } from "../enum/transaction-type.enum";
 
 export class Transaction {
   private readonly _id: string;
-  private readonly _orderId: string;
+  private readonly _orderId?: string;
   private readonly _userId: string;
   private readonly _amount: number;
   private readonly _type: TransactionType;
@@ -47,7 +47,7 @@ export class Transaction {
     });
 
     this._id = params.id || crypto.randomUUID();
-    this._orderId = params.orderId || '';
+    this._orderId = params.orderId;
     this._userId = params.userId;
     this._amount = params.amount;
     this._type = params.type;
@@ -74,7 +74,7 @@ export class Transaction {
     return this._id;
   }
 
-  get orderId(): string {
+  get orderId(): string | undefined {
     return this._orderId;
   }
 

@@ -4,7 +4,7 @@ import { TransactionStatus } from "../../domain/enum/transaction-status.enum";
 export interface ITransactionRepository {
   create(transaction: Transaction): Promise<Transaction>;
   findById(id: string): Promise<Transaction | null>;
-  findByOrderId(orderId: string): Promise<Transaction[]>;
+  findByOrderId(orderId: string): Promise<Transaction | null>;
   findByUserId(
     userId: string,
     page?: number,

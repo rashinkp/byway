@@ -19,6 +19,7 @@ export const createCheckoutSessionSchema = z.object({
   courses: z.array(courseSchema).min(1, "At least one course is required").optional(),
   couponCode: z.string().optional(),
   orderId: z.string().optional(),
+  paymentMethod: z.enum(["WALLET", "STRIPE", "PAYPAL", "RAZORPAY"]).optional(),
 });
 
 export type CreateCheckoutSessionDto = z.infer<typeof createCheckoutSessionSchema>; 

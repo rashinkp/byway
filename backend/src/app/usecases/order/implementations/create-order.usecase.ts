@@ -35,7 +35,10 @@ export class CreateOrderUseCase implements ICreateOrderUseCase {
       };
     } else if (paymentMethod === "STRIPE") {
       // Create Stripe checkout session
-      const session = await this.paymentService.createStripeCheckoutSession(userId, order.id, input);
+      const session = await this.paymentService.createStripeCheckoutSession(userId, order.id, {
+        ...input,
+        userId
+      });
 
       return {
         order,

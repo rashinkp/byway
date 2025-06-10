@@ -396,26 +396,31 @@ enum RefundStatus {
 
 
 model TransactionHistory {
-  id            String          @id @default(uuid())
-  orderId       String?         // Make orderId optional
-  userId        String
-  walletId      String?         // Make walletId optional
-  courseId      String?
-  amount        Decimal
-  type          TransactionType
-  status        TransactionStatus
-  paymentGateway PaymentGateway?
-  transactionId String?
-  createdAt     DateTime        @default(now())
-  updatedAt     DateTime        @updatedAt
-  order         Order?          @relation("OrderToTransactionHistory", fields: [orderId], references: [id], onDelete: Cascade) // Make order relation optional
-  user          User            @relation("UserToTransactionHistory", fields: [userId], references: [id], onDelete: Cascade)
-  wallet        Wallet?         @relation("WalletToTransactionHistory", fields: [walletId], references: [id], onDelete: SetNull)
-  course        Course?         @relation("CourseToTransactionHistory", fields: [courseId], references: [id], onDelete: SetNull)
-  @@index([orderId])
+  id              String            @id @default(uuid())
+  orderId         String?           
+  userId          String
+  amount          Float
+  type            TransactionType
+  status          TransactionStatus
+  paymentGateway  PaymentGateway
+  paymentMethod   String?
+  paymentDetails  Json?
+  courseId        String?
+  transactionId   String?           @unique
+  metadata        Json?
+  walletId        String?
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+
+  user            User              @relation("UserToTransactionHistory", fields: [userId], references: [id])
+  order           Order?            @relation("OrderToTransactionHistory", fields: [orderId], references: [id])
+  course          Course?           @relation("CourseToTransactionHistory", fields: [courseId], references: [id])
+  wallet          Wallet?           @relation("WalletToTransactionHistory", fields: [walletId], references: [id])
+
   @@index([userId])
-  @@index([walletId])
+  @@index([orderId])
   @@index([courseId])
+  @@index([walletId])
 }
 
 enum TransactionType {
