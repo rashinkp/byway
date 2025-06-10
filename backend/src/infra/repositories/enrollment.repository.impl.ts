@@ -33,26 +33,35 @@ export class EnrollmentRepository implements IEnrollmentRepository {
   }
 
   async create(input: ICreateEnrollmentInputDTO): Promise<IEnrollmentOutputDTO[]> {
+    console.log('Creating enrollments with input:', input);
     const enrollments = await Promise.all(
       input.courseIds.map(async (courseId) => {
-        const enrollment = await this.prisma.enrollment.create({
-          data: {
-            userId: input.userId,
-            courseId,
-            enrolledAt: new Date(),
-            orderItemId: input.orderItemId,
-            accessStatus: 'ACTIVE',
-          },
-        });
-        return {
-          userId: enrollment.userId,
-          courseId: enrollment.courseId,
-          enrolledAt: enrollment.enrolledAt.toISOString(),
-          orderItemId: enrollment.orderItemId || undefined,
-          accessStatus: enrollment.accessStatus,
-        };
+        console.log('Creating enrollment for course:', courseId);
+        try {
+          const enrollment = await this.prisma.enrollment.create({
+            data: {
+              userId: input.userId,
+              courseId,
+              enrolledAt: new Date(),
+              orderItemId: input.orderItemId,
+              accessStatus: 'ACTIVE',
+            },
+          });
+          console.log('Enrollment created successfully:', enrollment);
+          return {
+            userId: enrollment.userId,
+            courseId: enrollment.courseId,
+            enrolledAt: enrollment.enrolledAt.toISOString(),
+            orderItemId: enrollment.orderItemId || undefined,
+            accessStatus: enrollment.accessStatus,
+          };
+        } catch (error) {
+          console.error('Error creating enrollment:', error);
+          throw error;
+        }
       })
     );
+    console.log('All enrollments created:', enrollments);
     return enrollments;
   }
 

@@ -14,12 +14,7 @@ export const useCreateOrder = () => {
       // Invalidate orders query to refetch the list
       queryClient.invalidateQueries({ queryKey: ["orders"] });
       
-      // Show success message
-      if (data.data.order.paymentGateway === "WALLET") {
-        toast.success("Order created and paid successfully");
-      } else {
-        toast.success("Order created successfully. Proceed with payment.");
-      }
+
     },
     onError: (error: Error) => {
       toast.error(error.message || "Failed to create order");

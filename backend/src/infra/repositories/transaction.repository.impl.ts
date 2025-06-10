@@ -80,6 +80,8 @@ export class TransactionRepository implements ITransactionRepository {
         return PaymentGateway.PAYPAL;
       case "RAZORPAY":
         return PaymentGateway.RAZORPAY;
+      case "WALLET":
+        return PaymentGateway.WALLET;
       default:
         throw new Error(`Unknown payment gateway: ${gateway}`);
     }
@@ -129,6 +131,8 @@ export class TransactionRepository implements ITransactionRepository {
         return "PAYPAL";
       case PaymentGateway.RAZORPAY:
         return "RAZORPAY";
+      case PaymentGateway.WALLET:
+        return "WALLET";
       default:
         throw new Error(`Unknown payment gateway: ${gateway}`);
     }

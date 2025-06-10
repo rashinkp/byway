@@ -34,6 +34,8 @@ export class PaymentService implements IPaymentService {
   ) {}
 
   async handleWalletPayment(userId: string, orderId: string, amount: number): Promise<ServiceResponse<{ transaction: Transaction }>> {
+    console.log('Starting wallet payment process for order:', orderId);
+    
     const wallet = await this.walletRepository.findByUserId(userId);
     if (!wallet) {
       throw new HttpError("Wallet not found", StatusCodes.NOT_FOUND);
@@ -42,9 +44,12 @@ export class PaymentService implements IPaymentService {
       throw new HttpError("Insufficient wallet balance", StatusCodes.BAD_REQUEST);
     }
 
+    console.log('Wallet found with balance:', wallet.balance.amount);
+
     // Deduct from wallet
     wallet.reduceAmount(amount);
     await this.walletRepository.update(wallet);
+    console.log('Amount deducted from wallet:', amount);
 
     // Create transaction
     const transaction = new Transaction({
@@ -56,6 +61,7 @@ export class PaymentService implements IPaymentService {
       paymentGateway: PaymentGatewayEnum.WALLET,
     });
     await this.transactionRepository.create(transaction);
+    console.log('Transaction created:', transaction.id);
 
     // Update order status
     await this.orderRepository.updateOrderStatus(
@@ -64,6 +70,38 @@ export class PaymentService implements IPaymentService {
       transaction.id,
       "WALLET"
     );
+    console.log('Order status updated to COMPLETED');
+
+    // Create enrollments for each course in the order
+    console.log('Fetching order items for enrollment creation');
+    const orderItems = await this.orderRepository.findOrderItems(orderId);
+    console.log('Found order items:', orderItems);
+
+    if (!orderItems || orderItems.length === 0) {
+      console.error('No order items found for order:', orderId);
+      throw new HttpError("No order items found", StatusCodes.NOT_FOUND);
+    }
+
+    console.log('Creating enrollments for each course');
+    for (const item of orderItems) {
+      console.log('Creating enrollment for course:', item.courseId);
+      try {
+        await this.enrollmentRepository.create({
+          userId,
+          courseIds: [item.courseId],
+          orderItemId: item.id
+        });
+        console.log('Enrollment created successfully for course:', item.courseId);
+      } catch (error) {
+        console.error('Error creating enrollment for course:', item.courseId, error);
+        throw new HttpError(
+          `Failed to create enrollment for course ${item.courseId}`,
+          StatusCodes.INTERNAL_SERVER_ERROR
+        );
+      }
+    }
+
+    console.log('All enrollments created successfully');
 
     return {
       data: {
