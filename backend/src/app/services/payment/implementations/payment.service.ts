@@ -122,12 +122,12 @@ export class PaymentService implements IPaymentService {
 
         console.log('Processing webhook for orderId:', orderId);
 
-        // For wallet top-ups, use the orderId as transactionId
-        let transaction;
-        if (isWalletTopUp) {
+        // Try to find transaction by orderId first
+        let transaction = await this.transactionRepository.findByOrderId(orderId);
+        
+        // If not found and it's a wallet top-up, try finding by transaction ID
+        if (!transaction && isWalletTopUp) {
           transaction = await this.transactionRepository.findById(orderId);
-        } else {
-          transaction = await this.transactionRepository.findByOrderId(orderId);
         }
 
         if (!transaction) {
@@ -160,6 +160,17 @@ export class PaymentService implements IPaymentService {
             throw new HttpError("Order not found", StatusCodes.NOT_FOUND);
           }
           await this.orderRepository.updateOrderStatus(orderId, "COMPLETED", session.payment_intent as string, "STRIPE");
+
+          // Create enrollments for each course in the order
+          const orderItems = await this.orderRepository.findOrderItems(orderId);
+          for (const item of orderItems) {
+            await this.enrollmentRepository.create({
+              userId: order.userId,
+              courseIds: [item.courseId],
+              orderItemId: item.id
+            });
+          }
+
           return {
             data: { order, transaction },
             message: "Payment completed successfully"

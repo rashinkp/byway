@@ -26,4 +26,5 @@ export interface IOrderRepository {
   update(order: Order): Promise<Order>;
   delete(id: string): Promise<void>;
   createOrderItems(orderId: string, courses: any[]): Promise<{ id: string; orderId: string; courseId: string }[]>;
+  findOrderItems(orderId: string): Promise<{ id: string; orderId: string; courseId: string }[]>;
 }

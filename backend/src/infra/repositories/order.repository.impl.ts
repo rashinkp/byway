@@ -325,4 +325,16 @@ export class OrderRepository implements IOrderRepository {
     );
     return orderItems;
   }
+
+  async findOrderItems(orderId: string): Promise<{ id: string; orderId: string; courseId: string }[]> {
+    const orderItems = await this.prisma.orderItem.findMany({
+      where: { orderId },
+      select: {
+        id: true,
+        orderId: true,
+        courseId: true
+      }
+    });
+    return orderItems;
+  }
 }

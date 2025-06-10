@@ -1,10 +1,10 @@
 import { CreateOrderDto } from "../../../../domain/dtos/order/create-order.dto";
 import { Order } from "../../../../domain/entities/order.entity";
-import { Transaction } from "../../../../domain/entities/transaction.entity";
+import { ITransactionOutputDTO } from "../../../../domain/dtos/transaction/transaction.dto";
 
 export interface CreateOrderResponse {
   order: Order;
-  transaction?: Transaction;
+  transaction?: ITransactionOutputDTO;
   session?: {
     id: string;
     url: string;

@@ -5,6 +5,7 @@ import { PaymentService } from "../app/services/payment/implementations/payment.
 import { StripePaymentGateway } from "../infra/providers/stripe-payment.gateway";
 import { StripeWebhookGateway } from "../infra/providers/stripe-webhook.gateway";
 import { GetAllOrdersUseCase } from "../app/usecases/order/implementations/get-all-orders.use-case";
+import { CreateTransactionUseCase } from "../app/usecases/transaction/implementations/create-transaction.usecase";
 
 export interface OrderDependencies {
   orderController: OrderController;
@@ -28,9 +29,11 @@ export function createOrderDependencies(
   );
 
   // Initialize use cases
+  const createTransactionUseCase = new CreateTransactionUseCase(deps.transactionRepository);
   const createOrderUseCase = new CreateOrderUseCase(
     deps.orderRepository,
-    paymentService
+    paymentService,
+    createTransactionUseCase
   );
 
   const getAllOrdersUseCase = new GetAllOrdersUseCase(deps.orderRepository);
