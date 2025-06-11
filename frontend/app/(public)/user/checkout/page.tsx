@@ -143,7 +143,8 @@ export default function CheckoutPage() {
         if (response.data.session?.url) {
           window.location.href = response.data.session.url;
         } else {
-          router.push("/user/my-orders");
+          // For wallet payments, redirect to success page
+          router.push(`/success?order_id=${response.data.order.id}&type=wallet-payment`);
         }
       }
     } catch (error: any) {

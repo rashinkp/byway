@@ -3,9 +3,9 @@
 import { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
 import { AlertCircle, ArrowLeft, ShoppingBag } from "lucide-react";
 import Link from "next/link";
+import { motion } from "framer-motion";
 
 export default function PaymentFailedPage() {
   const searchParams = useSearchParams();
@@ -19,25 +19,34 @@ export default function PaymentFailedPage() {
   }, [searchParams]);
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
-      <Card className="w-full max-w-md p-6 space-y-6">
-        <div className="text-center space-y-4">
-          <div className="flex justify-center">
+    <div className="min-h-screen bg-gray-50/50 flex items-center justify-center p-4">
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+        className="max-w-md w-full bg-white rounded-xl shadow-lg p-8 text-center"
+      >
+        <div className="flex justify-center mb-6">
+          <motion.div
+            initial={{ scale: 0 }}
+            animate={{ scale: 1 }}
+            transition={{ delay: 0.2, type: "spring" }}
+          >
             <AlertCircle className="h-16 w-16 text-red-500" />
-          </div>
-          <h1 className="text-2xl font-bold text-gray-900">Payment Failed</h1>
-          {error && (
-            <p className="text-sm text-gray-600 bg-red-50 p-3 rounded-md">
-              {error}
-            </p>
-          )}
+          </motion.div>
         </div>
+
+        <h1 className="text-2xl font-bold text-gray-900 mb-4">Payment Failed</h1>
+        {error && (
+          <p className="text-gray-600 mb-8 bg-red-50 p-4 rounded-lg text-sm">
+            {error}
+          </p>
+        )}
 
         <div className="space-y-4">
           <Link href="/user/my-orders" className="block">
             <Button
-              className="w-full flex items-center justify-center gap-2"
-              variant="default"
+              className="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors flex items-center justify-center gap-2"
             >
               <ShoppingBag className="h-4 w-4" />
               View Orders
@@ -46,8 +55,7 @@ export default function PaymentFailedPage() {
 
           <Link href="/" className="block">
             <Button
-              className="w-full flex items-center justify-center gap-2"
-              variant="ghost"
+              className="w-full bg-gray-100 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-200 transition-colors flex items-center justify-center gap-2"
             >
               <ArrowLeft className="h-4 w-4" />
               Back to Home
@@ -55,13 +63,13 @@ export default function PaymentFailedPage() {
           </Link>
         </div>
 
-        <div className="text-center text-sm text-gray-500">
+        <div className="mt-8 text-center text-sm text-gray-500">
           <p>Need help? Contact our support team</p>
           <Link href="/contact" className="text-blue-600 hover:underline">
             Contact Support
           </Link>
         </div>
-      </Card>
+      </motion.div>
     </div>
   );
 } 

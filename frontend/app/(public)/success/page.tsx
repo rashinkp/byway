@@ -12,13 +12,15 @@ const SuccessPage = () => {
   const searchParams = useSearchParams();
   const { user } = useAuth();
   const sessionId = searchParams.get("session_id");
+  const orderId = searchParams.get("order_id");
   const isWalletTopUp = searchParams.get("type") === "wallet-topup";
+  const isWalletPayment = searchParams.get("type") === "wallet-payment";
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const verifySession = async () => {
-      if (!sessionId) {
+      if (!sessionId && !orderId) {
         setIsLoading(false);
         return;
       }
@@ -27,7 +29,7 @@ const SuccessPage = () => {
         toast.success("Payment verified successfully!");
         setIsLoading(false);
       } catch (err) {
-        console.error("Error verifying Stripe session:", err);
+        console.error("Error verifying payment:", err);
         toast.warning(
           "Payment completed, but verification encountered an issue"
         );
@@ -36,7 +38,7 @@ const SuccessPage = () => {
     };
 
     verifySession();
-  }, [sessionId]);
+  }, [sessionId, orderId]);
 
   const handleGoToCourses = () => {
     router.push("/user/my-courses");
@@ -89,45 +91,59 @@ const SuccessPage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gray-50/50 flex items-center justify-center p-4">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
-        className="max-w-md w-full bg-white rounded-lg shadow-lg p-8 text-center"
+        className="max-w-md w-full bg-white rounded-xl shadow-lg p-8 text-center"
       >
-        <motion.div
-          initial={{ scale: 0 }}
-          animate={{ scale: 1 }}
-          transition={{
-            delay: 0.2,
-            type: "spring",
-            stiffness: 200,
-            damping: 20,
-          }}
-        >
-          {isWalletTopUp ? (
-            <WalletIcon className="h-16 w-16 text-green-500 mx-auto" />
-          ) : (
-            <CheckCircleIcon className="h-16 w-16 text-green-500 mx-auto" />
-          )}
-        </motion.div>
-        <h1 className="mt-4 text-2xl font-bold text-gray-900">
-          {isWalletTopUp ? "Wallet Top-up Successful!" : "Payment Successful!"}
-        </h1>
-        <p className="mt-2 text-gray-600">
+        <div className="flex justify-center mb-6">
+          <motion.div
+            initial={{ scale: 0 }}
+            animate={{ scale: 1 }}
+            transition={{ delay: 0.2, type: "spring" }}
+          >
+            {isWalletTopUp ? (
+              <WalletIcon className="h-16 w-16 text-green-500" />
+            ) : (
+              <CheckCircleIcon className="h-16 w-16 text-green-500" />
+            )}
+          </motion.div>
+        </div>
+
+        <h1 className="text-2xl font-bold text-gray-900 mb-4">
           {isWalletTopUp
-            ? "Your wallet has been topped up successfully. You can now use your wallet balance for purchases."
-            : "Thank you for your purchase. Your courses are now available in your account."}
+            ? "Wallet Top-up Successful!"
+            : isWalletPayment
+            ? "Payment Successful!"
+            : "Payment Successful!"}
+        </h1>
+
+        <p className="text-gray-600 mb-8">
+          {isWalletTopUp
+            ? "Your wallet has been topped up successfully."
+            : isWalletPayment
+            ? "Your course purchase was successful. You can now access your courses."
+            : "Your payment was successful. You can now access your courses."}
         </p>
-        <motion.button
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-          onClick={isWalletTopUp ? handleGoToWallet : handleGoToCourses}
-          className="mt-6 px-6 py-3 bg-blue-700 text-white rounded-lg hover:bg-blue-800 transition-colors"
-        >
-          {isWalletTopUp ? "Go to Wallet" : "Go to My Courses"}
-        </motion.button>
+
+        <div className="space-y-4">
+          {!isWalletTopUp && (
+            <button
+              onClick={handleGoToCourses}
+              className="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors"
+            >
+              Go to My Courses
+            </button>
+          )}
+          <button
+            onClick={handleGoToWallet}
+            className="w-full bg-gray-100 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-200 transition-colors"
+          >
+            Go to Wallet
+          </button>
+        </div>
       </motion.div>
     </div>
   );
