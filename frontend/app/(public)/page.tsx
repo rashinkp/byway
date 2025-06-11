@@ -1,12 +1,26 @@
+'use client'
+
 import { CategoryCard } from "@/components/category/CategoryCard";
-import { CourseCard } from "@/components/course/CourseCard";
 import { TopCourses } from "@/components/course/TopCourseList";
 import { StatsCard } from "@/components/DashboardStats";
 import { HeroSection } from "@/components/HeroSection";
 import { TopInstructors } from "@/components/instructor/TopInstructor";
 import { Atom, Code, Megaphone, Telescope } from "lucide-react";
+import { useCategories } from "@/hooks/category/useCategories";
+import { useRouter } from "next/navigation";
 
 export default function UserDashboard() {
+  const router = useRouter();
+  const { data: categoriesData, isLoading: isCategoriesLoading } = useCategories({
+    page: 1,
+    limit: 4,
+    filterBy: "Active"
+  });
+
+  const handleCategoryClick = (categoryId: string) => {
+    router.push(`/courses?category=${categoryId}`);
+  };
+
   const topCourses = [
     {
       id: "1",
@@ -118,80 +132,67 @@ export default function UserDashboard() {
     { value: "2400+", description: "Courses by our best mentors" },
   ];
 
-  const categories = [
+  const categories = categoriesData?.items.map(category => ({
+    id: category.id,
+    name: category.name,
+    courseCount: 0, // This will need to be updated when we have course count data
+    icon: <Code className="w-5 h-5 text-blue-500" />, // Default icon, can be customized based on category
+  })) || [];
+
+  const topInstructors = [
     {
-      name: "Astrology",
-      courseCount: 11,
-      icon: <Telescope className="w-5 h-5 text-blue-500" />,
-    },
-    {
-      name: "Development",
+      image:
+        "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80",
+      name: "Jacob Jones",
+      role: "UI/UX Designer",
       courseCount: 12,
-      icon: <Code className="w-5 h-5 text-blue-500" />,
     },
     {
-      name: "Marketing",
-      courseCount: 12,
-      icon: <Megaphone className="w-5 h-5 text-blue-500" />,
+      image:
+        "https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80",
+      name: "Jenny Wilson",
+      role: "Developer",
+      courseCount: 15,
     },
     {
-      name: "Physics",
-      courseCount: 14,
-      icon: <Atom className="w-5 h-5 text-blue-500" />,
+      image:
+        "https://images.unsplash.com/photo-1517841903200-7a706fc245bc?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80",
+      name: "Ronald Richards",
+      role: "Marketer",
+      courseCount: 10,
+    },
+    {
+      image:
+        "https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80",
+      name: "Esther Howard",
+      role: "Astrologer",
+      courseCount: 8,
+    },
+    {
+      image:
+        "https://images.unsplash.com/photo-1517841903200-7a706fc245bc?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80",
+      name: "Ronald Richards",
+      role: "Marketer",
+      courseCount: 10,
+    },
+    {
+      image:
+        "https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80",
+      name: "Esther Howard",
+      role: "Astrologer",
+      courseCount: 8,
     },
   ];
-
-
-   const topInstructors = [
-     {
-       image:
-         "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80",
-       name: "Jacob Jones",
-       role: "UI/UX Designer",
-       courseCount: 12,
-     },
-     {
-       image:
-         "https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80",
-       name: "Jenny Wilson",
-       role: "Developer",
-       courseCount: 15,
-     },
-     {
-       image:
-         "https://images.unsplash.com/photo-1517841903200-7a706fc245bc?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80",
-       name: "Ronald Richards",
-       role: "Marketer",
-       courseCount: 10,
-     },
-     {
-       image:
-         "https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80",
-       name: "Esther Howard",
-       role: "Astrologer",
-       courseCount: 8,
-     },
-     {
-       image:
-         "https://images.unsplash.com/photo-1517841903200-7a706fc245bc?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80",
-       name: "Ronald Richards",
-       role: "Marketer",
-       courseCount: 10,
-     },
-     {
-       image:
-         "https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80",
-       name: "Esther Howard",
-       role: "Astrologer",
-       courseCount: 8,
-     },
-   ];
 
   return (
     <div className="container mx-auto px-4 py-8">
       <HeroSection className="mb-12" />
       <StatsCard stats={stats} className="mb-8" />
-      <CategoryCard categories={categories} className="mb-8" />
+      <CategoryCard 
+        categories={categories} 
+        className="mb-8" 
+        onCategoryClick={handleCategoryClick}
+      />
       <TopCourses courses={topCourses} className="mb-8" />
       <TopInstructors instructors={topInstructors} className="mb-8" />
     </div>

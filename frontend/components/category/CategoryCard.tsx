@@ -1,8 +1,8 @@
-import { Telescope, Code, Megaphone, Atom } from "lucide-react";
 import { cn } from "@/utils/cn";
 import Link from "next/link";
 
 interface Category {
+  id: string;
   name: string;
   courseCount: number;
   icon: React.ReactNode;
@@ -11,9 +11,10 @@ interface Category {
 interface CategoryCardProps {
   categories: Category[];
   className?: string;
+  onCategoryClick?: (categoryId: string) => void;
 }
 
-export function CategoryCard({ categories, className }: CategoryCardProps) {
+export function CategoryCard({ categories, className, onCategoryClick }: CategoryCardProps) {
   return (
     <div className={cn("p-6", className)}>
       {/* Header */}
@@ -28,10 +29,11 @@ export function CategoryCard({ categories, className }: CategoryCardProps) {
 
       {/* Categories Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        {categories.map((category, index) => (
+        {categories.map((category) => (
           <div
-            key={index}
-            className="flex items-center gap-4 p-4 bg-blue-50 rounded-lg border border-blue-100 hover:bg-blue-100 transition-colors duration-200"
+            key={category.id}
+            onClick={() => onCategoryClick?.(category.id)}
+            className="flex items-center gap-4 p-4 bg-blue-50 rounded-lg border border-blue-100 hover:bg-blue-100 transition-colors duration-200 cursor-pointer"
           >
             {/* Icon */}
             <div className="w-10 h-10 flex items-center justify-center bg-blue-100 rounded-full">
@@ -43,9 +45,6 @@ export function CategoryCard({ categories, className }: CategoryCardProps) {
               <h3 className="text-base font-medium text-gray-800">
                 {category.name}
               </h3>
-              <p className="text-sm text-gray-500">
-                {category.courseCount} courses
-              </p>
             </div>
           </div>
         ))}
