@@ -72,16 +72,12 @@ export interface OrderItem {
   };
 }
 
-export async function getOrders(params: GetOrdersParams = {}): Promise<OrdersResponse> {
-  try {
-    const response = await api.get<{ data: OrdersResponse }>("/orders", { params });
-    return response.data.data;
-  } catch (error: any) {
-    console.error("Get orders error:", {
-      status: error.response?.status,
-      data: error.response?.data,
-      message: error.message
-    });
-    throw new Error(error.response?.data?.message || "Failed to fetch orders");
-  }
+export async function getOrders(params: GetOrdersParams): Promise<ApiResponse<OrdersResponse>> {
+  const response = await api.get("/orders", { params });
+  return response.data;
+}
+
+export async function retryOrder(orderId: string): Promise<{ data: { session: { url: string } } }> {
+  const response = await api.post(`/orders/${orderId}/retry`);
+  return response.data;
 }

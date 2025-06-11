@@ -21,7 +21,7 @@ export function useOrders(): UseOrdersResult {
     setError(null);
     try {
       const response = await getOrders(params);
-      setOrders(response);
+      setOrders(response.data);
       setCurrentParams(params);
     } catch (err: any) {
       setError(err.message);

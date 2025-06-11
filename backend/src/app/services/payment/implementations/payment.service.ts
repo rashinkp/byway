@@ -66,9 +66,9 @@ export class PaymentService implements IPaymentService {
     // Update order status
     await this.orderRepository.updateOrderStatus(
       orderId,
-      "COMPLETED",
+      OrderStatus.COMPLETED,
       transaction.id,
-      "WALLET"
+      PaymentGatewayEnum.WALLET
     );
     console.log('Order status updated to COMPLETED');
 
@@ -149,6 +149,67 @@ export class PaymentService implements IPaymentService {
 
   async handleStripeWebhook(event: WebhookEvent): Promise<ServiceResponse<{ order?: any; transaction?: Transaction }>> {
     try {
+      console.log('Processing webhook event:', event.type);
+
+      // Handle payment failures
+      if (event.type === 'payment_intent.payment_failed' || event.type === 'charge.failed') {
+        console.log('=== Payment Failure Handler Start ===');
+        const paymentIntentId = event.data.object.payment_intent || event.data.object.id;
+        console.log('Payment failed for intent:', paymentIntentId);
+        console.log('Event data:', JSON.stringify(event.data.object, null, 2));
+
+        // Get session metadata to find orderId
+        console.log('Fetching session metadata...');
+        const metadata = await this.webhookGateway.getCheckoutSessionMetadata(paymentIntentId);
+        console.log('Session metadata:', metadata);
+        const orderId = metadata.orderId;
+
+        if (!orderId) {
+          console.error('No order ID found in session metadata');
+          throw new HttpError("No order ID found in session metadata", StatusCodes.BAD_REQUEST);
+        }
+        console.log('Found orderId:', orderId);
+
+        // Find and update transaction
+        console.log('Finding transaction for orderId:', orderId);
+        const transaction = await this.transactionRepository.findByOrderId(orderId);
+        console.log('Found transaction:', transaction);
+
+        if (transaction) {
+          console.log('Updating transaction status to FAILED...');
+          await this.transactionRepository.updateStatus(transaction.id, TransactionStatus.FAILED);
+          console.log('Transaction status updated to FAILED');
+        } else {
+          console.log('No transaction found for orderId:', orderId);
+        }
+
+        // Update order status
+        console.log('Updating order status to FAILED...');
+        const order = await this.orderRepository.findById(orderId);
+        if (!order) {
+          console.error('Order not found:', orderId);
+          throw new HttpError("Order not found", StatusCodes.NOT_FOUND);
+        }
+
+        await this.orderRepository.updateOrderStatus(
+          orderId,
+          OrderStatus.FAILED,
+          paymentIntentId,
+          PaymentGatewayEnum.STRIPE
+        );
+        console.log('Order status updated to FAILED');
+
+        console.log('=== Payment Failure Handler End ===');
+        return {
+          data: { 
+            order: order.toJSON(),
+            transaction: transaction || undefined 
+          },
+          message: "Payment failure handled"
+        };
+      }
+
+      // Handle successful payments
       if (event.type === 'checkout.session.completed') {
         const session = event.data.object as Stripe.Checkout.Session;
         const orderId = session.metadata?.orderId;
@@ -197,7 +258,12 @@ export class PaymentService implements IPaymentService {
           if (!order) {
             throw new HttpError("Order not found", StatusCodes.NOT_FOUND);
           }
-          await this.orderRepository.updateOrderStatus(orderId, "COMPLETED", session.payment_intent as string, "STRIPE");
+          await this.orderRepository.updateOrderStatus(
+            orderId,
+            OrderStatus.COMPLETED,
+            session.payment_intent as string,
+            PaymentGatewayEnum.STRIPE
+          );
 
           // Create enrollments for each course in the order
           const orderItems = await this.orderRepository.findOrderItems(orderId);
@@ -214,6 +280,51 @@ export class PaymentService implements IPaymentService {
             message: "Payment completed successfully"
           };
         }
+      }
+
+      // Handle expired checkout sessions
+      if (event.type === 'checkout.session.expired') {
+        const session = event.data.object as Stripe.Checkout.Session;
+        const orderId = session.metadata?.orderId;
+        const isWalletTopUp = session.metadata?.isWalletTopUp === 'true';
+
+        if (orderId) {
+          // Find and update transaction
+          let transaction = await this.transactionRepository.findByOrderId(orderId);
+          if (!transaction && isWalletTopUp) {
+            transaction = await this.transactionRepository.findById(orderId);
+          }
+
+          if (transaction) {
+            await this.transactionRepository.updateStatus(transaction.id, TransactionStatus.FAILED);
+            console.log('Transaction status updated to FAILED due to expired session');
+          }
+
+          // Update order status if it's not a wallet top-up
+          if (!isWalletTopUp) {
+            await this.orderRepository.updateOrderStatus(
+              orderId,
+              OrderStatus.FAILED,
+              session.payment_intent as string,
+              PaymentGatewayEnum.STRIPE
+            );
+            console.log('Order status updated to FAILED due to expired session');
+          }
+        }
+
+        return {
+          data: {},
+          message: "Checkout session expired"
+        };
+      }
+
+      // Handle payment intent created
+      if (event.type === 'payment_intent.created') {
+        console.log('Payment intent created:', event.data.object.id);
+        return {
+          data: {},
+          message: "Payment intent created"
+        };
       }
 
       return {

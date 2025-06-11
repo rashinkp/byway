@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { RefreshCw, Clock, Calendar, DollarSign, XCircle } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { StatusBadge } from "./StatusBadge";
@@ -7,47 +7,17 @@ import { useCreateOrder } from "@/hooks/order/useCreateOrder";
 import { toast } from "sonner";
 import { formatDate, formatPrice } from "@/utils/formatters";
 import { Button } from "@/components/ui/button";
+import { useRetryOrder } from "@/hooks/order/useRetryOrder";
 
 interface OrderCardProps {
   order: Order;
-  isRetrying: boolean;
 }
 
-export const OrderCard: React.FC<OrderCardProps> = ({
-  order,
-  isRetrying,
-}) => {
-  const { mutateAsync: createOrder } = useCreateOrder();
+export function OrderCard({ order }: OrderCardProps) {
+  const { mutate: retryOrder, isPending: isRetrying } = useRetryOrder();
 
-  const handleRetryPayment = async () => {
-    try {
-      const coursesInput = order.items.map(item => ({
-        id: item.courseId,
-        title: item.title || 'Unknown Course',
-        description: item.description || 'No description available',
-        price: item.price || 0,
-        offer: item.coursePrice,
-        thumbnail: item.thumbnail || '',
-        duration: '',
-        level: item.level || 'BEGINNER',
-        lectures: 0,
-        creator: {
-          name: 'Unknown'
-        }
-      }));
-
-      const response = await createOrder({
-        courses: coursesInput,
-        paymentMethod: "STRIPE"
-      });
-
-      if (response.data.session?.url) {
-        window.location.href = response.data.session.url;
-      }
-    } catch (error) {
-      console.error("Failed to retry payment:", error);
-      toast.error("Failed to retry payment. Please try again later.");
-    }
+  const handleRetry = () => {
+    retryOrder(order.id);
   };
 
   const getLevelColor = (level: string): string => {
@@ -76,8 +46,28 @@ export const OrderCard: React.FC<OrderCardProps> = ({
             </p>
           </div>
           <div className="flex items-center gap-2">
-            {/* <StatusBadge status={order.orderStatus} type="order" /> */}
             <StatusBadge status={order.paymentStatus} type="payment" />
+            {order.paymentStatus === "FAILED" && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleRetry}
+                disabled={isRetrying}
+                className="text-blue-600 hover:text-blue-700"
+              >
+                {isRetrying ? (
+                  <>
+                    <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
+                    Retrying...
+                  </>
+                ) : (
+                  <>
+                    <RefreshCw className="w-4 h-4 mr-2" />
+                    Retry Payment
+                  </>
+                )}
+              </Button>
+            )}
           </div>
         </div>
       </div>
@@ -133,29 +123,8 @@ export const OrderCard: React.FC<OrderCardProps> = ({
               {formatPrice(order.amount)}
             </p>
           </div>
-          {order.paymentStatus === "FAILED" && (
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={handleRetryPayment}
-              disabled={isRetrying}
-              className="text-blue-600 hover:text-blue-700"
-            >
-              {isRetrying ? (
-                <>
-                  <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
-                  Retrying...
-                </>
-              ) : (
-                <>
-                  <RefreshCw className="w-4 h-4 mr-2" />
-                  Retry Payment
-                </>
-              )}
-            </Button>
-          )}
         </div>
       </div>
     </div>
   );
-}; 
+} 

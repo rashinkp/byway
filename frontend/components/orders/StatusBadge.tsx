@@ -1,5 +1,5 @@
 import React from "react";
-import { CheckCircle, Clock, XCircle, AlertCircle } from "lucide-react";
+import { Clock, CheckCircle, XCircle, AlertCircle } from "lucide-react";
 
 interface StatusBadgeProps {
   status: string;
@@ -41,6 +41,13 @@ export const StatusBadge: React.FC<StatusBadgeProps> = ({
             bg: "bg-red-50",
             text: "Failed",
           };
+        case "REFUNDED":
+          return {
+            icon: AlertCircle,
+            color: "text-purple-600",
+            bg: "bg-purple-50",
+            text: "Refunded",
+          };
         default:
           return {
             icon: AlertCircle,
@@ -65,12 +72,26 @@ export const StatusBadge: React.FC<StatusBadgeProps> = ({
             bg: "bg-yellow-50",
             text: "Pending",
           };
+        case "CONFIRMED":
+          return {
+            icon: CheckCircle,
+            color: "text-blue-600",
+            bg: "bg-blue-50",
+            text: "Confirmed",
+          };
         case "FAILED":
           return {
             icon: XCircle,
             color: "text-red-600",
             bg: "bg-red-50",
             text: "Failed",
+          };
+        case "CANCELLED":
+          return {
+            icon: XCircle,
+            color: "text-gray-600",
+            bg: "bg-gray-50",
+            text: "Cancelled",
           };
         default:
           return {

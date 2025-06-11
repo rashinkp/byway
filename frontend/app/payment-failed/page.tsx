@@ -1,19 +1,15 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useSearchParams, useRouter } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { AlertCircle, ArrowLeft, RefreshCw, ShoppingBag } from "lucide-react";
+import { AlertCircle, ArrowLeft, ShoppingBag } from "lucide-react";
 import Link from "next/link";
-import { useCreateOrder } from "@/hooks/order/useCreateOrder";
 
 export default function PaymentFailedPage() {
   const searchParams = useSearchParams();
-  const router = useRouter();
   const [error, setError] = useState<string>("");
-  const { mutateAsync: createOrder } = useCreateOrder();
-  const orderId = searchParams.get("order_id");
 
   useEffect(() => {
     const errorMessage = searchParams.get("error");
@@ -21,22 +17,6 @@ export default function PaymentFailedPage() {
       setError(decodeURIComponent(errorMessage));
     }
   }, [searchParams]);
-
-  const handleRetry = async () => {
-    if (orderId) {
-      try {
-        const response = await createOrder({
-          courses: [],
-          paymentMethod: "STRIPE"
-        });
-        if (response.data.session?.url) {
-          window.location.href = response.data.session.url;
-        }
-      } catch (error) {
-        console.error("Failed to retry payment:", error);
-      }
-    }
-  };
 
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
@@ -54,19 +34,10 @@ export default function PaymentFailedPage() {
         </div>
 
         <div className="space-y-4">
-          <Button
-            onClick={handleRetry}
-            className="w-full flex items-center justify-center gap-2"
-            variant="default"
-          >
-            <RefreshCw className="h-4 w-4" />
-            Retry Payment
-          </Button>
-
           <Link href="/user/my-orders" className="block">
             <Button
               className="w-full flex items-center justify-center gap-2"
-              variant="outline"
+              variant="default"
             >
               <ShoppingBag className="h-4 w-4" />
               View Orders

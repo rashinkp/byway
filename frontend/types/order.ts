@@ -22,6 +22,8 @@ export interface OrderItem {
   updatedAt: string;
 }
 
+export type OrderStatus = "PENDING" | "COMPLETED" | "FAILED" | "REFUNDED";
+
 export interface Order {
   id: string;
   userId: string;

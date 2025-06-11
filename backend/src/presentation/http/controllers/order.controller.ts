@@ -1,6 +1,7 @@
 import { BaseController } from "./base.controller";
 import { IGetAllOrdersUseCase } from "../../../app/usecases/order/interfaces/get-all-orders.usecase.interface";
 import { ICreateOrderUseCase } from "../../../app/usecases/order/interfaces/create-order.usecase.interface";
+import { IRetryOrderUseCase } from "../../../app/usecases/order/interfaces/retry-order.usecase.interface";
 import { IHttpErrors } from "../interfaces/http-errors.interface";
 import { IHttpSuccess } from "../interfaces/http-success.interface";
 import { validateGetAllOrders } from "../../validators/order.validators";
@@ -14,6 +15,7 @@ export class OrderController extends BaseController {
   constructor(
     private getAllOrdersUseCase: IGetAllOrdersUseCase,
     private createOrderUseCase: ICreateOrderUseCase,
+    private retryOrderUseCase: IRetryOrderUseCase,
     httpErrors: IHttpErrors,
     httpSuccess: IHttpSuccess
   ) {
@@ -43,6 +45,23 @@ export class OrderController extends BaseController {
       const validatedData = await CreateOrderDtoSchema.parseAsync(request.body);
       const result = await this.createOrderUseCase.execute(userId, validatedData);
       return this.success_201(result, "Order created successfully");
+    });
+  }
+
+  async retryOrder(httpRequest: IHttpRequest): Promise<IHttpResponse> {
+    return this.handleRequest(httpRequest, async (request) => {
+      const userId = request.user?.id;
+      if (!userId) {
+        throw new BadRequestError("User ID is required");
+      }
+
+      const orderId = request.params?.orderId;
+      if (!orderId) {
+        throw new BadRequestError("Order ID is required");
+      }
+
+      const result = await this.retryOrderUseCase.execute(userId, orderId);
+      return this.success_200(result, "Order retry initiated successfully");
     });
   }
 } 

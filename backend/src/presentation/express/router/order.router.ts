@@ -24,5 +24,14 @@ export function orderRouter(orderController: OrderController): Router {
     )
   );
 
+  // Retry a failed order
+  router.post("/:orderId/retry", restrictTo("USER"), (req, res) =>
+    expressAdapter(
+      req,
+      res,
+      orderController.retryOrder.bind(orderController)
+    )
+  );
+
   return router;
 } 

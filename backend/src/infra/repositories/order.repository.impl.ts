@@ -1,16 +1,12 @@
 import { PrismaClient } from "@prisma/client";
 import { IOrderRepository } from "../../app/repositories/order.repository";
 import { Order } from "../../domain/entities/order.entity";
-import { OrderItem } from "../../domain/entities/order-item.entity";
 import { Course } from "../../domain/entities/course.entity";
 import { v4 as uuidv4 } from "uuid";
 import { OrderStatus } from "../../domain/enum/order-status.enum";
 import { PaymentStatus } from "../../domain/enum/payment-status.enum";
 import { PaymentGateway } from "../../domain/enum/payment-gateway.enum";
 import { GetAllOrdersDto } from "../../domain/dtos/order/order.dto";
-import { Price } from "../../domain/value-object/price";
-import { Duration } from "../../domain/value-object/duration";
-import { Offer } from "../../domain/value-object/offer";
 
 export class OrderRepository implements IOrderRepository {
   constructor(private prisma: PrismaClient) {}
@@ -27,7 +23,7 @@ export class OrderRepository implements IOrderRepository {
     const where = {
       userId,
       ...(filters.status && filters.status !== "ALL"
-        ? { orderStatus: filters.status as OrderStatus }
+        ? { orderStatus: filters.status as "PENDING" | "CONFIRMED" | "CANCELLED" }
         : {}),
       ...(filters.startDate && filters.endDate
         ? {
@@ -45,7 +41,7 @@ export class OrderRepository implements IOrderRepository {
             },
           }
         : {}),
-    };
+    } as const;
 
     const [orders, total] = await Promise.all([
       this.prisma.order.findMany({
@@ -205,19 +201,34 @@ export class OrderRepository implements IOrderRepository {
 
   async updateOrderStatus(
     orderId: string,
-    status: "PENDING" | "COMPLETED" | "FAILED" | "CANCELLED",
+    status: OrderStatus,
     paymentId: string,
-    paymentGateway: "STRIPE" | "RAZORPAY"
+    paymentGateway: PaymentGateway
   ): Promise<void> {
+    const paymentStatus = this.mapOrderStatusToPaymentStatus(status);
     await this.prisma.order.update({
       where: { id: orderId },
       data: {
-        paymentStatus: status as any,
+        orderStatus: status,
+        paymentStatus,
         paymentId,
-        paymentGateway: paymentGateway as any,
+        paymentGateway,
         updatedAt: new Date(),
       },
     });
+  }
+
+  private mapOrderStatusToPaymentStatus(orderStatus: OrderStatus): PaymentStatus {
+    switch (orderStatus) {
+      case OrderStatus.COMPLETED:
+        return PaymentStatus.COMPLETED;
+      case OrderStatus.FAILED:
+        return PaymentStatus.FAILED;
+      case OrderStatus.REFUNDED:
+        return PaymentStatus.REFUNDED;
+      default:
+        return PaymentStatus.PENDING;
+    }
   }
 
   async findMany(params: { where: any; skip: number; take: number; orderBy: any; include?: any }): Promise<Order[]> {
@@ -234,7 +245,7 @@ export class OrderRepository implements IOrderRepository {
       data: {
         id: order.id,
         userId: order.userId,
-        orderStatus: order.status,
+        orderStatus: order.status as "PENDING" | "CONFIRMED" | "CANCELLED",
         paymentStatus: order.paymentStatus,
         paymentId: order.paymentIntentId,
         paymentGateway: order.paymentGateway,
@@ -266,7 +277,7 @@ export class OrderRepository implements IOrderRepository {
     const updatedOrder = await this.prisma.order.update({
       where: { id: order.id },
       data: {
-        orderStatus: order.status,
+        orderStatus: order.status as "PENDING" | "CONFIRMED" | "CANCELLED",
         paymentStatus: order.paymentStatus,
         paymentId: order.paymentIntentId,
         paymentGateway: order.paymentGateway,
@@ -340,5 +351,12 @@ export class OrderRepository implements IOrderRepository {
       orderId: item.orderId,
       courseId: item.courseId
     }));
+  }
+
+  async findCourseById(courseId: string): Promise<Course | null> {
+    const course = await this.prisma.course.findUnique({
+      where: { id: courseId }
+    });
+    return course ? Course.fromPrisma(course) : null;
   }
 }
