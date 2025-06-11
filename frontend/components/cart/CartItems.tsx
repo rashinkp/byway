@@ -17,7 +17,7 @@ export function CartItems({
   onRemoveCourse,
 }: CartItemsProps) {
   return (
-    <div className="bg-white rounded-lg shadow-sm overflow-hidden">
+    <>
       {cart.map((item, index) => (
         <div key={index}>
           {isRemoving && removingCourseId === item.courseId ? (
@@ -31,6 +31,6 @@ export function CartItems({
           )}
         </div>
       ))}
-    </div>
+    </>
   );
 }

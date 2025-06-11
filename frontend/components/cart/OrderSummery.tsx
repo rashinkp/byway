@@ -1,82 +1,59 @@
-import { Course, ICart } from "@/types/cart";
-import { ChevronRight, HelpCircle } from "lucide-react";
-import Link from "next/link";
-import { useCallback } from "react";
+import { ICart } from "@/types/cart";
+import { Receipt, HelpCircle } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
+import Link from "next/link";
 
 interface OrderSummaryProps {
   cart: ICart[];
 }
 
-export const OrderSummary = ({ cart }: OrderSummaryProps) => {
-  const calculateSubtotal = useCallback((): number => {
-    return (
-      cart?.reduce(
-        (total, item) =>
-          total +
-          (typeof item?.course?.offer === "string"
-            ? parseFloat(item.course?.offer)
-            : typeof item?.course?.offer === "number"
-            ? item.course?.offer
-            : 0),
-        0
-      ) ?? 0
-    );
-  }, [cart]);
+export function OrderSummary({ cart }: OrderSummaryProps) {
+  const formatPrice = (price: number | string | undefined): string => {
+    if (typeof price === 'string') {
+      return `₹${parseFloat(price).toFixed(2)}`;
+    }
+    if (typeof price === 'number') {
+      return `₹${price.toFixed(2)}`;
+    }
+    return '₹0.00';
+  };
 
-  const calculateTax = useCallback((): number => {
-    return calculateSubtotal() * 0.07;
-  }, [calculateSubtotal]);
+  const subtotal = cart.reduce(
+    (total, item) => total + (item.course?.offer || item.course?.price || 0),
+    0
+  );
 
-  const calculateTotal = useCallback((): number => {
-    return calculateSubtotal() + calculateTax();
-  }, [calculateSubtotal, calculateTax]);
+  const total = subtotal;
 
   return (
-    <div className="bg-white/80 backdrop-blur-sm border border-gray-100 shadow-sm rounded-xl p-6 sticky top-24">
-      <div className="flex items-center gap-2 text-gray-900 mb-4">
-        <h2 className="text-xl font-semibold">Order Summary</h2>
+    <div className="bg-white rounded-lg shadow-sm p-6">
+      <div className="flex items-center gap-2 mb-6">
+        <Receipt className="h-5 w-5 text-primary" />
+        <h2 className="text-lg font-semibold">Order Summary</h2>
       </div>
-      <Separator className="mb-4" />
-      <div className="space-y-3">
-        <div className="flex justify-between">
-          <span className="text-gray-600">Subtotal</span>
-          <span className="text-gray-800">${calculateSubtotal().toFixed(2)}</span>
+
+      <div className="space-y-4">
+        <div className="flex justify-between text-sm">
+          <span className="text-muted-foreground">Subtotal</span>
+          <span className="font-medium">{formatPrice(subtotal)}</span>
         </div>
-        <div className="flex justify-between">
-          <span className="text-gray-600">Tax (7%)</span>
-          <span className="text-gray-800">${calculateTax().toFixed(2)}</span>
+
+        <div className="border-t pt-4">
+          <div className="flex justify-between">
+            <span className="font-semibold">Total</span>
+            <span className="font-semibold text-lg">{formatPrice(total)}</span>
+          </div>
         </div>
-      </div>
-      <Separator className="my-4" />
-      <div className="flex justify-between font-bold text-lg">
-        <span className="text-gray-900">Total</span>
-        <span className="text-blue-700">${calculateTotal().toFixed(2)}</span>
-      </div>
-      <Link
-        href="/user/checkout"
-        className={`w-full bg-blue-600 text-white font-medium py-3 px-4 rounded-xl mt-6 flex items-center justify-center transition-colors ${
-          cart?.length === 0
-            ? "opacity-50 cursor-not-allowed"
-            : "hover:bg-blue-700"
-        }`}
-      >
-        Proceed to Checkout
-        <ChevronRight size={18} className="ml-1" />
-      </Link>
-      <div className="mt-6 text-center">
-        <Badge 
-          variant="outline"
-          className="bg-blue-50 text-blue-700 border-blue-200 inline-flex items-center gap-1"
-        >
-          <HelpCircle size={14} />
-          Need help?{" "}
-          <a href="#" className="hover:underline">
-            Contact Support
-          </a>
-        </Badge>
+
+        <div className="pt-4">
+          <Badge variant="outline" className="w-full justify-center gap-2 py-2">
+            <HelpCircle className="h-4 w-4" />
+            <Link href="/contact" className="text-sm">
+              Need help? Contact support
+            </Link>
+          </Badge>
+        </div>
       </div>
     </div>
   );
-};
+}

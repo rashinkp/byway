@@ -42,6 +42,7 @@ import { useRouter } from "next/navigation";
 import { useCategories } from "@/hooks/category/useCategories";
 import { useGlobalSearch } from "@/hooks/search/useGlobalSearch";
 import { useDebounce } from "@/hooks/useDebounce";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface HeaderProps {
   client?: { id: string; name: string };
@@ -54,12 +55,6 @@ export function Header({ client }: HeaderProps = {}) {
     useCreateInstructor();
   const { data: instructorData, isLoading: isInstructorLoading } =
     useGetInstructorByUserId(false);
-  const { data: categoriesData } = useCategories({
-    page: 1,
-    limit: 4,
-    sortBy: "name",
-    sortOrder: "asc"
-  });
   const [isInstructorModalOpen, setIsInstructorModalOpen] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
@@ -331,7 +326,10 @@ export function Header({ client }: HeaderProps = {}) {
             
             <nav className="flex items-center gap-4">
               {isLoading ? (
-                <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+                <div className="flex items-center gap-4">
+                  <Skeleton className="h-10 w-24" />
+                  <Skeleton className="h-10 w-24" />
+                </div>
               ) : user ? (
                 <>
                   {user.role !== "INSTRUCTOR" && (
@@ -515,8 +513,13 @@ export function Header({ client }: HeaderProps = {}) {
                   Categories
                 </Link>
                 {isLoading ? (
-                  <div className="flex justify-center">
-                    <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+                  <div className="space-y-3">
+                    <Skeleton className="h-8 w-full" />
+                    <Skeleton className="h-8 w-full" />
+                    <div className="flex justify-between items-center gap-2 mt-4">
+                      <Skeleton className="h-10 w-1/2" />
+                      <Skeleton className="h-10 w-1/2" />
+                    </div>
                   </div>
                 ) : user ? (
                   <>
