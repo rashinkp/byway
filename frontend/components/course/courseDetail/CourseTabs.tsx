@@ -1,5 +1,5 @@
-import { Skeleton } from "@/components/ui/skeleton";
-import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
+import { Course } from "@/types/course";
+import { BookOpen, FileText, Star, User } from "lucide-react";
 
 interface CourseTabsProps {
   activeTab: string;
@@ -12,28 +12,59 @@ export default function CourseTabs({
   setActiveTab,
   isLoading,
 }: CourseTabsProps) {
+  const tabs = [
+    {
+      id: "description",
+      label: "Description",
+      icon: <FileText className="w-4 h-4" />,
+    },
+    {
+      id: "instructor",
+      label: "Instructor",
+      icon: <User className="w-4 h-4" />,
+    },
+    {
+      id: "syllabus",
+      label: "Syllabus",
+      icon: <BookOpen className="w-4 h-4" />,
+    },
+    {
+      id: "reviews",
+      label: "Reviews",
+      icon: <Star className="w-4 h-4" />,
+    },
+  ];
+
   if (isLoading) {
     return (
-      <div className="py-4">
-        <LoadingSpinner size="sm" text="Loading course content..." />
+      <div className="border-b border-gray-100">
+        <div className="flex space-x-8 px-6 py-4">
+          {[1, 2, 3, 4].map((i) => (
+            <div
+              key={i}
+              className="h-8 bg-gray-200 rounded w-24 animate-pulse"
+            ></div>
+          ))}
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="border-b mb-6">
-      <div className="flex gap-6">
-        {["Description", "Instructor", "Syllabus", "Reviews"].map((tab) => (
+    <div className="border-b border-gray-100">
+      <div className="flex space-x-8 px-6 py-4">
+        {tabs.map((tab) => (
           <button
-            key={tab}
-            className={`py-3 px-1 ${
-              activeTab === tab.toLowerCase()
-                ? "border-b-2 border-blue-600 text-blue-600"
-                : "text-gray-600"
+            key={tab.id}
+            onClick={() => setActiveTab(tab.id)}
+            className={`flex items-center space-x-2 py-2 px-1 border-b-2 transition-colors ${
+              activeTab === tab.id
+                ? "border-blue-600 text-blue-600"
+                : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
             }`}
-            onClick={() => setActiveTab(tab.toLowerCase())}
           >
-            {tab}
+            {tab.icon}
+            <span className="font-medium">{tab.label}</span>
           </button>
         ))}
       </div>

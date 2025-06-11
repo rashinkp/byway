@@ -3,21 +3,11 @@ import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
 
 interface CourseBreadcrumbsProps {
   course: any;
-  isLoading: boolean;
 }
 
 export default function CourseBreadcrumbs({
   course,
-  isLoading,
 }: CourseBreadcrumbsProps) {
-  if (isLoading) {
-    return (
-      <div className="py-4">
-        <LoadingSpinner size="sm" text="Loading course details..." />
-      </div>
-    );
-  }
-
   return (
     <div className="flex text-sm text-gray-500 mb-4">
       <span>Home</span>

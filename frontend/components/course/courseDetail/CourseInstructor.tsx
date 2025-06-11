@@ -1,10 +1,10 @@
-import UserProfile from "@/public/UserProfile.jpg";
-import { Star, Users, BookOpen } from "lucide-react";
+import { User } from "@/types/user";
+import { Award, BookOpen, Users } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
-import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
+import CourseInstructorSkeleton from "./CourseInstructorSkeleton";
 
 interface CourseInstructorProps {
-  instructor: any;
+  instructor: User | undefined;
   isLoading: boolean;
 }
 
@@ -13,42 +13,34 @@ export default function CourseInstructor({
   isLoading,
 }: CourseInstructorProps) {
   if (isLoading) {
-    return (
-      <div className="py-4">
-        <LoadingSpinner size="sm" text="Loading instructor details..." />
-      </div>
-    );
+    return <CourseInstructorSkeleton />;
   }
 
   return (
-    <div>
-      <h2 className="text-xl font-bold mb-4">Instructor</h2>
-      <div className="flex items-start gap-4 mb-6">
-        <img
-          src={instructor?.avatar || UserProfile.src}
-          alt={instructor?.name}
-          className="w-16 h-16 rounded-full"
-        />
-        <div>
-          <h3 className="text-lg font-bold text-blue-600">
-            {instructor?.name}
-          </h3>
-          <p className="text-gray-600 mb-2">{instructor?.bio}</p>
-          <div className="flex flex-wrap gap-4 mb-4">
-            <div className="flex items-center gap-1">
-              <Star size={16} />
-              <span>40,440 Reviews</span>
+    <div className="space-y-8">
+      <div className="flex items-start space-x-6">
+        <div className="w-16 h-16 rounded-full overflow-hidden bg-gray-100">
+          {instructor?.avatar ? (
+            <img
+              src={instructor.avatar}
+              alt={instructor.name}
+              className="w-full h-full object-cover"
+            />
+          ) : (
+            <div className="w-full h-full bg-blue-50 flex items-center justify-center text-blue-600 text-xl font-bold">
+              {instructor?.name?.charAt(0) || "I"}
             </div>
-            <div className="flex items-center gap-1">
-              <Users size={16} />
-              <span>500 Students</span>
-            </div>
-            <div className="flex items-center gap-1">
-              <BookOpen size={16} />
-              <span>15 Courses</span>
-            </div>
+          )}
+        </div>
+        <div className="flex-1">
+          <h2 className="text-xl font-semibold text-gray-900">{instructor?.name}</h2>
+          <p className="text-gray-600 mt-1">{instructor?.email}</p>
+          <div className="mt-4 space-y-2">
+            <p className="text-sm text-gray-600">{instructor?.bio}</p>
+            <p className="text-sm text-gray-600">{instructor?.education}</p>
+            <p className="text-sm text-gray-600">{instructor?.skills}</p>
+            <p className="text-sm text-gray-600">{instructor?.country}, {instructor?.city}</p>
           </div>
-          <p className="text-gray-700">{instructor?.bio}</p>
         </div>
       </div>
     </div>

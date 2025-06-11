@@ -1,13 +1,17 @@
-import { Star } from "lucide-react";
-import UserProfile from "@/public/UserProfile.jpg";
-import { Skeleton } from "@/components/ui/skeleton";
+import { Badge } from "@/components/ui/badge";
+import { Separator } from "@/components/ui/separator";
+import { BookOpen, Clock, Users, Award, Star } from "lucide-react";
+import { Course } from "@/types/course";
+import { User } from "@/types/user";
+import CourseInfoSkeleton from "./CourseInfoSkeleton";
 
 interface CourseInfoProps {
-  course: any;
-  instructor: any;
+  course: Course | undefined;
+  instructor: User | undefined;
   lessonsLength: number | undefined;
   courseLoading: boolean;
   instructorLoading: boolean;
+  isEnrolled: boolean;
 }
 
 export default function CourseInfo({
@@ -16,93 +20,68 @@ export default function CourseInfo({
   lessonsLength,
   courseLoading,
   instructorLoading,
+  isEnrolled,
 }: CourseInfoProps) {
-  const renderStars = (rating: number) => {
-    const stars = [];
-    for (let i = 0; i < 5; i++) {
-      stars.push(
-        <Star
-          key={i}
-          size={16}
-          fill={i < Math.floor(rating) ? "#FFD700" : "none"}
-          color={i < Math.floor(rating) ? "#FFD700" : "#D1D5DB"}
-        />
-      );
-    }
-    return stars;
-  };
 
-  if (courseLoading) {
-    return (
-      <div>
-        <Skeleton className="h-8 w-3/4 mb-4" />
-        <Skeleton className="h-4 w-full mb-2" />
-        <Skeleton className="h-4 w-5/6 mb-6" />
-        <div className="flex flex-wrap items-center gap-2 mb-6">
-          <Skeleton className="h-4 w-12" />
-          <Skeleton className="h-4 w-20" />
-          <Skeleton className="h-4 w-24" />
-          <span className="mx-1">|</span>
-          <Skeleton className="h-4 w-16" />
-          <span className="mx-1">|</span>
-          <Skeleton className="h-4 w-16" />
-          <span className="mx-1">|</span>
-          <Skeleton className="h-4 w-16" />
-        </div>
-        <div className="flex items-center mb-6">
-          <Skeleton className="h-10 w-10 rounded-full mr-3" />
-          <Skeleton className="h-4 w-32" />
-        </div>
-        <div className="flex items-center gap-2 mb-6">
-          <Skeleton className="h-5 w-5 rounded-full" />
-          <Skeleton className="h-4 w-20" />
-        </div>
-      </div>
-    );
+  if (courseLoading || instructorLoading) {
+    return <CourseInfoSkeleton />;
   }
 
+  // Ensure we always pass a number or undefined to formatPrice
+  const offer = typeof course?.offer === 'number' ? course.offer : undefined;
+  const price = typeof course?.price === 'number' ? course.price : undefined;
+
   return (
-    <div>
-      <h1 className="text-3xl font-bold mb-4">{course?.title}</h1>
-      <p className="text-gray-700 mb-4">{course?.description}</p>
-      <div className="flex flex-wrap items-center gap-2 mb-6">
-        <span className="font-bold text-amber-500">4.6</span>
-        <div className="flex">{renderStars(4.6)}</div>
-        <span className="text-gray-600">(167,593 rating)</span>
-        <span className="mx-1">|</span>
-        <span>{course?.duration} Total Hours</span>
-        <span className="mx-1">|</span>
-        <span>{lessonsLength} Lectures</span>
-        <span className="mx-1">|</span>
-        <span>{course?.level}</span>
-      </div>
-      {instructorLoading ? (
-        <div className="flex items-center mb-6">
-          <Skeleton className="h-10 w-10 rounded-full mr-3" />
-          <Skeleton className="h-4 w-32" />
+    <div className="bg-white/80 backdrop-blur-sm border border-gray-100 shadow-sm rounded-xl p-6">
+      <div className="space-y-6">
+        <div>
+          <h1 className="text-2xl font-semibold text-gray-900 mb-2">
+            {course?.title}
+          </h1>
+          <p className="text-gray-600">{course?.description}</p>
         </div>
-      ) : (
-        <div className="flex items-center mb-6">
-          <img
-            src={instructor?.avatar || UserProfile.src}
-            alt={instructor?.name}
-            className="w-10 h-10 rounded-full mr-3"
-          />
+
+        <div className="flex flex-wrap items-center gap-4">
+          <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">
+            <BookOpen className="w-3 h-3 mr-1" />
+            {lessonsLength || 0} Lessons
+          </Badge>
+          <Badge variant="outline" className="bg-purple-50 text-purple-700 border-purple-200">
+            <Clock className="w-3 h-3 mr-1" />
+            {course?.duration || "N/A"}
+          </Badge>
+          <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">
+            <Award className="w-3 h-3 mr-1" />
+            {course?.level || "All Levels"}
+          </Badge>
+          <Badge variant="outline" className="bg-yellow-50 text-yellow-700 border-yellow-200">
+            <Star className="w-3 h-3 mr-1" />
+            {course?.rating || "No ratings"}
+          </Badge>
+        </div>
+
+        <Separator />
+
+        <div className="flex items-center gap-4">
+          <div className="w-12 h-12 rounded-full overflow-hidden bg-gray-100">
+            {instructor?.avatar ? (
+              <img
+                src={instructor.avatar}
+                alt={instructor.name}
+                className="w-full h-full object-cover"
+              />
+            ) : (
+              <div className="w-full h-full bg-blue-50 flex items-center justify-center text-blue-600 text-lg font-bold">
+                {instructor?.name?.charAt(0) || "I"}
+              </div>
+            )}
+          </div>
           <div>
-            <span>Created by </span>
-            <a href="#" className="text-blue-600 font-medium">
-              {instructor?.name}
-            </a>
+            <p className="text-sm font-medium text-gray-500">Instructor</p>
+            <p className="text-gray-900">{instructor?.name || "Anonymous"}</p>
           </div>
         </div>
-      )}
-      <div className="flex items-center gap-2 mb-6">
-        <span className="flex items-center gap-1">
-          <span className="w-5 h-5 flex items-center justify-center rounded-full bg-gray-200">
-            <span className="text-xs">🌐</span>
-          </span>
-        </span>
-        English
+
       </div>
     </div>
   );

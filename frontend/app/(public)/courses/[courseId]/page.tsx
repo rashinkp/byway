@@ -15,6 +15,7 @@ import CourseSidebar from "@/components/course/courseDetail/CourseSidebar";
 import { useAuth } from "@/hooks/auth/useAuth";
 import { useRouter } from "next/navigation";
 import { useAddToCart } from "@/hooks/cart/useAddToCart";
+import { User } from "@/types/user";
 
 export default function CourseDetail() {
   const router = useRouter();
@@ -61,68 +62,78 @@ export default function CourseDetail() {
   }
 
   return (
-    <div className="max-w-7xl mx-auto p-4">
-      <CourseBreadcrumbs course={course} isLoading={courseLoading} />
-      <div className="flex flex-col lg:flex-row gap-8">
-        <div className="lg:w-3/4">
-          <CourseInfo
-            course={course}
-            instructor={instructor}
-            lessonsLength={data?.lessons.length}
-            courseLoading={courseLoading}
-            instructorLoading={instructorLoading}
-          />
-          <CourseTabs
-            activeTab={activeTab}
-            setActiveTab={setActiveTab}
-            isLoading={courseLoading}
-          />
-          <div className="mb-6">
-            {activeTab === "description" && (
-              <CourseDescription course={course} isLoading={courseLoading} />
-            )}
-            {activeTab === "instructor" && (
-              <CourseInstructor
-                instructor={instructor}
-                isLoading={instructorLoading}
+    <div className="min-h-screen bg-gray-50/50 p-6">
+      <div className="max-w-7xl mx-auto space-y-6">
+        <CourseBreadcrumbs course={course} />
+        
+        <div className="flex flex-col lg:flex-row gap-6">
+          <div className="lg:w-3/4 space-y-6">
+            <CourseInfo
+              course={course}
+              instructor={instructor as User}
+              lessonsLength={data?.lessons.length}
+              courseLoading={courseLoading}
+              instructorLoading={instructorLoading}
+              isEnrolled={course?.isEnrolled || false}
+            />
+            
+            <div className="bg-white/80 backdrop-blur-sm border border-gray-100 shadow-sm rounded-xl overflow-hidden">
+              <CourseTabs
+                activeTab={activeTab}
+                setActiveTab={setActiveTab}
+                isLoading={courseLoading}
               />
-            )}
-            {activeTab === "syllabus" && (
-              <>
-                {!user && (
-                  <div className="p-4 bg-gray-100 rounded-md">
-                    <p className="text-lg">
-                      Please{" "}
-                      <a href="/login" className="text-blue-600 underline">
-                        log in
-                      </a>{" "}
-                      to view the course syllabus.
-                    </p>
-                  </div>
+              
+              <div className="p-6">
+                {activeTab === "description" && (
+                  <CourseDescription course={course} isLoading={courseLoading} />
                 )}
-                {user && (
-                  <CourseSyllabus
-                    lessons={data?.lessons}
-                    isLoading={lessonLoading}
+                {activeTab === "instructor" && (
+                  <CourseInstructor
+                    instructor={instructor as User}
+                    isLoading={instructorLoading}
                   />
                 )}
-              </>
-            )}
-            {activeTab === "reviews" && (
-              <div>
-                <h2 className="text-xl font-bold mb-4">Reviews</h2>
-                <p>Course reviews would appear here.</p>
+                {activeTab === "syllabus" && (
+                  <>
+                    {!user && (
+                      <div className="p-4 bg-blue-50 rounded-lg border border-blue-100">
+                        <p className="text-gray-700">
+                          Please{" "}
+                          <a href="/login" className="text-blue-600 hover:underline font-medium">
+                            log in
+                          </a>{" "}
+                          to view the course syllabus.
+                        </p>
+                      </div>
+                    )}
+                    {user && (
+                      <CourseSyllabus
+                        lessons={data?.lessons}
+                        isLoading={lessonLoading}
+                      />
+                    )}
+                  </>
+                )}
+                {activeTab === "reviews" && (
+                  <div className="space-y-4">
+                    <h2 className="text-xl font-semibold text-gray-900">Reviews</h2>
+                    <p className="text-gray-600">Course reviews would appear here.</p>
+                  </div>
+                )}
               </div>
-            )}
+            </div>
           </div>
-        </div>
-        <div className="lg:w-1/4">
-          <CourseSidebar
-            course={course}
-            isLoading={courseLoading || userLoading}
-            isCartLoading={isCartLoading}
-            handleAddToCart={handleAddToCart}
-          />
+          
+          <div className="lg:w-1/4">
+            <CourseSidebar
+              course={course}
+              isLoading={courseLoading || userLoading}
+              isCartLoading={isCartLoading}
+              handleAddToCart={handleAddToCart}
+              isEnrolled={course?.isEnrolled || false}
+            />
+          </div>
         </div>
       </div>
     </div>
