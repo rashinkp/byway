@@ -18,6 +18,7 @@ export class Transaction {
   private readonly _createdAt: Date;
   private readonly _updatedAt: Date;
   private readonly _walletId?: string;
+  private readonly _description?: string;
 
   constructor(params: {
     id?: string;
@@ -35,6 +36,7 @@ export class Transaction {
     metadata?: Record<string, any>;
     createdAt?: Date;
     updatedAt?: Date;
+    description?: string;
   }) {
     console.log("Creating Transaction entity with params:", {
       orderId: params.orderId,
@@ -61,6 +63,7 @@ export class Transaction {
     this._walletId = params.walletId;
     this._createdAt = params.createdAt || new Date();
     this._updatedAt = params.updatedAt || new Date();
+    this._description = params.description;
 
     console.log("Transaction entity created:", {
       id: this._id,
@@ -158,6 +161,10 @@ export class Transaction {
     return this._walletId;
   }
 
+  get description(): string | undefined {
+    return this._description;
+  }
+
   static create(data: {
     id?: string;
     orderId?: string;
@@ -171,6 +178,7 @@ export class Transaction {
     transactionId?: string;
     createdAt?: Date;
     updatedAt?: Date;
+    description?: string;
   }): Transaction {
     return new Transaction({
       id: data.id,
@@ -184,7 +192,8 @@ export class Transaction {
       paymentGateway: data.paymentGateway,
       transactionId: data.transactionId,
       createdAt: data.createdAt,
-      updatedAt: data.updatedAt
+      updatedAt: data.updatedAt,
+      description: data.description
     });
   }
 }

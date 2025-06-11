@@ -32,7 +32,6 @@ export const CourseDtoSchema = z.object({
 });
 
 export const OrderItemDtoSchema = z.object({
-  id: z.string(),
   orderId: z.string(),
   courseId: z.string(),
   courseTitle: z.string(),
@@ -49,9 +48,7 @@ export const OrderItemDtoSchema = z.object({
   createdBy: z.string(),
   deletedAt: z.string().nullable(),
   approvalStatus: z.string(),
-  details: z.any().nullable(),
-  createdAt: z.string(),
-  updatedAt: z.string(),
+  details: z.any().nullable()
 });
 
 export const OrderDtoSchema = z.object({

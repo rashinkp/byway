@@ -67,7 +67,7 @@ export class RetryOrderUseCase implements IRetryOrderUseCase {
     });
 
     // Create new Stripe checkout session
-    const session = await this.paymentService.createStripeCheckoutSession(userId, order.id, {
+    const session = await this.paymentService.createStripeCheckoutSession(userId, order.id!, {
       courses: courses.map(course => ({
         id: course.id,
         title: course.title,

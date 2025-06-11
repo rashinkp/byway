@@ -72,8 +72,7 @@ export class OrderRepository implements IOrderRepository {
   }
 
   private mapToOrderEntity(order: any): Order {
-    return new Order(
-      order.id,
+    const mappedOrder = new Order(
       order.userId,
       order.orderStatus as OrderStatus,
       order.paymentStatus as PaymentStatus,
@@ -82,7 +81,6 @@ export class OrderRepository implements IOrderRepository {
       Number(order.amount),
       order.couponCode,
       order.items.map((item: any) => ({
-        id: item.id,
         orderId: item.orderId,
         courseId: item.courseId,
         courseTitle: item.courseTitle || item.course?.title || 'Unknown Course',
@@ -95,17 +93,15 @@ export class OrderRepository implements IOrderRepository {
         price: item.course?.price ? Number(item.course.price) : Number(item.coursePrice),
         thumbnail: item.course?.thumbnail || null,
         status: item.course?.status || 'ACTIVE',
-        categoryId: item.course?.categoryId || null,
-        createdBy: item.course?.createdBy || null,
+        categoryId: item.course?.categoryId || '',
+        createdBy: item.course?.createdBy || '',
         deletedAt: item.course?.deletedAt ? new Date(item.course.deletedAt).toISOString() : null,
         approvalStatus: item.course?.approvalStatus || 'PENDING',
-        details: item.course?.details || null,
-        createdAt: new Date(item.createdAt).toISOString(),
-        updatedAt: new Date(item.updatedAt).toISOString(),
-      })),
-      new Date(order.createdAt),
-      new Date(order.updatedAt)
+        details: item.course?.details || null
+      }))
     );
+    mappedOrder.id = order.id;
+    return mappedOrder;
   }
 
   async findById(id: string): Promise<Order | null> {
@@ -243,7 +239,6 @@ export class OrderRepository implements IOrderRepository {
   async create(order: Order): Promise<Order> {
     const createdOrder = await this.prisma.order.create({
       data: {
-        id: order.id,
         userId: order.userId,
         orderStatus: order.status as "PENDING" | "CONFIRMED" | "CANCELLED",
         paymentStatus: order.paymentStatus,
@@ -252,7 +247,6 @@ export class OrderRepository implements IOrderRepository {
         amount: order.totalAmount,
         items: {
           create: order.items.map((item) => ({
-            id: item.id,
             courseId: item.courseId,
             courseTitle: item.courseTitle,
             coursePrice: item.coursePrice,
@@ -270,7 +264,9 @@ export class OrderRepository implements IOrderRepository {
       },
     });
 
-    return this.mapToOrderEntity(createdOrder);
+    const mappedOrder = this.mapToOrderEntity(createdOrder);
+    order.id = mappedOrder.id;
+    return order;
   }
 
   async update(order: Order): Promise<Order> {
@@ -337,19 +333,18 @@ export class OrderRepository implements IOrderRepository {
     return orderItems;
   }
 
-  async findOrderItems(orderId: string): Promise<{ id: string; orderId: string; courseId: string }[]> {
-    console.log('Finding order items for order:', orderId);
+  async findOrderItems(orderId: string): Promise<{ id: string; orderId: string; courseId: string; coursePrice: number }[]> {
     const orderItems = await this.prisma.orderItem.findMany({
       where: { orderId },
       include: {
         course: true
       }
     });
-    console.log('Found order items:', orderItems);
     return orderItems.map(item => ({
       id: item.id,
       orderId: item.orderId,
-      courseId: item.courseId
+      courseId: item.courseId,
+      coursePrice: Number(item.coursePrice)
     }));
   }
 

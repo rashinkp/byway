@@ -3,7 +3,6 @@ import { PaymentGateway } from "../enum/payment-gateway.enum";
 import { PaymentStatus } from "../enum/payment-status.enum";
 
 export interface OrderItem {
-  id: string;
   orderId: string;
   courseId: string;
   courseTitle: string;
@@ -21,13 +20,12 @@ export interface OrderItem {
   deletedAt: string | null;
   approvalStatus: string;
   details: any | null;
-  createdAt: string;
-  updatedAt: string;
 }
 
 export class Order {
+  public id?: string;
+
   constructor(
-    public readonly id: string,
     public readonly userId: string,
     public readonly status: OrderStatus,
     public readonly paymentStatus: PaymentStatus,
@@ -35,9 +33,7 @@ export class Order {
     public readonly paymentGateway: PaymentGateway | null,
     public readonly totalAmount: number,
     public readonly couponCode: string | null,
-    public readonly items: OrderItem[],
-    public readonly createdAt: Date,
-    public readonly updatedAt: Date
+    public readonly items: OrderItem[]
   ) {}
 
   // Domain methods
@@ -86,8 +82,6 @@ export class Order {
       orderStatus: this.status,
       paymentId: this.paymentIntentId,
       paymentGateway: this.paymentGateway,
-      createdAt: this.createdAt.toISOString(),
-      updatedAt: this.updatedAt.toISOString(),
       items: this.items,
     };
   }

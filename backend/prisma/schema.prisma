@@ -432,12 +432,15 @@ enum TransactionType {
   REFUND
   WALLET_TOPUP
   WALLET_WITHDRAWAL
+  REVENUE
 }
 
 enum TransactionStatus {
   PENDING
   COMPLETED
   FAILED
+  REFUNDED
+  CANCELLED
 }
 
 enum PaymentGateway {
@@ -445,6 +448,7 @@ enum PaymentGateway {
   PAYPAL
   RAZORPAY
   WALLET
+  INTERNAL
 }
 
 

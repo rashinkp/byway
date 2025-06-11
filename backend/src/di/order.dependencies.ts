@@ -19,28 +19,19 @@ export function createOrderDependencies(
   const webhookGateway = new StripeWebhookGateway();
 
   // Initialize payment service
-  const paymentService = new PaymentService(
-    deps.walletRepository,
-    deps.orderRepository,
-    deps.transactionRepository,
-    deps.enrollmentRepository,
-    stripeGateway,
-    webhookGateway,
-    deps.userRepository
-  );
-
+ 
   // Initialize use cases
   const createTransactionUseCase = new CreateTransactionUseCase(deps.transactionRepository);
   const createOrderUseCase = new CreateOrderUseCase(
     deps.orderRepository,
-    paymentService,
+    deps.paymentService,
     createTransactionUseCase
   );
 
   const getAllOrdersUseCase = new GetAllOrdersUseCase(deps.orderRepository);
   const retryOrderUseCase = new RetryOrderUseCase(
     deps.orderRepository,
-    paymentService,
+    deps.paymentService,
     createTransactionUseCase
   );
 

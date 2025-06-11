@@ -16,6 +16,7 @@ import { StripeWebhookGateway } from "../../../../infra/providers/stripe-webhook
 import { IUserRepository } from "../../../repositories/user.repository";
 import Stripe from "stripe";
 import { OrderStatus } from "../../../../domain/enum/order-status.enum";
+import { IRevenueDistributionService } from "../../revenue-distribution/interfaces/revenue-distribution.service.interface";
 
 interface ServiceResponse<T> {
   data: T;
@@ -30,12 +31,11 @@ export class PaymentService implements IPaymentService {
     private readonly enrollmentRepository: IEnrollmentRepository,
     private readonly paymentGateway: PaymentGateway,
     private readonly webhookGateway: StripeWebhookGateway,
-    private readonly userRepository: IUserRepository
+    private readonly userRepository: IUserRepository,
+    private readonly revenueDistributionService: IRevenueDistributionService
   ) {}
 
   async handleWalletPayment(userId: string, orderId: string, amount: number): Promise<ServiceResponse<{ transaction: Transaction }>> {
-    console.log('Starting wallet payment process for order:', orderId);
-    
     const wallet = await this.walletRepository.findByUserId(userId);
     if (!wallet) {
       throw new HttpError("Wallet not found", StatusCodes.NOT_FOUND);
@@ -44,12 +44,9 @@ export class PaymentService implements IPaymentService {
       throw new HttpError("Insufficient wallet balance", StatusCodes.BAD_REQUEST);
     }
 
-    console.log('Wallet found with balance:', wallet.balance.amount);
-
     // Deduct from wallet
     wallet.reduceAmount(amount);
     await this.walletRepository.update(wallet);
-    console.log('Amount deducted from wallet:', amount);
 
     // Create transaction
     const transaction = new Transaction({
@@ -61,7 +58,6 @@ export class PaymentService implements IPaymentService {
       paymentGateway: PaymentGatewayEnum.WALLET,
     });
     await this.transactionRepository.create(transaction);
-    console.log('Transaction created:', transaction.id);
 
     // Update order status
     await this.orderRepository.updateOrderStatus(
@@ -70,28 +66,21 @@ export class PaymentService implements IPaymentService {
       transaction.id,
       PaymentGatewayEnum.WALLET
     );
-    console.log('Order status updated to COMPLETED');
 
     // Create enrollments for each course in the order
-    console.log('Fetching order items for enrollment creation');
     const orderItems = await this.orderRepository.findOrderItems(orderId);
-    console.log('Found order items:', orderItems);
 
     if (!orderItems || orderItems.length === 0) {
-      console.error('No order items found for order:', orderId);
       throw new HttpError("No order items found", StatusCodes.NOT_FOUND);
     }
 
-    console.log('Creating enrollments for each course');
     for (const item of orderItems) {
-      console.log('Creating enrollment for course:', item.courseId);
       try {
         await this.enrollmentRepository.create({
           userId,
           courseIds: [item.courseId],
           orderItemId: item.id
         });
-        console.log('Enrollment created successfully for course:', item.courseId);
       } catch (error) {
         console.error('Error creating enrollment for course:', item.courseId, error);
         throw new HttpError(
@@ -100,8 +89,6 @@ export class PaymentService implements IPaymentService {
         );
       }
     }
-
-    console.log('All enrollments created successfully');
 
     return {
       data: {
@@ -149,57 +136,164 @@ export class PaymentService implements IPaymentService {
 
   async handleStripeWebhook(event: WebhookEvent): Promise<ServiceResponse<{ order?: any; transaction?: Transaction }>> {
     try {
-      console.log('Processing webhook event:', event.type);
 
-      // Handle payment failures
-      if (event.type === 'payment_intent.payment_failed' || event.type === 'charge.failed') {
-        console.log('=== Payment Failure Handler Start ===');
-        const paymentIntentId = event.data.object.payment_intent || event.data.object.id;
-        console.log('Payment failed for intent:', paymentIntentId);
-        console.log('Event data:', JSON.stringify(event.data.object, null, 2));
+      // Handle successful payments
+      if (event.type === 'checkout.session.completed') {
+        console.log('=== Processing Successful Payment ===');
+        const session = event.data.object as Stripe.Checkout.Session;
+        console.log('Session Data:', JSON.stringify(session, null, 2));
+        
+        const orderId = session.metadata?.orderId;
+        const isWalletTopUp = session.metadata?.isWalletTopUp === 'true';
 
-        // Get session metadata to find orderId
-        console.log('Fetching session metadata...');
-        const metadata = await this.webhookGateway.getCheckoutSessionMetadata(paymentIntentId);
-        console.log('Session metadata:', metadata);
-        const orderId = metadata.orderId;
+        console.log('Order ID:', orderId);
+        console.log('Is Wallet Top Up:', isWalletTopUp);
 
         if (!orderId) {
           console.error('No order ID found in session metadata');
           throw new HttpError("No order ID found in session metadata", StatusCodes.BAD_REQUEST);
         }
-        console.log('Found orderId:', orderId);
 
-        // Find and update transaction
-        console.log('Finding transaction for orderId:', orderId);
+        let transaction = await this.transactionRepository.findByOrderId(orderId);
+        console.log('Found transaction:', transaction);
+        
+        if (!transaction && isWalletTopUp) {
+          console.log('Looking for transaction by ID for wallet top up');
+          transaction = await this.transactionRepository.findById(orderId);
+        }
+
+        if (!transaction) {
+          console.error('Transaction not found for order:', orderId);
+          throw new HttpError("Transaction not found", StatusCodes.NOT_FOUND);
+        }
+
+        // Update transaction status first
+        console.log('Updating transaction status to COMPLETED');
+        await this.transactionRepository.updateStatus(transaction.id, TransactionStatus.COMPLETED);
+
+        if (isWalletTopUp) {
+          console.log('Processing wallet top up');
+          const wallet = await this.walletRepository.findByUserId(transaction.userId);
+          if (!wallet) {
+            console.error('Wallet not found for user:', transaction.userId);
+            throw new HttpError("Wallet not found", StatusCodes.NOT_FOUND);
+          }
+          wallet.addAmount(transaction.amount);
+          await this.walletRepository.update(wallet);
+          return {
+            data: { transaction },
+            message: "Wallet top-up completed successfully"
+          };
+        } else {
+          try {
+            console.log('=== Processing Course Purchase ===');
+            // Update order status
+            const order = await this.orderRepository.findById(orderId);
+            if (!order) {
+              console.error('Order not found:', orderId);
+              throw new HttpError("Order not found", StatusCodes.NOT_FOUND);
+            }
+
+            console.log('Updating order status to COMPLETED');
+            await this.orderRepository.updateOrderStatus(
+              orderId,
+              OrderStatus.COMPLETED,
+              session.payment_intent as string,
+              PaymentGatewayEnum.STRIPE
+            );
+
+            // Create enrollments
+            console.log('Fetching order items');
+            const orderItems = await this.orderRepository.findOrderItems(orderId);
+            console.log('Found order items:', orderItems);
+
+            if (!orderItems || orderItems.length === 0) {
+              console.error('No order items found for order:', orderId);
+              throw new HttpError("No order items found", StatusCodes.NOT_FOUND);
+            }
+
+            console.log('Creating enrollments for', orderItems.length, 'items');
+            for (const item of orderItems) {
+              console.log('Creating enrollment for course:', item.courseId);
+              try {
+                await this.enrollmentRepository.create({
+                  userId: order.userId,
+                  courseIds: [item.courseId],
+                  orderItemId: item.id
+                });
+                console.log('Successfully created enrollment for course:', item.courseId);
+              } catch (error) {
+                console.error('Error creating enrollment for course:', item.courseId, error);
+                throw error;
+              }
+            }
+
+            // Distribute revenue
+            console.log('Starting revenue distribution');
+            try {
+              await this.revenueDistributionService.distributeRevenue(orderId);
+              console.log('Revenue distribution completed successfully');
+            } catch (error) {
+              console.error('Error during revenue distribution:', error);
+              throw error;
+            }
+
+            return {
+              data: { order, transaction },
+              message: "Payment completed successfully"
+            };
+          } catch (error) {
+            console.error('Error processing successful payment:', error);
+            // Revert transaction status if enrollment or revenue distribution fails
+            console.log('Reverting transaction status to FAILED');
+            await this.transactionRepository.updateStatus(transaction.id, TransactionStatus.FAILED);
+            throw new HttpError(
+              error instanceof Error ? error.message : "Error processing successful payment",
+              StatusCodes.INTERNAL_SERVER_ERROR
+            );
+          }
+        }
+      }
+
+      // Handle payment failures
+      if (event.type === 'payment_intent.payment_failed' || event.type === 'charge.failed') {
+        console.log('Processing payment failure event');
+        const paymentIntentId = event.data.object.payment_intent || event.data.object.id;
+        console.log('Payment Intent ID:', paymentIntentId);
+        
+        const metadata = await this.webhookGateway.getCheckoutSessionMetadata(paymentIntentId);
+        console.log('Session Metadata:', metadata);
+        
+        const orderId = metadata.orderId;
+        console.log('Order ID from metadata:', orderId);
+
+        if (!orderId) {
+          console.error('No order ID found in metadata');
+          throw new HttpError("No order ID found in session metadata", StatusCodes.BAD_REQUEST);
+        }
+
         const transaction = await this.transactionRepository.findByOrderId(orderId);
         console.log('Found transaction:', transaction);
 
         if (transaction) {
-          console.log('Updating transaction status to FAILED...');
+          console.log('Updating transaction status to FAILED');
           await this.transactionRepository.updateStatus(transaction.id, TransactionStatus.FAILED);
-          console.log('Transaction status updated to FAILED');
-        } else {
-          console.log('No transaction found for orderId:', orderId);
         }
 
-        // Update order status
-        console.log('Updating order status to FAILED...');
         const order = await this.orderRepository.findById(orderId);
         if (!order) {
           console.error('Order not found:', orderId);
           throw new HttpError("Order not found", StatusCodes.NOT_FOUND);
         }
 
+        console.log('Updating order status to FAILED');
         await this.orderRepository.updateOrderStatus(
           orderId,
           OrderStatus.FAILED,
           paymentIntentId,
           PaymentGatewayEnum.STRIPE
         );
-        console.log('Order status updated to FAILED');
 
-        console.log('=== Payment Failure Handler End ===');
         return {
           data: { 
             order: order.toJSON(),
@@ -209,130 +303,14 @@ export class PaymentService implements IPaymentService {
         };
       }
 
-      // Handle successful payments
-      if (event.type === 'checkout.session.completed') {
-        const session = event.data.object as Stripe.Checkout.Session;
-        const orderId = session.metadata?.orderId;
-        const isWalletTopUp = session.metadata?.isWalletTopUp === 'true';
-
-        if (!orderId) {
-          throw new HttpError("No order ID found in session metadata", StatusCodes.BAD_REQUEST);
-        }
-
-        console.log('Processing webhook for orderId:', orderId);
-
-        // Try to find transaction by orderId first
-        let transaction = await this.transactionRepository.findByOrderId(orderId);
-        
-        // If not found and it's a wallet top-up, try finding by transaction ID
-        if (!transaction && isWalletTopUp) {
-          transaction = await this.transactionRepository.findById(orderId);
-        }
-
-        if (!transaction) {
-          console.error('Transaction not found for orderId:', orderId);
-          throw new HttpError("Transaction not found", StatusCodes.NOT_FOUND);
-        }
-
-        console.log('Found transaction:', transaction);
-
-        // Update transaction status
-        await this.transactionRepository.updateStatus(transaction.id, TransactionStatus.COMPLETED);
-
-        if (isWalletTopUp) {
-          // For wallet top-ups, update the wallet balance
-          const wallet = await this.walletRepository.findByUserId(transaction.userId);
-          if (!wallet) {
-            throw new HttpError("Wallet not found", StatusCodes.NOT_FOUND);
-          }
-          wallet.addAmount(transaction.amount);
-          await this.walletRepository.update(wallet);
-          console.log('Wallet updated with amount:', transaction.amount);
-          return {
-            data: { transaction },
-            message: "Wallet top-up completed successfully"
-          };
-        } else {
-          // For regular orders, handle order completion
-          const order = await this.orderRepository.findById(orderId);
-          if (!order) {
-            throw new HttpError("Order not found", StatusCodes.NOT_FOUND);
-          }
-          await this.orderRepository.updateOrderStatus(
-            orderId,
-            OrderStatus.COMPLETED,
-            session.payment_intent as string,
-            PaymentGatewayEnum.STRIPE
-          );
-
-          // Create enrollments for each course in the order
-          const orderItems = await this.orderRepository.findOrderItems(orderId);
-          for (const item of orderItems) {
-            await this.enrollmentRepository.create({
-              userId: order.userId,
-              courseIds: [item.courseId],
-              orderItemId: item.id
-            });
-          }
-
-          return {
-            data: { order, transaction },
-            message: "Payment completed successfully"
-          };
-        }
-      }
-
-      // Handle expired checkout sessions
-      if (event.type === 'checkout.session.expired') {
-        const session = event.data.object as Stripe.Checkout.Session;
-        const orderId = session.metadata?.orderId;
-        const isWalletTopUp = session.metadata?.isWalletTopUp === 'true';
-
-        if (orderId) {
-          // Find and update transaction
-          let transaction = await this.transactionRepository.findByOrderId(orderId);
-          if (!transaction && isWalletTopUp) {
-            transaction = await this.transactionRepository.findById(orderId);
-          }
-
-          if (transaction) {
-            await this.transactionRepository.updateStatus(transaction.id, TransactionStatus.FAILED);
-            console.log('Transaction status updated to FAILED due to expired session');
-          }
-
-          // Update order status if it's not a wallet top-up
-          if (!isWalletTopUp) {
-            await this.orderRepository.updateOrderStatus(
-              orderId,
-              OrderStatus.FAILED,
-              session.payment_intent as string,
-              PaymentGatewayEnum.STRIPE
-            );
-            console.log('Order status updated to FAILED due to expired session');
-          }
-        }
-
-        return {
-          data: {},
-          message: "Checkout session expired"
-        };
-      }
-
-      // Handle payment intent created
-      if (event.type === 'payment_intent.created') {
-        console.log('Payment intent created:', event.data.object.id);
-        return {
-          data: {},
-          message: "Payment intent created"
-        };
-      }
-
+      console.log('=== Webhook Processing End ===');
       return {
         data: {},
         message: "Webhook processed successfully"
       };
     } catch (error) {
-      console.error('Error processing webhook:', error);
+      console.error('=== Webhook Processing Error ===');
+      console.error('Error details:', error);
       throw new HttpError(
         error instanceof Error ? error.message : "Error processing webhook",
         StatusCodes.INTERNAL_SERVER_ERROR

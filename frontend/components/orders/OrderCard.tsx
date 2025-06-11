@@ -74,7 +74,7 @@ export function OrderCard({ order }: OrderCardProps) {
 
       <div className="divide-y divide-gray-200">
         {order.items.map((item) => (
-          <div key={item.id} className="p-4 flex items-start justify-between">
+          <div key={item.orderId} className="p-4 flex items-start justify-between">
             <div className="flex gap-4">
               <div className="w-16 h-16 flex-shrink-0">
                 <img

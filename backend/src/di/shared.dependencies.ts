@@ -33,6 +33,7 @@ import { PaymentService } from "../app/services/payment/implementations/payment.
 import { IPaymentService } from "../app/services/payment/interfaces/payment.service.interface";
 import { StripePaymentGateway } from "../infra/providers/stripe-payment.gateway";
 import { StripeWebhookGateway } from "../infra/providers/stripe-webhook.gateway";
+import { RevenueDistributionService } from "../app/services/revenue-distribution/implementations/revenue-distribution.service";
 
 export interface SharedDependencies {
   prisma: typeof prismaClient;
@@ -73,6 +74,12 @@ export function createSharedDependencies(): SharedDependencies {
   const walletRepository = new WalletRepository(prismaClient);
   const paymentGateway = new StripePaymentGateway();
   const webhookGateway = new StripeWebhookGateway();
+  const revenueDistributionService = new RevenueDistributionService(
+    walletRepository,
+    transactionRepository,
+    orderRepository,
+    userRepository
+  );
   const paymentService = new PaymentService(
     walletRepository,
     orderRepository,
@@ -80,7 +87,8 @@ export function createSharedDependencies(): SharedDependencies {
     enrollmentRepository,
     paymentGateway,
     webhookGateway,
-    userRepository
+    userRepository,
+    revenueDistributionService
   );
 
   const httpErrors = new HttpErrors();

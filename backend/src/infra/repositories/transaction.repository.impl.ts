@@ -20,11 +20,9 @@ export class TransactionRepository implements ITransactionRepository {
       orderId: prismaTransaction.orderId || undefined,
       userId: prismaTransaction.userId,
       amount: Number(prismaTransaction.amount),
-      type: this.mapPrismaTransactionType(prismaTransaction.type),
-      status: this.mapPrismaTransactionStatus(prismaTransaction.status),
-      paymentGateway: this.mapPrismaPaymentGateway(
-        prismaTransaction.paymentGateway
-      ),
+      type: prismaTransaction.type as TransactionType,
+      status: prismaTransaction.status as TransactionStatus,
+      paymentGateway: prismaTransaction.paymentGateway as PaymentGateway,
       courseId: prismaTransaction.courseId || undefined,
       transactionId: prismaTransaction.transactionId || undefined,
       walletId: prismaTransaction.walletId || undefined,
@@ -36,35 +34,13 @@ export class TransactionRepository implements ITransactionRepository {
   private mapPrismaTransactionType(
     type: PrismaTransactionType
   ): TransactionType {
-    switch (type) {
-      case "PURCHASE":
-        return TransactionType.PURCHASE;
-      case "PAYMENT":
-        return TransactionType.PAYMENT;
-      case "REFUND":
-        return TransactionType.REFUND;
-      case "WALLET_TOPUP":
-        return TransactionType.WALLET_TOPUP;
-      case "WALLET_WITHDRAWAL":
-        return TransactionType.WALLET_WITHDRAWAL;
-      default:
-        throw new Error(`Unknown transaction type: ${type}`);
-    }
+    return type as TransactionType;
   }
 
   private mapPrismaTransactionStatus(
     status: PrismaTransactionStatus
   ): TransactionStatus {
-    switch (status) {
-      case "PENDING":
-        return TransactionStatus.PENDING;
-      case "COMPLETED":
-        return TransactionStatus.COMPLETED;
-      case "FAILED":
-        return TransactionStatus.FAILED;
-      default:
-        throw new Error(`Unknown transaction status: ${status}`);
-    }
+    return status as TransactionStatus;
   }
 
   private mapPrismaPaymentGateway(
@@ -73,115 +49,62 @@ export class TransactionRepository implements ITransactionRepository {
     if (!gateway) {
       throw new Error("Payment gateway is required");
     }
-    switch (gateway) {
-      case "STRIPE":
-        return PaymentGateway.STRIPE;
-      case "PAYPAL":
-        return PaymentGateway.PAYPAL;
-      case "RAZORPAY":
-        return PaymentGateway.RAZORPAY;
-      case "WALLET":
-        return PaymentGateway.WALLET;
-      default:
-        throw new Error(`Unknown payment gateway: ${gateway}`);
-    }
+    return gateway as PaymentGateway;
   }
 
   private mapToPrismaTransactionType(
     type: TransactionType
   ): PrismaTransactionType {
-    switch (type) {
-      case TransactionType.PURCHASE:
-        return "PURCHASE";
-      case TransactionType.PAYMENT:
-        return "PAYMENT";
-      case TransactionType.REFUND:
-        return "REFUND";
-      case TransactionType.WALLET_TOPUP:
-        return "WALLET_TOPUP";
-      case TransactionType.WALLET_WITHDRAWAL:
-        return "WALLET_WITHDRAWAL";
-      default:
-        throw new Error(`Unknown transaction type: ${type}`);
-    }
+    return type as PrismaTransactionType;
   }
 
   private mapToPrismaTransactionStatus(
     status: TransactionStatus
   ): PrismaTransactionStatus {
-    switch (status) {
-      case TransactionStatus.PENDING:
-        return "PENDING";
-      case TransactionStatus.COMPLETED:
-        return "COMPLETED";
-      case TransactionStatus.FAILED:
-        return "FAILED";
-      default:
-        throw new Error(`Unknown transaction status: ${status}`);
-    }
+    return status as PrismaTransactionStatus;
   }
 
   private mapToPrismaPaymentGateway(
     gateway: PaymentGateway
   ): PrismaPaymentGateway {
-    switch (gateway) {
-      case PaymentGateway.STRIPE:
-        return "STRIPE";
-      case PaymentGateway.PAYPAL:
-        return "PAYPAL";
-      case PaymentGateway.RAZORPAY:
-        return "RAZORPAY";
-      case PaymentGateway.WALLET:
-        return "WALLET";
-      default:
-        throw new Error(`Unknown payment gateway: ${gateway}`);
-    }
+    return gateway as PrismaPaymentGateway;
   }
 
   async create(transaction: Transaction): Promise<Transaction> {
-    console.log('TransactionRepository.create - Input:', {
-      orderId: transaction.orderId,
-      userId: transaction.userId,
-      amount: transaction.amount,
-      type: transaction.type,
-      status: transaction.status,
-      paymentGateway: transaction.paymentGateway
-    });
-
     try {
-      const data: any = {
-        id: transaction.id,
-        userId: transaction.userId,
-        amount: transaction.amount,
-        type: this.mapToPrismaTransactionType(transaction.type),
-        status: this.mapToPrismaTransactionStatus(transaction.status),
-        paymentGateway: this.mapToPrismaPaymentGateway(transaction.paymentGateway),
-        paymentMethod: transaction.paymentMethod,
-        paymentDetails: transaction.paymentDetails,
-        courseId: transaction.courseId,
-        transactionId: transaction.transactionId,
-        metadata: transaction.metadata
-      };
-
-      // Only add orderId if it exists
-      if (transaction.orderId) {
-        data.orderId = transaction.orderId;
-      }
-
-      const created = await this.prisma.transactionHistory.create({
-        data
+      const createdTransaction = await this.prisma.transactionHistory.create({
+        data: {
+          id: transaction.id,
+          userId: transaction.userId,
+          amount: transaction.amount,
+          type: transaction.type as PrismaTransactionType,
+          status: transaction.status as PrismaTransactionStatus,
+          paymentGateway: transaction.paymentGateway as PrismaPaymentGateway,
+          paymentMethod: transaction.paymentMethod,
+          paymentDetails: transaction.paymentDetails,
+          courseId: transaction.courseId,
+          transactionId: transaction.transactionId,
+          metadata: transaction.metadata,
+          orderId: transaction.orderId
+        }
       });
 
-      console.log('TransactionRepository.create - Success:', {
-        id: created.id,
-        orderId: created.orderId,
-        amount: created.amount,
-        status: created.status
+      return new Transaction({
+        id: createdTransaction.id,
+        orderId: createdTransaction.orderId || undefined,
+        userId: createdTransaction.userId,
+        amount: Number(createdTransaction.amount),
+        type: createdTransaction.type as TransactionType,
+        status: createdTransaction.status as TransactionStatus,
+        paymentGateway: createdTransaction.paymentGateway as PaymentGateway,
+        courseId: createdTransaction.courseId || undefined,
+        transactionId: createdTransaction.transactionId || undefined,
+        walletId: createdTransaction.walletId || undefined,
+        createdAt: createdTransaction.createdAt,
+        updatedAt: createdTransaction.updatedAt,
       });
-
-      return this.mapToTransaction(created);
     } catch (error) {
-      console.error('TransactionRepository.create - Error:', error);
+      console.error('Error creating transaction:', error);
       throw error;
     }
   }
