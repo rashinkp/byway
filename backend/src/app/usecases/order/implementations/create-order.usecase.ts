@@ -20,7 +20,7 @@ export class CreateOrderUseCase implements ICreateOrderUseCase {
   ) {}
 
   async execute(userId: string, input: CreateOrderDto) {
-    const { courses, paymentMethod, couponCode } = input;
+    const { courses, paymentMethod, couponCode } = input; 
 
     // Calculate total amount
     const totalAmount = courses.reduce((sum, course) => sum + (course.offer || course.price), 0);

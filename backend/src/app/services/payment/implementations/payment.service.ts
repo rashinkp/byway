@@ -90,6 +90,17 @@ export class PaymentService implements IPaymentService {
       }
     }
 
+    // Distribute revenue
+    try {
+      await this.revenueDistributionService.distributeRevenue(orderId);
+    } catch (error) {
+      console.error('Error during revenue distribution:', error);
+      throw new HttpError(
+        'Failed to distribute revenue',
+        StatusCodes.INTERNAL_SERVER_ERROR
+      );
+    }
+
     return {
       data: {
         transaction,
