@@ -96,23 +96,10 @@ export default function CourseDetail() {
                 )}
                 {activeTab === "syllabus" && (
                   <>
-                    {!user && (
-                      <div className="p-4 bg-blue-50 rounded-lg border border-blue-100">
-                        <p className="text-gray-700">
-                          Please{" "}
-                          <a href="/login" className="text-blue-600 hover:underline font-medium">
-                            log in
-                          </a>{" "}
-                          to view the course syllabus.
-                        </p>
-                      </div>
-                    )}
-                    {user && (
                       <CourseSyllabus
                         lessons={data?.lessons}
                         isLoading={lessonLoading}
                       />
-                    )}
                   </>
                 )}
                 {activeTab === "reviews" && (
