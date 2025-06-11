@@ -1,7 +1,6 @@
 import type { ICart } from "@/types/cart";
 import { Award, BookOpen, Clock, Trash2 } from "lucide-react";
-
-
+import { Badge } from "@/components/ui/badge";
 
 interface CartItemProps {
   item: ICart;
@@ -33,11 +32,11 @@ export function CartItem({ item, isRemoving, onRemove }: CartItemProps) {
   );
 
   return (
-    <div className="p-6 border-b last:border-b-0 hover:bg-gray-50 flex items-start">
+    <div className="p-6 border-b last:border-b-0 hover:bg-blue-50/50 transition-colors flex items-start">
       <img
         src={course.thumbnail}
         alt={item.id}
-        className="w-32 h-20 object-cover rounded-md bg-gray-100 flex-shrink-0"
+        className="w-32 h-20 object-cover rounded-xl bg-blue-50 flex-shrink-0"
       />
       <div className="ml-5 flex-1">
         <div className="flex justify-between items-start">
@@ -49,7 +48,7 @@ export function CartItem({ item, isRemoving, onRemove }: CartItemProps) {
           </div>
           <button
             onClick={() => course.id && onRemove(course.id)}
-            className="text-gray-400 hover:text-red-500 flex-shrink-0 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="text-gray-400 hover:text-red-500 flex-shrink-0 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             title="Remove from cart"
             disabled={isRemoving}
           >
@@ -58,26 +57,29 @@ export function CartItem({ item, isRemoving, onRemove }: CartItemProps) {
         </div>
         <div className="flex items-center mt-3 text-sm text-gray-500 space-x-4">
           <span className="flex items-center">
-            <Clock size={16} className="mr-1" />
+            <Clock size={16} className="mr-1 text-blue-600" />
             {course.duration}
           </span>
           <span className="flex items-center">
-            <BookOpen size={16} className="mr-1" />
+            <BookOpen size={16} className="mr-1 text-blue-600" />
             20 lectures
           </span>
           <span className="flex items-center">
-            <Award size={16} className="mr-1" />
+            <Award size={16} className="mr-1 text-blue-600" />
             {course.level}
           </span>
         </div>
         <div className="mt-3 text-right">
-          <div className="font-bold text-lg">${Number(offerPrice || 0).toFixed(2)}</div>
+          <div className="font-bold text-lg text-blue-700">${Number(offerPrice || 0).toFixed(2)}</div>
           <div className="text-gray-500 line-through text-sm">
             ${originalPrice.toFixed(2)}
           </div>
-          <span className="inline-block bg-red-50 text-red-500 text-xs font-medium px-2 py-1 rounded mt-1">
+          <Badge 
+            variant="outline"
+            className="bg-red-50 text-red-600 border-red-200 mt-1"
+          >
             {discountPercentage}% OFF
-          </span>
+          </Badge>
         </div>
       </div>
     </div>

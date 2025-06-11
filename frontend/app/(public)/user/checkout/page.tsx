@@ -1,394 +1,190 @@
 "use client";
 
-import { useState, useMemo, useCallback, memo, FC } from "react";
-import { useSearchParams, useRouter } from "next/navigation";
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { useCart } from "@/hooks/cart/useCart";
-import { useGetCourseById } from "@/hooks/course/useGetCourseById";
+import { useAuth } from "@/hooks/auth/useAuth";
+import { useWallet } from "@/hooks/wallet/useWallet";
 import { useCreateOrder } from "@/hooks/order/useCreateOrder";
 import { toast } from "sonner";
-import { Course, ICart } from "@/types/cart";
-import OrderDetailsSkeleton from "@/components/checkout/OrderDetailsSkeleton";
+import { Card } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import OrderSummary from "@/components/checkout/OrderSummery";
 import OrderDetails from "@/components/checkout/OrderDetails";
-import PaymentMethodSkeleton from "@/components/checkout/PaymentMethodSkeleton";
 import PaymentMethodSelection from "@/components/checkout/PaymentMethodSelection";
-import { useAuth } from "@/hooks/auth/useAuth";
-import { OrderSummary } from "@/components/checkout/OrderSummery";
+import OrderDetailsSkeleton from "@/components/checkout/OrderDetailsSkeleton";
+import PaymentMethodSkeleton from "@/components/checkout/PaymentMethodSkeleton";
 import OrderSummarySkeleton from "@/components/checkout/OrderSummerySkeleton";
-import { useWallet } from "@/hooks/wallet/useWallet";
+import { ICart, Course } from "@/types/cart";
+
+type PaymentMethodType = "WALLET" | "STRIPE" | "PAYPAL" | "RAZORPAY";
 
 interface PaymentMethod {
-  id: "razorpay" | "paypal" | "stripe" | "wallet";
+  id: PaymentMethodType;
   name: string;
 }
 
-interface CheckoutPageProps {
-  page?: number;
-  limit?: number;
-}
-
-const CheckoutPage: FC<CheckoutPageProps> = memo(({ page = 1, limit = 10 }) => {
-  const searchParams = useSearchParams();
-  const courseId = searchParams.get("courseId");
-  const { data: cartData, isLoading: cartLoading } = useCart({ page, limit });
-  const { data: singleCourse, isLoading: courseLoading } = useGetCourseById(
-    courseId as string
-  );
-  const [activeStep, setActiveStep] = useState(1);
-  const { wallet, isLoading: walletLoading } = useWallet();
-  const [selectedPaymentMethod, setSelectedPaymentMethod] =
-    useState<PaymentMethod["id"]>("stripe");
-  const [couponCode, setCouponCode] = useState<string>("");
-
-  const { user } = useAuth();
-  const { mutateAsync: createOrder, isPending: isCreatingOrder } = useCreateOrder();
+export default function CheckoutPage() {
   const router = useRouter();
+  const { data: cartData, isLoading: isCartLoading } = useCart();
+  const { user } = useAuth();
+  const { wallet } = useWallet();
+  const createOrder = useCreateOrder();
+  const [selectedMethod, setSelectedMethod] = useState<PaymentMethodType>("WALLET");
+  const [isCreatingOrder, setIsCreatingOrder] = useState(false);
+  const [couponCode, setCouponCode] = useState("");
+  const [discount, setDiscount] = useState(0);
 
-  const paypalOptions = useMemo(
-    () => ({
-      clientId: process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID || "",
-      currency: "USD",
-      intent: "capture",
-    }),
-    []
-  );
+  const courseDetails = cartData?.items
+    .map(item => item.course)
+    .filter((course): course is Course => course !== undefined) || [];
 
-  // Calculate totals, tax, and course details
-  const {
-    totalOriginalPrice,
-    totalDiscountedPrice,
-    tax,
-    finalAmount,
-    courseDetails,
-  } = useMemo(() => {
-    const TAX_RATE = 0.1; // 10% tax rate
+  const totalDiscountedPrice = courseDetails.reduce((total: number, course: Course) => {
+    const price = typeof course.price === 'string' ? parseFloat(course.price) : course.price;
+    const offer = course.offer ? (typeof course.offer === 'string' ? parseFloat(course.offer) : course.offer) : price;
+    return total + (offer || 0);
+  }, 0);
 
-    const validatePrice = (
-      price: any,
-      field: string,
-      courseId: string
-    ): number => {
-      const value = typeof price === "string" ? parseFloat(price) : price;
-      if (isNaN(value) || value <= 0) {
-        console.error(`Invalid ${field} for course ${courseId}:`, {
-          price,
-          value,
-        });
-        return 0;
-      }
-      return value;
-    };
+  const finalAmount = totalDiscountedPrice - discount;
 
-    if (courseId && singleCourse) {
-      const price = validatePrice(singleCourse.price, "price", singleCourse.id);
-      const offer = validatePrice(
-        singleCourse.offer ?? price,
-        "offer",
-        singleCourse.id
-      );
-      const calculatedTax = offer * TAX_RATE;
-      const finalAmount = offer + calculatedTax;
-      return {
-        totalOriginalPrice: price,
-        totalDiscountedPrice: offer,
-        tax: calculatedTax,
-        finalAmount,
-        courseDetails: [
-          {
-            id: singleCourse.id,
-            title: singleCourse.title || "Unknown Course",
-            description: singleCourse.description || "No description available",
-            thumbnail: singleCourse.thumbnail || "/default-thumbnail.jpg",
-            price,
-            offer,
-            duration: String(singleCourse.duration ?? "Unknown"),
-            level: singleCourse.level || "Unknown",
-          } as Course,
-        ],
-      };
-    } else if (cartData?.items) {
-      const courses = cartData.items
-        .map((item: ICart) => item.course)
-        .filter((course): course is NonNullable<ICart["course"]> => !!course)
-        .map((course) => {
-          const price = validatePrice(course.price, "price", course.id);
-          const offer = validatePrice(
-            course.offer ?? price,
-            "offer",
-            course.id
-          );
-          return {
-            id: course.id,
-            title: course.title || "Unknown Course",
-            description: course.description || "No description available",
-            thumbnail: course.thumbnail || "/default-thumbnail.jpg",
-            price,
-            offer,
-            duration: String(course.duration ?? "Unknown"),
-            level: course.level || "Unknown",
-            lectures: course.lectures ?? 0,
-            creator: course.creator ?? { name: "Unknown" },
-          } as Course;
-        });
-
-      if (courses.length === 0) {
-        console.error("No valid courses in cart:", cartData.items);
-        toast.error("No valid courses in cart");
-        return {
-          totalOriginalPrice: 0,
-          totalDiscountedPrice: 0,
-          tax: 0,
-          finalAmount: 0,
-          courseDetails: [],
-        };
-      }
-
-      const totalOriginal = courses.reduce(
-        (sum, course) => sum + course.price,
-        0
-      );
-      const totalDiscounted = courses.reduce(
-        (sum, course) => sum + course.offer,
-        0
-      );
-      if (totalDiscounted <= 0) {
-        console.error("Invalid total discounted price for cart:", {
-          totalOriginal,
-          totalDiscounted,
-          courses,
-        });
-        toast.error("Invalid cart total");
-        return {
-          totalOriginalPrice: 0,
-          totalDiscountedPrice: 0,
-          tax: 0,
-          finalAmount: 0,
-          courseDetails: [],
-        };
-      }
-
-      const calculatedTax = totalDiscounted * TAX_RATE;
-      const finalAmount = totalDiscounted + calculatedTax;
-
-      return {
-        totalOriginalPrice: totalOriginal,
-        totalDiscountedPrice: totalDiscounted,
-        tax: calculatedTax,
-        finalAmount,
-        courseDetails: courses,
-      };
+  useEffect(() => {
+    if (!isCartLoading && (!cartData?.items || cartData.items.length === 0)) {
+      router.push("/cart");
     }
+  }, [cartData, isCartLoading, router]);
 
-    return {
-      totalOriginalPrice: 0,
-      totalDiscountedPrice: 0,
-      tax: 0,
-      finalAmount: 0,
-      courseDetails: [] as Course[],
-    };
-  }, [courseId, singleCourse, cartData?.items]);
+  const handleApplyCoupon = async () => {
+    if (!couponCode) return;
+    
+    try {
+      // TODO: Implement coupon validation and discount calculation
+      setDiscount(10); // Placeholder discount
+      toast.success("Coupon applied successfully!");
+    } catch (error) {
+      toast.error("Invalid coupon code");
+    }
+  };
 
-  const coursesInput = useMemo(() => {
-    return courseDetails.map((course) => ({
-      id: course.id,
-      title: course.title,
-      description: course.description,
-      price: course.price,
-      offer: course.offer,
+  const handlePaymentMethodSelect = (methodId: PaymentMethodType) => {
+    setSelectedMethod(methodId);
+  };
 
-      thumbnail: course.thumbnail,
-      duration: course.duration,
-      level: course.level,
-    }));
-  }, [courseDetails]);
-
-  const handlePaymentMethodSelect = useCallback(
-    (methodId: PaymentMethod["id"]) => {
-      console.log("Selecting payment method:", methodId);
-      setSelectedPaymentMethod(methodId);
-    },
-    []
-  );
-
-  const handleProceedToPayment = useCallback(() => {
-    if (!courseDetails.length) {
-      toast.error("No courses selected for purchase");
+  const handleProceedToPayment = async () => {
+    if (!user) {
+      toast.error("Please login to continue");
+      router.push("/login");
       return;
     }
-    if (finalAmount <= 0) {
-      toast.error("Invalid order amount");
-      return;
+
+    if (selectedMethod === "WALLET") {
+      if (!wallet || wallet.balance < finalAmount) {
+        toast.error("Insufficient wallet balance");
+        return;
+      }
     }
-    setActiveStep(2);
-  }, [courseDetails, finalAmount]);
 
-  const handleSubmit = useCallback(
-    async (e: React.MouseEvent) => {
-      e.preventDefault();
-      if (!courseDetails.length) {
-        toast.error("No courses selected for purchase");
-        return;
-      }
-      if (finalAmount <= 0) {
-        toast.error("Invalid order amount");
-        return;
-      }
-      if (!user?.id) {
-        toast.error("Please log in to proceed with payment");
-        return;
-      }
+    try {
+      setIsCreatingOrder(true);
+      const orderData = {
+        courses: courseDetails.map(course => ({
+          id: course.id,
+          title: course.title,
+          description: course.description || "",
+          thumbnail: course.thumbnail || "",
+          price: Number(course.price),
+          offer: course.offer ? Number(course.offer) : Number(course.price),
+          duration: course.duration?.toString() || "",
+          lectures: course.lectures || 0,
+          level: course.level || "",
+          creator: {
+            name: course.creator?.name || ""
+          }
+        })),
+        paymentMethod: selectedMethod,
+        couponCode: couponCode || undefined
+      };
 
-      if (selectedPaymentMethod === "wallet") {
-        if (!wallet) {
-          toast.error("Wallet not found");
-          return;
-        }
-        if (wallet.balance < finalAmount) {
-          toast.error("Insufficient wallet balance");
-          return;
-        }
-      }
+      const response = await createOrder.mutateAsync(orderData);
 
-      try {
-        const orderData = {
-          courses: courseDetails.map(course => ({
-            id: course.id,
-            title: course.title,
-            description: course.description,
-            thumbnail: course.thumbnail,
-            price: course.price,
-            offer: course.offer || course.price,
-            duration: course.duration,
-            lectures: course.lectures,
-            level: course.level,
-            creator: {
-              name: course.creator?.name || "Unknown"
-            }
-          })),
-          paymentMethod: selectedPaymentMethod.toUpperCase() as "WALLET" | "STRIPE" | "PAYPAL" | "RAZORPAY",
-          couponCode: couponCode || undefined,
-        };
-        console.log("Sending order data:", orderData);
-        const response = await createOrder(orderData);
-
-        if (selectedPaymentMethod === "wallet") {
-          router.push("/success");
-        } else if (selectedPaymentMethod === "stripe" && response.data.session?.url) {
+      if (response.data) {
+        if (selectedMethod === "STRIPE" && response.data.session?.url) {
           window.location.href = response.data.session.url;
+        } else if (selectedMethod === "WALLET") {
+          toast.success("Order placed successfully!");
+          router.push("/user/orders");
         }
-      } catch (error) {
-        console.error("Error processing payment:", error);
-        toast.error("Failed to process payment");
       }
-    },
-    [
-      courseDetails,
-      couponCode,
-      createOrder,
-      selectedPaymentMethod,
-      finalAmount,
-      user,
-      wallet,
-      router,
-    ]
-  );
-
-  const isLoading = cartLoading || courseLoading || walletLoading || isCreatingOrder;
+    } catch (error: any) {
+      toast.error(error.message || "Failed to create order");
+    } finally {
+      setIsCreatingOrder(false);
+    }
+  };
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-blue-800">
-            Complete Your Purchase
-          </h1>
-          <p className="text-gray-600 mt-2">
-            You're just a few steps away from accessing your course(s)
-          </p>
-        </div>
-
-        <div className="flex flex-col lg:flex-row gap-6">
-          <div className="w-full lg:w-7/12 bg-white rounded-lg shadow-md p-6">
-            <div className="flex mb-8 border-b pb-4">
-              <div
-                className={`flex-1 text-center ${
-                  activeStep >= 1
-                    ? "text-blue-700 font-medium"
-                    : "text-gray-400"
-                }`}
-              >
-                <div
-                  className={`w-8 h-8 mx-auto mb-2 rounded-full flex items-center justify-center ${
-                    activeStep >= 1
-                      ? "bg-blue-700 text-white"
-                      : "bg-gray-200 text-gray-500"
-                  }`}
-                >
-                  1
-                </div>
-                Order Details
-              </div>
-              <div
-                className={`flex-1 text-center ${
-                  activeStep >= 2
-                    ? "text-blue-700 font-medium"
-                    : "text-gray-400"
-                }`}
-              >
-                <div
-                  className={`w-8 h-8 mx-auto mb-2 rounded-full flex items-center justify-center ${
-                    activeStep >= 2
-                      ? "bg-blue-700 text-white"
-                      : "bg-gray-200 text-gray-500"
-                  }`}
-                >
-                  2
-                </div>
-                Payment
-              </div>
+    <div className="min-h-screen bg-gray-50/50 p-6">
+      <div className="max-w-7xl mx-auto space-y-6">
+        {/* Header */}
+        <Card className="bg-white/80 backdrop-blur-sm border border-gray-100 shadow-sm rounded-xl p-6">
+          <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
+            <div>
+              <h1 className="text-2xl font-semibold text-gray-900">Checkout</h1>
+              <p className="text-gray-600 mt-1">
+                Complete your purchase to access your courses
+              </p>
             </div>
+            <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">
+              {courseDetails.length} {courseDetails.length === 1 ? "Course" : "Courses"}
+            </Badge>
+          </div>
+        </Card>
 
-            {isLoading ? (
-              <OrderDetailsSkeleton />
-            ) : activeStep === 1 ? (
-              <OrderDetails
-                courseDetails={courseDetails}
-                onProceed={handleProceedToPayment}
-                isDisabled={!courseDetails.length || finalAmount <= 0}
-              />
-            ) : isCreatingOrder ? (
-              <PaymentMethodSkeleton />
-            ) : (
-              <PaymentMethodSelection
-                selectedMethod={selectedPaymentMethod}
-                onMethodSelect={handlePaymentMethodSelect}
-                couponCode={couponCode}
-                onCouponChange={setCouponCode}
-                onSubmit={handleSubmit}
-                isPending={isCreatingOrder}
-                isDisabled={!courseDetails.length || finalAmount <= 0}
-                paypalOptions={paypalOptions}
-                finalAmount={finalAmount}
-                courses={coursesInput}
-              />
-            )}
+        {/* Main Content */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Left Column - Order Details & Payment */}
+          <div className="lg:col-span-2 space-y-6">
+            {/* Order Details */}
+            <Card className="bg-white/80 backdrop-blur-sm border border-gray-100 shadow-sm rounded-xl p-6">
+              {isCartLoading ? (
+                <OrderDetailsSkeleton />
+              ) : (
+                <OrderDetails courseDetails={courseDetails} />
+              )}
+            </Card>
+
+            {/* Payment Method */}
+            <Card className="bg-white/80 backdrop-blur-sm border border-gray-100 shadow-sm rounded-xl p-6">
+              {isCartLoading ? (
+                <PaymentMethodSkeleton />
+              ) : (
+                <PaymentMethodSelection
+                  onMethodSelect={handlePaymentMethodSelect}
+                />
+              )}
+            </Card>
           </div>
 
-          <div className="w-full lg:w-5/12">
-            {isLoading ? (
-              <OrderSummarySkeleton />
-            ) : (
-              <OrderSummary
-                courses={courseDetails}
-                totalDiscountedPrice={totalDiscountedPrice}
-                tax={tax}
-                finalAmount={finalAmount}
-              />
-            )}
+          {/* Right Column - Order Summary */}
+          <div className="lg:col-span-1">
+            <Card className="bg-white/80 backdrop-blur-sm border border-gray-100 shadow-sm rounded-xl p-6 sticky top-6">
+              {isCartLoading ? (
+                <OrderSummarySkeleton />
+              ) : (
+                <OrderSummary
+                  subtotal={totalDiscountedPrice}
+                  discount={discount}
+                  total={finalAmount}
+                  onApplyCoupon={handleApplyCoupon}
+                  couponCode={couponCode}
+                  onCouponChange={setCouponCode}
+                  isPending={isCreatingOrder}
+                  onSubmit={handleProceedToPayment}
+                />
+              )}
+            </Card>
           </div>
         </div>
       </div>
     </div>
   );
-});
-
-export default CheckoutPage;
+}
