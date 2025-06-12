@@ -24,17 +24,21 @@ export interface ICreateCourseInputDTO {
 export interface IUpdateCourseInputDTO {
   id: string;
   title?: string;
-  description?: string | null;
+  description?: string;
   categoryId?: string;
-  price?: Price | null;
-  duration?: Duration | null;
+  price?: number;
+  duration?: number;
   level?: CourseLevel;
-  thumbnail?: string | null;
-  offer?: Offer | null;
+  thumbnail?: string;
+  offer?: number;
   status?: CourseStatus;
   createdBy: string;
+  // Course details fields
+  longDescription?: string;
+  prerequisites?: string;
+  objectives?: string;
+  targetAudience?: string;
   adminSharePercentage?: number;
-  details?: CourseDetails | null;
 }
 
 export interface IGetAllCoursesInputDTO {
@@ -95,7 +99,12 @@ export interface ICourseOutputDTO {
   details?: CourseDetails | null;
   rating?: number;
   reviewCount?: number;
-  lessons?: number;
+  lessons?: {
+    id: string;
+    title: string;
+    description: string | null;
+    order: number;
+  }[];
   bestSeller?: boolean;
 }
 
@@ -119,7 +128,14 @@ export interface ICourseWithEnrollmentStatus extends ICourseOutputDTO {
     name: string;
     email: string;
     avatar: string | null;
+    role: string;
   } | null;
+  lessons?: {
+    id: string;
+    title: string;
+    description: string | null;
+    order: number;
+  }[];
 }
 
 export interface ICourseResponseDTO {

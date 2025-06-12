@@ -14,11 +14,13 @@ export class GetCourseByIdUseCase implements IGetCourseByIdUseCase {
     courseId: string,
     userId?: string
   ): Promise<ICourseWithEnrollmentStatus | null> {
+    // Get course with all its data
     const course = await this.courseRepository.findById(courseId);
     if (!course) {
       throw new HttpError("Course not found", 404);
     }
 
+    // Check enrollment status
     let isEnrolled = false;
     if (userId) {
       const enrollment = await this.enrollmentRepository.findByUserAndCourse(
@@ -28,12 +30,12 @@ export class GetCourseByIdUseCase implements IGetCourseByIdUseCase {
       isEnrolled = !!enrollment;
     }
 
+    // Get course data with all its details
     const courseData = course.toJSON();
+
     return {
       ...courseData,
       isEnrolled,
-      category: courseData.category || null,
-      instructor: courseData.creator || null,
       instructorSharePercentage: Number(courseData.adminSharePercentage)
     };
   }

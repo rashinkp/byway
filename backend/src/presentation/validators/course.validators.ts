@@ -35,13 +35,11 @@ const courseFieldsSchema = z.object({
     .number()
     .nonnegative("Price must be non-negative")
     .optional()
-    .nullable()
-    .transform((val) => (val !== null && val !== undefined ? Price.create(val) : val)),
+    .nullable(),
   duration: z
     .number()
     .optional()
-    .nullable()
-    .transform((val) => (val !== null && val !== undefined ? Duration.create(val) : val)),
+    .nullable(),
   level: z.enum(courseLevelValues),
   thumbnail: z.string().url("Invalid URL").optional().nullable(),
   offer: z
@@ -49,23 +47,17 @@ const courseFieldsSchema = z.object({
     .min(0, "Offer must be non-negative")
     .max(100, "Offer cannot exceed 100")
     .optional()
-    .nullable()
-    .transform((val) => (val !== null && val !== undefined ? Offer.create(val) : val)),
+    .nullable(),
   status: z.enum(courseStatusValues).default(CourseStatus.DRAFT),
   adminSharePercentage: z
     .number()
     .min(0.01, "Admin share must be at least 0.01%")
     .max(100, "Admin share cannot exceed 100%")
     .default(20),
-  details: z
-    .object({
-      prerequisites: z.string().optional().nullable(),
-      longDescription: z.string().optional().nullable(),
-      objectives: z.string().optional().nullable(),
-      targetAudience: z.string().optional().nullable(),
-    })
-    .optional()
-    .nullable(),
+  prerequisites: z.string().optional().nullable(),
+  longDescription: z.string().optional().nullable(),
+  objectives: z.string().optional().nullable(),
+  targetAudience: z.string().optional().nullable()
 });
 
 // Schemas

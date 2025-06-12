@@ -8,65 +8,62 @@ import { ICourseRepository } from "../../../repositories/course.repository.inter
 import { IUpdateCourseUseCase } from "../interfaces/update-course.usecase.interface";
 import { ILessonRepository } from "../../../repositories/lesson.repository";
 import { CourseStatus } from "../../../../domain/enum/course-status.enum";
+import { Price } from "../../../../domain/value-object/price";
+import { Duration } from "../../../../domain/value-object/duration";
+import { Offer } from "../../../../domain/value-object/offer";
+import { Course } from "../../../../domain/entities/course.entity";
 
 export class UpdateCourseUseCase implements IUpdateCourseUseCase {
   constructor(
     private courseRepository: ICourseRepository,
-    private categoryRepository: ICategoryRepository,
-    private lessonRepository: ILessonRepository
   ) {}
 
   async execute(input: IUpdateCourseInputDTO): Promise<ICourseOutputDTO> {
-    const course = await this.courseRepository.findById(input.id);
-    if (!course || course.deletedAt) {
-      throw new HttpError("Course not found or deleted", 404);
-    }
+    try {
+      const course = await this.courseRepository.findById(input.id);
+      if (!course) {
+        throw new HttpError("Course not found", 404);
 
-    if (course.createdBy !== input.createdBy) {
-      throw new HttpError("Only the course creator can update it", 403);
-    }
-
-    if (input.categoryId && input.categoryId !== course.categoryId) {
-      const category = await this.categoryRepository.findById(input.categoryId);
-      if (!category || category.deletedAt) {
-        throw new HttpError("Category not found or deleted", 404);
+        
       }
-    }
 
-    if (input.title && input.title !== course.title) {
-      const existingCourse = await this.courseRepository.findByName(
-        input.title
-      );
-      if (existingCourse && !existingCourse.deletedAt) {
-        throw new HttpError("A course with this title already exists", 400);
+
+      console.log("Updating course with input:", input);
+
+
+      // Update course with input data
+      course.updateBasicInfo({
+        title: input.title,
+        description: input.description,
+        categoryId: input.categoryId,
+        price: input.price ? Price.create(input.price) : null,
+        duration: input.duration ? Duration.create(input.duration) : null,
+        level: input.level,
+        thumbnail: input.thumbnail,
+        offer: input.offer ? Offer.create(input.offer) : null,
+        status: input.status,
+        adminSharePercentage: input.adminSharePercentage
+      });
+
+
+      console.log("Course updated with basic info:", course.toJSON());
+
+
+      // Update course details if provided
+      if (input.longDescription || input.prerequisites || input.objectives || input.targetAudience) {
+        course.updateDetails({
+          longDescription: input.longDescription,
+          prerequisites: input.prerequisites,
+          objectives: input.objectives,
+          targetAudience: input.targetAudience
+        });
       }
+
+      const updatedCourse = await this.courseRepository.update(course);
+      return updatedCourse.toJSON();
+    } catch (error) {
+      console.error("Error updating course", { error, input });
+      throw new HttpError("Failed to update course", 500);
     }
-
-    // Check if course has published lessons when publishing
-    if (input.status === CourseStatus.PUBLISHED) {
-      const hasPublishedLessons = await this.lessonRepository.hasPublishedLessons(input.id);
-      if (!hasPublishedLessons) {
-        throw new HttpError("Cannot publish course without at least one published lesson", 400);
-      }
-    }
-
-    console.log("Updating course:", input);
-
-    course.update({
-      title: input.title,
-      description: input.description,
-      categoryId: input.categoryId,
-      price: input.price,
-      duration: input.duration,
-      level: input.level,
-      thumbnail: input.thumbnail,
-      offer: input.offer,
-      status: input.status,
-      details: input.details,
-    });
-
-    const updatedCourse = await this.courseRepository.update(course);
-
-    return updatedCourse.toJSON();
   }
 }

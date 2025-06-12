@@ -106,6 +106,7 @@ export class CourseController extends BaseController {
         ...request.body,
         createdBy: request.user.id,
       });
+
       const course = await this.updateCourseUseCase.execute({
         id: request.params.id,
         ...validated,

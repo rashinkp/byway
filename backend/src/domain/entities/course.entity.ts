@@ -6,11 +6,60 @@ import { Offer } from "../value-object/offer";
 import { CourseStatus } from "../enum/course-status.enum";
 import { APPROVALSTATUS } from "../enum/approval-status.enum";
 
-export interface CourseDetails {
-  prerequisites?: string | null;
-  longDescription?: string | null;
-  objectives?: string | null;
-  targetAudience?: string | null;
+export class CourseDetails {
+  private _prerequisites: string | null;
+  private _longDescription: string | null;
+  private _objectives: string | null;
+  private _targetAudience: string | null;
+
+  constructor(props: {
+    prerequisites?: string | null;
+    longDescription?: string | null;
+    objectives?: string | null;
+    targetAudience?: string | null;
+  }) {
+    this._prerequisites = props.prerequisites ?? null;
+    this._longDescription = props.longDescription ?? null;
+    this._objectives = props.objectives ?? null;
+    this._targetAudience = props.targetAudience ?? null;
+  }
+
+  get prerequisites(): string | null {
+    return this._prerequisites;
+  }
+
+  get longDescription(): string | null {
+    return this._longDescription;
+  }
+
+  get objectives(): string | null {
+    return this._objectives;
+  }
+
+  get targetAudience(): string | null {
+    return this._targetAudience;
+  }
+
+  update(props: Partial<{
+    prerequisites: string | null;
+    longDescription: string | null;
+    objectives: string | null;
+    targetAudience: string | null;
+  }>): void {
+    if (props.prerequisites !== undefined) this._prerequisites = props.prerequisites;
+    if (props.longDescription !== undefined) this._longDescription = props.longDescription;
+    if (props.objectives !== undefined) this._objectives = props.objectives;
+    if (props.targetAudience !== undefined) this._targetAudience = props.targetAudience;
+  }
+
+  toJSON() {
+    return {
+      prerequisites: this._prerequisites,
+      longDescription: this._longDescription,
+      objectives: this._objectives,
+      targetAudience: this._targetAudience,
+    };
+  }
 }
 
 export interface CourseProps {
@@ -150,20 +199,47 @@ export class Course {
   }
 
   // Business logic
-  update(props: Partial<CourseProps>): void {
+  updateBasicInfo(props: Partial<{
+    title: string;
+    description: string | null;
+    level: CourseLevel;
+    price: Price | null;
+    thumbnail: string | null;
+    duration: Duration | null;
+    offer: Offer | null;
+    status: CourseStatus;
+    categoryId: string;
+    adminSharePercentage: number;
+  }>): void {
     if (props.title) this._title = props.title;
-    if (props.description !== undefined)
-      this._description = props.description ?? null;
+    if (props.description !== undefined) this._description = props.description;
     if (props.level) this._level = props.level;
-    if (props.price !== undefined) this._price = props.price ?? null;
-    if (props.thumbnail !== undefined)
-      this._thumbnail = props.thumbnail ?? null;
-    if (props.duration !== undefined) this._duration = props.duration ?? null;
-    if (props.offer !== undefined) this._offer = props.offer ?? null;
+    if (props.price !== undefined) this._price = props.price;
+    if (props.thumbnail !== undefined) this._thumbnail = props.thumbnail;
+    if (props.duration !== undefined) this._duration = props.duration;
+    if (props.offer !== undefined) this._offer = props.offer;
     if (props.status) this._status = props.status;
     if (props.categoryId) this._categoryId = props.categoryId;
     if (props.adminSharePercentage !== undefined) this._adminSharePercentage = props.adminSharePercentage;
-    if (props.details !== undefined) this._details = props.details ?? null;
+    this._updatedAt = new Date();
+  }
+
+  updateDetails(props: Partial<{
+    prerequisites: string | null;
+    longDescription: string | null;
+    objectives: string | null;
+    targetAudience: string | null;
+  }>): void {
+    if (!this._details) {
+      this._details = new CourseDetails({
+        prerequisites: props.prerequisites ?? null,
+        longDescription: props.longDescription ?? null,
+        objectives: props.objectives ?? null,
+        targetAudience: props.targetAudience ?? null
+      });
+    } else {
+      this._details.update(props);
+    }
     this._updatedAt = new Date();
   }
 
@@ -198,7 +274,7 @@ export class Course {
       deletedAt: this._deletedAt?.toISOString() ?? null,
       approvalStatus: this._approvalStatus,
       adminSharePercentage: this._adminSharePercentage,
-      details: this._details,
+      details: this._details?.toJSON() ?? null,
       rating: this._rating,
       reviewCount: this._reviewCount,
       lessons: this._lessons,
@@ -224,7 +300,7 @@ export class Course {
       deletedAt: data.deletedAt,
       approvalStatus: data.approvalStatus,
       adminSharePercentage: data.adminSharePercentage,
-      details: data.details,
+      details: data.details ? new CourseDetails(data.details) : null,
     });
   }
 }

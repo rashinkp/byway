@@ -17,7 +17,7 @@ export function useLogin() {
         user.role === "ADMIN"
           ? "/admin/dashboard"
           : user.role === "INSTRUCTOR"
-          ? "/instructor/dashboard"
+          ? "/instructor"
           : "/";
       router.push(redirectPath);
     },

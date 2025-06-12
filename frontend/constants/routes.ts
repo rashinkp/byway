@@ -1,7 +1,7 @@
 
 export const ROUTES = {
   ADMIN: "/admin/dashboard",
-  INSTRUCTOR: "/instructor/dashboard",
+  INSTRUCTOR: "/instructor",
   USER: "/",
   DEFAULT: "/",
 };

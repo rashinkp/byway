@@ -6,7 +6,6 @@ import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Course } from "@/types/course";
-import Link from "next/link";
 import { CourseCardSkeleton } from "@/components/course/CourseCardSkeleton";
 
 type GridCourse = Course & {
@@ -177,7 +176,6 @@ export function CourseGrid({
                 variants={itemVariants}
                 className="flex"
               >
-                <Link href={`/courses/${course.id}`}>
                   <CourseCard
                     id={course.id}
                     thumbnail={course.thumbnail}
@@ -189,7 +187,6 @@ export function CourseGrid({
                     price={course.price}
                     bestSeller={course.bestSeller}
                   />
-                </Link>
               </motion.div>
             ))}
       </motion.div>

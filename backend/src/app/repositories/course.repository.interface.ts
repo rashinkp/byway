@@ -4,6 +4,7 @@ import {
   IGetEnrolledCoursesInputDTO,
 } from "../../domain/dtos/course/course.dto";
 import { Course } from "../../domain/entities/course.entity";
+import { CourseDetails } from "../../domain/entities/course.entity";
 
 export interface ICourseRepository {
   save(course: Course): Promise<Course>;
@@ -16,4 +17,6 @@ export interface ICourseRepository {
     input: IGetEnrolledCoursesInputDTO
   ): Promise<ICourseResponseDTO>;
   updateApprovalStatus(course: Course): Promise<Course>;
+  findCourseDetails(courseId: string): Promise<CourseDetails | null>;
+  updateCourseDetails(courseId: string, details: CourseDetails): Promise<CourseDetails>;
 }

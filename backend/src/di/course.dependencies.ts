@@ -36,8 +36,6 @@ export function createCourseDependencies(
   );
   const updateCourseUseCase = new UpdateCourseUseCase(
     courseRepository,
-    categoryRepository,
-    deps.lessonRepository
   );
   const deleteCourseUseCase = new DeleteCourseUseCase(courseRepository);
   const getEnrolledCoursesUseCase = new GetEnrolledCoursesUseCase(

@@ -1,5 +1,6 @@
 import { PrismaClient, Prisma } from "@prisma/client";
-import { Course } from "../../domain/entities/course.entity";
+import { Decimal } from "@prisma/client/runtime/library";
+import { Course, CourseDetails } from "../../domain/entities/course.entity";
 import { CourseLevel } from "../../domain/enum/course-level.enum";
 import { Price } from "../../domain/value-object/price";
 import { Duration } from "../../domain/value-object/duration";
@@ -11,12 +12,15 @@ import {
   IGetAllCoursesInputDTO,
   IGetEnrolledCoursesInputDTO,
 } from "../../domain/dtos/course/course.dto";
-import { Decimal } from "@prisma/client/runtime/library";
 import { ICourseRepository } from "../../app/repositories/course.repository.interface";
 import { HttpError } from "../../presentation/http/errors/http-error";
 
 export class CourseRepository implements ICourseRepository {
   constructor(private prisma: PrismaClient) {}
+
+  private hasValue<T>(value: T | null | undefined): value is T {
+    return value !== null && value !== undefined;
+  }
 
   async save(course: Course): Promise<Course> {
     try {
@@ -25,10 +29,12 @@ export class CourseRepository implements ICourseRepository {
         title: course.title,
         description: course.description,
         level: course.level,
-        price: course.price?.getValue() ?? null,
+        price: course.price?.getValue(),
         thumbnail: course.thumbnail,
-        duration: course.duration?.getValue() ?? null,
-        offer: course.offer?.getValue() ?? null,
+        duration: course.duration?.getValue()
+          ? Number(course.duration.getValue())
+          : null,
+        offer: course.offer?.getValue(),
         status: course.status,
         adminSharePercentage: course.adminSharePercentage,
         category: {
@@ -77,12 +83,12 @@ export class CourseRepository implements ICourseRepository {
         approvalStatus: saved.approvalStatus as APPROVALSTATUS,
         adminSharePercentage: saved.adminSharePercentage.toNumber(),
         details: saved.details
-          ? {
+          ? new CourseDetails({
               prerequisites: saved.details.prerequisites,
               longDescription: saved.details.longDescription,
               objectives: saved.details.objectives,
               targetAudience: saved.details.targetAudience,
-            }
+            })
           : null,
       });
     } catch (error) {
@@ -94,18 +100,7 @@ export class CourseRepository implements ICourseRepository {
     try {
       const course = await this.prisma.course.findUnique({
         where: { id },
-        include: { 
-          details: true,
-          category: true,
-          creator: {
-            select: {
-              id: true,
-              name: true,
-              email: true,
-              avatar: true
-            }
-          }
-        },
+        include: { details: true },
       });
 
       if (!course) return null;
@@ -128,12 +123,12 @@ export class CourseRepository implements ICourseRepository {
         approvalStatus: course.approvalStatus as APPROVALSTATUS,
         adminSharePercentage: course.adminSharePercentage.toNumber(),
         details: course.details
-          ? {
+          ? new CourseDetails({
               prerequisites: course.details.prerequisites,
               longDescription: course.details.longDescription,
               objectives: course.details.objectives,
               targetAudience: course.details.targetAudience,
-            }
+            })
           : null,
       });
     } catch (error) {
@@ -171,12 +166,12 @@ export class CourseRepository implements ICourseRepository {
         deletedAt: course.deletedAt,
         approvalStatus: course.approvalStatus as APPROVALSTATUS,
         details: course.details
-          ? {
+          ? new CourseDetails({
               prerequisites: course.details.prerequisites,
               longDescription: course.details.longDescription,
               objectives: course.details.objectives,
               targetAudience: course.details.targetAudience,
-            }
+            })
           : null,
       });
     } catch (error) {
@@ -209,21 +204,24 @@ export class CourseRepository implements ICourseRepository {
     const where: Prisma.CourseWhereInput = {
       ...(search ? { title: { contains: search, mode: "insensitive" } } : {}),
       // Admin can see all courses including deleted ones if includeDeleted is true
-      ...(role === "ADMIN" 
-        ? (includeDeleted ? {} : { deletedAt: null })
-        // Instructor can only see their own courses
-        : role === "INSTRUCTOR"
+      ...(role === "ADMIN"
+        ? includeDeleted
+          ? {}
+          : { deletedAt: null }
+        : // Instructor can only see their own courses
+        role === "INSTRUCTOR"
         ? { createdBy: userId, ...(includeDeleted ? {} : { deletedAt: null }) }
-        // Regular users can only see published, verified and non-deleted courses
-        : { 
-            deletedAt: null, 
+        : // Regular users can only see published, verified and non-deleted courses
+          {
+            deletedAt: null,
             status: CourseStatus.PUBLISHED,
-            approvalStatus: APPROVALSTATUS.APPROVED
-          }
-      ),
+            approvalStatus: APPROVALSTATUS.APPROVED,
+          }),
       ...(filterBy === "Active" ? { deletedAt: null } : {}),
       ...(filterBy === "Inactive" ? { deletedAt: { not: null } } : {}),
-      ...(filterBy === "Declined" ? { approvalStatus: APPROVALSTATUS.DECLINED } : {}),
+      ...(filterBy === "Declined"
+        ? { approvalStatus: APPROVALSTATUS.DECLINED }
+        : {}),
       ...(myCourses && userId ? { createdBy: userId } : {}),
       ...(level !== "All" ? { level } : {}),
       ...(duration === "Under5" ? { duration: { lte: 5 } } : {}),
@@ -265,12 +263,12 @@ export class CourseRepository implements ICourseRepository {
             deletedAt: course.deletedAt,
             approvalStatus: course.approvalStatus as APPROVALSTATUS,
             details: course.details
-              ? {
+              ? new CourseDetails({
                   prerequisites: course.details.prerequisites,
                   longDescription: course.details.longDescription,
                   objectives: course.details.objectives,
                   targetAudience: course.details.targetAudience,
-                }
+                })
               : null,
           })
       );
@@ -288,16 +286,23 @@ export class CourseRepository implements ICourseRepository {
 
   async update(course: Course): Promise<Course> {
     try {
-      const data = {
+      const data: Prisma.CourseUpdateInput = {
         title: course.title,
         description: course.description,
         level: course.level,
         price: course.price?.getValue(),
         thumbnail: course.thumbnail,
-        duration: course.duration?.getValue(),
+        duration: course.duration?.getValue()
+          ? Number(course.duration.getValue())
+          : null,
         offer: course.offer?.getValue(),
         status: course.status,
-        categoryId: course.categoryId,
+        category: course.categoryId
+          ? { connect: { id: course.categoryId } }
+          : undefined,
+        adminSharePercentage: course.adminSharePercentage
+          ? new Decimal(course.adminSharePercentage.toString())
+          : undefined,
         details: course.details
           ? {
               upsert: {
@@ -340,13 +345,14 @@ export class CourseRepository implements ICourseRepository {
         updatedAt: updated.updatedAt,
         deletedAt: updated.deletedAt,
         approvalStatus: updated.approvalStatus as APPROVALSTATUS,
+        adminSharePercentage: updated.adminSharePercentage?.toNumber() ?? 0,
         details: updated.details
-          ? {
+          ? new CourseDetails({
               prerequisites: updated.details.prerequisites,
               longDescription: updated.details.longDescription,
               objectives: updated.details.objectives,
               targetAudience: updated.details.targetAudience,
-            }
+            })
           : null,
       });
     } catch (error) {
@@ -379,12 +385,12 @@ export class CourseRepository implements ICourseRepository {
         deletedAt: updated.deletedAt,
         approvalStatus: updated.approvalStatus as APPROVALSTATUS,
         details: updated.details
-          ? {
+          ? new CourseDetails({
               prerequisites: updated.details.prerequisites,
               longDescription: updated.details.longDescription,
               objectives: updated.details.objectives,
               targetAudience: updated.details.targetAudience,
-            }
+            })
           : null,
       });
     } catch (error) {
@@ -451,12 +457,12 @@ export class CourseRepository implements ICourseRepository {
             deletedAt: course.deletedAt,
             approvalStatus: course.approvalStatus as APPROVALSTATUS,
             details: course.details
-              ? {
+              ? new CourseDetails({
                   prerequisites: course.details.prerequisites,
                   longDescription: course.details.longDescription,
                   objectives: course.details.objectives,
                   targetAudience: course.details.targetAudience,
-                }
+                })
               : null,
           })
       );
@@ -500,12 +506,12 @@ export class CourseRepository implements ICourseRepository {
         deletedAt: updated.deletedAt,
         approvalStatus: updated.approvalStatus as APPROVALSTATUS,
         details: updated.details
-          ? {
+          ? new CourseDetails({
               prerequisites: updated.details.prerequisites,
               longDescription: updated.details.longDescription,
               objectives: updated.details.objectives,
               targetAudience: updated.details.targetAudience,
-            }
+            })
           : null,
       });
     } catch (error) {
@@ -514,6 +520,64 @@ export class CourseRepository implements ICourseRepository {
         course,
       });
       throw new HttpError("Failed to update course approval status", 500);
+    }
+  }
+
+  async findCourseDetails(courseId: string): Promise<CourseDetails | null> {
+    try {
+      const details = await this.prisma.courseDetails.findUnique({
+        where: { courseId },
+      });
+
+      if (!details) return null;
+
+      return new CourseDetails({
+        prerequisites: details.prerequisites,
+        longDescription: details.longDescription,
+        objectives: details.objectives,
+        targetAudience: details.targetAudience,
+      });
+    } catch (error) {
+      console.error("Error retrieving course details", { error, courseId });
+      throw new HttpError("Failed to retrieve course details", 500);
+    }
+  }
+
+  async updateCourseDetails(
+    courseId: string,
+    details: CourseDetails
+  ): Promise<CourseDetails> {
+    try {
+      const updatedDetails = await this.prisma.courseDetails.upsert({
+        where: { courseId },
+        create: {
+          courseId,
+          prerequisites: details.prerequisites,
+          longDescription: details.longDescription,
+          objectives: details.objectives,
+          targetAudience: details.targetAudience,
+        },
+        update: {
+          prerequisites: details.prerequisites,
+          longDescription: details.longDescription,
+          objectives: details.objectives,
+          targetAudience: details.targetAudience,
+        },
+      });
+
+      return new CourseDetails({
+        prerequisites: updatedDetails.prerequisites,
+        longDescription: updatedDetails.longDescription,
+        objectives: updatedDetails.objectives,
+        targetAudience: updatedDetails.targetAudience,
+      });
+    } catch (error) {
+      console.error("Error updating course details", {
+        error,
+        courseId,
+        details,
+      });
+      throw new HttpError("Failed to update course details", 500);
     }
   }
 }

@@ -38,26 +38,33 @@ export class CreateCourseUseCase implements ICreateCourseUseCase {
       throw new HttpError("A course with this title already exists", 400);
     }
 
-    // Create course entity
+    // Create course entity with basic info
     const course = new Course({
       title: input.title,
       description: input.description,
       categoryId: input.categoryId,
-      price: input.price != null ? input.price : null,
-      duration: input.duration != null ? input.duration : null,
+      price: input.price,
+      duration: input.duration,
       level: input.level,
       thumbnail: input.thumbnail,
-      offer: input.offer != null ? input.offer : null,
+      offer: input.offer,
       status: input.status,
       createdBy: input.createdBy,
-      adminSharePercentage: input.adminSharePercentage,
-      details: input.details,
+      adminSharePercentage: input.adminSharePercentage
     });
 
+    // Add course details if provided
+    if (input.details) {
+      course.updateDetails({
+        prerequisites: input.details.prerequisites,
+        longDescription: input.details.longDescription,
+        objectives: input.details.objectives,
+        targetAudience: input.details.targetAudience
+      });
+    }
 
     // Persist course
     const savedCourse = await this.courseRepository.save(course);
-
     return savedCourse.toJSON();
   }
 }
