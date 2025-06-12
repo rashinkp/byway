@@ -8,6 +8,8 @@ import { TopInstructors } from "@/components/instructor/TopInstructor";
 import { Atom, Code, Megaphone, Telescope } from "lucide-react";
 import { useCategories } from "@/hooks/category/useCategories";
 import { useRouter } from "next/navigation";
+import { useGetAllCourses } from "@/hooks/course/useGetAllCourse";
+import { useGetAllInstructors } from "@/hooks/instructor/useGetAllInstructor";
 
 export default function UserDashboard() {
   const router = useRouter();
@@ -17,113 +19,24 @@ export default function UserDashboard() {
     filterBy: "Active"
   });
 
+  const { data: coursesData, isLoading: isCoursesLoading } = useGetAllCourses({
+    page: 1,
+    limit: 4,
+    role: "USER"
+  });
+
+  const { data: instructorsData, isLoading: isInstructorsLoading } = useGetAllInstructors({
+    page: 1,
+    limit: 4,
+    sortBy: "createdAt",
+    sortOrder: "desc",
+    filterBy: "Approved",
+    includeDeleted: false
+  });
+
   const handleCategoryClick = (categoryId: string) => {
     router.push(`/courses?category=${categoryId}`);
   };
-
-  const topCourses = [
-    {
-      id: "1",
-      thumbnail:
-        "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=60",
-      title: "Beginner's Guide to Design",
-      tutorName: "Ronald Richards",
-      rating: 4.9,
-      reviewCount: 1200,
-      duration: "22 Total Hours",
-      formattedDuration: "22 Total Hours",
-      lessons: 155,
-      price: 149.9,
-      bestSeller: true,
-    },
-    {
-      thumbnail:
-        "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=60",
-      title: "Beginner's Guide to Design",
-      tutorName: "Ronald Richards",
-      rating: 4.9,
-      reviewCount: 1200,
-      duration: "22 Total Hours",
-      lessons: 155,
-      price: 149.9,
-      bestSeller: false,
-    },
-    {
-      thumbnail:
-        "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=60",
-      title: "Beginner's Guide to Design",
-      tutorName: "Ronald Richards",
-      rating: 4.9,
-      reviewCount: 1200,
-      duration: "22 Total Hours",
-      lessons: 155,
-      price: 149.9,
-      bestSeller: false,
-    },
-    {
-      thumbnail:
-        "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=60",
-      title: "Beginner's Guide to Design",
-      tutorName: "Ronald Richards",
-      rating: 4.9,
-      reviewCount: 1200,
-      duration: "22 Total Hours",
-      lessons: 155,
-      price: 149.9,
-      bestSeller: false,
-    },
-  ];
-
-  const allCourses = [
-    {
-      thumbnail:
-        "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=60",
-      title: "Master Web Development with React and Node.js",
-      tutorName: "John Doe",
-      rating: 4.7,
-      reviewCount: 1243,
-      duration: "12h 30m",
-      lessons: 45,
-      price: 49.99,
-      bestSeller: true,
-    },
-    {
-      thumbnail:
-        "https://images.unsplash.com/photo-1501504906304-e396f752d904?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=60",
-      title: "Introduction to Data Science with Python",
-      tutorName: "Jane Smith",
-      rating: 4.5,
-      reviewCount: 892,
-      duration: "8h 15m",
-      lessons: 30,
-      price: 39.99,
-      bestSeller: false,
-    },
-    {
-      thumbnail:
-        "https://images.unsplash.com/photo-1531482615713-2afd69097998?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=60",
-      title: "UI/UX Design Fundamentals",
-      tutorName: "Alex Brown",
-      rating: 4.8,
-      reviewCount: 567,
-      duration: "6h 45m",
-      lessons: 25,
-      price: 29.99,
-      bestSeller: false,
-    },
-    {
-      thumbnail:
-        "https://images.unsplash.com/photo-1531482615713-2afd69097998?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=60",
-      title: "UI/UX Design Fundamentals",
-      tutorName: "Alex Brown",
-      rating: 4.8,
-      reviewCount: 567,
-      duration: "6h 45m",
-      lessons: 25,
-      price: 29.99,
-      bestSeller: false,
-    },
-  ];
 
   const stats = [
     { value: "250+", description: "Courses by our best mentors" },
@@ -139,50 +52,34 @@ export default function UserDashboard() {
     icon: <Code className="w-5 h-5 text-blue-500" />, // Default icon, can be customized based on category
   })) || [];
 
-  const topInstructors = [
-    {
-      image:
-        "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80",
-      name: "Jacob Jones",
-      role: "UI/UX Designer",
-      courseCount: 12,
-    },
-    {
-      image:
-        "https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80",
-      name: "Jenny Wilson",
-      role: "Developer",
-      courseCount: 15,
-    },
-    {
-      image:
-        "https://images.unsplash.com/photo-1517841903200-7a706fc245bc?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80",
-      name: "Ronald Richards",
-      role: "Marketer",
-      courseCount: 10,
-    },
-    {
-      image:
-        "https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80",
-      name: "Esther Howard",
-      role: "Astrologer",
-      courseCount: 8,
-    },
-    {
-      image:
-        "https://images.unsplash.com/photo-1517841903200-7a706fc245bc?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80",
-      name: "Ronald Richards",
-      role: "Marketer",
-      courseCount: 10,
-    },
-    {
-      image:
-        "https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80",
-      name: "Esther Howard",
-      role: "Astrologer",
-      courseCount: 8,
-    },
-  ];
+  const topCourses = coursesData?.items.map(course => ({
+    id: course.id,
+    thumbnail: course.thumbnail || "/default-thumbnail.png",
+    title: course.title,
+    tutorName: "Instructor", // This will need to be updated when we have instructor data
+    rating: course.rating || 4.5,
+    reviewCount: course.reviewCount || 100,
+    duration: course.duration ? `${course.duration} hours` : "Unknown",
+    formattedDuration: course.duration ? `${course.duration} hours` : "Unknown",
+    lessons: course.lessons || 10,
+    price: course.offer || course.price || 0,
+    bestSeller: course.bestSeller || false,
+  })) || [];
+
+  const topInstructors = instructorsData?.data.items.map(instructor => ({
+    id: instructor.id,
+    areaOfExpertise: instructor.areaOfExpertise,
+    professionalExperience: instructor.professionalExperience,
+    about: instructor.about || "",
+    website: instructor.website || "",
+    education: instructor.education || "",
+    certifications: instructor.certifications || "",
+    totalStudents: instructor.totalStudents,
+    user: {
+      ...instructor.user,
+      avatar: instructor.user.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(instructor.user.name)}&background=random`
+    }
+  })) || [];
 
   return (
     <div className="container mx-auto px-4 py-8">
