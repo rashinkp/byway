@@ -50,9 +50,6 @@ export function CourseDetails({
         <ImageSection
           src={src}
           alt={alt}
-          onImageChange={() => {}}
-          isUploading={false}
-          uploadProgress={null}
         />
         <div className="flex-1">
          

@@ -2,6 +2,7 @@
 import { cn } from "@/utils/cn";
 import { useState } from "react";
 import { Star, Clock, BookOpen } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 interface CourseCardProps {
   id: string;
@@ -29,6 +30,7 @@ export function CourseCard({
   formattedDuration: duration,
 }: CourseCardProps) {
   const [isHovered, setIsHovered] = useState(false);
+  const router = useRouter();
   
 
   // Format price to display with 2 decimal places
@@ -60,15 +62,20 @@ export function CourseCard({
     );
   };
 
+  const handleClick = () => {
+    router.push(`/courses/${id}`);
+  };
+
   return (
     <div
       className={cn(
-        "flex flex-col bg-white rounded-lg border border-gray-200 transition-shadow duration-200 w-[320px] h-[320px]",
+        "flex flex-col bg-white rounded-lg border border-gray-200 transition-shadow duration-200 w-[320px] h-[320px] cursor-pointer",
         isHovered && "shadow-md",
         className
       )}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
+      onClick={handleClick}
     >
       {/* Thumbnail */}
       <div className="h-[180px] overflow-hidden rounded-t-lg relative">
@@ -88,7 +95,7 @@ export function CourseCard({
       </div>
 
       {/* Course info */}
-      <div className="flex flex-col flex-grow p-4">
+      <div className="p-4 flex-1 flex flex-col">
         <div className="flex items-center gap-2 mb-1">
           <div className="flex items-center gap-1">
             {renderStars(rating)}

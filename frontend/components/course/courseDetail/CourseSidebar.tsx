@@ -1,11 +1,8 @@
 "use client";
 import { useRouter } from "next/navigation";
-import { Course } from "@/types/course"; 
+import { Course } from "@/types/course";
 import { Button } from "@/components/ui/button";
 import { Check, Lock, ShoppingCart } from "lucide-react";
-import { useAuth } from "@/hooks/auth/useAuth";
-import { useGetEnrolledCourses } from "@/hooks/course/useGetEnrolledCourses";
-import { useCart } from "@/hooks/cart/useCart";
 import CourseSidebarSkeleton from "./CourseSidebarSkeleton";
 
 interface CourseSidebarProps {
@@ -23,19 +20,7 @@ export default function CourseSidebar({
   handleAddToCart,
   isEnrolled,
 }: CourseSidebarProps) {
-  const { user } = useAuth();
   const router = useRouter();
-  const { data: enrolledCourses } = useGetEnrolledCourses({
-    page: 1,
-    limit: 10,
-    sortBy: "enrolledAt",
-    sortOrder: "desc",
-    search: "",
-    level: "All"
-  });
-  const { data: cart } = useCart();
-
-  const isInCart = cart?.items.some((cartItem) => cartItem.courseId === course?.id);
 
   const handleEnroll = () => {
     if (course?.id) {
@@ -45,7 +30,7 @@ export default function CourseSidebar({
 
   const formatPrice = (price: number | string | null | undefined) => {
     if (!price) return "Free";
-    const numPrice = typeof price === 'number' ? price : Number(price);
+    const numPrice = typeof price === "number" ? price : Number(price);
     return `$${numPrice.toFixed(2)}`;
   };
 
@@ -72,24 +57,14 @@ export default function CourseSidebar({
 
         {!isEnrolled && (
           <div className="space-y-4">
-            {isInCart ? (
-              <Button
-                className="w-full bg-blue-600 hover:bg-blue-700 text-white"
-                onClick={() => router.push("/cart")}
-              >
-                <ShoppingCart className="w-4 h-4 mr-2" />
-                Go to Cart
-              </Button>
-            ) : (
-              <Button
-                className="w-full bg-blue-600 hover:bg-blue-700 text-white"
-                onClick={handleAddToCart}
-                disabled={isCartLoading}
-              >
-                <ShoppingCart className="w-4 h-4 mr-2" />
-                {isCartLoading ? "Adding..." : "Add to Cart"}
-              </Button>
-            )}
+            <Button
+              className="w-full bg-blue-600 hover:bg-blue-700 text-white"
+              onClick={handleAddToCart}
+              disabled={isCartLoading}
+            >
+              <ShoppingCart className="w-4 h-4 mr-2" />
+              {isCartLoading ? "Adding..." : "Add to Cart"}
+            </Button>
 
             <Button
               className="w-full bg-gray-100 hover:bg-gray-200 text-gray-700"
