@@ -252,7 +252,7 @@ export function CourseFormModal({
         longDescription: data.longDescription,
         objectives: data.objectives,
         targetAudience: data.targetAudience,
-        adminSharePercentage: data.adminSharePercentage,
+        adminSharePercentage: data.adminSharePercentage || 20,
       };
 
       if (isEditing && initialData?.id) {
@@ -312,6 +312,7 @@ export function CourseFormModal({
               objectives: initialData.objectives,
               targetAudience: initialData.targetAudience,
               status: initialData.status,
+              adminSharePercentage: initialData.adminSharePercentage ?? 20,
             }
           : undefined
       }

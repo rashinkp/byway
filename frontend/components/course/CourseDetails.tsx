@@ -88,6 +88,7 @@ export function CourseDetails({
             longDescription: course.details?.longDescription || undefined,
             objectives: course.details?.objectives || undefined,
             targetAudience: course.details?.targetAudience || undefined,
+            adminSharePercentage: course.adminSharePercentage || 20,
           }}
         />
       )}

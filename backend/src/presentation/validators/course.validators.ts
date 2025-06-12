@@ -62,9 +62,14 @@ const courseFieldsSchema = z.object({
 
 // Schemas
 const createCourseSchema = courseFieldsSchema as z.ZodType<Omit<ICreateCourseInputDTO, "createdBy">>;
-const updateCourseSchema = courseFieldsSchema.partial() as z.ZodType<
-  Partial<Omit<IUpdateCourseInputDTO, "createdBy" | "id">>
->;
+const updateCourseSchema = z.object({
+  ...courseFieldsSchema.partial().shape,
+  adminSharePercentage: z
+    .number()
+    .min(0.01, "Admin share must be at least 0.01%")
+    .max(100, "Admin share cannot exceed 100%")
+    .default(20)
+}) as z.ZodType<Partial<Omit<IUpdateCourseInputDTO, "createdBy" | "id">>>;
 const courseIdSchema = z.object({
   id: uuidSchema,
 });
