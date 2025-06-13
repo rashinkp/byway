@@ -79,10 +79,10 @@ const InstructorProfilePage: React.FC = () => {
 
   const handleDelete = () => {
     toggleDeleteUser(instructor.userId, {
-      onSuccess: () => {
-        refetch();
-      }
-    });
+        onSuccess: () => {
+          refetch();
+        }
+      });
   };
 
   const handleDownloadCV = () => {
