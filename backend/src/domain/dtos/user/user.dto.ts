@@ -50,7 +50,6 @@ export function validateGetAllUsers(data: unknown): GetAllUsersDto {
 // Toggle Delete DTO
 export const ToggleDeleteUserDtoSchema = z.object({
   id: z.string().uuid(),
-  deletedAt: z.enum(["true", "false"]),
 });
 
 export type ToggleDeleteUserDto = z.infer<typeof ToggleDeleteUserDtoSchema>;

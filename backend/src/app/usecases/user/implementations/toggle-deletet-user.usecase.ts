@@ -15,12 +15,13 @@ export class ToggleDeleteUserUseCase implements IToggleDeleteUserUseCase {
       throw new HttpError("Unauthorized: Admin role required", 403);
     }
 
+
     const user = await this.userRepository.findById(dto.id);
     if (!user) {
       throw new HttpError("User not found", 404);
     }
 
-    if (dto.deletedAt === "true") {
+    if (!user.deletedAt) {
       user.softDelete();
     } else {
       user.restore();

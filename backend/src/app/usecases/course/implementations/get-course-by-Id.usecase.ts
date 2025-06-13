@@ -3,6 +3,9 @@ import { HttpError } from "../../../../presentation/http/errors/http-error";
 import { ICourseRepository } from "../../../repositories/course.repository.interface";
 import { IEnrollmentRepository } from "../../../repositories/enrollment.repository.interface";
 import { IGetCourseByIdUseCase } from "../interfaces/get-course-by-id.usecase.interface";
+import { APPROVALSTATUS } from "../../../../domain/enum/approval-status.enum";
+import { CourseStatus } from "../../../../domain/enum/course-status.enum";
+import { JwtPayload } from "jsonwebtoken";
 
 export class GetCourseByIdUseCase implements IGetCourseByIdUseCase {
   constructor(
@@ -12,7 +15,7 @@ export class GetCourseByIdUseCase implements IGetCourseByIdUseCase {
 
   async execute(
     courseId: string,
-    userId?: string
+    user?: JwtPayload
   ): Promise<ICourseWithEnrollmentStatus | null> {
     // Get course with all its data
     const course = await this.courseRepository.findById(courseId);
@@ -20,18 +23,32 @@ export class GetCourseByIdUseCase implements IGetCourseByIdUseCase {
       throw new HttpError("Course not found", 404);
     }
 
+    const courseData = course.toJSON();
+    
+    // Check if user has permission to view the course
+    const isAdmin = user?.role === "ADMIN";
+    const isCreator = user?.id === courseData.createdBy;
+
+    // If not admin or creator, check course status
+    if (!isAdmin && !isCreator) {
+      if (
+        courseData.deletedAt ||
+        courseData.approvalStatus !== APPROVALSTATUS.APPROVED ||
+        courseData.status !== CourseStatus.PUBLISHED
+      ) {
+        throw new HttpError("Course not found", 404);
+      }
+    }
+
     // Check enrollment status
     let isEnrolled = false;
-    if (userId) {
+    if (user?.id) {
       const enrollment = await this.enrollmentRepository.findByUserAndCourse(
-        userId,
+        user.id,
         courseId
       );
       isEnrolled = !!enrollment;
     }
-
-    // Get course data with all its details
-    const courseData = course.toJSON();
 
     return {
       ...courseData,

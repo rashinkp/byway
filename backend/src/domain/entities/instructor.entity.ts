@@ -12,6 +12,7 @@ interface InstructorInterface {
   totalStudents: number;
   createdAt: Date;
   updatedAt: Date;
+  deletedAt?: Date | null;
 }
 
 export class Instructor {
@@ -28,6 +29,7 @@ export class Instructor {
   private _totalStudents: number;
   private _createdAt: Date;
   private _updatedAt: Date;
+  private _deletedAt?: Date | null;
 
   static create(dto: {
     userId: string;
@@ -57,6 +59,7 @@ export class Instructor {
       totalStudents: 0,
       createdAt: new Date(),
       updatedAt: new Date(),
+      deletedAt: null
     });
   }
 
@@ -106,6 +109,7 @@ export class Instructor {
     totalStudents: number;
     createdAt: Date;
     updatedAt: Date;
+    deletedAt?: Date | null;
   }): Instructor {
     return new Instructor({
       id: data.id,
@@ -121,6 +125,7 @@ export class Instructor {
       totalStudents: data.totalStudents,
       createdAt: data.createdAt,
       updatedAt: data.updatedAt,
+      deletedAt: data.deletedAt
     });
   }
 
@@ -138,6 +143,7 @@ export class Instructor {
     this._totalStudents = props.totalStudents;
     this._createdAt = props.createdAt;
     this._updatedAt = props.updatedAt;
+    this._deletedAt = props.deletedAt;
   }
 
   get id(): string {
@@ -192,6 +198,10 @@ export class Instructor {
     return this._updatedAt;
   }
 
+  get deletedAt(): Date | null | undefined {
+    return this._deletedAt;
+  }
+
   approve(): void {
     if (this._status === "APPROVED") {
       throw new Error("Instructor is already approved");
@@ -223,6 +233,7 @@ export class Instructor {
       totalStudents: this._totalStudents,
       createdAt: this._createdAt,
       updatedAt: this._updatedAt,
+      deletedAt: this._deletedAt
     };
   }
 }

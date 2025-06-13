@@ -10,8 +10,6 @@ export class GetInstructorDetailsUseCaseImpl implements GetInstructorDetailsUseC
   ) {}
 
   async execute(userId: string) {
-
-
     const user = await this.userRepository.findById(userId);
     if (!user) {
       throw new HttpError("User not found for instructor", 404);
@@ -21,19 +19,17 @@ export class GetInstructorDetailsUseCaseImpl implements GetInstructorDetailsUseC
       throw new HttpError("User is not an instructor", 403);
     }
 
-
     const instructor = await this.instructorRepository.findInstructorByUserId(
       userId
     );
-
-    const instructorId = instructor?.id;
 
     if (!instructor) {
       throw new HttpError("Instructor not found", 404);
     }
 
     return {
-      id: instructor.id,
+      userId: user.id,
+      instructorId: instructor.id,
       name: user.name,
       email: user.email,
       avatar: user.avatar ?? null,
@@ -46,7 +42,9 @@ export class GetInstructorDetailsUseCaseImpl implements GetInstructorDetailsUseC
       cv: instructor.cv,
       totalStudents: instructor.totalStudents,
       status: instructor.status,
-      createdAt: instructor.createdAt,
+      createdAt: user.createdAt,
+      updatedAt: user.updatedAt,
+      deletedAt: user.deletedAt ?? null
     };
   }
 } 

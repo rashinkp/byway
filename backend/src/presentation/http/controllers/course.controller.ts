@@ -85,7 +85,7 @@ export class CourseController extends BaseController {
       });
       const course = await this.getCourseByIdUseCase.execute(
         validated.id,
-        request.user?.id
+        request.user
       );
       if (!course) {
         throw new BadRequestError("Course not found");

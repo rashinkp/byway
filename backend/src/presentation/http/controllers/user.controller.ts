@@ -76,7 +76,6 @@ export class UserController extends BaseController {
       }
       const validated = validateToggleDeleteUser({
         id: request.params.id,
-        deletedAt: request.body.deletedAt,
       });
       const user = await this.toggleDeleteUserUseCase.execute(
         validated,
@@ -91,7 +90,7 @@ export class UserController extends BaseController {
         deletedAt: user.deletedAt,
         createdAt: user.createdAt,
         updatedAt: user.updatedAt,
-      }, validated.deletedAt === "true" ? "User deleted successfully" : "User restored successfully");
+      },  "User data updated successfully");
     });
   }
 
@@ -138,7 +137,7 @@ export class UserController extends BaseController {
         throw new HttpError("User not found", 404);
       }
 
-      console.log(user , profile);
+
       return this.success_200({
         id: user.id,
         name: user.name,

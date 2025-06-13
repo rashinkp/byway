@@ -48,23 +48,23 @@ export interface IUserDetails {
 
 // Instructor details from the API response
 export interface IInstructorDetails {
-  id: string;
   userId: string;
-  areaOfExpertise: string;
-  professionalExperience: string;
-  about?: string;
-  website?: string;
-  education: string;
-  certifications: string;
-  cv: string;
-  status: "PENDING" | "APPROVED" | "DECLINED";
-  totalStudents: number;
-  createdAt: string;
-  updatedAt: string;
+  instructorId: string;
   name: string;
   email: string;
   avatar: string | null;
-  
+  areaOfExpertise: string;
+  professionalExperience: string;
+  about: string | null;
+  website: string | null;
+  education: string;
+  certifications: string;
+  cv: string;
+  status: string;
+  totalStudents: number;
+  createdAt: string;
+  updatedAt: string;
+  deletedAt: string | null;
 }
 
 // Response structure for useGetInstructorByUserId hook

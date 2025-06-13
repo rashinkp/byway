@@ -43,21 +43,13 @@ export const getAllUsers = async ({
   }
 };
 
-export async function deleteUser(id: string): Promise<void> {
+export const toggleDeleteUser = async (id: string): Promise<void> => {
   try {
-    await api.put(`/user/admin/${id}`, { deletedAt: "true" });
+    await api.patch(`/user/softDelete/${id}`);
   } catch (error: any) {
-    throw new Error(error.response?.data?.message || "Failed to delete user");
+    throw new Error(error.response?.data?.message || "Failed to toggle user status");
   }
-}
-
-export async function recoverUser(id: string): Promise<void> {
-  try {
-    await api.put(`/user/admin/${id}`, { deletedAt: "false" });
-  } catch (error: any) {
-    throw new Error(error.response?.data?.message || "Failed to recover user");
-  }
-}
+};
 
 export async function getUserData(): Promise<User> {
   try {

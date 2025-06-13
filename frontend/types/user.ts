@@ -41,9 +41,9 @@ export interface User {
   dateOfBirth?: string;
   gender?: GenderType;
   isVerified: boolean;
-  deletedAt?: string;
   createdAt: string;
   updatedAt: string;
+  deletedAt: string | null;
   instructor?: IInstructorWithUserDetails;
 }
 

@@ -28,7 +28,6 @@ const getAllUsersSchema = z.object({
 
 const toggleDeleteUserSchema = z.object({
   id: uuidSchema,
-  deletedAt: z.enum(["true", "false"]),
 });
 
 const updateUserSchema = z.object({

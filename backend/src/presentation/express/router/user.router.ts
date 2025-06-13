@@ -11,13 +11,7 @@ export function userRouter(userController: UserController): Router {
     expressAdapter(req, res, userController.getAllUsers.bind(userController))
   );
 
-  router.put("/admin/:id", restrictTo("ADMIN"), (req, res) =>
-    expressAdapter(
-      req,
-      res,
-      userController.toggleDeleteUser.bind(userController)
-    )
-  );
+
 
   // User routes
   router.get("/me", restrictTo("USER", "INSTRUCTOR", "ADMIN"), (req, res) =>
@@ -37,6 +31,15 @@ export function userRouter(userController: UserController): Router {
 
   router.get("/:userId/public", optionalAuth, (req, res) =>
     expressAdapter(req, res, userController.getPublicUser.bind(userController))
+  );
+
+
+  router.patch("/softDelete/:id", restrictTo("ADMIN"), (req, res) =>
+    expressAdapter(
+      req,
+      res,
+      userController.toggleDeleteUser.bind(userController)
+    )
   );
 
   router.get("/admin/:userId", restrictTo("ADMIN"), (req, res) =>

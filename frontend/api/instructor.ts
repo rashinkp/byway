@@ -137,17 +137,22 @@ export const getPublicInstructors = async (params?: {
 };
 
 export const getInstructorDetails = async (
-  instructorId: string
-): Promise<ApiResponse<IInstructorDetails | null>> => {
+  userId: string
+): Promise<ApiResponse<IInstructorDetails>> => {
   try {
-    const response = await api.get<
-      ApiResponse<IInstructorDetails | null>
-    >(`/instructor/instructors/${instructorId}`);
+    const response = await api.get<ApiResponse<IInstructorDetails>>(
+      `/instructor/${userId}`
+    );
     return response.data;
   } catch (error: any) {
-    console.error("Error fetching instructor details:", error);
-    throw new Error(
-      error.response?.data?.message || "Failed to fetch instructor details"
-    );
+    throw {
+      response: error.response
+        ? {
+            status: error.response.status,
+            data: error.response.data,
+          }
+        : undefined,
+      message: error.response?.data?.message || "Failed to get instructor details",
+    };
   }
 };

@@ -4,16 +4,13 @@ import { IInstructorDetails } from "@/types/instructor";
 import { ApiResponse } from "@/types/apiResponse";
 
 export function useGetInstructorDetails(
-  instructorId: string,
+  userId: string,
   enabled: boolean = true
 ) {
-  const queryResult = useQuery<
-    ApiResponse<IInstructorDetails | null>,
-    Error
-  >({
-    queryKey: ["instructorDetails", instructorId],
-    queryFn: () => getInstructorDetails(instructorId),
-    enabled: !!instructorId && enabled, // Only run if instructorId exists and enabled is true
+  const queryResult = useQuery<ApiResponse<IInstructorDetails>, Error>({
+    queryKey: ["instructorDetails", userId],
+    queryFn: () => getInstructorDetails(userId),
+    enabled: !!userId && enabled,
   });
 
   return queryResult;

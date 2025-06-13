@@ -2,7 +2,8 @@ import { InstructorDetails } from "@prisma/client";
 
 export interface GetInstructorDetailsUseCase {
   execute(instructorId: string): Promise<{
-    id: string;
+    userId: string;
+    instructorId: string;
     name: string;
     email: string;
     avatar: string | null;
@@ -16,5 +17,7 @@ export interface GetInstructorDetailsUseCase {
     totalStudents: number;
     status: string;
     createdAt: Date;
+    updatedAt: Date;
+    deletedAt: Date | null;
   }>;
 } 
