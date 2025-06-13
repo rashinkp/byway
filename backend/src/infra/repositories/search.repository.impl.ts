@@ -26,11 +26,18 @@ export class SearchRepository implements ISearchRepository {
     const [items, total] = await Promise.all([
       this.prisma.user.findMany({
         where: {
-          role: "INSTRUCTOR",
-          OR: [
-            { name: { contains: query, mode: 'insensitive' } },
-            { instructorDetails: { about: { contains: query, mode: 'insensitive' } } },
-          ],
+          AND: [
+            {
+              role: "INSTRUCTOR",
+              OR: [
+                { name: { contains: query, mode: 'insensitive' } },
+                { instructorDetails: { about: { contains: query, mode: 'insensitive' } } },
+              ],
+            },
+            {
+              deletedAt: null
+            }
+          ]
         },
         select: {
           id: true,
@@ -47,11 +54,18 @@ export class SearchRepository implements ISearchRepository {
       }),
       this.prisma.user.count({
         where: {
-          role: "INSTRUCTOR",
-          OR: [
-            { name: { contains: query, mode: 'insensitive' } },
-            { instructorDetails: { about: { contains: query, mode: 'insensitive' } } },
-          ],
+          AND: [
+            {
+              role: "INSTRUCTOR",
+              OR: [
+                { name: { contains: query, mode: 'insensitive' } },
+                { instructorDetails: { about: { contains: query, mode: 'insensitive' } } },
+              ],
+            },
+            {
+              deletedAt: null
+            }
+          ]
         },
       }),
     ]);
@@ -73,10 +87,19 @@ export class SearchRepository implements ISearchRepository {
     const [items, total] = await Promise.all([
       this.prisma.course.findMany({
         where: {
-          OR: [
-            { title: { contains: query, mode: 'insensitive' } },
-            { description: { contains: query, mode: 'insensitive' } },
-          ],
+          AND: [
+            {
+              OR: [
+                { title: { contains: query, mode: 'insensitive' } },
+                { description: { contains: query, mode: 'insensitive' } },
+              ],
+            },
+            {
+              deletedAt: null,
+              approvalStatus: 'APPROVED',
+              status: 'PUBLISHED'
+            }
+          ]
         },
         select: {
           id: true,
@@ -90,10 +113,19 @@ export class SearchRepository implements ISearchRepository {
       }),
       this.prisma.course.count({
         where: {
-          OR: [
-            { title: { contains: query, mode: 'insensitive' } },
-            { description: { contains: query, mode: 'insensitive' } },
-          ],
+          AND: [
+            {
+              OR: [
+                { title: { contains: query, mode: 'insensitive' } },
+                { description: { contains: query, mode: 'insensitive' } },
+              ],
+            },
+            {
+              deletedAt: null,
+              approvalStatus: 'APPROVED',
+              status: 'PUBLISHED'
+            }
+          ]
         },
       }),
     ]);
@@ -116,10 +148,17 @@ export class SearchRepository implements ISearchRepository {
     const [items, total] = await Promise.all([
       this.prisma.category.findMany({
         where: {
-          OR: [
-            { name: { contains: query, mode: 'insensitive' } },
-            { description: { contains: query, mode: 'insensitive' } },
-          ],
+          AND: [
+            {
+              OR: [
+                { name: { contains: query, mode: 'insensitive' } },
+                { description: { contains: query, mode: 'insensitive' } },
+              ],
+            },
+            {
+              deletedAt: null
+            }
+          ]
         },
         select: {
           id: true,
@@ -131,10 +170,17 @@ export class SearchRepository implements ISearchRepository {
       }),
       this.prisma.category.count({
         where: {
-          OR: [
-            { name: { contains: query, mode: 'insensitive' } },
-            { description: { contains: query, mode: 'insensitive' } },
-          ],
+          AND: [
+            {
+              OR: [
+                { name: { contains: query, mode: 'insensitive' } },
+                { description: { contains: query, mode: 'insensitive' } },
+              ],
+            },
+            {
+              deletedAt: null
+            }
+          ]
         },
       }),
     ]);
