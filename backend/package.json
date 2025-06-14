@@ -7,7 +7,9 @@
     "dev": "nodemon src/presentation/express/settings/server.ts",
     "build": "tsc",
     "lint": "eslint . --ext .ts",
-    "test": "jest"
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage"
   },
   "keywords": [],
   "author": "",
@@ -45,14 +47,18 @@
     "zod": "^3.25.30"
   },
   "devDependencies": {
+    "@jest/types": "^30.0.0",
     "@types/bcrypt": "^5.0.2",
     "@types/cors": "^2.8.17",
     "@types/express": "^5.0.1",
+    "@types/jest": "^29.5.14",
     "@types/node": "^22.13.17",
     "@types/paypal__checkout-server-sdk": "^1.0.8",
+    "jest": "^30.0.0",
     "nodemon": "^3.1.9",
     "prisma": "^6.7.0",
     "prisma-import": "^1.0.5",
+    "ts-jest": "^29.4.0",
     "ts-node": "^10.9.2",
     "tsx": "^4.19.3",
     "typescript": "^5.8.2"

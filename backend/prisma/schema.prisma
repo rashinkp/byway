@@ -424,6 +424,10 @@ model TransactionHistory {
   @@index([orderId])
   @@index([courseId])
   @@index([walletId])
+  @@index([createdAt])  // For time-based queries
+  @@index([status])     // For filtering by status
+  @@index([type])       // For filtering by transaction type
+  @@index([paymentGateway]) // For filtering by payment method
 }
 
 enum TransactionType {

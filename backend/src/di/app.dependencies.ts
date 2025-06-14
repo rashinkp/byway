@@ -17,6 +17,7 @@ import { GlobalSearchUseCase } from "../app/usecases/search/implementation/globa
 import { SearchController } from "../presentation/http/controllers/search.controller";
 import { searchRouter } from "../presentation/express/router/search.router";
 import { createWalletDependencies } from "./wallet.dependencies";
+import { createRevenueDependencies } from "./revenue.dependencies";
 
 export interface AppDependencies {
   authController: any;
@@ -35,6 +36,7 @@ export interface AppDependencies {
   searchController: any;
   searchRouter: any;
   walletController: any;
+  revenueController: any;
 }
 
 export function createAppDependencies(): AppDependencies {
@@ -55,6 +57,7 @@ export function createAppDependencies(): AppDependencies {
   const fileDeps = createFileDependencies(sharedDeps);
   const progressDeps = createProgressDependencies(sharedDeps);
   const walletDeps = createWalletDependencies(sharedDeps);
+  const revenueDeps = createRevenueDependencies(sharedDeps);
 
   const searchRepository = new SearchRepository(prisma);
   const globalSearchUseCase = new GlobalSearchUseCase(searchRepository);
@@ -82,6 +85,7 @@ export function createAppDependencies(): AppDependencies {
     progressController: progressDeps.progressController,
     searchController,
     searchRouter: searchRouterInstance,
-    walletController: walletDeps.walletController
+    walletController: walletDeps.walletController,
+    revenueController: revenueDeps.revenueController,
   };
 }
