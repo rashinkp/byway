@@ -1,7 +1,4 @@
 import { SharedDependencies } from "./shared.dependencies";
-import { CourseRepository } from "../infra/repositories/course.repository.impl";
-import { UserRepository } from "../infra/repositories/user.repository.impl";
-import { EnrollmentRepository } from "../infra/repositories/enrollment.repository.impl";
 import { GetCourseStatsUseCase } from "../app/usecases/course/implementations/get-course-stats.usecase";
 import { GetTopEnrolledCoursesUseCase } from "../app/usecases/course/implementations/get-top-enrolled-courses.usecase";
 import { GetUserStatsUseCase } from "../app/usecases/user/implementations/get-user-stats.usecase";
@@ -10,22 +7,23 @@ import { GetEnrollmentStatsUseCase } from "../app/usecases/enrollment/implementa
 import { GetDashboardUseCase } from "../app/usecases/dashboard/implementations/get-dashboard.usecase";
 import { DashboardController } from "../presentation/http/controllers/dashboard.controller";
 import { GetLatestRevenueUseCase } from "../app/usecases/revenue/implementations/get-latest-revenue.usecase";
-import { PrismaRevenueRepository } from "../infra/repositories/revenue.repository";
 
 export const createDashboardDependencies = (sharedDeps: SharedDependencies) => {
-  const { prisma, httpErrors, httpSuccess } = sharedDeps;
+  const { 
+    courseRepository, 
+    userRepository, 
+    enrollmentRepository, 
+    instructorRepository,
+    revenueRepository,
+    httpErrors, 
+    httpSuccess 
+  } = sharedDeps;
 
-  // Create repositories
-  const courseRepository = new CourseRepository(prisma);
-  const userRepository = new UserRepository(prisma);
-  const enrollmentRepository = new EnrollmentRepository(prisma);
-  const revenueRepository = new PrismaRevenueRepository(prisma);
-
-  // Create use cases
+  // Create use cases using shared repositories
   const getCourseStatsUseCase = new GetCourseStatsUseCase(courseRepository);
   const getTopEnrolledCoursesUseCase = new GetTopEnrolledCoursesUseCase(courseRepository);
   const getUserStatsUseCase = new GetUserStatsUseCase(userRepository);
-  const getTopInstructorsUseCase = new GetTopInstructorsUseCase(userRepository);
+  const getTopInstructorsUseCase = new GetTopInstructorsUseCase(instructorRepository);
   const getEnrollmentStatsUseCase = new GetEnrollmentStatsUseCase(enrollmentRepository);
   const getLatestRevenueUseCase = new GetLatestRevenueUseCase(revenueRepository);
 

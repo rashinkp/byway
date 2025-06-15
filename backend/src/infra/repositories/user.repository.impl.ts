@@ -161,24 +161,5 @@ export class UserRepository implements IUserRepository {
     };
   }
 
-  async getTopInstructors(input: IGetTopInstructorsInput): Promise<ITopInstructor[]> {
-    const instructors = await this.prisma.user.findMany({
-      where: { 
-        role: 'INSTRUCTOR',
-        deletedAt: null 
-      },
-      take: input.limit || 5,
-    });
 
-    return instructors.map(instructor => ({
-      instructorId: instructor.id,
-      instructorName: instructor.name,
-      email: instructor.email,
-      courseCount: 0, // Default value since courses relation might not exist
-      totalEnrollments: 0, // Default value since enrollments relation might not exist
-      totalRevenue: 0, // Default value since revenue calculation might need more complex logic
-      averageRating: 0, // Default value since rating system might not be implemented
-      isActive: instructor.deletedAt === null,
-    }));
-  }
 }

@@ -2,8 +2,10 @@ import { PrismaClient } from "@prisma/client";
 import { Instructor } from "../../domain/entities/instructor.entity";
 import { APPROVALSTATUS } from "../../domain/enum/approval-status.enum";
 import { IInstructorRepository } from "../../app/repositories/instructor.repository";
+import { IGetTopInstructorsInput } from "@/app/usecases/user/interfaces/get-top-instructors.usecase.interface";
+import { ITopInstructor } from "@/domain/dtos/admin/admin-dashboard.dto";
 
-export class InstructorRepository implements IInstructorRepository {
+export class PrismaInstructorRepository implements IInstructorRepository {
   constructor(private prisma: PrismaClient) {}
 
   async createInstructor(instructor: Instructor): Promise<Instructor> {
@@ -146,9 +148,79 @@ export class InstructorRepository implements IInstructorRepository {
     });
 
     return {
-      items: instructors.map(instructor => Instructor.fromPrisma(instructor)),
+      items: instructors.map((instructor) => Instructor.fromPrisma(instructor)),
       total,
       totalPages: Math.ceil(total / limit),
     };
+  }
+
+  async getTopInstructors(
+    input: IGetTopInstructorsInput
+  ): Promise<ITopInstructor[]> {
+    // Get all instructors with their courses and enrollments
+    const instructors = await this.prisma.user.findMany({
+      where: {
+        role: "INSTRUCTOR",
+        deletedAt: null,
+      },
+      include: {
+        coursesCreated: {
+          include: {
+            enrollments: true
+          }
+        }
+      },
+      take: input.limit || 5,
+    });
+
+    // Calculate metrics for each instructor
+    const instructorsWithMetrics = await Promise.all(
+      instructors.map(async (instructor) => {
+        // Calculate course count
+        const courseCount = instructor.coursesCreated.length;
+
+        // Calculate total enrollments across all courses
+        const totalEnrollments = instructor.coursesCreated.reduce((sum: number, course: any) => {
+          return sum + course.enrollments.length;
+        }, 0);
+
+        // Calculate total revenue from completed order items for instructor's courses
+        const courseIds = instructor.coursesCreated.map((course: any) => course.id);
+        const completedOrderItems = await this.prisma.orderItem.findMany({
+          where: {
+            courseId: {
+              in: courseIds
+            },
+            order: {
+              paymentStatus: 'COMPLETED',
+              orderStatus: 'COMPLETED'
+            }
+          }
+        });
+
+        // Calculate total revenue (instructor gets the remaining amount after admin share)
+        const totalRevenue = completedOrderItems.reduce((sum: number, item: any) => {
+          const itemPrice = Number(item.coursePrice);
+          const adminSharePercentage = Number(item.adminSharePercentage);
+          const adminRevenue = itemPrice * (adminSharePercentage / 100);
+          const instructorRevenue = itemPrice - adminRevenue; // Instructor gets the remaining amount
+          return sum + instructorRevenue;
+        }, 0);
+
+        return {
+          instructorId: instructor.id,
+          instructorName: instructor.name,
+          email: instructor.email,
+          courseCount,
+          totalEnrollments,
+          totalRevenue,
+          averageRating: 0, // Default value since rating system might not be implemented
+          isActive: instructor.deletedAt === null,
+        };
+      })
+    );
+
+    // Sort by total revenue in descending order
+    return instructorsWithMetrics.sort((a, b) => b.totalRevenue - a.totalRevenue);
   }
 }

@@ -1,14 +1,13 @@
 import { prismaClient } from "../infra/prisma/client";
+import { PrismaInstructorRepository } from "../infra/repositories/instructor.repository.impl";
 import { UserRepository } from "../infra/repositories/user.repository.impl";
 import { CategoryRepository } from "../infra/repositories/category.repository.impl";
 import { CourseRepository } from "../infra/repositories/course.repository.impl";
-import { InstructorRepository } from "../infra/repositories/instructor.repository.impl";
 import { AuthRepository } from "../infra/repositories/auth.repository.impl";
 import { EnrollmentRepository } from "../infra/repositories/enrollment.repository.impl";
 import { OtpProvider } from "../infra/providers/otp/otp.provider";
 import { GoogleAuthProvider } from "../infra/providers/auth/google-auth.provider";
 import { envConfig } from "../presentation/express/configs/env.config";
-import { IUserRepository } from "../app/repositories/user.repository";
 import { ICategoryRepository } from "../app/repositories/category.repository";
 import { ICourseRepository } from "../app/repositories/course.repository.interface";
 import { IInstructorRepository } from "../app/repositories/instructor.repository";
@@ -34,6 +33,9 @@ import { IPaymentService } from "../app/services/payment/interfaces/payment.serv
 import { StripePaymentGateway } from "../infra/providers/stripe-payment.gateway";
 import { StripeWebhookGateway } from "../infra/providers/stripe-webhook.gateway";
 import { RevenueDistributionService } from "../app/services/revenue-distribution/implementations/revenue-distribution.service";
+import { IUserRepository } from "@/app/repositories/user.repository";
+import { PrismaRevenueRepository } from "../infra/repositories/revenue.repository";
+import { IRevenueRepository } from "../app/repositories/revenue.repository";
 
 export interface SharedDependencies {
   prisma: typeof prismaClient;
@@ -48,6 +50,7 @@ export interface SharedDependencies {
   cartRepository: ICartRepository;
   orderRepository: IOrderRepository;
   transactionRepository: ITransactionRepository;
+  revenueRepository: IRevenueRepository;
   otpProvider: OtpProvider;
   googleAuthProvider: GoogleAuthProvider;
   httpErrors: HttpErrors;
@@ -61,7 +64,7 @@ export function createSharedDependencies(): SharedDependencies {
   const userRepository = new UserRepository(prismaClient);
   const categoryRepository = new CategoryRepository(prismaClient);
   const courseRepository = new CourseRepository(prismaClient);
-  const instructorRepository = new InstructorRepository(prismaClient);
+  const instructorRepository = new PrismaInstructorRepository(prismaClient);
   const authRepository = new AuthRepository(prismaClient);
   const enrollmentRepository = new EnrollmentRepository(prismaClient);
   const lessonRepository = new LessonRepository(prismaClient);
@@ -95,6 +98,8 @@ export function createSharedDependencies(): SharedDependencies {
   const httpSuccess = new HttpSuccess();
   const cookieService = new CookieService();
 
+  const revenueRepository = new PrismaRevenueRepository(prismaClient);
+
   return {
     prisma: prismaClient,
     userRepository,
@@ -108,6 +113,7 @@ export function createSharedDependencies(): SharedDependencies {
     cartRepository,
     orderRepository,
     transactionRepository,
+    revenueRepository,
     otpProvider,
     googleAuthProvider,
     httpErrors,

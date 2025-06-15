@@ -20,5 +20,5 @@ export interface IUserRepository {
   
   // User stats methods
   getUserStats(input: IGetUserStatsInput): Promise<IUserStats>;
-  getTopInstructors(input: IGetTopInstructorsInput): Promise<ITopInstructor[]>;
+ 
 }
