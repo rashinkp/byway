@@ -22,15 +22,15 @@ export function VerifyOtpForm() {
   const { mutate: verifyOtp, isPending: isSubmitting, error } = useVerifyOtp();
   const { mutate: resendOtp, isPending: isResending } = useResendOtp();
   const { redirectByRole } = useRoleRedirect();
-  const { 
-    resendCooldown, 
+  const {
+    resendCooldown,
     isLoading: isStatusLoading,
-    formatTime, 
+    formatTime,
     refreshStatus,
-    setResendCooldown 
-  } = useVerificationStatus({ 
+    setResendCooldown,
+  } = useVerificationStatus({
     email,
-    onError: console.error 
+    onError: console.error,
   });
 
   // Handle OTP submission
@@ -41,9 +41,7 @@ export function VerifyOtpForm() {
     const verificationType =
       type === "forgot-password" ? "password-reset" : "signup";
 
-    verifyOtp(
-      { email, otp, type: verificationType },
-    );
+    verifyOtp({ email, otp, type: verificationType });
   };
 
   // Handle OTP resend

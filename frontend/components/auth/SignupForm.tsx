@@ -23,16 +23,18 @@ type SignupFormData = z.infer<typeof signupSchema>;
 export function SignupForm() {
   const router = useRouter();
   const { mutate: signup, isPending, error } = useSignup();
-  const {error:googelAuthError ,isSubmitting , handleGoogleAuth } = useGoogleAuth()
+  const {
+    error: googelAuthError,
+    isSubmitting,
+    handleGoogleAuth,
+  } = useGoogleAuth();
 
-
-   const {
-      login: facebookLogin,
-      isLoading: facebookLoading,
-      error: facebookError,
-    } = useFacebookAuth();
+  const {
+    login: facebookLogin,
+    isLoading: facebookLoading,
+    error: facebookError,
+  } = useFacebookAuth();
   const { redirectByRole } = useRoleRedirect();
-  
 
   const form = useForm<SignupFormData>({
     resolver: zodResolver(signupSchema),
@@ -44,7 +46,7 @@ export function SignupForm() {
   });
 
   const onSubmit = (data: SignupFormData) => {
-    console.log(data)
+    console.log(data);
     signup(
       { name: data.name, email: data.email, password: data.password },
       {
@@ -54,7 +56,6 @@ export function SignupForm() {
       }
     );
   };
-
 
   return (
     <SplitScreenLayout

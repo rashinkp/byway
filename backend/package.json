@@ -3,8 +3,8 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "start": "node dist/presentation/express/settings/server.js",
-    "dev": "nodemon src/presentation/express/settings/server.ts",
+    "start": "node -r tsconfig-paths/register dist/presentation/express/settings/server.js",
+    "dev": "nodemon -r tsconfig-paths/register src/presentation/express/settings/server.ts",
     "build": "tsc",
     "lint": "eslint . --ext .ts",
     "test": "jest",

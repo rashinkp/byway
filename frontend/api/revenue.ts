@@ -2,8 +2,10 @@ import { api } from './api';
 import { 
   GetOverallRevenueParams,
   GetCourseRevenueParams,
+  GetLatestRevenueParams,
   OverallRevenueResponse,
-  CourseRevenueResponse
+  CourseRevenueResponse,
+  LatestRevenueResponse
 } from '@/types/analytics';
 
 export const analyticsApi = {
@@ -16,4 +18,9 @@ export const analyticsApi = {
     const response = await api.get('/revenue/courses', { params });
     return response.data;
   },
+
+  getLatestRevenue: async (params: GetLatestRevenueParams): Promise<LatestRevenueResponse> => {
+    const response = await api.get('/revenue/latest', { params });
+    return response.data;
+  }
 };

@@ -16,7 +16,6 @@ export function useGoogleAuth(redirectPath: string = "/"): UseGoogleAuthResult {
   const [error, setError] = useState<string | null>(null);
   const { redirectByRole } = useRoleRedirect();
   const { setUser } = useAuthStore();
-  
 
   const handleGoogleAuth = useGoogleLogin({
     onSuccess: async (tokenResponse) => {
@@ -31,7 +30,7 @@ export function useGoogleAuth(redirectPath: string = "/"): UseGoogleAuthResult {
           description: "You are now logged in.",
         });
         setUser(response.data); // Set user in the store
-        redirectByRole(response.data.role || '/')
+        redirectByRole(response.data.role || "/");
       } catch (err: any) {
         const errorMessages: Record<string, string> = {
           "This email is registered with a different authentication method":

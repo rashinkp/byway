@@ -37,7 +37,7 @@ export default function AdminProfilePage() {
   }
 
   return (
-    <div className="max-w-5xl mx-auto">
+    <div className="">
       <ProfileSection user={user} setIsModalOpen={setIsModalOpen} />
       <EditProfileForm
         open={isModalOpen}

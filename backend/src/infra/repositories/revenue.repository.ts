@@ -2,6 +2,7 @@ import { PrismaClient } from "@prisma/client";
 import { TransactionType } from "../../domain/enum/transaction-type.enum";
 import { TransactionStatus } from "../../domain/enum/transaction-status.enum";
 import { IRevenueRepository } from "@/app/repositories/revenue.repository";
+import { GetLatestRevenueParams, GetLatestRevenueResult } from "@/domain/dtos/revenue/get-latest-revenue.dto";
 
 export class PrismaRevenueRepository implements IRevenueRepository {
   constructor(private readonly prisma: PrismaClient) {}
@@ -170,5 +171,137 @@ export class PrismaRevenueRepository implements IRevenueRepository {
         }),
       },
     });
+  }
+
+  async getLatestRevenue(params: GetLatestRevenueParams): Promise<{
+    items: GetLatestRevenueResult['items'];
+    total: number;
+  }> {
+    const { startDate, endDate, userId, page = 1, limit = 10, search, sortBy = 'latest' } = params;
+    const skip = (page - 1) * limit;
+
+    // Build where clause
+    const whereClause: any = {
+      createdAt: {
+        gte: startDate,
+        lte: endDate,
+      },
+      userId,
+      type: 'REVENUE',
+      status: 'COMPLETED',
+    };
+
+    // Add search functionality
+    if (search) {
+      whereClause.OR = [
+        {
+          order: {
+            items: {
+              some: {
+                course: {
+                  title: {
+                    contains: search,
+                    mode: 'insensitive',
+                  },
+                },
+              },
+            },
+          },
+        },
+        {
+          order: {
+            items: {
+              some: {
+                course: {
+                  creator: {
+                    name: {
+                      contains: search,
+                      mode: 'insensitive',
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+        {
+          order: {
+            user: {
+              name: {
+                contains: search,
+                mode: 'insensitive',
+              },
+            },
+          },
+        },
+      ];
+    }
+
+    // Get transactions with type REVENUE and status COMPLETED
+    const transactions = await this.prisma.transactionHistory.findMany({
+      where: whereClause,
+      include: {
+        order: {
+          include: {
+            items: {
+              include: {
+                course: {
+                  include: {
+                    creator: {
+                      select: {
+                        id: true,
+                        name: true,
+                        email: true,
+                      },
+                    },
+                  },
+                },
+              },
+            },
+            user: {
+              select: {
+                id: true,
+                name: true,
+                email: true,
+              },
+            },
+          },
+        },
+      },
+      orderBy: {
+        createdAt: sortBy === 'latest' ? 'desc' : 'asc',
+      },
+      skip,
+      take: limit,
+    });
+
+    // Get total count for pagination
+    const total = await this.prisma.transactionHistory.count({
+      where: whereClause,
+    });
+
+    // Transform the data
+    const items = transactions.flatMap(transaction => 
+      transaction.order?.items.map(item => ({
+        orderId: transaction.orderId || '',
+        courseId: item.courseId,
+        courseTitle: item.course.title,
+        creatorName: item.course.creator.name,
+        coursePrice: Number(item.coursePrice),
+        offerPrice: Number(item.coursePrice) - (Number(item.discount) || 0),
+        adminSharePercentage: Number(item.adminSharePercentage),
+        adminShare: (Number(item.coursePrice) * Number(item.adminSharePercentage)) / 100,
+        netAmount: Number(item.coursePrice) - ((Number(item.coursePrice) * Number(item.adminSharePercentage)) / 100),
+        createdAt: transaction.createdAt,
+        customerName: transaction.order?.user?.name || 'Unknown Customer',
+        customerEmail: transaction.order?.user?.email || '',
+        transactionAmount: Number(transaction.amount),
+      })) || []
+    );
+
+    return {
+      items,
+      total,
+    };
   }
 }

@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { expressAdapter } from "../../adapters/express.adapter";
 import { restrictTo } from "../middlewares/auth.middleware";
-import { RevenueController } from "@/presentation/http/controllers/revenue.controller";
+import { RevenueController } from "../../http/controllers/revenue.controller";
 
 export function revenueRouter(
   revenueController: RevenueController
@@ -17,6 +17,12 @@ export function revenueRouter(
   router.get("/courses", restrictTo("ADMIN"), (req, res) =>
     expressAdapter(req, res, (httpRequest) =>
       revenueController.getCourseRevenue(httpRequest)
+    )
+  );
+
+  router.get("/latest", restrictTo("ADMIN"), (req, res) =>
+    expressAdapter(req, res, (httpRequest) =>
+      revenueController.getLatestRevenue(httpRequest)
     )
   );
 

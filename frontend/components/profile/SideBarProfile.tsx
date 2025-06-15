@@ -34,7 +34,7 @@ const Sidebar: FC<SidebarProps> = ({ activeSection, setActiveSection, isInstruct
       ];
 
   return (
-    <div className="w-64 bg-white border-r border-gray-200 min-h-screen">
+    <div className="w-64 bg-white/60 backdrop-blur-sm border-r border-gray-200/50 min-h-screen">
       <div className="p-6">
         <h2 className="text-xl font-semibold text-gray-800">
           {isInstructor ? "Instructor Dashboard" : "My Account"}
@@ -51,7 +51,7 @@ const Sidebar: FC<SidebarProps> = ({ activeSection, setActiveSection, isInstruct
                 "w-full flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-lg transition-colors",
                 activeSection === item.id
                   ? "bg-blue-50 text-blue-700"
-                  : "text-gray-600 hover:bg-gray-50"
+                  : "text-gray-600 hover:bg-gray-50/50"
               )}
             >
               <Icon className="w-5 h-5" />
@@ -60,7 +60,7 @@ const Sidebar: FC<SidebarProps> = ({ activeSection, setActiveSection, isInstruct
           );
         })}
       </nav>
-      <div className="pt-6 mt-6 border-t border-gray-200 px-3">
+      <div className="pt-6 mt-6 border-t border-gray-200/50 px-3">
         <button
           onClick={() => {
             logout(undefined, {
@@ -70,7 +70,7 @@ const Sidebar: FC<SidebarProps> = ({ activeSection, setActiveSection, isInstruct
             });
           }}
           disabled={isLoggingOut}
-          className="w-full flex items-center gap-3 px-4 py-3 text-red-600 hover:bg-red-50 rounded-lg transition-colors duration-200"
+          className="w-full flex items-center gap-3 px-4 py-3 text-red-600 hover:bg-red-50/50 rounded-lg transition-colors duration-200"
         >
           <LogOut className="w-5 h-5" />
           <span className="text-sm font-medium">

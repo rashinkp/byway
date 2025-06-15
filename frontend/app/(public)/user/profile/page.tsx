@@ -51,7 +51,7 @@ export default function ProfilePage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50/50">
       <div className="flex">
         <Sidebar
           activeSection={activeSection}
@@ -78,7 +78,7 @@ export default function ProfilePage() {
             {["certificates", "settings"].map(
               (section) =>
                 activeSection === section && (
-                  <div key={section} className="bg-white rounded-xl shadow-sm p-6">
+                  <div key={section} className="bg-white/60 backdrop-blur-sm border border-gray-200/50 rounded-xl p-6">
                     <h2 className="text-2xl font-bold text-gray-800 capitalize mb-2">
                       {section}
                     </h2>

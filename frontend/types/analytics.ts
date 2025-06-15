@@ -61,6 +61,13 @@ export interface GetCourseRevenueParams extends GetOverallRevenueParams {
   limit?: number;
 }
 
+export interface GetLatestRevenueParams extends GetOverallRevenueParams {
+  page?: number;
+  limit?: number;
+  search?: string;
+  sortBy?: 'latest' | 'oldest';
+}
+
 export interface OverallRevenue {
   totalRevenue: number;
   refundedAmount: number;
@@ -124,6 +131,34 @@ export interface CourseRevenueResponse {
       adminShare: number;
       netRevenue: number;
     }>;
+    total: number;
+    page: number;
+    limit: number;
+    totalPages: number;
+  };
+}
+
+export interface LatestRevenueItem {
+  orderId: string;
+  courseId: string;
+  courseTitle: string;
+  creatorName: string;
+  coursePrice: number;
+  offerPrice: number;
+  adminSharePercentage: number;
+  adminShare: number;
+  netAmount: number;
+  createdAt: string;
+  customerName: string;
+  customerEmail: string;
+  transactionAmount: number;
+}
+
+export interface LatestRevenueResponse {
+  success: boolean;
+  message: string;
+  data: {
+    items: LatestRevenueItem[];
     total: number;
     page: number;
     limit: number;

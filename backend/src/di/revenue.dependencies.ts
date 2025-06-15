@@ -1,19 +1,29 @@
+import { PrismaRevenueRepository } from "../infra/repositories/revenue.repository";
 import { SharedDependencies } from "./shared.dependencies";
-import { PrismaAnalyticsRepository } from "../infra/repositories/analytics.repository";
 import { GetOverallRevenueUseCase } from "../app/usecases/revenue/implementations/get-overall-revenue.usecase";
 import { GetCourseRevenueUseCase } from "../app/usecases/revenue/implementations/get-course-revenue.usecase";
 import { RevenueController } from "../presentation/http/controllers/revenue.controller";
+import { GetLatestRevenueUseCase } from "../app/usecases/revenue/implementations/get-latest-revenue.usecase";
+
 
 export const createRevenueDependencies = (sharedDeps: SharedDependencies) => {
   const { prisma, httpErrors, httpSuccess } = sharedDeps;
-  const analyticsRepository = new PrismaAnalyticsRepository(prisma);
-  
-  const getOverallRevenueUseCase = new GetOverallRevenueUseCase(analyticsRepository);
-  const getCourseRevenueUseCase = new GetCourseRevenueUseCase(analyticsRepository);
-  
+  const revenueRepository = new PrismaRevenueRepository(prisma);
+
+  const getOverallRevenueUseCase = new GetOverallRevenueUseCase(
+    revenueRepository
+  );
+  const getCourseRevenueUseCase = new GetCourseRevenueUseCase(
+    revenueRepository
+  );
+  const getLatestRevenueUseCase = new GetLatestRevenueUseCase(
+    revenueRepository
+  );
+
   const revenueController = new RevenueController(
     getOverallRevenueUseCase,
     getCourseRevenueUseCase,
+    getLatestRevenueUseCase,
     httpErrors,
     httpSuccess
   );

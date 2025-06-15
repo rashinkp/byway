@@ -20,7 +20,11 @@ type LoginFormData = z.infer<typeof loginSchema>;
 
 export function LoginForm() {
   const { mutate: login, isPending, error } = useLogin();
-  const { handleGoogleAuth, isSubmitting, error: googleAuthError } = useGoogleAuth()
+  const {
+    handleGoogleAuth,
+    isSubmitting,
+    error: googleAuthError,
+  } = useGoogleAuth();
   const {
     login: facebookLogin,
     isLoading: facebookLoading,
@@ -46,7 +50,6 @@ export function LoginForm() {
       }
     );
   };
-
 
   return (
     <SplitScreenLayout
@@ -75,7 +78,7 @@ export function LoginForm() {
         subtitle="Please enter your details to sign in"
         submitText="Sign in"
         isSubmitting={isPending || isSubmitting || facebookLoading}
-        error={googleAuthError|| error?.message || facebookError}
+        error={googleAuthError || error?.message || facebookError}
         googleAuthText="Continue with Google"
         facebookAuthText="Go with Facebook"
         onFacebookAuth={facebookLogin}
