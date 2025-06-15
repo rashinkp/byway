@@ -14,7 +14,7 @@ import {
 } from "@/components/analytics";
 import { useAnalyticsState } from "@/hooks/analytics/useAnalyticsState";
 
-export default function RevenueAnalytics() {
+export default function InstructorAnalytics() {
   const {
     dateRange,
     searchInput,
@@ -79,8 +79,8 @@ export default function RevenueAnalytics() {
       <div className="max-w-7xl mx-auto space-y-8">
         {/* Header Section */}
         <AnalyticsHeader
-          title="Revenue Analytics Dashboard"
-          subtitle="Monitor your revenue performance and track financial insights"
+          title="Instructor Analytics Dashboard"
+          subtitle="Track your course performance and earnings insights"
           dateRange={dateRange}
           onDateChange={handleDateChange}
         />
@@ -105,4 +105,4 @@ export default function RevenueAnalytics() {
       </div>
     </div>
   );
-}
+} 

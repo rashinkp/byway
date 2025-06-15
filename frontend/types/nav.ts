@@ -78,11 +78,6 @@ export const INSTRUCTOR_NAV_ITEMS: NavItem[] = [
     icon: BookOpen,
   },
   {
-    label: "Earnings",
-    href: "/instructor/earnings",
-    icon: DollarSign,
-  },
-  {
     label: "Wallet",
     href: "/instructor/wallet",
     icon: Wallet,
