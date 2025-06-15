@@ -15,7 +15,7 @@ export function useLogin() {
       setUser(user);
       const redirectPath =
         user.role === "ADMIN"
-          ? "/admin/dashboard"
+          ? "/admin"
           : user.role === "INSTRUCTOR"
           ? "/instructor"
           : "/";
@@ -27,4 +27,3 @@ export function useLogin() {
     },
   });
 }
- 

@@ -6,6 +6,7 @@ import {
 import { IEnrollmentRepository } from "../../app/repositories/enrollment.repository.interface";
 import { HttpError } from "../../presentation/http/errors/http-error";
 import { Enrollment } from "../../domain/entities/enrollment.entity";
+import { IEnrollmentStats, IGetEnrollmentStatsInput } from "../../app/usecases/enrollment/interfaces/get-enrollment-stats.usecase.interface";
 
 export class EnrollmentRepository implements IEnrollmentRepository {
   constructor(private prisma: PrismaClient) {}
@@ -133,5 +134,13 @@ export class EnrollmentRepository implements IEnrollmentRepository {
         },
       },
     });
+  }
+
+  async getEnrollmentStats(input: IGetEnrollmentStatsInput): Promise<IEnrollmentStats> {
+    const totalEnrollments = await this.prisma.enrollment.count();
+
+    return {
+      totalEnrollments,
+    };
   }
 }

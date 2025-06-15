@@ -1,6 +1,6 @@
 export interface GetLatestRevenueParams {
-  startDate: Date;
-  endDate: Date;
+  startDate?: Date;
+  endDate?: Date;
   userId: string;
   page?: number;
   limit?: number;

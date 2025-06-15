@@ -1,0 +1,40 @@
+import { IHttpRequest } from "../interfaces/http-request.interface";
+import { IHttpResponse } from "../interfaces/http-response.interface";
+import { IGetDashboardUseCase } from "../../../app/usecases/dashboard/interfaces/get-dashboard.usecase.interface";
+import { BaseController } from "./base.controller";
+import { IHttpErrors } from "../interfaces/http-errors.interface";
+import { IHttpSuccess } from "../interfaces/http-success.interface";
+import { z } from "zod";
+
+const getDashboardSchema = z.object({
+  limit: z
+    .string()
+    .transform((str) => parseInt(str))
+    .optional(),
+});
+
+export class DashboardController extends BaseController {
+  constructor(
+    private readonly getDashboardUseCase: IGetDashboardUseCase,
+    httpErrors: IHttpErrors,
+    httpSuccess: IHttpSuccess
+  ) {
+    super(httpErrors, httpSuccess);
+  }
+
+  async getDashboard(httpRequest: IHttpRequest): Promise<IHttpResponse> {
+    return this.handleRequest(httpRequest, async (request) => {
+      const query = request.query || {};
+      const { limit } = getDashboardSchema.parse({
+        limit: query.limit,
+      });
+      if (!request?.user?.id) throw new Error("User ID is required");
+      const result = await this.getDashboardUseCase.execute({
+        userId: request?.user?.id,
+        limit: limit || 10,
+      });
+
+      return this.success_200(result, "Dashboard data retrieved successfully");
+    });
+  }
+}

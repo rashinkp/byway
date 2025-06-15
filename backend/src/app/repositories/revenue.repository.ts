@@ -62,4 +62,6 @@ export interface IRevenueRepository {
     items: GetLatestRevenueResult['items'];
     total: number;
   }>;
+
+  getTotalRevenue(userId: string): Promise<number>;
 } 

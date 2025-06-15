@@ -12,7 +12,7 @@ import {
   RevenueOverviewCards,
   LatestRevenueList,
 } from "@/components/analytics";
-import { useAnalyticsState } from "@/hooks/analytics/useAnalyticsState";
+import { useAnalyticsState } from "@/hooks/revenue/useAnalyticsState";
 
 export default function RevenueAnalytics() {
   const {
@@ -28,7 +28,10 @@ export default function RevenueAnalytics() {
   const { data: overallData, isLoading: isLoadingOverall } = useOverallRevenue({
     startDate: dateRange.from
       ? format(dateRange.from, "yyyy-MM-dd")
-      : format(new Date().setFullYear(new Date().getFullYear() - 1), "yyyy-MM-dd"),
+      : format(
+          new Date().setFullYear(new Date().getFullYear() - 1),
+          "yyyy-MM-dd"
+        ),
     endDate: dateRange.to
       ? format(dateRange.to, "yyyy-MM-dd")
       : format(new Date(), "yyyy-MM-dd"),
@@ -37,7 +40,10 @@ export default function RevenueAnalytics() {
   const { data: courseData, isLoading: isLoadingCourses } = useCourseRevenue({
     startDate: dateRange.from
       ? format(dateRange.from, "yyyy-MM-dd")
-      : format(new Date().setFullYear(new Date().getFullYear() - 1), "yyyy-MM-dd"),
+      : format(
+          new Date().setFullYear(new Date().getFullYear() - 1),
+          "yyyy-MM-dd"
+        ),
     endDate: dateRange.to
       ? format(dateRange.to, "yyyy-MM-dd")
       : format(new Date(), "yyyy-MM-dd"),
@@ -45,16 +51,18 @@ export default function RevenueAnalytics() {
     sortOrder: "desc",
   });
 
-  const { data: latestData, isLoading: isLoadingLatest } =
-    useLatestRevenue({
-      ...latestRevenueParams,
-      startDate: dateRange.from
-        ? format(dateRange.from, "yyyy-MM-dd")
-        : format(new Date().setFullYear(new Date().getFullYear() - 1), "yyyy-MM-dd"),
-      endDate: dateRange.to
-        ? format(dateRange.to, "yyyy-MM-dd")
-        : format(new Date(), "yyyy-MM-dd"),
-    });
+  const { data: latestData, isLoading: isLoadingLatest } = useLatestRevenue({
+    ...latestRevenueParams,
+    startDate: dateRange.from
+      ? format(dateRange.from, "yyyy-MM-dd")
+      : format(
+          new Date().setFullYear(new Date().getFullYear() - 1),
+          "yyyy-MM-dd"
+        ),
+    endDate: dateRange.to
+      ? format(dateRange.to, "yyyy-MM-dd")
+      : format(new Date(), "yyyy-MM-dd"),
+  });
 
   const isLoading = isLoadingOverall || isLoadingCourses || isLoadingLatest;
 
@@ -86,10 +94,7 @@ export default function RevenueAnalytics() {
         />
 
         {/* Revenue Overview Cards */}
-        <RevenueOverviewCards
-          overallData={overallData}
-          dateRange={dateRange}
-        />
+        <RevenueOverviewCards overallData={overallData} dateRange={dateRange} />
 
         {/* Latest Revenue Transactions */}
         <LatestRevenueList

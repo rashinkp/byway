@@ -1,6 +1,5 @@
-
 export const ROUTES = {
-  ADMIN: "/admin/dashboard",
+  ADMIN: "/admin",
   INSTRUCTOR: "/instructor",
   USER: "/",
   DEFAULT: "/",

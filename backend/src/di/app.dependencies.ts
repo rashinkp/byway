@@ -19,6 +19,8 @@ import { searchRouter } from "../presentation/express/router/search.router";
 import { createWalletDependencies } from "./wallet.dependencies";
 import { createRevenueDependencies } from "./revenue.dependencies";
 import { revenueRouter } from "../presentation/express/router/revenue.router";
+import { createDashboardDependencies } from "./dashboard.dependencies";
+import { dashboardRouter } from "../presentation/express/router/dashboard.router";
 
 export interface AppDependencies {
   authController: any;
@@ -39,6 +41,8 @@ export interface AppDependencies {
   walletController: any;
   revenueController: any;
   revenueRouter: any;
+  dashboardController: any;
+  dashboardRouter: any;
 }
 
 export function createAppDependencies(): AppDependencies {
@@ -60,6 +64,7 @@ export function createAppDependencies(): AppDependencies {
   const progressDeps = createProgressDependencies(sharedDeps);
   const walletDeps = createWalletDependencies(sharedDeps);
   const revenueDeps = createRevenueDependencies(sharedDeps);
+  const dashboardDeps = createDashboardDependencies(sharedDeps);
 
   const searchRepository = new SearchRepository(prisma);
   const globalSearchUseCase = new GlobalSearchUseCase(searchRepository);
@@ -71,6 +76,9 @@ export function createAppDependencies(): AppDependencies {
 
   const searchRouterInstance = searchRouter(searchController);
   const revenueRouterInstance = revenueRouter(revenueDeps.revenueController);
+  const dashboardRouterInstance = dashboardRouter(
+    dashboardDeps.dashboardController
+  );
 
   return {
     authController: authDeps.authController,
@@ -91,5 +99,7 @@ export function createAppDependencies(): AppDependencies {
     walletController: walletDeps.walletController,
     revenueController: revenueDeps.revenueController,
     revenueRouter: revenueRouterInstance,
+    dashboardController: dashboardDeps.dashboardController,
+    dashboardRouter: dashboardRouterInstance,
   };
 }

@@ -20,7 +20,7 @@ export interface NavItem {
 
 export const ADMIN_NAV_ITEMS: NavItem[] = [
   {
-    href: "/admin/dashboard",
+    href: "/admin",
     label: "Dashboard",
     icon: LayoutDashboard,
   },

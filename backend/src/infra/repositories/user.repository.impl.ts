@@ -6,6 +6,8 @@ import {
   IPaginatedResponse,
   IUserRepository,
 } from "../../app/repositories/user.repository";
+import { IUserStats, IGetUserStatsInput } from "../../app/usecases/user/interfaces/get-user-stats.usecase.interface";
+import { ITopInstructor, IGetTopInstructorsInput } from "../../app/usecases/user/interfaces/get-top-instructors.usecase.interface";
 
 export class UserRepository implements IUserRepository {
   constructor(private prisma: PrismaClient) {}
@@ -137,5 +139,46 @@ export class UserRepository implements IUserRepository {
       },
     });
     return UserProfile.fromPrisma(created);
+  }
+
+  async getUserStats(input: IGetUserStatsInput): Promise<IUserStats> {
+    const [totalUsers, activeUsers, inactiveUsers, totalInstructors, activeInstructors, inactiveInstructors] = await Promise.all([
+      this.prisma.user.count(),
+      this.prisma.user.count({ where: { deletedAt: null } }),
+      this.prisma.user.count({ where: { deletedAt: { not: null } } }),
+      this.prisma.user.count({ where: { role: 'INSTRUCTOR' } }),
+      this.prisma.user.count({ where: { role: 'INSTRUCTOR', deletedAt: null } }),
+      this.prisma.user.count({ where: { role: 'INSTRUCTOR', deletedAt: { not: null } } }),
+    ]);
+
+    return {
+      totalUsers,
+      activeUsers,
+      inactiveUsers,
+      totalInstructors,
+      activeInstructors,
+      inactiveInstructors,
+    };
+  }
+
+  async getTopInstructors(input: IGetTopInstructorsInput): Promise<ITopInstructor[]> {
+    const instructors = await this.prisma.user.findMany({
+      where: { 
+        role: 'INSTRUCTOR',
+        deletedAt: null 
+      },
+      take: input.limit || 5,
+    });
+
+    return instructors.map(instructor => ({
+      instructorId: instructor.id,
+      instructorName: instructor.name,
+      email: instructor.email,
+      courseCount: 0, // Default value since courses relation might not exist
+      totalEnrollments: 0, // Default value since enrollments relation might not exist
+      totalRevenue: 0, // Default value since revenue calculation might need more complex logic
+      averageRating: 0, // Default value since rating system might not be implemented
+      isActive: instructor.deletedAt === null,
+    }));
   }
 }

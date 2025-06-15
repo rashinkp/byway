@@ -8,7 +8,7 @@ export function useRoleRedirect() {
 
   const redirectByRole = (role: string) => {
     const roleRedirects: Record<string, string> = {
-      ADMIN: "/admin/dashboard",
+      ADMIN: "/admin",
       INSTRUCTOR: "/instructor",
       USER: "/",
     };

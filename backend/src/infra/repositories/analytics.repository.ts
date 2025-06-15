@@ -2,6 +2,7 @@ import { PrismaClient } from "@prisma/client";
 import { IRevenueRepository } from "../../app/repositories/revenue.repository";
 import { TransactionType } from "../../domain/enum/transaction-type.enum";
 import { TransactionStatus } from "../../domain/enum/transaction-status.enum";
+import { GetLatestRevenueParams, GetLatestRevenueResult } from "../../domain/dtos/revenue/get-latest-revenue.dto";
 
 export class PrismaAnalyticsRepository implements IRevenueRepository {
   constructor(private readonly prisma: PrismaClient) {}
@@ -170,5 +171,99 @@ export class PrismaAnalyticsRepository implements IRevenueRepository {
         }),
       },
     });
+  }
+
+  async getTotalRevenue(userId: string): Promise<number> {
+    const result = await this.prisma.transactionHistory.aggregate({
+      where: {
+        userId,
+        type: 'REVENUE',
+        status: 'COMPLETED',
+      },
+      _sum: {
+        amount: true,
+      },
+    });
+
+    return result._sum.amount || 0;
+  }
+
+  async getLatestRevenue(input: GetLatestRevenueParams): Promise<GetLatestRevenueResult> {
+    const { startDate, endDate, userId, limit = 10, page = 1, search, sortBy } = input;
+    const skip = (page - 1) * limit;
+
+    const where: any = {
+      createdAt: {
+        gte: startDate,
+        lte: endDate,
+      },
+      ...(userId !== "admin" && { userId }),
+      ...(search && {
+        courseId: {
+          not: null,
+        },
+      }),
+    };
+
+    const orderBy = sortBy === "oldest" 
+      ? { createdAt: "asc" as const }
+      : { createdAt: "desc" as const };
+
+    const [transactions, total] = await Promise.all([
+      this.prisma.transactionHistory.findMany({
+        where,
+        skip,
+        take: limit,
+        orderBy,
+      }),
+      this.prisma.transactionHistory.count({ where }),
+    ]);
+
+    // Get course details for the transactions
+    const courseIds = transactions
+      .map(t => t.courseId)
+      .filter(id => id !== null) as string[];
+    
+    const courses = courseIds.length > 0 
+      ? await this.prisma.course.findMany({
+          where: { id: { in: courseIds } },
+          include: { creator: true },
+        })
+      : [];
+
+    const courseMap = new Map(courses.map(c => [c.id, c]));
+
+    const items = transactions.map(transaction => {
+      const course = transaction.courseId ? courseMap.get(transaction.courseId) : null;
+      const adminSharePercentage = course?.adminSharePercentage.toNumber() || 0;
+      const coursePrice = course?.price?.toNumber() || 0;
+      const offerPrice = transaction.amount;
+      const adminShare = (offerPrice * adminSharePercentage) / 100;
+      const netAmount = offerPrice - adminShare;
+      
+      return {
+        orderId: transaction.orderId || "",
+        courseId: transaction.courseId || "",
+        courseTitle: course?.title || "Unknown Course",
+        creatorName: course?.creator?.name || "Unknown Creator",
+        coursePrice,
+        offerPrice,
+        adminSharePercentage,
+        adminShare,
+        netAmount,
+        createdAt: transaction.createdAt,
+        customerName: "Unknown Customer", // Default since customer relation might not exist
+        customerEmail: "unknown@example.com", // Default since customer relation might not exist
+        transactionAmount: transaction.amount,
+      };
+    });
+
+    return {
+      items,
+      total,
+      page,
+      limit,
+      totalPages: Math.ceil(total / limit),
+    };
   }
 }

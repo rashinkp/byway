@@ -173,6 +173,21 @@ export class PrismaRevenueRepository implements IRevenueRepository {
     });
   }
 
+  async getTotalRevenue(userId: string): Promise<number> {
+    const result = await this.prisma.transactionHistory.aggregate({
+      where: {
+        userId,
+        type: 'REVENUE',
+        status: 'COMPLETED',
+      },
+      _sum: {
+        amount: true,
+      },
+    });
+
+    return result._sum.amount || 0;
+  }
+
   async getLatestRevenue(params: GetLatestRevenueParams): Promise<{
     items: GetLatestRevenueResult['items'];
     total: number;
@@ -182,14 +197,18 @@ export class PrismaRevenueRepository implements IRevenueRepository {
 
     // Build where clause
     const whereClause: any = {
-      createdAt: {
-        gte: startDate,
-        lte: endDate,
-      },
       userId,
       type: 'REVENUE',
       status: 'COMPLETED',
     };
+
+    // Add date range only if provided
+    if (startDate && endDate) {
+      whereClause.createdAt = {
+        gte: startDate,
+        lte: endDate,
+      };
+    }
 
     // Add search functionality
     if (search) {

@@ -14,6 +14,9 @@ import {
 } from "../../domain/dtos/course/course.dto";
 import { ICourseRepository } from "../../app/repositories/course.repository.interface";
 import { HttpError } from "../../presentation/http/errors/http-error";
+import { ICourseStats, IGetCourseStatsInput } from "@/app/usecases/course/interfaces/get-course-stats.usecase.interface";
+import { IGetTopEnrolledCoursesInput } from "@/app/usecases/course/interfaces/get-top-enrolled-courses.usecase.interface";
+import { ITopEnrolledCourse } from "@/domain/dtos/admin/admin-dashboard.dto";
 
 export class CourseRepository implements ICourseRepository {
   constructor(private prisma: PrismaClient) {}
@@ -579,5 +582,91 @@ export class CourseRepository implements ICourseRepository {
       });
       throw new HttpError("Failed to update course details", 500);
     }
+  }
+
+  async getCourseStats(input: IGetCourseStatsInput): Promise<ICourseStats> {
+    const [totalCourses, activeCourses, inactiveCourses, pendingCourses] = await Promise.all([
+      this.prisma.course.count({ where: { deletedAt: null } }),
+      this.prisma.course.count({ where: { deletedAt: null } }),
+      this.prisma.course.count({ where: { deletedAt: { not: null } } }),
+      this.prisma.course.count({ where: { approvalStatus: APPROVALSTATUS.PENDING, deletedAt: null } }),
+    ]);
+    return {
+      totalCourses,
+      activeCourses,
+      inactiveCourses,
+      pendingCourses,
+    };
+  }
+
+  async getTopEnrolledCourses(input: IGetTopEnrolledCoursesInput): Promise<ITopEnrolledCourse[]> {
+    console.log('getTopEnrolledCourses called with userId:', input.userId);
+    
+    // Step 1: Get all courses with enrollment count (all courses belong to admin)
+    const allCourses = await this.prisma.course.findMany({
+      include: {
+        creator: true,
+        enrollments: true
+      }
+    });
+    
+    console.log('All courses found:', allCourses.length);
+    
+    if (allCourses.length === 0) {
+      console.log('No courses found in system');
+      return [];
+    }
+
+    // Step 2: Sort by enrollment count and take top courses
+    const topEnrolledCourses = allCourses
+      .sort((a, b) => b.enrollments.length - a.enrollments.length)
+      .slice(0, input.limit || 5);
+
+    console.log('Top enrolled courses found:', topEnrolledCourses.length);
+
+    // Step 3: For each course, get revenue through completed order items
+    const coursesWithRevenue = await Promise.all(
+      topEnrolledCourses.map(async (course) => {
+        // Get all completed order items for this course
+        const completedOrderItems = await this.prisma.orderItem.findMany({
+          where: {
+            courseId: course.id,
+            order: {
+              paymentStatus: 'COMPLETED',
+              orderStatus: 'COMPLETED'
+            }
+          },
+          include: {
+            order: true
+          }
+        });
+
+        // Calculate total revenue from completed sales
+        const totalRevenue = completedOrderItems.reduce((sum, item) => {
+          // Use the actual course price from order item (price at time of purchase)
+          const itemPrice = Number(item.coursePrice);
+          const adminSharePercentage = Number(item.adminSharePercentage);
+          const adminRevenue = itemPrice * (adminSharePercentage / 100);
+          return sum + adminRevenue;
+        }, 0);
+
+        console.log(`Course ${course.title}: ${completedOrderItems.length} completed sales, revenue: ${totalRevenue}`);
+
+        return {
+          courseId: course.id,
+          courseTitle: course.title,
+          instructorName: course.creator?.name || 'Unknown',
+          enrollmentCount: course.enrollments.length,
+          revenue: totalRevenue,
+          rating: 0,
+          reviewCount: 0,
+        };
+      })
+    );
+
+    console.log('Final courses with revenue:', coursesWithRevenue.length);
+    
+    // Sort by revenue in descending order
+    return coursesWithRevenue.sort((a, b) => b.revenue - a.revenue);
   }
 }
