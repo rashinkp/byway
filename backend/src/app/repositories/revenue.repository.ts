@@ -1,6 +1,5 @@
 import { TransactionType } from "../../domain/enum/transaction-type.enum";
 import { TransactionStatus } from "../../domain/enum/transaction-status.enum";
-import { RevenueMetrics, RevenueByCourse, RevenueByInstructor } from "../../domain/entities/revenue.entity";
 
 export interface IRevenueRepository {
   getTransactionAmounts(params: {
@@ -8,6 +7,7 @@ export interface IRevenueRepository {
     endDate: Date;
     type: TransactionType;
     status: TransactionStatus;
+    userId: string;
   }): Promise<{ amount: number }>;
 
   getTransactionCounts(params: {
@@ -15,6 +15,7 @@ export interface IRevenueRepository {
     endDate: Date;
     type?: TransactionType;
     status?: TransactionStatus;
+    userId: string;
   }): Promise<number>;
 
   getCourseTransactions(params: {
@@ -22,18 +23,12 @@ export interface IRevenueRepository {
     endDate: Date;
     status: TransactionStatus;
     type: TransactionType;
+    userId: string;
+    courseId?: string;
   }): Promise<Array<{
     courseId: string;
     amount: number;
     count: number;
-  }>>;
-
-  getInstructorCourses(params: {
-    courseIds: string[];
-  }): Promise<Array<{
-    courseId: string;
-    instructorId: string;
-    instructorName: string;
   }>>;
 
   getCourseDetails(params: {
@@ -41,34 +36,19 @@ export interface IRevenueRepository {
   }): Promise<Array<{
     id: string;
     title: string;
+    thumbnail: string | null;
+    adminSharePercentage: number;
+    creator: {
+      id: string;
+      name: string;
+      avatar: string | null;
+    };
   }>>;
 
-  getRevenueMetrics(params: {
+  getTotalCourses(params: {
     startDate: Date;
     endDate: Date;
-    adminSharePercentage: number;
-  }): Promise<RevenueMetrics>;
-
-  getRevenueByCourse(params: {
-    startDate: Date;
-    endDate: Date;
-    adminSharePercentage: number;
-  }): Promise<RevenueByCourse[]>;
-
-  getRevenueByInstructor(params: {
-    startDate: Date;
-    endDate: Date;
-    adminSharePercentage: number;
-  }): Promise<RevenueByInstructor[]>;
-
-  getTransactionStats(params: {
-    startDate: Date;
-    endDate: Date;
-  }): Promise<{
-    totalTransactions: number;
-    successfulTransactions: number;
-    failedTransactions: number;
-    refundedTransactions: number;
-    averageTransactionAmount: number;
-  }>;
+    userId: string;
+    search?: string;
+  }): Promise<number>;
 } 

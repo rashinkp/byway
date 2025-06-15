@@ -199,15 +199,6 @@ export const TransactionList: React.FC<TransactionListProps> = ({
               <p className="text-sm text-gray-500">
                 {transaction.paymentGateway || "Unknown Gateway"}
               </p>
-              {transaction.status === "FAILED" && onRetryTransaction && (
-                <button
-                  onClick={() => onRetryTransaction(transaction)}
-                  className="mt-2 inline-flex items-center gap-2 px-3 py-1 text-sm font-medium text-blue-600 bg-blue-50 hover:bg-blue-100 rounded-md"
-                >
-                  <RefreshCw className="w-4 h-4" />
-                  Retry Payment
-                </button>
-              )}
             </div>
           </div>
         );

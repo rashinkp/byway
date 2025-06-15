@@ -54,6 +54,6 @@ export default function InstructorDetailPage() {
       instructor={instructor}
       courses={instructorCourses}
       isCoursesLoading={isCoursesLoading}
-    />
+                />
   );
 }

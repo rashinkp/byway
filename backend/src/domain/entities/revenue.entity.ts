@@ -1,5 +1,3 @@
-import { TransactionType } from "../enum/transaction-type.enum";
-import { TransactionStatus } from "../enum/transaction-status.enum";
 
 export class RevenueMetrics {
   constructor(

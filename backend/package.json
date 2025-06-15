@@ -47,6 +47,9 @@
     "zod": "^3.25.30"
   },
   "devDependencies": {
+    "@babel/core": "^7.27.4",
+    "@babel/preset-env": "^7.27.2",
+    "@babel/preset-typescript": "^7.27.1",
     "@jest/types": "^30.0.0",
     "@types/bcrypt": "^5.0.2",
     "@types/cors": "^2.8.17",

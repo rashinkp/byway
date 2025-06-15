@@ -22,6 +22,7 @@ export default function AdminWalletPage() {
     refetch: transactionsRefetch,
   } = useGetTransactionsByUser();
 
+
   const handleTopUp = () => {
     const numericAmount = parseFloat(amount);
     if (isNaN(numericAmount) || numericAmount <= 0) {

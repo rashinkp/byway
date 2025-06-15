@@ -1,7 +1,7 @@
 import { createSharedDependencies } from "./shared.dependencies";
 import { createAuthDependencies } from "./auth.dependencies";
 import { createUserDependencies } from "./user.dependencies";
-import { createInstructorDependencies } from "./instructor.dipendencies";
+import { createInstructorDependencies } from "./instructor.dependencies";
 import { createCategoryDependencies } from "./category.dependencies";
 import { createCourseDependencies } from "./course.dependencies";
 import { createLessonDependencies } from "./lesson.depenedencies";
@@ -18,6 +18,7 @@ import { SearchController } from "../presentation/http/controllers/search.contro
 import { searchRouter } from "../presentation/express/router/search.router";
 import { createWalletDependencies } from "./wallet.dependencies";
 import { createRevenueDependencies } from "./revenue.dependencies";
+import { revenueRouter } from "../presentation/express/router/revenue.router";
 
 export interface AppDependencies {
   authController: any;
@@ -37,6 +38,7 @@ export interface AppDependencies {
   searchRouter: any;
   walletController: any;
   revenueController: any;
+  revenueRouter: any;
 }
 
 export function createAppDependencies(): AppDependencies {
@@ -68,6 +70,7 @@ export function createAppDependencies(): AppDependencies {
   );
 
   const searchRouterInstance = searchRouter(searchController);
+  const revenueRouterInstance = revenueRouter(revenueDeps.revenueController);
 
   return {
     authController: authDeps.authController,
@@ -87,5 +90,6 @@ export function createAppDependencies(): AppDependencies {
     searchRouter: searchRouterInstance,
     walletController: walletDeps.walletController,
     revenueController: revenueDeps.revenueController,
+    revenueRouter: revenueRouterInstance,
   };
 }

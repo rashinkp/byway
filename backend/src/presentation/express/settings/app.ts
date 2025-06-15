@@ -6,7 +6,7 @@ import { cookieConfig } from "../configs/cookie.config";
 import { errorMiddleware } from "../middlewares/error.middleware";
 import { createAppDependencies } from "../../../di/app.dependencies";
 import morgan from "morgan";
-import { createRouter } from "../router";
+import { createRouter } from "../router/index.routes";
 import { expressAdapter } from "../../adapters/express.adapter";
 
 export const createApp = (): Application => {

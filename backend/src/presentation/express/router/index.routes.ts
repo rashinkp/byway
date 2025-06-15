@@ -14,7 +14,7 @@ import { orderRouter } from "./order.router";
 import { fileRouter } from "./file.router";
 import { progressRouter } from "./progress.router";
 import { walletRouter } from "./wallet.router";
-import { revenueRouter } from "./analytics.router";
+import {revenueRouter} from "./revenue.router";
 
 export const createRouter = (deps: AppDependencies): Router => {
   const router = Router();
