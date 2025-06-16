@@ -11,6 +11,7 @@ export interface ITopEnrolledCourse {
 export interface IGetTopEnrolledCoursesInput {
   userId: string;
   limit?: number;
+  role?: "ADMIN" | "INSTRUCTOR";
 }
 
 export interface IGetTopEnrolledCoursesUseCase {

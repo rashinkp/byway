@@ -585,12 +585,47 @@ export class CourseRepository implements ICourseRepository {
   }
 
   async getCourseStats(input: IGetCourseStatsInput): Promise<ICourseStats> {
+    const { userId, includeDeleted = false } = input;
+    
+    // Build where clause for filtering
+    const whereClause: Prisma.CourseWhereInput = {};
+    
+    // Filter by instructor if userId is provided
+    if (userId) {
+      whereClause.createdBy = userId;
+    }
+    
+    // Handle deleted courses
+    if (!includeDeleted) {
+      whereClause.deletedAt = null;
+    }
+    
+    // Build where clause for active courses (non-deleted)
+    const activeWhereClause: Prisma.CourseWhereInput = {
+      ...whereClause,
+      deletedAt: null
+    };
+    
+    // Build where clause for inactive courses (deleted)
+    const inactiveWhereClause: Prisma.CourseWhereInput = {
+      ...whereClause,
+      deletedAt: { not: null }
+    };
+    
+    // Build where clause for pending courses (non-deleted)
+    const pendingWhereClause: Prisma.CourseWhereInput = {
+      ...whereClause,
+      approvalStatus: APPROVALSTATUS.PENDING,
+      deletedAt: null
+    };
+
     const [totalCourses, activeCourses, inactiveCourses, pendingCourses] = await Promise.all([
-      this.prisma.course.count({ where: { deletedAt: null } }),
-      this.prisma.course.count({ where: { deletedAt: null } }),
-      this.prisma.course.count({ where: { deletedAt: { not: null } } }),
-      this.prisma.course.count({ where: { approvalStatus: APPROVALSTATUS.PENDING, deletedAt: null } }),
+      this.prisma.course.count({ where: whereClause }),
+      this.prisma.course.count({ where: activeWhereClause }),
+      this.prisma.course.count({ where: inactiveWhereClause }),
+      this.prisma.course.count({ where: pendingWhereClause }),
     ]);
+    
     return {
       totalCourses,
       activeCourses,
@@ -600,20 +635,35 @@ export class CourseRepository implements ICourseRepository {
   }
 
   async getTopEnrolledCourses(input: IGetTopEnrolledCoursesInput): Promise<ITopEnrolledCourse[]> {
-    console.log('getTopEnrolledCourses called with userId:', input.userId);
+    console.log('getTopEnrolledCourses called with userId:', input.userId, 'role:', input.role);
     
-    // Step 1: Get all courses with enrollment count (all courses belong to admin)
-    const allCourses = await this.prisma.course.findMany({
-      include: {
-        creator: true,
-        enrollments: true
-      }
-    });
+    // Step 1: Get courses based on role
+    let allCourses;
+    if (input.role === "INSTRUCTOR") {
+      // For instructor, get only their courses
+      allCourses = await this.prisma.course.findMany({
+        where: {
+          createdBy: input.userId
+        },
+        include: {
+          creator: true,
+          enrollments: true
+        }
+      });
+    } else {
+      // For admin, get all courses
+      allCourses = await this.prisma.course.findMany({
+        include: {
+          creator: true,
+          enrollments: true
+        }
+      });
+    }
     
-    console.log('All courses found:', allCourses.length);
+    console.log('Courses found:', allCourses.length, 'for role:', input.role);
     
     if (allCourses.length === 0) {
-      console.log('No courses found in system');
+      console.log('No courses found');
       return [];
     }
 
@@ -641,16 +691,28 @@ export class CourseRepository implements ICourseRepository {
           }
         });
 
-        // Calculate total revenue from completed sales
-        const totalRevenue = completedOrderItems.reduce((sum, item) => {
-          // Use the actual course price from order item (price at time of purchase)
-          const itemPrice = Number(item.coursePrice);
-          const adminSharePercentage = Number(item.adminSharePercentage);
-          const adminRevenue = itemPrice * (adminSharePercentage / 100);
-          return sum + adminRevenue;
-        }, 0);
+        // Calculate revenue based on role
+        let totalRevenue = 0;
+        if (input.role === "INSTRUCTOR") {
+          // For instructor: calculate instructor revenue (remaining amount after admin share)
+          totalRevenue = completedOrderItems.reduce((sum, item) => {
+            const itemPrice = Number(item.coursePrice);
+            const adminSharePercentage = Number(item.adminSharePercentage);
+            const adminRevenue = itemPrice * (adminSharePercentage / 100);
+            const instructorRevenue = itemPrice - adminRevenue; // Instructor gets the remaining amount
+            return sum + instructorRevenue;
+          }, 0);
+        } else {
+          // For admin: calculate admin revenue
+          totalRevenue = completedOrderItems.reduce((sum, item) => {
+            const itemPrice = Number(item.coursePrice);
+            const adminSharePercentage = Number(item.adminSharePercentage);
+            const adminRevenue = itemPrice * (adminSharePercentage / 100);
+            return sum + adminRevenue;
+          }, 0);
+        }
 
-        console.log(`Course ${course.title}: ${completedOrderItems.length} completed sales, revenue: ${totalRevenue}`);
+        console.log(`Course ${course.title}: ${completedOrderItems.length} completed sales, revenue: ${totalRevenue} (${input.role})`);
 
         return {
           courseId: course.id,

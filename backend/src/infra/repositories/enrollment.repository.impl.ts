@@ -114,6 +114,13 @@ export class EnrollmentRepository implements IEnrollmentRepository {
   async findByCourseId(courseId: string): Promise<Enrollment[]> {
     const enrollments = await this.prisma.enrollment.findMany({
       where: { courseId },
+      include: {
+        orderItem: {
+          include: {
+            order: true
+          }
+        }
+      }
     });
     return enrollments.map(enrollment => new Enrollment(
       `${enrollment.userId}-${enrollment.courseId}`,

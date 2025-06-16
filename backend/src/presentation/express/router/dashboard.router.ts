@@ -8,10 +8,17 @@ export function dashboardRouter(
 ): Router {
   const router = Router();
 
-  // GET /dashboard - Get dashboard data
+  // GET /dashboard/admin - Get admin dashboard data
   router.get("/admin", restrictTo("ADMIN"), (req, res) =>
     expressAdapter(req, res, (httpRequest) =>
       dashboardController.getDashboard(httpRequest)
+    )
+  );
+
+  // GET /dashboard/instructor - Get instructor dashboard data
+  router.get("/instructor", restrictTo("INSTRUCTOR"), (req, res) =>
+    expressAdapter(req, res, (httpRequest) =>
+      dashboardController.getInstructorDashboard(httpRequest)
     )
   );
 

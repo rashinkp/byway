@@ -5,6 +5,7 @@ import { GetUserStatsUseCase } from "../app/usecases/user/implementations/get-us
 import { GetTopInstructorsUseCase } from "../app/usecases/user/implementations/get-top-instructors.usecase";
 import { GetEnrollmentStatsUseCase } from "../app/usecases/enrollment/implementations/get-enrollment-stats.usecase";
 import { GetDashboardUseCase } from "../app/usecases/dashboard/implementations/get-dashboard.usecase";
+import { GetInstructorDashboardUseCase } from "../app/usecases/dashboard/implementations/get-instructor-dashboard.usecase";
 import { DashboardController } from "../presentation/http/controllers/dashboard.controller";
 import { GetLatestRevenueUseCase } from "../app/usecases/revenue/implementations/get-latest-revenue.usecase";
 
@@ -37,16 +38,26 @@ export const createDashboardDependencies = (sharedDeps: SharedDependencies) => {
     revenueRepository
   );
 
+  // Create instructor dashboard use case
+  const getInstructorDashboardUseCase = new GetInstructorDashboardUseCase(
+    courseRepository,
+    enrollmentRepository,
+    revenueRepository,
+    userRepository
+  );
+
   // Create controller
   const dashboardController = new DashboardController(
     getDashboardUseCase,
     httpErrors,
-    httpSuccess
+    httpSuccess,
+    getInstructorDashboardUseCase
   );
 
   return {
     dashboardController,
     getDashboardUseCase,
+    getInstructorDashboardUseCase,
     // Individual use cases for reuse
     getCourseStatsUseCase,
     getTopEnrolledCoursesUseCase,

@@ -5,7 +5,10 @@ export interface ICourseStats {
   pendingCourses: number;
 }
 
-export interface IGetCourseStatsInput {}
+export interface IGetCourseStatsInput {
+  userId?: string;
+  includeDeleted?: boolean;
+}
 
 export interface IGetCourseStatsUseCase {
   execute(input: IGetCourseStatsInput): Promise<ICourseStats>;

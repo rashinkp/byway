@@ -26,7 +26,7 @@ export class GetDashboardUseCase implements IGetDashboardUseCase {
       totalRevenue
     ] = await Promise.all([
       this.getCourseStatsUseCase.execute({}),
-      this.getTopEnrolledCoursesUseCase.execute({ userId: input.userId, limit: 5 }),
+      this.getTopEnrolledCoursesUseCase.execute({ userId: input.userId, limit: 5, role: "ADMIN" }),
       this.getUserStatsUseCase.execute({}),
       this.getTopInstructorsUseCase.execute({ limit: 5 }),
       this.getEnrollmentStatsUseCase.execute({}),
