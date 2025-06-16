@@ -18,7 +18,7 @@ import PaymentMethodSkeleton from "@/components/checkout/PaymentMethodSkeleton";
 import OrderSummarySkeleton from "@/components/checkout/OrderSummerySkeleton";
 import { Course as CartCourse } from "@/types/cart";
 
-type PaymentMethodType = "WALLET" | "STRIPE" | "PAYPAL" | "RAZORPAY";
+type PaymentMethodType = "WALLET" | "STRIPE";
 
 export default function CheckoutPage() {
   const router = useRouter();
@@ -140,10 +140,9 @@ export default function CheckoutPage() {
       const response = await createOrder.mutateAsync(orderData);
 
       if (response.data) {
-        if (response.data.session?.url) {
+        if (selectedMethod === "STRIPE" && response.data.session?.url) {
           window.location.href = response.data.session.url;
-        } else {
-          // For wallet payments, redirect to success page
+        } else if (selectedMethod === "WALLET") {
           router.push(`/success?order_id=${response.data.order.id}&type=wallet-payment`);
         }
       }

@@ -22,7 +22,7 @@ interface GridCourse extends Course {
 
 export default function CourseListingPage() {
   const searchParams = useSearchParams();
-  const itemsPerPage = 3;
+  const itemsPerPage = 10;
   const [currentPage, setCurrentPage] = useState(1);
   const [filters, setFilters] = useState<Record<string, any>>({
     search: "",
