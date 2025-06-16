@@ -1,7 +1,7 @@
-import { ICourseOutputDTO } from "../../../../domain/dtos/course/course.dto";
 import { HttpError } from "../../../../presentation/http/errors/http-error";
 import { ICourseRepository } from "../../../repositories/course.repository.interface";
 import { IDeleteCourseUseCase } from "../interfaces/delete-course.usecase.interface";
+import { ICourseWithDetailsDTO } from "../../../../domain/dtos/course/course.dto";
 
 export class DeleteCourseUseCase implements IDeleteCourseUseCase {
   constructor(private courseRepository: ICourseRepository) {}
@@ -10,7 +10,7 @@ export class DeleteCourseUseCase implements IDeleteCourseUseCase {
     courseId: string,
     userId: string,
     role: string
-  ): Promise<ICourseOutputDTO> {
+  ): Promise<ICourseWithDetailsDTO> {
     const course = await this.courseRepository.findById(courseId);
     if (!course) {
       throw new HttpError("Course not found", 404);

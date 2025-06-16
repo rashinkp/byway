@@ -52,7 +52,7 @@ export const createInstructor = async (
       }
       
       if (status === 403) {
-        throw {
+    throw {
           response: {
             status: 403,
             data: data || {
@@ -85,7 +85,7 @@ export const createInstructor = async (
       throw {
         response: undefined,
         message: error.message || "Failed to create instructor"
-      };
+    };
     }
   }
 };

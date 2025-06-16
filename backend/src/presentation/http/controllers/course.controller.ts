@@ -1,6 +1,5 @@
 import { ICreateCourseUseCase } from "../../../app/usecases/course/interfaces/create-course.usecase.interface";
 import { IGetAllCoursesUseCase } from "../../../app/usecases/course/interfaces/get-all-courses.usecase.interface";
-import { IGetCourseByIdUseCase } from "../../../app/usecases/course/interfaces/get-course-by-id.usecase.interface";
 import { IUpdateCourseUseCase } from "../../../app/usecases/course/interfaces/update-course.usecase.interface";
 import { IDeleteCourseUseCase } from "../../../app/usecases/course/interfaces/delete-course.usecase.interface";
 import { IGetEnrolledCoursesUseCase } from "../../../app/usecases/course/interfaces/get-enrolled-courses.usecase.interface";
@@ -20,16 +19,16 @@ import {
   getAllCoursesSchemaDef,
   getCourseByIdSchemaDef,
   getEnrolledCoursesSchemaDef,
-  updateCourseApprovalSchemaDef,
   updateCourseSchemaDef,
 } from "../../validators/course.validators";
 import { BaseController } from "./base.controller";
+import { IGetCourseWithDetailsUseCase } from "../../../app/usecases/course/interfaces/get-course-with-details.usecase.interface";
 
 export class CourseController extends BaseController {
   constructor(
     private createCourseUseCase: ICreateCourseUseCase,
     private getAllCoursesUseCase: IGetAllCoursesUseCase,
-    private getCourseByIdUseCase: IGetCourseByIdUseCase,
+    private getCourseWithDetailsUseCase: IGetCourseWithDetailsUseCase,
     private updateCourseUseCase: IUpdateCourseUseCase,
     private deleteCourseUseCase: IDeleteCourseUseCase,
     private getEnrolledCoursesUseCase: IGetEnrolledCoursesUseCase,
@@ -83,7 +82,7 @@ export class CourseController extends BaseController {
       const validated = getCourseByIdSchemaDef.params!.parse({
         id: request.params.id,
       });
-      const course = await this.getCourseByIdUseCase.execute(
+      const course = await this.getCourseWithDetailsUseCase.execute(
         validated.id,
         request.user
       );

@@ -1,5 +1,5 @@
 import {
-  ICourseOutputDTO,
+  ICourseWithDetailsDTO,
   IUpdateCourseApprovalInputDTO,
 } from "../../../../domain/dtos/course/course.dto";
 import { APPROVALSTATUS } from "../../../../domain/enum/approval-status.enum";
@@ -12,7 +12,7 @@ export class DeclineCourseUseCase implements IDeclineCourseUseCase {
 
   async execute(
     input: IUpdateCourseApprovalInputDTO
-  ): Promise<ICourseOutputDTO> {
+  ): Promise<ICourseWithDetailsDTO> {
     const course = await this.courseRepository.findById(input.courseId);
     if (!course) {
       throw new HttpError("Course not found", 404);

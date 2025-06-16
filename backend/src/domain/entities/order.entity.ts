@@ -24,6 +24,8 @@ export interface OrderItem {
 
 export class Order {
   public id?: string;
+  public createdAt?: Date;
+  public updatedAt?: Date;
 
   constructor(
     public readonly userId: string,
@@ -83,6 +85,8 @@ export class Order {
       paymentId: this.paymentIntentId,
       paymentGateway: this.paymentGateway,
       items: this.items,
+      createdAt: this.createdAt,
+      updatedAt: this.updatedAt
     };
   }
 } 

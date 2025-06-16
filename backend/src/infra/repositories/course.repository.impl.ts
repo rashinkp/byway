@@ -8,7 +8,7 @@ import { Offer } from "../../domain/value-object/offer";
 import { CourseStatus } from "../../domain/enum/course-status.enum";
 import { APPROVALSTATUS } from "../../domain/enum/approval-status.enum";
 import {
-  ICourseResponseDTO,
+  ICourseListResponseDTO,
   IGetAllCoursesInputDTO,
   IGetEnrolledCoursesInputDTO,
 } from "../../domain/dtos/course/course.dto";
@@ -103,7 +103,9 @@ export class CourseRepository implements ICourseRepository {
     try {
       const course = await this.prisma.course.findUnique({
         where: { id },
-        include: { details: true },
+        include: { 
+          details: true
+        }
       });
 
       if (!course) return null;
@@ -186,7 +188,7 @@ export class CourseRepository implements ICourseRepository {
     }
   }
 
-  async findAll(input: IGetAllCoursesInputDTO): Promise<ICourseResponseDTO> {
+  async findAll(input: IGetAllCoursesInputDTO): Promise<ICourseListResponseDTO> {
     const {
       page = 1,
       limit = 10,
@@ -407,7 +409,7 @@ export class CourseRepository implements ICourseRepository {
 
   async findEnrolledCourses(
     input: IGetEnrolledCoursesInputDTO
-  ): Promise<ICourseResponseDTO> {
+  ): Promise<ICourseListResponseDTO> {
     const {
       userId,
       page = 1,

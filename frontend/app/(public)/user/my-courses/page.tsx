@@ -28,24 +28,19 @@ interface GridCourse extends Course {
   bestSeller: boolean;
   thumbnail: string;
   price: number;
-  lastAccessed: string;
 }
 
 export default function MyCoursesPage() {
   const itemsPerPage = 6;
   const [currentPage, setCurrentPage] = useState(1);
-  const [sortBy, setSortBy] = useState<"title" | "enrolledAt" | "createdAt">(
-    "enrolledAt"
-  );
-  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
   const [isLoaded, setIsLoaded] = useState(false);
 
   // Fetch enrolled courses using the hook
   const { data, isLoading, error, refetch } = useGetEnrolledCourses({
     page: currentPage,
     limit: itemsPerPage,
-    sortBy,
-    sortOrder,
+    sortBy: "enrolledAt",
+    sortOrder: "desc",
     search: "",
     level: "All",
   });
@@ -61,7 +56,6 @@ export default function MyCoursesPage() {
       bestSeller: course.bestSeller ?? false,
       thumbnail: course.thumbnail ?? "/default-thumbnail.png",
       price: course.price ?? 0,
-      lastAccessed: course.lastAccessed ?? "Unknown",
     })) ?? [];
 
   // Calculate pagination values
@@ -77,19 +71,6 @@ export default function MyCoursesPage() {
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
-  };
-
-  const handleSortChange = (value: string) => {
-    if (value === "recent") {
-      setSortBy("enrolledAt");
-      setSortOrder("desc");
-    } else if (value === "progress") {
-      setSortBy("enrolledAt"); // Placeholder until progress sorting is supported
-      setSortOrder("desc");
-    } else if (value === "title") {
-      setSortBy("title");
-      setSortOrder("asc");
-    }
   };
 
   if (error) {
@@ -138,97 +119,62 @@ export default function MyCoursesPage() {
   };
 
   return (
-    <div className="container mx-auto px-4 py-2">
-      {/* Header with Sorting */}
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold text-gray-800">My Courses</h1>
-        <div className="flex items-center">
-          <span className="text-gray-600 mr-2">Sort by:</span>
-          <select
-            className="border border-gray-300 rounded-md px-3 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            value={
-              sortBy === "enrolledAt" && sortOrder === "desc"
-                ? "recent"
-                : sortBy
-            }
-            onChange={(e) => handleSortChange(e.target.value)}
-          >
-            <option value="recent">Recently Accessed</option>
-            <option value="progress">Progress</option>
-            <option value="title">Course Name</option>
-          </select>
-        </div>
+    <div className="w-full">
+      {/* Header with Description */}
+      <div className="mb-8">
+        <h1 className="text-2xl font-bold text-gray-800 mb-2">My Courses</h1>
+        <p className="text-gray-600">
+          Access all your enrolled courses here. Continue your learning journey and track your progress across all your courses.
+        </p>
       </div>
 
-      {/* Continue Learning Section */}
-      <div className="p-4 mb-8">
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-4">
-          <div>
-            <h2 className="text-lg font-semibold text-gray-800">
-              Continue Learning
-            </h2>
-            <p className="text-gray-600 text-sm">Pick up where you left off</p>
-          </div>
-          <a
-            href="#"
-            className="text-blue-600 hover:text-blue-800 text-sm mt-2 md:mt-0"
+      {/* Course Grid */}
+      <motion.div
+        className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-4 md:gap-6 w-full"
+        variants={containerVariants}
+        initial="hidden"
+        animate={isLoaded ? "show" : "hidden"}
+      >
+        {courses.map((course) => (
+          <motion.div
+            key={course.id}
+            className="w-full"
+            variants={{
+              hidden: { opacity: 0, y: 20 },
+              show: {
+                opacity: 1,
+                y: 0,
+                transition: { duration: 0.4, ease: "easeOut" },
+              },
+            }}
           >
-            View All
-          </a>
-        </div>
-
-        <motion.div
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
-          variants={containerVariants}
-          initial="hidden"
-          animate={isLoaded ? "show" : "hidden"}
-        >
-          {courses.slice(0, 3).map((course) => (
-            <motion.div
-              key={`continue-${course.id}`}
-              variants={{
-                hidden: { opacity: 0, y: 20 },
-                show: {
-                  opacity: 1,
-                  y: 0,
-                  transition: { duration: 0.4, ease: "easeOut" },
-                },
-              }}
-            >
-              <Link href={`/courses/${course.id}`}>
-                <CourseCard
-                  id={course.id}
-                  thumbnail={course.thumbnail}
-                  title={course.title}
-                  rating={course.rating}
-                  reviewCount={course.reviewCount}
-                  formattedDuration={course.formattedDuration}
-                  lessons={course.lessons}
-                  price={course.offer || course.price}
-                  bestSeller={course.bestSeller}
-                  className="w-full"
-                />
-              </Link>
-              <p className="text-sm text-gray-600 mt-2">
-                Last accessed {course.lastAccessed}
-              </p>
-            </motion.div>
-          ))}
-        </motion.div>
-      </div>
-
-      {/* All My Courses Section */}
-      {/* <div className="mb-6">
-        <CourseGrid courses={courses} isLoading={isLoading} />
-      </div> */}
+            <Link href={`/courses/${course.id}`} className="block h-full">
+              <CourseCard
+                id={course.id}
+                thumbnail={course.thumbnail}
+                title={course.title}
+                rating={course.rating}
+                reviewCount={course.reviewCount}
+                formattedDuration={course.formattedDuration}
+                lessons={course.lessons}
+                price={course.offer || course.price}
+                bestSeller={course.bestSeller}
+                className="w-full h-full hover:shadow-lg transition-shadow duration-300"
+              />
+            </Link>
+          </motion.div>
+        ))}
+      </motion.div>
 
       {/* Pagination */}
       {totalPages > 1 && (
-        <Pagination
-          totalPages={totalPages}
-          currentPage={currentPage}
-          onPageChange={handlePageChange}
-        />
+        <div className="mt-8">
+          <Pagination
+            totalPages={totalPages}
+            currentPage={currentPage}
+            onPageChange={handlePageChange}
+          />
+        </div>
       )}
     </div>
   );

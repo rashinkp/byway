@@ -6,6 +6,59 @@ import { Duration } from "../../value-object/duration";
 import { Offer } from "../../value-object/offer";
 import { Price } from "../../value-object/price";
 
+// Base course interface matching frontend Course interface
+export interface ICourseDTO {
+  id: string;
+  title: string;
+  description: string | null;
+  level: CourseLevel;
+  price: number | null;
+  thumbnail: string | null;
+  duration: number | null;
+  offer: number | null;
+  status: CourseStatus;
+  categoryId: string;
+  createdBy: string;
+  createdAt: Date;
+  updatedAt: Date;
+  deletedAt: Date | null;
+  approvalStatus: APPROVALSTATUS;
+  adminSharePercentage: number;
+  instructorSharePercentage: number;
+  details: {
+    prerequisites: string | null;
+    longDescription: string | null;
+    objectives: string | null;
+    targetAudience: string | null;
+  } | null;
+  rating?: number;
+  reviewCount?: number;
+  formattedDuration?: string;
+  lessons?: number;
+  bestSeller?: boolean;
+  progress?: number;
+  completedLessons?: number;
+  totalLessons?: number;
+  lastAccessed?: string;
+  isEnrolled?: boolean;
+}
+
+// Course with enrollment status - used for course listing
+export interface ICourseWithEnrollmentDTO extends Omit<ICourseDTO, 'createdAt' | 'updatedAt' | 'deletedAt'> {
+  createdAt: string;
+  updatedAt: string;
+  deletedAt: string | null;
+  isEnrolled: boolean;
+}
+
+// Course with details - used for course details page
+export interface ICourseWithDetailsDTO extends Omit<ICourseDTO, 'createdAt' | 'updatedAt' | 'deletedAt'> {
+  createdAt: string;
+  updatedAt: string;
+  deletedAt: string | null;
+}
+
+// Input DTOs
 export interface ICreateCourseInputDTO {
   title: string;
   description?: string | null;
@@ -33,7 +86,6 @@ export interface IUpdateCourseInputDTO {
   offer?: number;
   status?: CourseStatus;
   createdBy: string;
-  // Course details fields
   longDescription?: string;
   prerequisites?: string;
   objectives?: string;
@@ -78,36 +130,6 @@ export interface IUpdateCourseApprovalInputDTO {
   courseId: string;
 }
 
-export interface ICourseOutputDTO {
-  id: string;
-  title: string;
-  description?: string | null;
-  level: CourseLevel;
-  price?: number | null;
-  thumbnail?: string | null;
-  duration?: number | null;
-  offer?: number | null;
-  status: CourseStatus;
-  categoryId: string;
-  createdBy: string;
-  createdAt: string;
-  updatedAt: string;
-  deletedAt?: string | null;
-  approvalStatus: APPROVALSTATUS;
-  adminSharePercentage: number;
-  instructorSharePercentage: number;
-  details?: CourseDetails | null;
-  rating?: number;
-  reviewCount?: number;
-  lessons?: {
-    id: string;
-    title: string;
-    description: string | null;
-    order: number;
-  }[];
-  bestSeller?: boolean;
-}
-
 export interface IEnrollmentOutputDTO {
   userId: string;
   courseId: string;
@@ -116,30 +138,9 @@ export interface IEnrollmentOutputDTO {
   accessStatus: 'ACTIVE' | 'BLOCKED' | 'EXPIRED';
 }
 
-export interface ICourseWithEnrollmentStatus extends ICourseOutputDTO {
-  isEnrolled: boolean;
-  category?: {
-    id: string;
-    name: string;
-    description: string | null;
-  } | null;
-  instructor?: {
-    id: string;
-    name: string;
-    email: string;
-    avatar: string | null;
-    role: string;
-  } | null;
-  lessons?: {
-    id: string;
-    title: string;
-    description: string | null;
-    order: number;
-  }[];
-}
-
-export interface ICourseResponseDTO {
-  courses: ICourseOutputDTO[];
+// Response DTOs
+export interface ICourseListResponseDTO {
+  courses: ICourseWithEnrollmentDTO[];
   total: number;
   totalPage: number;
 }

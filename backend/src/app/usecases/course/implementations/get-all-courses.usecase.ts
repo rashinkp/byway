@@ -1,5 +1,5 @@
 import {
-  ICourseResponseDTO,
+  ICourseListResponseDTO,
   IGetAllCoursesInputDTO,
 } from "../../../../domain/dtos/course/course.dto";
 import { HttpError } from "../../../../presentation/http/errors/http-error";
@@ -9,7 +9,7 @@ import { IGetAllCoursesUseCase } from "../interfaces/get-all-courses.usecase.int
 export class GetAllCoursesUseCase implements IGetAllCoursesUseCase {
   constructor(private courseRepository: ICourseRepository) {}
 
-  async execute(input: IGetAllCoursesInputDTO): Promise<ICourseResponseDTO> {
+  async execute(input: IGetAllCoursesInputDTO): Promise<ICourseListResponseDTO> {
     try {
       const result = await this.courseRepository.findAll(input);
       return result;

@@ -101,6 +101,8 @@ export class OrderRepository implements IOrderRepository {
       }))
     );
     mappedOrder.id = order.id;
+    mappedOrder.createdAt = order.createdAt;
+    mappedOrder.updatedAt = order.updatedAt;
     return mappedOrder;
   }
 

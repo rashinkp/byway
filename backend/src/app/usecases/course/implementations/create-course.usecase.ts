@@ -1,6 +1,6 @@
 import {
-  ICourseOutputDTO,
   ICreateCourseInputDTO,
+  ICourseWithDetailsDTO
 } from "../../../../domain/dtos/course/course.dto";
 import { Course } from "../../../../domain/entities/course.entity";
 import { HttpError } from "../../../../presentation/http/errors/http-error";
@@ -16,7 +16,7 @@ export class CreateCourseUseCase implements ICreateCourseUseCase {
     private userRepository: IUserRepository
   ) {}
 
-  async execute(input: ICreateCourseInputDTO): Promise<ICourseOutputDTO> {
+  async execute(input: ICreateCourseInputDTO): Promise<ICourseWithDetailsDTO> {
     // Validate user is an instructor
     const user = await this.userRepository.findById(input.createdBy);
     if (!user) {

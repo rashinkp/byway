@@ -350,12 +350,12 @@ export function Header({ client }: HeaderProps = {}) {
                     </Button>
                   )}
                   <div className="flex items-center gap-5">
-                    {/* <div className="relative group">
+                    <div className="relative group">
                       <Heart
                         className="w-6 h-6 text-gray-600 group-hover:text-red-500 transition-colors cursor-pointer"
                         strokeWidth={1.5}
                       />
-                    </div> */}
+                    </div>
                     <div className="relative group">
                       <Link href="/user/cart">
                         <ShoppingCart
@@ -365,16 +365,16 @@ export function Header({ client }: HeaderProps = {}) {
                       </Link>
                     </div>
                     <div className="relative group">
-                      {/* <Bell
+                      <Bell
                         className="w-6 h-6 text-gray-600 group-hover:text-yellow-500 transition-colors cursor-pointer"
                         strokeWidth={1.5}
-                      /> */}
-                      {/* <Badge
+                      />
+                      <Badge
                         variant="destructive"
                         className="absolute -top-2 -right-2 w-5 h-5 p-0 flex items-center justify-center text-xs bg-yellow-500"
                       >
                         5
-                      </Badge> */}
+                      </Badge>
                     </div>
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>

@@ -1,5 +1,5 @@
 import {
-  ICourseResponseDTO,
+  ICourseListResponseDTO,
   IGetEnrolledCoursesInputDTO,
 } from "../../../../domain/dtos/course/course.dto";
 import { HttpError } from "../../../../presentation/http/errors/http-error";
@@ -15,7 +15,7 @@ export class GetEnrolledCoursesUseCase implements IGetEnrolledCoursesUseCase {
 
   async execute(
     input: IGetEnrolledCoursesInputDTO
-  ): Promise<ICourseResponseDTO> {
+  ): Promise<ICourseListResponseDTO> {
     const user = await this.userRepository.findById(input.userId);
     if (!user) {
       throw new HttpError("User not found", 404);

@@ -1,13 +1,10 @@
 import {
-  ICourseOutputDTO,
   IUpdateCourseInputDTO,
+  ICourseWithDetailsDTO
 } from "../../../../domain/dtos/course/course.dto";
 import { HttpError } from "../../../../presentation/http/errors/http-error";
-import { ICategoryRepository } from "../../../repositories/category.repository";
 import { ICourseRepository } from "../../../repositories/course.repository.interface";
 import { IUpdateCourseUseCase } from "../interfaces/update-course.usecase.interface";
-import { ILessonRepository } from "../../../repositories/lesson.repository";
-import { CourseStatus } from "../../../../domain/enum/course-status.enum";
 import { Price } from "../../../../domain/value-object/price";
 import { Duration } from "../../../../domain/value-object/duration";
 import { Offer } from "../../../../domain/value-object/offer";
@@ -18,7 +15,7 @@ export class UpdateCourseUseCase implements IUpdateCourseUseCase {
     private courseRepository: ICourseRepository,
   ) {}
 
-  async execute(input: IUpdateCourseInputDTO): Promise<ICourseOutputDTO> {
+  async execute(input: IUpdateCourseInputDTO): Promise<ICourseWithDetailsDTO> {
     try {
       const course = await this.courseRepository.findById(input.id);
       if (!course) {
