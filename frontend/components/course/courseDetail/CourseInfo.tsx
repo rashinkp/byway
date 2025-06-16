@@ -4,6 +4,7 @@ import { BookOpen, Clock, Users, Award, Star } from "lucide-react";
 import { Course } from "@/types/course";
 import { User } from "@/types/user";
 import CourseInfoSkeleton from "./CourseInfoSkeleton";
+import Link from "next/link";
 
 interface CourseInfoProps {
   course: Course | undefined;
@@ -63,23 +64,28 @@ export default function CourseInfo({
         <Separator />
 
         <div className="flex items-center gap-4">
-          <div className="w-12 h-12 rounded-full overflow-hidden bg-gray-100">
-            {instructor?.avatar ? (
-              <img
-                src={instructor.avatar}
-                alt={instructor.name}
-                className="w-full h-full object-cover"
-              />
-            ) : (
-              <div className="w-full h-full bg-blue-50 flex items-center justify-center text-blue-600 text-lg font-bold">
-                {instructor?.name?.charAt(0) || "I"}
-              </div>
-            )}
-          </div>
-          <div>
-            <p className="text-sm font-medium text-gray-500">Instructor</p>
-            <p className="text-gray-900">{instructor?.name || "Anonymous"}</p>
-          </div>
+          <Link 
+            href={`/instructors/${instructor?.id}`}
+            className="flex items-center gap-4 hover:bg-gray-50 p-2 rounded-lg transition-colors"
+          >
+            <div className="w-12 h-12 rounded-full overflow-hidden bg-gray-100">
+              {instructor?.avatar ? (
+                <img
+                  src={instructor.avatar}
+                  alt={instructor.name}
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <div className="w-full h-full bg-blue-50 flex items-center justify-center text-blue-600 text-lg font-bold">
+                  {instructor?.name?.charAt(0) || "I"}
+                </div>
+              )}
+            </div>
+            <div>
+              <p className="text-sm font-medium text-gray-500">Instructor</p>
+              <p className="text-gray-900 hover:text-blue-600 transition-colors">{instructor?.name || "Anonymous"}</p>
+            </div>
+          </Link>
         </div>
 
       </div>

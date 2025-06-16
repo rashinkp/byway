@@ -15,6 +15,7 @@ export function useCreateInstructor() {
     onSuccess: (response) => {
       setUser(response.data);
       queryClient.invalidateQueries({ queryKey: ["user"], exact: false });
+      queryClient.invalidateQueries({ queryKey: ["instructor"], exact: false });
       toast.success("Instructor application submitted successfully!", {
         description: "Your application is under review.",
       });
@@ -24,10 +25,24 @@ export function useCreateInstructor() {
         "Instructor creation failed:",
         JSON.stringify(error, null, 2)
       );
-      const errorMessage =
-        error.response?.data?.message ||
-        error.message ||
-        "Something went wrong while applying";
+      
+      // Handle different error types
+      let errorMessage = "Something went wrong while applying";
+      
+      if (error?.response?.status === 404) {
+        errorMessage = "User not found. Please try logging in again.";
+      } else if (error?.response?.status === 400) {
+        errorMessage = error?.response?.data?.message || "Invalid application data";
+      } else if (error?.response?.status === 403) {
+        errorMessage = "You are not authorized to perform this action";
+      } else if (error?.response?.status === 409) {
+        errorMessage = "You already have a pending application";
+      } else if (error?.response?.data?.message) {
+        errorMessage = error.response.data.message;
+      } else if (error?.message) {
+        errorMessage = error.message;
+      }
+      
       toast.error("Instructor Apply Failed", {
         description: errorMessage,
       });

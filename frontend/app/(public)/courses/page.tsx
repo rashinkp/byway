@@ -22,7 +22,7 @@ interface GridCourse extends Course {
 
 export default function CourseListingPage() {
   const searchParams = useSearchParams();
-  const itemsPerPage = 6;
+  const itemsPerPage = 3;
   const [currentPage, setCurrentPage] = useState(1);
   const [filters, setFilters] = useState<Record<string, any>>({
     search: "",
@@ -136,11 +136,13 @@ export default function CourseListingPage() {
         <div className="lg:w-4/5">
           <CourseGrid courses={courses} isLoading={isLoading} />
           {!isLoading && data && data.totalPages > 1 && (
-            <Pagination
-              totalPages={data.totalPages}
-              currentPage={currentPage}
-              onPageChange={handlePageChange}
-            />
+            <div className="flex justify-center items-center mt-8 mb-4">
+              <Pagination
+                totalPages={data.totalPages}
+                currentPage={currentPage}
+                onPageChange={handlePageChange}
+              />
+            </div>
           )}
         </div>
       </div>

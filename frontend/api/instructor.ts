@@ -13,15 +13,80 @@ export const createInstructor = async (
     );
     return response.data;
   } catch (error: any) {
-    throw {
-      response: error.response
-        ? {
-            status: error.response.status,
-            data: error.response.data, // Preserve the ApiResponse structure
-          }
-        : undefined,
-      message: error.response?.data?.message || "Failed to create instructor",
-    };
+    console.error("API Error in createInstructor:", error);
+    
+    // Handle different error scenarios
+    if (error.response) {
+      // Server responded with error status
+      const { status, data } = error.response;
+      
+      // Handle specific status codes
+      if (status === 404) {
+        throw {
+          response: {
+            status: 404,
+            data: {
+              message: "User not found. Please try logging in again.",
+              statusCode: 404,
+              success: false,
+              data: null
+            }
+          },
+          message: "User not found. Please try logging in again."
+        };
+      }
+      
+      if (status === 400) {
+        throw {
+          response: {
+            status: 400,
+            data: data || {
+              message: "Invalid application data",
+              statusCode: 400,
+              success: false,
+              data: null
+            }
+          },
+          message: data?.message || "Invalid application data"
+        };
+      }
+      
+      if (status === 403) {
+        throw {
+          response: {
+            status: 403,
+            data: data || {
+              message: "You are not authorized to perform this action",
+              statusCode: 403,
+              success: false,
+              data: null
+            }
+          },
+          message: data?.message || "You are not authorized to perform this action"
+        };
+      }
+      
+      // For other status codes, preserve the original error structure
+      throw {
+        response: {
+          status: status,
+          data: data
+        },
+        message: data?.message || `Request failed with status ${status}`
+      };
+    } else if (error.request) {
+      // Network error
+      throw {
+        response: undefined,
+        message: "Network error. Please check your connection and try again."
+      };
+    } else {
+      // Other errors
+      throw {
+        response: undefined,
+        message: error.message || "Failed to create instructor"
+      };
+    }
   }
 };
 
@@ -102,6 +167,19 @@ export const getInstructorByUserId = async (): Promise<
     return response.data;
   } catch (error: any) {
     console.error("Error fetching instructor by user ID:", error);
+    
+    // Handle 404 errors gracefully - user might not have an instructor record yet
+    if (error.response?.status === 404) {
+      // Return null instead of throwing error for 404
+      return {
+        success: true,
+        message: "No instructor record found",
+        data: null,
+        statusCode: 200
+      };
+    }
+    
+    // For other errors, throw as usual
     throw new Error(
       error.response?.data?.message || "Failed to fetch instructor"
     );

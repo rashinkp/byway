@@ -116,7 +116,7 @@ export default function InstructorDashboard() {
                 },
               ]}
             />
-          </div>
+      </div>
 
           {/* Course Status Stats */}
           {/* <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -301,8 +301,8 @@ export default function InstructorDashboard() {
                         </div>
                       </div>
                     </div>
-                  </div>
-                </div>
+      </div>
+    </div>
               ))}
             </div>
           </DashboardSection>

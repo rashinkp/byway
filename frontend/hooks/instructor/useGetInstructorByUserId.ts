@@ -14,6 +14,15 @@ export function useGetInstructorByUserId(enabled: boolean = true) {
     queryKey: ["instructor", user?.id],
     queryFn: getInstructorByUserId,
     enabled: !!user && enabled, // Only run if user exists and enabled is true
+    retry: (failureCount, error) => {
+      // Don't retry on 404 errors - it's normal for users to not have instructor records
+      if (error.message.includes("404") || error.message.includes("not found")) {
+        return false;
+      }
+      return failureCount < 3;
+    },
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    gcTime: 10 * 60 * 1000, // 10 minutes
   });
 
   return queryResult;

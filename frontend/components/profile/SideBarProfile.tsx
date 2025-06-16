@@ -30,7 +30,6 @@ const Sidebar: FC<SidebarProps> = ({ activeSection, setActiveSection, isInstruct
         { id: "wallet", label: "Wallet", icon: Wallet },
         { id: "transactions", label: "Transactions", icon: History },
         { id: "orders", label: "Orders", icon: ShoppingBag },
-        { id: "settings", label: "Settings", icon: Settings },
       ];
 
   return (

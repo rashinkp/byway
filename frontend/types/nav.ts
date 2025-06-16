@@ -59,11 +59,6 @@ export const ADMIN_NAV_ITEMS: NavItem[] = [
     label: "Profile",
     icon: User,
   },
-  {
-    href: "/admin/settings",
-    label: "Settings",
-    icon: Settings,
-  },
 ];
 
 export const INSTRUCTOR_NAV_ITEMS: NavItem[] = [
@@ -76,6 +71,11 @@ export const INSTRUCTOR_NAV_ITEMS: NavItem[] = [
     label: "Courses",
     href: "/instructor/courses",
     icon: BookOpen,
+  },
+  {
+    label: "Students",
+    href: "/instructor/students",
+    icon: Users,
   },
   {
     label: "Wallet",
@@ -91,10 +91,5 @@ export const INSTRUCTOR_NAV_ITEMS: NavItem[] = [
     label: "Profile",
     href: "/instructor/profile",
     icon: User,
-  },
-  {
-    label: "Settings",
-    href: "/instructor/settings",
-    icon: Settings,
   },
 ];

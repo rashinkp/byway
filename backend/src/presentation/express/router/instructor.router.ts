@@ -18,15 +18,6 @@ export function instructorRouter(
     )
   );
 
-  // Get instructor details (public with optional auth)
-  router.get("/:userId", optionalAuth, (req, res) =>
-    expressAdapter(
-      req,
-      res,
-      instructorController.getInstructorDetails.bind(instructorController)
-    )
-  );
-
   // Admin routes
   router.post("/approve", restrictTo("ADMIN"), (req, res) =>
     expressAdapter(
@@ -61,11 +52,21 @@ export function instructorRouter(
     )
   );
 
+  // Get current user's instructor data (must come before /:userId)
   router.get("/me", restrictTo("INSTRUCTOR", "ADMIN", "USER"), (req, res) =>
     expressAdapter(
       req,
       res,
       instructorController.getInstructorByUserId.bind(instructorController)
+    )
+  );
+
+  // Get instructor details (public with optional auth) - must come after specific routes
+  router.get("/:userId", optionalAuth, (req, res) =>
+    expressAdapter(
+      req,
+      res,
+      instructorController.getInstructorDetails.bind(instructorController)
     )
   );
 

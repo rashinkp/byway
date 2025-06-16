@@ -50,10 +50,13 @@ export class InstructorController extends BaseController {
         { ...validated, userId: request.user.id },
         request.user
       );
+      
+      // Fetch user data for response
       const user = await this.userRepository.findById(request.user.id);
       if (!user) {
-        throw new HttpError("User not found", StatusCodes.NOT_FOUND);
+        throw new HttpError("User data not found after instructor creation", StatusCodes.INTERNAL_SERVER_ERROR);
       }
+      
       return this.success_201(
         {
           id: instructor.id,
