@@ -1,47 +1,50 @@
 "use client";
 
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { DisableReviewResponse } from "@/types/course-review";
 import { disableReview } from "@/api/course-review";
+import { DisableReviewResponse } from "@/types/course-review";
 
 interface UseDisableReviewReturn {
-  disableReview: (id: string) => Promise<DisableReviewResponse>;
+  disableReview: (reviewId: string) => Promise<DisableReviewResponse>;
   isLoading: boolean;
   error: { message: string } | null;
 }
 
-export function useDisableReview(): UseDisableReviewReturn {
+export function useDisableReview(courseId?: string): UseDisableReviewReturn {
   const queryClient = useQueryClient();
 
-  const {
-    mutateAsync,
-    isPending: isLoading,
-    error,
-  } = useMutation<DisableReviewResponse, Error, string>({
-    mutationFn: disableReview,
+  const { mutateAsync, isPending, error } = useMutation<
+    DisableReviewResponse,
+    Error,
+    string
+  >({
+    mutationFn: async (reviewId: string) => {
+      const response = await disableReview(reviewId);
+      return response;
+    },
     onSuccess: () => {
-      // Invalidate all course review related queries
+      // Invalidate course reviews cache
+      if (courseId) {
+        queryClient.invalidateQueries({
+          queryKey: ["course-reviews", courseId],
+        });
+      }
+      // Also invalidate course data to refresh review stats
       queryClient.invalidateQueries({
-        queryKey: ["course-reviews"],
-      });
-      queryClient.invalidateQueries({
-        queryKey: ["course-review-stats"],
-      });
-      queryClient.invalidateQueries({
-        queryKey: ["user-reviews"],
+        queryKey: ["course", courseId],
       });
     },
   });
 
   const mappedError = error
     ? {
-        message: error.message || "Failed to disable review",
+        message: error instanceof Error ? error.message : "An unexpected error occurred",
       }
     : null;
 
   return {
     disableReview: mutateAsync,
-    isLoading,
+    isLoading: isPending,
     error: mappedError,
   };
 } 

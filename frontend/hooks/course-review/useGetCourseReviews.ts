@@ -22,6 +22,7 @@ export function useGetCourseReviews(
     sortBy = "createdAt",
     sortOrder = "desc",
     isMyReviews = false,
+    includeDisabled = false,
   } = params;
 
   const { data, isLoading, error, refetch } = useQuery<CourseReviewApiResponse>({
@@ -35,6 +36,7 @@ export function useGetCourseReviews(
         sortBy,
         sortOrder,
         isMyReviews,
+        includeDisabled,
       },
     ],
     queryFn: async () => {
@@ -45,6 +47,7 @@ export function useGetCourseReviews(
         sortBy,
         sortOrder,
         isMyReviews,
+        includeDisabled,
       });
       return response;
     },

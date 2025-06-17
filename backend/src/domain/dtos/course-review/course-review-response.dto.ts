@@ -7,6 +7,7 @@ export interface CourseReviewResponseDto {
   comment: string | null;
   createdAt: Date;
   updatedAt: Date;
+  deletedAt?: Date | null;
   user?: {
     id: string;
     name: string;

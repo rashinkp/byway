@@ -114,6 +114,7 @@ export class CourseReviewController extends BaseController {
         sortBy: validatedQuery.sortBy,
         sortOrder: validatedQuery.sortOrder,
         isMyReviews: request.user?.id ? validatedQuery.isMyReviews : false,
+        includeDisabled: validatedQuery.includeDisabled,
       };
 
       const result = await this.getCourseReviewsUseCase.execute(

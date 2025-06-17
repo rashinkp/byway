@@ -6,4 +6,5 @@ export interface QueryCourseReviewDto {
   sortBy?: 'rating' | 'createdAt';
   sortOrder?: 'asc' | 'desc';
   isMyReviews?: boolean;
+  includeDisabled?: boolean;
 } 

@@ -7,6 +7,7 @@ export interface CourseReview {
   comment?: string | null;
   createdAt: Date;
   updatedAt: Date;
+  deletedAt?: Date | null;
   user?: {
     id: string;
     name: string;
@@ -52,6 +53,7 @@ export interface QueryCourseReviewParams {
   sortBy?: 'rating' | 'createdAt';
   sortOrder?: 'asc' | 'desc';
   isMyReviews?: boolean;
+  includeDisabled?: boolean;
 }
 
 export interface GetUserReviewsParams {

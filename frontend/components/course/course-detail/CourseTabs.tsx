@@ -1,4 +1,4 @@
-import { BookOpen, FileText, Star, User } from "lucide-react";
+import { BookOpen, FileText, Star, User, Settings } from "lucide-react";
 import { Course } from "@/types/course";
 
 interface CourseTabsProps {
@@ -6,6 +6,12 @@ interface CourseTabsProps {
   setActiveTab: (tab: string) => void;
   isLoading: boolean;
   course?: Course;
+  showReviews?: boolean;
+  customTabs?: Array<{
+    id: string;
+    label: string;
+    icon: React.ReactNode;
+  }>;
 }
 
 export default function CourseTabs({
@@ -13,8 +19,10 @@ export default function CourseTabs({
   setActiveTab,
   isLoading,
   course,
+  showReviews = true,
+  customTabs = [],
 }: CourseTabsProps) {
-  const tabs = [
+  const baseTabs = [
     {
       id: "description",
       label: "Description",
@@ -30,20 +38,27 @@ export default function CourseTabs({
       label: "Syllabus",
       icon: <BookOpen className="w-4 h-4" />,
     },
-    {
-      id: "reviews",
-      label: course?.reviewStats && course.reviewStats.totalReviews > 0 
-        ? `Reviews (${course.reviewStats.totalReviews})` 
-        : "Reviews",
-      icon: <Star className="w-4 h-4" />,
-    },
   ];
+
+  const reviewTab = {
+    id: "reviews",
+    label: course?.reviewStats && course.reviewStats.totalReviews > 0 
+      ? `Reviews (${course.reviewStats.totalReviews})` 
+      : "Reviews",
+    icon: <Star className="w-4 h-4" />,
+  };
+
+  // Combine base tabs with custom tabs and reviews if enabled
+  let tabs = [...baseTabs, ...customTabs];
+  if (showReviews) {
+    tabs = [...tabs, reviewTab];
+  }
 
   if (isLoading) {
     return (
       <div className="border-b border-gray-100">
         <div className="flex space-x-8 px-6 py-4">
-          {[1, 2, 3, 4].map((i) => (
+          {tabs.map((_, i) => (
             <div
               key={i}
               className="h-8 bg-gray-200 rounded w-24 animate-pulse"

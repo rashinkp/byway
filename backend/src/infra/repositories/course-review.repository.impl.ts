@@ -28,6 +28,7 @@ function toCourseReviewResponseDto(data: any): CourseReviewResponseDto {
     comment: data.comment,
     createdAt: data.createdAt,
     updatedAt: data.updatedAt,
+    deletedAt: data.deletedAt,
     user: data.user
       ? {
           id: data.user.id,
@@ -110,8 +111,11 @@ export class CourseReviewRepository implements ICourseReviewRepository {
     
     const where: any = {
       courseId,
-      deletedAt: null,
     };
+    
+    if (!query.includeDisabled) {
+      where.deletedAt = null;
+    }
     
     if (query.isMyReviews && userId) {
       where.userId = userId;

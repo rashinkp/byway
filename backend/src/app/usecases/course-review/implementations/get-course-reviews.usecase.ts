@@ -21,6 +21,7 @@ export class GetCourseReviewsUseCase implements IGetCourseReviewsUseCase {
       sortBy: input.sortBy || 'createdAt',
       sortOrder: input.sortOrder || 'desc',
       isMyReviews: input.isMyReviews || false,
+      includeDisabled: input.includeDisabled || false,
     };
 
     // If isMyReviews is true, we need userId

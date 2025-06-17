@@ -17,7 +17,7 @@ export class DisableReviewUseCase implements IDisableReviewUseCase {
     if (review.isDeleted()) {
       // Enable the review (restore)
       review.restore();
-      await this.courseReviewRepository.update(review);
+      await this.courseReviewRepository.restore(review);
       return { action: 'enabled' };
     } else {
       // Disable the review

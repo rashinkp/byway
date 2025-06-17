@@ -1,18 +1,19 @@
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { BookOpen, Clock, Users, Award, Star } from "lucide-react";
+import { BookOpen, Clock, Award, Star } from "lucide-react";
 import { Course } from "@/types/course";
-import { User } from "@/types/user";
+import { User, PublicUser } from "@/types/user";
 import CourseInfoSkeleton from "./CourseInfoSkeleton";
 import Link from "next/link";
 
 interface CourseInfoProps {
   course: Course | undefined;
-  instructor: User | undefined;
+  instructor: (User | PublicUser) | undefined;
   lessonsLength: number | undefined;
   courseLoading: boolean;
   instructorLoading: boolean;
   isEnrolled: boolean;
+  userRole?: "USER" | "ADMIN" | "INSTRUCTOR";
 }
 
 export default function CourseInfo({
@@ -22,6 +23,7 @@ export default function CourseInfo({
   courseLoading,
   instructorLoading,
   isEnrolled,
+  userRole = "USER",
 }: CourseInfoProps) {
 
   if (courseLoading || instructorLoading) {
@@ -41,6 +43,18 @@ export default function CourseInfo({
         }`}
       />
     ));
+  };
+
+  // Generate instructor link based on user role
+  const getInstructorLink = (instructorId: string) => {
+    switch (userRole) {
+      case "ADMIN":
+        return `/admin/instructors/${instructorId}`;
+      case "INSTRUCTOR":
+        return `/instructor/instructors/${instructorId}`;
+      default:
+        return `/instructors/${instructorId}`;
+    }
   };
 
   return (
@@ -120,7 +134,7 @@ export default function CourseInfo({
 
         <div className="flex items-center gap-4">
           <Link 
-            href={`/instructors/${instructor?.id}`}
+            href={getInstructorLink(instructor?.id || '')}
             className="flex items-center gap-4 hover:bg-gray-50 p-2 rounded-lg transition-colors"
           >
             <div className="w-12 h-12 rounded-full overflow-hidden bg-gray-100">

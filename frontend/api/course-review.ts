@@ -49,17 +49,23 @@ export async function getCourseReviews(
   params: QueryCourseReviewParams = {}
 ): Promise<CourseReviewApiResponse> {
   try {
+    const queryParams: any = {
+      page: params.page || 1,
+      limit: params.limit || 10,
+      rating: params.rating,
+      sortBy: params.sortBy || "createdAt",
+      sortOrder: params.sortOrder || "desc",
+    };
+    if (params.isMyReviews === true) {
+      queryParams.isMyReviews = true;
+    }
+    if (params.includeDisabled === true) {
+      queryParams.includeDisabled = true;
+    }
     const response = await api.get<{ data: CourseReviewApiResponse }>(
       `/reviews/course/${courseId}`,
       {
-        params: {
-          page: params.page || 1,
-          limit: params.limit || 10,
-          rating: params.rating,
-          sortBy: params.sortBy || "createdAt",
-          sortOrder: params.sortOrder || "desc",
-          isMyReviews: params.isMyReviews || false,
-        },
+        params: queryParams,
       }
     );
     return response.data.data;

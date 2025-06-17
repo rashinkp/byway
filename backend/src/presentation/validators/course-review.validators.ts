@@ -32,6 +32,7 @@ const queryReviewsSchema = z.object({
   sortBy: z.enum(["rating", "createdAt"]).default("createdAt").optional(),
   sortOrder: z.enum(["asc", "desc"]).default("desc").optional(),
   isMyReviews: z.coerce.boolean().default(false).optional(),
+  includeDisabled: z.coerce.boolean().default(false).optional(),
 }) as z.ZodType<Omit<QueryCourseReviewDto, 'courseId'>>;
 
 // Review ID schema

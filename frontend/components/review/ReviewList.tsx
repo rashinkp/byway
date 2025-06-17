@@ -3,6 +3,7 @@ import { CourseReview } from "@/types/course-review";
 import { useAuth } from "@/hooks/auth/useAuth";
 import { useDeleteCourseReview } from "@/hooks/course-review/useDeleteCourseReview";
 import { useUpdateCourseReview } from "@/hooks/course-review/useUpdateCourseReview";
+import { useDisableReview } from "@/hooks/course-review/useDisableReview";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -15,6 +16,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import EditReviewForm from "./EditReviewForm";
 import ReviewItem from "./ReviewItem";
+import React from "react";
 
 interface ReviewListProps {
   reviews: CourseReview[];
@@ -23,6 +25,8 @@ interface ReviewListProps {
   total: number;
   courseId: string;
   activeFilter: 'all' | 'my';
+  userRole?: "USER" | "ADMIN" | "INSTRUCTOR";
+  disabledFilter?: 'all' | 'disabled';
 }
 
 export default function ReviewList({
@@ -32,16 +36,37 @@ export default function ReviewList({
   total,
   courseId,
   activeFilter,
+  userRole = "USER",
+  disabledFilter,
 }: ReviewListProps) {
   const { user } = useAuth();
   const [currentPage, setCurrentPage] = useState(1);
   const [editingReview, setEditingReview] = useState<string | null>(null);
   const [deletingReview, setDeletingReview] = useState<string | null>(null);
+  const [disablingReview, setDisablingReview] = useState<string | null>(null);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [showDisableDialog, setShowDisableDialog] = useState(false);
   const [reviewToDelete, setReviewToDelete] = useState<string | null>(null);
+  const [reviewToDisable, setReviewToDisable] = useState<{ id: string; isDisabled: boolean } | null>(null);
 
   const { deleteReview, isLoading: isDeleting } = useDeleteCourseReview();
   const { updateReview, isLoading: isUpdating } = useUpdateCourseReview();
+  const { disableReview, isLoading: isDisabling } = useDisableReview(courseId);
+
+  // Filter reviews based on disabled filter
+  const filteredReviews = React.useMemo(() => {
+    if (!disabledFilter || disabledFilter === 'all') {
+      return reviews;
+    }
+    
+    return reviews.filter(review => {
+      const isDisabled = review.deletedAt !== null;
+      if (disabledFilter === 'disabled') {
+        return isDisabled;
+      }
+      return true;
+    });
+  }, [reviews, disabledFilter]);
 
   const handleDeleteReview = async (reviewId: string) => {
     try {
@@ -63,9 +88,25 @@ export default function ReviewList({
     }
   };
 
+  const handleDisableReview = async (reviewId: string) => {
+    try {
+      await disableReview(reviewId);
+      setDisablingReview(null);
+      setShowDisableDialog(false);
+      setReviewToDisable(null);
+    } catch (error) {
+      // Error is handled by the hook
+    }
+  };
+
   const handleDeleteClick = (reviewId: string) => {
     setReviewToDelete(reviewId);
     setShowDeleteDialog(true);
+  };
+
+  const handleDisableClick = (reviewId: string, isDisabled: boolean) => {
+    setReviewToDisable({ id: reviewId, isDisabled });
+    setShowDisableDialog(true);
   };
 
   const confirmDelete = () => {
@@ -75,9 +116,21 @@ export default function ReviewList({
     }
   };
 
+  const confirmDisable = () => {
+    if (reviewToDisable) {
+      setDisablingReview(reviewToDisable.id);
+      handleDisableReview(reviewToDisable.id);
+    }
+  };
+
   const cancelDelete = () => {
     setShowDeleteDialog(false);
     setReviewToDelete(null);
+  };
+
+  const cancelDisable = () => {
+    setShowDisableDialog(false);
+    setReviewToDisable(null);
   };
 
   if (isLoading) {
@@ -107,15 +160,20 @@ export default function ReviewList({
     );
   }
 
-  if (reviews.length === 0) {
+  if (filteredReviews.length === 0) {
+    let message = "No reviews yet.";
+    
+    if (userRole === "USER" && activeFilter === 'my') {
+      message = "You haven't reviewed this course yet.";
+    } else if (userRole === "ADMIN" && activeFilter === 'my') {
+      message = "You haven't reviewed this course yet.";
+    } else if (userRole === "ADMIN" && disabledFilter === 'disabled') {
+      message = "No disabled reviews found.";
+    }
+    
     return (
       <div className="bg-white border border-gray-200 rounded-lg p-8 text-center">
-        <p className="text-gray-500">
-          {activeFilter === 'my' 
-            ? "You haven't reviewed this course yet." 
-            : "No reviews yet. Be the first to review this course!"
-          }
-        </p>
+        <p className="text-gray-500">{message}</p>
       </div>
     );
   }
@@ -124,7 +182,7 @@ export default function ReviewList({
     <div className="space-y-4">
       {/* Reviews */}
       <div className="space-y-4">
-        {reviews.map((review) => (
+        {filteredReviews.map((review) => (
           <div key={review.id} className="bg-white border border-gray-200 rounded-lg p-6">
             {editingReview === review.id ? (
               <EditReviewForm
@@ -139,7 +197,11 @@ export default function ReviewList({
                 isOwner={user?.id === review.userId}
                 onEdit={() => setEditingReview(review.id)}
                 onDelete={() => handleDeleteClick(review.id)}
-                isDeleting={deletingReview === review.id && isDeleting}
+                onDisable={userRole === "ADMIN" ? () => handleDisableClick(review.id, review.deletedAt !== null) : undefined}
+                isDeleting={deletingReview === review.id}
+                isDisabling={disablingReview === review.id}
+                userRole={userRole}
+                isDisabled={review.deletedAt !== null}
               />
             )}
           </div>
@@ -186,6 +248,33 @@ export default function ReviewList({
               disabled={isDeleting}
             >
               {isDeleting ? "Deleting..." : "Delete"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Disable/Enable Confirmation Dialog */}
+      <AlertDialog open={showDisableDialog} onOpenChange={setShowDisableDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>
+              {reviewToDisable?.isDisabled ? "Enable Review" : "Disable Review"}
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              {reviewToDisable?.isDisabled 
+                ? "Are you sure you want to enable this review? It will be visible to all users."
+                : "Are you sure you want to disable this review? It will be hidden from users but can be re-enabled later."
+              }
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={cancelDisable}>Cancel</AlertDialogCancel>
+            <AlertDialogAction 
+              onClick={confirmDisable}
+              className="bg-orange-600 hover:bg-orange-700 text-white"
+              disabled={isDisabling}
+            >
+              {isDisabling ? "Processing..." : (reviewToDisable?.isDisabled ? "Enable" : "Disable")}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
