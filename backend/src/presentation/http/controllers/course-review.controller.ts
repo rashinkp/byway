@@ -3,7 +3,6 @@ import { IUpdateCourseReviewUseCase } from "../../../app/usecases/course-review/
 import { IDeleteCourseReviewUseCase } from "../../../app/usecases/course-review/interfaces/delete-course-review.usecase.interface";
 import { IGetCourseReviewsUseCase } from "../../../app/usecases/course-review/interfaces/get-course-reviews.usecase.interface";
 import { IGetCourseReviewStatsUseCase } from "../../../app/usecases/course-review/interfaces/get-course-review-stats.usecase.interface";
-import { IGetMyCourseReviewUseCase } from "../../../app/usecases/course-review/interfaces/get-my-course-review.usecase.interface";
 import { IGetUserReviewsUseCase } from "../../../app/usecases/course-review/interfaces/get-user-reviews.usecase.interface";
 import { IDeleteReviewUseCase } from "../../../app/usecases/course-review/interfaces/delete-review.usecase.interface";
 import { IDisableReviewUseCase } from "../../../app/usecases/course-review/interfaces/disable-review.usecase.interface";
@@ -20,7 +19,6 @@ import {
   updateReviewSchemaDef,
   deleteReviewSchemaDef,
   getCourseReviewsSchemaDef,
-  getMyReviewSchemaDef,
   getUserReviewsSchemaDef,
   getReviewStatsSchemaDef,
   disableReviewSchemaDef,
@@ -35,7 +33,6 @@ export class CourseReviewController extends BaseController {
     private deleteCourseReviewUseCase: IDeleteCourseReviewUseCase,
     private getCourseReviewsUseCase: IGetCourseReviewsUseCase,
     private getCourseReviewStatsUseCase: IGetCourseReviewStatsUseCase,
-    private getMyCourseReviewUseCase: IGetMyCourseReviewUseCase,
     private getUserReviewsUseCase: IGetUserReviewsUseCase,
     private deleteReviewUseCase: IDeleteReviewUseCase,
     private disableReviewUseCase: IDisableReviewUseCase,
@@ -107,42 +104,25 @@ export class CourseReviewController extends BaseController {
       const validatedParams = getCourseReviewsSchemaDef.params!.parse({ courseId: request.params.courseId });
       const validatedQuery = getCourseReviewsSchemaDef.query!.parse(request.query);
 
-      const result = await this.getCourseReviewsUseCase.execute({
-        courseId: validatedParams.courseId,
-        ...validatedQuery,
-      });
+      // If isMyReviews is true, user must be authenticated
+      if (validatedQuery.isMyReviews && !request.user?.id) {
+        throw new UnauthorizedError("Authentication required to view your reviews");
+      }
+
+      const result = await this.getCourseReviewsUseCase.execute(
+        {
+          courseId: validatedParams.courseId,
+          page: validatedQuery.page,
+          limit: validatedQuery.limit,
+          rating: validatedQuery.rating,
+          sortBy: validatedQuery.sortBy,
+          sortOrder: validatedQuery.sortOrder,
+          isMyReviews: validatedQuery.isMyReviews,
+        },
+        validatedQuery.isMyReviews ? request.user?.id : undefined
+      );
 
       return this.success_200(result, "Course reviews retrieved successfully");
-    });
-  }
-
-  async getCourseReviewStats(httpRequest: IHttpRequest): Promise<IHttpResponse> {
-    return this.handleRequest(httpRequest, async (request) => {
-      if (!request.params.courseId) {
-        throw new BadRequestError("Course ID is required");
-      }
-
-      const validated = getReviewStatsSchemaDef.params!.parse({ courseId: request.params.courseId });
-      const stats = await this.getCourseReviewStatsUseCase.execute(validated.courseId);
-
-      return this.success_200(stats, "Course review stats retrieved successfully");
-    });
-  }
-
-  async getMyReview(httpRequest: IHttpRequest): Promise<IHttpResponse> {
-    return this.handleRequest(httpRequest, async (request) => {
-      if (!request.user?.id) {
-        throw new UnauthorizedError("User not authenticated");
-      }
-
-      if (!request.params.courseId) {
-        throw new BadRequestError("Course ID is required");
-      }
-
-      const validated = getMyReviewSchemaDef.params!.parse({ courseId: request.params.courseId });
-      const review = await this.getMyCourseReviewUseCase.execute(validated.courseId, request.user.id);
-
-      return this.success_200(review, "My review retrieved successfully");
     });
   }
 
@@ -160,6 +140,19 @@ export class CourseReviewController extends BaseController {
       );
 
       return this.success_200(result, "User reviews retrieved successfully");
+    });
+  }
+
+  async getCourseReviewStats(httpRequest: IHttpRequest): Promise<IHttpResponse> {
+    return this.handleRequest(httpRequest, async (request) => {
+      if (!request.params.courseId) {
+        throw new BadRequestError("Course ID is required");
+      }
+
+      const validated = getReviewStatsSchemaDef.params!.parse({ courseId: request.params.courseId });
+      const stats = await this.getCourseReviewStatsUseCase.execute(validated.courseId);
+
+      return this.success_200(stats, "Course review stats retrieved successfully");
     });
   }
 

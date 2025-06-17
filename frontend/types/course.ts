@@ -3,6 +3,18 @@ import { courseEditSchema } from "@/lib/validations/course";
 
 export type SortByType = "createdAt" | "name" | "updatedAt";
 
+// Review stats interface
+export interface CourseReviewStats {
+  averageRating: number;
+  totalReviews: number;
+  ratingDistribution: {
+    [key: number]: number;
+  };
+  ratingPercentages: {
+    [key: number]: number;
+  };
+}
+
 export interface Course {
   id: string;
   title: string;
@@ -37,6 +49,7 @@ export interface Course {
   totalLessons?: number;
   lastAccessed?: string;
   isEnrolled?: boolean;
+  reviewStats?: CourseReviewStats;
 }
 
 export interface AddCourseParams {

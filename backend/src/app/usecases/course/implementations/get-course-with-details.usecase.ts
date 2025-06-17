@@ -2,6 +2,7 @@ import { ICourseWithDetailsDTO, ICourseWithEnrollmentDTO } from "../../../../dom
 import { HttpError } from "../../../../presentation/http/errors/http-error";
 import { ICourseRepository } from "../../../repositories/course.repository.interface";
 import { IEnrollmentRepository } from "../../../repositories/enrollment.repository.interface";
+import { ICourseReviewRepository } from "../../../repositories/course-review.repository.interface";
 import { APPROVALSTATUS } from "../../../../domain/enum/approval-status.enum";
 import { CourseStatus } from "../../../../domain/enum/course-status.enum";
 import { JwtPayload } from "jsonwebtoken";
@@ -10,7 +11,8 @@ import { IGetCourseWithDetailsUseCase } from "../interfaces/get-course-with-deta
 export class GetCourseWithDetailsUseCase implements IGetCourseWithDetailsUseCase {
   constructor(
     private courseRepository: ICourseRepository,
-    private enrollmentRepository: IEnrollmentRepository
+    private enrollmentRepository: IEnrollmentRepository,
+    private courseReviewRepository: ICourseReviewRepository
   ) {}
 
   async execute(
@@ -45,12 +47,26 @@ export class GetCourseWithDetailsUseCase implements IGetCourseWithDetailsUseCase
       isEnrolled = !!enrollment;
     }
 
+    // Get review stats
+    const reviewStats = await this.courseReviewRepository.getCourseReviewStats(courseId);
+
     const courseData = course.toJSON();
     return {
       ...courseData,
       isEnrolled,
       details: courseDetails?.toJSON() ?? null,
-      instructorSharePercentage: 100 - courseData.adminSharePercentage
+      instructorSharePercentage: 100 - courseData.adminSharePercentage,
+      reviewStats: {
+        averageRating: reviewStats.averageRating,
+        totalReviews: reviewStats.totalReviews,
+        ratingDistribution: reviewStats.ratingDistribution,
+        ratingPercentages: Object.fromEntries(
+          Object.entries(reviewStats.ratingDistribution).map(([rating, count]) => [
+            rating,
+            reviewStats.totalReviews > 0 ? (count / reviewStats.totalReviews) * 100 : 0
+          ])
+        ),
+      }
     };
   }
 }

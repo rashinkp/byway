@@ -22,6 +22,7 @@ export function createCourseDependencies(
     categoryRepository,
     userRepository,
     enrollmentRepository,
+    courseReviewRepository,
   } = deps;
 
   const createCourseUseCase = new CreateCourseUseCase(
@@ -32,7 +33,8 @@ export function createCourseDependencies(
   const getAllCoursesUseCase = new GetAllCoursesUseCase(courseRepository);
   const getCourseWithDetailsUseCase = new GetCourseWithDetailsUseCase(
     courseRepository,
-    enrollmentRepository
+    enrollmentRepository,
+    courseReviewRepository
   );
   const updateCourseUseCase = new UpdateCourseUseCase(
     courseRepository,

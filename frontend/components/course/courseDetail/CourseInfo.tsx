@@ -32,6 +32,17 @@ export default function CourseInfo({
   const offer = typeof course?.offer === 'number' ? course.offer : undefined;
   const price = typeof course?.price === 'number' ? course.price : undefined;
 
+  const renderStars = (rating: number) => {
+    return Array.from({ length: 5 }, (_, i) => (
+      <Star
+        key={i}
+        className={`w-4 h-4 ${
+          i < rating ? "text-yellow-400 fill-current" : "text-gray-300"
+        }`}
+      />
+    ));
+  };
+
   return (
     <div className="bg-white/80 backdrop-blur-sm border border-gray-100 shadow-sm rounded-xl p-6">
       <div className="space-y-6">
@@ -55,11 +66,55 @@ export default function CourseInfo({
             <Award className="w-3 h-3 mr-1" />
             {course?.level || "All Levels"}
           </Badge>
-          <Badge variant="outline" className="bg-yellow-50 text-yellow-700 border-yellow-200">
-            <Star className="w-3 h-3 mr-1" />
-            {course?.rating || "No ratings"}
-          </Badge>
+          {course?.reviewStats && course.reviewStats.totalReviews > 0 ? (
+            <div className="flex items-center gap-2">
+              <div className="flex items-center gap-1">
+                {renderStars(course.reviewStats.averageRating)}
+              </div>
+              <span className="text-sm font-medium text-gray-700">
+                {course.reviewStats.averageRating.toFixed(1)}
+              </span>
+              <span className="text-sm text-gray-500">
+                ({course.reviewStats.totalReviews} {course.reviewStats.totalReviews === 1 ? 'review' : 'reviews'})
+              </span>
+            </div>
+          ) : (
+            <Badge variant="outline" className="bg-yellow-50 text-yellow-700 border-yellow-200">
+              <Star className="w-3 h-3 mr-1" />
+              No reviews yet
+            </Badge>
+          )}
         </div>
+
+        {/* Rating Distribution */}
+        {course?.reviewStats && course.reviewStats.totalReviews > 0 && (
+          <div className="bg-gray-50 rounded-lg p-4">
+            <h3 className="text-sm font-medium text-gray-700 mb-3">Rating Distribution</h3>
+            <div className="space-y-2">
+              {[5, 4, 3, 2, 1].map((rating) => {
+                const count = course.reviewStats?.ratingDistribution[rating] || 0;
+                const percentage = course.reviewStats?.ratingPercentages[rating] || 0;
+                return (
+                  <div key={rating} className="flex items-center gap-3">
+                    <div className="flex items-center gap-1 w-8">
+                      <span className="text-sm text-gray-600">{rating}</span>
+                      <Star className="w-3 h-3 text-yellow-400 fill-current" />
+                    </div>
+                    <div className="flex-1 bg-gray-200 rounded-full h-2">
+                      <div
+                        className="bg-yellow-400 h-2 rounded-full transition-all duration-300"
+                        style={{ width: `${percentage}%` }}
+                      />
+                    </div>
+                    <span className="text-sm text-gray-600 w-12 text-right">
+                      {count}
+                    </span>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
 
         <Separator />
 

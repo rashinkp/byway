@@ -4,7 +4,6 @@ import { UpdateCourseReviewUseCase } from "../app/usecases/course-review/impleme
 import { DeleteCourseReviewUseCase } from "../app/usecases/course-review/implementations/delete-course-review.usecase";
 import { GetCourseReviewsUseCase } from "../app/usecases/course-review/implementations/get-course-reviews.usecase";
 import { GetCourseReviewStatsUseCase } from "../app/usecases/course-review/implementations/get-course-review-stats.usecase";
-import { GetMyCourseReviewUseCase } from "../app/usecases/course-review/implementations/get-my-course-review.usecase";
 import { GetUserReviewsUseCase } from "../app/usecases/course-review/implementations/get-user-reviews.usecase";
 import { DeleteReviewUseCase } from "../app/usecases/course-review/implementations/delete-review.usecase";
 import { DisableReviewUseCase } from "../app/usecases/course-review/implementations/disable-review.usecase";
@@ -43,10 +42,6 @@ export function createCourseReviewDependencies(
     courseReviewRepository
   );
 
-  const getMyCourseReviewUseCase = new GetMyCourseReviewUseCase(
-    courseReviewRepository
-  );
-
   const getUserReviewsUseCase = new GetUserReviewsUseCase(
     courseReviewRepository
   );
@@ -65,7 +60,6 @@ export function createCourseReviewDependencies(
     deleteCourseReviewUseCase,
     getCourseReviewsUseCase,
     getCourseReviewStatsUseCase,
-    getMyCourseReviewUseCase,
     getUserReviewsUseCase,
     deleteReviewUseCase,
     disableReviewUseCase,

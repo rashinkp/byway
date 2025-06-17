@@ -46,7 +46,7 @@ export default function courseReviewRouter(
       )
   );
 
-  // Get reviews for a course
+  // Get reviews for a course (with optional isMyReviews filter)
   router.get(
     "/course/:courseId",
     optionalAuth,
@@ -55,6 +55,18 @@ export default function courseReviewRouter(
         req,
         res,
         courseReviewController.getCourseReviews.bind(courseReviewController)
+      )
+  );
+
+  // Get all reviews by the current user (for profile)
+  router.get(
+    "/my-reviews",
+    restrictTo("USER", "INSTRUCTOR", "ADMIN"),
+    (req, res) =>
+      expressAdapter(
+        req,
+        res,
+        courseReviewController.getUserReviews.bind(courseReviewController)
       )
   );
 
@@ -67,30 +79,6 @@ export default function courseReviewRouter(
         req,
         res,
         courseReviewController.getCourseReviewStats.bind(courseReviewController)
-      )
-  );
-
-  // Get my review for a specific course
-  router.get(
-    "/course/:courseId/my-review",
-    restrictTo("USER", "INSTRUCTOR", "ADMIN"),
-    (req, res) =>
-      expressAdapter(
-        req,
-        res,
-        courseReviewController.getMyReview.bind(courseReviewController)
-      )
-  );
-
-  // Get all reviews by the current user
-  router.get(
-    "/my-reviews",
-    restrictTo("USER", "INSTRUCTOR", "ADMIN"),
-    (req, res) =>
-      expressAdapter(
-        req,
-        res,
-        courseReviewController.getUserReviews.bind(courseReviewController)
       )
   );
 

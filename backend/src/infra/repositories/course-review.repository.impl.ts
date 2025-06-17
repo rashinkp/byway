@@ -103,7 +103,7 @@ export class CourseReviewRepository implements ICourseReviewRepository {
     });
   }
 
-  async findByCourseId(courseId: string, query: QueryCourseReviewDto): Promise<{ reviews: CourseReviewResponseDto[]; total: number; totalPages: number; }> {
+  async findByCourseId(courseId: string, query: QueryCourseReviewDto, userId?: string): Promise<{ reviews: CourseReviewResponseDto[]; total: number; totalPages: number; }> {
     const page = query.page || 1;
     const limit = query.limit || 10;
     const skip = (page - 1) * limit;
@@ -112,6 +112,10 @@ export class CourseReviewRepository implements ICourseReviewRepository {
       courseId,
       deletedAt: null,
     };
+    
+    if (query.isMyReviews && userId) {
+      where.userId = userId;
+    }
     
     if (query.rating) {
       where.rating = query.rating;

@@ -5,4 +5,5 @@ export interface QueryCourseReviewDto {
   rating?: number;
   sortBy?: 'rating' | 'createdAt';
   sortOrder?: 'asc' | 'desc';
+  isMyReviews?: boolean;
 } 

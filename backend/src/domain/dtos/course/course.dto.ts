@@ -5,6 +5,19 @@ import { CourseStatus } from "../../enum/course-status.enum";
 import { Duration } from "../../value-object/duration";
 import { Offer } from "../../value-object/offer";
 import { Price } from "../../value-object/price";
+import { RatingLevel } from "../../enum/rating-level.enum";
+
+// Review stats interface
+export interface ICourseReviewStats {
+  averageRating: number;
+  totalReviews: number;
+  ratingDistribution: {
+    [key in RatingLevel]: number;
+  };
+  ratingPercentages: {
+    [key in RatingLevel]: number;
+  };
+}
 
 // Base course interface matching frontend Course interface
 export interface ICourseDTO {
@@ -41,6 +54,7 @@ export interface ICourseDTO {
   totalLessons?: number;
   lastAccessed?: string;
   isEnrolled?: boolean;
+  reviewStats?: ICourseReviewStats;
 }
 
 // Course with enrollment status - used for course listing

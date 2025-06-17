@@ -2,7 +2,7 @@
 import { useRouter } from "next/navigation";
 import { Course } from "@/types/course";
 import { Button } from "@/components/ui/button";
-import { Check, Lock, ShoppingCart } from "lucide-react";
+import { Check, Lock, ShoppingCart, Star, Users } from "lucide-react";
 import CourseSidebarSkeleton from "./CourseSidebarSkeleton";
 
 interface CourseSidebarProps {
@@ -34,6 +34,17 @@ export default function CourseSidebar({
     return `$${numPrice.toFixed(2)}`;
   };
 
+  const renderStars = (rating: number) => {
+    return Array.from({ length: 5 }, (_, i) => (
+      <Star
+        key={i}
+        className={`w-3 h-3 ${
+          i < rating ? "text-yellow-400 fill-current" : "text-gray-300"
+        }`}
+      />
+    ));
+  };
+
   if (isLoading) {
     return <CourseSidebarSkeleton />;
   }
@@ -41,6 +52,27 @@ export default function CourseSidebar({
   return (
     <div className="bg-white/80 backdrop-blur-sm border border-gray-100 shadow-sm rounded-xl p-6 sticky top-6">
       <div className="space-y-6">
+        {/* Review Stats */}
+        {course?.reviewStats && course.reviewStats.totalReviews > 0 && (
+          <div className="space-y-3">
+            <h4 className="font-medium text-gray-900">Student Reviews</h4>
+            <div className="flex items-center gap-2">
+              <div className="flex items-center gap-1">
+                {renderStars(course.reviewStats.averageRating)}
+              </div>
+              <span className="text-sm font-medium text-gray-700">
+                {course.reviewStats.averageRating.toFixed(1)}
+              </span>
+            </div>
+            <div className="flex items-center gap-2 text-sm text-gray-600">
+              <Users className="w-4 h-4" />
+              <span>
+                {course.reviewStats.totalReviews} {course.reviewStats.totalReviews === 1 ? 'student' : 'students'} enrolled
+              </span>
+            </div>
+          </div>
+        )}
+
         <div className="space-y-2">
           <h3 className="text-xl font-semibold text-gray-900">Course Price</h3>
           <div className="flex items-baseline gap-2">

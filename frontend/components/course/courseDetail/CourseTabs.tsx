@@ -1,15 +1,18 @@
 import { BookOpen, FileText, Star, User } from "lucide-react";
+import { Course } from "@/types/course";
 
 interface CourseTabsProps {
   activeTab: string;
   setActiveTab: (tab: string) => void;
   isLoading: boolean;
+  course?: Course;
 }
 
 export default function CourseTabs({
   activeTab,
   setActiveTab,
   isLoading,
+  course,
 }: CourseTabsProps) {
   const tabs = [
     {
@@ -29,7 +32,9 @@ export default function CourseTabs({
     },
     {
       id: "reviews",
-      label: "Reviews",
+      label: course?.reviewStats && course.reviewStats.totalReviews > 0 
+        ? `Reviews (${course.reviewStats.totalReviews})` 
+        : "Reviews",
       icon: <Star className="w-4 h-4" />,
     },
   ];

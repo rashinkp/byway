@@ -26,20 +26,20 @@ const updateReviewSchema = z.object({
 
 // Query reviews schema
 const queryReviewsSchema = z.object({
-  courseId: uuidSchema,
   page: z.coerce.number().int().positive("Page must be positive").default(1).optional(),
   limit: z.coerce.number().int().positive("Limit must be positive").max(100, "Limit cannot exceed 100").default(10).optional(),
   rating: z.coerce.number().int().min(1, "Rating must be at least 1").max(5, "Rating cannot exceed 5").optional(),
   sortBy: z.enum(["rating", "createdAt"]).default("createdAt").optional(),
   sortOrder: z.enum(["asc", "desc"]).default("desc").optional(),
-}) as z.ZodType<QueryCourseReviewDto>;
+  isMyReviews: z.coerce.boolean().default(false).optional(),
+}) as z.ZodType<Omit<QueryCourseReviewDto, 'courseId'>>;
 
 // Review ID schema
 const reviewIdSchema = z.object({
   id: uuidSchema,
 });
 
-// User reviews query schema
+// User reviews query schema (for all reviews by user across all courses)
 const userReviewsQuerySchema = z.object({
   page: z.coerce.number().int().positive("Page must be positive").default(1).optional(),
   limit: z.coerce.number().int().positive("Limit must be positive").max(100, "Limit cannot exceed 100").default(10).optional(),
@@ -64,10 +64,6 @@ export const getCourseReviewsSchemaDef: ValidationSchema = {
   query: queryReviewsSchema,
 };
 
-export const getMyReviewSchemaDef: ValidationSchema = {
-  params: z.object({ courseId: uuidSchema }),
-};
-
 export const getUserReviewsSchemaDef: ValidationSchema = {
   query: userReviewsQuerySchema,
 };
@@ -89,8 +85,12 @@ export function validateUpdateReview(data: unknown): UpdateCourseReviewDto {
   return updateReviewSchema.parse(data);
 }
 
-export function validateQueryReviews(data: unknown): QueryCourseReviewDto {
-  return queryReviewsSchema.parse(data);
+export function validateQueryReviews(data: unknown, courseId: string): QueryCourseReviewDto {
+  const queryData = queryReviewsSchema.parse(data);
+  return {
+    ...queryData,
+    courseId,
+  };
 }
 
 export function validateReviewId(data: unknown): { id: string } {

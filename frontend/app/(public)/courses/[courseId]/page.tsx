@@ -12,6 +12,7 @@ import CourseDescription from "@/components/course/courseDetail/CourseDescriptio
 import CourseInstructor from "@/components/course/courseDetail/CourseInstructor";
 import CourseSyllabus from "@/components/course/courseDetail/CourseSyllabus";
 import CourseSidebar from "@/components/course/courseDetail/CourseSidebar";
+import CourseReviews from "@/components/course/courseDetail/CourseReviews";
 import { useAuth } from "@/hooks/auth/useAuth";
 import { useRouter } from "next/navigation";
 import { useAddToCart } from "@/hooks/cart/useAddToCart";
@@ -82,6 +83,7 @@ export default function CourseDetail() {
                 activeTab={activeTab}
                 setActiveTab={setActiveTab}
                 isLoading={courseLoading}
+                course={course}
               />
               
               <div className="p-6">
@@ -103,10 +105,10 @@ export default function CourseDetail() {
                   </>
                 )}
                 {activeTab === "reviews" && (
-                  <div className="space-y-4">
-                    <h2 className="text-xl font-semibold text-gray-900">Reviews</h2>
-                    <p className="text-gray-600">Course reviews would appear here.</p>
-                  </div>
+                  <CourseReviews
+                    course={course}
+                    isLoading={courseLoading}
+                  />
                 )}
               </div>
             </div>

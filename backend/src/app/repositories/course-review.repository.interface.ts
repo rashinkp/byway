@@ -11,7 +11,7 @@ export interface ICourseReviewRepository {
   delete(id: string): Promise<void>; 
 
   // Query operations
-  findByCourseId(courseId: string, query: QueryCourseReviewDto): Promise<{
+  findByCourseId(courseId: string, query: QueryCourseReviewDto, userId?: string): Promise<{
     reviews: CourseReviewResponseDto[];
     total: number;
     totalPages: number;
