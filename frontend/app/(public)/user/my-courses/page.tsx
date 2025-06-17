@@ -19,17 +19,6 @@ const formatDuration = (duration?: number | null): string => {
   return `${hours}h ${minutes > 0 ? `${minutes}m` : ""}`;
 };
 
-// Interface for GridCourse to match CourseCard requirements
-interface GridCourse extends Course {
-  rating: number;
-  reviewCount: number;
-  formattedDuration: string;
-  lessons: number;
-  bestSeller: boolean;
-  thumbnail: string;
-  price: number;
-}
-
 export default function MyCoursesPage() {
   const itemsPerPage = 6;
   const [currentPage, setCurrentPage] = useState(1);
@@ -45,18 +34,8 @@ export default function MyCoursesPage() {
     level: "All",
   });
 
-  // Map API courses to include UI-specific fields for CourseCard
-  const courses: GridCourse[] =
-    data?.items.map((course) => ({
-      ...course,
-      rating: course.rating ?? 4.5,
-      reviewCount: course.reviewCount ?? 100,
-      formattedDuration: formatDuration(course.duration),
-      lessons: course.lessons ?? 50,
-      bestSeller: course.bestSeller ?? false,
-      thumbnail: course.thumbnail ?? "/default-thumbnail.png",
-      price: course.price ?? 0,
-    })) ?? [];
+  // Use the courses directly from the API
+  const courses: Course[] = data?.items ?? [];
 
   // Calculate pagination values
   const totalPages = data?.totalPages ?? 1;
@@ -130,40 +109,34 @@ export default function MyCoursesPage() {
 
       {/* Course Grid */}
       <motion.div
-        className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-4 md:gap-6 w-full"
+        className="w-full"
         variants={containerVariants}
         initial="hidden"
         animate={isLoaded ? "show" : "hidden"}
       >
-        {courses.map((course) => (
-          <motion.div
-            key={course.id}
-            className="w-full"
-            variants={{
-              hidden: { opacity: 0, y: 20 },
-              show: {
-                opacity: 1,
-                y: 0,
-                transition: { duration: 0.4, ease: "easeOut" },
-              },
-            }}
-          >
-            <Link href={`/courses/${course.id}`} className="block h-full">
-              <CourseCard
-                id={course.id}
-                thumbnail={course.thumbnail}
-                title={course.title}
-                rating={course.rating}
-                reviewCount={course.reviewCount}
-                formattedDuration={course.formattedDuration}
-                lessons={course.lessons}
-                price={course.offer || course.price}
-                bestSeller={course.bestSeller}
-                className="w-full h-full hover:shadow-lg transition-shadow duration-300"
-              />
-            </Link>
-          </motion.div>
-        ))}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
+          {courses.map((course) => (
+            <motion.div
+              key={course.id}
+              className="w-full"
+              variants={{
+                hidden: { opacity: 0, y: 20 },
+                show: {
+                  opacity: 1,
+                  y: 0,
+                  transition: { duration: 0.4, ease: "easeOut" },
+                },
+              }}
+            >
+              <Link href={`/courses/${course.id}`} className="block h-full">
+                <CourseCard
+                  course={course}
+                  className="w-full h-full hover:shadow-lg transition-shadow duration-300"
+                />
+              </Link>
+            </motion.div>
+          ))}
+        </div>
       </motion.div>
 
       {/* Pagination */}

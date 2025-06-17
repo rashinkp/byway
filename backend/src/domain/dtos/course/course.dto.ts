@@ -7,8 +7,14 @@ import { Offer } from "../../value-object/offer";
 import { Price } from "../../value-object/price";
 import { RatingLevel } from "../../enum/rating-level.enum";
 
-// Review stats interface
+// Review stats interface for course listing (simplified)
 export interface ICourseReviewStats {
+  averageRating: number;
+  totalReviews: number;
+}
+
+// Review stats interface for course details (full)
+export interface ICourseReviewStatsDetailed {
   averageRating: number;
   totalReviews: number;
   ratingDistribution: {
@@ -54,15 +60,25 @@ export interface ICourseDTO {
   totalLessons?: number;
   lastAccessed?: string;
   isEnrolled?: boolean;
-  reviewStats?: ICourseReviewStats;
+  reviewStats?: ICourseReviewStatsDetailed;
+}
+
+// Instructor details interface
+export interface ICourseInstructorDTO {
+  id: string;
+  name: string;
+  avatar: string | null;
 }
 
 // Course with enrollment status - used for course listing
-export interface ICourseWithEnrollmentDTO extends Omit<ICourseDTO, 'createdAt' | 'updatedAt' | 'deletedAt'> {
+export interface ICourseWithEnrollmentDTO extends Omit<ICourseDTO, 'createdAt' | 'updatedAt' | 'deletedAt' | 'reviewStats'> {
   createdAt: string;
   updatedAt: string;
   deletedAt: string | null;
   isEnrolled: boolean;
+  isInCart: boolean;
+  instructor: ICourseInstructorDTO;
+  reviewStats: ICourseReviewStats;
 }
 
 // Course with details - used for course details page

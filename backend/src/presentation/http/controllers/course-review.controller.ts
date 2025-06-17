@@ -104,22 +104,21 @@ export class CourseReviewController extends BaseController {
       const validatedParams = getCourseReviewsSchemaDef.params!.parse({ courseId: request.params.courseId });
       const validatedQuery = getCourseReviewsSchemaDef.query!.parse(request.query);
 
-      // If isMyReviews is true, user must be authenticated
-      if (validatedQuery.isMyReviews && !request.user?.id) {
-        throw new UnauthorizedError("Authentication required to view your reviews");
-      }
+      // For guest users, always set isMyReviews to false to show all reviews
+      // For authenticated users, use the provided isMyReviews value
+      const queryParams = {
+        courseId: validatedParams.courseId,
+        page: validatedQuery.page,
+        limit: validatedQuery.limit,
+        rating: validatedQuery.rating,
+        sortBy: validatedQuery.sortBy,
+        sortOrder: validatedQuery.sortOrder,
+        isMyReviews: request.user?.id ? validatedQuery.isMyReviews : false,
+      };
 
       const result = await this.getCourseReviewsUseCase.execute(
-        {
-          courseId: validatedParams.courseId,
-          page: validatedQuery.page,
-          limit: validatedQuery.limit,
-          rating: validatedQuery.rating,
-          sortBy: validatedQuery.sortBy,
-          sortOrder: validatedQuery.sortOrder,
-          isMyReviews: validatedQuery.isMyReviews,
-        },
-        validatedQuery.isMyReviews ? request.user?.id : undefined
+        queryParams,
+        queryParams.isMyReviews ? request.user?.id : undefined
       );
 
       return this.success_200(result, "Course reviews retrieved successfully");

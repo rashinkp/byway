@@ -8,26 +8,18 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Course } from "@/types/course";
 import { CourseCardSkeleton } from "@/components/course/CourseCardSkeleton";
 
-type GridCourse = Course & {
-  rating: number;
-  reviewCount: number;
-  formattedDuration: string;
-  lessons: number;
-  bestSeller: boolean;
-  thumbnail: string;
-  price: number;
-};
-
 interface CourseGridProps {
-  courses: GridCourse[];
+  courses: Course[];
   className?: string;
   isLoading?: boolean;
+  variant?: 'default' | 'compact' | 'sidebar';
 }
 
 export function CourseGrid({
   courses,
   className,
   isLoading = false,
+  variant = 'default',
 }: CourseGridProps) {
   const [isLoaded, setIsLoaded] = useState(false);
 
@@ -60,14 +52,19 @@ export function CourseGrid({
     },
   };
 
+  // Grid layout based on variant
+  const getGridClasses = () => {
+    return "flex flex-wrap gap-4 md:gap-6 justify-start";
+  };
+
   // Skeleton Card Component using shadcn/ui Skeleton
   const SkeletonCard = () => (
-    <div className="flex flex-col bg-white rounded-xl border border-gray-100 shadow-sm w-full h-[450px]">
-      <div className="relative h-52">
+    <div className="flex flex-col bg-white rounded-xl border border-gray-100 shadow-sm w-full h-[320px]">
+      <div className="relative aspect-video">
         <Skeleton className="w-full h-full rounded-t-xl" />
         <Skeleton className="absolute top-4 left-4 w-20 h-6 rounded-md" />
       </div>
-      <div className="flex flex-col flex-grow p-5">
+      <div className="flex flex-col flex-grow p-4">
         <div className="flex items-center gap-2 mb-2">
           <div className="flex items-center gap-1">
             {[...Array(5)].map((_, i) => (
@@ -76,22 +73,22 @@ export function CourseGrid({
           </div>
           <Skeleton className="w-12 h-4 rounded" />
         </div>
-        <Skeleton className="w-3/4 h-6 rounded mb-2" />
-        <Skeleton className="w-1/2 h-6 rounded mb-3" />
-        <Skeleton className="w-2/3 h-4 rounded mb-4" />
-        <div className="flex items-center gap-4 mb-4">
+        <Skeleton className="w-3/4 h-4 rounded mb-2" />
+        <Skeleton className="w-1/2 h-3 rounded mb-3" />
+        <div className="flex items-center gap-3 mb-3">
           <div className="flex items-center gap-1">
-            <Skeleton className="w-4 h-4 rounded" />
-            <Skeleton className="w-16 h-4 rounded" />
+            <Skeleton className="w-3 h-3 rounded" />
+            <Skeleton className="w-16 h-3 rounded" />
           </div>
           <div className="flex items-center gap-1">
-            <Skeleton className="w-4 h-4 rounded" />
-            <Skeleton className="w-16 h-4 rounded" />
+            <Skeleton className="w-3 h-3 rounded" />
+            <Skeleton className="w-12 h-3 rounded" />
           </div>
         </div>
-        <div className="mt-auto flex items-center justify-between">
-          <Skeleton className="w-12 h-6 rounded" />
-          <Skeleton className="w-24 h-10 rounded-lg" />
+        <Skeleton className="w-20 h-5 rounded mb-3" />
+        <div className="mt-auto flex gap-2">
+          <Skeleton className="flex-1 h-8 rounded-lg" />
+          <Skeleton className="flex-1 h-8 rounded-lg" />
         </div>
       </div>
     </div>
@@ -127,9 +124,11 @@ export function CourseGrid({
 
   if (isLoading) {
     return (
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className={getGridClasses()}>
         {Array.from({ length: 6 }).map((_, index) => (
-          <CourseCardSkeleton key={index} />
+          <div key={index} className="w-80">
+            <SkeletonCard />
+          </div>
         ))}
       </div>
     );
@@ -156,39 +155,20 @@ export function CourseGrid({
         </div>
       </div>
       <motion.div
-        className={cn(
-          "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8",
-          className
-        )}
+        className={cn(getGridClasses(), className)}
         variants={containerVariants}
         initial="hidden"
         animate={isLoaded ? "show" : "hidden"}
       >
-        {isLoading
-          ? [...Array(6)].map((_, index) => (
-              <motion.div key={index} variants={itemVariants} className="flex">
-                <SkeletonCard />
-              </motion.div>
-            ))
-          : courses.map((course) => (
-              <motion.div
-                key={course.id}
-                variants={itemVariants}
-                className="flex"
-              >
-                  <CourseCard
-                    id={course.id}
-                    thumbnail={course.thumbnail}
-                    title={course.title}
-                    rating={course.rating}
-                    reviewCount={course.reviewCount}
-                    formattedDuration={course.formattedDuration}
-                    lessons={course.lessons}
-                    price={course.price}
-                    bestSeller={course.bestSeller}
-                  />
-              </motion.div>
-            ))}
+        {courses.map((course) => (
+          <motion.div
+            key={course.id}
+            variants={itemVariants}
+            className="w-80"
+          >
+            <CourseCard course={course} className="w-full h-full" />
+          </motion.div>
+        ))}
       </motion.div>
     </div>
   );

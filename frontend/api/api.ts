@@ -62,10 +62,23 @@ api.interceptors.response.use(
       isLoggingOut,
     });
 
+    // List of endpoints that should not trigger logout on 401
+    const guestAccessibleEndpoints = [
+      "/reviews/course/",
+      "/courses/",
+      "/instructors/",
+      "/categories/",
+    ];
+
+    const isGuestAccessibleEndpoint = guestAccessibleEndpoints.some(endpoint => 
+      error.config?.url?.includes(endpoint)
+    );
+
     if (
       error.response?.status === 401 &&
       !originalRequest._retry &&
-      !error.config?.url?.includes("/auth/logout")
+      !error.config?.url?.includes("/auth/logout") &&
+      !isGuestAccessibleEndpoint
     ) {
       console.log("Handling 401 for:", error.config?.url);
       if (isLoggingOut) {

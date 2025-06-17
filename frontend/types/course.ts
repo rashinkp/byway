@@ -3,16 +3,19 @@ import { courseEditSchema } from "@/lib/validations/course";
 
 export type SortByType = "createdAt" | "name" | "updatedAt";
 
-// Review stats interface
+// Review stats interface for course listing (simplified)
 export interface CourseReviewStats {
   averageRating: number;
   totalReviews: number;
-  ratingDistribution: {
-    [key: number]: number;
-  };
-  ratingPercentages: {
-    [key: number]: number;
-  };
+  ratingDistribution?: Record<number, number>;
+  ratingPercentages?: Record<number, number>;
+}
+
+// Instructor details interface
+export interface CourseInstructor {
+  id: string;
+  name: string;
+  avatar: string | null;
 }
 
 export interface Course {
@@ -20,19 +23,19 @@ export interface Course {
   title: string;
   description?: string | null;
   level: "BEGINNER" | "MEDIUM" | "ADVANCED";
-  price?: number | null;
+  price?: number | string | null;
   thumbnail?: string | null;
   duration?: number | null;
-  offer?: number | null;
+  offer?: number | string | null;
   status: "DRAFT" | "PUBLISHED" | "ARCHIVED";
   categoryId: string;
   createdBy: string;
-  createdAt: Date;
-  updatedAt: Date;
-  deletedAt?: Date | null;
-  approvalStatus: "PENDING" | "APPROVED" | "DECLINED"; // New field
+  createdAt: Date | string;
+  updatedAt: Date | string;
+  deletedAt?: Date | string | null;
+  approvalStatus: "PENDING" | "APPROVED" | "DECLINED";
   adminSharePercentage: number;
-  instructorSharePercentage: number;
+  instructorSharePercentage?: number;
   details?: {
     prerequisites?: string | null;
     longDescription?: string | null;
@@ -49,6 +52,8 @@ export interface Course {
   totalLessons?: number;
   lastAccessed?: string;
   isEnrolled?: boolean;
+  isInCart?: boolean;
+  instructor?: CourseInstructor;
   reviewStats?: CourseReviewStats;
 }
 

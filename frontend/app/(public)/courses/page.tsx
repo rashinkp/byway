@@ -102,7 +102,9 @@ export default function CourseListingPage() {
       lessons: 10,
       bestSeller: false,
       thumbnail: course.thumbnail || "/default-thumbnail.png",
-      price: course.offer || course.price || 0,
+      price: typeof course.offer === 'number' ? course.offer : 
+             typeof course.price === 'number' ? course.price : 
+             parseFloat(course.offer as string || course.price as string || '0'),
     })) || [];
 
   const handlePageChange = (page: number) => {
@@ -134,7 +136,7 @@ export default function CourseListingPage() {
           )}
         </div>
         <div className="lg:w-4/5">
-          <CourseGrid courses={courses} isLoading={isLoading} />
+          <CourseGrid courses={courses} isLoading={isLoading} variant="default" />
           {!isLoading && data && data.totalPages > 1 && (
             <div className="flex justify-center items-center mt-8 mb-4">
               <Pagination

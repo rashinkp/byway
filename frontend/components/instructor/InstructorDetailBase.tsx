@@ -160,17 +160,7 @@ export const InstructorDetailBase: React.FC<InstructorDetailBaseProps> = ({
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {courses.map((course: Course) => (
                   <Link key={course.id} href={`/courses/${course.id}`}>
-                    <CourseCard
-                      id={course.id}
-                      thumbnail={course.thumbnail || ""}
-                      title={course.title}
-                      rating={course.rating || 0}
-                      reviewCount={course.reviewCount || 0}
-                      lessons={course.totalLessons || 0}
-                      price={course.price || 0}
-                      formattedDuration={`${course.duration || 0} hours`}
-                      bestSeller={course.bestSeller || false}
-                    />
+                    <CourseCard course={course} />
                   </Link>
                 ))}
               </div>

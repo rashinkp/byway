@@ -5,7 +5,7 @@ import { TopCourses } from "@/components/course/TopCourseList";
 import { StatsCard } from "@/components/DashboardStats";
 import { HeroSection } from "@/components/HeroSection";
 import { TopInstructors } from "@/components/instructor/TopInstructor";
-import { Atom, Code, Megaphone, Telescope } from "lucide-react";
+import { Code } from "lucide-react";
 import { useCategories } from "@/hooks/category/useCategories";
 import { useRouter } from "next/navigation";
 import { useGetAllCourses } from "@/hooks/course/useGetAllCourse";
@@ -52,19 +52,7 @@ export default function UserDashboard() {
     icon: <Code className="w-5 h-5 text-blue-500" />, // Default icon, can be customized based on category
   })) || [];
 
-  const topCourses = coursesData?.items.map(course => ({
-    id: course.id,
-    thumbnail: course.thumbnail || "/default-thumbnail.png",
-    title: course.title,
-    tutorName: "Instructor", // This will need to be updated when we have instructor data
-    rating: course.rating || 4.5,
-    reviewCount: course.reviewCount || 100,
-    duration: course.duration ? `${course.duration} hours` : "Unknown",
-    formattedDuration: course.duration ? `${course.duration} hours` : "Unknown",
-    lessons: course.lessons || 10,
-    price: course.offer || course.price || 0,
-    bestSeller: course.bestSeller || false,
-  })) || [];
+  const topCourses = coursesData?.items || [];
 
   const topInstructors = instructorsData?.data.items.map(instructor => ({
     id: instructor.id,
@@ -90,7 +78,7 @@ export default function UserDashboard() {
         className="mb-8" 
         onCategoryClick={handleCategoryClick}
       />
-      <TopCourses courses={topCourses} className="mb-8" />
+      <TopCourses courses={topCourses} className="mb-8" variant="compact" />
       <TopInstructors instructors={topInstructors} className="mb-8" />
     </div>
   );

@@ -80,11 +80,11 @@ export default function ReviewStats({
               <div className="flex-1 bg-gray-200 rounded-full h-2">
                 <div
                   className="bg-yellow-400 h-2 rounded-full"
-                  style={{ width: `${stats.ratingPercentages[rating] || 0}%` }}
+                  style={{ width: `${stats.ratingPercentages?.[rating] ?? 0}%` }}
                 ></div>
               </div>
               <div className="w-8 text-sm text-gray-600 text-right">
-                {stats.ratingDistribution[rating] || 0}
+                {stats.ratingDistribution?.[rating] ?? 0}
               </div>
             </div>
           ))}

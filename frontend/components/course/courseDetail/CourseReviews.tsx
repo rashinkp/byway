@@ -27,7 +27,7 @@ export default function CourseReviews({
   } = useGetCourseReviews(course?.id || "", {
     page: 1,
     limit: 10,
-    isMyReviews: activeFilter === 'my',
+    isMyReviews: user ? activeFilter === 'my' : false,
   });
 
   if (isLoading) {

@@ -23,40 +23,13 @@ export default function courseReviewRouter(
   );
 
   // Update a review
-  router.put(
-    "/:id",
-    restrictTo("USER", "INSTRUCTOR", "ADMIN"),
-    (req, res) =>
-      expressAdapter(
-        req,
-        res,
-        courseReviewController.updateReview.bind(courseReviewController)
-      )
-  );
+
 
   // Delete a review (creator only)
-  router.delete(
-    "/:id",
-    restrictTo("USER", "INSTRUCTOR", "ADMIN"),
-    (req, res) =>
-      expressAdapter(
-        req,
-        res,
-        courseReviewController.deleteReview.bind(courseReviewController)
-      )
-  );
+
 
   // Get reviews for a course (with optional isMyReviews filter)
-  router.get(
-    "/course/:courseId",
-    optionalAuth,
-    (req, res) =>
-      expressAdapter(
-        req,
-        res,
-        courseReviewController.getCourseReviews.bind(courseReviewController)
-      )
-  );
+
 
   // Get all reviews by the current user (for profile)
   router.get(
@@ -68,6 +41,15 @@ export default function courseReviewRouter(
         res,
         courseReviewController.getUserReviews.bind(courseReviewController)
       )
+  );
+
+
+  router.get("/course/:courseId", optionalAuth, (req, res) =>
+    expressAdapter(
+      req,
+      res,
+      courseReviewController.getCourseReviews.bind(courseReviewController)
+    )
   );
 
   // Get review stats for a course
@@ -92,6 +74,28 @@ export default function courseReviewRouter(
         res,
         courseReviewController.disableReview.bind(courseReviewController)
       )
+  );
+
+
+
+
+
+  router.delete("/:id", restrictTo("USER", "INSTRUCTOR", "ADMIN"), (req, res) =>
+    expressAdapter(
+      req,
+      res,
+      courseReviewController.deleteReview.bind(courseReviewController)
+    )
+  );
+
+
+
+  router.put("/:id", restrictTo("USER", "INSTRUCTOR", "ADMIN"), (req, res) =>
+    expressAdapter(
+      req,
+      res,
+      courseReviewController.updateReview.bind(courseReviewController)
+    )
   );
 
   return router;
