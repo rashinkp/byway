@@ -33,6 +33,7 @@ model User {
   transactions      TransactionHistory[] @relation("UserToTransactionHistory")
   refunds           Refund[]        @relation("UserToRefund")
   wallet            Wallet?         @relation("UserToWallet")
+  reviews           CourseReview[]  @relation("UserToReview")
 }
 
 model UserProfile {
@@ -152,6 +153,7 @@ model Course {
   orderItems     OrderItem[]   @relation("CourseToOrderItem")
   refunds        Refund[]      @relation("CourseToRefund")
   lessonProgress LessonProgress[] @relation("CourseToLessonProgress")
+  reviews        CourseReview[] @relation("CourseToReview")
 }
 
 model CourseDetails {
@@ -466,4 +468,25 @@ model Wallet {
   user      User     @relation("UserToWallet", fields: [userId], references: [id], onDelete: Cascade)
   transactions TransactionHistory[] @relation("WalletToTransactionHistory")
   @@index([userId])
+}
+
+model CourseReview {
+  id          String    @id @default(uuid())
+  courseId    String
+  userId      String
+  rating      Int       // Rating from 1 to 5
+  title       String?   // Optional review title
+  comment     String?   // Optional review comment
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  deletedAt   DateTime? 
+
+  course      Course    @relation("CourseToReview", fields: [courseId], references: [id], onDelete: Cascade)
+  user        User      @relation("UserToReview", fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([courseId, userId]) // One review per user per course
+  @@index([courseId])
+  @@index([userId])
+  @@index([rating])
+  @@index([createdAt])
 }

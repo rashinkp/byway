@@ -36,6 +36,8 @@ import { RevenueDistributionService } from "../app/services/revenue-distribution
 import { IUserRepository } from "@/app/repositories/user.repository";
 import { PrismaRevenueRepository } from "../infra/repositories/revenue.repository";
 import { IRevenueRepository } from "../app/repositories/revenue.repository";
+import { CourseReviewRepository } from "../infra/repositories/course-review.repository.impl";
+import { ICourseReviewRepository } from "../app/repositories/course-review.repository.interface";
 
 export interface SharedDependencies {
   prisma: typeof prismaClient;
@@ -51,6 +53,7 @@ export interface SharedDependencies {
   orderRepository: IOrderRepository;
   transactionRepository: ITransactionRepository;
   revenueRepository: IRevenueRepository;
+  courseReviewRepository: ICourseReviewRepository;
   otpProvider: OtpProvider;
   googleAuthProvider: GoogleAuthProvider;
   httpErrors: HttpErrors;
@@ -72,6 +75,7 @@ export function createSharedDependencies(): SharedDependencies {
   const cartRepository = new CartRepository(prismaClient);
   const orderRepository = new OrderRepository(prismaClient);
   const transactionRepository = new TransactionRepository(prismaClient);
+  const courseReviewRepository = new CourseReviewRepository(prismaClient);
   const otpProvider = new OtpProvider(authRepository);
   const googleAuthProvider = new GoogleAuthProvider(envConfig.GOOGLE_CLIENT_ID);
   const walletRepository = new WalletRepository(prismaClient);
@@ -114,6 +118,7 @@ export function createSharedDependencies(): SharedDependencies {
     orderRepository,
     transactionRepository,
     revenueRepository,
+    courseReviewRepository,
     otpProvider,
     googleAuthProvider,
     httpErrors,

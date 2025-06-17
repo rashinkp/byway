@@ -12,6 +12,7 @@ import { createTransactionDependencies } from "./transaction.dependencies";
 import { createOrderDependencies } from "./order.dependencies";
 import { createFileDependencies } from "./file.dependencies";
 import { createProgressDependencies } from "./progress.dependencies";
+import { createCourseReviewDependencies } from "./course-review.dependencies";
 import { SearchRepository } from "../infra/repositories/search.repository.impl";
 import { GlobalSearchUseCase } from "../app/usecases/search/implementation/global-search.usecase";
 import { SearchController } from "../presentation/http/controllers/search.controller";
@@ -21,6 +22,7 @@ import { createRevenueDependencies } from "./revenue.dependencies";
 import { revenueRouter } from "../presentation/express/router/revenue.router";
 import { createDashboardDependencies } from "./dashboard.dependencies";
 import { dashboardRouter } from "../presentation/express/router/dashboard.router";
+import courseReviewRouter from "../presentation/express/router/course-review.router";
 
 export interface AppDependencies {
   authController: any;
@@ -43,6 +45,8 @@ export interface AppDependencies {
   revenueRouter: any;
   dashboardController: any;
   dashboardRouter: any;
+  courseReviewController: any;
+  courseReviewRouter: any;
 }
 
 export function createAppDependencies(): AppDependencies {
@@ -62,6 +66,7 @@ export function createAppDependencies(): AppDependencies {
   const orderDeps = createOrderDependencies(sharedDeps);
   const fileDeps = createFileDependencies(sharedDeps);
   const progressDeps = createProgressDependencies(sharedDeps);
+  const courseReviewDeps = createCourseReviewDependencies(sharedDeps);
   const walletDeps = createWalletDependencies(sharedDeps);
   const revenueDeps = createRevenueDependencies(sharedDeps);
   const dashboardDeps = createDashboardDependencies(sharedDeps);
@@ -79,6 +84,7 @@ export function createAppDependencies(): AppDependencies {
   const dashboardRouterInstance = dashboardRouter(
     dashboardDeps.dashboardController
   );
+  const courseReviewRouterInstance = courseReviewRouter(courseReviewDeps.courseReviewController);
 
   return {
     authController: authDeps.authController,
@@ -101,5 +107,7 @@ export function createAppDependencies(): AppDependencies {
     revenueRouter: revenueRouterInstance,
     dashboardController: dashboardDeps.dashboardController,
     dashboardRouter: dashboardRouterInstance,
+    courseReviewController: courseReviewDeps.courseReviewController,
+    courseReviewRouter: courseReviewRouterInstance,
   };
 }

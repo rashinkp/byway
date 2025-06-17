@@ -36,6 +36,7 @@ export const createRouter = (deps: AppDependencies): Router => {
   router.use("/revenue", revenueRouter(deps.revenueController));
   router.use("/search", deps.searchRouter);
   router.use("/dashboard", deps.dashboardRouter);
+  router.use("/reviews", deps.courseReviewRouter);
 
   return router;
 }; 
