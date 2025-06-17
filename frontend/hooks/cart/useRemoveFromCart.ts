@@ -54,6 +54,9 @@ export function useRemoveFromCart() {
     onSettled: () => {
       // Invalidate all cart queries
       queryClient.invalidateQueries({ queryKey: ["cart"] });
+      // Invalidate course queries to update cart status
+      queryClient.invalidateQueries({ queryKey: ["courses"] });
+      queryClient.invalidateQueries({ queryKey: ["course"] });
     },
   });
 }

@@ -99,7 +99,7 @@ export default function CourseListingPage() {
       formattedDuration: course.duration
         ? `${course.duration} hours`
         : "Unknown",
-      lessons: 10,
+      lessons: course.lessons || 0,
       bestSeller: false,
       thumbnail: course.thumbnail || "/default-thumbnail.png",
       price: typeof course.offer === 'number' ? course.offer : 

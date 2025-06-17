@@ -28,6 +28,10 @@ export default function CourseSidebar({
     }
   };
 
+  const handleGoToCart = () => {
+    router.push('/user/cart');
+  };
+
   const formatPrice = (price: number | string | null | undefined) => {
     if (!price) return "Free";
     const numPrice = typeof price === "number" ? price : Number(price);
@@ -77,17 +81,45 @@ export default function CourseSidebar({
           <h3 className="text-xl font-semibold text-gray-900">Course Price</h3>
           <div className="flex items-baseline gap-2">
             <span className="text-3xl font-bold text-blue-600">
-              ${course?.offer || course?.price}
+              {formatPrice(course?.offer || course?.price)}
             </span>
-            {course?.offer && (
+            {course?.offer && course?.price && (
               <span className="text-lg text-gray-500 line-through">
-                ${course?.price}
+                {formatPrice(course?.price)}
               </span>
             )}
           </div>
         </div>
 
-        {!isEnrolled && (
+        {/* Action Buttons */}
+        {isEnrolled ? (
+          <div className="text-center text-green-600 font-medium">
+            <Button
+              className="w-full mt-4 bg-green-600 hover:bg-green-700 text-white"
+              onClick={() => router.push(`/user/my-courses/${course?.id}`)}
+            >
+              Learn Now
+            </Button>
+          </div>
+        ) : course?.isInCart ? (
+          <div className="space-y-4">
+            <Button
+              className="w-full bg-green-600 hover:bg-green-700 text-white"
+              onClick={handleGoToCart}
+            >
+              <ShoppingCart className="w-4 h-4 mr-2" />
+              Go to Cart
+            </Button>
+
+            <Button
+              className="w-full bg-gray-100 hover:bg-gray-200 text-gray-700"
+              onClick={handleEnroll}
+            >
+              <Lock className="w-4 h-4 mr-2" />
+              Buy Now
+            </Button>
+          </div>
+        ) : (
           <div className="space-y-4">
             <Button
               className="w-full bg-blue-600 hover:bg-blue-700 text-white"
@@ -104,17 +136,6 @@ export default function CourseSidebar({
             >
               <Lock className="w-4 h-4 mr-2" />
               Buy Now
-            </Button>
-          </div>
-        )}
-
-        {isEnrolled && (
-          <div className="text-center text-green-600 font-medium">
-            <Button
-              className="w-full mt-4 bg-green-600 hover:bg-green-700 text-white"
-              onClick={() => router.push(`/user/my-courses/${course?.id}`)}
-            >
-              Learn Now
             </Button>
           </div>
         )}

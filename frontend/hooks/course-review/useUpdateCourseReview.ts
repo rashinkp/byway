@@ -32,6 +32,13 @@ export function useUpdateCourseReview(): UseUpdateCourseReviewReturn {
       queryClient.invalidateQueries({
         queryKey: ["user-reviews"],
       });
+      // Invalidate course data since it includes review stats
+      queryClient.invalidateQueries({
+        queryKey: ["course"],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["courses"],
+      });
     },
   });
 

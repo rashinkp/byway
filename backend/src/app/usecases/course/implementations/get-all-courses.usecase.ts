@@ -8,6 +8,7 @@ import { IEnrollmentRepository } from "../../../repositories/enrollment.reposito
 import { ICartRepository } from "../../../repositories/cart.repository";
 import { IUserRepository } from "../../../repositories/user.repository";
 import { ICourseReviewRepository } from "../../../repositories/course-review.repository.interface";
+import { ILessonRepository } from "../../../repositories/lesson.repository";
 import { IGetAllCoursesUseCase } from "../interfaces/get-all-courses.usecase.interface";
 
 export class GetAllCoursesUseCase implements IGetAllCoursesUseCase {
@@ -16,7 +17,8 @@ export class GetAllCoursesUseCase implements IGetAllCoursesUseCase {
     private enrollmentRepository: IEnrollmentRepository,
     private cartRepository: ICartRepository,
     private userRepository: IUserRepository,
-    private courseReviewRepository: ICourseReviewRepository
+    private courseReviewRepository: ICourseReviewRepository,
+    private lessonRepository: ILessonRepository
   ) {}
 
   async execute(input: IGetAllCoursesInputDTO): Promise<ICourseListResponseDTO> {
@@ -38,6 +40,11 @@ export class GetAllCoursesUseCase implements IGetAllCoursesUseCase {
           // Get review stats
           const reviewStats = await this.courseReviewRepository.getCourseReviewStats(course.id);
           console.log("Review stats:", reviewStats);
+          
+          // Get lesson count
+          const lessons = await this.lessonRepository.findByCourseId(course.id);
+          const lessonCount = lessons.length;
+          console.log("Lesson count:", lessonCount);
           
           // Check enrollment status
           let isEnrolled = false;
@@ -68,6 +75,7 @@ export class GetAllCoursesUseCase implements IGetAllCoursesUseCase {
               averageRating: reviewStats.averageRating,
               totalReviews: reviewStats.totalReviews,
             },
+            lessons: lessonCount,
             isEnrolled,
             isInCart,
           };
@@ -77,6 +85,7 @@ export class GetAllCoursesUseCase implements IGetAllCoursesUseCase {
             title: enhancedCourse.title,
             instructor: enhancedCourse.instructor,
             reviewStats: enhancedCourse.reviewStats,
+            lessons: enhancedCourse.lessons,
             isEnrolled: enhancedCourse.isEnrolled,
             isInCart: enhancedCourse.isInCart
           });

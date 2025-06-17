@@ -62,6 +62,9 @@ export function useAddToCart() {
     },
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ["cart"] });
+      // Invalidate course queries to update cart status
+      queryClient.invalidateQueries({ queryKey: ["courses"] });
+      queryClient.invalidateQueries({ queryKey: ["course"] });
     },
   });
 }

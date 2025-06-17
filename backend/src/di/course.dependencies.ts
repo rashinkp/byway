@@ -36,12 +36,14 @@ export function createCourseDependencies(
     enrollmentRepository,
     cartRepository,
     userRepository,
-    courseReviewRepository
+    courseReviewRepository,
+    deps.lessonRepository
   );
   const getCourseWithDetailsUseCase = new GetCourseWithDetailsUseCase(
     courseRepository,
     enrollmentRepository,
-    courseReviewRepository
+    courseReviewRepository,
+    cartRepository
   );
   const updateCourseUseCase = new UpdateCourseUseCase(
     courseRepository,
@@ -49,7 +51,9 @@ export function createCourseDependencies(
   const deleteCourseUseCase = new DeleteCourseUseCase(courseRepository);
   const getEnrolledCoursesUseCase = new GetEnrolledCoursesUseCase(
     courseRepository,
-    userRepository
+    userRepository,
+    courseReviewRepository,
+    deps.lessonRepository
   );
   const approveCourseUseCase = new ApproveCourseUseCase(courseRepository);
   const declineCourseUseCase = new DeclineCourseUseCase(courseRepository);

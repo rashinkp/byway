@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import { User } from "@/types/user";
 import { getCurrentUser } from "@/api/auth";
+import { clearAllCache } from "@/lib/utils";
 
 interface AuthState {
   user: User | null;
@@ -18,7 +19,11 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   isInitialized: false,
   isLoading: false,
   email: null,
-  setUser: (user) => set({ user, isInitialized: true }),
+  setUser: (user) => {
+    // Clear cache when user state changes
+    clearAllCache();
+    set({ user, isInitialized: true });
+  },
   setEmail: (email) => {
     if (typeof window !== "undefined") {
       localStorage.setItem("auth_email", email);
@@ -26,6 +31,9 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     set({ email });
   },
   clearAuth: () => {
+    // Clear cache when auth is cleared
+    clearAllCache();
+    
     if (typeof window !== "undefined") {
       localStorage.removeItem("auth_email");
     }
