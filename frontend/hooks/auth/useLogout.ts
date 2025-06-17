@@ -1,21 +1,15 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { logout } from "@/api/auth";
-import { useAuthStore } from "@/stores/auth.store";
-import { clearAllCache } from "@/lib/utils";
+import { useAuthActions } from "./useAuthActions";
 
 export function useLogout() {
-  const queryClient = useQueryClient();
-  const { clearAuth } = useAuthStore();
+  const { logoutUser } = useAuthActions();
 
   return useMutation({
     mutationFn: () => logout(),
     onSuccess: () => {
-      // Clear all cache to ensure fresh data for logged-out state
-      queryClient.clear();
-      clearAllCache();
-      
-      clearAuth(); // Clear store and localStorage
+      logoutUser();
       toast.success("Logged out successfully");
     },
     onError: (error: any) => {

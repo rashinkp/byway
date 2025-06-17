@@ -1,13 +1,11 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import { login } from "@/api/auth";
-import { useAuthStore } from "@/stores/auth.store";
 import { useRouter } from "next/navigation";
-import { clearAllCache } from "@/lib/utils";
+import { useAuthActions } from "./useAuthActions";
 
 export function useLogin() {
-  const setUser = useAuthStore((state) => state.setUser);
+  const { loginUser } = useAuthActions();
   const router = useRouter();
-  const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: ({ email, password }: { email: string; password: string }) =>
@@ -15,11 +13,8 @@ export function useLogin() {
     onSuccess: (user) => {
       console.log("Login success, user:", user);
       
-      // Clear all cache to ensure fresh data for the logged-in user
-      queryClient.clear();
-      clearAllCache();
+      loginUser(user);
       
-      setUser(user);
       const redirectPath =
         user.role === "ADMIN"
           ? "/admin"
@@ -30,7 +25,6 @@ export function useLogin() {
     },
     onError: (error: any) => {
       console.error("Login failed:", error.message);
-      setUser(null);
     },
   });
 }

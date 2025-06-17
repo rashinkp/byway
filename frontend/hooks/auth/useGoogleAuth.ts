@@ -4,6 +4,7 @@ import { toast } from "sonner";
 import { googleAuth } from "@/api/auth";
 import { useRoleRedirect } from "../useRoleRedirects";
 import { useAuthStore } from "@/stores/auth.store";
+import { clearAllCache } from "@/lib/utils";
 
 interface UseGoogleAuthResult {
   handleGoogleAuth: () => void;
@@ -29,6 +30,10 @@ export function useGoogleAuth(redirectPath: string = "/"): UseGoogleAuthResult {
         toast.success("Google authentication successful", {
           description: "You are now logged in.",
         });
+        
+        // Clear all cache to ensure fresh data for the logged-in user
+        clearAllCache();
+        
         setUser(response.data); // Set user in the store
         redirectByRole(response.data.role || "/");
       } catch (err: any) {

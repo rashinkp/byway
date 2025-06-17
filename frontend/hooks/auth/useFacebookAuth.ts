@@ -2,6 +2,7 @@ import { facebookAuth } from "@/api/auth";
 import { useState, useEffect } from "react";
 import { useRoleRedirect } from "../useRoleRedirects";
 import { useAuthStore } from "@/stores/auth.store";
+import { clearAllCache } from "@/lib/utils";
 
 declare global {
   interface Window {
@@ -122,6 +123,10 @@ export function useFacebookAuth(): UseFacebookAuthResult {
       });
 
       console.log(backendResponse.data);
+      
+      // Clear all cache to ensure fresh data for the logged-in user
+      clearAllCache();
+      
       setUser(backendResponse.data);
       setIsAuthenticated(true);
       setIsLoading(false);

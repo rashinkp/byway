@@ -52,20 +52,7 @@ const LessonCard: React.FC<{
   isExpanded: boolean;
   onToggle: () => void;
 }> = ({ lesson, isExpanded, onToggle }) => {
-  const { data: content } = useGetContentByLessonId(lesson.id);
 
-  const getContentIcon = (type: ContentType) => {
-    switch (type) {
-      case "VIDEO":
-        return <PlayCircle className="w-4 h-4" />;
-      case "DOCUMENT":
-        return <FileText className="w-4 h-4" />;
-      case "QUIZ":
-        return <HelpCircle className="w-4 h-4" />;
-      default:
-        return <BookOpen className="w-4 h-4" />;
-    }
-  };
 
   return (
     <div className="bg-white border border-gray-200 rounded-lg">
@@ -75,7 +62,6 @@ const LessonCard: React.FC<{
       >
         <div className="flex items-center space-x-3">
           <div className="flex-shrink-0">
-            {content && content.type && getContentIcon(content.type)}
           </div>
           <div className="text-left">
             <h4 className="font-medium text-gray-900">
@@ -97,21 +83,7 @@ const LessonCard: React.FC<{
         </div>
       </button>
 
-      {isExpanded && content && (
-        <div className="px-4 pb-4 border-t border-gray-100">
-          <div className="pt-4">
-            <p className="text-sm text-gray-600 mb-2">
-              {content.title}
-            </p>
-            {content.type === "VIDEO" && (
-              <div className="flex items-center space-x-2 text-xs text-gray-500">
-                <PlayCircle className="w-4 h-4" />
-                <span>Video content</span>
-              </div>
-            )}
-          </div>
-        </div>
-      )}
+      
     </div>
   );
 };
