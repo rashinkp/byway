@@ -23,6 +23,7 @@ import { revenueRouter } from "../presentation/express/router/revenue.router";
 import { createDashboardDependencies } from "./dashboard.dependencies";
 import { dashboardRouter } from "../presentation/express/router/dashboard.router";
 import courseReviewRouter from "../presentation/express/router/course-review.router";
+import { createChatDependencies } from "./chat.dependencies";
 
 export interface AppDependencies {
   authController: any;
@@ -47,6 +48,12 @@ export interface AppDependencies {
   dashboardRouter: any;
   courseReviewController: any;
   courseReviewRouter: any;
+  chatController: any;
+  sendMessageUseCase: any;
+  createChatUseCase: any;
+  messageRepository: any;
+  httpErrors: any;
+  httpSuccess: any;
 }
 
 export function createAppDependencies(): AppDependencies {
@@ -70,6 +77,7 @@ export function createAppDependencies(): AppDependencies {
   const walletDeps = createWalletDependencies(sharedDeps);
   const revenueDeps = createRevenueDependencies(sharedDeps);
   const dashboardDeps = createDashboardDependencies(sharedDeps);
+  const chatDeps = createChatDependencies(sharedDeps);
 
   const searchRepository = new SearchRepository(prisma);
   const globalSearchUseCase = new GlobalSearchUseCase(searchRepository);
@@ -109,5 +117,11 @@ export function createAppDependencies(): AppDependencies {
     dashboardRouter: dashboardRouterInstance,
     courseReviewController: courseReviewDeps.courseReviewController,
     courseReviewRouter: courseReviewRouterInstance,
+    chatController: chatDeps.chatController,
+    sendMessageUseCase: chatDeps.sendMessageUseCase,
+    createChatUseCase: chatDeps.createChatUseCase,
+    messageRepository: chatDeps.messageRepository,
+    httpErrors,
+    httpSuccess,
   };
 }

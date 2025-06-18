@@ -25,41 +25,28 @@ export class GetAllCoursesUseCase implements IGetAllCoursesUseCase {
     try {
       const result = await this.courseRepository.findAll(input);
       
-      console.log("GetAllCoursesUseCase - Input:", input);
-      console.log("GetAllCoursesUseCase - Raw courses count:", result.courses.length);
-      
       // Enhance courses with additional data
       const enhancedCourses = await Promise.all(
         result.courses.map(async (course) => {
-          console.log("Processing course:", course.id, course.title);
-          
           // Get instructor details
           const instructor = await this.userRepository.findById(course.createdBy);
-          console.log("Instructor found:", instructor ? instructor.name : "Not found");
-          
           // Get review stats
           const reviewStats = await this.courseReviewRepository.getCourseReviewStats(course.id);
-          console.log("Review stats:", reviewStats);
-          
           // Get lesson count
           const lessons = await this.lessonRepository.findByCourseId(course.id);
           const lessonCount = lessons.length;
-          console.log("Lesson count:", lessonCount);
-          
           // Check enrollment status
           let isEnrolled = false;
           if (input.userId) {
             const enrollment = await this.enrollmentRepository.findByUserAndCourse(input.userId, course.id);
             isEnrolled = !!enrollment;
           }
-          
           // Check cart status
           let isInCart = false;
           if (input.userId) {
             const cartItem = await this.cartRepository.findByUserAndCourse(input.userId, course.id);
             isInCart = !!cartItem;
           }
-          
           const enhancedCourse = {
             ...course,
             instructor: instructor ? {
@@ -79,17 +66,6 @@ export class GetAllCoursesUseCase implements IGetAllCoursesUseCase {
             isEnrolled,
             isInCart,
           };
-          
-          console.log("Enhanced course:", {
-            id: enhancedCourse.id,
-            title: enhancedCourse.title,
-            instructor: enhancedCourse.instructor,
-            reviewStats: enhancedCourse.reviewStats,
-            lessons: enhancedCourse.lessons,
-            isEnrolled: enhancedCourse.isEnrolled,
-            isInCart: enhancedCourse.isInCart
-          });
-          
           return enhancedCourse;
         })
       );

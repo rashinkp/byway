@@ -4,15 +4,13 @@ import cookieParser from "cookie-parser";
 import { corsConfig } from "../configs/cors.config";
 import { cookieConfig } from "../configs/cookie.config";
 import { errorMiddleware } from "../middlewares/error.middleware";
-import { createAppDependencies } from "../../../di/app.dependencies";
 import morgan from "morgan";
 import { createRouter } from "../router/index.routes";
 import { expressAdapter } from "../../adapters/express.adapter";
+import { AppDependencies } from "../../../di/app.dependencies";
 
-export const createApp = (): Application => {
+export const createApp = (deps: AppDependencies): Application => {
   const app = express();
-
-  const deps = createAppDependencies();
 
   // Stripe webhook route - must be before any middleware
   app.post(
