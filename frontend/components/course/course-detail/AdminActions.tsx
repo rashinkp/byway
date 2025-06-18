@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Card } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import {
   CheckCircle2,
@@ -9,12 +8,8 @@ import {
   Edit2,
   Loader2,
   Shield,
-  Clock,
-  DollarSign,
-  Percent,
-  Calendar,
-  FileText,
   BookOpen,
+  Settings,
 } from "lucide-react";
 import { Course } from "@/types/course";
 import {
@@ -49,61 +44,72 @@ export default function AdminActions({
   onToggleStatus,
 }: AdminActionsProps) {
   return (
-    <div className="space-y-6">
-      <div className="flex items-center gap-2 text-gray-900 mb-6">
-        <CheckCircle2 className="w-5 h-5" />
-        <h2 className="text-lg font-semibold">Admin Actions</h2>
-      </div>
-
-      {/* Course Status Badges */}
-      <Card className="p-4">
-        <h3 className="text-sm font-semibold text-gray-900 mb-3">Course Status</h3>
-        <div className="flex flex-wrap gap-2">
-          {/* Course Status Badge */}
-          <Badge className={`${
-            course.deletedAt 
-              ? 'bg-red-100 text-red-800 hover:bg-red-100' 
-              : course.status === 'PUBLISHED'
-              ? 'bg-green-100 text-green-800 hover:bg-green-100'
-              : course.status === 'DRAFT'
-              ? 'bg-yellow-100 text-yellow-800 hover:bg-yellow-100'
-              : course.status === 'ARCHIVED'
-              ? 'bg-gray-100 text-gray-800 hover:bg-gray-100'
-              : 'bg-gray-100 text-gray-800 hover:bg-gray-100'
-          }`}>
-            {course.deletedAt ? 'Deleted' : course.status || 'Unknown'}
-          </Badge>
-
-          {/* Approval Status Badge */}
-          <Badge className={`${
-            course.approvalStatus === 'APPROVED'
-              ? 'bg-green-100 text-green-800 hover:bg-green-100'
-              : course.approvalStatus === 'PENDING'
-              ? 'bg-yellow-100 text-yellow-800 hover:bg-yellow-100'
-              : course.approvalStatus === 'DECLINED'
-              ? 'bg-red-100 text-red-800 hover:bg-red-100'
-              : 'bg-gray-100 text-gray-800 hover:bg-gray-100'
-          }`}>
-            {course.approvalStatus || 'No Status'}
-          </Badge>
-
-          {/* Deleted At Info */}
-          {course.deletedAt && (
-            <Badge className="bg-red-100 text-red-800 hover:bg-red-100">
-              Deleted: {new Date(course.deletedAt).toLocaleDateString()}
-            </Badge>
-          )}
-
-          {/* Created At Info */}
-          <Badge className="bg-blue-100 text-blue-800 hover:bg-blue-100">
-            Created: {new Date(course.createdAt).toLocaleDateString()}
-          </Badge>
+    <div className="space-y-4">
+      {/* Course Status Section */}
+      <div className="space-y-3">
+        <div className="flex items-center gap-2 text-gray-900">
+          <Shield className="w-4 h-4 text-blue-600" />
+          <h3 className="text-sm font-medium">Course Status</h3>
         </div>
-      </Card>
+        <div className="space-y-3">
+          {/* Course Status */}
+          <div className="flex items-center justify-between">
+            <span className="text-sm text-gray-600">Status</span>
+            <Badge className={`${
+              course.deletedAt 
+                ? 'bg-red-50 text-red-700 border-red-200' 
+                : course.status === 'PUBLISHED'
+                ? 'bg-green-50 text-green-700 border-green-200'
+                : course.status === 'DRAFT'
+                ? 'bg-yellow-50 text-yellow-700 border-yellow-200'
+                : course.status === 'ARCHIVED'
+                ? 'bg-gray-50 text-gray-700 border-gray-200'
+                : 'bg-gray-50 text-gray-700 border-gray-200'
+            }`}>
+              {course.deletedAt ? 'Deleted' : course.status || 'Unknown'}
+            </Badge>
+          </div>
+
+          {/* Approval Status */}
+          <div className="flex items-center justify-between">
+            <span className="text-sm text-gray-600">Approval</span>
+            <Badge className={`${
+              course.approvalStatus === 'APPROVED'
+                ? 'bg-green-50 text-green-700 border-green-200'
+                : course.approvalStatus === 'PENDING'
+                ? 'bg-yellow-50 text-yellow-700 border-yellow-200'
+                : course.approvalStatus === 'DECLINED'
+                ? 'bg-red-50 text-red-700 border-red-200'
+                : 'bg-gray-50 text-gray-700 border-gray-200'
+            }`}>
+              {course.approvalStatus || 'No Status'}
+            </Badge>
+          </div>
+
+          {/* Created Date */}
+          <div className="flex items-center justify-between">
+            <span className="text-sm text-gray-600">Created</span>
+            <span className="text-sm font-medium text-gray-900">
+              {new Date(course.createdAt).toLocaleDateString()}
+            </span>
+          </div>
+
+          {/* Deleted Date (if applicable) */}
+          {course.deletedAt && (
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-gray-600">Deleted</span>
+              <span className="text-sm font-medium text-red-600">
+                {new Date(course.deletedAt).toLocaleDateString()}
+              </span>
+            </div>
+          )}
+        </div>
+      </div>
 
       <Separator />
 
-      <div className="space-y-4">
+      {/* Action Buttons */}
+      <div className="space-y-3">
         {course.approvalStatus === 'PENDING' && (
           <>
             <AlertDialog>

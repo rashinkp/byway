@@ -73,7 +73,7 @@ export default function CourseDetailLayout({
     <div className="min-h-screen bg-gray-50/50 p-6">
       <div className="max-w-7xl mx-auto space-y-6">
         <div className="flex flex-col lg:flex-row gap-6">
-          <div className={`space-y-6 ${userRole === "USER" ? "lg:w-3/4" : "w-full"}`}>
+          <div className={`space-y-6 ${userRole === "USER" || userRole === "ADMIN" ? "lg:w-3/4" : "w-full"}`}>
             <CourseInfo
               course={course}
               instructor={instructor as User}
@@ -137,8 +137,8 @@ export default function CourseDetailLayout({
             </div>
           </div>
           
-          {/* Only show sidebar for users */}
-          {userRole === "USER" && (
+          {/* Show sidebar for users and admins */}
+          {(userRole === "USER" || userRole === "ADMIN") && (
             <div className="lg:w-1/4">
               <CourseSidebar
                 course={course}

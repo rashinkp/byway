@@ -207,6 +207,23 @@ export class PrismaInstructorRepository implements IInstructorRepository {
           return sum + instructorRevenue;
         }, 0);
 
+        // Calculate average rating from course reviews
+        const reviews = await this.prisma.courseReview.findMany({
+          where: {
+            courseId: {
+              in: courseIds
+            },
+            deletedAt: null // Only include active reviews
+          },
+          select: {
+            rating: true
+          }
+        });
+
+        const averageRating = reviews.length > 0 
+          ? reviews.reduce((sum: number, review: any) => sum + review.rating, 0) / reviews.length
+          : 0;
+
         return {
           instructorId: instructor.id,
           instructorName: instructor.name,
@@ -214,7 +231,7 @@ export class PrismaInstructorRepository implements IInstructorRepository {
           courseCount,
           totalEnrollments,
           totalRevenue,
-          averageRating: 0, // Default value since rating system might not be implemented
+          averageRating,
           isActive: instructor.deletedAt === null,
         };
       })

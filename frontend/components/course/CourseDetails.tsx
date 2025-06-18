@@ -1,20 +1,12 @@
 "use client";
-
 import { Course } from "@/types/course";
-import { Edit, Loader2 } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { StaticImageData } from "next/image";
 import { useState } from "react";
-import { useSoftDeleteCourse } from "@/hooks/course/useSoftDeleteCourse";
-import { toast } from "sonner";
 import { ImageSection } from "./CourseDetailsImageSection";
 import { DetailsSection } from "./CourseDetailsSection";
-import { OverviewSection } from "./CourseOverviewSection";
 
 import { ActionSection } from "./CourseActionSection";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { CourseFormModal } from "./CourseFormModal";
-import { AdditionalDetailsSection } from "./CourseAdditionalDetails";
 
 export function CourseDetails({
   course,
@@ -29,7 +21,6 @@ export function CourseDetails({
 }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-
   const onPublish = () => {
     if (!course) return;
     setIsModalOpen(true); 
@@ -37,38 +28,43 @@ export function CourseDetails({
 
   if (isLoading) {
     return (
-      <div className="animate-pulse space-y-4">
-        <div className="h-32 w-32 bg-gray-200 rounded"></div>
-        <div className="h-4 w-3/4 bg-gray-200 rounded"></div>
+      <div className="bg-white/80 backdrop-blur-sm border border-gray-100 shadow-sm rounded-xl p-6">
+        <div className="animate-pulse space-y-4">
+          <div className="h-32 w-32 bg-gray-200 rounded"></div>
+          <div className="h-4 w-3/4 bg-gray-200 rounded"></div>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="space-y-8">
-      <div className="flex flex-col md:flex-row gap-6">
-        <ImageSection
-          src={src}
-          alt={alt}
-        />
-        <div className="flex-1">
-         
-          <DetailsSection course={course} />
+    <div className="space-y-6">
+      <div className="bg-white/80 backdrop-blur-sm border border-gray-100 shadow-sm rounded-xl p-6">
+        <div className="flex flex-col md:flex-row gap-6">
+          <ImageSection
+            src={src}
+            alt={alt}
+          />
+          <div className="flex-1">
+            <DetailsSection course={course} />
+          </div>
         </div>
       </div>
-      <Tabs defaultValue="overview" className="w-full">
-        <OverviewSection course={course} isEditing={isLoading} form={{}} />
-        <AdditionalDetailsSection course={course} />
-      </Tabs>
+      
+ 
+      
       {course && (
-        <ActionSection
-          course={course}
-          isUpdating={false}
-          onPublish={onPublish}
-          isEditing={isLoading}
-          setIsModalOpen={setIsModalOpen}
-        />
+        <div className="bg-white/80 backdrop-blur-sm border border-gray-100 shadow-sm rounded-xl p-6">
+          <ActionSection
+            course={course}
+            isUpdating={false}
+            onPublish={onPublish}
+            isEditing={isLoading}
+            setIsModalOpen={setIsModalOpen}
+          />
+        </div>
       )}
+      
       {course && (
         <CourseFormModal
           open={isModalOpen}

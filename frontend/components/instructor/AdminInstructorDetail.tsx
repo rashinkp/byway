@@ -1,11 +1,11 @@
-import React, { useState } from "react";
+import React from "react";
 import { Check, X, Download, Trash2, Clock, AlertCircle } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { toast } from "sonner";
 import { InstructorDetailBase } from "./InstructorDetailBase";
 import { IInstructorDetails } from "@/types/instructor";
 import { Course } from "@/types/course";
+import InstructorActions from "./InstructorActions";
 
 interface AdminInstructorDetailProps {
   instructor: IInstructorDetails;
@@ -26,8 +26,6 @@ export const AdminInstructorDetail: React.FC<AdminInstructorDetailProps> = ({
   onToggleDelete,
   onDownloadCV,
 }) => {
-  const [showDeleteModal, setShowDeleteModal] = useState(false);
-
   const getStatusBadge = (status: string) => {
     const statusConfig = {
       PENDING: { bg: "bg-yellow-100", text: "text-yellow-800", icon: Clock },
@@ -59,91 +57,27 @@ export const AdminInstructorDetail: React.FC<AdminInstructorDetailProps> = ({
     </div>
   );
 
-  const renderHeaderActions = () => (
-    <div className="flex flex-wrap gap-2">
-      {instructor.status === "PENDING" && (
-        <>
-          <button
-            onClick={onApprove}
-            className="inline-flex items-center px-3 py-1.5 bg-green-100 text-green-800 rounded-md hover:bg-green-200 transition-colors text-sm font-medium"
-          >
-            <Check className="w-4 h-4 mr-1.5" />
-            Approve
-          </button>
-          <button
-            onClick={onDecline}
-            className="inline-flex items-center px-3 py-1.5 bg-red-100 text-red-800 rounded-md hover:bg-red-200 transition-colors text-sm font-medium"
-          >
-            <X className="w-4 h-4 mr-1.5" />
-            Decline
-          </button>
-        </>
-      )}
-      {instructor.status === "DECLINED" && (
-        <button
-          onClick={onApprove}
-          className="inline-flex items-center px-3 py-1.5 bg-green-100 text-green-800 rounded-md hover:bg-green-200 transition-colors text-sm font-medium"
-        >
-          <Check className="w-4 h-4 mr-1.5" />
-          Approve
-        </button>
-      )}
-      <button
-        onClick={onDownloadCV}
-        className={`inline-flex items-center px-3 py-1.5 ${
-          instructor.cv && instructor.cv !== "No CV provided"
-            ? "bg-blue-100 text-blue-800 hover:bg-blue-200"
-            : "bg-gray-100 text-gray-400 cursor-not-allowed"
-        } rounded-md transition-colors text-sm font-medium`}
-        disabled={!instructor.cv || instructor.cv === "No CV provided"}
-      >
-        <Download className="w-4 h-4 mr-1.5" />
-        {instructor.cv && instructor.cv !== "No CV provided" ? "Download CV" : "No CV Available"}
-      </button>
-      <button
-        onClick={() => setShowDeleteModal(true)}
-        className={`inline-flex items-center px-3 py-1.5 ${
-          instructor.deletedAt 
-            ? "bg-green-100 text-green-800 hover:bg-green-200" 
-            : "bg-red-100 text-red-800 hover:bg-red-200"
-        } rounded-md transition-colors text-sm font-medium`}
-      >
-        {instructor.deletedAt ? (
-          <Check className="w-4 h-4 mr-1.5" />
-        ) : (
-          <X className="w-4 h-4 mr-1.5" />
-        )}
-        {instructor.deletedAt ? "Enable" : "Disable"}
-      </button>
-    </div>
+  // Create InstructorActions component for sidebar
+  const instructorActionsComponent = (
+    <InstructorActions
+      instructor={instructor}
+      onApprove={onApprove}
+      onDecline={onDecline}
+      onToggleDelete={onToggleDelete}
+      onDownloadCV={onDownloadCV}
+    />
   );
 
   return (
-    <>
-      <InstructorDetailBase
-        instructor={instructor}
-        courses={courses}
-        isCoursesLoading={isCoursesLoading}
-        renderHeaderActions={renderHeaderActions}
-        renderStatusBadges={renderStatusBadges}
-      />
-
-      <AlertDialog open={showDeleteModal} onOpenChange={setShowDeleteModal}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Delete Instructor</AlertDialogTitle>
-            <AlertDialogDescription>
-              Are you sure you want to {instructor.deletedAt ? "enable" : "disable"} the instructor "{instructor.name || instructor.email}"?
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={onToggleDelete}>
-              {instructor.deletedAt ? "Enable" : "Disable"}
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
-    </>
+    <InstructorDetailBase
+      instructor={instructor}
+      courses={courses}
+      isCoursesLoading={isCoursesLoading}
+      renderStatusBadges={renderStatusBadges}
+      sidebarProps={{
+        adminActions: instructorActionsComponent,
+        userRole: "ADMIN",
+      }}
+    />
   );
 }; 

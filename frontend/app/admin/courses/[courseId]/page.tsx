@@ -131,58 +131,18 @@ const AdminCourseDetails: React.FC = () => {
     );
   }
 
-  // Custom tabs for admin
-  const customTabs = [
-    {
-      id: "actions",
-      label: "Admin Actions",
-      icon: <Settings className="w-4 h-4" />,
-    },
-  ];
-
-  // Custom tab content for admin
-  const customTabContent = {
-    actions: (
-      <AdminActions
-        course={courseData}
-        isApproving={isApproving}
-        isDeclining={isDeclining}
-        isTogglingStatus={isTogglingStatus}
-        onApprove={handleApprove}
-        onDecline={handleDecline}
-        onToggleStatus={handleToggleStatus}
-      />
-    ),
-    curriculum: (
-      <div className="space-y-6">
-        <div className="flex items-center gap-2 text-gray-900">
-          <Play className="w-5 h-5" />
-          <h2 className="text-lg font-semibold">Course Curriculum</h2>
-        </div>
-        <Separator />
-        {isLessonsLoading ? (
-          <div className="flex justify-center py-8">
-            <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
-          </div>
-        ) : lessonsData?.lessons && lessonsData.lessons.length > 0 ? (
-          <div className="space-y-4">
-            {lessonsData.lessons.map((lesson: ILesson) => (
-              <LessonCard
-                key={lesson.id}
-                lesson={lesson}
-                isExpanded={expandedLessons.includes(lesson.id)}
-                onToggle={() => toggleLessonExpansion(lesson.id)}
-              />
-            ))}
-          </div>
-        ) : (
-          <div className="text-center py-8 text-gray-500">
-            No lessons available for this course yet.
-          </div>
-        )}
-      </div>
-    ),
-  };
+  // Create AdminActions component for sidebar
+  const adminActionsComponent = (
+    <AdminActions
+      course={courseData}
+      isApproving={isApproving}
+      isDeclining={isDeclining}
+      isTogglingStatus={isTogglingStatus}
+      onApprove={handleApprove}
+      onDecline={handleDecline}
+      onToggleStatus={handleToggleStatus}
+    />
+  );
 
   return (
     <CourseDetailLayout
@@ -196,9 +156,9 @@ const AdminCourseDetails: React.FC = () => {
         user: false,
       }}
       error={null}
-      sidebarProps={{}}
-      tabContent={customTabContent}
-      customTabs={customTabs}
+      sidebarProps={{
+        adminActions: adminActionsComponent,
+      }}
       showReviews={true}
     />
   );

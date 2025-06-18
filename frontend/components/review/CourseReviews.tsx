@@ -6,6 +6,7 @@ import ReviewStats from "./ReviewStats";
 import AddReviewForm from "./AddReviewForm";
 import ReviewList from "./ReviewList";
 import ReviewListSkeleton from "./ReviewListSkeleton";
+import { Star } from "lucide-react";
 
 interface CourseReviewsProps {
   course: Course | undefined;
@@ -43,6 +44,92 @@ export default function CourseReviews({
 
   // Use review stats from course data if available
   const reviewStats = course?.reviewStats;
+
+  const renderStars = (rating: number) => {
+    return Array.from({ length: 5 }, (_, i) => (
+      <Star
+        key={i}
+        className={`w-4 h-4 ${
+          i < rating ? "text-yellow-400 fill-current" : "text-gray-300"
+        }`}
+      />
+    ));
+  };
+
+  // For instructors, show a simplified view
+  if (userRole === "INSTRUCTOR") {
+    return (
+      <div className="space-y-6">
+        {/* Review Stats for Instructor */}
+        {reviewStats && reviewStats.totalReviews > 0 && (
+          <div className="bg-gray-50/50 rounded-lg p-6">
+            <h3 className="text-sm font-semibold text-gray-900 mb-4">Review Statistics</h3>
+            <div className="flex items-start space-x-6">
+              {/* Average Rating */}
+              <div className="text-center">
+                <div className="text-3xl font-bold text-gray-900">
+                  {reviewStats.averageRating.toFixed(1)}
+                </div>
+                <div className="flex justify-center mt-1">
+                  {renderStars(Math.round(reviewStats.averageRating))}
+                </div>
+                <div className="text-sm text-gray-600 mt-1">
+                  {reviewStats.totalReviews} {reviewStats.totalReviews === 1 ? 'review' : 'reviews'}
+                </div>
+              </div>
+
+              {/* Rating Distribution */}
+              <div className="flex-1 space-y-2">
+                {[5, 4, 3, 2, 1].map((rating) => (
+                  <div key={rating} className="flex items-center space-x-2">
+                    <div className="flex items-center space-x-1 w-8">
+                      <span className="text-sm text-gray-600">{rating}</span>
+                      <Star className="w-3 h-3 text-yellow-400 fill-current" />
+                    </div>
+                    <div className="flex-1 bg-gray-200 rounded-full h-2">
+                      <div
+                        className="bg-yellow-400 h-2 rounded-full transition-all duration-300"
+                        style={{ width: `${reviewStats.ratingPercentages?.[rating] ?? 0}%` }}
+                      />
+                    </div>
+                    <div className="w-8 text-sm text-gray-600 text-right">
+                      {reviewStats.ratingDistribution?.[rating] ?? 0}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Reviews List */}
+        <div className="space-y-4">
+          <div className="flex items-center justify-between">
+            <h3 className="text-sm font-semibold text-gray-900">
+              Student Reviews
+            </h3>
+            
+            {reviewsData?.total && (
+              <span className="text-xs text-gray-500">
+                {reviewsData.total} {reviewsData.total === 1 ? 'review' : 'reviews'}
+              </span>
+            )}
+          </div>
+
+          <ReviewList
+            reviews={reviewsData?.items || []}
+            isLoading={reviewsLoading}
+            error={reviewsError}
+            total={reviewsData?.total || 0}
+            courseId={course?.id || ""}
+            activeFilter={activeFilter}
+            userRole={userRole}
+            disabledFilter={disabledFilter}
+          />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-8">

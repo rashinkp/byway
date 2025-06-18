@@ -716,14 +716,30 @@ export class CourseRepository implements ICourseRepository {
 
         console.log(`Course ${course.title}: ${completedOrderItems.length} completed sales, revenue: ${totalRevenue} (${input.role})`);
 
+        // Get review stats for this course
+        const reviews = await this.prisma.courseReview.findMany({
+          where: {
+            courseId: course.id,
+            deletedAt: null // Only include active reviews
+          },
+          select: {
+            rating: true
+          }
+        });
+
+        const rating = reviews.length > 0 
+          ? reviews.reduce((sum: number, review: any) => sum + review.rating, 0) / reviews.length
+          : 0;
+        const reviewCount = reviews.length;
+
         return {
           courseId: course.id,
           courseTitle: course.title,
           instructorName: course.creator?.name || 'Unknown',
           enrollmentCount: course.enrollments.length,
           revenue: totalRevenue,
-          rating: 0,
-          reviewCount: 0,
+          rating,
+          reviewCount,
         };
       })
     );

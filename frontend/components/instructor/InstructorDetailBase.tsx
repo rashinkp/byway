@@ -20,6 +20,7 @@ import { IInstructorDetails } from "@/types/instructor";
 import { Course } from "@/types/course";
 import { CourseCard } from "@/components/course/CourseCard";
 import Link from "next/link";
+import InstructorSidebar from "./InstructorSidebar";
 
 interface InstructorDetailBaseProps {
   instructor: IInstructorDetails;
@@ -27,6 +28,10 @@ interface InstructorDetailBaseProps {
   isCoursesLoading?: boolean;
   renderHeaderActions?: () => React.ReactNode;
   renderStatusBadges?: () => React.ReactNode;
+  sidebarProps?: {
+    adminActions?: React.ReactNode;
+    userRole?: "USER" | "ADMIN" | "INSTRUCTOR";
+  };
 }
 
 export const InstructorDetailBase: React.FC<InstructorDetailBaseProps> = ({
@@ -35,8 +40,10 @@ export const InstructorDetailBase: React.FC<InstructorDetailBaseProps> = ({
   isCoursesLoading,
   renderHeaderActions,
   renderStatusBadges,
+  sidebarProps,
 }) => {
   const [activeTab, setActiveTab] = useState("about");
+  const userRole = sidebarProps?.userRole || "USER";
 
   const certifications = instructor.certifications
     ? instructor.certifications
@@ -72,11 +79,6 @@ export const InstructorDetailBase: React.FC<InstructorDetailBaseProps> = ({
       label: "Courses",
       icon: <BookOpen className="w-4 h-4" />,
     },
-    ...(renderHeaderActions ? [{
-      id: "controls",
-      label: "Controls",
-      icon: <Settings className="w-4 h-4" />,
-    }] : []),
   ];
 
   const renderTabContent = () => {
@@ -147,7 +149,11 @@ export const InstructorDetailBase: React.FC<InstructorDetailBaseProps> = ({
           <div className="space-y-6">
             <h3 className="text-lg font-semibold text-gray-900">Courses</h3>
             {isCoursesLoading ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className={`grid gap-6 ${
+                userRole === "ADMIN" 
+                  ? "grid-cols-1 sm:grid-cols-2 lg:grid-cols-2" 
+                  : "grid-cols-1 md:grid-cols-2 lg:grid-cols-3"
+              }`}>
                 {Array.from({ length: 3 }).map((_, index) => (
                   <div key={index} className="p-4">
                     <div className="h-6 w-3/4 bg-gray-200 rounded animate-pulse" />
@@ -157,7 +163,11 @@ export const InstructorDetailBase: React.FC<InstructorDetailBaseProps> = ({
                 ))}
               </div>
             ) : courses && courses.length > 0 ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className={`grid gap-6 ${
+                userRole === "ADMIN" 
+                  ? "grid-cols-1 sm:grid-cols-2 lg:grid-cols-2" 
+                  : "grid-cols-1 md:grid-cols-2 lg:grid-cols-3"
+              }`}>
                 {courses.map((course: Course) => (
                   <Link key={course.id} href={`/courses/${course.id}`}>
                     <CourseCard course={course} />
@@ -167,15 +177,6 @@ export const InstructorDetailBase: React.FC<InstructorDetailBaseProps> = ({
             ) : (
               <p className="text-gray-600">No courses available</p>
             )}
-          </div>
-        );
-      case "controls":
-        return (
-          <div className="space-y-6">
-            <h3 className="text-lg font-semibold text-gray-900">Instructor Controls</h3>
-            <div className="flex flex-wrap gap-2">
-              {renderHeaderActions?.()}
-            </div>
           </div>
         );
       default:
@@ -245,33 +246,49 @@ export const InstructorDetailBase: React.FC<InstructorDetailBaseProps> = ({
           </div>
         </Card>
 
-        {/* Main Content Section */}
-        <Card className="bg-white/80 backdrop-blur-sm border border-gray-100 shadow-sm rounded-xl overflow-hidden">
-          {/* Tabs Section */}
-          <div className="border-b border-gray-100">
-            <div className="flex space-x-8 px-6 py-4">
-              {tabs.map((tab) => (
-                <button
-                  key={tab.id}
-                  onClick={() => setActiveTab(tab.id)}
-                  className={`flex items-center space-x-2 py-2 px-1 border-b-2 transition-colors ${
-                    activeTab === tab.id
-                      ? "border-blue-600 text-blue-600"
-                      : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
-                  }`}
-                >
-                  {tab.icon}
-                  <span className="font-medium">{tab.label}</span>
-                </button>
-              ))}
-            </div>
+        <div className="flex flex-col lg:flex-row gap-6">
+          {/* Main Content Section */}
+          <div className={`space-y-6 ${userRole === "ADMIN" ? "lg:w-3/4" : "w-full"}`}>
+            <Card className="bg-white/80 backdrop-blur-sm border border-gray-100 shadow-sm rounded-xl overflow-hidden">
+              {/* Tabs Section */}
+              <div className="border-b border-gray-100">
+                <div className="flex space-x-8 px-6 py-4">
+                  {tabs.map((tab) => (
+                    <button
+                      key={tab.id}
+                      onClick={() => setActiveTab(tab.id)}
+                      className={`flex items-center space-x-2 py-2 px-1 border-b-2 transition-colors ${
+                        activeTab === tab.id
+                          ? "border-blue-600 text-blue-600"
+                          : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+                      }`}
+                    >
+                      {tab.icon}
+                      <span className="font-medium">{tab.label}</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Content Section */}
+              <div className="p-6">
+                {renderTabContent()}
+              </div>
+            </Card>
           </div>
 
-          {/* Content Section */}
-          <div className="p-6">
-            {renderTabContent()}
-          </div>
-        </Card>
+          {/* Sidebar - Only show for admin users */}
+          {userRole === "ADMIN" && (
+            <div className="lg:w-1/4">
+              <InstructorSidebar
+                instructor={instructor}
+                isLoading={false}
+                adminActions={sidebarProps?.adminActions}
+                userRole={userRole}
+              />
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );

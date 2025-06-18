@@ -137,7 +137,7 @@ export default function ReviewList({
     return (
       <div className="space-y-4">
         {[1, 2, 3].map((i) => (
-          <div key={i} className="bg-white border border-gray-200 rounded-lg p-6 animate-pulse">
+          <div key={i} className="bg-white/60 backdrop-blur-sm border border-gray-200/50 rounded-xl p-4 animate-pulse">
             <div className="flex items-start space-x-4">
               <div className="w-10 h-10 bg-gray-200 rounded-full"></div>
               <div className="flex-1 space-y-2">
@@ -154,8 +154,8 @@ export default function ReviewList({
 
   if (error) {
     return (
-      <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-        <p className="text-red-600">{error.message}</p>
+      <div className="bg-red-50/80 backdrop-blur-sm border border-red-200/50 rounded-xl p-4">
+        <p className="text-red-600 text-sm">{error.message}</p>
       </div>
     );
   }
@@ -169,11 +169,13 @@ export default function ReviewList({
       message = "You haven't reviewed this course yet.";
     } else if (userRole === "ADMIN" && disabledFilter === 'disabled') {
       message = "No disabled reviews found.";
+    } else if (userRole === "INSTRUCTOR") {
+      message = "No student reviews yet.";
     }
     
     return (
-      <div className="bg-white border border-gray-200 rounded-lg p-8 text-center">
-        <p className="text-gray-500">{message}</p>
+      <div className="bg-white/60 backdrop-blur-sm border border-gray-200/50 rounded-xl p-8 text-center">
+        <p className="text-gray-500 text-sm">{message}</p>
       </div>
     );
   }
@@ -183,7 +185,7 @@ export default function ReviewList({
       {/* Reviews */}
       <div className="space-y-4">
         {filteredReviews.map((review) => (
-          <div key={review.id} className="bg-white border border-gray-200 rounded-lg p-6">
+          <div key={review.id} className="bg-white/60 backdrop-blur-sm border border-gray-200/50 rounded-xl p-4 hover:bg-white/80 transition-all duration-200">
             {editingReview === review.id ? (
               <EditReviewForm
                 review={review}
@@ -210,11 +212,11 @@ export default function ReviewList({
 
       {/* Pagination */}
       {total > 10 && (
-        <div className="flex items-center justify-center space-x-2">
+        <div className="flex items-center justify-center space-x-2 pt-4">
           <button
             onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
             disabled={currentPage === 1}
-            className="px-3 py-2 text-sm border border-gray-300 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
+            className="px-3 py-2 text-sm border border-gray-200 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 transition-colors"
           >
             Previous
           </button>
@@ -224,7 +226,7 @@ export default function ReviewList({
           <button
             onClick={() => setCurrentPage(Math.min(Math.ceil(total / 10), currentPage + 1))}
             disabled={currentPage >= Math.ceil(total / 10)}
-            className="px-3 py-2 text-sm border border-gray-300 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
+            className="px-3 py-2 text-sm border border-gray-200 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 transition-colors"
           >
             Next
           </button>

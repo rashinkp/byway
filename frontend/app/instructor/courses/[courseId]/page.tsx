@@ -12,10 +12,13 @@ import {
   StarIcon,
   UserCircle,
   InfoIcon,
+  DollarSign,
+  Percent,
 } from "lucide-react";
 import ErrorDisplay from "@/components/ErrorDisplay";
 import { CourseDetails } from "@/components/course/CourseDetails";
 import { AdditionalDetailsSection } from "@/components/course/CourseAdditionalDetails";
+import CourseReviews from "@/components/review/CourseReviews";
 
 export default function CourseDetailPage() {
   const { courseId } = useParams();
@@ -46,9 +49,63 @@ export default function CourseDetailPage() {
   ];
 
   return (
-    <div className="container mx-auto py-4 px-4 sm:px-6 lg:px-8">
+    <div className="container mx-auto py-6 px-4 sm:px-6 lg:px-8">
+      {/* Course Stats Section */}
+      <div className="bg-white/80 backdrop-blur-sm border border-gray-100 shadow-sm rounded-xl p-6 mb-6">
+        <h3 className="text-sm font-semibold text-gray-900 mb-4">Course Performance</h3>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div className="flex items-center gap-3">
+            <div className="p-2 rounded-lg bg-blue-50">
+              <Percent className="h-4 w-4 text-blue-600" />
+            </div>
+            <div>
+              <p className="text-sm font-medium text-gray-900">
+                {course?.instructorSharePercentage || 0}%
+              </p>
+              <p className="text-xs text-gray-500">Your Share</p>
+            </div>
+          </div>
+          
+          <div className="flex items-center gap-3">
+            <div className="p-2 rounded-lg bg-orange-50">
+              <Users className="h-4 w-4 text-orange-600" />
+            </div>
+            <div>
+              <p className="text-sm font-medium text-gray-900">
+                {course?.adminSharePercentage || 0}%
+              </p>
+              <p className="text-xs text-gray-500">Admin Share</p>
+            </div>
+          </div>
+          
+          <div className="flex items-center gap-3">
+            <div className="p-2 rounded-lg bg-green-50">
+              <DollarSign className="h-4 w-4 text-green-600" />
+            </div>
+            <div>
+              <p className="text-sm font-medium text-gray-900">
+                ${Number(course?.price)?.toFixed(2) || "0.00"}
+              </p>
+              <p className="text-xs text-gray-500">Course Price</p>
+            </div>
+          </div>
+          
+          <div className="flex items-center gap-3">
+            <div className="p-2 rounded-lg bg-purple-50">
+              <TrendingUp className="h-4 w-4 text-purple-600" />
+            </div>
+            <div>
+              <p className="text-sm font-medium text-gray-900">
+                ${Number(course?.offer)?.toFixed(2) || "0.00"}
+              </p>
+              <p className="text-xs text-gray-500">Offer Price</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <Tabs defaultValue="overview" className="w-full">
-        <div className="relative mb-8">
+        <div className="relative mb-6">
           <TabsList className="flex justify-center md:justify-start gap-1 p-1 bg-gray-100 rounded-xl overflow-x-auto no-scrollbar">
             {tabItems.map((tab) => (
               <TabsTrigger
@@ -66,45 +123,6 @@ export default function CourseDetailPage() {
         </div>
 
         <TabsContent value="overview" className="mt-0">
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-            {[
-              { 
-                icon: TrendingUp, 
-                value: `${100 - (course?.instructorSharePercentage ?? 0)}%`, 
-                label: "Your Share" 
-              },
-              { 
-                icon: Users, 
-                value: `${course?.adminSharePercentage || 0}%`, 
-                label: "Admin Share" 
-              },
-              { 
-                icon: TrendingUp, 
-                value: course?.price ? `$${course.price}` : "$0", 
-                label: "Course Price" 
-              },
-              { 
-                icon: TrendingUp, 
-                value: course?.offer ? `$${course.offer}` : "$0", 
-                label: "Offer Price" 
-              },
-            ].map((stat, index) => (
-              <div
-                key={index}
-                className="bg-white p-4 rounded-xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow flex items-center gap-3"
-              >
-                <div className="p-2 rounded-lg bg-primary/10">
-                  <stat.icon className="h-5 w-5 text-primary" />
-                </div>
-                <div>
-                  <h3 className="text-lg font-semibold text-gray-900">
-                    {stat.value}
-                  </h3>
-                  <p className="text-sm text-gray-500">{stat.label}</p>
-                </div>
-              </div>
-            ))}
-          </div>
           <CourseDetails
             course={course}
             isLoading={isLoading}
@@ -116,10 +134,18 @@ export default function CourseDetailPage() {
           <LessonManager courseId={courseId as string} />
         </TabsContent>
         <TabsContent value="reviews" className="mt-0">
-          <p className="text-gray-600">No reviews available yet.</p>
+          <div className="bg-white/80 backdrop-blur-sm border border-gray-100 shadow-sm rounded-xl p-6">
+            <CourseReviews
+              course={course}
+              isLoading={isLoading}
+              userRole="INSTRUCTOR"
+            />
+          </div>
         </TabsContent>
         <TabsContent value="customers" className="mt-0">
-          <p className="text-gray-600">No customer data available yet.</p>
+          <div className="bg-white/80 backdrop-blur-sm border border-gray-100 shadow-sm rounded-xl p-6">
+            <p className="text-gray-600">No customer data available yet.</p>
+          </div>
         </TabsContent>
         <TabsContent value="details" className="mt-0">
           <AdditionalDetailsSection course={course} />
