@@ -16,6 +16,7 @@ import { IHttpRequest } from "../interfaces/http-request.interface";
 import { IHttpResponse } from "../interfaces/http-response.interface";
 import {
   sendMessageSchema,
+  sendMessageSocketSchema,
   createChatSchema,
   getChatHistorySchema,
   listUserChatsSchema,
@@ -40,10 +41,10 @@ export class ChatController extends BaseController {
   }
 
   async handleNewMessage(socketData: any) {
-    const validated = sendMessageSchema.parse(socketData);
+    const validated = sendMessageSocketSchema.parse(socketData);
     const message = await this.sendMessageUseCase.execute(
       new ChatId(validated.chatId),
-      new UserId(validated.senderId),
+      new UserId(socketData.senderId),
       new MessageContent(validated.content)
     );
     return message;
@@ -73,8 +74,19 @@ export class ChatController extends BaseController {
   async listUserChats(httpRequest: IHttpRequest): Promise<IHttpResponse> {
     return this.handleRequest(httpRequest, async (request) => {
       const validated = listUserChatsSchema.parse(request.query);
-      const chats = await this.listUserChatsUseCase.execute(new UserId(validated.userId));
-      return this.success_200(chats, "User chats retrieved successfully");
+      console.log('[ChatController] listUserChats - validated data:', validated);
+      
+      const page = validated.page || 1;
+      const limit = validated.limit || 10;
+      
+      const result = await this.listUserChatsUseCase.execute(
+        new UserId(validated.userId), 
+        page, 
+        limit
+      );
+      console.log('[ChatController] listUserChats - result:', result);
+      
+      return this.success_200(result, "User chats retrieved successfully");
     });
   }
 
@@ -104,7 +116,11 @@ export class ChatController extends BaseController {
   async getMessagesByChat(httpRequest: IHttpRequest): Promise<IHttpResponse> {
     return this.handleRequest(httpRequest, async (request) => {
       const validated = getMessagesByChatSchema.parse(request.query);
+      console.log('[ChatController] getMessagesByChat - validated data:', validated);
+      
       const messages = await this.getMessagesByChatUseCase.execute(new ChatId(validated.chatId));
+      console.log('[ChatController] getMessagesByChat - result:', messages);
+      
       return this.success_200(messages, "Messages retrieved successfully");
     });
   }

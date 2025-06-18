@@ -2,14 +2,29 @@ import io from 'socket.io-client';
 
 console.log('[Socket] Module loaded');
 
-// You can add auth or options here if needed
+// Function to get JWT token from cookies
+const getJwtToken = (): string | null => {
+  if (typeof document === 'undefined') return null;
+  
+  const cookies = document.cookie.split(';');
+  const jwtCookie = cookies.find(cookie => cookie.trim().startsWith('jwt='));
+  
+  if (!jwtCookie) return null;
+  
+  return jwtCookie.split('=')[1];
+};
+
+// Create socket connection with JWT token
 const socket = io('http://localhost:5001', {
   autoConnect: true,
-  // auth: { token: 'your-jwt-token' },
+  auth: {
+    token: getJwtToken() || undefined,
+  },
 });
 
 socket.on('connect', () => {
   console.log('[Socket] Connected:', socket.id);
+  console.log('[Socket] JWT token present:', !!getJwtToken());
 });
 
 socket.on('disconnect', () => {

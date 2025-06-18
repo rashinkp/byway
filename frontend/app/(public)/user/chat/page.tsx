@@ -1,120 +1,284 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { ChatList } from '@/components/chat/ChatList';
-import { Chat } from '@/types/chat';
-import { ChatWindow } from '@/components/chat';
+import { ChatWindow } from '@/components/chat/ChatWindow';
+import { Chat, Message, EnhancedChatItem, PaginatedChatList } from '@/types/chat';
+import { useAuthStore } from '@/stores/auth.store';
+import {
+  listUserChats,
+  getMessagesByChat,
+  joinChat,
+  sendMessage as sendMessageSocket,
+} from '@/services/socketChat';
 
-// Dummy data for demonstration
-const dummyChats: Chat[] = [
-  {
-    id: '1',
-    instructorName: 'Sarah Johnson',
-    courseTitle: 'Advanced React Development',
-    lastMessage: 'Thank you for the clarification! The course material is very helpful.',
-    lastMessageTime: '2 hours ago',
-    unreadCount: 2,
-    avatar: '/api/placeholder/40/40',
-  },
-  {
-    id: '2',
-    instructorName: 'Michael Chen',
-    courseTitle: 'Python for Data Science',
-    lastMessage: 'I have a question about the pandas library usage in module 3.',
-    lastMessageTime: '1 day ago',
-    unreadCount: 0,
-    avatar: '/api/placeholder/40/40',
-  },
-  {
-    id: '3',
-    instructorName: 'Emily Rodriguez',
-    courseTitle: 'UI/UX Design Fundamentals',
-    lastMessage: 'The design principles you explained really helped me understand the concept better.',
-    lastMessageTime: '3 days ago',
-    unreadCount: 1,
-    avatar: '/api/placeholder/40/40',
-  },
-  {
-    id: '4',
-    instructorName: 'David Thompson',
-    courseTitle: 'Machine Learning Basics',
-    lastMessage: 'Can you recommend some additional resources for understanding neural networks?',
-    lastMessageTime: '1 week ago',
-    unreadCount: 0,
-    avatar: '/api/placeholder/40/40',
-  },
-];
-
-const dummyMessages = [
-  {
-    id: '1',
-    senderId: 'instructor',
-    senderName: 'Sarah Johnson',
-    content: 'Hello! How can I help you with the React course today?',
-    timestamp: '10:30 AM',
-    isInstructor: true,
-  },
-  {
-    id: '2',
-    senderId: 'user',
-    senderName: 'You',
-    content: 'Hi Sarah! I have a question about the useState hook implementation.',
-    timestamp: '10:32 AM',
-    isInstructor: false,
-  },
-  {
-    id: '3',
-    senderId: 'instructor',
-    senderName: 'Sarah Johnson',
-    content: 'Of course! The useState hook is fundamental in React. What specific part are you having trouble with?',
-    timestamp: '10:35 AM',
-    isInstructor: true,
-  },
-  {
-    id: '4',
-    senderId: 'user',
-    senderName: 'You',
-    content: 'I\'m not sure how to properly update the state when dealing with objects.',
-    timestamp: '10:37 AM',
-    isInstructor: false,
-  },
-  {
-    id: '5',
-    senderId: 'instructor',
-    senderName: 'Sarah Johnson',
-    content: 'Great question! When updating objects in state, you need to create a new object reference. Here\'s an example: setUser(prevUser => ({ ...prevUser, name: "New Name" })). This ensures React detects the change and re-renders the component.',
-    timestamp: '10:40 AM',
-    isInstructor: true,
-  },
-];
+console.log('[UserChatPage] Module loaded');
 
 export default function ChatPage() {
-  const [selectedChat, setSelectedChat] = useState<Chat | null>(dummyChats[0]);
-  const [messages, setMessages] = useState(dummyMessages);
+  console.log('[UserChatPage] Component function called');
+  
+  const user = useAuthStore((state) => state.user);
+  const isInitialized = useAuthStore((state) => state.isInitialized);
+  const isLoading = useAuthStore((state) => state.isLoading);
+  const initializeAuth = useAuthStore((state) => state.initializeAuth);
+  
+  const [chatItems, setChatItems] = useState<EnhancedChatItem[]>([]);
+  const [selectedChat, setSelectedChat] = useState<EnhancedChatItem | null>(null);
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [hasMore, setHasMore] = useState(false);
+  const [loading, setLoading] = useState(false);
 
-  const handleSendMessage = (content: string) => {
-    const newMessage = {
-      id: Date.now().toString(),
-      senderId: 'user',
-      senderName: 'You',
-      content,
-      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-      isInstructor: false,
+  console.log('[UserChatPage] Component rendered, user:', user, 'isInitialized:', isInitialized, 'isLoading:', isLoading);
+
+  // Initialize auth if not already done
+  useEffect(() => {
+    console.log('[UserChatPage] Checking auth initialization...');
+    if (!isInitialized && !isLoading) {
+      console.log('[UserChatPage] Initializing auth...');
+      initializeAuth();
+    }
+  }, [isInitialized, isLoading, initializeAuth]);
+
+  // Log user data
+  useEffect(() => {
+    console.log('[UserChatPage] User data changed:', user);
+  }, [user]);
+
+  // Fetch user chats on mount
+  useEffect(() => {
+    console.log('[UserChatPage] useEffect for fetching chats triggered, user:', user, 'isInitialized:', isInitialized);
+    
+    if (!user) {
+      console.log('[UserChatPage] No user found, skipping chat fetch');
+      return;
+    }
+    
+    if (!isInitialized) {
+      console.log('[UserChatPage] Auth not initialized yet, skipping chat fetch');
+      return;
+    }
+    
+    console.log('[UserChatPage] Fetching chats for current user');
+    setLoading(true);
+    
+    try {
+      listUserChats({ page: 1, limit: 10 }, (result: any) => {
+        console.log('[UserChatPage] Received chat list from backend:', result);
+        
+        // Handle the response structure: { statusCode, body: { data: { items, hasMore, totalCount } } }
+        const chatData = result?.body?.data || result?.data || result;
+        
+        if (chatData && Array.isArray(chatData.items)) {
+          setChatItems(chatData.items);
+          setHasMore(chatData.hasMore || false);
+          setCurrentPage(1);
+          setLoading(false);
+          
+          // Don't auto-select the first item, let user choose
+          console.log('[UserChatPage] Chat list loaded, no auto-selection');
+        } else {
+          console.error('[UserChatPage] Invalid response structure:', result);
+          setLoading(false);
+        }
+      });
+    } catch (error) {
+      console.error('[UserChatPage] Error fetching chats:', error);
+      setLoading(false);
+    }
+  }, [user, isInitialized]);
+
+  // Load more chats
+  const loadMoreChats = useCallback(() => {
+    if (!user || !hasMore || loading) return;
+    
+    console.log('[UserChatPage] Loading more chats, page:', currentPage + 1);
+    setLoading(true);
+    
+    listUserChats({ page: currentPage + 1, limit: 10 }, (result: any) => {
+      console.log('[UserChatPage] Received more chat list from backend:', result);
+      
+      // Handle the response structure: { statusCode, body: { data: { items, hasMore, totalCount } } }
+      const chatData = result?.body?.data || result?.data || result;
+      
+      if (chatData && Array.isArray(chatData.items)) {
+        setChatItems(prev => [...prev, ...chatData.items]);
+        setHasMore(chatData.hasMore || false);
+        setCurrentPage(currentPage + 1);
+        setLoading(false);
+      } else {
+        console.error('[UserChatPage] Invalid response structure for load more:', result);
+        setLoading(false);
+      }
+    });
+  }, [user, hasMore, loading, currentPage]);
+
+  // Fetch messages when selected chat changes
+  useEffect(() => {
+    console.log('[UserChatPage] useEffect for fetching messages triggered, selectedChat:', selectedChat);
+    
+    if (!selectedChat) {
+      console.log('[UserChatPage] No selected chat, skipping message fetch');
+      return;
+    }
+    
+    if (selectedChat.type === 'chat' && selectedChat.chatId) {
+      console.log('[UserChatPage] Fetching messages for chat:', selectedChat.chatId);
+      joinChat(selectedChat.chatId);
+      getMessagesByChat({ chatId: selectedChat.chatId }, (msgs: Message[]) => {
+        console.log('[UserChatPage] Received messages from backend:', msgs);
+        setMessages(msgs);
+      });
+    } else {
+      console.log('[UserChatPage] Selected item is a user, no messages to fetch');
+      setMessages([]);
+    }
+  }, [selectedChat]);
+
+  // Listen for new incoming messages
+  useEffect(() => {
+    const handleMessage = (msg: Message) => {
+      console.log('[UserChatPage] Received new message:', msg);
+      if (msg.chatId === selectedChat?.chatId) {
+        console.log('[UserChatPage] Adding message to current chat');
+        setMessages((prev) => [...prev, msg]);
+      } else {
+        console.log('[UserChatPage] Message not for current chat, ignoring');
+      }
     };
-    setMessages([...messages, newMessage]);
-  };
+    
+    console.log('[UserChatPage] Setting up message listener');
+    import('@/lib/socket').then(({ default: socket }) => {
+      socket.on('message', handleMessage);
+      return () => socket.off('message', handleMessage);
+    });
+  }, [selectedChat]);
+
+  // Send message handler
+  const handleSendMessage = useCallback(
+    (content: string) => {
+      if (!user || !selectedChat) {
+        console.log('[UserChatPage] Cannot send message - missing user or chat');
+        return;
+      }
+      
+      if (selectedChat.type === 'user') {
+        console.log('[UserChatPage] Creating new chat with user:', selectedChat.userId);
+        // TODO: Implement create chat functionality
+        return;
+      }
+      
+      console.log('[UserChatPage] Sending message:', {
+        chatId: selectedChat.chatId,
+        content
+      });
+      
+      sendMessageSocket(
+        {
+          chatId: selectedChat.chatId!,
+          content,
+        },
+        (msg: Message) => {
+          console.log('[UserChatPage] Message sent successfully:', msg);
+          setMessages((prev) => [...prev, msg]);
+        }
+      );
+    },
+    [user, selectedChat]
+  );
+
+  console.log('[UserChatPage] Rendering with chat items:', chatItems.length, 'selectedChat:', selectedChat);
+
+  // Manual test function
+  const handleTestFetchChats = useCallback(() => {
+    if (!user) {
+      console.log('[UserChatPage] No user available for manual test');
+      return;
+    }
+    console.log('[UserChatPage] Manual test - fetching chats for current user');
+    listUserChats({ page: 1, limit: 10 }, (result: any) => {
+      console.log('[UserChatPage] Manual test - received chat list:', result);
+      
+      // Handle the response structure: { statusCode, body: { data: { items, hasMore, totalCount } } }
+      const chatData = result?.body?.data || result?.data || result;
+      
+      if (chatData && Array.isArray(chatData.items)) {
+        setChatItems(chatData.items);
+        setHasMore(chatData.hasMore || false);
+      } else {
+        console.error('[UserChatPage] Invalid response structure for manual test:', result);
+      }
+    });
+  }, [user]);
+
+  // Test socket connection
+  const handleTestSocketConnection = useCallback(() => {
+    console.log('[UserChatPage] Testing socket connection...');
+    import('@/lib/socket').then(({ default: socket }) => {
+      console.log('[UserChatPage] Current socket status:', socket.connected);
+      if (!socket.connected) {
+        console.log('[UserChatPage] Connecting socket...');
+        socket.connect();
+      }
+    });
+  }, []);
 
   return (
     <div className="container mx-auto py-6 px-4 sm:px-6 lg:px-8">
+      {/* Debug panel */}
+      <div className="absolute top-4 right-4 z-50 bg-white p-4 rounded-lg shadow-lg border">
+        <h3 className="font-semibold mb-2">Debug Info</h3>
+        <p className="text-sm">User: {user ? `${user.name} (${user.id})` : 'None'}</p>
+        <p className="text-sm">Initialized: {isInitialized ? 'Yes' : 'No'}</p>
+        <p className="text-sm">Loading: {isLoading ? 'Yes' : 'No'}</p>
+        <p className="text-sm">Chat Items: {chatItems.length}</p>
+        <p className="text-sm">Has More: {hasMore ? 'Yes' : 'No'}</p>
+        <p className="text-sm">Current Page: {currentPage}</p>
+        <div className="flex gap-2 mt-2">
+          <button 
+            onClick={handleTestSocketConnection}
+            className="px-3 py-1 bg-green-500 text-white text-xs rounded hover:bg-green-600"
+          >
+            Test Socket
+          </button>
+          <button 
+            onClick={handleTestFetchChats}
+            className="px-3 py-1 bg-blue-500 text-white text-xs rounded hover:bg-blue-600"
+          >
+            Test Fetch Chats
+          </button>
+          {hasMore && (
+            <button 
+              onClick={loadMoreChats}
+              disabled={loading}
+              className="px-3 py-1 bg-purple-500 text-white text-xs rounded hover:bg-purple-600 disabled:opacity-50"
+            >
+              {loading ? 'Loading...' : 'Load More'}
+            </button>
+          )}
+        </div>
+      </div>
+
       <div className="bg-white/80 backdrop-blur-sm border border-gray-100 shadow-sm rounded-xl overflow-hidden">
         <div className="flex h-[600px]">
           {/* Chat List Sidebar */}
           <div className="w-1/3 border-r border-gray-200 bg-gray-50/50">
             <ChatList 
-              chats={dummyChats}
+              chats={chatItems}
               selectedChat={selectedChat}
               onSelectChat={setSelectedChat}
             />
+            {hasMore && (
+              <div className="p-3 border-t border-gray-200">
+                <button 
+                  onClick={loadMoreChats}
+                  disabled={loading}
+                  className="w-full px-3 py-1.5 text-xs text-gray-600 hover:text-gray-800 disabled:opacity-50"
+                >
+                  {loading ? 'Loading more...' : 'Show more'}
+                </button>
+              </div>
+            )}
           </div>
           
           {/* Chat Window */}

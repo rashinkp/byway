@@ -1,9 +1,8 @@
-
 import { UserId } from '@/domain/value-object/UserId';
-import { Message } from '../../../../domain/entities/Message';
 import { ChatId } from '@/domain/value-object/ChatId';
 import { MessageContent } from '@/domain/value-object/MessageContent';
+import { EnrichedMessageDTO } from '../../../../domain/dtos/message.dto';
 
 export interface ISendMessageUseCase {
-  execute(chatId: ChatId, senderId: UserId, content: MessageContent): Promise<Message>;
+  execute(chatId: ChatId, senderId: UserId, content: MessageContent): Promise<EnrichedMessageDTO>;
 } 

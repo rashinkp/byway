@@ -53,8 +53,8 @@ export function Message({ message }: MessageProps) {
             }`}>
               {message.senderName}
             </span>
-            <Badge className={`text-xs px-2 py-0.5 ${getRoleBadgeColor(message.senderRole)}`}>
-              {message.senderRole.charAt(0).toUpperCase() + message.senderRole.slice(1)}
+            <Badge className={`text-xs px-2 py-0.5 ${getRoleBadgeColor(message.senderRole || 'user')}`}>
+              {(message.senderRole || 'user').charAt(0).toUpperCase() + (message.senderRole || 'user').slice(1)}
             </Badge>
           </div>
           <div className="flex items-center space-x-1">
@@ -75,7 +75,7 @@ export function Message({ message }: MessageProps) {
     </div>
 
     <div className={`flex-shrink-0 ${isInstructor ? 'order-2 ml-3' : 'order-1 mr-3'}`}>
-      <div className={`w-8 h-8 rounded-full flex items-center justify-center ${getRoleColor(message.senderRole)}`}>
+      <div className={`w-8 h-8 rounded-full flex items-center justify-center ${getRoleColor(message.senderRole || 'user')}`}>
         <span className="text-xs font-semibold">
           {message.senderName.charAt(0).toUpperCase()}
         </span>

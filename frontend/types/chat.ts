@@ -8,6 +8,29 @@ export interface Chat {
   avatar: string;
 }
 
+// Enhanced chat list item for the new structure
+export interface EnhancedChatItem {
+  id: string;
+  type: 'chat' | 'user'; // 'chat' for existing chats, 'user' for other users
+  displayName: string;
+  avatar?: string;
+  role: string;
+  lastMessage?: string;
+  lastMessageTime?: string;
+  unreadCount?: number;
+  userId?: string; // For user items, this is the other user's ID
+  chatId?: string; // For chat items, this is the chat ID
+  isOnline?: boolean;
+}
+
+// Paginated chat list response
+export interface PaginatedChatList {
+  items: EnhancedChatItem[];
+  totalCount: number;
+  hasMore: boolean;
+  nextPage?: number;
+}
+
 export interface Message {
   id: string;
   senderId: string;
@@ -16,4 +39,5 @@ export interface Message {
   content: string;
   timestamp: string;
   isInstructor: boolean;
+  chatId?: string;
 } 

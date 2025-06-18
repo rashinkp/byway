@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Chat, Message } from '@/types/chat';
+import { EnhancedChatItem, Message } from '@/types/chat';
 import { Message as MessageComponent } from './Message';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -7,7 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { Send, MoreVertical } from 'lucide-react';
 
 interface ChatWindowProps {
-  chat: Chat;
+  chat: EnhancedChatItem;
   messages: Message[];
   onSendMessage: (content: string) => void;
 }
@@ -33,7 +33,7 @@ export function ChatWindow({ chat, messages, onSendMessage }: ChatWindowProps) {
   };
 
   const getRoleColor = (role: string) => {
-    switch (role) {
+    switch (role.toLowerCase()) {
       case 'admin':
         return 'from-red-100 to-red-200 text-red-600';
       case 'instructor':
@@ -46,7 +46,7 @@ export function ChatWindow({ chat, messages, onSendMessage }: ChatWindowProps) {
   };
 
   const getRoleBadgeColor = (role: string) => {
-    switch (role) {
+    switch (role.toLowerCase()) {
       case 'admin':
         return 'bg-red-100 text-red-800';
       case 'instructor':
@@ -60,46 +60,65 @@ export function ChatWindow({ chat, messages, onSendMessage }: ChatWindowProps) {
 
   return (
     <div className="flex flex-col h-full bg-gradient-to-b from-gray-50 to-gray-100">
-    <div className="p-6 bg-white border-b border-gray-200 shadow-sm">
+    <div className="p-4 bg-white border-b border-gray-200 shadow-sm">
       <div className="flex items-center justify-between">
-        <div className="flex items-center space-x-4">
-          <div className={`w-12 h-12 bg-gradient-to-br rounded-full flex items-center justify-center ${getRoleColor(chat.userRole)}`}>
+        <div className="flex items-center space-x-3">
+          <div className={`w-10 h-10 bg-gradient-to-br rounded-full flex items-center justify-center ${getRoleColor(chat.role)}`}>
             <span className="font-semibold text-sm">
-              {(chat.userName?.charAt(0) || '?').toUpperCase()}
+              {(chat.displayName?.charAt(0) || '?').toUpperCase()}
             </span>
           </div>
           <div>
-            <h3 className="text-lg font-semibold text-gray-900">
-              {chat.userName || 'Unknown'}
+            <h3 className="text-base font-semibold text-gray-900">
+              {chat.displayName || 'Unknown'}
             </h3>
-            <Badge className={`text-sm px-3 py-1 ${getRoleBadgeColor(chat.userRole)}`}>
-              {chat.userRole
-                ? chat.userRole.charAt(0).toUpperCase() + chat.userRole.slice(1)
-                : 'Unknown'}
-            </Badge>
+            <div className="flex items-center space-x-2">
+              <Badge className={`text-xs px-2 py-0.5 ${getRoleBadgeColor(chat.role)}`}>
+                {chat.role.charAt(0).toUpperCase() + chat.role.slice(1).toLowerCase()}
+              </Badge>
+              {chat.type === 'user' && (
+                <Badge className="text-xs px-2 py-0.5 bg-gray-100 text-gray-800">
+                  New Chat
+                </Badge>
+              )}
+            </div>
           </div>
         </div>
         <Button variant="ghost" size="sm" className="text-gray-400 hover:text-gray-600 hover:bg-gray-100">
-          <MoreVertical className="w-5 h-5" />
+          <MoreVertical className="w-4 h-4" />
         </Button>
       </div>
     </div>
 
     <div className="flex-1 overflow-y-auto p-6">
-      {messages.map((message) => (
-        <MessageComponent
-          key={message.id}
-          message={message}
-        />
-      ))}
-      <div ref={messagesEndRef} />
+      {chat.type === 'user' ? (
+        <div className="flex items-center justify-center h-full">
+          <div className="text-center">
+            <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <Send className="w-8 h-8 text-gray-400" />
+            </div>
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">Start a conversation</h3>
+            <p className="text-gray-500">Send a message to begin chatting with {chat.displayName}</p>
+          </div>
+        </div>
+      ) : (
+        <>
+          {messages.map((message) => (
+            <MessageComponent
+              key={message.id}
+              message={message}
+            />
+          ))}
+          <div ref={messagesEndRef} />
+        </>
+      )}
     </div>
 
     <div className="p-6 bg-white border-t border-gray-200">
       <div className="flex space-x-4">
         <Input
           type="text"
-          placeholder="Type your message..."
+          placeholder={chat.type === 'user' ? "Type your first message..." : "Type your message..."}
           value={newMessage}
           onChange={(e) => setNewMessage(e.target.value)}
           onKeyPress={(e) => e.key === 'Enter' && handleSendMessage(e)}

@@ -7,6 +7,7 @@ import { MessageContent } from '../../../../domain/value-object/MessageContent';
 import { Message } from '../../../../domain/entities/Message';
 import { MessageId } from '../../../../domain/value-object/MessageId';
 import { Timestamp } from '../../../../domain/value-object/Timestamp';
+import { EnrichedMessageDTO } from '../../../../domain/dtos/message.dto';
 
 export class SendMessageUseCase implements ISendMessageUseCase {
   constructor(
@@ -14,7 +15,7 @@ export class SendMessageUseCase implements ISendMessageUseCase {
     private readonly messageRepository: IMessageRepository
   ) {}
 
-  async execute(chatId: ChatId, senderId: UserId, content: MessageContent): Promise<Message> {
+  async execute(chatId: ChatId, senderId: UserId, content: MessageContent): Promise<EnrichedMessageDTO> {
     const chat = await this.chatRepository.findById(chatId);
     if (!chat) throw new Error('Chat not found');
     const message = new Message(
@@ -27,6 +28,12 @@ export class SendMessageUseCase implements ISendMessageUseCase {
     chat.addMessage(message);
     await this.messageRepository.create(message);
     await this.chatRepository.save(chat);
-    return message;
+    
+    // Return enriched message data
+    const enrichedMessage = await this.messageRepository.findByIdWithUserData(message.id);
+    if (!enrichedMessage) {
+      throw new Error('Failed to retrieve created message');
+    }
+    return enrichedMessage;
   }
 } 

@@ -5,6 +5,7 @@ import { ChatId } from '../../domain/value-object/ChatId';
 import { UserId } from '../../domain/value-object/UserId';
 import { MessageContent } from '../../domain/value-object/MessageContent';
 import { Timestamp } from '../../domain/value-object/Timestamp';
+import { EnrichedMessageDTO } from '../../domain/dtos/message.dto';
 import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
@@ -24,6 +25,41 @@ export class MessageRepository implements IMessageRepository {
       orderBy: { createdAt: 'asc' },
     });
     return messages.map(this.toDomain);
+  }
+
+  async findByChatWithUserData(chatId: ChatId): Promise<EnrichedMessageDTO[]> {
+    const messages = await prisma.message.findMany({
+      where: { chatId: chatId.value },
+      include: {
+        sender: {
+          select: {
+            id: true,
+            name: true,
+            role: true,
+          },
+        },
+      },
+      orderBy: { createdAt: 'asc' },
+    });
+    
+    return messages as EnrichedMessageDTO[];
+  }
+
+  async findByIdWithUserData(id: MessageId): Promise<EnrichedMessageDTO | null> {
+    const message = await prisma.message.findUnique({
+      where: { id: id.value },
+      include: {
+        sender: {
+          select: {
+            id: true,
+            name: true,
+            role: true,
+          },
+        },
+      },
+    });
+    
+    return message as EnrichedMessageDTO | null;
   }
 
   async create(message: Message): Promise<void> {

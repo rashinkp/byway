@@ -20,18 +20,18 @@ export class CookieService {
   ): void {
     const token = this.generateToken(user);
     res.cookie("jwt", token, {
-      httpOnly: true,
+      httpOnly: process.env.NODE_ENV === "production",
       secure: process.env.NODE_ENV === "production",
-      sameSite: "strict",
+      sameSite: "lax",
       maxAge: 60 * 60 * 1000, 
     });
   }
 
   static clearAuthCookie(res: Response): void {
     res.clearCookie("jwt", {
-      httpOnly: true,
+      httpOnly: process.env.NODE_ENV === "production",
       secure: process.env.NODE_ENV === "production",
-      sameSite: "strict",
+      sameSite: "lax",
     });
   }
 }
