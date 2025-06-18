@@ -10,13 +10,10 @@ import {
   getMessagesByChat,
   joinChat,
   sendMessage as sendMessageSocket,
+  createChat as createChatSocket,
 } from '@/services/socketChat';
 
-console.log('[UserChatPage] Module loaded');
-
 export default function ChatPage() {
-  console.log('[UserChatPage] Component function called');
-  
   const user = useAuthStore((state) => state.user);
   const isInitialized = useAuthStore((state) => state.isInitialized);
   const isLoading = useAuthStore((state) => state.isLoading);
@@ -28,62 +25,33 @@ export default function ChatPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [hasMore, setHasMore] = useState(false);
   const [loading, setLoading] = useState(false);
-
-  console.log('[UserChatPage] Component rendered, user:', user, 'isInitialized:', isInitialized, 'isLoading:', isLoading);
+  const [pendingMessage, setPendingMessage] = useState<string | null>(null);
 
   // Initialize auth if not already done
   useEffect(() => {
-    console.log('[UserChatPage] Checking auth initialization...');
     if (!isInitialized && !isLoading) {
-      console.log('[UserChatPage] Initializing auth...');
       initializeAuth();
     }
   }, [isInitialized, isLoading, initializeAuth]);
 
-  // Log user data
-  useEffect(() => {
-    console.log('[UserChatPage] User data changed:', user);
-  }, [user]);
-
   // Fetch user chats on mount
   useEffect(() => {
-    console.log('[UserChatPage] useEffect for fetching chats triggered, user:', user, 'isInitialized:', isInitialized);
-    
-    if (!user) {
-      console.log('[UserChatPage] No user found, skipping chat fetch');
-      return;
-    }
-    
-    if (!isInitialized) {
-      console.log('[UserChatPage] Auth not initialized yet, skipping chat fetch');
-      return;
-    }
-    
-    console.log('[UserChatPage] Fetching chats for current user');
+    if (!user) return;
+    if (!isInitialized) return;
     setLoading(true);
-    
     try {
       listUserChats({ page: 1, limit: 10 }, (result: any) => {
-        console.log('[UserChatPage] Received chat list from backend:', result);
-        
-        // Handle the response structure: { statusCode, body: { data: { items, hasMore, totalCount } } }
         const chatData = result?.body?.data || result?.data || result;
-        
         if (chatData && Array.isArray(chatData.items)) {
           setChatItems(chatData.items);
           setHasMore(chatData.hasMore || false);
           setCurrentPage(1);
           setLoading(false);
-          
-          // Don't auto-select the first item, let user choose
-          console.log('[UserChatPage] Chat list loaded, no auto-selection');
         } else {
-          console.error('[UserChatPage] Invalid response structure:', result);
           setLoading(false);
         }
       });
     } catch (error) {
-      console.error('[UserChatPage] Error fetching chats:', error);
       setLoading(false);
     }
   }, [user, isInitialized]);
@@ -92,13 +60,9 @@ export default function ChatPage() {
   const loadMoreChats = useCallback(() => {
     if (!user || !hasMore || loading) return;
     
-    console.log('[UserChatPage] Loading more chats, page:', currentPage + 1);
     setLoading(true);
     
     listUserChats({ page: currentPage + 1, limit: 10 }, (result: any) => {
-      console.log('[UserChatPage] Received more chat list from backend:', result);
-      
-      // Handle the response structure: { statusCode, body: { data: { items, hasMore, totalCount } } }
       const chatData = result?.body?.data || result?.data || result;
       
       if (chatData && Array.isArray(chatData.items)) {
@@ -107,7 +71,6 @@ export default function ChatPage() {
         setCurrentPage(currentPage + 1);
         setLoading(false);
       } else {
-        console.error('[UserChatPage] Invalid response structure for load more:', result);
         setLoading(false);
       }
     });
@@ -115,22 +78,14 @@ export default function ChatPage() {
 
   // Fetch messages when selected chat changes
   useEffect(() => {
-    console.log('[UserChatPage] useEffect for fetching messages triggered, selectedChat:', selectedChat);
-    
-    if (!selectedChat) {
-      console.log('[UserChatPage] No selected chat, skipping message fetch');
-      return;
-    }
-    
+    if (!selectedChat) return;
     if (selectedChat.type === 'chat' && selectedChat.chatId) {
-      console.log('[UserChatPage] Fetching messages for chat:', selectedChat.chatId);
       joinChat(selectedChat.chatId);
-      getMessagesByChat({ chatId: selectedChat.chatId }, (msgs: Message[]) => {
-        console.log('[UserChatPage] Received messages from backend:', msgs);
-        setMessages(msgs);
+      getMessagesByChat({ chatId: selectedChat.chatId }, (result: any) => {
+        const msgs = result?.body?.data || result?.data || result;
+        setMessages(Array.isArray(msgs) ? msgs : []);
       });
     } else {
-      console.log('[UserChatPage] Selected item is a user, no messages to fetch');
       setMessages([]);
     }
   }, [selectedChat]);
@@ -138,16 +93,10 @@ export default function ChatPage() {
   // Listen for new incoming messages
   useEffect(() => {
     const handleMessage = (msg: Message) => {
-      console.log('[UserChatPage] Received new message:', msg);
       if (msg.chatId === selectedChat?.chatId) {
-        console.log('[UserChatPage] Adding message to current chat');
-        setMessages((prev) => [...prev, msg]);
-      } else {
-        console.log('[UserChatPage] Message not for current chat, ignoring');
-      }
+        setMessages((prev) => prev.some(m => m.id === msg.id) ? prev : [...prev, msg]);
+      };
     };
-    
-    console.log('[UserChatPage] Setting up message listener');
     import('@/lib/socket').then(({ default: socket }) => {
       socket.on('message', handleMessage);
       return () => socket.off('message', handleMessage);
@@ -157,67 +106,100 @@ export default function ChatPage() {
   // Send message handler
   const handleSendMessage = useCallback(
     (content: string) => {
-      if (!user || !selectedChat) {
-        console.log('[UserChatPage] Cannot send message - missing user or chat');
-        return;
-      }
-      
+      if (!user || !selectedChat) return;
       if (selectedChat.type === 'user') {
-        console.log('[UserChatPage] Creating new chat with user:', selectedChat.userId);
-        // TODO: Implement create chat functionality
+        // No chat exists, send message with userId (recipient)
+        sendMessageSocket(
+          {
+            userId: selectedChat.userId, // recipient's userId
+            content,
+          },
+          (msg: Message) => {
+            // After first message, join the new chat room and update selectedChat
+            if (msg.chatId) {
+              joinChat(msg.chatId);
+              // Update selectedChat to new chat type
+              setSelectedChat((prev) => prev && prev.userId === msg.receiverId ? {
+                ...prev,
+                type: 'chat',
+                chatId: msg.chatId,
+                id: msg.chatId,
+              } : prev);
+              // Update chatItems to reflect the new chat type and chatId
+              setChatItems((prev) => prev.map(item =>
+                item.userId === msg.receiverId && item.type === 'user'
+                  ? { ...item, type: 'chat', chatId: msg.chatId, id: msg.chatId }
+                  : item
+              ));
+            }
+            setMessages((prev) => prev.some(m => m.id === msg.id) ? prev : [...prev, msg]);
+          },
+          (err: any) => {
+            alert(err?.message || 'Failed to send message');
+          }
+        );
         return;
       }
-      
-      console.log('[UserChatPage] Sending message:', {
-        chatId: selectedChat.chatId,
-        content
-      });
-      
+      // Existing chat
       sendMessageSocket(
         {
           chatId: selectedChat.chatId!,
           content,
         },
         (msg: Message) => {
-          console.log('[UserChatPage] Message sent successfully:', msg);
-          setMessages((prev) => [...prev, msg]);
+          setMessages((prev) => prev.some(m => m.id === msg.id) ? prev : [...prev, msg]);
+        },
+        (err: any) => {
+          alert(err?.message || 'Failed to send message');
         }
       );
     },
     [user, selectedChat]
   );
 
-  console.log('[UserChatPage] Rendering with chat items:', chatItems.length, 'selectedChat:', selectedChat);
+  // useEffect to send pending message after new chat is selected
+  useEffect(() => {
+    if (pendingMessage && selectedChat && selectedChat.type === 'chat' && selectedChat.chatId) {
+      sendMessageSocket(
+        {
+          chatId: selectedChat.chatId,
+          userId: selectedChat.userId, // recipient's userId
+          content: pendingMessage,
+        },
+        (msg: Message) => {
+          getMessagesByChat({ chatId: selectedChat.chatId }, (result: any) => {
+            const msgs = result?.body?.data || result?.data || result;
+            setMessages(Array.isArray(msgs) ? msgs : []);
+          });
+        },
+        (err: any) => {
+          alert(err?.message || 'Failed to send message');
+        }
+      );
+      setPendingMessage(null);
+    }
+  }, [pendingMessage, selectedChat]);
 
   // Manual test function
   const handleTestFetchChats = useCallback(() => {
     if (!user) {
-      console.log('[UserChatPage] No user available for manual test');
       return;
     }
-    console.log('[UserChatPage] Manual test - fetching chats for current user');
     listUserChats({ page: 1, limit: 10 }, (result: any) => {
-      console.log('[UserChatPage] Manual test - received chat list:', result);
-      
-      // Handle the response structure: { statusCode, body: { data: { items, hasMore, totalCount } } }
       const chatData = result?.body?.data || result?.data || result;
       
       if (chatData && Array.isArray(chatData.items)) {
         setChatItems(chatData.items);
         setHasMore(chatData.hasMore || false);
       } else {
-        console.error('[UserChatPage] Invalid response structure for manual test:', result);
       }
     });
   }, [user]);
 
   // Test socket connection
   const handleTestSocketConnection = useCallback(() => {
-    console.log('[UserChatPage] Testing socket connection...');
     import('@/lib/socket').then(({ default: socket }) => {
-      console.log('[UserChatPage] Current socket status:', socket.connected);
       if (!socket.connected) {
-        console.log('[UserChatPage] Connecting socket...');
         socket.connect();
       }
     });
@@ -225,40 +207,6 @@ export default function ChatPage() {
 
   return (
     <div className="container mx-auto py-6 px-4 sm:px-6 lg:px-8">
-      {/* Debug panel */}
-      <div className="absolute top-4 right-4 z-50 bg-white p-4 rounded-lg shadow-lg border">
-        <h3 className="font-semibold mb-2">Debug Info</h3>
-        <p className="text-sm">User: {user ? `${user.name} (${user.id})` : 'None'}</p>
-        <p className="text-sm">Initialized: {isInitialized ? 'Yes' : 'No'}</p>
-        <p className="text-sm">Loading: {isLoading ? 'Yes' : 'No'}</p>
-        <p className="text-sm">Chat Items: {chatItems.length}</p>
-        <p className="text-sm">Has More: {hasMore ? 'Yes' : 'No'}</p>
-        <p className="text-sm">Current Page: {currentPage}</p>
-        <div className="flex gap-2 mt-2">
-          <button 
-            onClick={handleTestSocketConnection}
-            className="px-3 py-1 bg-green-500 text-white text-xs rounded hover:bg-green-600"
-          >
-            Test Socket
-          </button>
-          <button 
-            onClick={handleTestFetchChats}
-            className="px-3 py-1 bg-blue-500 text-white text-xs rounded hover:bg-blue-600"
-          >
-            Test Fetch Chats
-          </button>
-          {hasMore && (
-            <button 
-              onClick={loadMoreChats}
-              disabled={loading}
-              className="px-3 py-1 bg-purple-500 text-white text-xs rounded hover:bg-purple-600 disabled:opacity-50"
-            >
-              {loading ? 'Loading...' : 'Load More'}
-            </button>
-          )}
-        </div>
-      </div>
-
       <div className="bg-white/80 backdrop-blur-sm border border-gray-100 shadow-sm rounded-xl overflow-hidden">
         <div className="flex h-[600px]">
           {/* Chat List Sidebar */}
@@ -288,6 +236,7 @@ export default function ChatPage() {
                 chat={selectedChat}
                 messages={messages}
                 onSendMessage={handleSendMessage}
+                currentUserId={user?.id || ''}
               />
             ) : (
               <div className="flex-1 flex items-center justify-center">

@@ -18,7 +18,7 @@ export function createChatDependencies(sharedDeps?: ReturnType<typeof createShar
   const createChatUseCase = new CreateChatUseCase(chatRepository);
   const listUserChatsUseCase = new ListUserChatsUseCase(chatRepository);
   const getChatHistoryUseCase = new GetChatHistoryUseCase(chatRepository);
-  const getMessagesByChatUseCase = new GetMessagesByChatUseCase(messageRepository);
+  const getMessagesByChatUseCase = new GetMessagesByChatUseCase(messageRepository, chatRepository);
   const getMessageByIdUseCase = new GetMessageByIdUseCase(messageRepository);
   const deleteMessageUseCase = new DeleteMessageUseCase(messageRepository);
   const chatController = new ChatController(

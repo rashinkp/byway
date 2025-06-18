@@ -5,12 +5,24 @@ export const joinChat = (chatId: string) => {
   socket.emit('join', chatId);
 };
 
-export const sendMessage = (data: { chatId: string; content: string }, callback?: (message: any) => void) => {
-  console.log('[SocketService] Sending message:', data);
-  socket.emit('newMessage', data);
-  if (callback) {
-    socket.once('message', callback);
-  }
+export const sendMessage = (
+  data: { chatId?: string; content: string; userId?: string },
+  callback?: (message: any) => void,
+  errorCallback?: (error: any) => void
+) => {
+  socket.emit('sendMessage', data);
+
+  const onMessageSent = (msg: any) => {
+    socket.off('error', onError);
+    if (callback) callback(msg);
+  };
+  const onError = (err: any) => {
+    socket.off('messageSent', onMessageSent);
+    if (errorCallback) errorCallback(err);
+  };
+
+  socket.once('messageSent', onMessageSent);
+  socket.once('error', onError);
 };
 
 export const createChat = (data: { user1Id: string; user2Id: string }, callback?: (chat: any) => void) => {
@@ -45,11 +57,6 @@ export const listUserChats = (data: { page?: number; limit?: number } = {}, call
     console.log('[SocketService] Received user chats:', result);
     callback(result);
   });
-  
-  // Add error handling
-  socket.once('error', (error: any) => {
-    console.error('[SocketService] Error fetching chats:', error);
-  });
 };
 
 export const getMessagesByChat = (data: any, callback: (messages: any) => void) => {
@@ -72,5 +79,12 @@ export const deleteMessage = (data: any, callback?: (result: any) => void) => {
   socket.emit('deleteMessage', data);
   if (callback) {
     socket.once('messageDeleted', callback);
+  }
+};
+
+export const createChatSocket = (data: { user1Id: string; user2Id: string }, callback?: (chat: any) => void) => {
+  socket.emit('createChat', data);
+  if (callback) {
+    socket.once('chatCreated', callback);
   }
 }; 

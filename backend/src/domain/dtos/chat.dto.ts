@@ -1,42 +1,11 @@
-import { MessageDTO } from './message.dto';
-
-// Basic chat DTO for internal operations
-export class ChatDTO {
-  id!: string;
-  user1Id!: string;
-  user2Id!: string;
-  createdAt!: Date;
-  updatedAt!: Date;
-  messages!: MessageDTO[];
-}
-
-// Chat list DTO that matches Prisma structure
-export class ChatListItemDTO {
-  id!: string;
-  user1Id!: string;
-  user2Id!: string;
-  createdAt!: Date;
-  updatedAt!: Date;
-  user1!: {
-    id: string;
-    name: string;
-    role: string;
-    avatar?: string;
-  };
-  user2!: {
-    id: string;
-    name: string;
-    role: string;
-    avatar?: string;
-  };
-  messages!: Array<{
-    id: string;
-    content: string;
-    createdAt: Date;
-    sender: {
-      name: string;
-    };
-  }>;
+// DTO for message responses sent to frontend (minimal for one-to-one chat)
+export interface MessageResponseDTO {
+  id: string;
+  chatId: string;
+  senderId: string;
+  receiverId: string;
+  content: string;
+  timestamp: string;
 }
 
 // Enhanced chat list item for frontend display
@@ -60,10 +29,4 @@ export class PaginatedChatListDTO {
   totalCount!: number;
   hasMore!: boolean;
   nextPage?: number;
-}
-
-// DTO for creating new chats
-export class CreateChatDTO {
-  user1Id!: string;
-  user2Id!: string;
 } 

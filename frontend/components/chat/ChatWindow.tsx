@@ -10,9 +10,10 @@ interface ChatWindowProps {
   chat: EnhancedChatItem;
   messages: Message[];
   onSendMessage: (content: string) => void;
+  currentUserId: string;
 }
 
-export function ChatWindow({ chat, messages, onSendMessage }: ChatWindowProps) {
+export function ChatWindow({ chat, messages, onSendMessage, currentUserId }: ChatWindowProps) {
   const [newMessage, setNewMessage] = useState('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -103,12 +104,14 @@ export function ChatWindow({ chat, messages, onSendMessage }: ChatWindowProps) {
         </div>
       ) : (
         <>
-          {messages.map((message) => (
+          {Array.isArray(messages) ? messages.map((message) => (
             <MessageComponent
               key={message.id}
               message={message}
+              currentUserId={currentUserId}
+              chat={chat}
             />
-          ))}
+          )) : null}
           <div ref={messagesEndRef} />
         </>
       )}

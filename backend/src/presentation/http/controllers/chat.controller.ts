@@ -41,12 +41,14 @@ export class ChatController extends BaseController {
   }
 
   async handleNewMessage(socketData: any) {
+    console.log('[ChatController] handleNewMessage - raw socketData:', socketData);
     const validated = sendMessageSocketSchema.parse(socketData);
-    const message = await this.sendMessageUseCase.execute(
-      new ChatId(validated.chatId),
-      new UserId(socketData.senderId),
-      new MessageContent(validated.content)
-    );
+    console.log('[ChatController] handleNewMessage - validated:', validated);
+    const { chatId, content } = validated;
+    const senderId = socketData.senderId;
+    const userId = socketData.userId;
+    console.log('[ChatController] handleNewMessage - chatId:', chatId, 'userId:', userId, 'senderId:', senderId, 'content:', content);
+    const message = await this.sendMessageUseCase.execute({ chatId, userId, senderId, content });
     return message;
   }
 
@@ -103,12 +105,12 @@ export class ChatController extends BaseController {
 
   async sendMessage(httpRequest: IHttpRequest): Promise<IHttpResponse> {
     return this.handleRequest(httpRequest, async (request) => {
-      const validated = sendMessageSchema.parse(request.body);
-      const message = await this.sendMessageUseCase.execute(
-        new ChatId(validated.chatId),
-        new UserId(validated.senderId),
-        new MessageContent(validated.content)
-      );
+      const { chatId, userId, content } = request.body;
+      const senderId = request.user?.id;
+      if (!senderId) {
+        return this.httpErrors.error_401('Unauthorized: No user id');
+      }
+      const message = await this.sendMessageUseCase.execute({ chatId, userId, senderId, content });
       return this.success_201(message, "Message sent successfully");
     });
   }
@@ -139,5 +141,19 @@ export class ChatController extends BaseController {
       await this.deleteMessageUseCase.execute(new MessageId(validated.messageId));
       return this.success_200({}, "Message deleted successfully");
     });
+  }
+
+  async getChatBetweenUsers(senderId: string, recipientId: string) {
+    return this.getChatHistoryUseCase.execute(
+      new UserId(senderId),
+      new UserId(recipientId)
+    );
+  }
+
+  async createChatBetweenUsers(senderId: string, recipientId: string) {
+    return this.createChatUseCase.execute(
+      new UserId(senderId),
+      new UserId(recipientId)
+    );
   }
 } 

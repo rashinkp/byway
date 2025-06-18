@@ -33,11 +33,9 @@ export interface PaginatedChatList {
 
 export interface Message {
   id: string;
+  chatId: string;
   senderId: string;
-  senderName: string;
-  senderRole: 'user' | 'instructor' | 'admin';
+  receiverId: string;
   content: string;
   timestamp: string;
-  isInstructor: boolean;
-  chatId?: string;
 } 

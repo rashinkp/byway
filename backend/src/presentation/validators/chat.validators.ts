@@ -8,8 +8,12 @@ export const sendMessageSchema = z.object({
 
 // Schema for socket messages where senderId comes from JWT
 export const sendMessageSocketSchema = z.object({
-  chatId: z.string().min(1),
+  chatId: z.string().min(1).optional(),
+  userId: z.string().min(1).optional(),
   content: z.string().min(1),
+}).refine((data) => data.chatId || data.userId, {
+  message: 'Either chatId or userId is required',
+  path: ['chatId'],
 });
 
 export const createChatSchema = z.object({

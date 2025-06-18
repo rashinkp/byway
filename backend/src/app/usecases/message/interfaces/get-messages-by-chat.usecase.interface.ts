@@ -1,6 +1,6 @@
+import { MessageResponseDTO } from '@/domain/dtos/chat.dto';
 import { ChatId } from '../../../../domain/value-object/ChatId';
-import { EnrichedMessageDTO } from '../../../../domain/dtos/message.dto';
 
 export interface IGetMessagesByChatUseCase {
-  execute(chatId: ChatId): Promise<EnrichedMessageDTO[]>;
+  execute(chatId: ChatId): Promise<MessageResponseDTO[]>;
 } 

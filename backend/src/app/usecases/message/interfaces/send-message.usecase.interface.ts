@@ -1,8 +1,13 @@
-import { UserId } from '@/domain/value-object/UserId';
-import { ChatId } from '@/domain/value-object/ChatId';
-import { MessageContent } from '@/domain/value-object/MessageContent';
-import { EnrichedMessageDTO } from '../../../../domain/dtos/message.dto';
+import { MessageResponseDTO } from "@/domain/dtos/chat.dto";
+
+
+export interface SendMessageInput {
+  chatId?: string;
+  userId?: string; // recipient
+  senderId: string;
+  content: string;
+}
 
 export interface ISendMessageUseCase {
-  execute(chatId: ChatId, senderId: UserId, content: MessageContent): Promise<EnrichedMessageDTO>;
+  execute(input: SendMessageInput): Promise<MessageResponseDTO>;
 } 

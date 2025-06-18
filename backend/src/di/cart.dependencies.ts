@@ -4,8 +4,6 @@ import { RemoveFromCartUseCase } from "../app/usecases/cart/implementations/remo
 import { ApplyCouponUseCase } from "../app/usecases/cart/implementations/apply-coupon.usecase";
 import { ClearCartUseCase } from "../app/usecases/cart/implementations/clear-cart.usecase";
 import { CartController } from "../presentation/http/controllers/cart.controller";
-import { HttpErrors } from "../presentation/http/http.errors";
-import { HttpSuccess } from "../presentation/http/http.success";
 import { SharedDependencies } from "./shared.dependencies";
 
 export interface CartDependencies {

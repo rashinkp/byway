@@ -2,7 +2,7 @@ import { IChatRepository } from '../../app/repositories/chat.repository.interfac
 import { Chat } from '../../domain/entities/Chat';
 import { ChatId } from '../../domain/value-object/ChatId';
 import { UserId } from '../../domain/value-object/UserId';
-import { ChatListItemDTO, PaginatedChatListDTO, EnhancedChatListItemDTO } from '../../domain/dtos/chat.dto';
+import { PaginatedChatListDTO, EnhancedChatListItemDTO } from '../../domain/dtos/chat.dto';
 import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
@@ -28,48 +28,6 @@ export class ChatRepository implements IChatRepository {
       include: { messages: true },
     });
     return chats.map(this.toDomain);
-  }
-
-  async findByUserWithUserData(userId: UserId): Promise<ChatListItemDTO[]> {
-    const chats = await prisma.chat.findMany({
-      where: {
-        OR: [
-          { user1Id: userId.value },
-          { user2Id: userId.value },
-        ],
-      },
-      include: {
-        user1: {
-          select: {
-            id: true,
-            name: true,
-            role: true,
-            avatar: true,
-          },
-        },
-        user2: {
-          select: {
-            id: true,
-            name: true,
-            role: true,
-            avatar: true,
-          },
-        },
-        messages: {
-          orderBy: { createdAt: 'desc' },
-          take: 1,
-          include: {
-            sender: {
-              select: {
-                name: true,
-              },
-            },
-          },
-        },
-      },
-    });
-
-    return chats as ChatListItemDTO[];
   }
 
   async findEnhancedChatList(userId: UserId, page: number = 1, limit: number = 10): Promise<PaginatedChatListDTO> {
@@ -214,16 +172,18 @@ export class ChatRepository implements IChatRepository {
     };
   }
 
-  async create(chat: Chat): Promise<void> {
-    await prisma.chat.create({
+  async create(chat: Chat): Promise<Chat> {
+    console.log('[ChatRepository] Creating chat:', chat.user1Id.value, chat.user2Id.value);
+    const created = await prisma.chat.create({
       data: {
-        id: chat.id.value,
         user1Id: chat.user1Id.value,
         user2Id: chat.user2Id.value,
         createdAt: chat.createdAt.value,
         updatedAt: chat.updatedAt.value,
       },
     });
+    console.log('[ChatRepository] Chat created in DB:', created.id);
+    return this.toDomain(created);
   }
 
   async save(chat: Chat): Promise<void> {
@@ -236,6 +196,7 @@ export class ChatRepository implements IChatRepository {
   }
 
   async getChatBetweenUsers(user1Id: UserId, user2Id: UserId): Promise<Chat | null> {
+    console.log('[ChatRepository] getChatBetweenUsers:', user1Id.value, user2Id.value);
     const chat = await prisma.chat.findFirst({
       where: {
         OR: [
@@ -245,7 +206,11 @@ export class ChatRepository implements IChatRepository {
       },
       include: { messages: true },
     });
-    if (!chat) return null;
+    if (!chat) {
+      console.log('[ChatRepository] No chat found between users');
+      return null;
+    }
+    console.log('[ChatRepository] Found chat:', chat.id);
     return this.toDomain(chat);
   }
 

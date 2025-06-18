@@ -1,7 +1,7 @@
 import { IGetMessageByIdUseCase } from '../interfaces/get-message-by-id.usecase.interface';
 import { IMessageRepository } from '../../../repositories/message.repository.interface';
-import { Message } from '../../../../domain/entities/Message';
 import { MessageId } from '@/domain/value-object/MessageId';
+import { Message } from '../../../../domain/entities/Message';
 
 export class GetMessageByIdUseCase implements IGetMessageByIdUseCase {
   constructor(private readonly messageRepository: IMessageRepository) {}
