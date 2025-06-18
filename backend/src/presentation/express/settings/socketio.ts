@@ -23,6 +23,10 @@ export function setupSocketIO(server: HTTPServer, logger: WinstonLogger, chatCon
     });
 
     socket.on("newMessage", socketHandler(async (data, socket, io) => {
+      if (!socket.data.user) {
+        socket.emit("error", { message: "Authentication required to send messages." });
+        return;
+      }
       const message = await chatController.handleNewMessage(data);
       return message;
     }, 'broadcast'));

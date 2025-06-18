@@ -53,6 +53,7 @@
     "@babel/preset-typescript": "^7.27.1",
     "@jest/types": "^30.0.0",
     "@types/bcrypt": "^5.0.2",
+    "@types/cookie": "^0.6.0",
     "@types/cors": "^2.8.17",
     "@types/express": "^5.0.1",
     "@types/jest": "^29.5.14",
