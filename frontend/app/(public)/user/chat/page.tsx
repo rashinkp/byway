@@ -5,6 +5,20 @@ import { ChatList } from '@/components/chat/ChatList';
 import { ChatWindow } from '@/components/chat/ChatWindow';
 import { Chat, Message, EnhancedChatItem, PaginatedChatList } from '@/types/chat';
 import { useAuthStore } from '@/stores/auth.store';
+import { Button } from '@/components/ui/button';
+import { 
+  MessageSquare, 
+  Users, 
+  Settings, 
+  Search,
+  Bell,
+  Menu,
+  X,
+  Loader2,
+  Wifi,
+  WifiOff,
+  Badge
+} from 'lucide-react';
 import {
   listUserChats,
   getMessagesByChat,
@@ -26,6 +40,8 @@ export default function ChatPage() {
   const [hasMore, setHasMore] = useState(false);
   const [loading, setLoading] = useState(false);
   const [pendingMessage, setPendingMessage] = useState<string | null>(null);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [isConnected, setIsConnected] = useState(true);
 
   // Initialize auth if not already done
   useEffect(() => {
@@ -99,7 +115,13 @@ export default function ChatPage() {
     };
     import('@/lib/socket').then(({ default: socket }) => {
       socket.on('message', handleMessage);
-      return () => socket.off('message', handleMessage);
+      socket.on('connect', () => setIsConnected(true));
+      socket.on('disconnect', () => setIsConnected(false));
+      return () => {
+        socket.off('message', handleMessage);
+        socket.off('connect');
+        socket.off('disconnect');
+      };
     });
   }, [selectedChat]);
 
@@ -131,8 +153,20 @@ export default function ChatPage() {
                   ? { ...item, type: 'chat', chatId: msg.chatId, id: msg.chatId }
                   : item
               ));
+              // Re-fetch chat list and messages from backend for stability
+              listUserChats({ page: 1, limit: 10 }, (result: any) => {
+                const chatData = result?.body?.data || result?.data || result;
+                if (chatData && Array.isArray(chatData.items)) {
+                  setChatItems(chatData.items);
+                  setHasMore(chatData.hasMore || false);
+                  setCurrentPage(1);
+                }
+              });
+              getMessagesByChat({ chatId: msg.chatId }, (result: any) => {
+                const msgs = result?.body?.data || result?.data || result;
+                setMessages(Array.isArray(msgs) ? msgs : []);
+              });
             }
-            setMessages((prev) => prev.some(m => m.id === msg.id) ? prev : [...prev, msg]);
           },
           (err: any) => {
             alert(err?.message || 'Failed to send message');
@@ -180,80 +214,126 @@ export default function ChatPage() {
     }
   }, [pendingMessage, selectedChat]);
 
-  // Manual test function
-  const handleTestFetchChats = useCallback(() => {
-    if (!user) {
-      return;
+  const handleSelectChat = (chat: EnhancedChatItem) => {
+    setSelectedChat(chat);
+    // Auto-close sidebar on mobile when chat is selected
+    if (window.innerWidth < 768) {
+      setIsSidebarOpen(false);
     }
-    listUserChats({ page: 1, limit: 10 }, (result: any) => {
-      const chatData = result?.body?.data || result?.data || result;
-      
-      if (chatData && Array.isArray(chatData.items)) {
-        setChatItems(chatData.items);
-        setHasMore(chatData.hasMore || false);
-      } else {
-      }
-    });
-  }, [user]);
+  };
 
-  // Test socket connection
-  const handleTestSocketConnection = useCallback(() => {
-    import('@/lib/socket').then(({ default: socket }) => {
-      if (!socket.connected) {
-        socket.connect();
-      }
-    });
-  }, []);
+  if (!isInitialized || isLoading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 flex items-center justify-center">
+        <div className="text-center space-y-4">
+          <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-2xl flex items-center justify-center mx-auto animate-pulse">
+            <Loader2 className="w-8 h-8 text-white animate-spin" />
+          </div>
+          <div>
+            <h3 className="text-lg font-semibold text-slate-900">Loading Chat</h3>
+            <p className="text-slate-600">Please wait while we set up your conversations...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div className="container mx-auto py-6 px-4 sm:px-6 lg:px-8">
-      <div className="bg-white/80 backdrop-blur-sm border border-gray-100 shadow-sm rounded-xl overflow-hidden">
-        <div className="flex h-[600px]">
-          {/* Chat List Sidebar */}
-          <div className="w-1/3 border-r border-gray-200 bg-gray-50/50">
-            <ChatList 
-              chats={chatItems}
-              selectedChat={selectedChat}
-              onSelectChat={setSelectedChat}
-            />
-            {hasMore && (
-              <div className="p-3 border-t border-gray-200">
-                <button 
-                  onClick={loadMoreChats}
-                  disabled={loading}
-                  className="w-full px-3 py-1.5 text-xs text-gray-600 hover:text-gray-800 disabled:opacity-50"
-                >
-                  {loading ? 'Loading more...' : 'Show more'}
-                </button>
-              </div>
-            )}
-          </div>
-          
-          {/* Chat Window */}
-          <div className="flex-1 flex flex-col">
-            {selectedChat ? (
-              <ChatWindow
-                chat={selectedChat}
-                messages={messages}
-                onSendMessage={handleSendMessage}
-                currentUserId={user?.id || ''}
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
+
+      {/* Main Chat Interface */}
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        <div className="bg-white/60 backdrop-blur-xl border border-slate-200/60 shadow-2xl shadow-slate-200/50 rounded-3xl overflow-hidden">
+          <div className="flex h-[calc(100vh-8rem)]">
+            {/* Chat List Sidebar */}
+            <div className={`${
+              isSidebarOpen ? 'translate-x-0' : '-translate-x-full'
+            } fixed md:relative md:translate-x-0 z-40 w-80 md:w-96 h-full transition-transform duration-300 ease-in-out md:transition-none`}>
+              <ChatList 
+                chats={chatItems}
+                selectedChat={selectedChat}
+                onSelectChat={handleSelectChat}
               />
-            ) : (
-              <div className="flex-1 flex items-center justify-center">
-                <div className="text-center">
-                  <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-                    </svg>
-                  </div>
-                  <h3 className="text-lg font-semibold text-gray-900 mb-2">Select a conversation</h3>
-                  <p className="text-gray-500">Choose a chat from the list to start messaging</p>
+              
+              {/* Load More Button */}
+              {hasMore && (
+                <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-white via-white to-transparent">
+                  <Button 
+                    onClick={loadMoreChats}
+                    disabled={loading}
+                    variant="outline"
+                    className="w-full rounded-xl border-slate-200/60 hover:bg-slate-50 transition-all duration-200"
+                  >
+                    {loading ? (
+                      <>
+                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                        Loading...
+                      </>
+                    ) : (
+                      'Load more conversations'
+                    )}
+                  </Button>
                 </div>
-              </div>
+              )}
+            </div>
+            
+            {/* Mobile Overlay */}
+            {isSidebarOpen && (
+              <div 
+                className="fixed inset-0 bg-black/20 backdrop-blur-sm z-30 md:hidden"
+                onClick={() => setIsSidebarOpen(false)}
+              />
             )}
+            
+            {/* Chat Window */}
+            <div className="flex-1 flex flex-col">
+              {selectedChat ? (
+                <ChatWindow
+                  chat={selectedChat}
+                  messages={messages}
+                  onSendMessage={handleSendMessage}
+                  currentUserId={user?.id || ''}
+                />
+              ) : (
+                <div className="flex-1 flex items-center justify-center bg-gradient-to-br from-slate-50 to-white">
+                  <div className="text-center space-y-8 max-w-md px-8">
+                    <div className="relative">
+                      <div className="w-32 h-32 bg-gradient-to-br from-blue-100 via-indigo-100 to-purple-100 rounded-full flex items-center justify-center mx-auto shadow-2xl">
+                        <div className="w-20 h-20 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-full flex items-center justify-center">
+                          <MessageSquare className="w-10 h-10 text-white" />
+                        </div>
+                      </div>
+                      <div className="absolute -top-2 -right-2 w-12 h-12 bg-gradient-to-br from-emerald-400 to-teal-500 rounded-full flex items-center justify-center shadow-lg">
+                        <Users className="w-6 h-6 text-white" />
+                      </div>
+                    </div>
+                    
+                    <div className="space-y-4">
+                      <h3 className="text-2xl font-bold text-slate-900">
+                        Welcome to Chat
+                      </h3>
+                      <p className="text-slate-600 leading-relaxed text-lg">
+                        Select a conversation from the sidebar to start chatting with your team members.
+                      </p>
+                      <div className="flex flex-wrap gap-2 justify-center pt-4">
+                        <Badge className="bg-blue-100 text-blue-700 border-blue-200 px-3 py-1">
+                          Real-time messaging
+                        </Badge>
+                        <Badge className="bg-emerald-100 text-emerald-700 border-emerald-200 px-3 py-1">
+                          Secure & private
+                        </Badge>
+                        <Badge className="bg-purple-100 text-purple-700 border-purple-200 px-3 py-1">
+                          Team collaboration
+                        </Badge>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </div>
     </div>
   );
-} 
+}

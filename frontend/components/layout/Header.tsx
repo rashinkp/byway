@@ -9,7 +9,6 @@ import { Button } from "@/components/ui/button";
 import {
   Loader2,
   Search,
-  Heart,
   ShoppingCart,
   Bell,
   Menu,
@@ -22,6 +21,7 @@ import {
   Star,
   Users,
   Tag,
+  MessageSquare,
 } from "lucide-react";
 import { useState, useCallback, useEffect, useRef } from "react";
 import {
@@ -351,10 +351,12 @@ export function Header({ client }: HeaderProps = {}) {
                   )}
                   <div className="flex items-center gap-5">
                     <div className="relative group">
-                      <Heart
-                        className="w-6 h-6 text-gray-600 group-hover:text-red-500 transition-colors cursor-pointer"
-                        strokeWidth={1.5}
-                      />
+                      <Link href="/user/chat">
+                        <MessageSquare
+                          className="w-6 h-6 text-gray-600 group-hover:text-blue-500 transition-colors cursor-pointer"
+                          strokeWidth={1.5}
+                        />
+                      </Link>
                     </div>
                     <div className="relative group">
                       <Link href="/user/cart">
