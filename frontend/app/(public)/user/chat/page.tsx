@@ -242,13 +242,13 @@ export default function ChatPage() {
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
 
       {/* Main Chat Interface */}
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-6">
-        <div className="bg-white/60 backdrop-blur-xl border border-slate-200/60 shadow-2xl shadow-slate-200/50 rounded-3xl overflow-hidden">
-          <div className="flex h-[calc(100vh-8rem)]">
+      <div className="w-full h-[100dvh] flex items-stretch">
+        <div className="w-full h-full bg-white/60 backdrop-blur-xl border border-slate-200/60 shadow-2xl shadow-slate-200/50 rounded-3xl overflow-hidden">
+          <div className="flex h-full">
             {/* Chat List Sidebar */}
             <div className={`${
               isSidebarOpen ? 'translate-x-0' : '-translate-x-full'
-            } fixed md:relative md:translate-x-0 z-40 w-80 md:w-96 h-full transition-transform duration-300 ease-in-out md:transition-none`}>
+            } md:relative md:translate-x-0 z-40 w-80 md:w-96 h-full transition-transform duration-300 ease-in-out md:transition-none`}>
               <ChatList 
                 chats={chatItems}
                 selectedChat={selectedChat}

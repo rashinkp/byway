@@ -1,7 +1,8 @@
-export function formatDate(dateString:Date | null | string | undefined) {
-  if (!dateString) return 'Not available';
+export function formatDate(dateString: Date | null | string | undefined) {
+  if (!dateString) return '';
 
   const date = new Date(dateString);
+  if (isNaN(date.getTime())) return '';
 
   return date.toLocaleString("en-US", {
     year: "numeric",
