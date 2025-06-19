@@ -2,7 +2,7 @@ import http from "http";
 import { envConfig } from "../configs/env.config";
 import { WinstonLogger } from "../../../infra/providers/logging/winston.logger";
 import { PrismaDatabaseProvider } from "../../../infra/database/postgres/prisma.database.provider";
-import { setupSocketIO } from "./socketio";
+import { setupSocketIO } from "../../socketio";
 import { createAppDependencies } from "../../../di/app.dependencies";
 
 const startServer = async (): Promise<void> => {

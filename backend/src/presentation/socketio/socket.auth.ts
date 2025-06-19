@@ -1,4 +1,4 @@
-import { JwtProvider } from "../../../infra/providers/auth/jwt.provider";
+import { JwtProvider } from "../../infra/providers/auth/jwt.provider";
 import { Socket } from "socket.io";
 import cookie from "cookie";
 
