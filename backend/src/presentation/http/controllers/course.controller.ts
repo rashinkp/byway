@@ -62,7 +62,9 @@ export class CourseController extends BaseController {
         (course.notifiedAdminIds as string[]).forEach((adminId: string) => {
           io.to(adminId).emit('newNotification', {
             message: `A new course "${course.title}" has been created.`,
+            type: 'COURSE_CREATION',
             courseId: course.id,
+            courseTitle: course.title,
             // ...any other notification data
           });
         });
@@ -153,10 +155,13 @@ export class CourseController extends BaseController {
         const message = isCurrentlyDeleted 
           ? `Your course "${course.title}" has been disabled and is no longer available to students.`
           : `Your course "${course.title}" has been enabled and is now available to students.`;
+        const notificationType = isCurrentlyDeleted ? 'COURSE_DISABLED' : 'COURSE_ENABLED';
         
         io.to(course.createdBy).emit('newNotification', {
           message: message,
+          type: notificationType,
           courseId: course.id,
+          courseTitle: course.title,
           // ...any other notification data
         });
       }
@@ -207,7 +212,9 @@ export class CourseController extends BaseController {
       if (io && course.createdBy) {
         io.to(course.createdBy).emit('newNotification', {
           message: `Your course \"${course.title}\" has been approved!`,
+          type: 'COURSE_APPROVED',
           courseId: course.id,
+          courseTitle: course.title,
           // ...any other notification data
         });
       }
@@ -233,7 +240,9 @@ export class CourseController extends BaseController {
       if (io && course.createdBy) {
         io.to(course.createdBy).emit('newNotification', {
           message: `Your course \"${course.title}\" has been declined. Please review and update as needed.`,
+          type: 'COURSE_DECLINED',
           courseId: course.id,
+          courseTitle: course.title,
           // ...any other notification data
         });
       }

@@ -9,12 +9,16 @@ import { GetMessagesByChatUseCase } from "../app/usecases/message/implementation
 import { GetMessageByIdUseCase } from "../app/usecases/message/implementations/get-message-by-id.usecase";
 import { ChatController } from "../presentation/http/controllers/chat.controller";
 import { DeleteMessageUseCase } from "../app/usecases/message/implementations/delete-message.usecase";
+import { CreateNotificationsForUsersUseCase } from "../app/usecases/notification/implementations/create-notifications-for-users.usecase";
+import { PrismaNotificationRepository } from "../infra/repositories/notification-repository.prisma";
 
 export function createChatDependencies(sharedDeps?: ReturnType<typeof createSharedDependencies>) {
   const deps = sharedDeps || createSharedDependencies();
   const chatRepository = new ChatRepository();
   const messageRepository = new MessageRepository();
-  const sendMessageUseCase = new SendMessageUseCase(chatRepository, messageRepository);
+  const notificationRepository = new PrismaNotificationRepository(deps.prisma);
+  const createNotificationsForUsersUseCase = new CreateNotificationsForUsersUseCase(notificationRepository);
+  const sendMessageUseCase = new SendMessageUseCase(chatRepository, messageRepository, createNotificationsForUsersUseCase);
   const createChatUseCase = new CreateChatUseCase(chatRepository);
   const listUserChatsUseCase = new ListUserChatsUseCase(chatRepository);
   const getChatHistoryUseCase = new GetChatHistoryUseCase(chatRepository);

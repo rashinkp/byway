@@ -1,14 +1,188 @@
 'use client';
 import { useEffect } from 'react';
+import { toast } from 'sonner';
 import socket from '../lib/socket';
+import { useAuth } from '@/hooks/auth/useAuth';
+import { Bell } from 'lucide-react';
+
+interface SocketNotification {
+  message: string;
+  type?: string;
+  eventType?: string;
+  courseId?: string;
+  courseTitle?: string;
+  amount?: number;
+  chatId?: string;
+  messageId?: string;
+  senderId?: string;
+  receiverId?: string;
+  timestamp?: string;
+}
+
+const eventTypeColors: Record<string, string> = {
+  COURSE_CREATION: "bg-blue-50 text-blue-700 border-blue-200",
+  COURSE_APPROVED: "bg-emerald-50 text-emerald-700 border-emerald-200",
+  COURSE_DECLINED: "bg-red-50 text-red-700 border-red-200",
+  COURSE_ENABLED: "bg-green-50 text-green-700 border-green-200",
+  COURSE_DISABLED: "bg-orange-50 text-orange-700 border-orange-200",
+  COURSE_PURCHASED: "bg-purple-50 text-purple-700 border-purple-200",
+  REVENUE_EARNED: "bg-amber-50 text-amber-700 border-amber-200",
+  ENROLLMENT: "bg-purple-50 text-purple-700 border-purple-200",
+  PAYMENT: "bg-amber-50 text-amber-700 border-amber-200",
+  SYSTEM: "bg-slate-50 text-slate-700 border-slate-200",
+  ANNOUNCEMENT: "bg-pink-50 text-pink-700 border-pink-200",
+  FEEDBACK: "bg-indigo-50 text-indigo-700 border-indigo-200",
+  CHAT_UPDATE: "bg-orange-50 text-orange-700 border-orange-200",
+  NEW_MESSAGE: "bg-blue-50 text-blue-700 border-blue-200",
+  ASSIGNMENT: "bg-teal-50 text-teal-700 border-teal-200",
+};
 
 export default function SocketProvider() {
+  const { user } = useAuth();
+
   useEffect(() => {
     // Reference socket to ensure it's not tree-shaken
     if (socket) {
-      // Optionally, you can log here as well
       console.log('[SocketProvider] Socket instance:', socket);
     }
   }, []);
+
+  useEffect(() => {
+    if (!user?.id) return;
+
+    const handleNewNotification = (notification: SocketNotification) => {
+      // Get the notification type from either 'type' or 'eventType' field
+      const notificationType = notification.type || notification.eventType;
+      
+      // Skip if no type is provided
+      if (!notificationType) {
+        console.warn('[SocketProvider] Received notification without type:', notification);
+        return;
+      }
+
+      // Create custom toast that matches notification modal design
+      const toastContent = (
+        <div className="flex gap-4 p-4">
+          {/* Avatar */}
+          <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center flex-shrink-0">
+            <Bell className="w-4 h-4 text-white" />
+          </div>
+          
+          {/* Content */}
+          <div className="flex-1 min-w-0">
+            <div className="flex items-start justify-between gap-3 mb-2">
+              <h4 className="font-semibold text-gray-900 text-sm line-clamp-1">
+                {getNotificationTitle(notificationType)}
+              </h4>
+              <span className="text-xs text-gray-500 whitespace-nowrap font-medium">
+                Just now
+              </span>
+            </div>
+            
+            <p className="text-gray-600 text-xs leading-relaxed line-clamp-2 mb-2">
+              {notification.message}
+            </p>
+            
+            {/* Badge */}
+    
+          </div>
+        </div>
+      );
+
+      // Show toast with custom content
+      toast.custom((t) => (
+        <div 
+          className="bg-white border border-gray-200 rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300 cursor-pointer max-w-sm"
+          onClick={() => {
+            // Navigate based on notification type and user role
+            handleNotificationClick(notification, user.role);
+          }}
+        >
+          {toastContent}
+        </div>
+      ), {
+        duration: 6000,
+        position: 'top-right',
+      });
+    };
+
+    // Listen for new notifications
+    socket.on('newNotification', handleNewNotification);
+
+    // Cleanup
+    return () => {
+      socket.off('newNotification', handleNewNotification);
+    };
+  }, [user?.id, user?.role]);
+
   return <div style={{ display: 'none' }} id="socket-provider" />;
+}
+
+// Helper function to get notification title
+function getNotificationTitle(type: string): string {
+  switch (type) {
+    case 'REVENUE_EARNED':
+      return 'Revenue Earned';
+    case 'COURSE_PURCHASED':
+      return 'Course Purchased';
+    case 'COURSE_APPROVED':
+      return 'Course Approved';
+    case 'COURSE_DECLINED':
+      return 'Course Declined';
+    case 'COURSE_ENABLED':
+      return 'Course Enabled';
+    case 'COURSE_DISABLED':
+      return 'Course Disabled';
+    case 'COURSE_CREATION':
+      return 'New Course Created';
+    case 'NEW_MESSAGE':
+      return 'New Message';
+    default:
+      return 'New Notification';
+  }
+}
+
+// Helper function to handle notification clicks
+function handleNotificationClick(notification: SocketNotification, userRole: string) {
+  const notificationType = notification.type || notification.eventType;
+  
+  if (!notificationType) {
+    console.warn('[SocketProvider] Cannot handle notification click - no type found');
+    return;
+  }
+
+  switch (notificationType) {
+    case 'REVENUE_EARNED':
+      const walletPath = userRole === 'ADMIN' ? '/admin/wallet' : '/instructor/wallet';
+      window.location.href = walletPath;
+      break;
+    case 'COURSE_PURCHASED':
+      window.location.href = '/user/my-courses';
+      break;
+    case 'COURSE_APPROVED':
+    case 'COURSE_DECLINED':
+      if (notification.courseId) {
+        window.location.href = `/instructor/courses/${notification.courseId}`;
+      }
+      break;
+    case 'COURSE_ENABLED':
+    case 'COURSE_DISABLED':
+      if (notification.courseId) {
+        const coursePath = userRole === 'ADMIN' 
+          ? `/admin/courses/${notification.courseId}`
+          : `/instructor/courses/${notification.courseId}`;
+        window.location.href = coursePath;
+      }
+      break;
+    case 'COURSE_CREATION':
+      if (notification.courseId) {
+        window.location.href = `/admin/courses/${notification.courseId}`;
+      }
+      break;
+    case 'NEW_MESSAGE':
+      if (notification.chatId) {
+        window.location.href = `/chat`;
+      }
+      break;
+  }
 } 

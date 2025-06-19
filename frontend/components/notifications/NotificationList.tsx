@@ -228,7 +228,7 @@ const NotificationList: React.FC<NotificationListProps> = ({
               ))}
             </div>
             
-            {hasMore && !loading && (
+            {hasMore && !loading && uniqueNotifications.length < (total || 0) && (
               <div className="p-4 flex justify-center">
                 <Button 
                   variant="outline" 

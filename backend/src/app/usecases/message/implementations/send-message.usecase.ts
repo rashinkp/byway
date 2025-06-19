@@ -9,11 +9,15 @@ import { MessageId } from '../../../../domain/value-object/MessageId';
 import { Timestamp } from '../../../../domain/value-object/Timestamp';
 import { MessageResponseDTO } from '@/domain/dtos/chat.dto';
 import { Chat } from '../../../../domain/entities/Chat';
+import { CreateNotificationsForUsersUseCase } from '../../notification/implementations/create-notifications-for-users.usecase';
+import { NotificationEventType } from '../../../../domain/enum/notification-event-type.enum';
+import { NotificationEntityType } from '../../../../domain/enum/notification-entity-type.enum';
 
 export class SendMessageUseCase implements ISendMessageUseCase {
   constructor(
     private readonly chatRepository: IChatRepository,
-    private readonly messageRepository: IMessageRepository
+    private readonly messageRepository: IMessageRepository,
+    private readonly createNotificationsForUsersUseCase?: CreateNotificationsForUsersUseCase
   ) {}
 
   async execute(input: SendMessageInput): Promise<MessageResponseDTO> {
@@ -100,6 +104,27 @@ export class SendMessageUseCase implements ISendMessageUseCase {
       };
     }
     const receiverId = chat.user1Id.value === enrichedMessage.senderId ? chat.user2Id.value : chat.user1Id.value;
+    
+    // Send notification to the receiver
+    if (this.createNotificationsForUsersUseCase) {
+      try {
+        await this.createNotificationsForUsersUseCase.execute(
+          [receiverId],
+          {
+            eventType: NotificationEventType.NEW_MESSAGE,
+            entityType: NotificationEntityType.CHAT,
+            entityId: chatId.value,
+            entityName: 'Chat',
+            message: `You have received a new message: ${input.content.substring(0, 50)}${input.content.length > 50 ? '...' : ''}`,
+            link: `/chat/${chatId.value}`
+          }
+        );
+      } catch (error) {
+        // Don't fail the message sending if notification fails
+        console.error('Failed to send message notification:', error);
+      }
+    }
+    
     return {
       id: enrichedMessage.id,
       chatId: enrichedMessage.chatId,
