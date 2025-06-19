@@ -24,6 +24,7 @@ import { createDashboardDependencies } from "./dashboard.dependencies";
 import { dashboardRouter } from "../presentation/express/router/dashboard.router";
 import courseReviewRouter from "../presentation/express/router/course-review.router";
 import { createChatDependencies } from "./chat.dependencies";
+import { createNotificationDependencies } from "./notification.dependencies";
 
 export interface AppDependencies {
   authController: any;
@@ -54,30 +55,44 @@ export interface AppDependencies {
   messageRepository: any;
   httpErrors: any;
   httpSuccess: any;
+  getUserNotificationsUseCase: any;
+  notificationController: any;
+  createNotificationsForUsersUseCase: any;
+  courseRepository: any;
+  categoryRepository: any;
+  userRepository: any;
+  enrollmentRepository: any;
+  cartRepository: any;
+  courseReviewRepository: any;
+  lessonRepository: any;
 }
 
 export function createAppDependencies(): AppDependencies {
-  const sharedDeps = createSharedDependencies();
-  const { prisma, httpErrors, httpSuccess } = sharedDeps;
+  const shared = createSharedDependencies();
+  const { prisma, httpErrors, httpSuccess } = shared;
 
-  const authDeps = createAuthDependencies(sharedDeps);
-  const userDeps = createUserDependencies(sharedDeps);
-  const instructorDeps = createInstructorDependencies(sharedDeps);
-  const categoryDeps = createCategoryDependencies(sharedDeps);
-  const courseDeps = createCourseDependencies(sharedDeps);
-  const lessonDeps = createLessonDependencies(sharedDeps);
-  const lessonContentDeps = createLessonContentDependencies(sharedDeps);
-  const cartDeps = createCartDependencies(sharedDeps);
-  const stripeDeps = createStripeDependencies(sharedDeps);
-  const transactionDeps = createTransactionDependencies(sharedDeps);
-  const orderDeps = createOrderDependencies(sharedDeps);
-  const fileDeps = createFileDependencies(sharedDeps);
-  const progressDeps = createProgressDependencies(sharedDeps);
-  const courseReviewDeps = createCourseReviewDependencies(sharedDeps);
-  const walletDeps = createWalletDependencies(sharedDeps);
-  const revenueDeps = createRevenueDependencies(sharedDeps);
-  const dashboardDeps = createDashboardDependencies(sharedDeps);
-  const chatDeps = createChatDependencies(sharedDeps);
+  const authDeps = createAuthDependencies(shared);
+  const userDeps = createUserDependencies(shared);
+  const instructorDeps = createInstructorDependencies(shared);
+  const categoryDeps = createCategoryDependencies(shared);
+  const notificationDeps = createNotificationDependencies(shared);
+  const courseDeps = createCourseDependencies({
+    ...shared,
+    createNotificationsForUsersUseCase: notificationDeps.createNotificationsForUsersUseCase,
+  });
+  const lessonDeps = createLessonDependencies(shared);
+  const lessonContentDeps = createLessonContentDependencies(shared);
+  const cartDeps = createCartDependencies(shared);
+  const stripeDeps = createStripeDependencies(shared);
+  const transactionDeps = createTransactionDependencies(shared);
+  const orderDeps = createOrderDependencies(shared);
+  const fileDeps = createFileDependencies(shared);
+  const progressDeps = createProgressDependencies(shared);
+  const courseReviewDeps = createCourseReviewDependencies(shared);
+  const walletDeps = createWalletDependencies(shared);
+  const revenueDeps = createRevenueDependencies(shared);
+  const dashboardDeps = createDashboardDependencies(shared);
+  const chatDeps = createChatDependencies(shared);
 
   const searchRepository = new SearchRepository(prisma);
   const globalSearchUseCase = new GlobalSearchUseCase(searchRepository);
@@ -95,6 +110,9 @@ export function createAppDependencies(): AppDependencies {
   const courseReviewRouterInstance = courseReviewRouter(courseReviewDeps.courseReviewController);
 
   return {
+    ...shared,
+    ...notificationDeps,
+    ...courseDeps,
     authController: authDeps.authController,
     userController: userDeps.userController,
     instructorController: instructorDeps.instructorController,
@@ -121,7 +139,15 @@ export function createAppDependencies(): AppDependencies {
     sendMessageUseCase: chatDeps.sendMessageUseCase,
     createChatUseCase: chatDeps.createChatUseCase,
     messageRepository: chatDeps.messageRepository,
-    httpErrors,
-    httpSuccess,
+    getUserNotificationsUseCase: notificationDeps.getUserNotificationsUseCase,
+    notificationController: notificationDeps.notificationController,
+    createNotificationsForUsersUseCase: notificationDeps.createNotificationsForUsersUseCase,
+    courseRepository: shared.courseRepository,
+    categoryRepository: shared.categoryRepository,
+    userRepository: shared.userRepository,
+    enrollmentRepository: shared.enrollmentRepository,
+    cartRepository: shared.cartRepository,
+    courseReviewRepository: shared.courseReviewRepository,
+    lessonRepository: shared.lessonRepository,
   };
 }

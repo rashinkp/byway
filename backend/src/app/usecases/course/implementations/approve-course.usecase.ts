@@ -6,9 +6,17 @@ import { APPROVALSTATUS } from "../../../../domain/enum/approval-status.enum";
 import { ICourseRepository } from "../../../repositories/course.repository.interface";
 import { HttpError } from "../../../../presentation/http/errors/http-error";
 import { IApproveCourseUseCase } from "../interfaces/approve-course.usecase.interface";
+import { IUserRepository } from '../../../repositories/user.repository';
+import { CreateNotificationsForUsersUseCase } from '../../notification/implementations/create-notifications-for-users.usecase';
+import { NotificationEventType } from '../../../../domain/enum/notification-event-type.enum';
+import { NotificationEntityType } from '../../../../domain/enum/notification-entity-type.enum';
 
 export class ApproveCourseUseCase implements IApproveCourseUseCase {
-  constructor(private courseRepository: ICourseRepository) {}
+  constructor(
+    private courseRepository: ICourseRepository,
+    private userRepository: IUserRepository,
+    private createNotificationsForUsersUseCase: CreateNotificationsForUsersUseCase
+  ) {}
 
   async execute(
     input: IUpdateCourseApprovalInputDTO
@@ -22,6 +30,16 @@ export class ApproveCourseUseCase implements IApproveCourseUseCase {
     const updatedCourse = await this.courseRepository.updateApprovalStatus(
       course
     );
+
+    // Notify the instructor (creator) that their course was approved
+    await this.createNotificationsForUsersUseCase.execute([course.createdBy], {
+      eventType: NotificationEventType.COURSE_APPROVED,
+      entityType: NotificationEntityType.COURSE,
+      entityId: course.id,
+      entityName: course.title,
+      message: `Your course "${course.title}" has been approved!`,
+      link: `/instructor/courses/${course.id}`,
+    });
 
     return updatedCourse.toJSON();
   }

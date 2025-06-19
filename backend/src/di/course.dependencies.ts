@@ -7,15 +7,16 @@ import { GetEnrolledCoursesUseCase } from "../app/usecases/course/implementation
 import { ApproveCourseUseCase } from "../app/usecases/course/implementations/approve-course.usecase";
 import { DeclineCourseUseCase } from "../app/usecases/course/implementations/decline-course.usecase";
 import { EnrollCourseUseCase } from "../app/usecases/course/implementations/enroll-course.usecase";
-import { SharedDependencies } from "./shared.dependencies";
 import { GetCourseWithDetailsUseCase } from "../app/usecases/course/implementations/get-course-with-details.usecase";
+import { SharedDependencies } from './shared.dependencies';
+import { CreateNotificationsForUsersUseCase } from '../app/usecases/notification/implementations/create-notifications-for-users.usecase';
 
 export interface CourseDependencies {
   courseController: CourseController;
 }
 
 export function createCourseDependencies(
-  deps: SharedDependencies
+  deps: SharedDependencies & { createNotificationsForUsersUseCase: CreateNotificationsForUsersUseCase }
 ): CourseDependencies {
   const {
     courseRepository,
@@ -26,10 +27,11 @@ export function createCourseDependencies(
     courseReviewRepository,
   } = deps;
 
-  const createCourseUseCase = new CreateCourseUseCase(
+  const createCourseUseCase =   new CreateCourseUseCase(
     courseRepository,
     categoryRepository,
-    userRepository
+    userRepository,
+    deps.createNotificationsForUsersUseCase
   );
   const getAllCoursesUseCase = new GetAllCoursesUseCase(
     courseRepository,
@@ -55,8 +57,8 @@ export function createCourseDependencies(
     courseReviewRepository,
     deps.lessonRepository
   );
-  const approveCourseUseCase = new ApproveCourseUseCase(courseRepository);
-  const declineCourseUseCase = new DeclineCourseUseCase(courseRepository);
+  const approveCourseUseCase = new ApproveCourseUseCase(courseRepository, userRepository, deps.createNotificationsForUsersUseCase);
+  const declineCourseUseCase = new DeclineCourseUseCase(courseRepository, userRepository, deps.createNotificationsForUsersUseCase);
   const enrollCourseUseCase = new EnrollCourseUseCase(
     courseRepository,
     enrollmentRepository,

@@ -43,12 +43,16 @@ import { useCategories } from "@/hooks/category/useCategories";
 import { useGlobalSearch } from "@/hooks/search/useGlobalSearch";
 import { useDebounce } from "@/hooks/useDebounce";
 import { Skeleton } from "@/components/ui/skeleton";
+import NotificationList, { Notification } from "@/components/notifications/NotificationList";
+import { Dialog, DialogContent, DialogOverlay } from "@/components/ui/dialog";
+import { useNotificationSocket } from '@/hooks/notification/useNotificationSocket';
 
 interface HeaderProps {
   client?: { id: string; name: string };
+  onNotificationClick?: () => void;
 }
 
-export function Header({ client }: HeaderProps = {}) {
+export function Header({ client, onNotificationClick }: HeaderProps = {}) {
   const { user, isLoading } = useAuth();
   const { mutate: logout, isPending: isLoggingOut } = useLogout();
   const { mutate: createInstructor, isPending: isCreatingInstructor } =
@@ -370,13 +374,8 @@ export function Header({ client }: HeaderProps = {}) {
                       <Bell
                         className="w-6 h-6 text-gray-600 group-hover:text-yellow-500 transition-colors cursor-pointer"
                         strokeWidth={1.5}
+                        onClick={onNotificationClick}
                       />
-                      <Badge
-                        variant="destructive"
-                        className="absolute -top-2 -right-2 w-5 h-5 p-0 flex items-center justify-center text-xs bg-yellow-500"
-                      >
-                        5
-                      </Badge>
                     </div>
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>

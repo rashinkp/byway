@@ -1,4 +1,4 @@
-import { PrismaClient, Gender } from "@prisma/client";
+import { PrismaClient, Gender, Role } from "@prisma/client";
 import { User } from "../../domain/entities/user.entity";
 import { UserProfile } from "../../domain/entities/user-profile.entity";
 import { GetAllUsersDto } from "../../domain/dtos/user/user.dto";
@@ -161,5 +161,10 @@ export class UserRepository implements IUserRepository {
     };
   }
 
-
+  async findByRole(role: Role): Promise<User[]> {
+    const users = await this.prisma.user.findMany({
+      where: { role },
+    });
+    return users.map(u => User.fromPrisma(u));
+  }
 }

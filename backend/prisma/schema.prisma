@@ -37,6 +37,7 @@ model User {
   user1Chats        Chat[]          @relation("User1Chats")
   user2Chats        Chat[]          @relation("User2Chats")
   sentMessages      Message[]       @relation("MessageSender")
+  notifications     Notification[]  // User's notifications
 }
 
 model UserProfile {
@@ -522,4 +523,45 @@ model Message {
 
   @@index([chatId])
   @@index([senderId])
+}
+
+// Notification Event Types
+
+enum EventType {
+  ENROLLMENT
+  COURSE_CREATION
+  CHAT_UPDATE
+  ASSIGNMENT
+  SYSTEM
+  PAYMENT
+  FEEDBACK
+  ANNOUNCEMENT
+  COURSE_APPROVED
+  COURSE_DECLINED
+}
+
+enum EntityType {
+  COURSE
+  CHAT
+  USER
+  ASSIGNMENT
+  GENERAL
+  PAYMENT
+  REVIEW
+}
+
+model Notification {
+  id            String      @id @default(uuid())
+  userId        String
+  user          User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  eventType     EventType
+  entityType    EntityType
+  entityId      String      // ID of the related entity (Course ID, Chat ID, etc.)
+  entityName    String      // Optional: Name/title of the related entity (e.g., "Math 101")
+
+  message       String
+  link          String?
+  createdAt     DateTime    @default(now())
+  expiresAt     DateTime    // Expiry date for the notification (3 months after createdAt)
 }

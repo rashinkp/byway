@@ -8,15 +8,26 @@ import { ICategoryRepository } from "../../../repositories/category.repository";
 import { ICourseRepository } from "../../../repositories/course.repository.interface";
 import { IUserRepository } from "../../../repositories/user.repository";
 import { ICreateCourseUseCase } from "../interfaces/create-course.usecase.interface";
+import { NotificationEventType } from '../../../../domain/enum/notification-event-type.enum';
+import { NotificationEntityType } from '../../../../domain/enum/notification-entity-type.enum';
+import { CreateNotificationsForUsersUseCase } from '../../notification/implementations/create-notifications-for-users.usecase';
+import { Price } from '../../../../domain/value-object/price';
+import { Duration } from '../../../../domain/value-object/duration';
+import { Offer } from '../../../../domain/value-object/offer';
+
+export interface CreateCourseResultDTO extends ICourseWithDetailsDTO {
+  notifiedAdminIds: string[];
+}
 
 export class CreateCourseUseCase implements ICreateCourseUseCase {
   constructor(
     private courseRepository: ICourseRepository,
     private categoryRepository: ICategoryRepository,
-    private userRepository: IUserRepository
+    private userRepository: IUserRepository,
+    private createNotificationsForUsersUseCase: CreateNotificationsForUsersUseCase
   ) {}
 
-  async execute(input: ICreateCourseInputDTO): Promise<ICourseWithDetailsDTO> {
+  async execute(input: ICreateCourseInputDTO): Promise<CreateCourseResultDTO> {
     // Validate user is an instructor
     const user = await this.userRepository.findById(input.createdBy);
     if (!user) {
@@ -43,11 +54,17 @@ export class CreateCourseUseCase implements ICreateCourseUseCase {
       title: input.title,
       description: input.description,
       categoryId: input.categoryId,
-      price: input.price,
-      duration: input.duration,
+      price: input.price !== undefined && input.price !== null
+        ? (typeof input.price === 'number' ? Price.create(input.price) : input.price)
+        : null,
+      duration: input.duration !== undefined && input.duration !== null
+        ? (typeof input.duration === 'number' ? Duration.create(input.duration) : input.duration)
+        : null,
       level: input.level,
       thumbnail: input.thumbnail,
-      offer: input.offer,
+      offer: input.offer !== undefined && input.offer !== null
+        ? (typeof input.offer === 'number' ? Offer.create(input.offer) : input.offer)
+        : null,
       status: input.status,
       createdBy: input.createdBy,
       adminSharePercentage: input.adminSharePercentage
@@ -65,6 +82,22 @@ export class CreateCourseUseCase implements ICreateCourseUseCase {
 
     // Persist course
     const savedCourse = await this.courseRepository.save(course);
-    return savedCourse.toJSON();
+
+    // Notify all admins using the notification use case
+    const admins = await this.userRepository.findByRole('ADMIN');
+    const adminIds = admins.map(a => a.id);
+    await this.createNotificationsForUsersUseCase.execute(adminIds, {
+      eventType: NotificationEventType.COURSE_CREATION,
+      entityType: NotificationEntityType.COURSE,
+      entityId: savedCourse.id,
+      entityName: savedCourse.title,
+      message: `A new course "${savedCourse.title}" has been created.`,
+      link: `/admin/courses/${savedCourse.id}`,
+    });
+
+    return {
+      ...savedCourse.toJSON(),
+      notifiedAdminIds: adminIds,
+    };
   }
 }

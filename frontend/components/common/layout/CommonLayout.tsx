@@ -7,6 +7,7 @@ import { useLogout } from "@/hooks/auth/useLogout";
 import { CommonSidebar } from "@/components/common/layout/CommonSidebar";
 import { TopNavbar } from "@/components/common/layout/TopNavbar";
 import BywayFooter from "@/components/Footer";
+import NotificationModal from '@/components/notifications/NotificationModal';
 
 interface CommonLayoutProps {
   children: React.ReactNode;
@@ -33,6 +34,7 @@ export default function CommonLayout({
   const pathname = usePathname();
   const [collapsed, setCollapsed] = useState(isCollapsible);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [notificationOpen, setNotificationOpen] = useState(false);
 
   // Initialize auth on mount
   useEffect(() => {
@@ -109,7 +111,9 @@ export default function CommonLayout({
         headerSubtitle={sidebarHeaderSubtitle}
         navItems={navItems}
         isCollapsible={isCollapsible}
+        onNotificationClick={() => setNotificationOpen(true)}
       />
+      <NotificationModal open={notificationOpen} onOpenChange={setNotificationOpen} />
       <div className="flex-1 flex flex-col min-h-screen">
         <TopNavbar
           pathname={pathname}

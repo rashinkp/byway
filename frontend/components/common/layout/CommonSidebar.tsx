@@ -8,7 +8,7 @@ import {
 } from "@radix-ui/react-tooltip";
 import { NavItemLink } from "@/components/common/layout/NavItemLink";
 import { Button } from "@/components/ui/button";
-import { LogOut } from "lucide-react";
+import { LogOut, Bell } from "lucide-react";
 import { NavItem } from "@/types/nav";
 import { SidebarHeader } from "./SideBarHeader";
 
@@ -23,6 +23,7 @@ interface CommonSidebarProps {
   headerSubtitle: string;
   navItems: NavItem[];
   isCollapsible: boolean;
+  onNotificationClick?: () => void;
 }
 
 export function CommonSidebar({
@@ -36,18 +37,8 @@ export function CommonSidebar({
   headerSubtitle,
   navItems,
   isCollapsible,
-}: {
-  collapsed: boolean;
-  toggleCollapse?: () => void;
-  mobileMenuOpen: boolean;
-  setMobileMenuOpen: (open: boolean) => void;
-  pathname: string;
-  handleLogout: () => void;
-  headerTitle: string;
-  headerSubtitle: string;
-  navItems: NavItem[];
-  isCollapsible: boolean;
-}) {
+  onNotificationClick,
+}: CommonSidebarProps) {
   return (
     <aside
       className={`fixed top-0 left-0 z-40 h-screen bg-black text-white shadow-xl transition-all duration-300 ease-in-out
@@ -81,6 +72,30 @@ export function CommonSidebar({
                 />
               ))}
             </nav>
+          </TooltipProvider>
+        </div>
+
+        <div className={`px-5 pb-2 flex ${collapsed ? 'justify-center' : 'justify-start'} w-full`}> 
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <button
+                  type="button"
+                  onClick={onNotificationClick}
+                  className={`flex items-center gap-2 rounded-lg px-3 py-2 transition-colors duration-200 hover:bg-zinc-800 text-yellow-400 hover:text-yellow-300 w-full ${collapsed ? 'justify-center' : ''}`}
+                  aria-label="Notifications"
+                >
+                  <Bell className="w-4 h-4" />
+                  {!collapsed && <span className="text-sm">Notifications</span>}
+                </button>
+              </TooltipTrigger>
+              <TooltipContent
+                side="right"
+                className="bg-zinc-800 text-white border-zinc-700 px-3 py-1.5 rounded-lg"
+              >
+                Notifications
+              </TooltipContent>
+            </Tooltip>
           </TooltipProvider>
         </div>
 

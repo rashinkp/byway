@@ -11,6 +11,7 @@ import {
   User,
   Wallet,
   MessageSquare,
+  Bell,
 } from "lucide-react";
 
 export interface NavItem {

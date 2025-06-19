@@ -20,5 +20,5 @@ export interface IUserRepository {
   
   // User stats methods
   getUserStats(input: IGetUserStatsInput): Promise<IUserStats>;
- 
+  findByRole(role: string): Promise<User[]>;
 }

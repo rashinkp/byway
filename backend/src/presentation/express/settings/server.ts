@@ -18,7 +18,7 @@ const startServer = async (): Promise<void> => {
     const PORT = envConfig.PORT || 5001;
 
     // --- Socket.IO Integration ---
-    setupSocketIO(server, logger, deps.chatController);
+    setupSocketIO(server, logger, deps.chatController, deps.notificationController);
     // --- End Socket.IO Integration ---
 
     server.listen(PORT, () => {

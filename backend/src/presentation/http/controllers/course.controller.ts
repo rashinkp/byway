@@ -23,6 +23,7 @@ import {
 } from "../../validators/course.validators";
 import { BaseController } from "./base.controller";
 import { IGetCourseWithDetailsUseCase } from "../../../app/usecases/course/interfaces/get-course-with-details.usecase.interface";
+import { getSocketIOInstance } from '../../socketio';
 
 export class CourseController extends BaseController {
   constructor(
@@ -54,6 +55,19 @@ export class CourseController extends BaseController {
         ...validated,
         createdBy: request.user.id,
       });
+
+      // Emit real-time notification to all admins
+      const io = getSocketIOInstance();
+      if (io && course.notifiedAdminIds) {
+        (course.notifiedAdminIds as string[]).forEach((adminId: string) => {
+          io.to(adminId).emit('newNotification', {
+            message: `A new course "${course.title}" has been created.`,
+            courseId: course.id,
+            // ...any other notification data
+          });
+        });
+      }
+
       return this.success_201(course, "Course created successfully");
     });
   }
@@ -171,6 +185,17 @@ export class CourseController extends BaseController {
       const course = await this.approveCourseUseCase.execute({
         courseId: request.body.courseId,
       });
+
+      // Emit real-time notification to the instructor (creator)
+      const io = getSocketIOInstance();
+      if (io && course.createdBy) {
+        io.to(course.createdBy).emit('newNotification', {
+          message: `Your course \"${course.title}\" has been approved!`,
+          courseId: course.id,
+          // ...any other notification data
+        });
+      }
+
       return this.success_200(course, "Course approved successfully");
     });
   }
@@ -186,6 +211,17 @@ export class CourseController extends BaseController {
       const course = await this.declineCourseUseCase.execute({
         courseId: request.body.courseId,
       });
+
+      // Emit real-time notification to the instructor (creator)
+      const io = getSocketIOInstance();
+      if (io && course.createdBy) {
+        io.to(course.createdBy).emit('newNotification', {
+          message: `Your course \"${course.title}\" has been declined. Please review and update as needed.`,
+          courseId: course.id,
+          // ...any other notification data
+        });
+      }
+
       return this.success_200(course, "Course declined successfully");
     });
   }
