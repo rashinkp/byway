@@ -351,7 +351,7 @@ export function Header({ client }: HeaderProps = {}) {
                   )}
                   <div className="flex items-center gap-5">
                     <div className="relative group">
-                      <Link href="/user/chat">
+                      <Link href="/chat">
                         <MessageSquare
                           className="w-6 h-6 text-gray-600 group-hover:text-blue-500 transition-colors cursor-pointer"
                           strokeWidth={1.5}

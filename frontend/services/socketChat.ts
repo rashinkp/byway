@@ -39,11 +39,14 @@ export const getChatHistory = (data: any, callback: (history: any) => void) => {
   socket.once('chatHistory', callback);
 };
 
-export const listUserChats = (data: { page?: number; limit?: number } = {}, callback: (result: any) => void) => {
+export const listUserChats = (
+  data: { page?: number; limit?: number; search?: string; sort?: string; filter?: string } = {},
+  callback: (result: any) => void
+) => {
   console.log('[SocketService] Listing user chats for current user');
   console.log('[SocketService] Socket connected:', socket.connected);
   console.log('[SocketService] Socket ID:', socket.id);
-  console.log('[SocketService] Pagination data:', data);
+  console.log('[SocketService] Pagination/filter/sort data:', data);
   
   if (!socket.connected) {
     console.error('[SocketService] Socket not connected, cannot fetch chats');

@@ -30,89 +30,189 @@ export class ChatRepository implements IChatRepository {
     return chats.map(this.toDomain);
   }
 
-  async findEnhancedChatList(userId: UserId, page: number = 1, limit: number = 10): Promise<PaginatedChatListDTO> {
+  async findEnhancedChatList(userId: UserId, page: number = 1, limit: number = 10, search?: string, sort?: string, filter?: string): Promise<PaginatedChatListDTO> {
     const offset = (page - 1) * limit;
     
-    // Get user's existing chats with latest messages
-    const existingChats = await prisma.chat.findMany({
-      where: {
-        OR: [
-          { user1Id: userId.value },
-          { user2Id: userId.value },
-        ],
-      },
-      include: {
-        user1: {
-          select: {
-            id: true,
-            name: true,
-            role: true,
-            avatar: true,
+    // Build where clause for search
+    const chatWhere: any = {
+      OR: [
+        { user1Id: userId.value },
+        { user2Id: userId.value },
+      ],
+    };
+
+    let chatItems: EnhancedChatListItemDTO[] = [];
+    if (search) {
+      // Find chats where the other user's name matches
+      const nameMatchChats = await prisma.chat.findMany({
+        where: {
+          OR: [
+            {
+              AND: [
+                { user1Id: userId.value },
+                { user2: { name: { contains: search, mode: 'insensitive' } } },
+              ],
+            },
+            {
+              AND: [
+                { user2Id: userId.value },
+                { user1: { name: { contains: search, mode: 'insensitive' } } },
+              ],
+            },
+          ],
+        },
+        include: {
+          user1: { select: { id: true, name: true, role: true, avatar: true } },
+          user2: { select: { id: true, name: true, role: true, avatar: true } },
+          messages: {
+            orderBy: { createdAt: 'desc' },
+            take: 1,
+            include: { sender: { select: { name: true } } },
           },
         },
-        user2: {
-          select: {
-            id: true,
-            name: true,
-            role: true,
-            avatar: true,
+        orderBy: { updatedAt: 'desc' },
+        skip: offset,
+        take: limit,
+      });
+
+      // Find chats where the last message matches (but not already in nameMatchChats)
+      const nameMatchIds = new Set(nameMatchChats.map(chat => chat.id));
+      const messageMatchChats = await prisma.chat.findMany({
+        where: {
+          OR: [
+            { user1Id: userId.value },
+            { user2Id: userId.value },
+          ],
+          messages: {
+            some: {
+              content: { contains: search, mode: 'insensitive' },
+            },
+          },
+          NOT: {
+            id: { in: Array.from(nameMatchIds) },
           },
         },
-        messages: {
-          orderBy: { createdAt: 'desc' },
-          take: 1,
-          include: {
-            sender: {
-              select: {
-                name: true,
+        include: {
+          user1: { select: { id: true, name: true, role: true, avatar: true } },
+          user2: { select: { id: true, name: true, role: true, avatar: true } },
+          messages: {
+            orderBy: { createdAt: 'desc' },
+            take: 1,
+            include: { sender: { select: { name: true } } },
+          },
+        },
+        orderBy: { updatedAt: 'desc' },
+        skip: 0,
+        take: limit,
+      });
+
+      // Merge, name matches first, then message matches
+      const allChats = [...nameMatchChats, ...messageMatchChats];
+
+      // Convert to enhanced format as before
+      chatItems = allChats.map(chat => {
+        const otherUser = chat.user1Id === userId.value ? chat.user2 : chat.user1;
+        const lastMessage = chat.messages[0];
+        return {
+          id: chat.id,
+          type: 'chat',
+          displayName: otherUser.name,
+          avatar: otherUser.avatar || undefined,
+          role: otherUser.role,
+          lastMessage: lastMessage?.content,
+          lastMessageTime: lastMessage?.createdAt ? this.formatTime(lastMessage.createdAt) : undefined,
+          unreadCount: 0,
+          chatId: chat.id,
+          userId: otherUser.id,
+          isOnline: false,
+        };
+      });
+    } else {
+      // Default: get user's existing chats with latest messages
+      const existingChats = await prisma.chat.findMany({
+        where: {
+          OR: [
+            { user1Id: userId.value },
+            { user2Id: userId.value },
+          ],
+        },
+        include: {
+          user1: {
+            select: {
+              id: true,
+              name: true,
+              role: true,
+              avatar: true,
+            },
+          },
+          user2: {
+            select: {
+              id: true,
+              name: true,
+              role: true,
+              avatar: true,
+            },
+          },
+          messages: {
+            orderBy: { createdAt: 'desc' },
+            take: 1,
+            include: {
+              sender: {
+                select: {
+                  name: true,
+                },
               },
             },
           },
         },
-      },
-      orderBy: {
-        updatedAt: 'desc',
-      },
-    });
+        orderBy: { updatedAt: 'desc' },
+        skip: offset,
+        take: limit,
+      });
+      chatItems = existingChats.map(chat => {
+        const otherUser = chat.user1Id === userId.value ? chat.user2 : chat.user1;
+        const lastMessage = chat.messages[0];
+        return {
+          id: chat.id,
+          type: 'chat',
+          displayName: otherUser.name,
+          avatar: otherUser.avatar || undefined,
+          role: otherUser.role,
+          lastMessage: lastMessage?.content,
+          lastMessageTime: lastMessage?.createdAt ? this.formatTime(lastMessage.createdAt) : undefined,
+          unreadCount: 0,
+          chatId: chat.id,
+          userId: otherUser.id,
+          isOnline: false,
+        };
+      });
+    }
 
-    // Convert chats to enhanced format
-    const chatItems: EnhancedChatListItemDTO[] = existingChats.map(chat => {
-      const otherUser = chat.user1Id === userId.value ? chat.user2 : chat.user1;
-      const lastMessage = chat.messages[0];
-      
-      return {
-        id: chat.id,
-        type: 'chat',
-        displayName: otherUser.name,
-        avatar: otherUser.avatar || undefined,
-        role: otherUser.role,
-        lastMessage: lastMessage?.content,
-        lastMessageTime: lastMessage?.createdAt ? this.formatTime(lastMessage.createdAt) : undefined,
-        unreadCount: 0, // TODO: Implement unread count
-        chatId: chat.id,
-        userId: otherUser.id,
-        isOnline: false, // TODO: Implement online status
-      };
-    });
+    // Determine sort order
+    let orderBy: any = { updatedAt: 'desc' };
+    if (sort === 'name') orderBy = { user1: { name: 'asc' } };
+    if (sort === 'updatedAt') orderBy = { updatedAt: 'desc' };
 
     // If we have fewer chats than the limit, fill with other users
+    let userItems: EnhancedChatListItemDTO[] = [];
     if (chatItems.length < limit) {
       const remainingSlots = limit - chatItems.length;
-      
-      // Get user IDs that are already in chats
       const existingUserIds = new Set([
         userId.value,
-        ...existingChats.map(chat => 
-          chat.user1Id === userId.value ? chat.user2Id : chat.user1Id
-        )
+        ...chatItems.map((chat: any) =>
+          chat.userId
+        ),
       ]);
-
-      // Get other users ordered by role (ADMIN -> INSTRUCTOR -> USER) and then alphabetically
+      // Build user where clause for search
+      const userWhere: any = {
+        id: { notIn: Array.from(existingUserIds) },
+        deletedAt: null,
+      };
+      if (search) {
+        userWhere.name = { contains: search, mode: 'insensitive' };
+      }
       const otherUsers = await prisma.user.findMany({
-        where: {
-          id: { notIn: Array.from(existingUserIds) },
-          deletedAt: null,
-        },
+        where: userWhere,
         select: {
           id: true,
           name: true,
@@ -120,27 +220,21 @@ export class ChatRepository implements IChatRepository {
           avatar: true,
         },
         orderBy: [
-          {
-            role: 'asc', // ADMIN comes first, then INSTRUCTOR, then USER
-          },
-          {
-            name: 'asc', // Then alphabetically by name
-          },
+          sort === 'name' ? { name: 'asc' } : { role: 'asc' },
+          { name: 'asc' },
         ],
         take: remainingSlots,
         skip: offset,
       });
-
-      const userItems: EnhancedChatListItemDTO[] = otherUsers.map(user => ({
+      userItems = otherUsers.map(user => ({
         id: `user-${user.id}`,
         type: 'user',
         displayName: user.name,
         avatar: user.avatar || undefined,
         role: user.role,
         userId: user.id,
-        isOnline: false, // TODO: Implement online status
+        isOnline: false,
       }));
-
       chatItems.push(...userItems);
     }
 

@@ -10,6 +10,7 @@ import {
   DollarSign,
   User,
   Wallet,
+  MessageSquare,
 } from "lucide-react";
 
 export interface NavItem {
@@ -23,6 +24,11 @@ export const ADMIN_NAV_ITEMS: NavItem[] = [
     href: "/admin",
     label: "Dashboard",
     icon: LayoutDashboard,
+  },
+  {
+    href: "/chat",
+    label: "Chat",
+    icon: MessageSquare,
   },
   {
     href: "/admin/students",
@@ -66,6 +72,11 @@ export const INSTRUCTOR_NAV_ITEMS: NavItem[] = [
     label: "Dashboard",
     href: "/instructor",
     icon: LayoutDashboard,
+  },
+  {
+    label: "Chat",
+    href: "/chat",
+    icon: MessageSquare,
   },
   {
     label: "Courses",

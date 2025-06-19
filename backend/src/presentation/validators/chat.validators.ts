@@ -30,6 +30,9 @@ export const listUserChatsSchema = z.object({
   userId: z.string().min(1),
   page: z.number().min(1).optional(),
   limit: z.number().min(1).max(50).optional(),
+  search: z.string().optional(),
+  sort: z.string().optional(),
+  filter: z.string().optional(),
 });
 
 export const getMessagesByChatSchema = z.object({

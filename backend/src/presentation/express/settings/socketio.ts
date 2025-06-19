@@ -39,11 +39,17 @@ export function setupSocketIO(server: HTTPServer, logger: WinstonLogger, chatCon
       const userId = socket.data.user.id;
       const page = data.page || 1;
       const limit = data.limit || 10;
+      const search = data.search || undefined;
+      const sort = data.sort || undefined;
+      const filter = data.filter || undefined;
       const result = await chatController.listUserChats({ 
         query: { 
           userId,
           page,
-          limit
+          limit,
+          search,
+          sort,
+          filter
         } 
       } as any);
       return result;

@@ -80,11 +80,17 @@ export class ChatController extends BaseController {
       
       const page = validated.page || 1;
       const limit = validated.limit || 10;
+      const search = validated.search || undefined;
+      const sort = validated.sort || undefined;
+      const filter = validated.filter || undefined;
       
       const result = await this.listUserChatsUseCase.execute(
         new UserId(validated.userId), 
         page, 
-        limit
+        limit,
+        search,
+        sort,
+        filter
       );
       console.log('[ChatController] listUserChats - result:', result);
       

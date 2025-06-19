@@ -16,7 +16,7 @@ export default function PublicLayout({
     <div className="flex flex-col min-h-screen">
       <Header />
       <main className="flex-1">{children}</main>
-      {pathname !== '/user/chat' && <BywayFooter />}
+      <BywayFooter />
     </div>
   );
 }

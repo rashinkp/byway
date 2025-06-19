@@ -42,6 +42,7 @@ export default function ChatPage() {
   const [pendingMessage, setPendingMessage] = useState<string | null>(null);
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [isConnected, setIsConnected] = useState(true);
+  const [searchQuery, setSearchQuery] = useState('');
 
   // Initialize auth if not already done
   useEffect(() => {
@@ -50,13 +51,13 @@ export default function ChatPage() {
     }
   }, [isInitialized, isLoading, initializeAuth]);
 
-  // Fetch user chats on mount
+  // Fetch user chats on mount and when searchQuery changes
   useEffect(() => {
     if (!user) return;
     if (!isInitialized) return;
     setLoading(true);
     try {
-      listUserChats({ page: 1, limit: 10 }, (result: any) => {
+      listUserChats({ page: 1, limit: 10, search: searchQuery }, (result: any) => {
         const chatData = result?.body?.data || result?.data || result;
         if (chatData && Array.isArray(chatData.items)) {
           setChatItems(chatData.items);
@@ -70,7 +71,7 @@ export default function ChatPage() {
     } catch (error) {
       setLoading(false);
     }
-  }, [user, isInitialized]);
+  }, [user, isInitialized, searchQuery]);
 
   // Load more chats
   const loadMoreChats = useCallback(() => {
@@ -253,6 +254,7 @@ export default function ChatPage() {
                 chats={chatItems}
                 selectedChat={selectedChat}
                 onSelectChat={handleSelectChat}
+                onSearch={setSearchQuery}
               />
               
               {/* Load More Button */}
