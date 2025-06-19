@@ -12,4 +12,11 @@ export class NotificationDTO {
   link?: string | null;
   createdAt!: string;
   expiresAt!: string;
+}
+
+export class PaginatedNotificationListDTO {
+  items!: NotificationDTO[];
+  total!: number;
+  hasMore!: boolean;
+  nextPage?: number;
 } 

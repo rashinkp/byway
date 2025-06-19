@@ -36,6 +36,51 @@ export class PrismaNotificationRepository implements NotificationRepositoryInter
     return found.map(this.toDTO);
   }
 
+  async findManyByUserId(options: {
+    userId: string;
+    skip?: number;
+    take?: number;
+    sortBy?: string;
+    sortOrder?: 'asc' | 'desc';
+    eventType?: string;
+    search?: string;
+  }): Promise<{ items: NotificationDTO[]; total: number; hasMore: boolean; nextPage?: number }> {
+    const {
+      userId,
+      skip = 0,
+      take = 5,
+      sortBy = 'createdAt',
+      sortOrder = 'desc',
+      eventType,
+      search,
+    } = options;
+    const where: any = { userId };
+    if (eventType) where.eventType = eventType;
+    if (search) {
+      where.OR = [
+        { message: { contains: search, mode: 'insensitive' } },
+        { entityName: { contains: search, mode: 'insensitive' } },
+      ];
+    }
+    const [items, total] = await Promise.all([
+      this.prisma.notification.findMany({
+        where,
+        orderBy: { [sortBy]: sortOrder },
+        skip,
+        take,
+      }),
+      this.prisma.notification.count({ where }),
+    ]);
+    const hasMore = skip + take < total;
+    const nextPage = hasMore ? Math.floor(skip / take) + 2 : undefined;
+    return {
+      items: items.map(this.toDTO),
+      total,
+      hasMore,
+      nextPage,
+    };
+  }
+
   async deleteById(id: string): Promise<void> {
     await this.prisma.notification.delete({ where: { id } });
   }

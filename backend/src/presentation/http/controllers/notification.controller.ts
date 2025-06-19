@@ -23,12 +23,12 @@ export class NotificationController extends BaseController {
         throw new UnauthorizedError("User not authenticated");
       }
       const validated = validateGetUserNotifications(request.query);
-      const notifications = await this.getUserNotificationsUseCase.execute(validated.userId);
+      const notifications = await this.getUserNotificationsUseCase.execute(validated);
       return this.success_200(notifications, "User notifications retrieved successfully");
     });
   }
 
-  async getUserNotificationsForSocketIO(data: { userId: string }) {
-    return this.getUserNotificationsUseCase.execute(data.userId);
+  async getUserNotificationsForSocketIO(data: any) {
+    return this.getUserNotificationsUseCase.execute(data);
   }
 } 

@@ -1,35 +1,131 @@
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
 import { getUserNotificationsSocket } from '@/services/socketNotification';
 import { useAuth } from '@/hooks/auth/useAuth';
 import socket from '@/lib/socket';
+
+function formatTime(dateStr: string) {
+  const date = new Date(dateStr);
+  return date.toLocaleString('en-US', {
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: true,
+  });
+}
+
+function formatDateForGrouping(dateStr: string) {
+  const date = new Date(dateStr);
+  const today = new Date();
+  const yesterday = new Date(today);
+  yesterday.setDate(yesterday.getDate() - 1);
+  
+  if (date.toDateString() === today.toDateString()) {
+    return 'Today';
+  } else if (date.toDateString() === yesterday.toDateString()) {
+    return 'Yesterday';
+  } else {
+    return date.toLocaleDateString('en-US', {
+      weekday: 'long',
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+    });
+  }
+}
 
 export const useNotificationSocket = () => {
   const { user } = useAuth();
   const [notifications, setNotifications] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(false);
+  const [total, setTotal] = useState(0);
+  const [search, setSearch] = useState('');
+  const [sortBy, setSortBy] = useState('createdAt');
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
+  const [eventType, setEventType] = useState<string | undefined>(undefined);
+  const take = 5;
+  const prevFilters = useRef({ search, sortBy, sortOrder, eventType });
 
-  const fetchNotifications = useCallback(() => {
+  const fetchNotifications = useCallback((opts?: { reset?: boolean; pageOverride?: number }) => {
     if (!user?.id) return;
     setLoading(true);
     setError(null);
-    getUserNotificationsSocket({ userId: user.id }, (data) => {
-      setNotifications(data);
-      setLoading(false);
-    });
-  }, [user?.id]);
+    const currentPage = opts?.pageOverride ?? page;
+    getUserNotificationsSocket(
+      {
+        userId: user.id,
+        skip: opts?.reset ? 0 : (currentPage - 1) * take,
+        take,
+        sortBy,
+        sortOrder,
+        eventType,
+        search: search.trim() || undefined,
+      },
+      (result) => {
+        setTotal(result.total);
+        setHasMore(result.hasMore);
+        const mapped = (result.items || []).map((n: any) => ({
+          ...n,
+          title: n.entityName || n.eventType || 'Notification',
+          message: n.message,
+          time: formatTime(n.createdAt),
+          date: formatDateForGrouping(n.createdAt),
+          eventType: n.eventType,
+        }));
+        if (opts?.reset) {
+          setNotifications(mapped);
+        } else {
+          setNotifications((prev) => [...prev, ...mapped]);
+        }
+        setLoading(false);
+      }
+    );
+  }, [user?.id, sortBy, sortOrder, eventType, search]);
 
+  // Effect: Reset page and fetch when filters/search/sort change
   useEffect(() => {
-    if (user?.id) {
+    if (!user?.id) return;
+    // Only run if filters/search/sort actually changed
+    const prev = prevFilters.current;
+    if (
+      prev.search !== search ||
+      prev.sortBy !== sortBy ||
+      prev.sortOrder !== sortOrder ||
+      prev.eventType !== eventType
+    ) {
+      setPage(1);
+      fetchNotifications({ reset: true, pageOverride: 1 });
+      prevFilters.current = { search, sortBy, sortOrder, eventType };
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [search, sortBy, sortOrder, eventType, user?.id]);
+
+  // Effect: Fetch next page when page changes (but not on first render)
+  useEffect(() => {
+    if (!user?.id) return;
+    if (page > 1) {
       fetchNotifications();
     }
-  }, [user?.id, fetchNotifications]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [page, user?.id]);
+
+  // Effect: Initial fetch on mount or user change
+  useEffect(() => {
+    if (user?.id) {
+      setPage(1);
+      fetchNotifications({ reset: true, pageOverride: 1 });
+      prevFilters.current = { search, sortBy, sortOrder, eventType };
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user?.id]);
 
   // Listen for real-time notification events
   useEffect(() => {
     if (!user?.id) return;
     const handleNewNotification = () => {
-      fetchNotifications();
+      setPage(1);
+      fetchNotifications({ reset: true, pageOverride: 1 });
     };
     socket.on('newNotification', handleNewNotification);
     return () => {
@@ -37,10 +133,34 @@ export const useNotificationSocket = () => {
     };
   }, [user?.id, fetchNotifications]);
 
+  const loadMore = () => {
+    if (hasMore && !loading) {
+      setPage((prev) => prev + 1);
+    }
+  };
+
+  const refetch = () => {
+    setPage(1);
+    fetchNotifications({ reset: true, pageOverride: 1 });
+  };
+
   return {
     notifications,
     loading,
     error,
-    refetch: fetchNotifications,
+    hasMore,
+    total,
+    page,
+    setPage,
+    search,
+    setSearch,
+    sortBy,
+    setSortBy,
+    sortOrder,
+    setSortOrder,
+    eventType,
+    setEventType,
+    loadMore,
+    refetch,
   };
 }; 

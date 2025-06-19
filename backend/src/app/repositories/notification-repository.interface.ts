@@ -8,4 +8,13 @@ export interface NotificationRepositoryInterface {
   deleteById(id: string): Promise<void>;
   deleteExpired(): Promise<number>; // returns number of deleted
   // Add more query methods as needed
+  findManyByUserId(options: {
+    userId: string;
+    skip?: number;
+    take?: number;
+    sortBy?: string;
+    sortOrder?: 'asc' | 'desc';
+    eventType?: string;
+    search?: string;
+  }): Promise<{ items: NotificationDTO[]; total: number; hasMore: boolean; nextPage?: number }>;
 } 
