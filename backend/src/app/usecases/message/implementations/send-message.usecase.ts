@@ -61,7 +61,15 @@ export class SendMessageUseCase implements ISendMessageUseCase {
         chat = await this.chatRepository.getChatBetweenUsers(new UserId(input.senderId), new UserId(input.userId!));
       }
       if (chat) {
-        await this.chatRepository.save(chat);
+        const updatedChat = new Chat(
+          chat.id,
+          chat.user1Id,
+          chat.user2Id,
+          chat.createdAt,
+          new Timestamp(new Date()),
+          chat.messages
+        );
+        await this.chatRepository.save(updatedChat);
       }
     }
     let enrichedMessage: any = null;

@@ -45,6 +45,9 @@ export default function ChatPage() {
   const [isConnected, setIsConnected] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
 
+  // Track previous chatId for leave logic
+  const previousChatIdRef = React.useRef<string | null>(null);
+
   // Initialize auth if not already done
   useEffect(() => {
     if (!isInitialized && !isLoading) {
@@ -151,6 +154,15 @@ export default function ChatPage() {
   }, [pendingMessage, selectedChat]);
 
   const handleSelectChat = (chat: EnhancedChatItem) => {
+    // Leave previous chat room if any
+    if (previousChatIdRef.current && previousChatIdRef.current !== chat.chatId) {
+      socket.emit('leave', previousChatIdRef.current);
+    }
+    // Join new chat room
+    if (chat.type === 'chat' && chat.chatId) {
+      socket.emit('join', chat.chatId);
+      previousChatIdRef.current = chat.chatId;
+    }
     setSelectedChat(chat);
     // Auto-close sidebar on mobile when chat is selected
     if (window.innerWidth < 768) {

@@ -21,6 +21,10 @@ export function setupSocketIO(server: HTTPServer, logger: WinstonLogger, chatCon
       socket.join(chatId);
     });
 
+    socket.on("leave", (chatId) => {
+      socket.leave(chatId);
+    });
+
     socket.on("createChat", socketHandler(async (data) => {
       
         const chat = await chatController.handleCreateChat(data);
