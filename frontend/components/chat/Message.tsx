@@ -9,9 +9,10 @@ interface MessageProps {
   message: MessageType;
   currentUserId: string;
   chat: EnhancedChatItem;
+  onDelete?: () => void;
 }
 
-export function Message({ message, currentUserId, chat }: MessageProps) {
+export function Message({ message, currentUserId, chat, onDelete }: MessageProps) {
   const isMine = message.senderId === currentUserId;
   const [menuOpen, setMenuOpen] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
@@ -134,7 +135,7 @@ export function Message({ message, currentUserId, chat }: MessageProps) {
               confirmText="Delete"
               cancelText="Cancel"
               onConfirm={() => {
-                // TODO: implement actual delete logic
+                if (onDelete) onDelete();
                 setShowDeleteConfirm(false);
               }}
             />

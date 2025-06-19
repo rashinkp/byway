@@ -10,4 +10,6 @@ export interface IListUserChatsUseCase {
     sort?: string,
     filter?: string
   ): Promise<PaginatedChatListDTO>;
+
+  getChatParticipantsById(chatId: string): Promise<{ user1Id: string, user2Id: string } | null>;
 } 

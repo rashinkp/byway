@@ -4,11 +4,13 @@ import { WinstonLogger } from "../../../infra/providers/logging/winston.logger";
 import { ChatController } from "../../http/controllers/chat.controller";
 import { socketAuthMiddleware } from "./socket.auth";
 import { socketHandler } from "./socket.utils";
+import { PrismaClient } from '@prisma/client';
 
 export function setupSocketIO(server: HTTPServer, logger: WinstonLogger, chatController: ChatController) {
   const io = new SocketIOServer(server, {
     cors: { origin: "*" },
   });
+  const prisma = new PrismaClient();
 
   io.use(socketAuthMiddleware);
 
@@ -70,6 +72,15 @@ export function setupSocketIO(server: HTTPServer, logger: WinstonLogger, chatCon
     socket.on("deleteMessage", socketHandler(async (data) => {
       
         await chatController.deleteMessage({ params: data } as any);
+      // Emit chatListUpdated to both users in the chat using controller
+      if (data && data.chatId) {
+        const participants = await chatController.getChatParticipantsById(data.chatId);
+        if (participants) {
+          console.log('[SocketIO] Emitting chatListUpdated after deleteMessage to:', participants.user1Id, participants.user2Id);
+          io.to(participants.user1Id).emit('chatListUpdated');
+          io.to(participants.user2Id).emit('chatListUpdated');
+        }
+      }
       return { messageId: data.messageId };
     }, "messageDeleted"));
 
@@ -97,6 +108,13 @@ export function setupSocketIO(server: HTTPServer, logger: WinstonLogger, chatCon
         socket.emit('messageSent', message);
         socket.emit('message', message);
         io.to(effectiveChatId || chatId).emit('message', message);
+        // Emit chatListUpdated to both users in the chat using controller
+        const participants = await chatController.getChatParticipantsById(effectiveChatId || chatId);
+        if (participants) {
+          console.log('[SocketIO] Emitting chatListUpdated after sendMessage to:', participants.user1Id, participants.user2Id);
+          io.to(participants.user1Id).emit('chatListUpdated');
+          io.to(participants.user2Id).emit('chatListUpdated');
+        }
       } catch (err) {
         console.log('[SocketIO] Caught error in sendMessage:', err);
         socket.emit('error', { message: 'Failed to send message.' });

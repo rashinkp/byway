@@ -28,7 +28,6 @@ export class MessageRepository implements IMessageRepository {
   }
 
   async findByChatWithUserData(chatId: ChatId): Promise<EnrichedMessageDTO[]> {
-    console.log('[MessageRepository] findByChatWithUserData - chatId:', chatId.value);
     const messages = await prisma.message.findMany({
       where: { chatId: chatId.value },
       include: {
@@ -42,7 +41,6 @@ export class MessageRepository implements IMessageRepository {
       },
       orderBy: { createdAt: 'asc' },
     });
-    console.log('[MessageRepository] findByChatWithUserData - DB result:', messages);
     return messages as EnrichedMessageDTO[];
   }
 
@@ -63,7 +61,6 @@ export class MessageRepository implements IMessageRepository {
   }
 
   async create(message: Message): Promise<void> {
-    console.log('[MessageRepository] Creating message:', message.id.value, 'for chat:', message.chatId.value, 'by sender:', message.senderId.value);
     try {
       await prisma.message.create({
         data: {
@@ -74,9 +71,7 @@ export class MessageRepository implements IMessageRepository {
           createdAt: message.createdAt.value,
         },
       });
-      console.log('[MessageRepository] Message created in DB:', message.id.value);
     } catch (err) {
-      console.error('[MessageRepository] Error creating message:', err);
       throw err;
     }
   }

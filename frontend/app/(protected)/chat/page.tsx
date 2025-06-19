@@ -26,6 +26,7 @@ import {
   sendMessage as sendMessageSocket,
   createChat as createChatSocket,
 } from '@/services/socketChat';
+import socket from '@/lib/socket';
 
 export default function ChatPage() {
   const user = useAuthStore((state) => state.user);
@@ -126,7 +127,74 @@ export default function ChatPage() {
     });
   }, [selectedChat]);
 
-  // Send message handler
+  // useEffect to send pending message after new chat is selected
+  useEffect(() => {
+    if (pendingMessage && selectedChat && selectedChat.type === 'chat' && selectedChat.chatId) {
+      sendMessageSocket(
+        {
+          chatId: selectedChat.chatId,
+          userId: selectedChat.userId, // recipient's userId
+          content: pendingMessage,
+        },
+        (msg: Message) => {
+          getMessagesByChat({ chatId: selectedChat.chatId }, (result: any) => {
+            const msgs = result?.body?.data || result?.data || result;
+            setMessages(Array.isArray(msgs) ? msgs : []);
+          });
+        },
+        (err: any) => {
+          alert(err?.message || 'Failed to send message');
+        }
+      );
+      setPendingMessage(null);
+    }
+  }, [pendingMessage, selectedChat]);
+
+  const handleSelectChat = (chat: EnhancedChatItem) => {
+    setSelectedChat(chat);
+    // Auto-close sidebar on mobile when chat is selected
+    if (window.innerWidth < 768) {
+      setIsSidebarOpen(false);
+    }
+  };
+
+  const handleDeleteMessage = useCallback((messageId: string) => {
+    if (selectedChat && selectedChat.type === 'chat' && selectedChat.chatId) {
+      getMessagesByChat({ chatId: selectedChat.chatId }, (result: any) => {
+        const msgs = result?.body?.data || result?.data || result;
+        setMessages(Array.isArray(msgs) ? msgs : []);
+      });
+      // Refresh chat list as well
+      listUserChats({ page: 1, limit: 10, search: searchQuery }, (result: any) => {
+        const chatData = result?.body?.data || result?.data || result;
+        if (chatData && Array.isArray(chatData.items)) {
+          setChatItems(chatData.items);
+          setHasMore(chatData.hasMore || false);
+          setCurrentPage(1);
+        }
+      });
+    }
+  }, [selectedChat, searchQuery]);
+
+  useEffect(() => {
+    function handleChatListUpdated() {
+      console.log('[Frontend] Received chatListUpdated event, refetching chat list...');
+      listUserChats({ page: 1, limit: 10, search: searchQuery }, (result: any) => {
+        const chatData = result?.body?.data || result?.data || result;
+        if (chatData && Array.isArray(chatData.items)) {
+          setChatItems(chatData.items);
+          setHasMore(chatData.hasMore || false);
+          setCurrentPage(1);
+        }
+      });
+    }
+    socket.on('chatListUpdated', handleChatListUpdated);
+    return () => {
+      socket.off('chatListUpdated', handleChatListUpdated);
+    };
+  }, [searchQuery]);
+
+  // Restore handleSendMessage function
   const handleSendMessage = useCallback(
     (content: string) => {
       if (!user || !selectedChat) return;
@@ -183,6 +251,7 @@ export default function ChatPage() {
         },
         (msg: Message) => {
           setMessages((prev) => prev.some(m => m.id === msg.id) ? prev : [...prev, msg]);
+          // Do not update chatItems here; rely on chatListUpdated event to refetch from backend
         },
         (err: any) => {
           alert(err?.message || 'Failed to send message');
@@ -192,36 +261,21 @@ export default function ChatPage() {
     [user, selectedChat]
   );
 
-  // useEffect to send pending message after new chat is selected
   useEffect(() => {
-    if (pendingMessage && selectedChat && selectedChat.type === 'chat' && selectedChat.chatId) {
-      sendMessageSocket(
-        {
-          chatId: selectedChat.chatId,
-          userId: selectedChat.userId, // recipient's userId
-          content: pendingMessage,
-        },
-        (msg: Message) => {
-          getMessagesByChat({ chatId: selectedChat.chatId }, (result: any) => {
-            const msgs = result?.body?.data || result?.data || result;
-            setMessages(Array.isArray(msgs) ? msgs : []);
-          });
-        },
-        (err: any) => {
-          alert(err?.message || 'Failed to send message');
-        }
-      );
-      setPendingMessage(null);
+    if (!user) return;
+    const handleConnect = () => {
+      console.log('[Frontend] Joining userId room:', user.id);
+      socket.emit('join', user.id);
+    };
+    socket.on('connect', handleConnect);
+    // If already connected, join immediately
+    if (socket.connected) {
+      handleConnect();
     }
-  }, [pendingMessage, selectedChat]);
-
-  const handleSelectChat = (chat: EnhancedChatItem) => {
-    setSelectedChat(chat);
-    // Auto-close sidebar on mobile when chat is selected
-    if (window.innerWidth < 768) {
-      setIsSidebarOpen(false);
-    }
-  };
+    return () => {
+      socket.off('connect', handleConnect);
+    };
+  }, [user]);
 
   if (!isInitialized || isLoading) {
     return (
@@ -295,6 +349,7 @@ export default function ChatPage() {
                   messages={messages}
                   onSendMessage={handleSendMessage}
                   currentUserId={user?.id || ''}
+                  onDeleteMessage={handleDeleteMessage}
                 />
               ) : (
                 <div className="flex-1 flex flex-col min-h-0">

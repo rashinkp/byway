@@ -4,6 +4,7 @@ import { ChatId } from '../../domain/value-object/ChatId';
 import { UserId } from '../../domain/value-object/UserId';
 import { PaginatedChatListDTO, EnhancedChatListItemDTO } from '../../domain/dtos/chat.dto';
 import { PrismaClient } from '@prisma/client';
+import { Role } from '../../domain/enum/role.enum';
 
 const prisma = new PrismaClient();
 
@@ -43,20 +44,38 @@ export class ChatRepository implements IChatRepository {
 
     let chatItems: EnhancedChatListItemDTO[] = [];
     if (search) {
-      // Find chats where the other user's name matches
-      const nameMatchChats = await prisma.chat.findMany({
+      const normalizedSearch = search.trim().toLowerCase();
+      const roleMap: Record<string, Role> = {
+        'admin': Role.ADMIN,
+        'instructor': Role.INSTRUCTOR,
+        'user': Role.USER,
+      };
+      const roleSearch = roleMap[normalizedSearch] || undefined;
+
+      // Find chats where the other user's name or role matches
+      const nameOrRoleMatchChats = await prisma.chat.findMany({
         where: {
           OR: [
             {
               AND: [
                 { user1Id: userId.value },
-                { user2: { name: { contains: search, mode: 'insensitive' } } },
+                {
+                  OR: [
+                    { user2: { name: { contains: search, mode: 'insensitive' } } },
+                    ...(roleSearch ? [{ user2: { role: roleSearch as Role } }] : []),
+                  ],
+                },
               ],
             },
             {
               AND: [
                 { user2Id: userId.value },
-                { user1: { name: { contains: search, mode: 'insensitive' } } },
+                {
+                  OR: [
+                    { user1: { name: { contains: search, mode: 'insensitive' } } },
+                    ...(roleSearch ? [{ user1: { role: roleSearch as Role } }] : []),
+                  ],
+                },
               ],
             },
           ],
@@ -75,8 +94,8 @@ export class ChatRepository implements IChatRepository {
         take: limit,
       });
 
-      // Find chats where the last message matches (but not already in nameMatchChats)
-      const nameMatchIds = new Set(nameMatchChats.map(chat => chat.id));
+      // Find chats where the last message matches (but not already in nameOrRoleMatchChats)
+      const nameOrRoleMatchIds = new Set(nameOrRoleMatchChats.map(chat => chat.id));
       const messageMatchChats = await prisma.chat.findMany({
         where: {
           OR: [
@@ -89,7 +108,7 @@ export class ChatRepository implements IChatRepository {
             },
           },
           NOT: {
-            id: { in: Array.from(nameMatchIds) },
+            id: { in: Array.from(nameOrRoleMatchIds) },
           },
         },
         include: {
@@ -106,24 +125,24 @@ export class ChatRepository implements IChatRepository {
         take: limit,
       });
 
-      // Merge, name matches first, then message matches
-      const allChats = [...nameMatchChats, ...messageMatchChats];
+      // Merge, name/role matches first, then message matches
+      const allChats = [...nameOrRoleMatchChats, ...messageMatchChats];
 
       // Convert to enhanced format as before
       chatItems = allChats.map(chat => {
-        const otherUser = chat.user1Id === userId.value ? chat.user2 : chat.user1;
-        const lastMessage = chat.messages[0];
+        const otherUser = chat.user1 ? (chat.user1Id === userId.value ? chat.user2 : chat.user1) : undefined;
+        const lastMessage = chat.messages && chat.messages[0];
         return {
           id: chat.id,
           type: 'chat',
-          displayName: otherUser.name,
-          avatar: otherUser.avatar || undefined,
-          role: otherUser.role,
+          displayName: otherUser?.name || '',
+          avatar: otherUser?.avatar || undefined,
+          role: otherUser?.role || '',
           lastMessage: lastMessage?.content,
           lastMessageTime: lastMessage?.createdAt ? this.formatTime(lastMessage.createdAt) : undefined,
           unreadCount: 0,
           chatId: chat.id,
-          userId: otherUser.id,
+          userId: otherUser?.id,
           isOnline: false,
         };
       });
@@ -170,19 +189,19 @@ export class ChatRepository implements IChatRepository {
         take: limit,
       });
       chatItems = existingChats.map(chat => {
-        const otherUser = chat.user1Id === userId.value ? chat.user2 : chat.user1;
-        const lastMessage = chat.messages[0];
+        const otherUser = chat.user1 ? (chat.user1Id === userId.value ? chat.user2 : chat.user1) : undefined;
+        const lastMessage = chat.messages && chat.messages[0];
         return {
           id: chat.id,
           type: 'chat',
-          displayName: otherUser.name,
-          avatar: otherUser.avatar || undefined,
-          role: otherUser.role,
+          displayName: otherUser?.name || '',
+          avatar: otherUser?.avatar || undefined,
+          role: otherUser?.role || '',
           lastMessage: lastMessage?.content,
           lastMessageTime: lastMessage?.createdAt ? this.formatTime(lastMessage.createdAt) : undefined,
           unreadCount: 0,
           chatId: chat.id,
-          userId: otherUser.id,
+          userId: otherUser?.id,
           isOnline: false,
         };
       });
@@ -208,8 +227,18 @@ export class ChatRepository implements IChatRepository {
         id: { notIn: Array.from(existingUserIds) },
         deletedAt: null,
       };
+      const normalizedSearch = search ? search.trim().toLowerCase() : '';
+      const roleMap: Record<string, Role> = {
+        'admin': Role.ADMIN,
+        'instructor': Role.INSTRUCTOR,
+        'user': Role.USER,
+      };
+      const roleSearch = roleMap[normalizedSearch] || undefined;
       if (search) {
-        userWhere.name = { contains: search, mode: 'insensitive' };
+        userWhere.OR = [
+          { name: { contains: search, mode: 'insensitive' } },
+          ...(roleSearch ? [{ role: roleSearch as Role }] : []),
+        ];
       }
       const otherUsers = await prisma.user.findMany({
         where: userWhere,

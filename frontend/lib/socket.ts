@@ -1,7 +1,5 @@
 import io from 'socket.io-client';
 
-console.log('[Socket] Module loaded');
-
 // Function to get JWT token from cookies
 const getJwtToken = (): string | null => {
   if (typeof document === 'undefined') return null;

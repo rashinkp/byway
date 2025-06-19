@@ -41,13 +41,10 @@ export class ChatController extends BaseController {
   }
 
   async handleNewMessage(socketData: any) {
-    console.log('[ChatController] handleNewMessage - raw socketData:', socketData);
     const validated = sendMessageSocketSchema.parse(socketData);
-    console.log('[ChatController] handleNewMessage - validated:', validated);
     const { chatId, content } = validated;
     const senderId = socketData.senderId;
     const userId = socketData.userId;
-    console.log('[ChatController] handleNewMessage - chatId:', chatId, 'userId:', userId, 'senderId:', senderId, 'content:', content);
     const message = await this.sendMessageUseCase.execute({ chatId, userId, senderId, content });
     return message;
   }
@@ -76,7 +73,6 @@ export class ChatController extends BaseController {
   async listUserChats(httpRequest: IHttpRequest): Promise<IHttpResponse> {
     return this.handleRequest(httpRequest, async (request) => {
       const validated = listUserChatsSchema.parse(request.query);
-      console.log('[ChatController] listUserChats - validated data:', validated);
       
       const page = validated.page || 1;
       const limit = validated.limit || 10;
@@ -92,7 +88,6 @@ export class ChatController extends BaseController {
         sort,
         filter
       );
-      console.log('[ChatController] listUserChats - result:', result);
       
       return this.success_200(result, "User chats retrieved successfully");
     });
@@ -124,10 +119,8 @@ export class ChatController extends BaseController {
   async getMessagesByChat(httpRequest: IHttpRequest): Promise<IHttpResponse> {
     return this.handleRequest(httpRequest, async (request) => {
       const validated = getMessagesByChatSchema.parse(request.query);
-      console.log('[ChatController] getMessagesByChat - validated data:', validated);
       
       const messages = await this.getMessagesByChatUseCase.execute(new ChatId(validated.chatId));
-      console.log('[ChatController] getMessagesByChat - result:', messages);
       
       return this.success_200(messages, "Messages retrieved successfully");
     });
@@ -161,5 +154,10 @@ export class ChatController extends BaseController {
       new UserId(senderId),
       new UserId(recipientId)
     );
+  }
+
+  // Efficiently get only the participants of a chat by chatId
+  async getChatParticipantsById(chatId: string): Promise<{ user1Id: string, user2Id: string } | null> {
+    return this.listUserChatsUseCase.getChatParticipantsById(chatId);
   }
 } 

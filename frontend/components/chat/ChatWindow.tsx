@@ -7,15 +7,17 @@ import { Badge } from '@/components/ui/badge';
 import { Send, MoreVertical } from 'lucide-react';
 import Link from 'next/link';
 import { useAuth } from '@/hooks/auth/useAuth';
+import { deleteMessage } from '@/services/socketChat';
 
 interface ChatWindowProps {
   chat: EnhancedChatItem;
   messages: Message[];
   onSendMessage: (content: string) => void;
   currentUserId: string;
+  onDeleteMessage?: (messageId: string) => void;
 }
 
-export function ChatWindow({ chat, messages, onSendMessage, currentUserId }: ChatWindowProps) {
+export function ChatWindow({ chat, messages, onSendMessage, currentUserId, onDeleteMessage }: ChatWindowProps) {
   const [newMessage, setNewMessage] = useState('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const [menuOpen, setMenuOpen] = useState(false);
@@ -109,6 +111,12 @@ export function ChatWindow({ chat, messages, onSendMessage, currentUserId }: Cha
   };
   const canViewProfile = Boolean(getProfileLink());
 
+  const handleDeleteMessage = (messageId: string) => {
+    deleteMessage({ messageId }, () => {
+      if (onDeleteMessage) onDeleteMessage(messageId);
+    });
+  };
+
   return (
     <div className="flex flex-col h-full min-h-0 bg-white">
       {/* Header */}
@@ -126,7 +134,6 @@ export function ChatWindow({ chat, messages, onSendMessage, currentUserId }: Cha
             >
               {(chat.displayName?.charAt(0) || "?").toUpperCase()}
             </div>
-            <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-green-500 border-2 border-white rounded-full"></div>
           </div>
 
           {/* User Info */}
@@ -146,7 +153,6 @@ export function ChatWindow({ chat, messages, onSendMessage, currentUserId }: Cha
                 </Badge>
               )}
             </div>
-            <p className="text-xs text-green-600">Active now</p>
           </div>
         </div>
 
@@ -213,6 +219,7 @@ export function ChatWindow({ chat, messages, onSendMessage, currentUserId }: Cha
                       message={message}
                       currentUserId={currentUserId}
                       chat={chat}
+                      onDelete={() => handleDeleteMessage(message.id)}
                     />
                   ))}
                 </div>
