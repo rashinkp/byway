@@ -239,12 +239,12 @@ export default function ChatPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
+    <div className="h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 overflow-hidden">
 
       {/* Main Chat Interface */}
-      <div className="w-full h-[100dvh] flex items-stretch">
-        <div className="w-full h-full bg-white/60 backdrop-blur-xl border border-slate-200/60 shadow-2xl shadow-slate-200/50 rounded-3xl overflow-hidden">
-          <div className="flex h-full">
+      <div className="w-full h-full flex items-stretch">
+        <div className="w-full h-full bg-white/60 backdrop-blur-xl border border-slate-200/60 shadow-2xl shadow-slate-200/50 rounded-3xl overflow-hidden flex flex-col min-h-0">
+          <div className="flex flex-1 min-h-0">
             {/* Chat List Sidebar */}
             <div className={`${
               isSidebarOpen ? 'translate-x-0' : '-translate-x-full'
@@ -286,7 +286,7 @@ export default function ChatPage() {
             )}
             
             {/* Chat Window */}
-            <div className="flex-1 flex flex-col">
+            <div className="flex-1 flex flex-col h-full min-h-0">
               {selectedChat ? (
                 <ChatWindow
                   chat={selectedChat}
@@ -295,36 +295,38 @@ export default function ChatPage() {
                   currentUserId={user?.id || ''}
                 />
               ) : (
-                <div className="flex-1 flex items-center justify-center bg-gradient-to-br from-slate-50 to-white">
-                  <div className="text-center space-y-8 max-w-md px-8">
-                    <div className="relative">
-                      <div className="w-32 h-32 bg-gradient-to-br from-blue-100 via-indigo-100 to-purple-100 rounded-full flex items-center justify-center mx-auto shadow-2xl">
-                        <div className="w-20 h-20 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-full flex items-center justify-center">
-                          <MessageSquare className="w-10 h-10 text-white" />
+                <div className="flex-1 flex flex-col min-h-0">
+                  <div className="flex-1 flex items-center justify-center bg-gradient-to-br from-slate-50 to-white min-h-0">
+                    <div className="text-center space-y-8 max-w-md px-8">
+                      <div className="relative">
+                        <div className="w-32 h-32 bg-gradient-to-br from-blue-100 via-indigo-100 to-purple-100 rounded-full flex items-center justify-center mx-auto shadow-2xl">
+                          <div className="w-20 h-20 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-full flex items-center justify-center">
+                            <MessageSquare className="w-10 h-10 text-white" />
+                          </div>
+                        </div>
+                        <div className="absolute -top-2 -right-2 w-12 h-12 bg-gradient-to-br from-emerald-400 to-teal-500 rounded-full flex items-center justify-center shadow-lg">
+                          <Users className="w-6 h-6 text-white" />
                         </div>
                       </div>
-                      <div className="absolute -top-2 -right-2 w-12 h-12 bg-gradient-to-br from-emerald-400 to-teal-500 rounded-full flex items-center justify-center shadow-lg">
-                        <Users className="w-6 h-6 text-white" />
-                      </div>
-                    </div>
-                    
-                    <div className="space-y-4">
-                      <h3 className="text-2xl font-bold text-slate-900">
-                        Welcome to Chat
-                      </h3>
-                      <p className="text-slate-600 leading-relaxed text-lg">
-                        Select a conversation from the sidebar to start chatting with your team members.
-                      </p>
-                      <div className="flex flex-wrap gap-2 justify-center pt-4">
-                        <Badge className="bg-blue-100 text-blue-700 border-blue-200 px-3 py-1">
-                          Real-time messaging
-                        </Badge>
-                        <Badge className="bg-emerald-100 text-emerald-700 border-emerald-200 px-3 py-1">
-                          Secure & private
-                        </Badge>
-                        <Badge className="bg-purple-100 text-purple-700 border-purple-200 px-3 py-1">
-                          Team collaboration
-                        </Badge>
+                      
+                      <div className="space-y-4">
+                        <h3 className="text-2xl font-bold text-slate-900">
+                          Welcome to Chat
+                        </h3>
+                        <p className="text-slate-600 leading-relaxed text-lg">
+                          Select a conversation from the sidebar to start chatting with your team members.
+                        </p>
+                        <div className="flex flex-wrap gap-2 justify-center pt-4">
+                          <Badge className="bg-blue-100 text-blue-700 border-blue-200 px-3 py-1">
+                            Real-time messaging
+                          </Badge>
+                          <Badge className="bg-emerald-100 text-emerald-700 border-emerald-200 px-3 py-1">
+                            Secure & private
+                          </Badge>
+                          <Badge className="bg-purple-100 text-purple-700 border-purple-200 px-3 py-1">
+                            Team collaboration
+                          </Badge>
+                        </div>
                       </div>
                     </div>
                   </div>

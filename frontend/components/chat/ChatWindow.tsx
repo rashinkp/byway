@@ -89,9 +89,9 @@ export function ChatWindow({ chat, messages, onSendMessage, currentUserId }: Cha
   }
 
   return (
-    <div className="flex flex-col h-full bg-white">
+    <div className="flex flex-col h-full min-h-0 bg-white">
       {/* Header */}
-      <div className="flex items-center justify-between px-4 py-3 border-b border-gray-200 bg-white">
+      <div className="flex-shrink-0 flex items-center justify-between px-4 py-3 border-b border-gray-200 bg-white" style={{ minHeight: 64 }}>
         <div className="flex items-center space-x-3">
           {/* Avatar */}
           <div className="relative">
@@ -133,7 +133,7 @@ export function ChatWindow({ chat, messages, onSendMessage, currentUserId }: Cha
       </div>
 
       {/* Messages Area */}
-      <div className="flex-1 overflow-y-auto px-4 py-4 bg-gray-50">
+      <div className="flex-1 min-h-0 overflow-y-auto px-4 py-4 bg-gray-50">
         {chat.type === 'user' ? (
           <div className="flex items-center justify-center h-full">
             <div className="text-center space-y-4 max-w-sm">
@@ -178,7 +178,7 @@ export function ChatWindow({ chat, messages, onSendMessage, currentUserId }: Cha
       </div>
 
       {/* Input Area */}
-      <div className="px-4 py-3 bg-white border-t border-gray-200">
+      <div className="flex-shrink-0 px-4 py-3 bg-white border-t border-gray-200" style={{ minHeight: 64 }}>
         <form onSubmit={handleSendMessage}>
           <div className="flex items-center space-x-2">
             <Input
