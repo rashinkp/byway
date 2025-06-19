@@ -23,6 +23,7 @@ import { UnauthorizedError } from "../errors/unautherized-error";
 import { HttpError } from "../errors/http-error";
 import { BaseController } from "./base.controller";
 import { GetInstructorDetailsUseCase } from "../../../app/usecases/instructor/interfaces/get-instructor-details.usecase.interface";
+import { getSocketIOInstance } from "../../socketio";
 
 export class InstructorController extends BaseController {
   constructor(
@@ -137,6 +138,22 @@ export class InstructorController extends BaseController {
         validated,
         request.user
       );
+
+      // Get user details for Socket.IO notification
+      const user = await this.userRepository.findById(instructor.userId);
+      
+      // Emit real-time notification to the instructor
+      const io = getSocketIOInstance();
+      if (io && user) {
+        io.to(instructor.userId).emit('newNotification', {
+          message: `Congratulations! Your instructor application has been approved. You can now create and publish courses.`,
+          type: 'INSTRUCTOR_APPROVED',
+          instructorId: instructor.id,
+          instructorName: user.name || user.email,
+          timestamp: new Date().toISOString()
+        });
+      }
+
       return this.success_200(
         {
           id: instructor.id,
@@ -157,6 +174,22 @@ export class InstructorController extends BaseController {
         validated,
         request.user
       );
+
+      // Get user details for Socket.IO notification
+      const user = await this.userRepository.findById(instructor.userId);
+      
+      // Emit real-time notification to the instructor
+      const io = getSocketIOInstance();
+      if (io && user) {
+        io.to(instructor.userId).emit('newNotification', {
+          message: `Your instructor application has been declined. You can reapply after 5 minutes with updated information.`,
+          type: 'INSTRUCTOR_DECLINED',
+          instructorId: instructor.id,
+          instructorName: user.name || user.email,
+          timestamp: new Date().toISOString()
+        });
+      }
+
       return this.success_200(
         {
           id: instructor.id,

@@ -152,6 +152,58 @@ export const useSocketNotifications = () => {
           });
           break;
 
+        case 'INSTRUCTOR_APPROVED':
+          toast.success('🎉 Instructor Approved!', {
+            description: notification.message,
+            duration: 5000,
+            action: {
+              label: 'Go to Dashboard',
+              onClick: () => {
+                window.location.href = '/instructor/dashboard';
+              }
+            }
+          });
+          break;
+
+        case 'INSTRUCTOR_DECLINED':
+          toast.error('❌ Instructor Declined', {
+            description: notification.message,
+            duration: 8000,
+            action: {
+              label: 'Reapply',
+              onClick: () => {
+                window.location.href = '/instructor/apply';
+              }
+            }
+          });
+          break;
+
+        case 'USER_DISABLED':
+          toast.error('🚫 Account Disabled', {
+            description: notification.message,
+            duration: 10000,
+            action: {
+              label: 'Login',
+              onClick: () => {
+                window.location.href = '/login';
+              }
+            }
+          });
+          break;
+
+        case 'USER_ENABLED':
+          toast.success('✅ Account Enabled', {
+            description: notification.message,
+            duration: 8000,
+            action: {
+              label: 'Login',
+              onClick: () => {
+                window.location.href = '/login';
+              }
+            }
+          });
+          break;
+
         default:
           // Generic notification
           toast.info('🔔 New Notification', {

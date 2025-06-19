@@ -16,7 +16,7 @@ export interface InstructorDependencies {
 export function createInstructorDependencies(
   deps: SharedDependencies
 ): InstructorDependencies {
-  const { instructorRepository, userRepository } = deps;
+  const { instructorRepository, userRepository, createNotificationsForUsersUseCase } = deps;
 
   const updateUserUseCase = new UpdateUserUseCase(userRepository);
   const createInstructorUseCase = new CreateInstructorUseCase(
@@ -30,10 +30,13 @@ export function createInstructorDependencies(
   const approveInstructorUseCase = new ApproveInstructorUseCase(
     instructorRepository,
     userRepository,
-    updateUserUseCase
+    updateUserUseCase,
+    createNotificationsForUsersUseCase
   );
   const declineInstructorUseCase = new DeclineInstructorUseCase(
-    instructorRepository
+    instructorRepository,
+    userRepository,
+    createNotificationsForUsersUseCase
   );
   const getInstructorByUserIdUseCase = new GetInstructorByUserIdUseCase(
     instructorRepository

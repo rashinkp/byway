@@ -2,16 +2,41 @@ import { NotificationRepositoryInterface } from '../../app/repositories/notifica
 import { Notification } from '../../domain/entities/notification.entity';
 import { NotificationDTO } from '../../domain/dtos/notification.dto';
 import  { PrismaClient}  from '@prisma/client';
+import { NotificationEntityType } from '../../domain/enum/notification-entity-type.enum';
 
 export class PrismaNotificationRepository implements NotificationRepositoryInterface {
     constructor(private readonly prisma: PrismaClient) {}
+
+    private mapEntityType(entityType: NotificationEntityType): 'COURSE' | 'CHAT' | 'USER' | 'ASSIGNMENT' | 'GENERAL' | 'PAYMENT' | 'REVIEW' {
+        switch (entityType) {
+            case NotificationEntityType.COURSE:
+                return 'COURSE';
+            case NotificationEntityType.CHAT:
+                return 'CHAT';
+            case NotificationEntityType.USER:
+                return 'USER';
+            case NotificationEntityType.ASSIGNMENT:
+                return 'ASSIGNMENT';
+            case NotificationEntityType.GENERAL:
+                return 'GENERAL';
+            case NotificationEntityType.PAYMENT:
+                return 'PAYMENT';
+            case NotificationEntityType.REVIEW:
+                return 'REVIEW';
+            case NotificationEntityType.INSTRUCTOR:
+                return 'USER'; // Map INSTRUCTOR to USER since Prisma doesn't have INSTRUCTOR
+            default:
+                return 'GENERAL';
+        }
+    }
+
   async create(notification: Notification): Promise<NotificationDTO> {
     const created = await this.prisma.notification.create({
       data: {
         id: notification.id,
         userId: notification.userId.value,
         eventType: notification.eventType,
-        entityType: notification.entityType,
+        entityType: this.mapEntityType(notification.entityType),
         entityId: notification.entityId,
         entityName: notification.entityName,
         message: notification.message,

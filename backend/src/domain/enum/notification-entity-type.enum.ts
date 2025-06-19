@@ -6,4 +6,5 @@ export enum NotificationEntityType {
   GENERAL = 'GENERAL',
   PAYMENT = 'PAYMENT',
   REVIEW = 'REVIEW',
+  INSTRUCTOR = 'INSTRUCTOR',
 } 

@@ -27,6 +27,23 @@ export function registerMessageHandlers(socket: Socket, io: SocketIOServer, chat
     return { messageId: data.messageId };
   }, 'messageDeleted'));
 
+  // Handle when user joins a chat (to clear pending notifications)
+  socket.on('joinChat', async ({ chatId }) => {
+    try {
+      const userId = socket.data.user?.id;
+      if (userId && chatId) {
+        // Join the chat room
+        socket.join(chatId);
+        
+        // Clear any pending notifications for this user in this chat
+        // This will be handled by the notification batching service
+        console.log(`[SocketIO] User ${userId} joined chat ${chatId}`);
+      }
+    } catch (err) {
+      console.log('[SocketIO] Error in joinChat:', err);
+    }
+  });
+
   socket.on('sendMessage', async ({ chatId, userId, content }) => {
     try {
       console.log('[SocketIO] sendMessage event received:', { chatId, userId, content });
@@ -52,20 +69,8 @@ export function registerMessageHandlers(socket: Socket, io: SocketIOServer, chat
       socket.emit('message', message);
       io.to(effectiveChatId || chatId).emit('message', message);
       
-      // Emit real-time notification to the receiver
-      const receiverId = message.receiverId;
-      if (receiverId && receiverId !== senderId) {
-        io.to(receiverId).emit('newNotification', {
-          type: 'NEW_MESSAGE',
-          title: 'New Message',
-          message: `You have received a new message: ${content.substring(0, 50)}${content.length > 50 ? '...' : ''}`,
-          chatId: effectiveChatId || chatId,
-          messageId: message.id,
-          senderId: senderId,
-          receiverId: receiverId,
-          timestamp: new Date().toISOString()
-        });
-      }
+      // Note: Real-time notifications are now handled by the batching service
+      // which will send them after a delay to prevent overwhelming the user
       
       // Emit chatListUpdated to both users in the chat using controller
       const participants = await chatController.getChatParticipantsById(effectiveChatId || chatId);

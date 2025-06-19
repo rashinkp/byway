@@ -15,11 +15,11 @@ export interface UserDependencies {
 export function createUserDependencies(
   deps: SharedDependencies
 ): UserDependencies {
-  const { userRepository, instructorRepository } = deps;
+  const { userRepository, instructorRepository, createNotificationsForUsersUseCase } = deps;
 
   // Initialize use cases
   const getAllUsersUseCase = new GetAllUsersUseCase(userRepository);
-  const toggleDeleteUserUseCase = new ToggleDeleteUserUseCase(userRepository);
+  const toggleDeleteUserUseCase = new ToggleDeleteUserUseCase(userRepository, createNotificationsForUsersUseCase);
   const getCurrentUserUseCase = new GetCurrentUserUseCase(userRepository);
   const getUserByIdUseCase = new GetUserByIdUseCase(userRepository);
   const updateUserUseCase = new UpdateUserUseCase(userRepository);

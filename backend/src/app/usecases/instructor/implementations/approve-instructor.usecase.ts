@@ -7,12 +7,16 @@ import { IUserRepository } from "../../../repositories/user.repository";
 import { IUpdateUserUseCase } from "../../user/interfaces/update-user.usecase.interface";
 import { IApproveInstructorUseCase } from "../interfaces/approve-instructor.usecase.interface";
 import { IInstructorRepository } from "../../../repositories/instructor.repository";
+import { CreateNotificationsForUsersUseCase } from "../../notification/implementations/create-notifications-for-users.usecase";
+import { NotificationEventType } from "../../../../domain/enum/notification-event-type.enum";
+import { NotificationEntityType } from "../../../../domain/enum/notification-entity-type.enum";
 
 export class ApproveInstructorUseCase implements IApproveInstructorUseCase {
   constructor(
     private instructorRepository: IInstructorRepository,
     private userRepository: IUserRepository,
-    private updateUserUseCase: IUpdateUserUseCase
+    private updateUserUseCase: IUpdateUserUseCase,
+    private createNotificationsForUsersUseCase: CreateNotificationsForUsersUseCase
   ) {}
 
   async execute(
@@ -45,6 +49,18 @@ export class ApproveInstructorUseCase implements IApproveInstructorUseCase {
       user.id
     );
 
-    return this.instructorRepository.updateInstructor(instructor);
+    const updatedInstructor = await this.instructorRepository.updateInstructor(instructor);
+
+    // Send notification to the instructor about approval
+    await this.createNotificationsForUsersUseCase.execute([instructor.userId], {
+      eventType: NotificationEventType.INSTRUCTOR_APPROVED,
+      entityType: NotificationEntityType.INSTRUCTOR,
+      entityId: instructor.id,
+      entityName: user.name || user.email,
+      message: `Congratulations! Your instructor application has been approved. You can now create and publish courses.`,
+      link: `/instructor/dashboard`,
+    });
+
+    return updatedInstructor;
   }
 }

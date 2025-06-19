@@ -26,6 +26,7 @@ import { UnauthorizedError } from "../errors/unautherized-error";
 import { BadRequestError } from "../errors/bad-request-error";
 import { HttpError } from "../errors/http-error";
 import { BaseController } from "./base.controller";
+import { getSocketIOInstance } from "../../socketio";
 
 export class UserController extends BaseController {
   constructor(
@@ -81,6 +82,25 @@ export class UserController extends BaseController {
         validated,
         request.user
       );
+
+      // Emit real-time notification to the user
+      const io = getSocketIOInstance();
+      if (io) {
+        const isCurrentlyDeleted = user.deletedAt ? true : false;
+        const notificationType = isCurrentlyDeleted ? 'USER_DISABLED' : 'USER_ENABLED';
+        const message = isCurrentlyDeleted 
+          ? "Your account has been disabled by an administrator. If you believe this is a mistake, please contact support."
+          : "Your account has been re-enabled. You can now access the platform again.";
+        
+        io.to(user.id).emit('newNotification', {
+          message: message,
+          type: notificationType,
+          userId: user.id,
+          userName: user.name || user.email,
+          timestamp: new Date().toISOString()
+        });
+      }
+
       return this.success_200({
         id: user.id,
         name: user.name,

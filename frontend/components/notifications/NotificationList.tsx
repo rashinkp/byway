@@ -47,6 +47,10 @@ const eventTypeColors: Record<string, string> = {
   FEEDBACK: "bg-indigo-50 text-indigo-700 border-indigo-200",
   CHAT_UPDATE: "bg-orange-50 text-orange-700 border-orange-200",
   ASSIGNMENT: "bg-teal-50 text-teal-700 border-teal-200",
+  INSTRUCTOR_APPROVED: "bg-green-50 text-green-700 border-green-200",
+  INSTRUCTOR_DECLINED: "bg-red-50 text-red-700 border-red-200",
+  USER_DISABLED: "bg-red-50 text-red-700 border-red-200",
+  USER_ENABLED: "bg-green-50 text-green-700 border-green-200",
 };
 
 const eventTypeOptions = [
@@ -65,6 +69,10 @@ const eventTypeOptions = [
   { value: 'FEEDBACK', label: 'Feedback' },
   { value: 'CHAT_UPDATE', label: 'Chat Update' },
   { value: 'ASSIGNMENT', label: 'Assignment' },
+  { value: 'INSTRUCTOR_APPROVED', label: 'Instructor Approved' },
+  { value: 'INSTRUCTOR_DECLINED', label: 'Instructor Declined' },
+  { value: 'USER_DISABLED', label: 'Account Disabled' },
+  { value: 'USER_ENABLED', label: 'Account Enabled' },
 ];
 
 const sortOptions = [

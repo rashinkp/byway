@@ -39,6 +39,7 @@ import { IRevenueRepository } from "../app/repositories/revenue.repository";
 import { CourseReviewRepository } from "../infra/repositories/course-review.repository.impl";
 import { ICourseReviewRepository } from "../app/repositories/course-review.repository.interface";
 import { CreateNotificationsForUsersUseCase } from "../app/usecases/notification/implementations/create-notifications-for-users.usecase";
+import { NotificationBatchingService } from "../app/services/notification/notification-batching.service";
 
 export interface SharedDependencies {
   prisma: typeof prismaClient;
@@ -62,6 +63,8 @@ export interface SharedDependencies {
   cookieService: CookieService;
   walletRepository: IWalletRepository;
   paymentService: IPaymentService;
+  createNotificationsForUsersUseCase: CreateNotificationsForUsersUseCase;
+  notificationBatchingService: NotificationBatchingService;
 }
 
 export function createSharedDependencies(createNotificationsForUsersUseCase?: CreateNotificationsForUsersUseCase): SharedDependencies {
@@ -105,6 +108,7 @@ export function createSharedDependencies(createNotificationsForUsersUseCase?: Cr
   const cookieService = new CookieService();
 
   const revenueRepository = new PrismaRevenueRepository(prismaClient);
+  const notificationBatchingService = new NotificationBatchingService(createNotificationsForUsersUseCase!);
 
   return {
     prisma: prismaClient,
@@ -128,5 +132,7 @@ export function createSharedDependencies(createNotificationsForUsersUseCase?: Cr
     cookieService,
     walletRepository,
     paymentService,
+    createNotificationsForUsersUseCase: createNotificationsForUsersUseCase!,
+    notificationBatchingService,
   };
 }

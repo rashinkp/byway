@@ -35,6 +35,10 @@ const eventTypeColors: Record<string, string> = {
   CHAT_UPDATE: "bg-orange-50 text-orange-700 border-orange-200",
   NEW_MESSAGE: "bg-blue-50 text-blue-700 border-blue-200",
   ASSIGNMENT: "bg-teal-50 text-teal-700 border-teal-200",
+  INSTRUCTOR_APPROVED: "bg-green-50 text-green-700 border-green-200",
+  INSTRUCTOR_DECLINED: "bg-red-50 text-red-700 border-red-200",
+  USER_DISABLED: "bg-red-50 text-red-700 border-red-200",
+  USER_ENABLED: "bg-green-50 text-green-700 border-green-200",
 };
 
 export default function SocketProvider() {
@@ -137,6 +141,14 @@ function getNotificationTitle(type: string): string {
       return 'New Course Created';
     case 'NEW_MESSAGE':
       return 'New Message';
+    case 'INSTRUCTOR_APPROVED':
+      return 'Instructor Approved';
+    case 'INSTRUCTOR_DECLINED':
+      return 'Instructor Declined';
+    case 'USER_DISABLED':
+      return 'Account Disabled';
+    case 'USER_ENABLED':
+      return 'Account Enabled';
     default:
       return 'New Notification';
   }
@@ -183,6 +195,18 @@ function handleNotificationClick(notification: SocketNotification, userRole: str
       if (notification.chatId) {
         window.location.href = `/chat`;
       }
+      break;
+    case 'INSTRUCTOR_APPROVED':
+      window.location.href = '/instructor/dashboard';
+      break;
+    case 'INSTRUCTOR_DECLINED':
+      window.location.href = '/instructor/apply';
+      break;
+    case 'USER_DISABLED':
+      window.location.href = '/login';
+      break;
+    case 'USER_ENABLED':
+      window.location.href = '/login';
       break;
   }
 } 
