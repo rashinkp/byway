@@ -36,6 +36,10 @@ const eventTypeColors: Record<string, string> = {
   COURSE_CREATION: "bg-blue-50 text-blue-700 border-blue-200",
   COURSE_APPROVED: "bg-emerald-50 text-emerald-700 border-emerald-200",
   COURSE_DECLINED: "bg-red-50 text-red-700 border-red-200",
+  COURSE_ENABLED: "bg-green-50 text-green-700 border-green-200",
+  COURSE_DISABLED: "bg-orange-50 text-orange-700 border-orange-200",
+  COURSE_PURCHASED: "bg-purple-50 text-purple-700 border-purple-200",
+  REVENUE_EARNED: "bg-amber-50 text-amber-700 border-amber-200",
   ENROLLMENT: "bg-purple-50 text-purple-700 border-purple-200",
   PAYMENT: "bg-amber-50 text-amber-700 border-amber-200",
   SYSTEM: "bg-slate-50 text-slate-700 border-slate-200",
@@ -50,6 +54,10 @@ const eventTypeOptions = [
   { value: 'COURSE_CREATION', label: 'Course Creation' },
   { value: 'COURSE_APPROVED', label: 'Course Approved' },
   { value: 'COURSE_DECLINED', label: 'Course Declined' },
+  { value: 'COURSE_ENABLED', label: 'Course Enabled' },
+  { value: 'COURSE_DISABLED', label: 'Course Disabled' },
+  { value: 'COURSE_PURCHASED', label: 'Course Purchased' },
+  { value: 'REVENUE_EARNED', label: 'Revenue Earned' },
   { value: 'ENROLLMENT', label: 'Enrollment' },
   { value: 'PAYMENT', label: 'Payment' },
   { value: 'SYSTEM', label: 'System' },
@@ -81,6 +89,11 @@ const NotificationList: React.FC<NotificationListProps> = ({
   eventType,
   loadMore,
 }) => {
+  // Deduplicate notifications by ID as a safeguard
+  const uniqueNotifications = notifications.filter((notification, index, self) => 
+    index === self.findIndex(n => n.id === notification.id)
+  );
+
   return (
     <div className="w-full h-full flex flex-col bg-white">
       {/* Header */}
@@ -92,14 +105,9 @@ const NotificationList: React.FC<NotificationListProps> = ({
             </div>
             <div>
               <h2 className="text-xl font-semibold text-gray-900">Notifications</h2>
-              <p className="text-sm text-gray-500">{total ?? notifications.length} total</p>
+              <p className="text-sm text-gray-500">{total ?? uniqueNotifications.length} total</p>
             </div>
           </div>
-          {page && page > 1 && (
-            <Badge variant="outline" className="text-xs">
-              Page {page}
-            </Badge>
-          )}
         </div>
 
         {/* Search and Filters */}
@@ -166,7 +174,7 @@ const NotificationList: React.FC<NotificationListProps> = ({
             <h3 className="text-lg font-medium text-gray-900 mb-2">Loading notifications</h3>
             <p className="text-gray-500 text-sm">Please wait while we fetch your updates...</p>
           </div>
-        ) : notifications.length === 0 ? (
+        ) : uniqueNotifications.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-full py-12">
             <div className="w-16 h-16 bg-gray-100 rounded-2xl flex items-center justify-center mb-4">
               <Bell className="w-8 h-8 text-gray-400" />
@@ -177,7 +185,7 @@ const NotificationList: React.FC<NotificationListProps> = ({
         ) : (
           <div className="h-full overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
             <div className="p-4 space-y-2">
-              {notifications.map((notification) => (
+              {uniqueNotifications.map((notification) => (
                 <Card
                   key={notification.id}
                   className="group border-0 bg-gray-50/50 hover:bg-white hover:shadow-lg transition-all duration-300 cursor-pointer rounded-xl overflow-hidden"

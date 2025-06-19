@@ -17,6 +17,7 @@ import { IUserRepository } from "../../../repositories/user.repository";
 import Stripe from "stripe";
 import { OrderStatus } from "../../../../domain/enum/order-status.enum";
 import { IRevenueDistributionService } from "../../revenue-distribution/interfaces/revenue-distribution.service.interface";
+import { getSocketIOInstance } from "../../../../presentation/socketio";
 
 interface ServiceResponse<T> {
   data: T;
@@ -100,6 +101,9 @@ export class PaymentService implements IPaymentService {
         StatusCodes.INTERNAL_SERVER_ERROR
       );
     }
+
+    // Send real-time notifications via Socket.IO
+    await this.sendPurchaseNotifications({ userId }, orderItems);
 
     return {
       data: {
@@ -249,6 +253,9 @@ export class PaymentService implements IPaymentService {
               throw error;
             }
 
+            // Send real-time notifications via Socket.IO
+            await this.sendPurchaseNotifications(order, orderItems);
+
             return {
               data: { order, transaction },
               message: "Payment completed successfully"
@@ -326,6 +333,74 @@ export class PaymentService implements IPaymentService {
         error instanceof Error ? error.message : "Error processing webhook",
         StatusCodes.INTERNAL_SERVER_ERROR
       );
+    }
+  }
+
+  private async sendPurchaseNotifications(order: any, orderItems: any[]): Promise<void> {
+    try {
+      const io = getSocketIOInstance();
+      if (!io) {
+        console.log('Socket.IO not available for notifications');
+        return;
+      }
+
+      // Get admin user ID
+      const { items: admins } = await this.userRepository.findAll({
+        role: "ADMIN",
+        page: 1,
+        limit: 1,
+        includeDeleted: false
+      });
+      
+      if (!admins || admins.length === 0) {
+        console.error('Admin user not found for notifications');
+        return;
+      }
+      const adminId = admins[0].id;
+
+      // Process each order item and send notifications
+      for (const item of orderItems) {
+        const course = await this.orderRepository.findCourseById(item.courseId);
+        if (!course) {
+          console.error('Course not found for notifications:', item.courseId);
+          continue;
+        }
+
+        // Calculate shares (same logic as revenue distribution)
+        const coursePrice = Number(item.coursePrice);
+        const adminShare = (coursePrice * 20) / 100; // 20% admin share
+        const instructorShare = (coursePrice * 80) / 100; // 80% instructor share
+
+        // 1. Notify instructor about revenue earned
+        io.to(course.createdBy).emit('newNotification', {
+          message: `Revenue earned: $${instructorShare.toFixed(2)} from course "${course.title}" purchase.`,
+          type: 'REVENUE_EARNED',
+          courseId: course.id,
+          courseTitle: course.title,
+          amount: instructorShare
+        });
+
+        // 2. Notify admin about revenue earned
+        io.to(adminId).emit('newNotification', {
+          message: `Revenue earned: $${adminShare.toFixed(2)} from course "${course.title}" purchase.`,
+          type: 'REVENUE_EARNED',
+          courseId: course.id,
+          courseTitle: course.title,
+          amount: adminShare
+        });
+
+        // 3. Notify purchaser about course purchase completion
+        io.to(order.userId).emit('newNotification', {
+          message: `Course "${course.title}" purchase completed! You're ready to start learning.`,
+          type: 'COURSE_PURCHASED',
+          courseId: course.id,
+          courseTitle: course.title
+        });
+      }
+
+    } catch (error) {
+      console.error('Error sending purchase notifications via Socket.IO:', error);
+      // Don't throw error to avoid breaking the payment process
     }
   }
 } 

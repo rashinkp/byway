@@ -38,6 +38,7 @@ import { PrismaRevenueRepository } from "../infra/repositories/revenue.repositor
 import { IRevenueRepository } from "../app/repositories/revenue.repository";
 import { CourseReviewRepository } from "../infra/repositories/course-review.repository.impl";
 import { ICourseReviewRepository } from "../app/repositories/course-review.repository.interface";
+import { CreateNotificationsForUsersUseCase } from "../app/usecases/notification/implementations/create-notifications-for-users.usecase";
 
 export interface SharedDependencies {
   prisma: typeof prismaClient;
@@ -63,7 +64,7 @@ export interface SharedDependencies {
   paymentService: IPaymentService;
 }
 
-export function createSharedDependencies(): SharedDependencies {
+export function createSharedDependencies(createNotificationsForUsersUseCase?: CreateNotificationsForUsersUseCase): SharedDependencies {
   const userRepository = new UserRepository(prismaClient);
   const categoryRepository = new CategoryRepository(prismaClient);
   const courseRepository = new CourseRepository(prismaClient);
@@ -85,7 +86,8 @@ export function createSharedDependencies(): SharedDependencies {
     walletRepository,
     transactionRepository,
     orderRepository,
-    userRepository
+    userRepository,
+    createNotificationsForUsersUseCase!
   );
   const paymentService = new PaymentService(
     walletRepository,

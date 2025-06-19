@@ -145,6 +145,22 @@ export class CourseController extends BaseController {
         request.user.id,
         request.user.role
       );
+
+      // Emit real-time notification to the instructor (creator)
+      const io = getSocketIOInstance();
+      if (io && course.createdBy) {
+        const isCurrentlyDeleted = course.deletedAt ? false : true; // If deletedAt is null, it was just disabled
+        const message = isCurrentlyDeleted 
+          ? `Your course "${course.title}" has been disabled and is no longer available to students.`
+          : `Your course "${course.title}" has been enabled and is now available to students.`;
+        
+        io.to(course.createdBy).emit('newNotification', {
+          message: message,
+          courseId: course.id,
+          // ...any other notification data
+        });
+      }
+
       return this.success_200(course, "Course deleted successfully");
     });
   }

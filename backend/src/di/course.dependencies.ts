@@ -50,7 +50,11 @@ export function createCourseDependencies(
   const updateCourseUseCase = new UpdateCourseUseCase(
     courseRepository,
   );
-  const deleteCourseUseCase = new DeleteCourseUseCase(courseRepository);
+  const deleteCourseUseCase = new DeleteCourseUseCase(
+    courseRepository,
+    userRepository,
+    deps.createNotificationsForUsersUseCase
+  );
   const getEnrolledCoursesUseCase = new GetEnrolledCoursesUseCase(
     courseRepository,
     userRepository,

@@ -3,6 +3,18 @@ import { getUserNotificationsSocket } from '@/services/socketNotification';
 import { useAuth } from '@/hooks/auth/useAuth';
 import socket from '@/lib/socket';
 
+// Utility function to deduplicate notifications by ID
+const deduplicateNotifications = (notifications: any[]) => {
+  const seenIds = new Set();
+  return notifications.filter(n => {
+    if (seenIds.has(n.id)) {
+      return false;
+    }
+    seenIds.add(n.id);
+    return true;
+  });
+};
+
 function formatTime(dateStr: string) {
   const date = new Date(dateStr);
   return date.toLocaleString('en-US', {
@@ -74,9 +86,19 @@ export const useNotificationSocket = () => {
           eventType: n.eventType,
         }));
         if (opts?.reset) {
-          setNotifications(mapped);
+          // Deduplicate notifications when resetting
+          setNotifications(deduplicateNotifications(mapped));
         } else {
-          setNotifications((prev) => [...prev, ...mapped]);
+          setNotifications((prev) => {
+            // Create a Set of existing notification IDs for efficient lookup
+            const existingIds = new Set(prev.map(n => n.id));
+            // Filter out duplicates from new notifications
+            const uniqueNewNotifications = mapped.filter(n => !existingIds.has(n.id));
+            const combined = [...prev, ...uniqueNewNotifications];
+            
+            // Deduplicate the entire array by ID
+            return deduplicateNotifications(combined);
+          });
         }
         setLoading(false);
       }

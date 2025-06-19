@@ -11,6 +11,9 @@ import { Transaction } from "../../../../domain/entities/transaction.entity";
 import { Money } from "../../../../domain/value-object/money.value-object";
 import { Wallet } from "../../../../domain/entities/wallet.entity";
 import { IUserRepository } from "../../../repositories/user.repository";
+import { CreateNotificationsForUsersUseCase } from "../../../usecases/notification/implementations/create-notifications-for-users.usecase";
+import { NotificationEventType } from "../../../../domain/enum/notification-event-type.enum";
+import { NotificationEntityType } from "../../../../domain/enum/notification-entity-type.enum";
 
 export class RevenueDistributionService implements IRevenueDistributionService {
   private readonly ADMIN_SHARE_PERCENTAGE = 20;
@@ -20,7 +23,8 @@ export class RevenueDistributionService implements IRevenueDistributionService {
     private walletRepository: IWalletRepository,
     private transactionRepository: ITransactionRepository,
     private orderRepository: IOrderRepository,
-    private userRepository: IUserRepository
+    private userRepository: IUserRepository,
+    private createNotificationsForUsersUseCase: CreateNotificationsForUsersUseCase
   ) {}
 
   async distributeRevenue(orderId: string): Promise<void> {
@@ -72,6 +76,9 @@ export class RevenueDistributionService implements IRevenueDistributionService {
       orderItem.orderId,
       coursePrice
     );
+
+    // Send notifications to instructor and admin
+    await this.sendPurchaseNotifications(course, orderItem, instructorShare, adminShare);
   }
 
   private calculateShares(coursePrice: number): { adminShare: number; instructorShare: number } {
@@ -154,5 +161,57 @@ export class RevenueDistributionService implements IRevenueDistributionService {
 
     await this.transactionRepository.create(adminTransaction);
     await this.transactionRepository.create(instructorTransaction);
+  }
+
+  private async sendPurchaseNotifications(
+    course: any,
+    orderItem: any,
+    instructorShare: number,
+    adminShare: number
+  ): Promise<void> {
+    try {
+      // Get admin user ID and order details
+      const adminId = await this.getAdminUserId();
+      const order = await this.orderRepository.findById(orderItem.orderId);
+      
+      if (!order) {
+        console.error('Order not found for notifications');
+        return;
+      }
+
+      // 1. Notify instructor about revenue earned
+      await this.createNotificationsForUsersUseCase.execute([course.createdBy], {
+        eventType: NotificationEventType.REVENUE_EARNED,
+        entityType: NotificationEntityType.PAYMENT,
+        entityId: course.id,
+        entityName: course.title,
+        message: `Revenue earned: $${instructorShare.toFixed(2)} from course "${course.title}" purchase.`,
+        link: `/instructor/wallet`,
+      });
+
+      // 2. Notify admin about revenue earned
+      await this.createNotificationsForUsersUseCase.execute([adminId], {
+        eventType: NotificationEventType.REVENUE_EARNED,
+        entityType: NotificationEntityType.PAYMENT,
+        entityId: course.id,
+        entityName: course.title,
+        message: `Revenue earned: $${adminShare.toFixed(2)} from course "${course.title}" purchase.`,
+        link: `/admin/wallet`,
+      });
+
+      // 3. Notify purchaser about course purchase completion
+      await this.createNotificationsForUsersUseCase.execute([order.userId], {
+        eventType: NotificationEventType.COURSE_PURCHASED,
+        entityType: NotificationEntityType.COURSE,
+        entityId: course.id,
+        entityName: course.title,
+        message: `Course "${course.title}" purchase completed! You're ready to start learning.`,
+        link: `/user/my-courses`,
+      });
+
+    } catch (error) {
+      console.error('Error sending purchase notifications:', error);
+      // Don't throw error to avoid breaking the revenue distribution process
+    }
   }
 } 

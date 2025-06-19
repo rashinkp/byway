@@ -248,6 +248,10 @@ export class Course {
     this._updatedAt = new Date();
   }
 
+  isDeleted(): boolean {
+    return this._deletedAt !== null;
+  }
+
   setApprovalStatus(status: APPROVALSTATUS): void {
     if (this._approvalStatus === status) {
       throw new Error(`Course is already ${status}`);

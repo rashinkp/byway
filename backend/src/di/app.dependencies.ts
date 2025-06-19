@@ -68,14 +68,14 @@ export interface AppDependencies {
 }
 
 export function createAppDependencies(): AppDependencies {
-  const shared = createSharedDependencies();
+  const notificationDeps = createNotificationDependencies(createSharedDependencies());
+  const shared = createSharedDependencies(notificationDeps.createNotificationsForUsersUseCase);
   const { prisma, httpErrors, httpSuccess } = shared;
 
   const authDeps = createAuthDependencies(shared);
   const userDeps = createUserDependencies(shared);
   const instructorDeps = createInstructorDependencies(shared);
   const categoryDeps = createCategoryDependencies(shared);
-  const notificationDeps = createNotificationDependencies(shared);
   const courseDeps = createCourseDependencies({
     ...shared,
     createNotificationsForUsersUseCase: notificationDeps.createNotificationsForUsersUseCase,
