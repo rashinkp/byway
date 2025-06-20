@@ -53,28 +53,6 @@ export default function OrderSummary({
         </div>
       </div>
 
-      <div className="space-y-4">
-        <div className="flex items-center gap-2 text-gray-900">
-          <Tag className="w-5 h-5 text-blue-600" />
-          <h3 className="text-sm font-medium">Apply Coupon</h3>
-        </div>
-        <div className="flex gap-2">
-          <input
-            type="text"
-            value={couponCode}
-            onChange={(e) => onCouponChange(e.target.value)}
-            placeholder="Enter coupon code"
-            className="flex-1 px-4 py-2 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-          />
-          <Button
-            onClick={onApplyCoupon}
-            disabled={isPending || !couponCode}
-            className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-xl transition-colors"
-          >
-            Apply
-          </Button>
-        </div>
-      </div>
 
       <div className="space-y-4">
         <div className="flex items-center gap-2 text-gray-900">
