@@ -265,7 +265,7 @@ export default function CourseContent() {
     totalLessons > 0 ? Math.round((completedLessons / totalLessons) * 100) : 0;
 
   return (
-    <div className="flex flex-col lg:flex-row w-full bg-gray-100 min-h-screen">
+    <div className="flex flex-col lg:flex-row w-full bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 min-h-screen">
       <EnrolledCourseSidebar
         courseTitle="Introduction to User Experience Design"
         progressPercentage={progressPercentage}
@@ -280,15 +280,21 @@ export default function CourseContent() {
         goToPreviousPage={goToPreviousPage}
         goToNextPage={goToNextPage}
       />
-      <div className="flex-1 p-6 lg:p-10">
+      <div className="flex-1 p-4 lg:p-8 xl:p-12">
         {isError ? (
-          <div className="flex flex-col items-center justify-center h-full space-y-4">
-            <p className="text-red-600 text-lg">
-              Unable to load course content
+          <div className="flex flex-col items-center justify-center h-full space-y-6 animate-fade-in">
+            <div className="w-24 h-24 rounded-full bg-red-100 flex items-center justify-center mb-4">
+              <svg className="w-12 h-12 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
+              </svg>
+            </div>
+            <h3 className="text-2xl font-bold text-gray-800 mb-2">Unable to Load Course</h3>
+            <p className="text-gray-600 text-center max-w-md">
+              We're having trouble loading the course content. Please try again or return to your courses.
             </p>
             <button
               onClick={() => router.push("/user/my-courses")}
-              className="px-4 py-2 bg-primary text-white rounded-md hover:bg-primary/90 transition-colors"
+              className="px-8 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-semibold rounded-xl hover:from-blue-700 hover:to-indigo-700 transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl"
             >
               Return to My Courses
             </button>
@@ -296,34 +302,176 @@ export default function CourseContent() {
         ) : isLoading || isProgressLoading ? (
           <LessonContentSkeleton />
         ) : selectedLesson?.id === "certificate" ? (
-          <div className="max-w-4xl mx-auto relative">
-            <div className="mt-12 flex flex-col items-center justify-center bg-white rounded-lg shadow-lg p-8 border border-blue-100 animate-fade-in">
-              <h2 className="text-2xl font-bold text-blue-700 mb-2">🎓 Course Certificate</h2>
-              <p className="text-gray-600 mb-4">Congratulations! You have completed all lessons in this course.</p>
-              {certLoading && <p className="text-blue-500">Checking for your certificate...</p>}
-              {certError && <p className="text-red-500 mb-2">{certError}</p>}
-              {certificate ? (
-                <a
-                  href={certificate.pdfUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-block px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg shadow hover:bg-blue-700 transition-colors mt-2"
-                >
-                  <span role="img" aria-label="certificate">📄</span> View/Download Certificate
-                </a>
-              ) : (
-                <button
-                  className="inline-block px-6 py-3 bg-green-600 text-white font-semibold rounded-lg shadow hover:bg-green-700 transition-colors mt-2"
-                  onClick={createCertificate}
-                  disabled={certLoading}
-                >
-                  <span role="img" aria-label="generate">✨</span> Generate Certificate
-                </button>
-              )}
+          <div className="max-w-5xl mx-auto relative animate-fade-in">
+            {/* Celebration Header */}
+            <div className="text-center mb-8">
+              <div className="inline-flex items-center justify-center p-4 bg-gradient-to-r from-yellow-400 to-orange-400 rounded-full mb-4 animate-bounce">
+                <span className="text-4xl">🎉</span>
+              </div>
+              <h1 className="text-4xl lg:text-5xl font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 bg-clip-text text-transparent mb-2">
+                Congratulations!
+              </h1>
+              <p className="text-xl text-gray-600">You've successfully completed the course</p>
             </div>
+
+            {/* Certificate Container */}
+            <div className="relative overflow-hidden rounded-3xl bg-white shadow-2xl border border-gray-200">
+              {/* Decorative Background Pattern */}
+              <div className="absolute inset-0 opacity-5">
+                <div className="absolute inset-0" style={{
+                  backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%239C92AC' fill-opacity='0.4'%3E%3Cpath d='m36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`
+                }} />
+              </div>
+
+              {/* Header Section */}
+              <div className="relative bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 px-8 py-12 text-center text-white">
+                <div className="absolute top-4 left-4 right-4 flex justify-between">
+                  <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center">
+                    <span className="text-lg">🏆</span>
+                  </div>
+                  <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center">
+                    <span className="text-lg">⭐</span>
+                  </div>
+                </div>
+                
+                <div className="mb-6">
+                  <div className="w-20 h-20 mx-auto bg-white/10 rounded-full flex items-center justify-center mb-4 backdrop-blur-sm">
+                    <span className="text-4xl">🎓</span>
+                  </div>
+                  <h2 className="text-3xl lg:text-4xl font-bold mb-2">Certificate of Completion</h2>
+                  <div className="w-24 h-1 bg-white/50 mx-auto rounded-full"></div>
+                </div>
+
+                <div className="space-y-3">
+                  <p className="text-lg opacity-90">This is to certify that</p>
+                  <h3 className="text-2xl lg:text-3xl font-bold text-yellow-300">
+                    {certificate?.userName || "Student Name"}
+                  </h3>
+                  <p className="text-lg opacity-90">has successfully completed</p>
+                  <h4 className="text-xl lg:text-2xl font-semibold">
+                    {certificate?.courseTitle || "Course Title"}
+                  </h4>
+                </div>
+              </div>
+
+              {/* Content Section */}
+              <div className="relative px-8 py-12">
+                <div className="grid lg:grid-cols-2 gap-8 items-center">
+                  {/* Certificate Preview/Actions */}
+                  <div className="space-y-6">
+                    {certLoading && (
+                      <div className="flex items-center justify-center p-8 bg-blue-50 rounded-2xl">
+                        <div className="flex items-center space-x-3">
+                          <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
+                          <span className="text-blue-600 font-medium">Preparing your certificate...</span>
+                        </div>
+                      </div>
+                    )}
+
+                    {certError && (
+                      <div className="p-4 bg-red-50 border border-red-200 rounded-xl">
+                        <div className="flex items-center space-x-2">
+                          <span className="text-red-500">⚠️</span>
+                          <span className="text-red-700 font-medium">{certError}</span>
+                        </div>
+                      </div>
+                    )}
+
+                    {certificate?.pdfUrl ? (
+                      <a
+                        href={certificate.pdfUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="group inline-flex items-center justify-center w-full px-8 py-4 bg-gradient-to-r from-green-600 to-emerald-600 text-white font-semibold rounded-xl hover:from-green-700 hover:to-emerald-700 transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl"
+                      >
+                        <span className="mr-2 text-lg group-hover:animate-bounce">📄</span>
+                        View & Download Certificate
+                        <svg className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                        </svg>
+                      </a>
+                    ) : (
+                      <button
+                        className="group inline-flex items-center justify-center w-full px-8 py-4 bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-semibold rounded-xl hover:from-purple-700 hover:to-indigo-700 transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+                        onClick={createCertificate}
+                        disabled={certLoading}
+                      >
+                        <span className="mr-2 text-lg group-hover:animate-pulse">✨</span>
+                        {certLoading ? "Generating..." : "Generate Certificate"}
+                        {!certLoading && (
+                          <svg className="ml-2 w-5 h-5 group-hover:rotate-12 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                          </svg>
+                        )}
+                      </button>
+                    )}
+                  </div>
+
+                  {/* Achievement Stats */}
+                  <div className="space-y-6">
+                    <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl p-6 border border-blue-100">
+                      <h4 className="text-lg font-semibold text-gray-800 mb-4 flex items-center">
+                        <span className="mr-2">📊</span>
+                        Achievement Summary
+                      </h4>
+                      <div className="space-y-4">
+                        <div className="flex justify-between items-center">
+                          <span className="text-gray-600">Lessons Completed</span>
+                          <span className="font-bold text-green-600">{completedLessons}/{totalLessons}</span>
+                        </div>
+                        <div className="flex justify-between items-center">
+                          <span className="text-gray-600">Progress</span>
+                          <span className="font-bold text-blue-600">{progressPercentage}%</span>
+                        </div>
+                        <div className="w-full bg-gray-200 rounded-full h-3">
+                          <div 
+                            className="bg-gradient-to-r from-blue-500 to-green-500 h-3 rounded-full transition-all duration-1000 ease-out"
+                            style={{ width: `${progressPercentage}%` }}
+                          ></div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {certificate && (
+                      <div className="bg-gradient-to-br from-amber-50 to-yellow-50 rounded-2xl p-6 border border-amber-100">
+                        <h4 className="text-lg font-semibold text-gray-800 mb-4 flex items-center">
+                          <span className="mr-2">🔖</span>
+                          Certificate Details
+                        </h4>
+                        <div className="space-y-3 text-sm">
+                          <div className="flex justify-between items-center">
+                            <span className="text-gray-600">Certificate No:</span>
+                            <span className="font-mono text-xs bg-gray-100 px-2 py-1 rounded">
+                              {certificate.certificateNumber}
+                            </span>
+                          </div>
+                          <div className="flex justify-between items-center">
+                            <span className="text-gray-600">Issue Date:</span>
+                            <span className="font-medium">
+                              {certificate.issuedAt && new Date(certificate.issuedAt).toLocaleDateString()}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              {/* Footer Decoration */}
+              <div className="relative h-4 bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600">
+                <div className="absolute inset-0 bg-gradient-to-r from-yellow-400 via-pink-400 to-red-400 opacity-30"></div>
+              </div>
+            </div>
+
+            {/* Floating Elements */}
+            <div className="absolute -top-4 -left-4 w-8 h-8 bg-yellow-400 rounded-full animate-pulse opacity-70"></div>
+            <div className="absolute -top-2 -right-6 w-6 h-6 bg-pink-400 rounded-full animate-pulse opacity-70 animation-delay-300"></div>
+            <div className="absolute -bottom-4 -left-6 w-10 h-10 bg-blue-400 rounded-full animate-pulse opacity-70 animation-delay-700"></div>
+            <div className="absolute -bottom-2 -right-4 w-4 h-4 bg-green-400 rounded-full animate-pulse opacity-70 animation-delay-500"></div>
           </div>
         ) : selectedLesson ? (
-          <div className="max-w-4xl mx-auto relative">
+          <div className="max-w-5xl mx-auto relative">
             <LessonContent
               selectedLesson={selectedLesson}
               content={content}
@@ -341,36 +489,19 @@ export default function CourseContent() {
             )}
           </div>
         ) : (
-          <div className="flex items-center justify-center h-full">
-            <p className="text-gray-500 text-lg">Select a lesson to begin</p>
+          <div className="flex flex-col items-center justify-center h-full space-y-6 animate-fade-in">
+            <div className="w-32 h-32 rounded-full bg-gradient-to-br from-blue-100 to-indigo-100 flex items-center justify-center mb-4">
+              <svg className="w-16 h-16 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+              </svg>
+            </div>
+            <h3 className="text-2xl font-bold text-gray-800 mb-2">Ready to Learn?</h3>
+            <p className="text-gray-600 text-center max-w-md">
+              Select a lesson from the sidebar to begin your learning journey
+            </p>
           </div>
         )}
       </div>
-      <style jsx>{`
-        @keyframes fadeIn {
-          from {
-            opacity: 0;
-            transform: translateY(10px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-        .animate-fade-in {
-          animation: fadeIn 0.3s ease-out;
-        }
-        video::-webkit-media-controls-panel {
-          background-color: rgba(0, 0, 0, 0.7);
-        }
-        video::-webkit-media-controls-play-button,
-        video::-webkit-media-controls-volume-slider,
-        video::-webkit-media-controls-mute-button,
-        video::-webkit-media-controls-timeline,
-        video::-webkit-media-controls-current-time-display {
-          filter: brightness(1.2);
-        }
-      `}</style>
     </div>
   );
 }
