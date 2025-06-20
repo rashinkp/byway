@@ -1,5 +1,6 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useCallback } from "react";
 import { Upload, File, CheckCircle, XCircle } from "lucide-react";
+import { getPresignedUrl, uploadFileToS3 } from "@/api/file";
 
 interface ThumbnailUploadInputProps {
   file: File | null;
@@ -24,27 +25,7 @@ export const ThumbnailUploadInput = ({
   setUploadProgress,
   errors,
 }: ThumbnailUploadInputProps) => {
-  const [isScriptLoaded, setIsScriptLoaded] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
-
-  useEffect(() => {
-    const script = document.createElement("script");
-    script.src =
-      process.env.NEXT_PUBLIC_CLOUDINARY_WIDGET_URL ||
-      "https://widget.cloudinary.com/v2.0/global/all.js";
-    script.async = true;
-    script.onload = () => setIsScriptLoaded(true);
-    script.onerror = () => setIsScriptLoaded(false);
-    document.body.appendChild(script);
-
-    return () => {
-      setTimeout(() => {
-        if (document.body.contains(script)) {
-          document.body.removeChild(script);
-        }
-      }, 1000);
-    };
-  }, []);
 
   const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
@@ -69,57 +50,26 @@ export const ThumbnailUploadInput = ({
     }
   };
 
-  const uploadToCloudinary = useCallback(
+  // S3 upload logic
+  const uploadToS3 = useCallback(
     async (file: File): Promise<string> => {
-      if (!isScriptLoaded || !window.cloudinary) {
-        throw new Error("Cloudinary widget not loaded");
+      setUploadStatus("uploading");
+      setUploadProgress(0);
+      try {
+        const { uploadUrl, fileUrl } = await getPresignedUrl(file.name, file.type);
+        await uploadFileToS3(file, uploadUrl, setUploadProgress);
+        setUploadStatus("success");
+        return fileUrl;
+      } catch (error) {
+        setUploadStatus("error");
+        throw error;
       }
-
-      const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
-      const uploadPreset = process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET;
-      const apiBaseUrl = process.env.NEXT_PUBLIC_CLOUDINARY_API_BASE_URL;
-
-      if (!cloudName || !uploadPreset || !apiBaseUrl) {
-        throw new Error("Cloudinary configuration missing");
-      }
-
-      return new Promise((resolve, reject) => {
-        setUploadStatus("uploading");
-        const formData = new FormData();
-        formData.append("file", file);
-        formData.append("upload_preset", uploadPreset);
-        formData.append("cloud_name", cloudName);
-
-        const xhr = new XMLHttpRequest();
-        xhr.open("POST", `${apiBaseUrl}/${cloudName}/image/upload`, true);
-
-        xhr.upload.onprogress = (event) => {
-          if (event.lengthComputable) {
-            setUploadProgress((event.loaded / event.total) * 100);
-          }
-        };
-
-        xhr.onload = () => {
-          if (xhr.status === 200) {
-            const response = JSON.parse(xhr.responseText);
-            setUploadStatus("success");
-            resolve(response.secure_url);
-          } else {
-            setUploadStatus("error");
-            reject(new Error("Upload failed"));
-          }
-        };
-
-        xhr.onerror = () => {
-          setUploadStatus("error");
-          reject(new Error("Upload failed"));
-        };
-
-        xhr.send(formData);
-      });
     },
-    [isScriptLoaded, setUploadStatus, setUploadProgress]
+    [setUploadStatus, setUploadProgress]
   );
+
+  // Expose uploadToS3 as a static method for ContentInputForm
+  (ThumbnailUploadInput as any).uploadToS3 = uploadToS3;
 
   return (
     <div className="space-y-3">
@@ -238,53 +188,4 @@ export const ThumbnailUploadInput = ({
       )}
     </div>
   );
-};
-
-ThumbnailUploadInput.uploadToCloudinary = async (
-  file: File,
-  setUploadStatus: (status: "idle" | "uploading" | "success" | "error") => void,
-  setUploadProgress: (progress: number) => void
-): Promise<string> => {
-  const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
-  const uploadPreset = process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET;
-  const apiBaseUrl = process.env.NEXT_PUBLIC_CLOUDINARY_API_BASE_URL;
-
-  if (!cloudName || !uploadPreset || !apiBaseUrl) {
-    throw new Error("Cloudinary configuration missing");
-  }
-
-  return new Promise((resolve, reject) => {
-    setUploadStatus("uploading");
-    const formData = new FormData();
-    formData.append("file", file);
-    formData.append("upload_preset", uploadPreset);
-    formData.append("cloud_name", cloudName);
-
-    const xhr = new XMLHttpRequest();
-    xhr.open("POST", `${apiBaseUrl}/${cloudName}/image/upload`, true);
-
-    xhr.upload.onprogress = (event) => {
-      if (event.lengthComputable) {
-        setUploadProgress((event.loaded / event.total) * 100);
-      }
-    };
-
-    xhr.onload = () => {
-      if (xhr.status === 200) {
-        const response = JSON.parse(xhr.responseText);
-        setUploadStatus("success");
-        resolve(response.secure_url);
-      } else {
-        setUploadStatus("error");
-        reject(new Error("Upload failed"));
-      }
-    };
-
-    xhr.onerror = () => {
-      setUploadStatus("error");
-      reject(new Error("Upload failed"));
-    };
-
-    xhr.send(formData);
-  });
 };

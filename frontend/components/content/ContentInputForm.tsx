@@ -119,11 +119,8 @@ export const ContentInputForm = ({
     let finalThumbnailUrl = thumbnailUrl;
     if (file) {
       try {
-        finalFileUrl = await FileUploadInput.uploadToCloudinary(
-          file,
-          type,
-          setUploadStatus,
-          setUploadProgress
+        finalFileUrl = await (FileUploadInput as any).uploadToS3(
+          file
         );
       } catch (error) {
         setErrors((prev) => ({
@@ -135,10 +132,8 @@ export const ContentInputForm = ({
     }
     if (thumbnail && type === ContentType.VIDEO) {
       try {
-        finalThumbnailUrl = await ThumbnailUploadInput.uploadToCloudinary(
-          thumbnail,
-          setThumbnailUploadStatus,
-          setThumbnailUploadProgress
+        finalThumbnailUrl = await (ThumbnailUploadInput as any).uploadToS3(
+          thumbnail
         );
       } catch (error) {
         setErrors((prev) => ({
