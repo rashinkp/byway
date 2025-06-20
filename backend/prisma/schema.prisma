@@ -38,6 +38,7 @@ model User {
   user2Chats        Chat[]          @relation("User2Chats")
   sentMessages      Message[]       @relation("MessageSender")
   notifications     Notification[]  // User's notifications
+  certificates      Certificate[]   @relation("UserToCertificate")
 }
 
 model UserProfile {
@@ -158,6 +159,7 @@ model Course {
   refunds        Refund[]      @relation("CourseToRefund")
   lessonProgress LessonProgress[] @relation("CourseToLessonProgress")
   reviews        CourseReview[] @relation("CourseToReview")
+  certificates   Certificate[] @relation("CourseToCertificate")
 }
 
 model CourseDetails {
@@ -212,6 +214,7 @@ model Enrollment {
   course        Course        @relation("CourseEnrollments", fields: [courseId], references: [id], onDelete: Cascade)
   orderItem     OrderItem?    @relation("OrderItemToEnrollment", fields: [orderItemId], references: [id])
   lessonProgress LessonProgress[] @relation("EnrollmentToLessonProgress")
+  certificates  Certificate[] @relation("EnrollmentToCertificate")
 
   @@id([userId, courseId])
   @@index([userId])
@@ -573,4 +576,39 @@ model Notification {
   link          String?
   createdAt     DateTime    @default(now())
   expiresAt     DateTime    // Expiry date for the notification (3 months after createdAt)
+}
+
+// Certificate System
+model Certificate {
+  id              String           @id @default(uuid())
+  userId          String
+  courseId        String
+  enrollmentId    String
+  certificateNumber String         @unique // Unique certificate number
+  status          CertificateStatus @default(PENDING)
+  issuedAt        DateTime?
+  expiresAt       DateTime?        // Optional expiry date
+  pdfUrl          String?          // URL to the generated PDF certificate
+  metadata        Json?            // Additional certificate data (scores, completion date, etc.)
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+
+  user            User             @relation("UserToCertificate", fields: [userId], references: [id], onDelete: Cascade)
+  course          Course           @relation("CourseToCertificate", fields: [courseId], references: [id], onDelete: Cascade)
+  enrollment      Enrollment       @relation("EnrollmentToCertificate", fields: [enrollmentId, courseId], references: [userId, courseId], onDelete: Cascade)
+
+  @@unique([userId, courseId]) // One certificate per user per course
+  @@index([userId])
+  @@index([courseId])
+  @@index([certificateNumber])
+  @@index([status])
+  @@index([issuedAt])
+}
+
+enum CertificateStatus {
+  PENDING
+  GENERATED
+  ISSUED
+  EXPIRED
+  REVOKED
 }

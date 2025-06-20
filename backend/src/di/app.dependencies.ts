@@ -25,7 +25,8 @@ import { dashboardRouter } from "../presentation/express/router/dashboard.router
 import courseReviewRouter from "../presentation/express/router/course-review.router";
 import { createChatDependencies } from "./chat.dependencies";
 import { createNotificationDependencies } from "./notification.dependencies";
-
+import { createCertificateDependencies } from "./certificate.dependencies";
+import { CertificateController } from "../presentation/http/controllers/certificate.controller";
 export interface AppDependencies {
   authController: any;
   userController: any;
@@ -65,6 +66,7 @@ export interface AppDependencies {
   cartRepository: any;
   courseReviewRepository: any;
   lessonRepository: any;
+  certificateController: CertificateController;
 }
 
 export function createAppDependencies(): AppDependencies {
@@ -109,6 +111,16 @@ export function createAppDependencies(): AppDependencies {
   );
   const courseReviewRouterInstance = courseReviewRouter(courseReviewDeps.courseReviewController);
 
+  // Certificate dependencies
+  const certificateDeps = createCertificateDependencies(
+    shared,
+    shared.certificateRepository,
+    shared.enrollmentRepository,
+    shared.courseRepository,
+    shared.userRepository,
+    shared.lessonProgressRepository
+  );
+
   return {
     ...shared,
     ...notificationDeps,
@@ -149,5 +161,6 @@ export function createAppDependencies(): AppDependencies {
     cartRepository: shared.cartRepository,
     courseReviewRepository: shared.courseReviewRepository,
     lessonRepository: shared.lessonRepository,
+    certificateController: certificateDeps.certificateController,
   };
 }

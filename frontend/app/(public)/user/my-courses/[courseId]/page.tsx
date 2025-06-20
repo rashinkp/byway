@@ -3,7 +3,7 @@
 
 import { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { ILesson } from "@/types/lesson";
+import { ILesson, LessonStatus } from "@/types/lesson";
 import { useGetAllLessonsInCourse } from "@/hooks/lesson/useGetAllLesson";
 import { useGetContentByLessonId } from "@/hooks/content/useGetContentByLessonId";
 import { useProgress } from "@/hooks/progress/useProgress";
@@ -15,6 +15,7 @@ import { toast } from "sonner";
 import { AxiosError } from "axios";
 import { LockOverlay } from "@/components/ui/LockOverlay";
 import { IQuizAnswer } from "@/types/progress";
+import { useCertificate } from "@/hooks/certificate/useCertificate";
 
 interface LessonWithCompletion extends ILesson {
   completed: boolean;
@@ -63,6 +64,9 @@ export default function CourseContent() {
     error: contentError,
   } = useGetContentByLessonId(selectedLesson?.id || "");
 
+  // Fetch certificate
+  const { certificate, loading: certLoading, error: certError, fetchCertificate, createCertificate } = useCertificate(courseId);
+
   // Handle content errors
   useEffect(() => {
     if (isContentError && contentError) {
@@ -84,8 +88,8 @@ export default function CourseContent() {
           router.push(`/courses/${courseId}`);
         }, 2000);
       } else {
-        toast.error("Failed to load lesson content. Please try again.");
-      }
+       console.log("errorMessage", errorMessage);
+      } 
     }
   }, [isContentError, contentError, courseId, router]);
 
@@ -163,12 +167,34 @@ export default function CourseContent() {
     }
   }, [progressData?.accessStatus, router]);
 
-  const allLessons = lessonsWithCompletion;
-  const currentLessonIndex = allLessons.findIndex(
+  // Fetch certificate when all lessons are completed
+  useEffect(() => {
+    if (lessonsWithCompletion.length > 0 && lessonsWithCompletion.every(lesson => lesson.completed)) {
+      fetchCertificate();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [lessonsWithCompletion]);
+
+  // Add certificate as a pseudo-lesson
+  const certificateStep: LessonWithCompletion = {
+    id: "certificate",
+    title: "🎓 Certificate",
+    completed: !!certificate,
+    isLocked: !lessonsWithCompletion.every(lesson => lesson.completed),
+    courseId: courseId,
+    order: lessonsWithCompletion.length + 1,
+    status: LessonStatus.PUBLISHED,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+  };
+
+  const allItems = [...lessonsWithCompletion, certificateStep];
+
+  const currentLessonIndex = allItems.findIndex(
     (lesson) => lesson.id === selectedLesson?.id
   );
 
-  const handleLessonSelect = (lesson: LessonWithCompletion) => {
+  const handleLessonSelect = (lesson: LessonWithCompletion | typeof certificateStep) => {
     setSelectedLesson(lesson);
   };
 
@@ -210,14 +236,14 @@ export default function CourseContent() {
   };
 
   const goToNextLesson = () => {
-    if (currentLessonIndex < allLessons.length - 1) {
-      setSelectedLesson(allLessons[currentLessonIndex + 1]);
+    if (currentLessonIndex < allItems.length - 1) {
+      setSelectedLesson(allItems[currentLessonIndex + 1]);
     }
   };
 
   const goToPrevLesson = () => {
     if (currentLessonIndex > 0) {
-      setSelectedLesson(allLessons[currentLessonIndex - 1]);
+      setSelectedLesson(allItems[currentLessonIndex - 1]);
     }
   };
 
@@ -234,7 +260,7 @@ export default function CourseContent() {
   };
 
   const completedLessons = progressData?.completedLessons || 0;
-  const totalLessons = progressData?.totalLessons || allLessons.length;
+  const totalLessons = progressData?.totalLessons || allItems.length;
   const progressPercentage =
     totalLessons > 0 ? Math.round((completedLessons / totalLessons) * 100) : 0;
 
@@ -246,7 +272,7 @@ export default function CourseContent() {
         isLoading={isLoading || isProgressLoading}
         isError={isError}
         error={error}
-        allLessons={allLessons}
+        allLessons={allItems}
         selectedLesson={selectedLesson}
         handleLessonSelect={handleLessonSelect}
         data={data}
@@ -269,6 +295,33 @@ export default function CourseContent() {
           </div>
         ) : isLoading || isProgressLoading ? (
           <LessonContentSkeleton />
+        ) : selectedLesson?.id === "certificate" ? (
+          <div className="max-w-4xl mx-auto relative">
+            <div className="mt-12 flex flex-col items-center justify-center bg-white rounded-lg shadow-lg p-8 border border-blue-100 animate-fade-in">
+              <h2 className="text-2xl font-bold text-blue-700 mb-2">🎓 Course Certificate</h2>
+              <p className="text-gray-600 mb-4">Congratulations! You have completed all lessons in this course.</p>
+              {certLoading && <p className="text-blue-500">Checking for your certificate...</p>}
+              {certError && <p className="text-red-500 mb-2">{certError}</p>}
+              {certificate ? (
+                <a
+                  href={certificate.pdfUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-block px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg shadow hover:bg-blue-700 transition-colors mt-2"
+                >
+                  <span role="img" aria-label="certificate">📄</span> View/Download Certificate
+                </a>
+              ) : (
+                <button
+                  className="inline-block px-6 py-3 bg-green-600 text-white font-semibold rounded-lg shadow hover:bg-green-700 transition-colors mt-2"
+                  onClick={createCertificate}
+                  disabled={certLoading}
+                >
+                  <span role="img" aria-label="generate">✨</span> Generate Certificate
+                </button>
+              )}
+            </div>
+          </div>
         ) : selectedLesson ? (
           <div className="max-w-4xl mx-auto relative">
             <LessonContent
@@ -278,7 +331,7 @@ export default function CourseContent() {
               isContentError={isContentError}
               contentError={contentError}
               currentLessonIndex={currentLessonIndex}
-              allLessons={allLessons}
+              allLessons={allItems}
               goToPrevLesson={goToPrevLesson}
               goToNextLesson={goToNextLesson}
               markLessonComplete={markLessonComplete}
