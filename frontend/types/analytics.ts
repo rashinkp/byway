@@ -106,6 +106,7 @@ export interface OverallRevenueResponse {
     totalRevenue: number;
     refundedAmount: number;
     netRevenue: number;
+    coursesSold: number;
     period: {
       start: string;
       end: string;

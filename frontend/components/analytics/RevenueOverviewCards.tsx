@@ -17,6 +17,7 @@ interface RevenueOverviewCardsProps {
       totalRevenue: number;
       refundedAmount: number;
       netRevenue: number;
+      coursesSold: number;
     };
   } | null;
   dateRange: DateRange;
@@ -66,18 +67,17 @@ export default function RevenueOverviewCards({
         <div className="flex items-center justify-between">
           <div className="space-y-2">
             <p className="text-sm font-medium text-gray-500 uppercase tracking-wide">
-              Refunded Amount
+              Courses Sold
             </p>
             <h3 className="text-2xl font-semibold text-gray-900">
-              {formatCurrency(overallData?.data?.refundedAmount || 0)}
+              {overallData?.data?.coursesSold ?? 0}
             </h3>
             <div className="text-sm text-gray-500">
-              Net after refunds:{" "}
-              {formatCurrency(overallData?.data?.netRevenue || 0)}
+              In selected period
             </div>
           </div>
-          <div className="bg-red-50 p-3 rounded-lg">
-            <ArrowDownRight className="w-6 h-6 text-red-600" />
+          <div className="bg-purple-50 p-3 rounded-lg">
+            <Activity className="w-6 h-6 text-purple-600" />
           </div>
         </div>
       </div>
@@ -94,10 +94,7 @@ export default function RevenueOverviewCards({
                 : "Select date"}
             </h3>
             <div className="text-sm text-gray-500">
-              To:{" "}
-              {dateRange.to
-                ? format(dateRange.to, "MMM d, yyyy")
-                : "Select date"}
+              To: {dateRange.to ? format(dateRange.to, "MMM d, yyyy") : "Select date"}
             </div>
           </div>
           <div className="bg-green-50 p-3 rounded-lg">

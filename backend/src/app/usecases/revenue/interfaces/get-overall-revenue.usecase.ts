@@ -7,6 +7,7 @@ export interface IGetOverallRevenueUseCase {
     totalRevenue: number;
     refundedAmount: number;
     netRevenue: number;
+    coursesSold: number;
     period: {
       start: Date;
       end: Date;
