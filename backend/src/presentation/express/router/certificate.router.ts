@@ -14,5 +14,9 @@ export const certificateRouter = (certificateController: CertificateController):
     expressAdapter(req, res, certificateController.getCertificate)
   );
 
+  router.get("/list", restrictTo("USER", "INSTRUCTOR", "ADMIN"), (req, res) =>
+    expressAdapter(req, res, certificateController.listUserCertificates)
+  );
+
   return router;
 }; 

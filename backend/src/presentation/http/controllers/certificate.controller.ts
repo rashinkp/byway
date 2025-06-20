@@ -50,4 +50,18 @@ export class CertificateController extends BaseController {
       return this.success_200(certificate, "Certificate found");
     });
   };
+
+  listUserCertificates = async (httpRequest: IHttpRequest): Promise<IHttpResponse> => {
+    return this.handleRequest(httpRequest, async (request) => {
+      const userId = request.user?.id;
+      if (!userId) {
+        return this.httpErrors.error_400("User ID missing");
+      }
+      const certificates = await this.certificateRepository.findByUserId(userId);
+      if (!certificates || certificates.length === 0) {
+        return this.httpErrors.error_404("No certificates found for this user");
+      }
+      return this.success_200(certificates, "Certificates found");
+    });
+  };
 } 

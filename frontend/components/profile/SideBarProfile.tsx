@@ -1,7 +1,7 @@
 "use client";
 
 import { FC } from "react";
-import { User, BookOpen, Wallet, History, ShoppingBag, Settings, BarChart2, LogOut } from "lucide-react";
+import { User, BookOpen, Wallet, History, ShoppingBag, Settings, BarChart2, LogOut, Award } from "lucide-react";
 import { cn } from "@/utils/cn";
 import { useLogout } from "@/hooks/auth/useLogout";
 import { useRouter } from "next/navigation";
@@ -27,6 +27,7 @@ const Sidebar: FC<SidebarProps> = ({ activeSection, setActiveSection, isInstruct
     : [
         { id: "profile", label: "Profile", icon: User },
         { id: "courses", label: "My Courses", icon: BookOpen },
+        { id: "certificates", label: "Certificates", icon: Award },
         { id: "wallet", label: "Wallet", icon: Wallet },
         { id: "transactions", label: "Transactions", icon: History },
         { id: "orders", label: "Orders", icon: ShoppingBag },

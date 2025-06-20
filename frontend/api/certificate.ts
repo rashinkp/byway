@@ -20,4 +20,9 @@ export async function generateCertificate(courseId: string): Promise<Certificate
     { courseId }
   );
   return response.data.data;
+}
+
+export async function listUserCertificates(): Promise<CertificateDTO[]> {
+  const response = await api.get<ApiResponse<CertificateDTO[]>>("/certificates/list");
+  return response.data.data;
 } 
