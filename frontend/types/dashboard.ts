@@ -4,6 +4,11 @@ export interface CourseStats {
   activeCourses: number;
   inactiveCourses: number;
   pendingCourses: number;
+  approvedCourses: number;
+  declinedCourses: number;
+  publishedCourses: number;
+  draftCourses: number;
+  archivedCourses: number;
 }
 
 export interface UserStats {

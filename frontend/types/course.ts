@@ -111,7 +111,7 @@ export interface IGetAllCoursesInput {
   sortBy?: "title" | "price" | "createdAt";
   sortOrder?: "asc" | "desc";
   includeDeleted?: boolean;
-  filterBy?: "All" | "Active" | "Inactive";
+  filterBy?: "All" | "Active" | "Inactive" | "Approved" | "Declined" | "Pending" | "Published" | "Draft" | "Archived";
   userId?: string;
   myCourses?: boolean;
   role?: "USER" | "INSTRUCTOR" | "ADMIN";

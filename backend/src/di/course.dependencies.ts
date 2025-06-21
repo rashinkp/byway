@@ -8,6 +8,7 @@ import { ApproveCourseUseCase } from "../app/usecases/course/implementations/app
 import { DeclineCourseUseCase } from "../app/usecases/course/implementations/decline-course.usecase";
 import { EnrollCourseUseCase } from "../app/usecases/course/implementations/enroll-course.usecase";
 import { GetCourseWithDetailsUseCase } from "../app/usecases/course/implementations/get-course-with-details.usecase";
+import { GetCourseStatsUseCase } from "../app/usecases/course/implementations/get-course-stats.usecase";
 import { SharedDependencies } from './shared.dependencies';
 import { CreateNotificationsForUsersUseCase } from '../app/usecases/notification/implementations/create-notifications-for-users.usecase';
 
@@ -68,6 +69,7 @@ export function createCourseDependencies(
     enrollmentRepository,
     userRepository
   );
+  const getCourseStatsUseCase = new GetCourseStatsUseCase(courseRepository);
 
   const courseController = new CourseController(
     createCourseUseCase,
@@ -79,6 +81,7 @@ export function createCourseDependencies(
     approveCourseUseCase,
     declineCourseUseCase,
     enrollCourseUseCase,
+    getCourseStatsUseCase,
     deps.httpErrors,
     deps.httpSuccess,
   );

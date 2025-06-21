@@ -130,7 +130,7 @@ export interface IGetAllCoursesInputDTO {
   sortOrder?: "asc" | "desc";
   includeDeleted?: boolean;
   search?: string;
-  filterBy?: "All" | "Active" | "Inactive" | "Declined";
+  filterBy?: "All" | "Active" | "Inactive" | "Approved" | "Declined" | "Pending" | "Published" | "Draft" | "Archived";
   userId?: string;
   myCourses?: boolean;
   role?: "USER" | "INSTRUCTOR" | "ADMIN";

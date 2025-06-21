@@ -6,6 +6,7 @@ import { IGetEnrolledCoursesUseCase } from "../../../app/usecases/course/interfa
 import { IApproveCourseUseCase } from "../../../app/usecases/course/interfaces/approve-course.usecase.interface";
 import { IDeclineCourseUseCase } from "../../../app/usecases/course/interfaces/decline-course.usecase.interface";
 import { IEnrollCourseUseCase } from "../../../app/usecases/course/interfaces/enroll-course.usecase.interface";
+import { IGetCourseStatsUseCase } from "../../../app/usecases/course/interfaces/get-course-stats.usecase.interface";
 import { IHttpErrors } from "../interfaces/http-errors.interface";
 import { IHttpSuccess } from "../interfaces/http-success.interface";
 import { IHttpRequest } from "../interfaces/http-request.interface";
@@ -36,6 +37,7 @@ export class CourseController extends BaseController {
     private approveCourseUseCase: IApproveCourseUseCase,
     private declineCourseUseCase: IDeclineCourseUseCase,
     private enrollCourseUseCase: IEnrollCourseUseCase,
+    private getCourseStatsUseCase: IGetCourseStatsUseCase,
     httpErrors: IHttpErrors,
     httpSuccess: IHttpSuccess
   ) {
@@ -264,6 +266,13 @@ export class CourseController extends BaseController {
         courseIds: validated.courseIds,
       });
       return this.success_201(enrollments, "Enrollment successful");
+    });
+  }
+
+  async getCourseStats(httpRequest: IHttpRequest): Promise<IHttpResponse> {
+    return this.handleRequest(httpRequest, async (request) => {
+      const stats = await this.getCourseStatsUseCase.execute({ isAdmin: true });
+      return this.success_200(stats, "Course statistics retrieved successfully");
     });
   }
 }

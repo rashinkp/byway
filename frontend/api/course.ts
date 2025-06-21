@@ -8,6 +8,7 @@ import {
   IGetEnrolledCoursesInput,
   IUpdateCourseApprovalInput,
 } from "@/types/course";
+import { CourseStats } from "@/types/dashboard";
 
 export async function getAllCourses({
   page = 1,
@@ -152,5 +153,15 @@ export async function declineCourse({
     throw new Error(
       error.response?.data?.message || "Failed to decline course"
     );
+  }
+}
+
+export async function getCourseStats(): Promise<CourseStats> {
+  try {
+    const response = await api.get<{ data: CourseStats }>('/courses/stats');
+    return response.data.data;
+  } catch (error: any) {
+    console.error("Failed to fetch course stats:", error);
+    throw new Error(error.response?.data?.message || "Failed to fetch course stats");
   }
 }

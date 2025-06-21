@@ -40,6 +40,19 @@ export default function courseRouter(
         courseController.getEnrolledCourses.bind(courseController)
       )
   );
+  
+  // Course statistics - must come before /:id route
+  router.get(
+    "/stats",
+    optionalAuth,
+    (req, res) =>
+      expressAdapter(
+        req,
+        res,
+        courseController.getCourseStats.bind(courseController)
+      )
+  );
+  
   router.get(
     "/:id",
     optionalAuth,

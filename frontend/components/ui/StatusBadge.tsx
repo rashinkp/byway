@@ -14,8 +14,11 @@ export function StatusBadge({
   return (
     <span
       className={`
-        inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
-        ${isActive ? "bg-green-50 text-green-700" : "bg-red-50 text-red-700"}
+        inline-flex items-center px-3 py-1 rounded-full text-xs font-medium border
+        ${isActive 
+          ? "bg-emerald-50 text-emerald-700 border-emerald-200" 
+          : "bg-rose-50 text-rose-700 border-rose-200"
+        }
         ${className}
       `}
     >

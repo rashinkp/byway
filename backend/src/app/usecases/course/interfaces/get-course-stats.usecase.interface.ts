@@ -3,11 +3,17 @@ export interface ICourseStats {
   activeCourses: number;
   inactiveCourses: number;
   pendingCourses: number;
+  approvedCourses: number;
+  declinedCourses: number;
+  publishedCourses: number;
+  draftCourses: number;
+  archivedCourses: number;
 }
 
 export interface IGetCourseStatsInput {
   userId?: string;
   includeDeleted?: boolean;
+  isAdmin?: boolean;
 }
 
 export interface IGetCourseStatsUseCase {

@@ -87,7 +87,7 @@ const getAllCoursesSchema = z.object({
     .default("false")
     .optional(),
   search: z.string().default("").optional(),
-  filterBy: z.enum(["All", "Active", "Inactive", "Declined"]).default("All").optional(),
+  filterBy: z.enum(["All", "Active", "Inactive", "Approved", "Declined", "Pending", "Published", "Draft", "Archived"]).default("All").optional(),
   myCourses: z
     .string()
     .transform((val) => val === "true")

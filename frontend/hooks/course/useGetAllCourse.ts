@@ -58,7 +58,7 @@ export function useGetAllCourses({
         level,
         duration,
         price,
-        includeDeleted,
+        includeDeleted: shouldIncludeDeleted,
         categoryId,
       },
     ],

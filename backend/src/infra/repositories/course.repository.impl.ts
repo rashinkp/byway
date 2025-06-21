@@ -222,11 +222,21 @@ export class CourseRepository implements ICourseRepository {
             status: CourseStatus.PUBLISHED,
             approvalStatus: APPROVALSTATUS.APPROVED,
           }),
+      
+      // Filter by active/inactive status
       ...(filterBy === "Active" ? { deletedAt: null } : {}),
       ...(filterBy === "Inactive" ? { deletedAt: { not: null } } : {}),
-      ...(filterBy === "Declined"
-        ? { approvalStatus: APPROVALSTATUS.DECLINED }
-        : {}),
+      
+      // Filter by approval status
+      ...(filterBy === "Approved" ? { approvalStatus: APPROVALSTATUS.APPROVED } : {}),
+      ...(filterBy === "Declined" ? { approvalStatus: APPROVALSTATUS.DECLINED } : {}),
+      ...(filterBy === "Pending" ? { approvalStatus: APPROVALSTATUS.PENDING } : {}),
+      
+      // Filter by publish status
+      ...(filterBy === "Published" ? { status: CourseStatus.PUBLISHED } : {}),
+      ...(filterBy === "Draft" ? { status: CourseStatus.DRAFT } : {}),
+      ...(filterBy === "Archived" ? { status: CourseStatus.ARCHIVED } : {}),
+      
       ...(myCourses && userId ? { createdBy: userId } : {}),
       ...(level !== "All" ? { level } : {}),
       ...(duration === "Under5" ? { duration: { lte: 5 } } : {}),
@@ -587,7 +597,7 @@ export class CourseRepository implements ICourseRepository {
   }
 
   async getCourseStats(input: IGetCourseStatsInput): Promise<ICourseStats> {
-    const { userId, includeDeleted = false } = input;
+    const { userId, includeDeleted = false, isAdmin = false } = input;
     
     // Build where clause for filtering
     const whereClause: Prisma.CourseWhereInput = {};
@@ -621,19 +631,79 @@ export class CourseRepository implements ICourseRepository {
       deletedAt: null
     };
 
-    const [totalCourses, activeCourses, inactiveCourses, pendingCourses] = await Promise.all([
-      this.prisma.course.count({ where: whereClause }),
-      this.prisma.course.count({ where: activeWhereClause }),
-      this.prisma.course.count({ where: inactiveWhereClause }),
-      this.prisma.course.count({ where: pendingWhereClause }),
-    ]);
-    
-    return {
-      totalCourses,
-      activeCourses,
-      inactiveCourses,
-      pendingCourses,
-    };
+    if (!isAdmin) {
+      // Original behavior for non-admin users
+      const [totalCourses, activeCourses, inactiveCourses, pendingCourses] = await Promise.all([
+        this.prisma.course.count({ where: whereClause }),
+        this.prisma.course.count({ where: activeWhereClause }),
+        this.prisma.course.count({ where: inactiveWhereClause }),
+        this.prisma.course.count({ where: pendingWhereClause }),
+      ]);
+      
+      return {
+        totalCourses,
+        activeCourses,
+        inactiveCourses,
+        pendingCourses,
+        approvedCourses: 0,
+        declinedCourses: 0,
+        publishedCourses: 0,
+        draftCourses: 0,
+        archivedCourses: 0,
+      };
+    } else {
+      // Comprehensive stats for admin
+      const [
+        totalCourses,
+        activeCourses,
+        inactiveCourses,
+        pendingCourses,
+        approvedCourses,
+        declinedCourses,
+        publishedCourses,
+        draftCourses,
+        archivedCourses
+      ] = await Promise.all([
+        // Total courses (including deleted)
+        this.prisma.course.count({}),
+        
+        // Active courses (not deleted)
+        this.prisma.course.count({ where: { deletedAt: null } }),
+        
+        // Inactive courses (deleted)
+        this.prisma.course.count({ where: { deletedAt: { not: null } } }),
+        
+        // Pending courses
+        this.prisma.course.count({ where: { approvalStatus: APPROVALSTATUS.PENDING } }),
+        
+        // Approved courses
+        this.prisma.course.count({ where: { approvalStatus: APPROVALSTATUS.APPROVED } }),
+        
+        // Declined courses
+        this.prisma.course.count({ where: { approvalStatus: APPROVALSTATUS.DECLINED } }),
+        
+        // Published courses
+        this.prisma.course.count({ where: { status: CourseStatus.PUBLISHED } }),
+        
+        // Draft courses
+        this.prisma.course.count({ where: { status: CourseStatus.DRAFT } }),
+        
+        // Archived courses
+        this.prisma.course.count({ where: { status: CourseStatus.ARCHIVED } })
+      ]);
+      
+      return {
+        totalCourses,
+        activeCourses,
+        inactiveCourses,
+        pendingCourses,
+        approvedCourses,
+        declinedCourses,
+        publishedCourses,
+        draftCourses,
+        archivedCourses,
+      };
+    }
   }
 
   async getTopEnrolledCourses(input: IGetTopEnrolledCoursesInput): Promise<ITopEnrolledCourse[]> {

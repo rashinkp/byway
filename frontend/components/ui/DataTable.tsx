@@ -103,7 +103,7 @@ export function DataTable<T>({
 
   return (
     <div className="space-y-4">
-      <div className="bg-white/10 backdrop-blur-md rounded-lg shadow-lg overflow-hidden border border-gray-200/20">
+      <div className="bg-white/60 backdrop-blur-sm border border-gray-200/50 rounded-xl shadow-sm overflow-hidden">
         {isLoading ? (
           <TableSkeleton
             columns={columns.length}
@@ -112,17 +112,17 @@ export function DataTable<T>({
         ) : (
           <Table>
             <TableHeader>
-              <TableRow className="bg-gray-50/50 border-b border-gray-200/20 hover:bg-gray-50/70 transition-colors">
+              <TableRow className="bg-gray-50/50 border-b border-gray-200/50 hover:bg-gray-50/70 transition-colors">
                 {columns.map((column, index) => (
                   <TableHead
                     key={index}
-                    className="text-gray-600 font-semibold text-sm tracking-tight py-4"
+                    className="text-gray-600 font-semibold text-sm tracking-tight py-4 px-6"
                   >
                     {column.header}
                   </TableHead>
                 ))}
                 {actions.length > 0 && (
-                  <TableHead className="text-gray-600 font-semibold text-sm tracking-tight py-4">
+                  <TableHead className="text-gray-600 font-semibold text-sm tracking-tight py-4 px-6">
                     Actions
                   </TableHead>
                 )}
@@ -134,9 +134,12 @@ export function DataTable<T>({
                   <TableRow>
                     <TableCell
                       colSpan={columns.length + (actions.length > 0 ? 1 : 0)}
-                      className="text-center text-gray-500 py-8"
+                      className="text-center text-gray-500 py-12"
                     >
-                      No data found
+                      <div className="flex flex-col items-center space-y-2">
+                        <div className="text-gray-400 text-lg">No data found</div>
+                        <div className="text-sm">Try adjusting your search or filters</div>
+                      </div>
                     </TableCell>
                   </TableRow>
                 ) : (
@@ -148,9 +151,9 @@ export function DataTable<T>({
                       animate="visible"
                       exit="exit"
                       className={`
-                        border-b border-gray-200/20
+                        border-b border-gray-200/50
                         transition-all duration-200
-                        hover:bg-white/20 hover:shadow-sm
+                        hover:bg-white/80 hover:shadow-sm
                         ${onRowClick ? "cursor-pointer" : ""}
                       `}
                       onClick={() => onRowClick?.(item)}
@@ -158,7 +161,7 @@ export function DataTable<T>({
                       {columns.map((column, colIndex) => (
                         <TableCell
                           key={colIndex}
-                          className="text-gray-800 text-sm py-3 max-w-xs truncate"
+                          className="text-gray-800 text-sm py-4 px-6 max-w-xs truncate"
                           title={
                             column.render
                               ? undefined
@@ -179,7 +182,7 @@ export function DataTable<T>({
                         </TableCell>
                       ))}
                       {actions.length > 0 && (
-                        <TableCell className="py-3">
+                        <TableCell className="py-4 px-6">
                           <div className="flex space-x-2">
                             {actions.map((action, actionIndex) => {
                               const label =
@@ -199,15 +202,15 @@ export function DataTable<T>({
                                   className={`
                                     relative
                                     text-xs font-medium
-                                    rounded-full
+                                    rounded-lg
                                     transition-all duration-200
                                     hover:scale-105 hover:shadow-md
                                     ${
                                       variant === "destructive"
-                                        ? "bg-red-500/10 text-red-600 hover:bg-red-500/20"
+                                        ? "bg-red-50 text-red-600 hover:bg-red-100 border-red-200"
                                         : variant === "default"
-                                        ? "bg-blue-500/10 text-blue-600 hover:bg-blue-500/20"
-                                        : "bg-gray-500/10 text-gray-600 hover:bg-gray-500/20"
+                                        ? "bg-blue-50 text-blue-600 hover:bg-blue-100 border-blue-200"
+                                        : "bg-gray-50 text-gray-600 hover:bg-gray-100 border-gray-200"
                                     }
                                   `}
                                   onClick={(e) => {
@@ -237,49 +240,7 @@ export function DataTable<T>({
           </Table>
         )}
       </div>
-      {totalPages > 1 && !isLoading && (
-        <div className="flex items-center justify-between text-sm text-gray-500">
-          <div>
-            Showing {(currentPage - 1) * itemsPerPage + 1}-
-            {Math.min(currentPage * itemsPerPage, totalItems ?? data.length)} of{" "}
-            {totalItems ?? data.length} items
-          </div>
-          <div className="flex space-x-2">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={handlePrevious}
-              disabled={currentPage === 1}
-              className="
-                bg-white/10 backdrop-blur-md
-                border-gray-200/20
-                rounded-full
-                transition-all duration-200
-                hover:bg-white/20 hover:shadow-md
-                disabled:opacity-50 disabled:cursor-not-allowed
-              "
-            >
-              <ChevronLeft className="h-4 w-4" />
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={handleNext}
-              disabled={currentPage === totalPages}
-              className="
-                bg-white/10 backdrop-blur-md
-                border-gray-200/20
-                rounded-full
-                transition-all duration-200
-                hover:bg-white/20 hover:shadow-md
-                disabled:opacity-50 disabled:cursor-not-allowed
-              "
-            >
-              <ChevronRight className="h-4 w-4" />
-            </Button>
-          </div>
-        </div>
-      )}
+      
       <AlertDialog open={confirmOpen} onOpenChange={setConfirmOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
