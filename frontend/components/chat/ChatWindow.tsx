@@ -15,21 +15,47 @@ interface ChatWindowProps {
   onSendMessage: (content: string) => void;
   currentUserId: string;
   onDeleteMessage?: (messageId: string) => void;
+  onLoadMoreMessages?: () => void;
+  loadingMoreMessages?: boolean;
 }
 
-export function ChatWindow({ chat, messages, onSendMessage, currentUserId, onDeleteMessage }: ChatWindowProps) {
+export function ChatWindow({ chat, messages, onSendMessage, currentUserId, onDeleteMessage, onLoadMoreMessages, loadingMoreMessages }: ChatWindowProps) {
   const [newMessage, setNewMessage] = useState('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const messagesContainerRef = useRef<HTMLDivElement>(null);
   const [menuOpen, setMenuOpen] = useState(false);
   const { user: currentUser } = useAuth();
+  const prevMessagesLength = useRef(messages.length);
+  const prevScrollHeight = useRef<number | null>(null);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
 
   useEffect(() => {
-    scrollToBottom();
-  }, [messages]);
+    if (loadingMoreMessages) {
+      if (messagesContainerRef.current) {
+        prevScrollHeight.current = messagesContainerRef.current.scrollHeight;
+      }
+      prevMessagesLength.current = messages.length;
+    }
+  }, [loadingMoreMessages]);
+
+  useEffect(() => {
+    if (!loadingMoreMessages && prevMessagesLength.current < messages.length) {
+      if (messagesContainerRef.current && prevScrollHeight.current !== null) {
+        const container = messagesContainerRef.current;
+        const newScrollHeight = container.scrollHeight;
+        container.scrollTop = newScrollHeight - (prevScrollHeight.current - container.scrollTop);
+      }
+      prevMessagesLength.current = messages.length;
+      prevScrollHeight.current = null;
+      return;
+    }
+    if (!loadingMoreMessages) {
+      scrollToBottom();
+    }
+  }, [messages, loadingMoreMessages]);
 
   const handleSendMessage = (e: React.FormEvent) => {
     e.preventDefault();
@@ -182,7 +208,7 @@ export function ChatWindow({ chat, messages, onSendMessage, currentUserId, onDel
       </div>
 
       {/* Messages Area */}
-      <div className="flex-1 min-h-0 overflow-y-auto px-4 py-4 bg-gray-50">
+      <div ref={messagesContainerRef} className="flex-1 min-h-0 overflow-y-auto px-4 py-4 bg-gray-50">
         {chat.type === "user" ? (
           <div className="flex items-center justify-center h-full">
             <div className="text-center space-y-4 max-w-sm">
@@ -202,6 +228,19 @@ export function ChatWindow({ chat, messages, onSendMessage, currentUserId, onDel
           </div>
         ) : (
           <div className="space-y-4">
+            {onLoadMoreMessages && (
+              <div className="flex justify-center mb-4">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={onLoadMoreMessages}
+                  disabled={loadingMoreMessages}
+                  className="text-xs"
+                >
+                  {loadingMoreMessages ? 'Loading...' : 'View more'}
+                </Button>
+              </div>
+            )}
             {groupedMessages.map((group, groupIdx) => (
               <div key={group.date + "-" + groupIdx}>
                 {/* Date Separator */}

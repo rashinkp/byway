@@ -11,4 +11,5 @@ export interface ICartRepository {
   clearUserCart(userId: string): Promise<void>;
   deleteByUserAndCourse(userId: string, courseId: string): Promise<void>;
   deleteByUserId(userId: string): Promise<void>;
+  countByUserId(userId: string): Promise<number>;
 } 

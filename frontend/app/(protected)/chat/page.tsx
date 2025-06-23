@@ -44,6 +44,8 @@ export default function ChatPage() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [isConnected, setIsConnected] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
+  const [loadingMoreMessages, setLoadingMoreMessages] = useState(false);
+  const [hasMoreMessages, setHasMoreMessages] = useState(false);
 
   // Track previous chatId for leave logic
   const previousChatIdRef = React.useRef<string | null>(null);
@@ -97,19 +99,43 @@ export default function ChatPage() {
     });
   }, [user, hasMore, loading, currentPage]);
 
-  // Fetch messages when selected chat changes
+  // Fetch messages when selected chat changes (paginated)
   useEffect(() => {
     if (!selectedChat) return;
     if (selectedChat.type === 'chat' && selectedChat.chatId) {
       joinChat(selectedChat.chatId);
-      getMessagesByChat({ chatId: selectedChat.chatId }, (result: any) => {
+      getMessagesByChat({ chatId: selectedChat.chatId, limit: 20 }, (result: any) => {
         const msgs = result?.body?.data || result?.data || result;
-        setMessages(Array.isArray(msgs) ? msgs : []);
+        setMessages(Array.isArray(msgs) ? msgs.slice().reverse() : []);
+        setHasMoreMessages(Array.isArray(msgs) && msgs.length === 20);
       });
     } else {
       setMessages([]);
+      setHasMoreMessages(false);
     }
   }, [selectedChat]);
+
+  // Load more (older) messages
+  const handleLoadMoreMessages = useCallback(() => {
+    if (!selectedChat || !selectedChat.chatId || loadingMoreMessages || !messages.length) return;
+    setLoadingMoreMessages(true);
+    const oldestMessageId = messages[0]?.id;
+    getMessagesByChat({ chatId: selectedChat.chatId, limit: 20, beforeMessageId: oldestMessageId }, (result: any) => {
+      const msgs = result?.body?.data || result?.data || result;
+      if (Array.isArray(msgs) && msgs.length > 0) {
+        setMessages(prev => {
+          const newMsgs = msgs.reverse();
+          const existingIds = new Set(prev.map(m => m.id));
+          const uniqueNewMsgs = newMsgs.filter(m => !existingIds.has(m.id));
+          return [...uniqueNewMsgs, ...prev];
+        });
+        setHasMoreMessages(msgs.length === 20);
+      } else {
+        setHasMoreMessages(false);
+      }
+      setLoadingMoreMessages(false);
+    });
+  }, [selectedChat, messages, loadingMoreMessages]);
 
   // Listen for new incoming messages
   useEffect(() => {
@@ -362,6 +388,8 @@ export default function ChatPage() {
                   onSendMessage={handleSendMessage}
                   currentUserId={user?.id || ''}
                   onDeleteMessage={handleDeleteMessage}
+                  onLoadMoreMessages={hasMoreMessages ? handleLoadMoreMessages : undefined}
+                  loadingMoreMessages={loadingMoreMessages}
                 />
               ) : (
                 <div className="flex-1 flex flex-col min-h-0">

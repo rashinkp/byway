@@ -27,9 +27,17 @@ export class MessageRepository implements IMessageRepository {
     return messages.map(this.toDomain);
   }
 
-  async findByChatWithUserData(chatId: ChatId): Promise<EnrichedMessageDTO[]> {
+  async findByChatWithUserData(chatId: ChatId, limit = 20, beforeMessageId?: string): Promise<EnrichedMessageDTO[]> {
+    let beforeDate: Date | undefined = undefined;
+    if (beforeMessageId) {
+      const beforeMsg = await prisma.message.findUnique({ where: { id: beforeMessageId } });
+      if (beforeMsg) beforeDate = beforeMsg.createdAt;
+    }
     const messages = await prisma.message.findMany({
-      where: { chatId: chatId.value },
+      where: {
+        chatId: chatId.value,
+        ...(beforeDate ? { createdAt: { lt: beforeDate } } : {}),
+      },
       include: {
         sender: {
           select: {
@@ -39,7 +47,8 @@ export class MessageRepository implements IMessageRepository {
           },
         },
       },
-      orderBy: { createdAt: 'asc' },
+      orderBy: { createdAt: 'desc' },
+      take: limit,
     });
     return messages as EnrichedMessageDTO[];
   }

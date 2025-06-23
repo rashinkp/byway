@@ -5,9 +5,9 @@ import { EnrichedMessageDTO } from '../../domain/dtos/message.dto';
 
 export interface IMessageRepository {
   findById(id: MessageId): Promise<Message | null>;
-  findByIdWithUserData(id: MessageId): Promise<EnrichedMessageDTO | null>;
   findByChat(chatId: ChatId): Promise<Message[]>;
-  findByChatWithUserData(chatId: ChatId): Promise<EnrichedMessageDTO[]>;
+  findByChatWithUserData(chatId: ChatId, limit?: number, beforeMessageId?: string): Promise<EnrichedMessageDTO[]>;
+  findByIdWithUserData(id: MessageId): Promise<EnrichedMessageDTO | null>;
   create(message: Message): Promise<void>;
   save(message: Message): Promise<void>;
   delete(id: MessageId): Promise<void>;

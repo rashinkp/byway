@@ -152,4 +152,8 @@ export class TransactionRepository implements ITransactionRepository {
     });
     return this.mapToTransaction(updated);
   }
+
+  async countByUserId(userId: string): Promise<number> {
+    return this.prisma.transactionHistory.count({ where: { userId } });
+  }
 }

@@ -10,6 +10,7 @@ export interface ITransactionRepository {
     page?: number,
     limit?: number
   ): Promise<Transaction[]>;
+  countByUserId(userId: string): Promise<number>;
   updateStatus(
     id: string,
     status: TransactionStatus,

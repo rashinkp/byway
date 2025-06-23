@@ -12,6 +12,13 @@ export class AddToCartUseCase implements IAddToCartUseCase {
   ) {}
 
   async execute(userId: string, data: AddToCartDto): Promise<Cart> {
+    // Restrict cart size
+    const cartCount = await this.cartRepository.countByUserId(userId);
+    const MAX_CART_ITEMS = 5;
+    if (cartCount >= MAX_CART_ITEMS) {
+      throw new HttpError(`You can only have up to ${MAX_CART_ITEMS} items in your cart.`, 400);
+    }
+
     // Check if course is already in cart
     const existingCart = await this.cartRepository.findByUserAndCourse(
       userId,

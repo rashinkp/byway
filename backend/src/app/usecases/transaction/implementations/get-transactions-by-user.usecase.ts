@@ -7,13 +7,19 @@ export class GetTransactionsByUserUseCase implements IGetTransactionsByUserUseCa
     private readonly transactionRepository: ITransactionRepository
   ) {}
 
-  async execute(input: IGetTransactionsByUserInputDTO): Promise<ITransactionOutputDTO[]> {
-    const transactions = await this.transactionRepository.findByUserId(
-      input.userId,
-      input.page,
-      input.limit
-    );
-    return transactions.map(transaction => this.mapToDTO(transaction));
+  async execute(input: IGetTransactionsByUserInputDTO): Promise<{ items: ITransactionOutputDTO[]; total: number; page: number; totalPages: number }> {
+    const { userId, page = 1, limit = 10 } = input;
+    const [transactions, total] = await Promise.all([
+      this.transactionRepository.findByUserId(userId, page, limit),
+      this.transactionRepository.countByUserId(userId),
+    ]);
+    const totalPages = Math.ceil(total / limit);
+    return {
+      items: transactions.map(transaction => this.mapToDTO(transaction)),
+      total,
+      page,
+      totalPages,
+    };
   }
 
   private mapToDTO(transaction: any): ITransactionOutputDTO {

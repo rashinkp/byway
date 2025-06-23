@@ -119,9 +119,9 @@ export class ChatController extends BaseController {
   async getMessagesByChat(httpRequest: IHttpRequest): Promise<IHttpResponse> {
     return this.handleRequest(httpRequest, async (request) => {
       const validated = getMessagesByChatSchema.parse(request.query);
-      
-      const messages = await this.getMessagesByChatUseCase.execute(new ChatId(validated.chatId));
-      
+      const limit = validated.limit || 20;
+      const beforeMessageId = validated.beforeMessageId || undefined;
+      const messages = await this.getMessagesByChatUseCase.execute(new ChatId(validated.chatId), limit, beforeMessageId);
       return this.success_200(messages, "Messages retrieved successfully");
     });
   }

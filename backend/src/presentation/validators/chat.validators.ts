@@ -36,7 +36,9 @@ export const listUserChatsSchema = z.object({
 });
 
 export const getMessagesByChatSchema = z.object({
-  chatId: z.string().min(1),
+  chatId: z.string(),
+  limit: z.coerce.number().optional(),
+  beforeMessageId: z.string().optional(),
 });
 
 export const getMessageByIdSchema = z.object({

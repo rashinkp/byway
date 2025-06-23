@@ -10,8 +10,8 @@ export class GetMessagesByChatUseCase implements IGetMessagesByChatUseCase {
     private readonly chatRepository: IChatRepository
   ) {}
 
-  async execute(chatId: ChatId): Promise<MessageResponseDTO[]> {
-    const messages = await this.messageRepository.findByChatWithUserData(chatId);
+  async execute(chatId: ChatId, limit = 20, beforeMessageId?: string): Promise<MessageResponseDTO[]> {
+    const messages = await this.messageRepository.findByChatWithUserData(chatId, limit, beforeMessageId);
     const chat = await this.chatRepository.findById(chatId);
     if (!chat) return [];
     return messages.map((msg) => {

@@ -36,4 +36,12 @@ export function registerChatHandlers(socket: Socket, io: SocketIOServer, chatCon
     } as any);
     return result;
   }, 'userChats'));
+
+  socket.on('getMessagesByChat', socketHandler(async (data) => {
+    const chatId = data.chatId;
+    const limit = data.limit || 20;
+    const beforeMessageId = data.beforeMessageId || undefined;
+    const messages = await chatController.getMessagesByChat({ query: { chatId, limit, beforeMessageId } } as any);
+    return messages;
+  }, 'messagesByChat'));
 } 

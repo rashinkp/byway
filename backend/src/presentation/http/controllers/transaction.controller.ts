@@ -57,8 +57,9 @@ export class TransactionController extends BaseController {
       if (!user?.id) {
         throw new Error("User not authenticated");
       }
-
-      const transactions = await this.getTransactionsByUserUseCase.execute({ userId: user.id });
+      const page = request.query?.page ? parseInt(request.query.page as string) : 1;
+      const limit = request.query?.limit ? parseInt(request.query.limit as string) : 10;
+      const transactions = await this.getTransactionsByUserUseCase.execute({ userId: user.id, page, limit });
       return this.success_200(transactions || [], "Transactions retrieved successfully");
     });
   }

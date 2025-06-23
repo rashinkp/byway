@@ -145,4 +145,8 @@ export class CartRepository implements ICartRepository {
       },
     });
   }
+
+  async countByUserId(userId: string): Promise<number> {
+    return this.prisma.cart.count({ where: { userId, deletedAt: null } });
+  }
 } 

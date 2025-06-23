@@ -51,16 +51,15 @@ export const getTransactionsByOrder = async (
   }
 };
 
-export const getTransactionsByUser = async (
-): Promise<ApiResponse<Transaction[]>> => {
+export const getTransactionsByUser = async (page = 1, limit = 10) => {
   try {
-    const response = await api.get(`/transactions/user`);
+    const response = await api.get(`/transactions/user`, {
+      params: { page, limit },
+    });
     return response.data;
   } catch (error: any) {
     console.error("Error fetching transactions by user:", error);
-    throw new Error(
-      error.response?.data?.message || "Failed to fetch transactions"
-    );
+    throw new Error(error.response?.data?.message || "Failed to fetch transactions");
   }
 };
 
