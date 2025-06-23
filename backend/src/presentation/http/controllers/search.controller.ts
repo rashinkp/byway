@@ -32,7 +32,8 @@ export class SearchController extends BaseController {
         limit: limit ? parseInt(limit) : undefined,
       });
 
-      const result = await this.globalSearchUseCase.execute(validatedParams);
+      const userId = request.user?.id;
+      const result = await this.globalSearchUseCase.execute({ ...validatedParams, userId });
       return this.success_200(result, "Search results retrieved successfully");
     });
   }

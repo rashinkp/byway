@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { CourseGrid } from "@/components/course/CourseGrid";
 import { Pagination } from "@/components/ui/Pagination";
 import ErrorDisplay from "@/components/ErrorDisplay";
 import { Course } from "@/types/course";
@@ -11,21 +10,13 @@ import { CourseCard } from "@/components/course/CourseCard";
 import Link from "next/link";
 import { BookOpen } from "lucide-react";
 
-// Utility function to format duration (in minutes) to hours
-const formatDuration = (duration?: number | null): string => {
-  if (!duration) return "Unknown duration";
-  const hours = Math.floor(duration / 60);
-  const minutes = duration % 60;
-  return `${hours}h ${minutes > 0 ? `${minutes}m` : ""}`;
-};
 
 export default function MyCoursesPage() {
-  const itemsPerPage = 6;
+  const itemsPerPage = 8;
   const [currentPage, setCurrentPage] = useState(1);
   const [isLoaded, setIsLoaded] = useState(false);
 
-  // Fetch enrolled courses using the hook
-  const { data, isLoading, error, refetch } = useGetEnrolledCourses({
+  const { data, isLoading, error } = useGetEnrolledCourses({
     page: currentPage,
     limit: itemsPerPage,
     sortBy: "enrolledAt",
@@ -34,12 +25,10 @@ export default function MyCoursesPage() {
     level: "All",
   });
 
-  // Use the courses directly from the API
   const courses: Course[] = data?.items ?? [];
 
   // Calculate pagination values
   const totalPages = data?.totalPages ?? 1;
-  const totalCourses = data?.total ?? 0;
 
   // Handle animation loading state
   useEffect(() => {

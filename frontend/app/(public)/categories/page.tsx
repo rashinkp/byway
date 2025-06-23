@@ -9,15 +9,11 @@ import { useRouter } from "next/navigation";
 export default function CategoriesPage() {
   const router = useRouter();
   const [page, setPage] = useState(1);
-  const [search, setSearch] = useState("");
-  const [filterBy, setFilterBy] = useState<"All" | "Active" | "Inactive">("All");
   const limit = 9;
 
   const { data, isLoading, error } = useCategories({
     page,
     limit,
-    search,
-    filterBy,
   });
 
   const handleCategoryClick = (categoryId: string) => {

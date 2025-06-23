@@ -11,6 +11,7 @@ import {
 import { OrderSkeleton } from "@/components/orders/OrderSkeleton";
 import { OrderCard } from "@/components/orders/OrderCard";
 import { useOrders } from "@/hooks/order/useOrders";
+import { Pagination } from "@/components/ui/Pagination";
 
 interface StatusBadgeProps {
   status: string;
@@ -107,19 +108,18 @@ const StatusBadge: React.FC<StatusBadgeProps> = ({
 };
 
 const OrderListing: React.FC = () => {
+  const [currentPage, setCurrentPage] = useState(1);
+  const [ordersPerPage] = useState(10);
   const { orders, isLoading, error, fetchOrders } = useOrders();
-  const [retryingOrder, setRetryingOrder] = useState<string | null>(null);
-
 
   useEffect(() => {
     fetchOrders({
-      page: 1,
-      limit: 10,
+      page: currentPage,
+      limit: ordersPerPage,
       sortBy: "createdAt",
       sortOrder: "desc",
     });
-  }, [fetchOrders]);
-
+  }, [fetchOrders, currentPage, ordersPerPage]);
 
   if (isLoading) {
     return (
@@ -165,11 +165,22 @@ const OrderListing: React.FC = () => {
           </p>
         </div>
       ) : (
-        <div className="space-y-6">
-          {orders.orders.map((order) => (
-            <OrderCard key={order.id} order={order} />
-          ))}
-        </div>
+        <>
+          <div className="space-y-6">
+            {orders.orders.map((order) => (
+              <OrderCard key={order.id} order={order} />
+            ))}
+          </div>
+          {orders.totalPages > 1 && (
+            <div className="mt-8 flex justify-center">
+              <Pagination
+                currentPage={currentPage}
+                totalPages={orders.totalPages}
+                onPageChange={setCurrentPage}
+              />
+            </div>
+          )}
+        </>
       )}
     </div>
   );

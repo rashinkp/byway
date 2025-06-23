@@ -43,7 +43,7 @@ export class PrismaCertificateRepository implements CertificateRepositoryInterfa
       where: { userId },
       orderBy: { createdAt: 'desc' },
     });
-    return found.map(this.toDTO);
+    return found.map(item => this.toDTO(item));
   }
 
   async findByCourseId(courseId: string): Promise<CertificateDTO[]> {
@@ -51,7 +51,7 @@ export class PrismaCertificateRepository implements CertificateRepositoryInterfa
       where: { courseId },
       orderBy: { createdAt: 'desc' },
     });
-    return found.map(this.toDTO);
+    return found.map(item => this.toDTO(item));
   }
 
   async findByUserIdAndCourseId(userId: string, courseId: string): Promise<CertificateDTO | null> {
@@ -134,7 +134,7 @@ export class PrismaCertificateRepository implements CertificateRepositoryInterfa
     const nextPage = hasMore ? Math.floor(skip / take) + 2 : undefined;
 
     return {
-      items: items.map(this.toDTOWithDetails),
+      items: items.map(item => this.toDTOWithDetails(item)),
       total,
       hasMore,
       nextPage,
@@ -149,7 +149,7 @@ export class PrismaCertificateRepository implements CertificateRepositoryInterfa
         status: { not: 'EXPIRED' },
       },
     });
-    return found.map(this.toDTO);
+    return found.map(item => this.toDTO(item));
   }
 
   async findCertificatesByStatus(status: string): Promise<CertificateDTO[]> {
@@ -157,7 +157,7 @@ export class PrismaCertificateRepository implements CertificateRepositoryInterfa
       where: { status: status as any },
       orderBy: { createdAt: 'desc' },
     });
-    return found.map(this.toDTO);
+    return found.map(item => this.toDTO(item));
   }
 
   private toDTO(certificate: any): CertificateDTO {

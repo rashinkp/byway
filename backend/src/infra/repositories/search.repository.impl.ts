@@ -5,20 +5,23 @@ import { ISearchResult, SearchParams } from "../../domain/dtos/search/search.dto
 export class SearchRepository implements ISearchRepository {
   constructor(private prisma: PrismaClient) {}
 
-  async search(params: SearchParams): Promise<ISearchResult> {
-    const { query, page = 1, limit = 10 } = params;
+  async search(params: SearchParams & { userId?: string }): Promise<ISearchResult> {
+    const { query, page = 1, limit = 10, userId } = params;
     const skip = (page - 1) * limit;
+    console.log("[SearchRepository] Received limit:", limit, "skip:", skip, "page:", page);
 
-    const [instructors, courses, categories] = await Promise.all([
+    const [instructors, courses, categories, certificates] = await Promise.all([
       this.searchInstructors(query, skip, limit),
       this.searchCourses(query, skip, limit),
       this.searchCategories(query, skip, limit),
+      this.searchCertificates(query, skip, limit, userId),
     ]);
 
     return {
       instructors,
       courses,
       categories,
+      certificates,
     };
   }
 
@@ -190,6 +193,52 @@ export class SearchRepository implements ISearchRepository {
         id: item.id,
         title: item.name,
         description: item.description || '',
+      })),
+      total,
+      page: Math.floor(skip / limit) + 1,
+      limit,
+    };
+  }
+
+  private async searchCertificates(query: string, skip: number, limit: number, userId?: string) {
+    if (!userId) {
+      return {
+        items: [],
+        total: 0,
+        page: 1,
+        limit,
+      };
+    }
+    const where: any = {
+      userId,
+      OR: [
+        { certificateNumber: { contains: query, mode: 'insensitive' } },
+        { course: { title: { contains: query, mode: 'insensitive' } } },
+        { user: { name: { contains: query, mode: 'insensitive' } } },
+      ],
+    };
+    // Debug log
+     const [items, total] = await Promise.all([
+      this.prisma.certificate.findMany({
+        where,
+        include: {
+          course: { select: { title: true } },
+          user: { select: { name: true } },
+        },
+        skip,
+        take: limit,
+      }),
+      this.prisma.certificate.count({ where }),
+    ]);
+
+    return {
+      items: items.map(item => ({
+        id: item.id,
+        certificateNumber: item.certificateNumber,
+        courseTitle: item.course?.title || '',
+        userName: item.user?.name || '',
+        issuedAt: item.issuedAt ? item.issuedAt.toISOString() : null,
+        pdfUrl: item.pdfUrl || '',
       })),
       total,
       page: Math.floor(skip / limit) + 1,

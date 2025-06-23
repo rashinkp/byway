@@ -1,5 +1,4 @@
 "use client";
-
 import { useState, useEffect } from "react";
 import { FilterSidebar } from "@/components/FilterSidebar";
 import { CourseGrid } from "@/components/course/CourseGrid";

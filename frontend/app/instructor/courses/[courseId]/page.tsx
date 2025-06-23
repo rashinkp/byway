@@ -44,7 +44,6 @@ export default function CourseDetailPage() {
     { id: "overview", label: "Overview", icon: InfoIcon },
     { id: "lessons", label: "Lessons", icon: BookOpen },
     { id: "reviews", label: "Reviews", icon: StarIcon },
-    { id: "customers", label: "Customers", icon: UserCircle },
     { id: "details", label: "Details", icon: InfoIcon },
   ];
 
@@ -140,11 +139,6 @@ export default function CourseDetailPage() {
               isLoading={isLoading}
               userRole="INSTRUCTOR"
             />
-          </div>
-        </TabsContent>
-        <TabsContent value="customers" className="mt-0">
-          <div className="bg-white/80 backdrop-blur-sm border border-gray-100 shadow-sm rounded-xl p-6">
-            <p className="text-gray-600">No customer data available yet.</p>
           </div>
         </TabsContent>
         <TabsContent value="details" className="mt-0">

@@ -8,13 +8,11 @@ import Link from "next/link";
 
 export default function InstructorsPage() {
   const [page, setPage] = useState(1);
-  const [search, setSearch] = useState("");
   const limit = 9;
 
   const { data, isLoading, error } = useGetAllInstructors({
     page,
     limit,
-    search,
     sortBy: "createdAt",
     sortOrder: "desc",
     filterBy: "Approved",

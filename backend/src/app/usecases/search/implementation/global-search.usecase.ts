@@ -8,7 +8,7 @@ import { IGlobalSearchUseCase } from "../interfaces/global-search.usecase.interf
 export class GlobalSearchUseCase implements IGlobalSearchUseCase {
   constructor(private searchRepository: ISearchRepository) {}
 
-  async execute(params: SearchParams): Promise<ISearchResult> {
+  async execute(params: SearchParams & { userId?: string }): Promise<ISearchResult> {
     return this.searchRepository.search(params);
   }
 }

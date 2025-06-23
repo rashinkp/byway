@@ -85,11 +85,6 @@ export const INSTRUCTOR_NAV_ITEMS: NavItem[] = [
     icon: BookOpen,
   },
   {
-    label: "Students",
-    href: "/instructor/students",
-    icon: Users,
-  },
-  {
     label: "Wallet",
     href: "/instructor/wallet",
     icon: Wallet,

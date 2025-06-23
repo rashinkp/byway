@@ -707,12 +707,9 @@ export class CourseRepository implements ICourseRepository {
   }
 
   async getTopEnrolledCourses(input: IGetTopEnrolledCoursesInput): Promise<ITopEnrolledCourse[]> {
-    console.log('getTopEnrolledCourses called with userId:', input.userId, 'role:', input.role);
     
-    // Step 1: Get courses based on role
     let allCourses;
     if (input.role === "INSTRUCTOR") {
-      // For instructor, get only their courses
       allCourses = await this.prisma.course.findMany({
         where: {
           createdBy: input.userId
@@ -723,7 +720,6 @@ export class CourseRepository implements ICourseRepository {
         }
       });
     } else {
-      // For admin, get all courses
       allCourses = await this.prisma.course.findMany({
         include: {
           creator: true,
@@ -732,19 +728,15 @@ export class CourseRepository implements ICourseRepository {
       });
     }
     
-    console.log('Courses found:', allCourses.length, 'for role:', input.role);
     
     if (allCourses.length === 0) {
-      console.log('No courses found');
       return [];
     }
 
-    // Step 2: Sort by enrollment count and take top courses
     const topEnrolledCourses = allCourses
       .sort((a, b) => b.enrollments.length - a.enrollments.length)
       .slice(0, input.limit || 5);
 
-    console.log('Top enrolled courses found:', topEnrolledCourses.length);
 
     // Step 3: For each course, get revenue through completed order items
     const coursesWithRevenue = await Promise.all(
@@ -784,7 +776,6 @@ export class CourseRepository implements ICourseRepository {
           }, 0);
         }
 
-        console.log(`Course ${course.title}: ${completedOrderItems.length} completed sales, revenue: ${totalRevenue} (${input.role})`);
 
         // Get review stats for this course
         const reviews = await this.prisma.courseReview.findMany({
@@ -814,7 +805,6 @@ export class CourseRepository implements ICourseRepository {
       })
     );
 
-    console.log('Final courses with revenue:', coursesWithRevenue.length);
     
     // Sort by revenue in descending order
     return coursesWithRevenue.sort((a, b) => b.revenue - a.revenue);

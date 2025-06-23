@@ -57,11 +57,31 @@ export class CertificateController extends BaseController {
       if (!userId) {
         return this.httpErrors.error_400("User ID missing");
       }
-      const certificates = await this.certificateRepository.findByUserId(userId);
-      if (!certificates || certificates.length === 0) {
-        return this.httpErrors.error_404("No certificates found for this user");
-      }
-      return this.success_200(certificates, "Certificates found");
+      // Get pagination and filter params
+      const page = parseInt(request.query?.["page"] as string) || 1;
+      const limit = parseInt(request.query?.["limit"] as string) || 10;
+      const sortBy = (request.query?.["sortBy"] as string) || "createdAt";
+      const sortOrder = (request.query?.["sortOrder"] as string) === "asc" ? "asc" : "desc";
+      const status = request.query?.["status"] as string | undefined;
+      const search = request.query?.["search"] as string | undefined;
+      const skip = (page - 1) * limit;
+      const result = await this.certificateRepository.findManyByUserId({
+        userId,
+        skip,
+        take: limit,
+        sortBy,
+        sortOrder,
+        status,
+        search,
+      });
+      return this.success_200({
+        items: result.items,
+        total: result.total,
+        page,
+        totalPages: Math.ceil(result.total / limit),
+        hasMore: result.hasMore,
+        nextPage: result.nextPage,
+      }, "Certificates found");
     });
   };
 } 
