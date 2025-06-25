@@ -62,6 +62,7 @@ export function Header({ client, onNotificationClick }: HeaderProps = {}) {
     useGetInstructorByUserId(false);
   const [isInstructorModalOpen, setIsInstructorModalOpen] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [showSearchResults, setShowSearchResults] = useState(false);
@@ -92,6 +93,30 @@ export function Header({ client, onNotificationClick }: HeaderProps = {}) {
     },
     [createInstructor]
   );
+
+  // Handle navigation with dropdown close
+  const handleNavigation = useCallback((path: string) => {
+    setIsDropdownOpen(false);
+    
+    // Map old paths to new profile section paths
+    const pathMap: { [key: string]: string } = {
+      "/user/my-courses": "/user/profile?section=courses",
+      "/user/wallet": "/user/profile?section=wallet",
+      "/user/transactions": "/user/profile?section=transactions",
+      "/user/my-orders": "/user/profile?section=orders",
+      "/user/profile": "/user/profile"
+    };
+
+    const newPath = pathMap[path] || path;
+    router.push(newPath);
+  }, [router]);
+
+  // Handle logout with dropdown close
+  const handleLogout = useCallback(() => {
+    setIsDropdownOpen(false);
+    logout();
+    router.push("/login");
+  }, [logout, router]);
 
   // Handle scroll effect
   useEffect(() => {
@@ -222,7 +247,7 @@ export function Header({ client, onNotificationClick }: HeaderProps = {}) {
                         onClick={onNotificationClick}
                       />
                     </div>
-                    <DropdownMenu>
+                    <DropdownMenu open={isDropdownOpen} onOpenChange={setIsDropdownOpen}>
                       <DropdownMenuTrigger asChild>
                         <div className="relative group cursor-pointer">
                           <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-medium border-2 border-blue-200 group-hover:border-blue-300 transition-all">
@@ -235,30 +260,17 @@ export function Header({ client, onNotificationClick }: HeaderProps = {}) {
                           {user.name || "User"}
                         </DropdownMenuLabel>
                         <DropdownMenuSeparator />
-                        <DropdownMenuItem>
-                          <Link
-                            href="/user/profile"
-                            className="flex items-center w-full"
-                          >
-                            <User className="mr-2 h-4 w-4" />
-                            Profile
-                          </Link>
+                        <DropdownMenuItem onClick={() => handleNavigation("/user/profile")}>
+                          <User className="mr-2 h-4 w-4" />
+                          Profile
                         </DropdownMenuItem>
-                        <DropdownMenuItem>
-                          <Link
-                            href="/user/my-courses"
-                            className="flex items-center w-full"
-                          >
-                            <BookOpen className="mr-2 h-4 w-4" />
-                            My Courses
-                          </Link>
+                        <DropdownMenuItem onClick={() => handleNavigation("/user/my-courses")}>
+                          <BookOpen className="mr-2 h-4 w-4" />
+                          My Courses
                         </DropdownMenuItem>
                         <DropdownMenuSeparator />
                         <DropdownMenuItem
-                          onClick={() => {
-                            logout();
-                            router.push("/login");
-                          }}
+                          onClick={handleLogout}
                           disabled={isLoggingOut}
                           className="text-gray-700 hover:text-red-600"
                         >
@@ -312,10 +324,12 @@ export function Header({ client, onNotificationClick }: HeaderProps = {}) {
             </Link>
             <div className="flex items-center gap-4">
               <div className="relative group">
-                <ShoppingCart
-                  className="w-6 h-6 text-gray-600 group-hover:text-blue-500 transition-colors cursor-pointer"
-                  strokeWidth={1.5}
-                />
+                <Link href="/user/cart">
+                  <ShoppingCart
+                    className="w-6 h-6 text-gray-600 group-hover:text-blue-500 transition-colors cursor-pointer"
+                    strokeWidth={1.5}
+                  />
+                </Link>
                 {user && (
                   <Badge className="absolute -top-2 -right-2 w-5 h-5 p-0 flex items-center justify-center text-xs">
                     2
@@ -341,6 +355,7 @@ export function Header({ client, onNotificationClick }: HeaderProps = {}) {
                 <Link
                   href="/categories"
                   className="block px-2 py-1 text-gray-700 hover:text-blue-600 font-medium text-base"
+                  onClick={() => setIsMenuOpen(false)}
                 >
                   Categories
                 </Link>
@@ -358,18 +373,23 @@ export function Header({ client, onNotificationClick }: HeaderProps = {}) {
                     <Link
                       href="/user/profile"
                       className="block px-2 py-1 text-gray-700 hover:text-blue-600 text-base"
+                      onClick={() => setIsMenuOpen(false)}
                     >
                       Profile
                     </Link>
                     <Link
-                      href="/user/my-courses"
+                      href="/user/profile?section=courses"
                       className="block px-2 py-1 text-gray-700 hover:text-blue-600 text-base"
+                      onClick={() => setIsMenuOpen(false)}
                     >
                       My Courses
                     </Link>
                     {user.role !== "INSTRUCTOR" && (
                       <button
-                        onClick={() => setIsInstructorModalOpen(true)}
+                        onClick={() => {
+                          setIsInstructorModalOpen(true);
+                          setIsMenuOpen(false);
+                        }}
                         disabled={isLoggingOut || isCreatingInstructor}
                         className="w-full text-left px-2 py-1 text-gray-700 hover:text-blue-600 text-base"
                       >
@@ -381,7 +401,10 @@ export function Header({ client, onNotificationClick }: HeaderProps = {}) {
                     <div className="flex justify-between items-center gap-2 mt-4">
                       <Button
                         variant="outline"
-                        onClick={() => logout()}
+                        onClick={() => {
+                          logout();
+                          setIsMenuOpen(false);
+                        }}
                         disabled={isLoggingOut}
                         className="w-full border-gray-300 text-gray-700 rounded-lg text-base"
                       >
@@ -395,12 +418,16 @@ export function Header({ client, onNotificationClick }: HeaderProps = {}) {
                       <Button
                         variant="outline"
                         className="w-full border-gray-300 text-gray-700 rounded-lg text-base"
+                        onClick={() => setIsMenuOpen(false)}
                       >
                         Login
                       </Button>
                     </Link>
                     <Link href="/signup" className="w-1/2">
-                      <Button className="w-full bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-base">
+                      <Button 
+                        className="w-full bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-base"
+                        onClick={() => setIsMenuOpen(false)}
+                      >
                         Sign Up
                       </Button>
                     </Link>

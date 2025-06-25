@@ -1,7 +1,7 @@
 "use client";
 
 import { FC } from "react";
-import { User, BookOpen, Wallet, History, ShoppingBag, Settings, BarChart2, LogOut, Award } from "lucide-react";
+import { User, BookOpen, Wallet, History, ShoppingBag, Settings, BarChart2, LogOut, Award, ChevronRight, ChevronLeft, Loader2 } from "lucide-react";
 import { cn } from "@/utils/cn";
 import { useLogout } from "@/hooks/auth/useLogout";
 import { useRouter } from "next/navigation";
@@ -10,9 +10,12 @@ interface SidebarProps {
   activeSection: string;
   setActiveSection: (section: string) => void;
   isInstructor?: boolean;
+  collapsed?: boolean;
+  toggleCollapse?: () => void;
+  loadingSection?: string | null;
 }
 
-const Sidebar: FC<SidebarProps> = ({ activeSection, setActiveSection, isInstructor = false }) => {
+const Sidebar: FC<SidebarProps> = ({ activeSection, setActiveSection, isInstructor = false, collapsed = false, toggleCollapse, loadingSection }) => {
   const { mutate: logout, isPending: isLoggingOut } = useLogout();
   const router = useRouter();
 
@@ -34,50 +37,79 @@ const Sidebar: FC<SidebarProps> = ({ activeSection, setActiveSection, isInstruct
       ];
 
   return (
-    <div className="w-64 bg-white/60 backdrop-blur-sm border-r border-gray-200/50 min-h-screen">
-      <div className="p-6">
-        <h2 className="text-xl font-semibold text-gray-800">
-          {isInstructor ? "Instructor Dashboard" : "My Account"}
-        </h2>
-      </div>
-      <nav className="space-y-1 px-3">
+    <div className={cn(
+      "w-full h-full bg-white border-r border-gray-200 flex flex-col relative transition-all duration-300",
+      "shadow-lg",
+      "z-[60]"
+    )}>
+      {/* Collapse/Expand Chevron - always visible on mobile, visible on hover on desktop when collapsed */}
+      <button
+        className={cn(
+          "flex items-center justify-center w-full h-14 border-b border-gray-200 transition-colors md:hidden",
+          "hover:bg-gray-50 focus:outline-none sticky top-0 z-10 bg-white"
+        )}
+        onClick={toggleCollapse}
+        aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+        type="button"
+      >
+        {collapsed ? <ChevronRight className="w-6 h-6 text-gray-500" /> : <ChevronLeft className="w-6 h-6 text-gray-500" />}
+      </button>
+      {/* Navigation */}
+      <nav className={cn(
+        "flex-1 flex flex-col gap-1 py-4 md:py-6 transition-all duration-300",
+        collapsed ? "items-center" : "px-3"
+      )}>
         {navigationItems.map((item) => {
           const Icon = item.icon;
+          const isLoading = loadingSection === item.id;
           return (
             <button
               key={item.id}
               onClick={() => setActiveSection(item.id)}
               className={cn(
-                "w-full flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-lg transition-colors",
+                "flex items-center gap-3 w-full rounded-lg transition-all duration-200",
+                collapsed ? "justify-center p-0 w-12 h-12" : "px-4 py-3 text-sm font-medium",
+                "hover:bg-gray-50 active:bg-gray-100",
                 activeSection === item.id
                   ? "bg-blue-50 text-blue-700"
-                  : "text-gray-600 hover:bg-gray-50/50"
+                  : "text-gray-600"
               )}
+              title={item.label}
+              disabled={isLoading}
             >
-              <Icon className="w-5 h-5" />
-              {item.label}
+              {isLoading ? (
+                <Loader2 className="w-5 h-5 animate-spin text-blue-500" />
+              ) : (
+                <Icon className="w-5 h-5 flex-shrink-0" />
+              )}
+              {/* Only show text if not collapsed or on desktop */}
+              <span className={cn("truncate", (collapsed ? "hidden" : "inline"), "md:inline")}>{isLoading ? "Loading..." : item.label}</span>
             </button>
           );
         })}
+        {/* Logout Button - now directly after menu */}
+        <div className={cn("mt-4 border-t border-gray-200 pt-3 w-full", collapsed ? "flex flex-col items-center" : "")}> 
+          <button
+            onClick={() => {
+              logout(undefined, {
+                onSuccess: () => {
+                  router.push("/login");
+                },
+              });
+            }}
+            disabled={isLoggingOut}
+            className={cn(
+              "flex items-center gap-3 w-full rounded-lg transition-all duration-200",
+              collapsed ? "justify-center p-0 w-12 h-12 mt-2" : "px-4 py-3 text-red-600 hover:bg-red-50 mt-2",
+              "hover:bg-red-50 disabled:opacity-50"
+            )}
+            title="Logout"
+          >
+            <LogOut className="w-5 h-5 flex-shrink-0" />
+            <span className={cn("text-sm font-medium truncate", (collapsed ? "hidden" : "inline"), "md:inline")}>{isLoggingOut ? "Logging out..." : "Logout"}</span>
+          </button>
+        </div>
       </nav>
-      <div className="pt-6 mt-6 border-t border-gray-200/50 px-3">
-        <button
-          onClick={() => {
-            logout(undefined, {
-              onSuccess: () => {
-                router.push("/login");
-              },
-            });
-          }}
-          disabled={isLoggingOut}
-          className="w-full flex items-center gap-3 px-4 py-3 text-red-600 hover:bg-red-50/50 rounded-lg transition-colors duration-200"
-        >
-          <LogOut className="w-5 h-5" />
-          <span className="text-sm font-medium">
-            {isLoggingOut ? "Logging out..." : "Logout"}
-          </span>
-        </button>
-      </div>
     </div>
   );
 };

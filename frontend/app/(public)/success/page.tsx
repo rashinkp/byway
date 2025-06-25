@@ -41,7 +41,7 @@ const SuccessPage = () => {
   }, [sessionId, orderId]);
 
   const handleGoToCourses = () => {
-    router.push("/user/my-courses");
+    router.push("/user/profile?section=courses");
   };
 
   const handleGoToWallet = () => {
@@ -55,10 +55,10 @@ const SuccessPage = () => {
         router.push("/instructor/wallet");
         break;
       case "USER":
-        router.push("/user/wallet");
+        router.push("/user/profile?section=wallet");
         break;
       default:
-        router.push("/user/wallet");
+        router.push("/user/profile?section=wallet");
     }
   };
 

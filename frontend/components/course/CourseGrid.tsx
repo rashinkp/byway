@@ -6,7 +6,6 @@ import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Course } from "@/types/course";
-import { CourseCardSkeleton } from "@/components/course/CourseCardSkeleton";
 
 interface CourseGridProps {
   courses: Course[];

@@ -157,13 +157,13 @@ export default function CourseContent() {
         description:
           "Your access to this course has been blocked. Please contact support.",
       });
-      router.push("/user/my-courses");
+      router.push("/user/profile?section=courses");
     } else if (progressData?.accessStatus === "EXPIRED") {
       toast.error("Access Expired", {
         description:
           "Your access to this course has expired. Please renew your enrollment.",
       });
-      router.push("/user/my-courses");
+      router.push("/user/profile?section=courses");
     }
   }, [progressData?.accessStatus, router]);
 
@@ -293,7 +293,7 @@ export default function CourseContent() {
               We're having trouble loading the course content. Please try again or return to your courses.
             </p>
             <button
-              onClick={() => router.push("/user/my-courses")}
+              onClick={() => router.push("/user/profile?section=courses")}
               className="px-8 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-semibold rounded-xl hover:from-blue-700 hover:to-indigo-700 transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl"
             >
               Return to My Courses

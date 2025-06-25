@@ -90,7 +90,7 @@ export function CourseCard({
 
   const handleLearnNow = (e: React.MouseEvent) => {
     e.stopPropagation();
-    router.push(`/user/my-courses/${course.id}`);
+    router.push(`/user/profile?section=courses&courseId=${course.id}`);
   };
 
   const handleGoToCart = (e: React.MouseEvent) => {

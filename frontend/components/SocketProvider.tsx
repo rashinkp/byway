@@ -165,11 +165,16 @@ function handleNotificationClick(notification: SocketNotification, userRole: str
 
   switch (notificationType) {
     case 'REVENUE_EARNED':
-      const walletPath = userRole === 'ADMIN' ? '/admin/wallet' : '/instructor/wallet';
-      window.location.href = walletPath;
+      if (userRole === 'ADMIN') {
+        window.location.href = '/admin/wallet';
+      } else if (userRole === 'INSTRUCTOR') {
+        window.location.href = '/instructor/wallet';
+      } else {
+        window.location.href = '/user/profile?section=wallet';
+      }
       break;
     case 'COURSE_PURCHASED':
-      window.location.href = '/user/my-courses';
+      window.location.href = '/user/profile?section=courses';
       break;
     case 'COURSE_APPROVED':
     case 'COURSE_DECLINED':

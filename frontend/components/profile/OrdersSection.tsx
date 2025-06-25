@@ -107,7 +107,7 @@ const StatusBadge: React.FC<StatusBadgeProps> = ({
   );
 };
 
-const OrderListing: React.FC = () => {
+export default function OrdersSection() {
   const [currentPage, setCurrentPage] = useState(1);
   const [ordersPerPage] = useState(10);
   const { orders, isLoading, error, fetchOrders } = useOrders();
@@ -123,12 +123,10 @@ const OrderListing: React.FC = () => {
 
   if (isLoading) {
     return (
-      <div className="max-w-4xl mx-auto p-6">
-        <div className="mb-6">
-          <h1 className="text-2xl font-bold text-gray-900 mb-2">My Orders</h1>
-          <p className="text-gray-600">
-            Track your course purchases and enrollments
-          </p>
+      <div className="w-full">
+        <div className="bg-white rounded-xl border border-gray-200 p-6 mb-8">
+          <h1 className="text-2xl font-bold text-gray-800 mb-2">My Orders</h1>
+          <p className="text-gray-600">Track your course purchases and enrollments</p>
         </div>
         <div className="space-y-4">
           {[1, 2, 3].map((i) => (
@@ -140,12 +138,10 @@ const OrderListing: React.FC = () => {
   }
 
   return (
-    <div className="max-w-4xl mx-auto p-6">
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-900 mb-2">My Orders</h1>
-        <p className="text-gray-600">
-          Track your course purchases and enrollments
-        </p>
+    <div className="w-full">
+      <div className="bg-white rounded-xl border border-gray-200 p-6 mb-8">
+        <h1 className="text-2xl font-bold text-gray-800 mb-2">My Orders</h1>
+        <p className="text-gray-600">Track your course purchases and enrollments</p>
       </div>
 
       {error && (
@@ -165,7 +161,7 @@ const OrderListing: React.FC = () => {
           </p>
         </div>
       ) : (
-        <>
+        <div className="bg-white rounded-xl border border-gray-200 p-6">
           <div className="space-y-6">
             {orders.orders.map((order) => (
               <OrderCard key={order.id} order={order} />
@@ -180,10 +176,8 @@ const OrderListing: React.FC = () => {
               />
             </div>
           )}
-        </>
+        </div>
       )}
     </div>
   );
-};
-
-export default OrderListing;
+} 
