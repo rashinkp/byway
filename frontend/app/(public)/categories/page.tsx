@@ -5,6 +5,7 @@ import { useCategories } from "@/hooks/category/useCategories";
 import { CategoryList } from "@/components/category/CategoryList";
 import { Pagination } from "@/components/ui/Pagination";
 import { useRouter } from "next/navigation";
+import ErrorDisplay from "@/components/ErrorDisplay";
 
 export default function CategoriesPage() {
   const router = useRouter();
@@ -23,7 +24,7 @@ export default function CategoriesPage() {
   if (error) {
     return (
       <div className="text-center py-10">
-        <p className="text-red-500">{error.message}</p>
+        <ErrorDisplay error={error} title="Category Error" description="There was a problem loading categories. Please try again." compact />
       </div>
     );
   }

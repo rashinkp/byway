@@ -32,19 +32,6 @@ export function TopInstructors({
 }: TopInstructorsProps) {
   return (
     <div className={cn("p-6", className)}>
-      {/* Header */}
-      <div className="flex justify-between items-center mb-8">
-        <div>
-          <h2 className="text-2xl font-bold text-gray-900">Top Instructors</h2>
-          <p className="text-gray-500 mt-1">Learn from industry experts</p>
-        </div>
-        <Link href="/instructors">
-          <Button variant="ghost" className="text-blue-600 hover:text-blue-700 hover:bg-blue-50">
-            View All Instructors
-          </Button>
-        </Link>
-      </div>
-
       {/* Instructors Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         {instructors.map((instructor) => (

@@ -10,9 +10,11 @@ import WalletSection from "@/components/profile/WalletSection";
 import TransactionsSection from "@/components/profile/TransactionsSection";
 import OrdersSection from "@/components/profile/OrdersSection";
 import CertificatesSection from "@/components/profile/CertificatesSection";
-import { Loader2 } from "lucide-react";
-import { useSearchParams, useRouter } from "next/navigation";
+import { Loader2, Menu } from "lucide-react";
+import { useSearchParams, useRouter, usePathname } from "next/navigation";
 import ErrorDisplay from "@/components/ErrorDisplay";
+import { Skeleton } from "@/components/ui/skeleton";
+import { TopNavbar } from "@/components/common/layout/TopNavbar";
 
 export default function ProfilePage() {
   const { data: user, isLoading, error } = useDetailedUserData();
@@ -22,6 +24,7 @@ export default function ProfilePage() {
   const [loadingSection, setLoadingSection] = useState<string | null>(null);
   const searchParams = useSearchParams();
   const router = useRouter();
+  const pathname = usePathname();
 
   // Expand sidebar by default on desktop
   useEffect(() => {
@@ -77,11 +80,27 @@ export default function ProfilePage() {
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-gray-50">
-        <div className="flex flex-col items-center gap-4">
-          <Loader2 className="w-8 h-8 text-blue-600 animate-spin" />
-          <p className="text-gray-600">Loading your profile...</p>
+      <div className="min-h-screen bg-gray-50/50 flex flex-row">
+        {/* Sidebar skeleton */}
+        <aside className="transition-all duration-300 w-14 md:w-64 bg-white border-r border-gray-200 shadow-lg flex flex-col">
+          <div className="p-4 space-y-4">
+            {[1,2,3,4,5].map(i => (
+              <Skeleton key={i} className="h-10 w-full rounded-lg" />
+            ))}
+          </div>
+        </aside>
+        {/* Main content skeleton */}
+        <main className="flex-1 transition-all duration-300 p-4 md:p-8 min-w-0">
+          <div className="max-w-5xl mx-auto space-y-6">
+            <Skeleton className="h-10 w-1/3 mb-4" />
+            <Skeleton className="h-6 w-1/2 mb-2" />
+            <Skeleton className="h-32 w-full mb-4" />
+            <Skeleton className="h-6 w-1/4 mb-2" />
+            <Skeleton className="h-6 w-1/4 mb-2" />
+            <Skeleton className="h-24 w-full rounded-xl" />
+            <Skeleton className="h-24 w-full rounded-xl" />
         </div>
+        </main>
       </div>
     );
   }
@@ -103,56 +122,85 @@ export default function ProfilePage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50/50 flex flex-row">
-      {/* Sidebar: regular flex column, below header, above footer */}
-      <aside className={`transition-all duration-300 ${sidebarCollapsed ? 'w-14' : 'w-64'} bg-white border-r border-gray-200 shadow-lg flex flex-col`}>
-        <Sidebar
-          activeSection={activeSection}
-          setActiveSection={handleSectionChange}
-          collapsed={sidebarCollapsed}
-          toggleCollapse={() => setSidebarCollapsed((c) => !c)}
-          loadingSection={loadingSection}
+    <>
+      <div className="min-h-screen bg-gray-50/50 flex flex-row relative">
+        {/* Sidebar for desktop */}
+        <aside className={`hidden md:flex transition-all duration-300 ${sidebarCollapsed ? 'w-14' : 'w-64'} bg-white border-r border-gray-200 shadow-lg flex-col z-30`}>
+          <Sidebar
+            activeSection={activeSection}
+            setActiveSection={handleSectionChange}
+            collapsed={sidebarCollapsed}
+            toggleCollapse={() => setSidebarCollapsed((c) => !c)}
+            loadingSection={loadingSection}
+          />
+        </aside>
+
+        {/* Sidebar for mobile: always show thin bar, overlay when expanded */}
+        <aside className={`w-14 bg-white border-r border-gray-200 shadow-lg z-20 flex flex-col md:hidden transition-all duration-300 ${!sidebarCollapsed ? 'pointer-events-none opacity-0' : ''}`}>
+          <Sidebar
+            activeSection={activeSection}
+            setActiveSection={handleSectionChange}
+            collapsed={true}
+            toggleCollapse={() => setSidebarCollapsed(false)}
+            loadingSection={loadingSection}
+          />
+        </aside>
+        {/* Overlay sidebar for mobile */}
+        {!sidebarCollapsed && (
+          <>
+             <div className="fixed left-0 right-0 top-[64px] bottom-0 bg-black/30 z-30 md:hidden" onClick={() => setSidebarCollapsed(true)} />
+            <aside className="fixed left-0 top-[64px] h-[calc(100vh-64px)] w-64 bg-white border-r border-gray-200 shadow-lg z-40 flex flex-col md:hidden transition-transform duration-300">
+              <Sidebar
+                activeSection={activeSection}
+                setActiveSection={handleSectionChange}
+                collapsed={false}
+                toggleCollapse={() => setSidebarCollapsed(true)}
+                loadingSection={loadingSection}
+              />
+            </aside>
+          </>
+        )}
+
+        {/* Main Content */}
+        <main className="flex-1 transition-all duration-300 p-4 md:p-8 min-w-0">
+          <div className="max-w-5xl mx-auto">
+            {activeSection === "profile" && (
+              <ProfileSection user={user} setIsModalOpen={setIsModalOpen} />
+            )}
+            {activeSection === 'courses' && (
+              <MyCoursesSection />
+            )}
+            {activeSection === 'wallet' && (
+              <WalletSection />
+            )}
+            {activeSection === 'transactions' && (
+              <TransactionsSection />
+            )}
+            {activeSection === 'orders' && (
+              <OrdersSection />
+            )}
+            {activeSection === 'certificates' && (
+              <CertificatesSection />
+            )}
+            {activeSection === 'settings' && (
+              <div className="bg-white rounded-xl border border-gray-200 p-6">
+                <h2 className="text-2xl font-bold text-gray-800 capitalize mb-2">
+                  Settings
+                </h2>
+                <div className="h-px bg-gray-200 my-4" />
+                <p className="text-gray-600">
+                  Content for settings section coming soon...
+                </p>
+              </div>
+            )}
+          </div>
+        </main>
+        <EditProfileForm
+          open={isModalOpen}
+          onOpenChange={setIsModalOpen}
+          user={user}
         />
-      </aside>
-      {/* Main Content: margin-left based on sidebar width, p-4 on mobile, p-8 on md+ */}
-      <main className={`flex-1 transition-all duration-300 p-4 md:p-8 min-w-0`}>
-        <div className="max-w-5xl mx-auto">
-          {activeSection === "profile" && (
-            <ProfileSection user={user} setIsModalOpen={setIsModalOpen} />
-          )}
-          {activeSection === 'courses' && (
-            <MyCoursesSection />
-          )}
-          {activeSection === 'wallet' && (
-            <WalletSection />
-          )}
-          {activeSection === 'transactions' && (
-            <TransactionsSection />
-          )}
-          {activeSection === 'orders' && (
-            <OrdersSection />
-          )}
-          {activeSection === 'certificates' && (
-            <CertificatesSection />
-          )}
-          {activeSection === 'settings' && (
-            <div className="bg-white rounded-xl border border-gray-200 p-6">
-              <h2 className="text-2xl font-bold text-gray-800 capitalize mb-2">
-                Settings
-              </h2>
-              <div className="h-px bg-gray-200 my-4" />
-              <p className="text-gray-600">
-                Content for settings section coming soon...
-              </p>
-            </div>
-          )}
-        </div>
-      </main>
-      <EditProfileForm
-        open={isModalOpen}
-        onOpenChange={setIsModalOpen}
-        user={user}
-      />
-    </div>
+      </div>
+    </>
   );
 }

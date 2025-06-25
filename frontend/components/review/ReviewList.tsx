@@ -18,6 +18,7 @@ import EditReviewForm from "./EditReviewForm";
 import ReviewItem from "./ReviewItem";
 import React from "react";
 import ErrorDisplay from "@/components/ErrorDisplay";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface ReviewListProps {
   reviews: CourseReview[];
@@ -138,16 +139,7 @@ export default function ReviewList({
     return (
       <div className="space-y-4">
         {[1, 2, 3].map((i) => (
-          <div key={i} className="bg-white/60 backdrop-blur-sm border border-gray-200/50 rounded-xl p-4 animate-pulse">
-            <div className="flex items-start space-x-4">
-              <div className="w-10 h-10 bg-gray-200 rounded-full"></div>
-              <div className="flex-1 space-y-2">
-                <div className="h-4 bg-gray-200 rounded w-1/4"></div>
-                <div className="h-4 bg-gray-200 rounded w-1/2"></div>
-                <div className="h-4 bg-gray-200 rounded w-full"></div>
-              </div>
-            </div>
-          </div>
+          <Skeleton key={i} className="h-24 w-full rounded-xl" />
         ))}
       </div>
     );

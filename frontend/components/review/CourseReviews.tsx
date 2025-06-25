@@ -7,6 +7,7 @@ import AddReviewForm from "./AddReviewForm";
 import ReviewList from "./ReviewList";
 import ReviewListSkeleton from "./ReviewListSkeleton";
 import { Star } from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface CourseReviewsProps {
   course: Course | undefined;
@@ -36,7 +37,13 @@ export default function CourseReviews({
   });
 
   if (isLoading) {
-    return <ReviewListSkeleton />;
+    return (
+      <div className="space-y-4">
+        {[1, 2, 3].map((i) => (
+          <Skeleton key={i} className="h-24 w-full rounded-xl" />
+        ))}
+      </div>
+    );
   }
 
   const isEnrolled = course?.isEnrolled || false;

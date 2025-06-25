@@ -17,15 +17,7 @@ interface CategoryCardProps {
 export function CategoryCard({ categories, className, onCategoryClick }: CategoryCardProps) {
   return (
     <div className={cn("p-6", className)}>
-      {/* Header */}
-      <div className="flex justify-between items-center mb-6">
-        <h2 className="text-lg font-semibold text-gray-800">Top Categories</h2>
-        <Link href="/categories">
-          <span className="text-sm font-medium text-blue-600 hover:text-blue-700 cursor-pointer">
-            See All
-          </span>
-        </Link>
-      </div>
+      {/* Header removed */}
 
       {/* Categories Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">

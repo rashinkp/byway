@@ -12,15 +12,7 @@ interface TopCoursesProps {
 export function TopCourses({ courses, className, variant = 'compact' }: TopCoursesProps) {
   return (
     <div className={cn("p-6", className)}>
-      {/* Header */}
-      <div className="flex justify-between items-center mb-6">
-        <h2 className="text-lg font-semibold text-gray-800">Top Courses</h2>
-        <Link href="/courses">
-          <span className="text-sm font-medium text-blue-600 hover:text-blue-700 cursor-pointer">
-            See All
-          </span>
-        </Link>
-      </div>
+      {/* Header removed */}
 
       {/* Courses Grid */}
       <CourseGrid courses={courses} variant={variant} />

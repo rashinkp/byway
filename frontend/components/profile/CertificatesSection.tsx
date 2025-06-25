@@ -5,6 +5,7 @@ import { useCertificateList } from "@/hooks/certificate/useCertificateList";
 import { Pagination } from "@/components/ui/Pagination";
 import { Loader2 } from "lucide-react";
 import ErrorDisplay from "@/components/ErrorDisplay";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export default function CertificatesSection() {
   const {
@@ -33,7 +34,11 @@ export default function CertificatesSection() {
       <div className="bg-white rounded-xl border border-gray-200 p-6">
         {/* Results area */}
         {loading ? (
-          <div className="flex items-center gap-2 text-blue-600"><Loader2 className="animate-spin" /> Loading certificates...</div>
+          <div className="space-y-4">
+            {[1,2,3].map(i => (
+              <Skeleton key={i} className="h-20 w-full rounded-lg" />
+            ))}
+          </div>
         ) : error ? (
           <ErrorDisplay error={error} onRetry={() => fetchCertificates(page)} title="Certificate Error" description="There was a problem loading your certificates. Please try again." />
         ) : certificates.length === 0 ? (

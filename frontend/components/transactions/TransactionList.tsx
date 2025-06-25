@@ -2,7 +2,7 @@ import React from "react";
 import { Transaction } from "@/types/transaction";
 import { ArrowUp, ArrowDown, AlertCircle, RefreshCw } from "lucide-react";
 import { formatDate, formatPrice } from "@/utils/formatters";
-import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface TransactionListProps {
   transactions: Transaction[];
@@ -134,8 +134,10 @@ export const TransactionList: React.FC<TransactionListProps> = ({
 
   if (isLoading) {
     return (
-      <div className="py-8">
-        <LoadingSpinner text="Loading transactions..." />
+      <div className="py-8 space-y-3">
+        {[1,2,3,4,5].map(i => (
+          <Skeleton key={i} className="h-16 w-full rounded-lg" />
+        ))}
       </div>
     );
   }

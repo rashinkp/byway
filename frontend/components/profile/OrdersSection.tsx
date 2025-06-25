@@ -8,11 +8,11 @@ import {
   AlertCircle,
   CreditCard,
 } from "lucide-react";
-import { OrderSkeleton } from "@/components/orders/OrderSkeleton";
 import { OrderCard } from "@/components/orders/OrderCard";
 import { useOrders } from "@/hooks/order/useOrders";
 import { Pagination } from "@/components/ui/Pagination";
 import ErrorDisplay from "@/components/ErrorDisplay";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface StatusBadgeProps {
   status: string;
@@ -131,7 +131,7 @@ export default function OrdersSection() {
         </div>
         <div className="space-y-4">
           {[1, 2, 3].map((i) => (
-            <OrderSkeleton key={i} />
+            <Skeleton key={i} className="h-32 w-full rounded-lg" />
           ))}
         </div>
       </div>

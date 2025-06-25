@@ -1,6 +1,7 @@
 import { FC, memo } from "react";
 import { PayPalScriptProvider, PayPalButtons } from "@paypal/react-paypal-js";
 import { usePayPalPayment } from "@/hooks/usePaypalPayment";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface PayPalPaymentProps {
   paypalOptions: {
@@ -20,7 +21,7 @@ const PayPalPayment: FC<PayPalPaymentProps> = memo(
     return (
       <div className="mt-6">
         {isPaypalLoading ? (
-          <div className="text-center">Loading PayPal Buttons...</div>
+          <Skeleton className="h-12 w-full rounded-lg" />
         ) : (
           <PayPalScriptProvider options={paypalOptions}>
             <PayPalButtons

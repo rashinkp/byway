@@ -5,11 +5,12 @@ import { TopCourses } from "@/components/course/TopCourseList";
 import { StatsCard } from "@/components/DashboardStats";
 import { HeroSection } from "@/components/HeroSection";
 import { TopInstructors } from "@/components/instructor/TopInstructor";
-import { Code } from "lucide-react";
+import { Code, Sparkles } from "lucide-react";
 import { useCategories } from "@/hooks/category/useCategories";
 import { useRouter } from "next/navigation";
 import { useGetAllCourses } from "@/hooks/course/useGetAllCourse";
 import { useGetAllInstructors } from "@/hooks/instructor/useGetAllInstructor";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export default function UserDashboard() {
   const router = useRouter();
@@ -70,16 +71,59 @@ export default function UserDashboard() {
   })) || [];
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <HeroSection className="mb-12" />
-      <StatsCard stats={stats} className="mb-8" />
-      <CategoryCard 
-        categories={categories} 
-        className="mb-8" 
-        onCategoryClick={handleCategoryClick}
-      />
-      <TopCourses courses={topCourses} className="mb-8" variant="compact" />
-      <TopInstructors instructors={topInstructors} className="mb-8" />
+    <div className="relative min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 pb-16">
+      <div className="container mx-auto px-2 sm:px-4 py-6 sm:py-8">
+        <HeroSection className="mb-10 sm:mb-16" />
+        <section className="mb-8 sm:mb-12">
+          <StatsCard stats={stats} className="mb-0 shadow-md bg-white/80" />
+        </section>
+        <section className="mb-8 sm:mb-12">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4 sm:mb-6">
+            <h2 className="text-xl sm:text-2xl font-bold text-gray-900 flex items-center gap-2">
+              <Sparkles className="w-6 h-6 text-blue-500" /> Top Categories
+            </h2>
+            <button
+              onClick={() => router.push('/categories')}
+              className="px-4 py-2 rounded-full bg-blue-50 text-blue-700 hover:bg-blue-100 font-medium text-sm transition w-full sm:w-auto"
+            >
+              View All
+            </button>
+          </div>
+          <CategoryCard 
+            categories={categories} 
+            className="mb-0" 
+            onCategoryClick={handleCategoryClick}
+          />
+        </section>
+        <section className="mb-8 sm:mb-12">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4 sm:mb-6">
+            <h2 className="text-xl sm:text-2xl font-bold text-gray-900 flex items-center gap-2">
+              <Sparkles className="w-6 h-6 text-purple-500" /> Top Courses
+            </h2>
+            <button
+              onClick={() => router.push('/courses')}
+              className="px-4 py-2 rounded-full bg-purple-50 text-purple-700 hover:bg-purple-100 font-medium text-sm transition w-full sm:w-auto"
+            >
+              View All
+            </button>
+          </div>
+          <TopCourses courses={topCourses} className="mb-0" variant="compact" />
+        </section>
+        <section className="mb-8 sm:mb-12">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4 sm:mb-6">
+            <h2 className="text-xl sm:text-2xl font-bold text-gray-900 flex items-center gap-2">
+              <Sparkles className="w-6 h-6 text-pink-500" /> Top Instructors
+            </h2>
+            <button
+              onClick={() => router.push('/instructors')}
+              className="px-4 py-2 rounded-full bg-pink-50 text-pink-700 hover:bg-pink-100 font-medium text-sm transition w-full sm:w-auto"
+            >
+              View All
+            </button>
+          </div>
+          <TopInstructors instructors={topInstructors} className="mb-0" />
+        </section>
+      </div>
     </div>
   );
 }

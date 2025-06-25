@@ -53,7 +53,10 @@ export function CourseGrid({
 
   // Grid layout based on variant
   const getGridClasses = () => {
-    return "flex flex-wrap gap-4 md:gap-6 justify-start";
+    if (variant === 'default') {
+      return "flex flex-wrap gap-4 md:gap-6 justify-start";
+    }
+    return "flex flex-wrap gap-4 md:gap-6 justify-center";
   };
 
   // Skeleton Card Component using shadcn/ui Skeleton
@@ -134,41 +137,12 @@ export function CourseGrid({
   }
 
   return (
-    <div className="relative">
-      <div className="absolute -top-16 -right-16 w-64 h-64 bg-blue-50 rounded-full opacity-50 blur-3xl -z-10" />
-      <div className="absolute -bottom-16 -left-16 w-64 h-64 bg-indigo-50 rounded-full opacity-50 blur-3xl -z-10" />
-      <div className="mb-6 flex justify-between items-center">
-        <div>
-          <h2 className="text-xl font-bold text-gray-800">Available Courses</h2>
-          <p className="text-gray-500 text-sm">
-            {isLoading
-              ? "Loading courses..."
-              : `Found ${courses.length} courses for you`}
-          </p>
+    <div className={cn(getGridClasses(), className)}>
+      {courses.map((course) => (
+        <div key={course.id} className="w-80">
+          <CourseCard course={course} className="w-full h-full" />
         </div>
-        <div className="bg-white px-4 py-2 rounded-lg border border-gray-100 shadow-sm">
-          <span className="text-sm text-gray-500">Showing:</span>
-          <span className="text-sm font-medium text-gray-800 ml-1">
-            {isLoading ? "..." : `${courses.length} courses`}
-          </span>
-        </div>
-      </div>
-      <motion.div
-        className={cn(getGridClasses(), className)}
-        variants={containerVariants}
-        initial="hidden"
-        animate={isLoaded ? "show" : "hidden"}
-      >
-        {courses.map((course) => (
-          <motion.div
-            key={course.id}
-            variants={itemVariants}
-            className="w-80"
-          >
-            <CourseCard course={course} className="w-full h-full" />
-          </motion.div>
-        ))}
-      </motion.div>
+      ))}
     </div>
   );
 }

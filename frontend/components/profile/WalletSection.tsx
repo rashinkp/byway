@@ -19,6 +19,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import ErrorDisplay from "@/components/ErrorDisplay";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export default function WalletSection() {
   const { wallet, isLoading: walletLoading, error: walletError, refetch: refetchWallet } = useWallet();
@@ -54,10 +55,10 @@ export default function WalletSection() {
     return (
       <div className="w-full space-y-6">
         <div className="bg-white rounded-xl border border-gray-200 p-6">
-          <div className="animate-pulse space-y-4">
-            <div className="h-8 bg-gray-200 rounded w-1/3"></div>
-            <div className="h-4 bg-gray-200 rounded w-2/3"></div>
-            <div className="h-32 bg-gray-200 rounded"></div>
+          <div className="space-y-4">
+            <Skeleton className="h-8 w-1/3" />
+            <Skeleton className="h-4 w-2/3" />
+            <Skeleton className="h-32 w-full" />
           </div>
         </div>
       </div>
@@ -131,21 +132,7 @@ export default function WalletSection() {
           </div>
         </div>
 
-        <div className="bg-white rounded-xl border border-gray-200 p-4 sm:p-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-gray-500 mb-1">
-                This Month
-              </p>
-              <p className="text-xl sm:text-2xl font-bold text-gray-900">
-                $0.00
-              </p>
-            </div>
-            <div className="bg-blue-50 p-3 rounded-lg">
-              <TrendingUp className="w-6 h-6 text-blue-600" />
-            </div>
-          </div>
-        </div>
+       
 
         <div className="bg-white rounded-xl border border-gray-200 p-4 sm:p-6 sm:col-span-2 lg:col-span-1">
           <div className="flex items-center justify-between">

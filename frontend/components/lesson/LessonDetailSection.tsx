@@ -22,6 +22,7 @@ import { StatusBadge } from "@/components/ui/StatusBadge";
 import { AlertComponent } from "../ui/AlertComponent";
 import { DetailsSectionSkeleton } from "../skeleton/CourseDetailSectionSkeleton";
 import ErrorDisplay from "@/components/ErrorDisplay";
+import { Skeleton } from "@/components/ui/skeleton";
 
 // Utilities and API
 import { formatDate } from "@/utils/formatDate";
@@ -112,7 +113,15 @@ export function LessonDetailSection({
   }
 
   if (isLoading) {
-    return <DetailsSectionSkeleton />;
+    return (
+      <div className="p-6">
+        <Skeleton className="h-8 w-1/2 mb-4" />
+        <Skeleton className="h-4 w-1/3 mb-2" />
+        <Skeleton className="h-32 w-full mb-4" />
+        <Skeleton className="h-4 w-1/4 mb-2" />
+        <Skeleton className="h-4 w-1/4 mb-2" />
+      </div>
+    );
   }
 
   return (

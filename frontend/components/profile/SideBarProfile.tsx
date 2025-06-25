@@ -42,18 +42,26 @@ const Sidebar: FC<SidebarProps> = ({ activeSection, setActiveSection, isInstruct
       "shadow-lg",
       "z-[60]"
     )}>
-      {/* Collapse/Expand Chevron - always visible on mobile, visible on hover on desktop when collapsed */}
-      <button
-        className={cn(
-          "flex items-center justify-center w-full h-14 border-b border-gray-200 transition-colors md:hidden",
-          "hover:bg-gray-50 focus:outline-none sticky top-0 z-10 bg-white"
-        )}
-        onClick={toggleCollapse}
-        aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
-        type="button"
-      >
-        {collapsed ? <ChevronRight className="w-6 h-6 text-gray-500" /> : <ChevronLeft className="w-6 h-6 text-gray-500" />}
-      </button>
+      {/* Collapse/Expand Chevron - always visible on mobile, at the very top when collapsed or expanded */}
+      {collapsed ? (
+        <button
+          className="md:hidden w-full h-14 flex items-center justify-center border-b border-gray-200 bg-white focus:outline-none z-20"
+          onClick={toggleCollapse}
+          aria-label="Expand sidebar"
+          type="button"
+        >
+          <ChevronRight className="w-6 h-6 text-gray-500" />
+        </button>
+      ) : (
+        <button
+          className="md:hidden w-full h-14 flex items-center justify-center border-b border-gray-200 bg-white focus:outline-none z-20"
+          onClick={toggleCollapse}
+          aria-label="Collapse sidebar"
+          type="button"
+        >
+          <ChevronLeft className="w-6 h-6 text-gray-500" />
+        </button>
+      )}
       {/* Navigation */}
       <nav className={cn(
         "flex-1 flex flex-col gap-1 py-4 md:py-6 transition-all duration-300",

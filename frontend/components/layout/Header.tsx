@@ -8,19 +8,12 @@ import { useGetInstructorByUserId } from "@/hooks/instructor/useGetInstructorByU
 import { Button } from "@/components/ui/button";
 import {
   Loader2,
-  Search,
   ShoppingCart,
   Bell,
   Menu,
   X,
-  ChevronDown,
   LogOut,
   User,
-  BookOpen,
-  Clock,
-  Star,
-  Users,
-  Tag,
   MessageSquare,
 } from "lucide-react";
 import { useState, useCallback, useEffect, useRef } from "react";
@@ -38,14 +31,10 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/utils/cn";
-import { useRouter } from "next/navigation";
-import { useCategories } from "@/hooks/category/useCategories";
+import { useRouter } from "next/navigation";  
 import { useGlobalSearch } from "@/hooks/search/useGlobalSearch";
 import { useDebounce } from "@/hooks/useDebounce";
 import { Skeleton } from "@/components/ui/skeleton";
-import NotificationList, { Notification } from "@/components/notifications/NotificationList";
-import { Dialog, DialogContent, DialogOverlay } from "@/components/ui/dialog";
-import { useNotificationSocket } from '@/hooks/notification/useNotificationSocket';
 import { HeaderSearchBar } from "@/components/layout/HeaderSearchBar";
 
 interface HeaderProps {
@@ -265,7 +254,6 @@ export function Header({ client, onNotificationClick }: HeaderProps = {}) {
                           Profile
                         </DropdownMenuItem>
                         <DropdownMenuItem onClick={() => handleNavigation("/user/my-courses")}>
-                          <BookOpen className="mr-2 h-4 w-4" />
                           My Courses
                         </DropdownMenuItem>
                         <DropdownMenuSeparator />
@@ -319,7 +307,6 @@ export function Header({ client, onNotificationClick }: HeaderProps = {}) {
               href="/"
               className="text-xl font-bold text-blue-600 flex items-center gap-2"
             >
-              <BookOpen className="w-6 h-6" />
               Byway
             </Link>
             <div className="flex items-center gap-4">

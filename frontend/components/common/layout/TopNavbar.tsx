@@ -2,13 +2,14 @@
 
 import { NavItem } from "@/types/nav";
 import Link from "next/link";
-import { ChevronRight, Home } from "lucide-react";
+import { ChevronRight } from "lucide-react";
 
 interface TopNavbarProps {
   pathname: string;
   navItems: NavItem[];
   isCollapsible?: boolean;
   collapsed?: boolean;
+  noMargin?: boolean;
 }
 
 export function TopNavbar({
@@ -16,12 +17,13 @@ export function TopNavbar({
   navItems,
   isCollapsible = false,
   collapsed = false,
+  noMargin = false,
 }: TopNavbarProps) {
   // Generate breadcrumbs from pathname
   const generateBreadcrumbs = () => {
     const segments = pathname.split("/").filter(Boolean);
     const breadcrumbs = [
-      { name: "Home", href: "/", icon: Home }
+      { name: "Home", href: "/" }
     ];
 
     let currentPath = "";
@@ -30,8 +32,7 @@ export function TopNavbar({
       const name = segment.replace(/-/g, " ").replace(/\b\w/g, l => l.toUpperCase());
       breadcrumbs.push({
         name,
-        href: currentPath,
-        icon: undefined
+        href: currentPath
       });
     });
 
@@ -42,33 +43,33 @@ export function TopNavbar({
 
   return (
     <div
-      className={`sticky top-0 z-10 bg-white border-b shadow-sm transition-all duration-300 ease-in-out ${
-        isCollapsible
-          ? collapsed
-            ? "lg:ml-20"
-            : "lg:ml-64"
-          : "lg:ml-64 lg:[&@media(min-width:1024px)]:ml-[80px] xl:ml-64"
+      className={`sticky top-0 z-10 bg-white border-b transition-all duration-300 ease-in-out ${
+        noMargin
+          ? ""
+          : isCollapsible
+            ? collapsed
+              ? "lg:ml-20"
+              : "lg:ml-64"
+            : "lg:ml-64 lg:[&@media(min-width:1024px)]:ml-[80px] xl:ml-64"
       }`}
     >
-      <div className="flex items-center h-16 px-4 lg:px-6">
-        <nav aria-label="Breadcrumb">
-          <ol className="flex items-center space-x-2 text-sm text-gray-600">
+      <div className="flex items-center min-h-10 px-6 sm:px-10 md:px-14">
+        <nav aria-label="Breadcrumb" className="w-full">
+          <ol className="flex flex-wrap items-center gap-x-1 gap-y-1 text-gray-600 text-[15px]">
             {breadcrumbs.map((breadcrumb, index) => (
               <li key={breadcrumb.href} className="flex items-center">
                 {index > 0 && (
                   <ChevronRight className="w-4 h-4 mx-2 text-gray-400" />
                 )}
                 {index === breadcrumbs.length - 1 ? (
-                  <span className="font-semibold text-gray-800 capitalize">
-                    {breadcrumb.icon && <breadcrumb.icon className="w-4 h-4 mr-1" />}
+                  <span className="font-normal text-gray-800 capitalize truncate max-w-[120px] sm:max-w-[200px] md:max-w-[300px]">
                     {breadcrumb.name}
                   </span>
                 ) : (
                   <Link
                     href={breadcrumb.href}
-                    className="flex items-center hover:text-gray-800 transition-colors capitalize"
+                    className="hover:text-gray-800 transition-colors capitalize truncate max-w-[120px] sm:max-w-[200px] md:max-w-[300px]"
                   >
-                    {breadcrumb.icon && <breadcrumb.icon className="w-4 h-4 mr-1" />}
                     {breadcrumb.name}
                   </Link>
                 )}

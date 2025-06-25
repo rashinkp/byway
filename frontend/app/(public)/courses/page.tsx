@@ -122,8 +122,7 @@ export default function CourseListingPage() {
 
   return (
     <div className="container mx-auto px-4 py-2">
-      <h1 className="text-2xl font-bold text-gray-800 mb-6">All Courses</h1>
-      <div className="flex flex-col lg:flex-row gap-6">
+      <div className="flex flex-col lg:flex-row gap-4">
         <div className="lg:w-1/5">
           {isLoading ? (
             <FilterSidebarSkeleton />
