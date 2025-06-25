@@ -12,6 +12,7 @@ import OrdersSection from "@/components/profile/OrdersSection";
 import CertificatesSection from "@/components/profile/CertificatesSection";
 import { Loader2 } from "lucide-react";
 import { useSearchParams, useRouter } from "next/navigation";
+import ErrorDisplay from "@/components/ErrorDisplay";
 
 export default function ProfilePage() {
   const { data: user, isLoading, error } = useDetailedUserData();
@@ -88,10 +89,7 @@ export default function ProfilePage() {
   if (error) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-gray-50">
-        <div className="text-center">
-          <div className="text-red-600 mb-2">Something went wrong</div>
-          <p className="text-gray-600">{error instanceof Error ? error.message : "An error occurred"}</p>
-        </div>
+        <ErrorDisplay error={error} title="Something went wrong" description="An error occurred while loading your profile." />
       </div>
     );
   }
@@ -99,10 +97,7 @@ export default function ProfilePage() {
   if (!user) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-gray-50">
-        <div className="text-center">
-          <div className="text-red-600 mb-2">No user data found</div>
-          <p className="text-gray-600">Please try logging in again</p>
-        </div>
+        <ErrorDisplay error={"No user data found"} title="No user data found" description="Please try logging in again." />
       </div>
     );
   }

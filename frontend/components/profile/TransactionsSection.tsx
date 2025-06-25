@@ -9,13 +9,13 @@ import {
   Receipt,
   TrendingUp,
   TrendingDown,
-  DollarSign,
   Calendar,
   Filter,
   Search,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import ErrorDisplay from "@/components/ErrorDisplay";
 
 export default function TransactionsSection() {
   const [page, setPage] = useState(1);
@@ -156,12 +156,14 @@ export default function TransactionsSection() {
         </div>
 
         <div className="p-4 sm:p-6">
-          <TransactionList
-            transactions={transactions}
-            isLoading={isTransactionsLoading}
-            error={transactionsError}
-            onRetry={transactionsRefetch}
-          />
+          {transactionsError ? (
+            <ErrorDisplay error={transactionsError} onRetry={transactionsRefetch} title="Transaction Error" description="There was a problem loading your transactions. Please try again." />
+          ) : (
+            <TransactionList
+              transactions={transactions}
+              isLoading={isTransactionsLoading}
+            />
+          )}
         </div>
 
         {/* Pagination */}

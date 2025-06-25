@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Star } from "lucide-react";
 import { useCreateCourseReview } from "@/hooks/course-review/useCreateCourseReview";
 import { CreateCourseReviewParams } from "@/types/course-review";
+import ErrorDisplay from "@/components/ErrorDisplay";
 
 interface AddReviewFormProps {
   courseId: string;
@@ -70,9 +71,7 @@ export default function AddReviewForm({
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       {error && (
-        <div className="p-3 bg-red-50 border border-red-200 rounded-lg">
-          <p className="text-red-600 text-sm">{error.message}</p>
-        </div>
+        <ErrorDisplay error={error} title="Review Error" description="There was a problem submitting your review. Please try again." compact />
       )}
 
       {/* Rating */}

@@ -2,6 +2,7 @@
 
 import { useState, useCallback } from "react";
 import { Upload, File, XCircle, CheckCircle } from "lucide-react";
+import ErrorDisplay from "@/components/ErrorDisplay";
 
 export enum FileUploadStatus {
   IDLE = "idle",
@@ -174,10 +175,7 @@ export default function FileUploadComponent({
       </div>
 
       {error && (
-        <p className="mt-1 text-sm text-red-500 flex items-center">
-          <XCircle className="h-4 w-4 mr-1" />
-          {error}
-        </p>
+        <ErrorDisplay error={error} title="File Upload Error" description="There was a problem with your file upload. Please try again." compact />
       )}
 
       {uploadStatus === FileUploadStatus.UPLOADING && (

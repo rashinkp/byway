@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { AlertCircle, Upload } from "lucide-react";
 import { cn } from "@/utils/cn";
+import ErrorDisplay from "@/components/ErrorDisplay";
 
 interface FileUploadProps {
   onUploadComplete: (fileUrl: string) => void;
@@ -96,10 +97,7 @@ export function FileUpload({
       )}
 
       {error && (
-        <Alert variant="destructive" className="mt-2">
-          <AlertCircle className="w-4 h-4" />
-          <AlertDescription>{error}</AlertDescription>
-        </Alert>
+        <ErrorDisplay error={error} title="File Upload Error" description="There was a problem uploading your file. Please try again." compact />
       )}
     </div>
   );

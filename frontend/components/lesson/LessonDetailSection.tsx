@@ -21,6 +21,7 @@ import { LessonFormModal } from "@/components/lesson/LessonFormModal";
 import { StatusBadge } from "@/components/ui/StatusBadge";
 import { AlertComponent } from "../ui/AlertComponent";
 import { DetailsSectionSkeleton } from "../skeleton/CourseDetailSectionSkeleton";
+import ErrorDisplay from "@/components/ErrorDisplay";
 
 // Utilities and API
 import { formatDate } from "@/utils/formatDate";
@@ -106,21 +107,7 @@ export function LessonDetailSection({
 
   if (error) {
     return (
-      <div className="bg-white rounded-lg p-8 shadow-md border border-red-100">
-        <div className="text-red-600">
-          <p className="text-lg">
-            Error loading lesson: {error.message || "Unknown error"}
-          </p>
-          {onRetry && (
-            <Button
-              onClick={onRetry}
-              className="mt-4 bg-blue-600 hover:bg-blue-700 text-white"
-            >
-              Retry
-            </Button>
-          )}
-        </div>
-      </div>
+      <ErrorDisplay error={error} onRetry={onRetry} title="Error loading lesson" description="There was a problem loading this lesson. Please try again." />
     );
   }
 

@@ -6,6 +6,7 @@ import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
 import { QuizQuestion } from "@/types/content";
 import { useState } from "react";
 import { IQuizAnswer } from "@/types/progress";
+import ErrorDisplay from "@/components/ErrorDisplay";
 
 interface LessonWithCompletion extends ILesson {
   completed: boolean;
@@ -122,7 +123,7 @@ export function LessonContent({
           </p>
         </div>
         {isContentError ? (
-          <div className="p-6 text-red-600">Error: {contentError?.message}</div>
+          <ErrorDisplay error={contentError} title="Lesson Content Error" description="There was a problem loading this lesson content. Please try again." />
         ) : !content ? (
           <div className="p-6 text-gray-600">No content available.</div>
         ) : (

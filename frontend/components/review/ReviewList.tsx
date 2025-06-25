@@ -17,6 +17,7 @@ import {
 import EditReviewForm from "./EditReviewForm";
 import ReviewItem from "./ReviewItem";
 import React from "react";
+import ErrorDisplay from "@/components/ErrorDisplay";
 
 interface ReviewListProps {
   reviews: CourseReview[];
@@ -154,9 +155,7 @@ export default function ReviewList({
 
   if (error) {
     return (
-      <div className="bg-red-50/80 backdrop-blur-sm border border-red-200/50 rounded-xl p-4">
-        <p className="text-red-600 text-sm">{error.message}</p>
-      </div>
+      <ErrorDisplay error={error} title="Review List Error" description="There was a problem loading the reviews. Please try again." compact />
     );
   }
 

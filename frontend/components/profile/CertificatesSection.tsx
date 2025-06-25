@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import { useCertificateList } from "@/hooks/certificate/useCertificateList";
 import { Pagination } from "@/components/ui/Pagination";
 import { Loader2 } from "lucide-react";
+import ErrorDisplay from "@/components/ErrorDisplay";
 
 export default function CertificatesSection() {
   const {
@@ -34,7 +35,7 @@ export default function CertificatesSection() {
         {loading ? (
           <div className="flex items-center gap-2 text-blue-600"><Loader2 className="animate-spin" /> Loading certificates...</div>
         ) : error ? (
-          <div className="text-red-500">{error}</div>
+          <ErrorDisplay error={error} onRetry={() => fetchCertificates(page)} title="Certificate Error" description="There was a problem loading your certificates. Please try again." />
         ) : certificates.length === 0 ? (
           <div className="text-gray-500">No certificates found.</div>
         ) : (

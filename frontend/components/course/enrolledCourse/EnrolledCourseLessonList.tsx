@@ -2,6 +2,7 @@ import { ILesson } from "@/types/lesson";
 import {  Lock, CheckCircle } from "lucide-react";
 import { LessonListSkeleton } from "./skeletons/LessonListSkeleton";
 import { IQuizAnswer } from "@/types/progress";
+import ErrorDisplay from "@/components/ErrorDisplay";
 
 interface LessonWithCompletion extends ILesson {
   completed: boolean;
@@ -36,9 +37,7 @@ export function LessonList({
 
   if (isError) {
     return (
-      <div className="text-red-500 text-sm">
-        {error?.message || "Failed to load lessons"}
-      </div>
+      <ErrorDisplay error={error} title="Lesson List Error" description="Failed to load lessons." />
     );
   }
 

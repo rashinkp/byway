@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { AlertCircle, ArrowLeft, ShoppingBag } from "lucide-react";
 import Link from "next/link";
 import { motion } from "framer-motion";
+import ErrorDisplay from "@/components/ErrorDisplay";
 
 export default function PaymentFailedPage() {
   const searchParams = useSearchParams();
@@ -38,9 +39,7 @@ export default function PaymentFailedPage() {
 
         <h1 className="text-2xl font-bold text-gray-900 mb-4">Payment Failed</h1>
         {error && (
-          <p className="text-gray-600 mb-8 bg-red-50 p-4 rounded-lg text-sm">
-            {error}
-          </p>
+          <ErrorDisplay error={error} title="Payment Failed" description="There was a problem processing your payment." compact />
         )}
 
         <div className="space-y-4">

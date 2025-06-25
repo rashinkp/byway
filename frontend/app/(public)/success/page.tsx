@@ -6,6 +6,7 @@ import { motion } from "framer-motion";
 import { toast } from "sonner";
 import { CheckCircleIcon, WalletIcon } from "lucide-react";
 import { useAuth } from "@/hooks/auth/useAuth";
+import ErrorDisplay from "@/components/ErrorDisplay";
 
 const SuccessPage = () => {
   const router = useRouter();
@@ -75,18 +76,7 @@ const SuccessPage = () => {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-red-600">Error</h1>
-          <p className="mt-2 text-gray-600">{error}</p>
-          <button
-            onClick={() => router.push("/")}
-            className="mt-4 px-6 py-2 bg-blue-700 text-white rounded-lg hover:bg-blue-800 transition-colors"
-          >
-            Return to Home
-          </button>
-        </div>
-      </div>
+      <ErrorDisplay error={error} title="Payment Error" description="There was a problem verifying your payment. Please try again or contact support." />
     );
   }
 

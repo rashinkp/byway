@@ -1,5 +1,6 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { ReactNode } from "react";
+import ErrorDisplay from "@/components/ErrorDisplay";
 
 interface AuthFormWrapperProps {
   title: string;
@@ -24,7 +25,7 @@ export function AuthFormWrapper({
           <p className="mt-2 text-muted-foreground text-sm md:text-base">{subtitle}</p>
         )}
       </div>
-      {error && <p className="auth-error">{error}</p>}
+      {error && <ErrorDisplay error={error} title="Authentication Error" description="There was a problem with your authentication. Please try again." compact />}
       {children}
     </>
   );

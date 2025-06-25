@@ -8,6 +8,7 @@ import { toast } from "sonner";
 import { AdminInstructorDetail } from "@/components/instructor/AdminInstructorDetail";
 import { Loader2 } from "lucide-react";
 import { useGetAllCourses } from "@/hooks/course/useGetAllCourse";
+import ErrorDisplay from "@/components/ErrorDisplay";
 
 const InstructorProfilePage: React.FC = () => {
   const params = useParams();
@@ -44,14 +45,7 @@ const InstructorProfilePage: React.FC = () => {
 
   if (error || !instructor) {
     return (
-      <div className="min-h-screen bg-gray-50/50 p-6">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center py-8">
-            <div className="text-red-600 mb-2">Error loading instructor profile</div>
-            <p className="text-gray-600">There was an error loading the instructor profile. Please try again later.</p>
-          </div>
-        </div>
-      </div>
+      <ErrorDisplay error={error || "No instructor found"} title="Error loading instructor profile" description="There was an error loading the instructor profile. Please try again later." />
     );
   }
 

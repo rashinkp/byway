@@ -10,6 +10,7 @@ import CourseInstructor from "./CourseInstructor";
 import CourseSyllabus from "./CourseSyllabus";
 import CourseSidebar from "./CourseSidebar";
 import CourseReviews from "@/components/review/CourseReviews";
+import ErrorDisplay from "@/components/ErrorDisplay";
 
 interface CourseDetailLayoutProps {
   course: Course | undefined;
@@ -58,14 +59,7 @@ export default function CourseDetailLayout({
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gray-50/50 p-6">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center py-8">
-            <div className="text-red-600 mb-2">Course Error</div>
-            <p className="text-gray-600">Error occurred while loading the course.</p>
-          </div>
-        </div>
-      </div>
+      <ErrorDisplay error={error} title="Course Error" description="Error occurred while loading the course." />
     );
   }
 

@@ -6,6 +6,7 @@ import { useGetInstructorDetails } from "@/hooks/instructor/useGetInstructorDeta
 import { IInstructorDetails } from "@/types/instructor";
 import { UserInstructorDetail } from "@/components/instructor/UserInstructorDetail";
 import { Loader2 } from "lucide-react";
+import ErrorDisplay from "@/components/ErrorDisplay";
 
 export default function InstructorDetailPage() {
   const params = useParams();
@@ -38,14 +39,7 @@ export default function InstructorDetailPage() {
 
   if (!instructor) {
     return (
-      <div className="min-h-screen bg-gray-50/50 p-6">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center py-8">
-            <div className="text-red-600 mb-2">Instructor Not Found</div>
-            <p className="text-gray-600">The instructor you're looking for doesn't exist or has been removed.</p>
-          </div>
-        </div>
-      </div>
+      <ErrorDisplay error={"Instructor Not Found"} title="Instructor Not Found" description="The instructor you're looking for doesn't exist or has been removed." />
     );
   }
 

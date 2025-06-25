@@ -5,6 +5,7 @@ import EditProfileForm from "@/components/profile/EditProfileForm";
 import { useState } from "react";
 import { Loader2 } from "lucide-react";
 import { useDetailedUserData } from "@/hooks/user/useDetailedUserData";
+import ErrorDisplay from "@/components/ErrorDisplay";
 
 export default function AdminProfilePage() {
   const { data: user, isLoading, error } = useDetailedUserData();
@@ -20,19 +21,13 @@ export default function AdminProfilePage() {
 
   if (error) {
     return (
-      <div className="text-center py-8">
-        <div className="text-red-600 mb-2">Something went wrong</div>
-        <p className="text-gray-600">{error instanceof Error ? error.message : "An error occurred"}</p>
-      </div>
+      <ErrorDisplay error={error} title="Something went wrong" description="An error occurred while loading your profile." />
     );
   }
 
   if (!user) {
     return (
-      <div className="text-center py-8">
-        <div className="text-red-600 mb-2">No user data found</div>
-        <p className="text-gray-600">Please try logging in again</p>
-      </div>
+      <ErrorDisplay error={"No user data found"} title="No user data found" description="Please try logging in again." />
     );
   }
 

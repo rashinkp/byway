@@ -12,6 +12,7 @@ import { OrderSkeleton } from "@/components/orders/OrderSkeleton";
 import { OrderCard } from "@/components/orders/OrderCard";
 import { useOrders } from "@/hooks/order/useOrders";
 import { Pagination } from "@/components/ui/Pagination";
+import ErrorDisplay from "@/components/ErrorDisplay";
 
 interface StatusBadgeProps {
   status: string;
@@ -145,9 +146,7 @@ export default function OrdersSection() {
       </div>
 
       {error && (
-        <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg text-red-800">
-          {error}
-        </div>
+        <ErrorDisplay error={error} onRetry={fetchOrders} title="Order Error" description="There was a problem loading your orders. Please try again." />
       )}
 
       {!orders || !orders.orders?.length ? (

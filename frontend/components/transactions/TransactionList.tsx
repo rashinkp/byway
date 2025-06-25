@@ -7,8 +7,8 @@ import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
 interface TransactionListProps {
   transactions: Transaction[];
   isLoading: boolean;
-  error: any;
-  onRetry: () => void;
+  error?: any;
+  onRetry?: () => void;
   onRetryTransaction?: (transaction: Transaction) => void;
 }
 
@@ -136,21 +136,6 @@ export const TransactionList: React.FC<TransactionListProps> = ({
     return (
       <div className="py-8">
         <LoadingSpinner text="Loading transactions..." />
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="text-center py-8">
-        <p className="text-red-600 mb-4">Failed to load transactions</p>
-        <button
-          onClick={onRetry}
-          className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-blue-600 bg-blue-50 hover:bg-blue-100 rounded-md"
-        >
-          <AlertCircle className="w-4 h-4" />
-          Retry
-        </button>
       </div>
     );
   }

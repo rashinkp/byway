@@ -18,9 +18,10 @@ import {
   ArrowDownRight,
 } from "lucide-react";
 import { toast } from "sonner";
+import ErrorDisplay from "@/components/ErrorDisplay";
 
 export default function WalletSection() {
-  const { wallet, isLoading: walletLoading } = useWallet();
+  const { wallet, isLoading: walletLoading, error: walletError, refetch: refetchWallet } = useWallet();
   const { mutate: topUpWallet, isPending: isToppingUp } = useWalletTopUp();
   const [amount, setAmount] = useState<string>("");
   const [showTopUpForm, setShowTopUpForm] = useState(false);
@@ -44,6 +45,10 @@ export default function WalletSection() {
   };
 
   const quickAmounts = [10, 25, 50, 100];
+
+  if (walletError) {
+    return <ErrorDisplay error={walletError} onRetry={refetchWallet} title="Wallet Error" description="There was a problem loading your wallet. Please try again." />;
+  }
 
   if (walletLoading) {
     return (
