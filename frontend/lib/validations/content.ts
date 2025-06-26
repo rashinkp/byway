@@ -41,7 +41,7 @@ const baseContentSchema = z.object({
       (val) => {
         if (!val) return true;
         return (
-          val.startsWith("https://res.cloudinary.com") || val.startsWith("http")
+          val.startsWith("https://") || val.startsWith("http")
         );
       },
       { message: "Invalid file URL" }
@@ -54,7 +54,7 @@ const baseContentSchema = z.object({
       (val) => {
         if (!val) return true;
         return (
-          val.startsWith("https://res.cloudinary.com") || val.startsWith("http")
+          val.startsWith("https://") || val.startsWith("http")
         );
       },
       { message: "Invalid thumbnail URL" }

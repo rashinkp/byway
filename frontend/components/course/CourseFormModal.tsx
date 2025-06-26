@@ -10,7 +10,7 @@ import { useCategories } from "@/hooks/category/useCategories";
 import { useMemo, useState } from "react";
 import { courseSchema, courseEditSchema } from "@/lib/validations/course";
 import { FileUploadStatus } from "@/components/FileUploadComponent";
-import { uploadToCloudinary } from "@/lib/cloudinary";
+import { getPresignedUrl, uploadFileToS3 } from "@/api/file";
 import { z } from "zod";
 
 export const baseFields: FormFieldConfig<CourseFormData>[] = [
@@ -222,20 +222,18 @@ export function CourseFormModal({
       return;
     }
 
-    let thumbnailUrl: string | undefined;
+    let finalThumbnailUrl: string | undefined;
 
     try {
-      // Handle thumbnail upload to Cloudinary
+      // Handle thumbnail upload to S3
       if (data.thumbnail instanceof File) {
         setThumbnailUploadStatus(FileUploadStatus.UPLOADING);
-        const uploadResult = await uploadToCloudinary(data.thumbnail, {
-          folder: "courses",
-          onProgress: (progress) => {
-            setThumbnailUploadProgress(progress.percent);
-          },
+        const { uploadUrl, fileUrl } = await getPresignedUrl(data.thumbnail.name, data.thumbnail.type);
+        await uploadFileToS3(data.thumbnail, uploadUrl, (progress) => {
+          setThumbnailUploadProgress(progress);
         });
-        thumbnailUrl = uploadResult.secure_url;
         setThumbnailUploadStatus(FileUploadStatus.SUCCESS);
+        finalThumbnailUrl = fileUrl;
       }
 
       // Prepare data for submission
@@ -244,7 +242,7 @@ export function CourseFormModal({
         description: data.description,
         level: data.level,
         price: data.price,
-        thumbnail: thumbnailUrl,
+        thumbnail: finalThumbnailUrl,
         duration: data.duration,
         offer: data.offer,
         categoryId: data.categoryId,

@@ -1,7 +1,10 @@
+"use client";
+
+import { useState } from "react";
 import { z } from "zod";
 import { FormFieldConfig, FormModal } from "@/components/ui/FormModal";
 import { useUpdateUser } from "@/hooks/user/useUpdateUser";
-import { uploadToCloudinary } from "@/lib/cloudinary";
+import { getPresignedUrl, uploadFileToS3 } from "@/api/file";
 import { User, UserProfileType } from "@/types/user";
 
 // Zod schema for profile validation (unchanged)
@@ -170,16 +173,14 @@ export default function EditProfileForm({
   const handleSubmit = async (data: z.infer<typeof profileSchema>) => {
     let avatarUrl: string | undefined;
 
-    // If avatar is a File, upload to Cloudinary
+    // If avatar is a File, upload to S3
     if (data.avatar instanceof File) {
       try {
-        const uploadResult = await uploadToCloudinary(data.avatar, {
-          uploadPreset: process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET,
-          folder: "profile-pictures",
-        });
-        avatarUrl = uploadResult.secure_url; // Set the Cloudinary URL
+        const { uploadUrl, fileUrl } = await getPresignedUrl(data.avatar.name, data.avatar.type);
+        await uploadFileToS3(data.avatar, uploadUrl);
+        avatarUrl = fileUrl; // Set the S3 URL
       } catch (error) {
-        console.error("Failed to upload avatar to Cloudinary:", error);
+        console.error("Failed to upload avatar to S3:", error);
         throw new Error("Failed to upload profile picture");
       }
     } else {
@@ -190,10 +191,10 @@ export default function EditProfileForm({
     const transformedData = {
       ...data,
       avatar: avatarUrl, // Ensure avatar is string | undefined
-      skills: data.skills
+      skills: typeof data.skills === "string" && data.skills
         ? data.skills
             .split(",")
-            .map((s) => s.trim())
+            .map((s: string) => s.trim())
             .join(", ")
         : undefined,
     };
