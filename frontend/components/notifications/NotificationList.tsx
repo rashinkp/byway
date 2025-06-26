@@ -97,6 +97,8 @@ const NotificationList: React.FC<NotificationListProps> = ({
   eventType,
   loadMore,
 }) => {
+  const [loadMoreLoading, setLoadMoreLoading] = React.useState(false);
+
   // Deduplicate notifications by ID as a safeguard
   const uniqueNotifications = notifications.filter((notification, index, self) => 
     index === self.findIndex(n => n.id === notification.id)
@@ -237,13 +239,24 @@ const NotificationList: React.FC<NotificationListProps> = ({
             </div>
             
             {hasMore && !loading && uniqueNotifications.length < (total || 0) && (
-              <div className="p-4 flex justify-center">
-                <Button 
-                  variant="outline" 
-                  onClick={loadMore}
-                  className="px-8 py-2 bg-white hover:bg-gray-50 border-gray-200 rounded-xl font-medium transition-all duration-200"
+              <div className="flex justify-center py-4">
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    setLoadMoreLoading(true);
+                    console.log('Load More Clicked:', {
+                      page,
+                      hasMore,
+                      loading,
+                      notificationsLength: uniqueNotifications.length,
+                    });
+                    loadMore();
+                    setTimeout(() => setLoadMoreLoading(false), 1000); // Simulate loading state
+                  }}
+                  disabled={loading || loadMoreLoading}
+                  className="min-w-[120px]"
                 >
-                  Load more notifications
+                  {loadMoreLoading || loading ? 'Loading...' : 'Load More'}
                 </Button>
               </div>
             )}

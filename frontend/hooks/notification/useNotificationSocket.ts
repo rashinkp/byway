@@ -64,10 +64,12 @@ export const useNotificationSocket = () => {
     setLoading(true);
     setError(null);
     const currentPage = opts?.pageOverride ?? page;
+    const skip = opts?.reset ? 0 : (currentPage - 1) * take;
+    console.log('[Notification Fetch]', { currentPage, skip, take, sortBy, sortOrder, eventType, search });
     getUserNotificationsSocket(
       {
         userId: user.id,
-        skip: opts?.reset ? 0 : (currentPage - 1) * take,
+        skip,
         take,
         sortBy,
         sortOrder,
@@ -127,7 +129,7 @@ export const useNotificationSocket = () => {
   useEffect(() => {
     if (!user?.id) return;
     if (page > 1) {
-      fetchNotifications();
+      fetchNotifications({ pageOverride: page });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [page, user?.id]);
