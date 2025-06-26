@@ -4,7 +4,7 @@ import { Message as MessageComponent } from './Message';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
-import { Send, MoreVertical } from 'lucide-react';
+import { Send, MoreVertical, ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
 import { useAuth } from '@/hooks/auth/useAuth';
 import { deleteMessage } from '@/services/socketChat';
@@ -17,9 +17,11 @@ interface ChatWindowProps {
   onDeleteMessage?: (messageId: string) => void;
   onLoadMoreMessages?: () => void;
   loadingMoreMessages?: boolean;
+  showBackButton?: boolean;
+  onBack?: () => void;
 }
 
-export function ChatWindow({ chat, messages, onSendMessage, currentUserId, onDeleteMessage, onLoadMoreMessages, loadingMoreMessages }: ChatWindowProps) {
+export function ChatWindow({ chat, messages, onSendMessage, currentUserId, onDeleteMessage, onLoadMoreMessages, loadingMoreMessages, showBackButton, onBack }: ChatWindowProps) {
   const [newMessage, setNewMessage] = useState('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const messagesContainerRef = useRef<HTMLDivElement>(null);
@@ -151,6 +153,16 @@ export function ChatWindow({ chat, messages, onSendMessage, currentUserId, onDel
         style={{ minHeight: 64 }}
       >
         <div className="flex items-center space-x-3">
+          {/* Back Button for mobile */}
+          {showBackButton && (
+            <button
+              className="md:hidden mr-2 p-2 rounded-full hover:bg-gray-100 focus:outline-none"
+              onClick={onBack}
+              aria-label="Back to chat list"
+            >
+              <ArrowLeft className="w-5 h-5 text-gray-600" />
+            </button>
+          )}
           {/* Avatar */}
           <div className="relative">
             <div

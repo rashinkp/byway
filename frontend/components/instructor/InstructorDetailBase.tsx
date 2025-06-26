@@ -252,7 +252,7 @@ export const InstructorDetailBase: React.FC<InstructorDetailBaseProps> = ({
             <Card className="bg-white/80 backdrop-blur-sm border border-gray-100 shadow-sm rounded-xl overflow-hidden">
               {/* Tabs Section */}
               <div className="border-b border-gray-100">
-                <div className="flex space-x-8 px-6 py-4">
+                <div className="flex space-x-8 px-6 py-4 overflow-x-auto whitespace-nowrap scrollbar-thin tab-scrollbar md:overflow-visible md:whitespace-normal relative">
                   {tabs.map((tab) => (
                     <button
                       key={tab.id}
@@ -267,6 +267,8 @@ export const InstructorDetailBase: React.FC<InstructorDetailBaseProps> = ({
                       <span className="font-medium">{tab.label}</span>
                     </button>
                   ))}
+                  {/* Right fade for scroll cue */}
+                  <div className="pointer-events-none absolute right-0 top-0 h-full w-8 bg-gradient-to-l from-white/90 to-transparent hidden sm:block" />
                 </div>
               </div>
 

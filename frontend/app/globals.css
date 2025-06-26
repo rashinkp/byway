@@ -239,3 +239,18 @@ video::-webkit-media-controls-current-time-display {
 ::-webkit-scrollbar-thumb:hover {
   background: #94a3b8;
 }
+
+.tab-scrollbar::-webkit-scrollbar {
+  height: 4px;
+}
+.tab-scrollbar::-webkit-scrollbar-thumb {
+  background: #d1d5db;
+  border-radius: 2px;
+}
+.tab-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+.tab-scrollbar {
+  scrollbar-color: #d1d5db transparent;
+  scrollbar-width: thin;
+}

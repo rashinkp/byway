@@ -46,6 +46,7 @@ export default function ChatPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [loadingMoreMessages, setLoadingMoreMessages] = useState(false);
   const [hasMoreMessages, setHasMoreMessages] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
 
   // Track previous chatId for leave logic
   const previousChatIdRef = React.useRef<string | null>(null);
@@ -315,6 +316,14 @@ export default function ChatPage() {
     };
   }, [user]);
 
+  // Responsive mobile detection
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 768);
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
   if (!isInitialized || isLoading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 flex items-center justify-center">
@@ -333,55 +342,53 @@ export default function ChatPage() {
 
   return (
     <div className="h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 overflow-hidden">
-
       {/* Main Chat Interface */}
       <div className="w-full h-full flex items-stretch">
         <div className="w-full h-full bg-white/60 backdrop-blur-xl border border-slate-200/60 shadow-2xl shadow-slate-200/50 rounded-3xl overflow-hidden flex flex-col min-h-0">
           <div className="flex flex-1 min-h-0">
-            {/* Chat List Sidebar */}
-            <div className={`${
-              isSidebarOpen ? 'translate-x-0' : '-translate-x-full'
-            } md:relative md:translate-x-0 z-40 w-80 md:w-96 h-full transition-transform duration-300 ease-in-out md:transition-none`}>
-              <ChatList 
-                chats={chatItems}
-                selectedChat={selectedChat}
-                onSelectChat={handleSelectChat}
-                onSearch={setSearchQuery}
-              />
-              
-              {/* Load More Button */}
-              {hasMore && (
-                <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-white via-white to-transparent">
-                  <Button 
-                    onClick={loadMoreChats}
-                    disabled={loading}
-                    variant="outline"
-                    className="w-full rounded-xl border-slate-200/60 hover:bg-slate-50 transition-all duration-200"
-                  >
-                    {loading ? (
-                      <>
-                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                        Loading...
-                      </>
-                    ) : (
-                      'Load more conversations'
-                    )}
-                  </Button>
-                </div>
-              )}
-            </div>
-            
+            {/* Chat List Sidebar (show on mobile only if sidebar is open and no chat selected) */}
+            {((isSidebarOpen && (!selectedChat || !isMobile)) || (!selectedChat && isMobile)) && (
+              <div className={`$${
+                isSidebarOpen ? 'translate-x-0' : '-translate-x-full'
+              } md:relative md:translate-x-0 z-40 ${isMobile && !selectedChat ? 'w-full' : 'w-80 md:w-96'} h-full transition-transform duration-300 ease-in-out md:transition-none`}>
+                <ChatList 
+                  chats={chatItems}
+                  selectedChat={selectedChat}
+                  onSelectChat={handleSelectChat}
+                  onSearch={setSearchQuery}
+                />
+                {/* Load More Button */}
+                {hasMore && (
+                  <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-white via-white to-transparent">
+                    <Button 
+                      onClick={loadMoreChats}
+                      disabled={loading}
+                      variant="outline"
+                      className="w-full rounded-xl border-slate-200/60 hover:bg-slate-50 transition-all duration-200"
+                    >
+                      {loading ? (
+                        <>
+                          <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                          Loading...
+                        </>
+                      ) : (
+                        'Load more conversations'
+                      )}
+                    </Button>
+                  </div>
+                )}
+              </div>
+            )}
             {/* Mobile Overlay */}
-            {isSidebarOpen && (
+            {isSidebarOpen && !selectedChat && (
               <div 
                 className="fixed inset-0 bg-black/20 backdrop-blur-sm z-30 md:hidden"
                 onClick={() => setIsSidebarOpen(false)}
               />
             )}
-            
-            {/* Chat Window */}
-            <div className="flex-1 flex flex-col h-full min-h-0">
-              {selectedChat ? (
+            {/* Chat Window (show on mobile only if a chat is selected) */}
+            {selectedChat && (!isMobile || (isMobile && !isSidebarOpen)) && (
+              <div className="flex-1 flex flex-col h-full min-h-0">
                 <ChatWindow
                   chat={selectedChat}
                   messages={messages}
@@ -390,46 +397,14 @@ export default function ChatPage() {
                   onDeleteMessage={handleDeleteMessage}
                   onLoadMoreMessages={hasMoreMessages ? handleLoadMoreMessages : undefined}
                   loadingMoreMessages={loadingMoreMessages}
+                  showBackButton={isMobile}
+                  onBack={() => {
+                    setIsSidebarOpen(true);
+                    setSelectedChat(null);
+                  }}
                 />
-              ) : (
-                <div className="flex-1 flex flex-col min-h-0">
-                  <div className="flex-1 flex items-center justify-center bg-gradient-to-br from-slate-50 to-white min-h-0">
-                    <div className="text-center space-y-8 max-w-md px-8">
-                      <div className="relative">
-                        <div className="w-32 h-32 bg-gradient-to-br from-blue-100 via-indigo-100 to-purple-100 rounded-full flex items-center justify-center mx-auto shadow-2xl">
-                          <div className="w-20 h-20 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-full flex items-center justify-center">
-                            <MessageSquare className="w-10 h-10 text-white" />
-                          </div>
-                        </div>
-                        <div className="absolute -top-2 -right-2 w-12 h-12 bg-gradient-to-br from-emerald-400 to-teal-500 rounded-full flex items-center justify-center shadow-lg">
-                          <Users className="w-6 h-6 text-white" />
-                        </div>
-                      </div>
-                      
-                      <div className="space-y-4">
-                        <h3 className="text-2xl font-bold text-slate-900">
-                          Welcome to Chat
-                        </h3>
-                        <p className="text-slate-600 leading-relaxed text-lg">
-                          Select a conversation from the sidebar to start chatting with your team members.
-                        </p>
-                        <div className="flex flex-wrap gap-2 justify-center pt-4">
-                          <Badge className="bg-blue-100 text-blue-700 border-blue-200 px-3 py-1">
-                            Real-time messaging
-                          </Badge>
-                          <Badge className="bg-emerald-100 text-emerald-700 border-emerald-200 px-3 py-1">
-                            Secure & private
-                          </Badge>
-                          <Badge className="bg-purple-100 text-purple-700 border-purple-200 px-3 py-1">
-                            Team collaboration
-                          </Badge>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              )}
-            </div>
+              </div>
+            )}
           </div>
         </div>
       </div>
