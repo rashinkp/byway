@@ -9,6 +9,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { PasswordInput } from "@/components/ui/PasswordInput";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { SocialAuthButton } from "@/components/ui/SocialAuthButton";
@@ -101,12 +102,20 @@ export function AuthForm<T extends FieldValues>({
                     {field.label}
                   </FormLabel>
                   <FormControl>
-                    <Input
-                      type={field.type}
-                      placeholder={field.placeholder}
-                      className="auth-input"
-                      {...formField}
-                    />
+                    {field.type === "password" ? (
+                      <PasswordInput
+                        placeholder={field.placeholder}
+                        className="auth-input"
+                        {...formField}
+                      />
+                    ) : (
+                      <Input
+                        type={field.type}
+                        placeholder={field.placeholder}
+                        className="auth-input"
+                        {...formField}
+                      />
+                    )}
                   </FormControl>
                   <FormMessage />
                 </FormItem>

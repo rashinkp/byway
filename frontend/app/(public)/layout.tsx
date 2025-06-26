@@ -14,10 +14,24 @@ export default function PublicLayout({
 }) {
   const [notificationOpen, setNotificationOpen] = useState(false);
   const pathname = usePathname();
+  
+  // Define authentication pages where breadcrumb should be hidden
+  const authPages = [
+    '/login',
+    '/signup', 
+    '/forgot-password',
+    '/reset-password',
+    '/verify-otp',
+    '/'
+  ];
+  
+  // Check if current page is an authentication page
+  const isAuthPage = authPages.includes(pathname);
+  
   return (
     <div className="flex flex-col min-h-screen">
       <Header onNotificationClick={() => setNotificationOpen(true)} />
-      <TopNavbar pathname={pathname} navItems={[]} noMargin />
+      {!isAuthPage && <TopNavbar pathname={pathname} navItems={[]} noMargin />}
       <NotificationModal open={notificationOpen} onOpenChange={setNotificationOpen} />
       <main className="flex-1">{children}</main>
       <BywayFooter />

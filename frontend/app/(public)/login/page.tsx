@@ -1,12 +1,8 @@
 // src/components/auth/LoginPage.tsx
 "use client";
 
-import { useEffect } from "react";
-import { useRouter } from "next/navigation";
 import dynamic from "next/dynamic";
-import { useAuth } from "@/hooks/auth/useAuth";
-import { ROUTES } from "@/constants/routes";
-import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
+import { AuthPageWrapper } from "@/components/auth/AuthPageWrapper";
 
 const LoginForm = dynamic(
   () => import("@/components/auth/LoginForm").then((mod) => mod.LoginForm),
@@ -16,24 +12,9 @@ const LoginForm = dynamic(
 );
 
 export default function LoginPage() {
-  const { isAuthenticated, isLoading, user } = useAuth();
-  const router = useRouter();
- 
-
-  useEffect(() => {
-    if (!isLoading && isAuthenticated && user) {
-      const route = ROUTES[user.role as keyof typeof ROUTES] || ROUTES.DEFAULT;
-      router.push(route);
-    }
-  }, [isAuthenticated, isLoading, user, router]);
-
-  if (isLoading) {
-    return <LoadingSpinner fullScreen text="Loading..." />;
-  }
-
-  if (isAuthenticated) {
-    return null;
-  }
-
-  return <LoginForm />;
+  return (
+    <AuthPageWrapper redirectIfAuthenticated={true}>
+      <LoginForm />
+    </AuthPageWrapper>
+  );
 }

@@ -1,32 +1,36 @@
 "use client";
 
-import { useEffect } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { VerifyOtpForm } from "@/components/auth/OtpForm";
-import { useAuth } from "@/hooks/auth/useAuth";
-import { ROUTES } from "@/constants/routes";
+import { AuthPageWrapper } from "@/components/auth/AuthPageWrapper";
 
 export default function VerifyOtpPage() {
-  const router = useRouter();
   const searchParams = useSearchParams();
-  const { isAuthenticated, isLoading, user } = useAuth();
   const email = searchParams.get("email");
 
-
-  useEffect(() => {
-    if (!isLoading && isAuthenticated && user) {
-      const route = ROUTES[user.role as keyof typeof ROUTES] || ROUTES.DEFAULT;
-      router.push(route);
-    }
-  }, [isAuthenticated, isLoading, user, router]);
-
-  if (user || !email) {
-    return null;
+  // If no email is provided, show error
+  if (!email) {
+    return (
+      <AuthPageWrapper>
+        <div className="min-h-screen flex items-center justify-center bg-gray-50/50 p-4">
+          <div className="w-full max-w-md text-center">
+            <h2 className="text-2xl font-bold text-gray-900 mb-2">Invalid Link</h2>
+            <p className="text-gray-600 mb-6">No email provided for verification.</p>
+            <a 
+              href="/signup" 
+              className="text-blue-600 hover:text-blue-800 underline"
+            >
+              Go back to signup
+            </a>
+          </div>
+        </div>
+      </AuthPageWrapper>
+    );
   }
 
   return (
-    <div className="">
+    <AuthPageWrapper redirectIfAuthenticated={true}>
       <VerifyOtpForm />
-    </div>
+    </AuthPageWrapper>
   );
 }

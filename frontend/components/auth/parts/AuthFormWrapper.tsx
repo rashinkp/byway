@@ -25,7 +25,16 @@ export function AuthFormWrapper({
           <p className="mt-2 text-muted-foreground text-sm md:text-base">{subtitle}</p>
         )}
       </div>
-      {error && <ErrorDisplay error={error} title="Authentication Error" description="There was a problem with your authentication. Please try again." compact />}
+      {error && (
+        <div className="flex justify-center mb-6">
+          <ErrorDisplay 
+            error={error} 
+            title="Authentication Error" 
+            description="There was a problem with your authentication. Please try again." 
+            compact 
+          />
+        </div>
+      )}
       {children}
     </>
   );

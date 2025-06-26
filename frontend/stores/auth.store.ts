@@ -17,12 +17,12 @@ interface AuthState {
 export const useAuthStore = create<AuthState>((set, get) => ({
   user: null,
   isInitialized: false,
-  isLoading: false,
+  isLoading: true,
   email: null,
   setUser: (user) => {
     // Clear cache when user state changes
     clearAllCache();
-    set({ user, isInitialized: true });
+    set({ user, isInitialized: true, isLoading: false });
   },
   setEmail: (email) => {
     if (typeof window !== "undefined") {

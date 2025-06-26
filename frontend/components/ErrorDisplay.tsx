@@ -39,22 +39,25 @@ const ErrorDisplay: FC<ErrorDisplayProps> = ({
         ref={errorRef}
         tabIndex={-1}
         role="alert"
-        className="inline-flex items-center gap-2 text-red-600 bg-red-50 border border-red-200 rounded px-3 py-2 text-sm"
+        className="w-full flex items-center justify-center mb-6"
         aria-live="assertive"
       >
-        <AlertCircle className="w-4 h-4" aria-hidden="true" />
-        <span>{title}</span>
-        {code && <span className="ml-2 text-xs text-red-400">[{code}]</span>}
-        <span className="ml-2">{errorMessage}</span>
-        {onRetry && (
-          <button
-            onClick={onRetry}
-            className="ml-2 underline text-blue-600 hover:text-blue-800"
-            aria-label="Retry the action"
-          >
-            Retry
-          </button>
-        )}
+        <div className="inline-flex items-center gap-3 text-red-600 bg-red-50 border border-red-200 rounded-lg px-4 py-3 text-sm font-medium shadow-sm max-w-md">
+          <AlertCircle className="w-5 h-5 flex-shrink-0" aria-hidden="true" />
+          <div className="flex flex-col items-start">
+            <span className="font-semibold">{title}</span>
+            <span className="text-red-500 font-normal">{errorMessage}</span>
+          </div>
+          {onRetry && (
+            <button
+              onClick={onRetry}
+              className="ml-2 underline text-blue-600 hover:text-blue-800 text-xs"
+              aria-label="Retry the action"
+            >
+              Retry
+            </button>
+          )}
+        </div>
         {children}
       </div>
     );
