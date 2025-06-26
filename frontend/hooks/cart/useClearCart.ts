@@ -4,6 +4,7 @@ import { clearCart } from "@/api/cart";
 import { ICart } from "@/types/cart";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
+import { useCartStore } from "@/stores/cart.store";
 
 export function useClearCart() {
   const queryClient = useQueryClient();
@@ -37,9 +38,7 @@ export function useClearCart() {
       return { previousQueries };
     },
     onSuccess: () => {
-      toast.success("Cart Cleared", {
-        description: "All items have been removed from your cart.",
-      });
+      useCartStore.getState().clear();
     },
     onError: (error: any, variables, context: any) => {
       // Revert all queries to previous state

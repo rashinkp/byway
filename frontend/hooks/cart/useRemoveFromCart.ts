@@ -4,6 +4,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { ICart } from "@/types/cart";
 import { removeFromCart } from "@/api/cart";
+import { useCartStore } from "@/stores/cart.store";
 
 export function useRemoveFromCart() {
   const queryClient = useQueryClient();
@@ -37,9 +38,7 @@ export function useRemoveFromCart() {
       return { previousQueries };
     },
     onSuccess: () => {
-      toast.success("Removed from Cart", {
-        description: "The course has been removed from your cart.",
-      });
+      useCartStore.getState().decrement();
     },
     onError: (error: any, courseId, context: any) => {
       // Revert all queries to previous state

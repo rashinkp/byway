@@ -4,9 +4,6 @@ import { getCart } from "@/api/cart";
 import { ICart, IGetCartInput } from "@/types/cart";
 import { useQuery } from "@tanstack/react-query";
 
-
-
-
 interface UseCartReturn {
   data: { items: ICart[]; total: number; totalPages: number } | undefined;
   isLoading: boolean;

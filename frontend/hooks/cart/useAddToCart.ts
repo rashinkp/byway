@@ -4,6 +4,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { ICart, ICartFormData } from "@/types/cart";
 import { addToCart } from "@/api/cart";
+import { useCartStore } from "@/stores/cart.store";
 
 export function useAddToCart() {
   const queryClient = useQueryClient();
@@ -49,9 +50,8 @@ export function useAddToCart() {
         page: old?.page || 1,
         limit: old?.limit || 10,
       }));
-      toast.success("Added to Cart", {
-        description: "The course has been added to your cart successfully.",
-      });
+      // Increment cart count in store
+      useCartStore.getState().increment();
     },
     onError: (error: any, newCartItem, context) => {
       // Revert on error

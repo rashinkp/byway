@@ -36,6 +36,7 @@ import { useGlobalSearch } from "@/hooks/search/useGlobalSearch";
 import { useDebounce } from "@/hooks/useDebounce";
 import { Skeleton } from "@/components/ui/skeleton";
 import { HeaderSearchBar } from "@/components/layout/HeaderSearchBar";
+import { useCartStore } from "@/stores/cart.store";
 
 interface HeaderProps {
   client?: { id: string; name: string };
@@ -65,6 +66,16 @@ export function Header({ client, onNotificationClick }: HeaderProps = {}) {
   
   // Refs for click outside handling
   const searchContainerRef = useRef<HTMLDivElement>(null);
+
+  const cartCount = useCartStore((state) => state.count);
+  const setCartCount = useCartStore((state) => state.setCount);
+
+  // Sync initial cart count from user data
+  useEffect(() => {
+    if (user && typeof user.cartCount === "number") {
+      setCartCount(user.cartCount);
+    }
+  }, [user, setCartCount]);
 
   const handleInstructorSubmit = useCallback(
     async (data: InstructorSubmitData): Promise<void> => {
@@ -227,9 +238,9 @@ export function Header({ client, onNotificationClick }: HeaderProps = {}) {
                           className="w-6 h-6 text-gray-600 group-hover:text-blue-500 transition-colors cursor-pointer"
                           strokeWidth={1.5}
                         />
-                        {user.cartCount && user.cartCount > 0 && (
+                        {cartCount > 0 && (
                           <span className="absolute -top-2 -right-2 w-5 h-5 p-0 flex items-center justify-center text-xs rounded-full bg-black text-white font-semibold border-2 border-white shadow">
-                            {user.cartCount}
+                            {cartCount}
                           </span>
                         )}
                       </Link>
@@ -331,9 +342,9 @@ export function Header({ client, onNotificationClick }: HeaderProps = {}) {
                         className="w-6 h-6 text-gray-600 group-hover:text-blue-500 transition-colors cursor-pointer"
                         strokeWidth={1.5}
                       />
-                      {user.cartCount && user.cartCount > 0 && (
+                      {cartCount > 0 && (
                         <span className="absolute -top-2 -right-2 w-5 h-5 p-0 flex items-center justify-center text-xs rounded-full bg-black text-white font-semibold border-2 border-white shadow">
-                          {user.cartCount}
+                          {cartCount}
                         </span>
                       )}
                     </Link>
