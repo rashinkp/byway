@@ -47,7 +47,7 @@ export default function StudentsPage() {
       actions={[
         {
           label: (user) => (user.deletedAt ? "Unblock" : "Block"),
-          onClick: (user) => toggleDeleteUser(user),
+          onClick: (user) => toggleDeleteUser(user.id), 
           variant: (user) => (user.deletedAt ? "default" : "destructive"),
           confirmationMessage: (user) =>
             user.deletedAt
@@ -79,6 +79,11 @@ export default function StudentsPage() {
       ]}
       defaultSortBy="name"
       role="USER"
+      filterOptions={[
+        { label: "All", value: "All" },
+        { label: "Active", value: "Active" },
+        { label: "Inactive", value: "Inactive" },
+      ]}
     />
   );
 }

@@ -124,7 +124,7 @@ export default function CourseSidebar({
               <div className="text-center text-green-600 font-medium">
                 <Button
                   className="w-full mt-4 bg-green-600 hover:bg-green-700 text-white"
-                  onClick={() => router.push(`/user/profile?section=courses&courseId=${course?.id}`)}
+                  onClick={() => router.push(`/user/my-courses/${course?.id}`)}
                 >
                   Learn Now
                 </Button>

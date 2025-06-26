@@ -6,7 +6,7 @@ import { useToggleDeleteUser } from "@/hooks/user/useToggleDeleteUser";
 import { approveInstructor, declineInstructor } from "@/api/instructor";
 import { toast } from "sonner";
 import { AdminInstructorDetail } from "@/components/instructor/AdminInstructorDetail";
-import { Loader2 } from "lucide-react";
+import InstructorDetailSkeleton from "@/components/skeleton/InstructorDetailSkeleton";
 import { useGetAllCourses } from "@/hooks/course/useGetAllCourse";
 import ErrorDisplay from "@/components/ErrorDisplay";
 
@@ -32,15 +32,7 @@ const InstructorProfilePage: React.FC = () => {
   const instructorCourses = coursesData?.items;
 
   if (isInstructorLoading) {
-    return (
-      <div className="min-h-screen bg-gray-50/50 p-6">
-        <div className="max-w-7xl mx-auto">
-          <div className="flex items-center justify-center min-h-[50vh]">
-            <Loader2 className="w-8 h-8 text-blue-600 animate-spin" />
-          </div>
-        </div>
-      </div>
-    );
+    return <InstructorDetailSkeleton />;
   }
 
   if (error || !instructor) {

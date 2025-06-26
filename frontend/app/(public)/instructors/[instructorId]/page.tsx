@@ -5,7 +5,7 @@ import { useParams } from "next/navigation";
 import { useGetInstructorDetails } from "@/hooks/instructor/useGetInstructorDetails";
 import { IInstructorDetails } from "@/types/instructor";
 import { UserInstructorDetail } from "@/components/instructor/UserInstructorDetail";
-import { Loader2 } from "lucide-react";
+import InstructorDetailSkeleton from "@/components/skeleton/InstructorDetailSkeleton";
 import ErrorDisplay from "@/components/ErrorDisplay";
 
 export default function InstructorDetailPage() {
@@ -26,15 +26,7 @@ export default function InstructorDetailPage() {
   const instructorCourses = coursesData?.items;
 
   if (isInstructorLoading) {
-    return (
-      <div className="min-h-screen bg-gray-50/50 p-6">
-        <div className="max-w-7xl mx-auto space-y-6">
-          <div className="flex items-center justify-center min-h-[50vh]">
-            <Loader2 className="w-8 h-8 text-blue-600 animate-spin" />
-          </div>
-        </div>
-      </div>
-    );
+    return <InstructorDetailSkeleton />;
   }
 
   if (!instructor) {
@@ -48,6 +40,6 @@ export default function InstructorDetailPage() {
       instructor={instructor}
       courses={instructorCourses}
       isCoursesLoading={isCoursesLoading}
-                />
+    />
   );
 }
