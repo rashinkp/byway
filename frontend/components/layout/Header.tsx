@@ -227,6 +227,11 @@ export function Header({ client, onNotificationClick }: HeaderProps = {}) {
                           className="w-6 h-6 text-gray-600 group-hover:text-blue-500 transition-colors cursor-pointer"
                           strokeWidth={1.5}
                         />
+                        {user.cartCount && user.cartCount > 0 && (
+                          <span className="absolute -top-2 -right-2 w-5 h-5 p-0 flex items-center justify-center text-xs rounded-full bg-black text-white font-semibold border-2 border-white shadow">
+                            {user.cartCount}
+                          </span>
+                        )}
                       </Link>
                     </div>
                     <div className="relative group">
@@ -326,10 +331,12 @@ export function Header({ client, onNotificationClick }: HeaderProps = {}) {
                         className="w-6 h-6 text-gray-600 group-hover:text-blue-500 transition-colors cursor-pointer"
                         strokeWidth={1.5}
                       />
+                      {user.cartCount && user.cartCount > 0 && (
+                        <span className="absolute -top-2 -right-2 w-5 h-5 p-0 flex items-center justify-center text-xs rounded-full bg-black text-white font-semibold border-2 border-white shadow">
+                          {user.cartCount}
+                        </span>
+                      )}
                     </Link>
-                    <Badge className="absolute -top-2 -right-2 w-5 h-5 p-0 flex items-center justify-center text-xs">
-                      2
-                    </Badge>
                   </div>
                   <div className="relative group">
                     <Bell

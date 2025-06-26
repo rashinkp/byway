@@ -5,11 +5,15 @@ import * as bcrypt from "bcrypt";
 import { AuthProvider } from "../../../../domain/enum/auth-provider.enum";
 import { LoginDto } from "../../../../domain/dtos/auth/login.dto";
 import { ILoginUseCase } from "../interfaces/login.usecase.interface";
+import { ICartRepository } from "../../../repositories/cart.repository";
 
 export class LoginUseCase implements ILoginUseCase {
-  constructor(private authRepository: IAuthRepository) {}
+  constructor(
+    private authRepository: IAuthRepository,
+    private cartRepository: ICartRepository
+  ) {}
 
-  async execute(dto: LoginDto): Promise<User> {
+  async execute(dto: LoginDto): Promise<{ user: User; cartCount: number }> {
     const user = await this.authRepository.findUserByEmail(dto.email);
     if (!user) {
       throw new HttpError("Invalid credentials", 401);
@@ -44,7 +48,12 @@ export class LoginUseCase implements ILoginUseCase {
         throw new HttpError("This user is not available right now", 403);
       }
 
-      return user;
+      const cartCount = await this.cartRepository.countByUserId(user.id);
+
+      return {
+        user,
+        cartCount,
+      };
     } catch (error) {
       if (error instanceof HttpError) {
         throw error;

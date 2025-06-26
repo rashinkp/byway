@@ -24,6 +24,7 @@ export interface UserResponse {
   deletedAt?: Date;
   createdAt?: Date;
   updatedAt?: Date;
+  cartCount?: number;
 }
 
 export interface PublicUserResponse {

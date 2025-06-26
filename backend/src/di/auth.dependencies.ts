@@ -33,7 +33,7 @@ export function createAuthDependencies(
     authRepository,
     googleAuthProvider
   );
-  const loginUseCase = new LoginUseCase(authRepository);
+  const loginUseCase = new LoginUseCase(authRepository , deps.cartRepository);
   const logoutUseCase = new LogoutUseCase();
   const registerUseCase = new RegisterUseCase(authRepository, otpProvider);
   const resendOtpUseCase = new ResendOtpUseCase(authRepository, otpProvider);

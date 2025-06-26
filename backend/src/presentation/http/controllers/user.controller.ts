@@ -119,7 +119,7 @@ export class UserController extends BaseController {
       if (!request.user?.id) {
         throw new UnauthorizedError("User not authenticated");
       }
-      const user = await this.getCurrentUserUseCase.execute(request.user.id);
+      const { user, cartCount } = await this.getCurrentUserUseCase.execute(request.user.id);
       const { user: fetchedUser, profile } = await this.getUserByIdUseCase.execute({ userId: user.id });
       return this.success_200({
         id: fetchedUser.id,
@@ -139,6 +139,7 @@ export class UserController extends BaseController {
         deletedAt: fetchedUser.deletedAt,
         createdAt: fetchedUser.createdAt,
         updatedAt: fetchedUser.updatedAt,
+        cartCount,
       }, "User retrieved successfully");
     });
   }

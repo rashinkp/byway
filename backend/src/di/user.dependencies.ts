@@ -20,7 +20,7 @@ export function createUserDependencies(
   // Initialize use cases
   const getAllUsersUseCase = new GetAllUsersUseCase(userRepository);
   const toggleDeleteUserUseCase = new ToggleDeleteUserUseCase(userRepository, createNotificationsForUsersUseCase);
-  const getCurrentUserUseCase = new GetCurrentUserUseCase(userRepository);
+  const getCurrentUserUseCase = new GetCurrentUserUseCase(userRepository, deps.cartRepository);
   const getUserByIdUseCase = new GetUserByIdUseCase(userRepository);
   const updateUserUseCase = new UpdateUserUseCase(userRepository);
   const getPublicUserUseCase = new GetPublicUserUseCase(userRepository);

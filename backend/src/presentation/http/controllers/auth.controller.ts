@@ -24,7 +24,6 @@ import { IHttpSuccess } from "../interfaces/http-success.interface";
 import { IHttpRequest } from "../interfaces/http-request.interface";
 import { IHttpResponse } from "../interfaces/http-response.interface";
 import { BadRequestError } from "../errors/bad-request-error";
-import { UnauthorizedError } from "../errors/unautherized-error";
 import { BaseController } from "./base.controller";
 
 export class AuthController extends BaseController {
@@ -102,7 +101,7 @@ export class AuthController extends BaseController {
   async login(httpRequest: IHttpRequest): Promise<IHttpResponse> {
     return this.handleRequest(httpRequest, async (request) => {
       const validated = validateLogin(request.body);
-      const user = await this.loginUseCase.execute(validated);
+      const { user, cartCount } = await this.loginUseCase.execute(validated);
       const response: ApiResponse<UserResponse> = {
         statusCode: 200,
         success: true,
@@ -112,6 +111,7 @@ export class AuthController extends BaseController {
           name: user.name,
           email: user.email,
           role: user.role,
+          cartCount,
         },
       };
       return {

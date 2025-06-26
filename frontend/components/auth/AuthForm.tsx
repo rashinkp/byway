@@ -16,6 +16,7 @@ import { SocialAuthButton } from "@/components/ui/SocialAuthButton";
 import { AuthFormWrapper } from "@/components/auth/parts/AuthFormWrapper";
 import { AuthLink } from "@/components/auth/parts/AuthLink";
 import { UseFormReturn, FieldValues, Path } from "react-hook-form";
+import { Loader2 } from "lucide-react";
 
 interface FieldConfig<T extends FieldValues> {
   name: Path<T>;
@@ -132,7 +133,14 @@ export function AuthForm<T extends FieldValues>({
             </div>
           )}
           <Button type="submit" className="w-full" disabled={isSubmitting}>
-            {isSubmitting ? "Signing in..." : submitText}
+            {isSubmitting ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Processing...
+              </>
+            ) : (
+              submitText
+            )}
           </Button>
           <div className="text-center">
             <AuthLink

@@ -45,6 +45,7 @@ export interface User {
   updatedAt: string;
   deletedAt: string | null;
   instructor?: IInstructorWithUserDetails;
+  cartCount?: number;
 }
 
 export interface IGetAllUsersResponse {
