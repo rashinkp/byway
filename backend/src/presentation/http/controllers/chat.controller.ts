@@ -8,6 +8,7 @@ import { IGetChatHistoryUseCase } from "../../../app/usecases/chat/interfaces/ge
 import { IGetMessagesByChatUseCase } from "../../../app/usecases/message/interfaces/get-messages-by-chat.usecase.interface";
 import { IGetMessageByIdUseCase } from "../../../app/usecases/message/interfaces/get-message-by-id.usecase.interface";
 import { IDeleteMessageUseCase } from "../../../app/usecases/message/interfaces/delete-message.usecase.interface";
+import { IMarkReadMessagesUseCase } from '../../../app/usecases/message/interfaces/mark-read-messages.usecase.interface';
 import { UserId } from "../../../domain/value-object/UserId";
 import { ChatId } from "../../../domain/value-object/ChatId";
 import { MessageContent } from "../../../domain/value-object/MessageContent";
@@ -34,6 +35,7 @@ export class ChatController extends BaseController {
     private getMessagesByChatUseCase: IGetMessagesByChatUseCase,
     private getMessageByIdUseCase: IGetMessageByIdUseCase,
     private deleteMessageUseCase: IDeleteMessageUseCase,
+    private markReadMessagesUseCase: IMarkReadMessagesUseCase,
     httpErrors: IHttpErrors,
     httpSuccess: IHttpSuccess
   ) {
@@ -159,5 +161,13 @@ export class ChatController extends BaseController {
   // Efficiently get only the participants of a chat by chatId
   async getChatParticipantsById(chatId: string): Promise<{ user1Id: string, user2Id: string } | null> {
     return this.listUserChatsUseCase.getChatParticipantsById(chatId);
+  }
+
+  async markMessagesAsRead(socketData: { chatId: string, userId: string }) {
+    await this.markReadMessagesUseCase.execute(
+      new ChatId(socketData.chatId),
+      new UserId(socketData.userId)
+    );
+    return { success: true };
   }
 } 

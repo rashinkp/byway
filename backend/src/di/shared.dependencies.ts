@@ -38,12 +38,11 @@ import { PrismaRevenueRepository } from "../infra/repositories/revenue.repositor
 import { IRevenueRepository } from "../app/repositories/revenue.repository";
 import { CourseReviewRepository } from "../infra/repositories/course-review.repository.impl";
 import { ICourseReviewRepository } from "../app/repositories/course-review.repository.interface";
-import { CreateNotificationsForUsersUseCase } from "../app/usecases/notification/implementations/create-notifications-for-users.usecase";
-import { NotificationBatchingService } from "../app/services/notification/notification-batching.service";
 import { LessonProgressRepository } from "../infra/repositories/lesson-progress.repository.impl";
 import { ILessonProgressRepository } from "../app/repositories/lesson-progress.repository.interface";
 import { PrismaCertificateRepository } from "../infra/repositories/certificate-repository.prisma";
 import { CertificateRepositoryInterface } from "../app/repositories/certificate-repository.interface";
+import { CreateNotificationsForUsersUseCase } from "../app/usecases/notification/implementations/create-notifications-for-users.usecase";
 
 export interface SharedDependencies {
   prisma: typeof prismaClient;
@@ -68,7 +67,6 @@ export interface SharedDependencies {
   walletRepository: IWalletRepository;
   paymentService: IPaymentService;
   createNotificationsForUsersUseCase: CreateNotificationsForUsersUseCase;
-  notificationBatchingService: NotificationBatchingService;
   lessonProgressRepository: ILessonProgressRepository;
   certificateRepository: CertificateRepositoryInterface;
 }
@@ -114,7 +112,6 @@ export function createSharedDependencies(createNotificationsForUsersUseCase?: Cr
   const cookieService = new CookieService();
 
   const revenueRepository = new PrismaRevenueRepository(prismaClient);
-  const notificationBatchingService = new NotificationBatchingService(createNotificationsForUsersUseCase!);
   const lessonProgressRepository = new LessonProgressRepository(prismaClient);
   const certificateRepository = new PrismaCertificateRepository(prismaClient);
 
@@ -141,7 +138,6 @@ export function createSharedDependencies(createNotificationsForUsersUseCase?: Cr
     walletRepository,
     paymentService,
     createNotificationsForUsersUseCase: createNotificationsForUsersUseCase!,
-    notificationBatchingService,
     lessonProgressRepository,
     certificateRepository,
   };

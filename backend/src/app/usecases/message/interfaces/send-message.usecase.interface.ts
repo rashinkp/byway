@@ -6,6 +6,8 @@ export interface SendMessageInput {
   userId?: string; // recipient
   senderId: string;
   content: string;
+  imageUrl?: string;
+  audioUrl?: string;
 }
 
 export interface ISendMessageUseCase {

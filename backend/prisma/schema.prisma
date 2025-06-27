@@ -522,6 +522,7 @@ model Message {
   imageUrl  String?   
   audioUrl  String?  
   isRead    Boolean   @default(false) 
+  type      MessageType @default(TEXT)
   createdAt DateTime @default(now())
 
   chat      Chat     @relation(fields: [chatId], references: [id], onDelete: Cascade)
@@ -529,6 +530,12 @@ model Message {
 
   @@index([chatId])
   @@index([senderId])
+}
+
+enum MessageType {
+  TEXT
+  IMAGE
+  AUDIO
 }
 
 // Notification Event Types

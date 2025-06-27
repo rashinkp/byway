@@ -22,8 +22,11 @@ export class GetMessagesByChatUseCase implements IGetMessagesByChatUseCase {
         chatId: msg.chatId,
         senderId: msg.senderId,
         receiverId,
-        content: msg.content,
-        timestamp: msg.createdAt ? new Date(msg.createdAt).toISOString() : '',
+        content: msg.content ? msg.content : undefined, // Handle optional content
+        imageUrl: msg.imageUrl ? msg.imageUrl : undefined, // Include S3 image URL
+        audioUrl: msg.audioUrl ? msg.audioUrl : undefined, // Include S3 audio URL
+        isRead: msg.isRead, 
+        timestamp: msg.createdAt ? new Date(msg.createdAt).toISOString() : "",
       };
     });
   }

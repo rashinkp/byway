@@ -34,10 +34,13 @@ export function registerMessageHandlers(socket: Socket, io: SocketIOServer, chat
       if (userId && chatId) {
         // Join the chat room
         socket.join(chatId);
-        
-        // Clear any pending notifications for this user in this chat
-        // This will be handled by the notification batching service
-        console.log(`[SocketIO] User ${userId} joined chat ${chatId}`);
+
+        // Mark all messages as read for this user in this chat
+        await chatController.markMessagesAsRead({ chatId, userId });
+
+        // Emit updated chat list to the user
+        io.to(userId).emit('chatListUpdated');
+        console.log(`[SocketIO] User ${userId} joined chat ${chatId} and messages marked as read`);
       }
     } catch (err) {
       console.log('[SocketIO] Error in joinChat:', err);

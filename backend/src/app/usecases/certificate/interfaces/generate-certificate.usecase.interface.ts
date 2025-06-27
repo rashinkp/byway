@@ -1,4 +1,4 @@
-import { CertificateDTO } from '../../../../domain/dtos/certificate.dto';
+import { CertificateDTO } from "../../../../domain/dtos/certificate.dto";
 
 export interface IGenerateCertificateRequest {
   userId: string;
@@ -12,5 +12,7 @@ export interface IGenerateCertificateResponse {
 }
 
 export interface IGenerateCertificateUseCase {
-  execute(request: IGenerateCertificateRequest): Promise<IGenerateCertificateResponse>;
-} 
+  execute(
+    request: IGenerateCertificateRequest
+  ): Promise<IGenerateCertificateResponse>;
+}

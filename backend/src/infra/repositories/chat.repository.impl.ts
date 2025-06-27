@@ -129,23 +129,38 @@ export class ChatRepository implements IChatRepository {
       const allChats = [...nameOrRoleMatchChats, ...messageMatchChats];
 
       // Convert to enhanced format as before
-      chatItems = allChats.map(chat => {
+      chatItems = await Promise.all(allChats.map(async chat => {
         const otherUser = chat.user1 ? (chat.user1Id === userId.value ? chat.user2 : chat.user1) : undefined;
         const lastMessage = chat.messages && chat.messages[0];
+        // Count unread messages for this user in this chat
+        const unreadCount = await prisma.message.count({
+          where: {
+            chatId: chat.id,
+            senderId: { not: userId.value },
+            isRead: false,
+          },
+        });
         return {
           id: chat.id,
           type: 'chat',
           displayName: otherUser?.name || '',
           avatar: otherUser?.avatar || undefined,
           role: otherUser?.role || '',
-          lastMessage: lastMessage?.content,
+          lastMessage: lastMessage
+            ? {
+                content: lastMessage.content || undefined,
+                imageUrl: lastMessage.imageUrl || undefined,
+                audioUrl: lastMessage.audioUrl || undefined,
+                type: lastMessage.type?.toLowerCase() as "text" | "image" | "audio",
+              }
+            : undefined,
           lastMessageTime: lastMessage?.createdAt ? this.formatTime(lastMessage.createdAt) : undefined,
-          unreadCount: 0,
+          unreadCount,
           chatId: chat.id,
           userId: otherUser?.id,
           isOnline: false,
         };
-      });
+      }));
     } else {
       // Default: get user's existing chats with latest messages
       const existingChats = await prisma.chat.findMany({
@@ -188,23 +203,38 @@ export class ChatRepository implements IChatRepository {
         skip: offset,
         take: limit,
       });
-      chatItems = existingChats.map(chat => {
+      chatItems = await Promise.all(existingChats.map(async chat => {
         const otherUser = chat.user1 ? (chat.user1Id === userId.value ? chat.user2 : chat.user1) : undefined;
         const lastMessage = chat.messages && chat.messages[0];
+        // Count unread messages for this user in this chat
+        const unreadCount = await prisma.message.count({
+          where: {
+            chatId: chat.id,
+            senderId: { not: userId.value },
+            isRead: false,
+          },
+        });
         return {
           id: chat.id,
           type: 'chat',
           displayName: otherUser?.name || '',
           avatar: otherUser?.avatar || undefined,
           role: otherUser?.role || '',
-          lastMessage: lastMessage?.content,
+          lastMessage: lastMessage
+            ? {
+                content: lastMessage.content || undefined,
+                imageUrl: lastMessage.imageUrl || undefined,
+                audioUrl: lastMessage.audioUrl || undefined,
+                type: lastMessage.type?.toLowerCase() as "text" | "image" | "audio",
+              }
+            : undefined,
           lastMessageTime: lastMessage?.createdAt ? this.formatTime(lastMessage.createdAt) : undefined,
-          unreadCount: 0,
+          unreadCount,
           chatId: chat.id,
           userId: otherUser?.id,
           isOnline: false,
         };
-      });
+      }));
     }
 
     // Determine sort order

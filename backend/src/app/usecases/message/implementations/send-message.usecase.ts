@@ -9,21 +9,13 @@ import { MessageId } from '../../../../domain/value-object/MessageId';
 import { Timestamp } from '../../../../domain/value-object/Timestamp';
 import { MessageResponseDTO } from '@/domain/dtos/chat.dto';
 import { Chat } from '../../../../domain/entities/Chat';
-import { CreateNotificationsForUsersUseCase } from '../../notification/implementations/create-notifications-for-users.usecase';
-import { NotificationBatchingService } from '../../../services/notification/notification-batching.service';
+import { MessageType } from '../../../../domain/enum/Message-type.enum';
 
 export class SendMessageUseCase implements ISendMessageUseCase {
-  private notificationBatchingService?: NotificationBatchingService;
-
   constructor(
     private readonly chatRepository: IChatRepository,
-    private readonly messageRepository: IMessageRepository,
-    private readonly createNotificationsForUsersUseCase?: CreateNotificationsForUsersUseCase
-  ) {
-    if (createNotificationsForUsersUseCase) {
-      this.notificationBatchingService = new NotificationBatchingService(createNotificationsForUsersUseCase);
-    }
-  }
+    private readonly messageRepository: IMessageRepository
+  ) {}
 
   async execute(input: SendMessageInput): Promise<MessageResponseDTO> {
     let chatId: ChatId;
@@ -52,11 +44,24 @@ export class SendMessageUseCase implements ISendMessageUseCase {
     } else {
       throw new Error('Either chatId or userId must be provided');
     }
+    // Determine message type
+    let messageType: MessageType;
+    if (input.imageUrl) {
+      messageType = MessageType.IMAGE;
+    } else if (input.audioUrl) {
+      messageType = MessageType.AUDIO;
+    } else {
+      messageType = MessageType.TEXT;
+    }
     const message = new Message(
       new MessageId(Math.random().toString(36).substring(2, 15)),
       chatId,
       new UserId(input.senderId),
-      new MessageContent(input.content),
+      input.content ? new MessageContent(input.content) : null,
+      input.imageUrl || null,
+      input.audioUrl || null,
+      messageType,
+      false, // isRead
       new Timestamp(new Date())
     );
     try {
@@ -93,7 +98,8 @@ export class SendMessageUseCase implements ISendMessageUseCase {
         chatId: message.chatId.value,
         senderId: message.senderId.value,
         receiverId: input.userId || '',
-        content: message.content.value,
+        content: message.content?.value || '',
+        isRead: false,
         timestamp: message.createdAt.value ? new Date(message.createdAt.value).toISOString() : '',
       };
     }
@@ -104,34 +110,20 @@ export class SendMessageUseCase implements ISendMessageUseCase {
         chatId: enrichedMessage.chatId,
         senderId: enrichedMessage.senderId,
         receiverId: input.userId || '',
-        content: enrichedMessage.content,
+        content: enrichedMessage.content || '',
+        isRead: false,
         timestamp: enrichedMessage.createdAt ? new Date(enrichedMessage.createdAt).toISOString() : '',
       };
     }
     const receiverId = chat.user1Id.value === enrichedMessage.senderId ? chat.user2Id.value : chat.user1Id.value;
-    
-    // Use batched notifications instead of individual notifications
-    if (this.notificationBatchingService) {
-      try {
-        await this.notificationBatchingService.addMessageToBatch(
-          receiverId,
-          enrichedMessage.senderId,
-          enrichedMessage.senderName || 'Someone',
-          chatId.value,
-          input.content
-        );
-      } catch (error) {
-        // Don't fail the message sending if notification fails
-        console.error('Failed to add message to notification batch:', error);
-      }
-    }
     
     return {
       id: enrichedMessage.id,
       chatId: enrichedMessage.chatId,
       senderId: enrichedMessage.senderId,
       receiverId,
-      content: enrichedMessage.content,
+      content: enrichedMessage.content || '',
+      isRead: false,
       timestamp: enrichedMessage.createdAt ? new Date(enrichedMessage.createdAt).toISOString() : '',
     };
   }
