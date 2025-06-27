@@ -155,22 +155,22 @@ export function ChatList({ chats, selectedChat, onSelectChat, onSearch }: ChatLi
                           </div>
                           <div className="flex items-center justify-between">
                             <p className="text-sm text-gray-600 truncate flex-1 mr-2">
-                              {chat.lastMessage || 'No messages yet'}
+                              {chat.lastMessage?.content || 'No messages yet'}
                             </p>
-                            {typeof chat.unreadCount === 'number' && chat.unreadCount > 0 && (
-                              <div className="flex-shrink-0 bg-blue-500 text-white text-xs font-medium px-2 py-0.5 rounded-full min-w-[18px] h-5 flex items-center justify-center">
-                                {chat.unreadCount > 99 ? '99+' : chat.unreadCount}
-                              </div>
+                            {(chat.unreadCount ?? 0) > 0 && (
+                              <span className="ml-2 bg-blue-500 text-white rounded-full px-2 py-0.5 text-xs">
+                                {chat.unreadCount}
+                              </span>
                             )}
                           </div>
-                          {/* Role Badge (hide for 'user') */}
-                          {chat.role !== 'USER' && (
-                            <div className="mt-2">
-                              <Badge className={`text-xs px-2 py-0.5 ${getRoleBadgeColor(chat.role)} rounded-md`}>
-                                {chat.role.charAt(0).toUpperCase() + chat.role.slice(1).toLowerCase()}
-                              </Badge>
-                            </div>
-                          )}
+                            {/* Role Badge (hide for 'user') */}
+                            {chat.role !== 'USER' && (
+                              <div className="mt-2">
+                                <Badge className={`text-xs px-2 py-0.5 ${getRoleBadgeColor(chat.role)} rounded-md`}>
+                                  {chat.role.charAt(0).toUpperCase() + chat.role.slice(1).toLowerCase()}
+                                </Badge>
+                              </div>
+                            )}
                         </div>
                       </div>
                     </div>

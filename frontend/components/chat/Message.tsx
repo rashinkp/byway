@@ -1,7 +1,7 @@
 import React from "react";
 import { Message as MessageType } from "@/types/chat";
 import { EnhancedChatItem } from "@/types/chat";
-import { MoreVertical, Trash2 } from "lucide-react";
+import { MoreVertical, Trash2, CheckCircle, Circle, Check, CheckCheck } from "lucide-react";
 import { useState } from "react";
 import { AlertComponent } from "@/components/ui/AlertComponent";
 
@@ -75,21 +75,51 @@ export function Message({ message, currentUserId, chat, onDelete }: MessageProps
         )}
 
         {/* Message Bubble Row (bubble + menu button for mine) */}
-        <div className="flex items-center w-full justify-end relative">
-          <div
-            className={`px-4 py-2 rounded-2xl max-w-full whitespace-pre-wrap break-words text-sm ${
-              isMine
-                ? "bg-blue-500 text-white rounded-br-md"
-                : "bg-white border border-gray-200 text-gray-900 rounded-bl-md"
-            }`}
-            style={{ minWidth: "2.5rem" }}
-          >
-            {message.content}
-          </div>
+        <div className="flex items-center">
+          {/* Audio message */}
+          {message.audioUrl && (
+            <div className="flex items-center gap-2 bg-gray-100 rounded p-2">
+              <audio controls src={message.audioUrl} className="w-48" />
+              {isMine && (
+                message.isRead ? (
+                  <CheckCheck className="text-green-500 w-4 h-4" />
+                ) : (
+                  <Check className="text-gray-400 w-4 h-4" />
+                )
+              )}
+            </div>
+          )}
+          {/* Image message */}
+          {message.imageUrl && (
+            <img src={message.imageUrl} alt="Sent image" className="max-w-xs rounded-lg" />
+          )}
+          {/* Text message */}
+          {message.content && (
+            <div
+              className={`px-4 py-2 rounded-2xl max-w-full whitespace-pre-wrap break-words text-sm ${
+                isMine
+                  ? "bg-blue-500 text-white rounded-br-md"
+                  : "bg-white border border-gray-200 text-gray-900 rounded-bl-md"
+              }`}
+              style={{ minWidth: "2.5rem" }}
+            >
+              {message.content}
+              {/* WhatsApp-like ticks for isMine only */}
+              {isMine && (
+                <span className="ml-2 align-middle">
+                  {message.isRead ? (
+                    <CheckCheck className="inline w-4 h-4 text-green-500" />
+                  ) : (
+                    <Check className="inline w-4 h-4 text-gray-400" />
+                  )}
+                </span>
+              )}
+            </div>
+          )}
           {isMine && (
-            <div className="relative flex items-center">
+            <div className="relative">
               <button
-                className="p-1 rounded-full hover:bg-blue-600/20 ml-0"
+                className="p-1 rounded-full hover:bg-blue-600/20 opacity-0 group-hover:opacity-100 transition-opacity"
                 onClick={() => setMenuOpen((open) => !open)}
                 tabIndex={-1}
                 aria-label="Message options"
@@ -97,8 +127,9 @@ export function Message({ message, currentUserId, chat, onDelete }: MessageProps
               >
                 <MoreVertical className="w-4 h-4 text-gray-500" />
               </button>
+              {/* Menu dropdown */}
               {menuOpen && (
-                <div className="absolute right-0 top-6 bg-white border border-gray-200 rounded shadow-lg min-w-[120px] z-20">
+                <div className="absolute right-0 top-full mt-1 bg-white border border-gray-200 rounded shadow-lg min-w-[120px] z-20">
                   <button
                     className="flex items-center w-full px-4 py-2 text-sm text-red-600 hover:bg-red-50 gap-2"
                     onClick={() => {
@@ -114,7 +145,7 @@ export function Message({ message, currentUserId, chat, onDelete }: MessageProps
             </div>
           )}
         </div>
-        {/* Row below bubble: timestamp and options */}
+        {/* Timestamp and delete confirmation */}
         <div
           className={`flex items-center gap-1 mt-1 ${
             isMine ? "justify-end" : "justify-start"
@@ -125,22 +156,22 @@ export function Message({ message, currentUserId, chat, onDelete }: MessageProps
           >
             {formatTime(message.timestamp)}
           </span>
-          {/* Delete confirmation dialog */}
-          {showDeleteConfirm && (
-            <AlertComponent
-              open={showDeleteConfirm}
-              onOpenChange={setShowDeleteConfirm}
-              title="Delete Message"
-              description="Are you sure you want to delete this message? This action cannot be undone."
-              confirmText="Delete"
-              cancelText="Cancel"
-              onConfirm={() => {
-                if (onDelete) onDelete();
-                setShowDeleteConfirm(false);
-              }}
-            />
-          )}
         </div>
+        {/* Delete confirmation dialog */}
+        {showDeleteConfirm && (
+          <AlertComponent
+            open={showDeleteConfirm}
+            onOpenChange={setShowDeleteConfirm}
+            title="Delete Message"
+            description="Are you sure you want to delete this message? This action cannot be undone."
+            confirmText="Delete"
+            cancelText="Cancel"
+            onConfirm={() => {
+              if (onDelete) onDelete();
+              setShowDeleteConfirm(false);
+            }}
+          />
+        )}
       </div>
     </div>
   );

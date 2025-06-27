@@ -3,28 +3,17 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { ChatList } from '@/components/chat/ChatList';
 import { ChatWindow } from '@/components/chat/ChatWindow';
-import { Chat, Message, EnhancedChatItem, PaginatedChatList } from '@/types/chat';
+import {  Message, EnhancedChatItem} from '@/types/chat';
 import { useAuthStore } from '@/stores/auth.store';
 import { Button } from '@/components/ui/button';
 import { 
-  MessageSquare, 
-  Users, 
-  Settings, 
-  Search,
-  Bell,
-  Menu,
-  X,
-  Loader2,
-  Wifi,
-  WifiOff,
-  Badge
+  Loader2,  
 } from 'lucide-react';
 import {
   listUserChats,
   getMessagesByChat,
   joinChat,
   sendMessage as sendMessageSocket,
-  createChat as createChatSocket,
 } from '@/services/socketChat';
 import socket from '@/lib/socket';
 
@@ -235,14 +224,14 @@ export default function ChatPage() {
 
   // Restore handleSendMessage function
   const handleSendMessage = useCallback(
-    (content: string) => {
+    (content: string, imageUrl?: string, audioUrl?: string) => {
       if (!user || !selectedChat) return;
       if (selectedChat.type === 'user') {
-        // No chat exists, send message with userId (recipient)
         sendMessageSocket(
           {
-            userId: selectedChat.userId, // recipient's userId
+            userId: selectedChat.userId,
             content,
+            imageUrl,
           },
           (msg: Message) => {
             // After first message, join the new chat room and update selectedChat
@@ -323,6 +312,35 @@ export default function ChatPage() {
     window.addEventListener('resize', checkMobile);
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
+
+  useEffect(() => {
+    function handleMessagesRead({ chatId }: { chatId: string }) {
+      console.log('[SocketIO] messagesRead event received:', chatId);
+      if (selectedChat?.chatId === chatId) {
+        console.log('[SocketIO] Refetching messages for chat:', chatId);
+        getMessagesByChat({ chatId }, (result: any) => {
+          const msgs = result?.body?.data || result?.data || result;
+          console.log('[SocketIO] Updated messages:', msgs);
+          setMessages(Array.isArray(msgs) ? msgs.slice().reverse() : []);
+        });
+      }
+      // Always refresh chat list to update unread counts
+      console.log('[SocketIO] Refetching chat list after messagesRead');
+      listUserChats({ page: 1, limit: 10, search: searchQuery }, (result: any) => {
+        const chatData = result?.body?.data || result?.data || result;
+        console.log('[SocketIO] Updated chat list:', chatData);
+        if (chatData && Array.isArray(chatData.items)) {
+          setChatItems(chatData.items);
+          setHasMore(chatData.hasMore || false);
+          setCurrentPage(1);
+        }
+      });
+    }
+    socket.on('messagesRead', handleMessagesRead);
+    return () => {
+      socket.off('messagesRead', handleMessagesRead);
+    };
+  }, [selectedChat, searchQuery]);
 
   if (!isInitialized || isLoading) {
     return (

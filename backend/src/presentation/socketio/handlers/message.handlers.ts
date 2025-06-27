@@ -40,6 +40,13 @@ export function registerMessageHandlers(socket: Socket, io: SocketIOServer, chat
 
         // Emit updated chat list to the user
         io.to(userId).emit('chatListUpdated');
+
+        // Emit messagesRead event to the user
+        console.log('[SocketIO] Emitting messagesRead to user:', userId, 'for chat:', chatId);
+        io.to(userId).emit('messagesRead', { chatId, userId });
+        // Also notify all participants in the chat room
+        io.to(chatId).emit('messagesRead', { chatId, userId });
+
         console.log(`[SocketIO] User ${userId} joined chat ${chatId} and messages marked as read`);
       }
     } catch (err) {

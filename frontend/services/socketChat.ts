@@ -2,11 +2,11 @@ import socket from '@/lib/socket';
 
 export const joinChat = (chatId: string) => {
   console.log('[SocketService] Joining chat:', chatId);
-  socket.emit('join', chatId);
+  socket.emit('joinChat', { chatId });
 };
 
 export const sendMessage = (
-  data: { chatId?: string; content: string; userId?: string },
+  data: { chatId?: string; content: string; userId?: string; imageUrl?: string; audioUrl?: string },
   callback?: (message: any) => void,
   errorCallback?: (error: any) => void
 ) => {

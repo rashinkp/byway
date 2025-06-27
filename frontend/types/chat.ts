@@ -15,7 +15,12 @@ export interface EnhancedChatItem {
   displayName: string;
   avatar?: string;
   role: string;
-  lastMessage?: string;
+  lastMessage?: {
+    content?: string;
+    imageUrl?: string;
+    audioUrl?: string;
+    type: 'text' | 'image' | 'audio';
+  };
   lastMessageTime?: string;
   unreadCount?: number;
   userId?: string; // For user items, this is the other user's ID
@@ -36,6 +41,9 @@ export interface Message {
   chatId: string;
   senderId: string;
   receiverId: string;
-  content: string;
+  content?: string;
+  imageUrl?: string;
+  audioUrl?: string;
+  isRead: boolean;
   timestamp: string;
 } 
