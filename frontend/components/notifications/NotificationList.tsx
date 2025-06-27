@@ -250,7 +250,7 @@ const NotificationList: React.FC<NotificationListProps> = ({
                       loading,
                       notificationsLength: uniqueNotifications.length,
                     });
-                    loadMore();
+                    loadMore?.();
                     setTimeout(() => setLoadMoreLoading(false), 1000); // Simulate loading state
                   }}
                   disabled={loading || loadMoreLoading}

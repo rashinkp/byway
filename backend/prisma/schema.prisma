@@ -518,7 +518,10 @@ model Message {
   id        String   @id @default(uuid())
   chatId    String
   senderId  String
-  content   String
+  content   String?
+  imageUrl  String?   
+  audioUrl  String?  
+  isRead    Boolean   @default(false) 
   createdAt DateTime @default(now())
 
   chat      Chat     @relation(fields: [chatId], references: [id], onDelete: Cascade)

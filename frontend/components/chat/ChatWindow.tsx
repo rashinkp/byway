@@ -4,10 +4,13 @@ import { Message as MessageComponent } from './Message';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
-import { Send, MoreVertical, ArrowLeft } from 'lucide-react';
+import { Send, MoreVertical, ArrowLeft, Image as ImageIcon, X } from 'lucide-react';
 import Link from 'next/link';
 import { useAuth } from '@/hooks/auth/useAuth';
 import { deleteMessage } from '@/services/socketChat';
+import { Dialog, DialogContent, DialogTitle, DialogFooter } from '@/components/ui/dialog';
+import { AlertComponent } from '@/components/ui/AlertComponent';
+import { Loader2 } from 'lucide-react';
 
 interface ChatWindowProps {
   chat: EnhancedChatItem;
@@ -29,6 +32,12 @@ export function ChatWindow({ chat, messages, onSendMessage, currentUserId, onDel
   const { user: currentUser } = useAuth();
   const prevMessagesLength = useRef(messages.length);
   const prevScrollHeight = useRef<number | null>(null);
+  const [imageModalOpen, setImageModalOpen] = useState(false);
+  const [selectedImage, setSelectedImage] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [imageError, setImageError] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const MAX_SIZE_MB = 2;
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -143,6 +152,56 @@ export function ChatWindow({ chat, messages, onSendMessage, currentUserId, onDel
     deleteMessage({ messageId }, () => {
       if (onDeleteMessage) onDeleteMessage(messageId);
     });
+  };
+
+  // Handle file selection and validation
+  const handleFileChange = (file: File | null) => {
+    setImageError(null);
+    if (!file) return;
+    if (!file.type.startsWith('image/')) {
+      setImageError('Only image files are allowed.');
+      return;
+    }
+    if (file.size > MAX_SIZE_MB * 1024 * 1024) {
+      setImageError(`File size must be less than ${MAX_SIZE_MB}MB.`);
+      return;
+    }
+    setSelectedImage(file);
+    setImagePreview(URL.createObjectURL(file));
+  };
+
+  // Handle drag and drop
+  const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+      handleFileChange(e.dataTransfer.files[0]);
+    }
+  };
+  const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+  };
+
+  // Optional: compress image (stub)
+  const compressImage = async (file: File): Promise<File> => {
+    // For now, just return the file. Add real compression logic if needed.
+    return file;
+  };
+
+  // Handle send image (stub)
+  const handleSendImage = async () => {
+    if (!selectedImage) return;
+    // Compress and send logic here (stub)
+    setImageModalOpen(false);
+    setSelectedImage(null);
+    setImagePreview(null);
+    setImageError(null);
+  };
+
+  const handleCloseModal = () => {
+    setImageModalOpen(false);
+    setSelectedImage(null);
+    setImagePreview(null);
+    setImageError(null);
   };
 
   return (
@@ -286,29 +345,119 @@ export function ChatWindow({ chat, messages, onSendMessage, currentUserId, onDel
         className="flex-shrink-0 px-4 py-3 bg-white border-t border-gray-200"
         style={{ minHeight: 64 }}
       >
-        <form onSubmit={handleSendMessage}>
-          <div className="flex items-center space-x-2">
-            <Input
-              type="text"
-              placeholder={
-                chat.type === "user"
-                  ? "Type your first message..."
-                  : "Type a message..."
-              }
-              value={newMessage}
-              onChange={(e) => setNewMessage(e.target.value)}
-              className="flex-1 border-gray-300 focus:border-blue-500 focus:ring-blue-500"
-            />
-            <Button
-              type="submit"
-              disabled={!newMessage.trim()}
-              className="bg-blue-500 hover:bg-blue-600 disabled:bg-gray-300 px-4 py-2"
-            >
-              <Send className="w-4 h-4" />
-            </Button>
-          </div>
+        <form onSubmit={handleSendMessage} className="flex items-center space-x-2">
+          <Button
+            type="button"
+            variant="outline"
+            className="p-2 flex items-center justify-center"
+            onClick={() => setImageModalOpen(true)}
+            aria-label="Add image"
+          >
+            <ImageIcon className="w-5 h-5 text-blue-500" />
+          </Button>
+          <Input
+            type="text"
+            placeholder={
+              chat.type === "user"
+                ? "Type your first message..."
+                : "Type a message..."
+            }
+            value={newMessage}
+            onChange={(e) => setNewMessage(e.target.value)}
+            className="flex-1 border-gray-300 focus:border-blue-500 focus:ring-blue-500"
+          />
+          <Button
+            type="submit"
+            disabled={!newMessage.trim()}
+            className="bg-blue-500 hover:bg-blue-600 disabled:bg-gray-300 px-4 py-2"
+          >
+            <Send className="w-4 h-4" />
+          </Button>
         </form>
       </div>
+
+      {/* Image Upload Overlay (not modal) */}
+      {imageModalOpen && (
+        <div className="fixed inset-x-0 bottom-0 z-40 flex justify-center items-end pointer-events-none">
+          <div className="w-full max-w-md bg-white border-t border-gray-200 rounded-t-lg shadow-xl p-6 mb-0 pointer-events-auto animate-in fade-in slide-in-from-bottom-4">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-semibold text-gray-900">Add Image</h3>
+              <button
+                type="button"
+                className="p-1 rounded-full hover:bg-gray-100"
+                onClick={handleCloseModal}
+                aria-label="Close image overlay"
+              >
+                <X className="w-5 h-5 text-gray-600" />
+              </button>
+            </div>
+            <div
+              className="flex flex-col items-center gap-4 py-2"
+              onDrop={handleDrop}
+              onDragOver={handleDragOver}
+            >
+              {!selectedImage ? (
+                <>
+                  <div
+                    className="w-full h-40 border-2 border-dashed border-gray-300 rounded-lg flex flex-col items-center justify-center cursor-pointer bg-gray-50 hover:bg-gray-100 transition"
+                    onClick={() => fileInputRef.current?.click()}
+                  >
+                    <ImageIcon className="w-10 h-10 text-gray-400 mb-2" />
+                    <span className="text-gray-500 text-sm">Drag & drop or click to select an image</span>
+                    <span className="text-xs text-gray-400 mt-1">(Max {MAX_SIZE_MB}MB, image only)</span>
+                  </div>
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={e => handleFileChange(e.target.files?.[0] || null)}
+                  />
+                </>
+              ) : (
+                <div className="w-full flex flex-col items-center gap-3">
+                  <div className="relative w-40 h-40">
+                    <img
+                      src={imagePreview || ''}
+                      alt="Preview"
+                      className="object-cover w-full h-full rounded-lg border"
+                    />
+                    <button
+                      type="button"
+                      className="absolute top-1 right-1 bg-white/80 hover:bg-white rounded-full p-1 shadow"
+                      onClick={() => setSelectedImage(null)}
+                    >
+                      <X className="w-4 h-4 text-gray-600" />
+                    </button>
+                  </div>
+                  <div className="text-xs text-gray-500">
+                    {selectedImage.name} &middot; {(selectedImage.size / 1024).toFixed(1)} KB
+                  </div>
+                </div>
+              )}
+              {imageError && <div className="text-red-500 text-xs mt-2">{imageError}</div>}
+            </div>
+            <div className="flex justify-end gap-2 mt-4">
+              <Button
+                variant="outline"
+                onClick={handleCloseModal}
+                type="button"
+              >
+                Close
+              </Button>
+              <Button
+                onClick={handleSendImage}
+                disabled={!selectedImage}
+                type="button"
+                className="bg-blue-600 text-white"
+              >
+                Send Image
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+
     </div>
   );
 }
