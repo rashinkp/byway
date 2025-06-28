@@ -22,7 +22,7 @@ interface ChatWindowProps {
   onBack?: () => void;
 }
 
-export function ChatWindow({ chat, messages, onSendMessage, currentUserId, onDeleteMessage, onLoadMoreMessages, loadingMoreMessages, showBackButton, onBack }: ChatWindowProps) {
+export function ChatWindow({ chat, messages, onSendMessage, currentUserId, onDeleteMessage, onLoadMoreMessages, loadingMoreMessages, showBackButton, onBack, ...props }: ChatWindowProps & { setPendingImageUrl?: (url: string) => void, setPendingAudioUrl?: (url: string) => void, isNewChat?: boolean }) {
   const [newMessage, setNewMessage] = useState('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const messagesContainerRef = useRef<HTMLDivElement>(null);
@@ -346,7 +346,13 @@ export function ChatWindow({ chat, messages, onSendMessage, currentUserId, onDel
       </div>
 
       {/* Input Area - use ModernChatInput only */}
-      <ModernChatInput onSendMessage={onSendMessage} />
+      <ModernChatInput
+        onSendMessage={onSendMessage}
+        disabled={false}
+        isNewChat={chat.type === 'user'}
+        setPendingImageUrl={props.setPendingImageUrl}
+        setPendingAudioUrl={props.setPendingAudioUrl}
+      />
 
     </div>
   );

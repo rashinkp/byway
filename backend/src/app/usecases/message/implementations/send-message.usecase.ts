@@ -99,6 +99,8 @@ export class SendMessageUseCase implements ISendMessageUseCase {
         senderId: message.senderId.value,
         receiverId: input.userId || '',
         content: message.content?.value || '',
+        imageUrl: message.imageUrl ? String(message.imageUrl) : undefined,
+        audioUrl: message.audioUrl ? String(message.audioUrl) : undefined,
         isRead: false,
         timestamp: message.createdAt.value ? new Date(message.createdAt.value).toISOString() : '',
       };
@@ -111,6 +113,8 @@ export class SendMessageUseCase implements ISendMessageUseCase {
         senderId: enrichedMessage.senderId,
         receiverId: input.userId || '',
         content: enrichedMessage.content || '',
+        imageUrl: enrichedMessage.imageUrl || undefined,
+        audioUrl: enrichedMessage.audioUrl || undefined,
         isRead: false,
         timestamp: enrichedMessage.createdAt ? new Date(enrichedMessage.createdAt).toISOString() : '',
       };
@@ -123,6 +127,8 @@ export class SendMessageUseCase implements ISendMessageUseCase {
       senderId: enrichedMessage.senderId,
       receiverId,
       content: enrichedMessage.content || '',
+      imageUrl: enrichedMessage.imageUrl || undefined,
+      audioUrl: enrichedMessage.audioUrl || undefined,
       isRead: false,
       timestamp: enrichedMessage.createdAt ? new Date(enrichedMessage.createdAt).toISOString() : '',
     };

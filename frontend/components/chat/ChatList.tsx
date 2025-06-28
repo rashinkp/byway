@@ -3,7 +3,7 @@ import { EnhancedChatItem } from '@/types/chat';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { MessageSquare, Search, ChevronLeft } from 'lucide-react';
+import { MessageSquare, Search, ChevronLeft, Image as ImageIcon, Mic } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth } from '@/hooks/auth/useAuth';
@@ -155,7 +155,19 @@ export function ChatList({ chats, selectedChat, onSelectChat, onSearch }: ChatLi
                           </div>
                           <div className="flex items-center justify-between">
                             <p className="text-sm text-gray-600 truncate flex-1 mr-2">
-                              {chat.lastMessage?.content || 'No messages yet'}
+                              {chat.lastMessage?.imageUrl ? (
+                                <span className="flex items-center gap-1 text-blue-500">
+                                  <ImageIcon className="w-4 h-4 inline" /> Photo
+                                </span>
+                              ) : chat.lastMessage?.audioUrl ? (
+                                <span className="flex items-center gap-1 text-green-500">
+                                  <Mic className="w-4 h-4 inline" /> Audio
+                                </span>
+                              ) : chat.lastMessage?.content ? (
+                                chat.lastMessage.content
+                              ) : (
+                                'No messages yet'
+                              )}
                             </p>
                             {(chat.unreadCount ?? 0) > 0 && (
                               <span className="ml-2 bg-blue-500 text-white rounded-full px-2 py-0.5 text-xs">

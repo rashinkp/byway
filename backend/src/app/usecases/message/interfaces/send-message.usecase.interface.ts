@@ -5,7 +5,7 @@ export interface SendMessageInput {
   chatId?: string;
   userId?: string; // recipient
   senderId: string;
-  content: string;
+  content?: string;
   imageUrl?: string;
   audioUrl?: string;
 }

@@ -10,7 +10,9 @@ export const sendMessageSchema = z.object({
 export const sendMessageSocketSchema = z.object({
   chatId: z.string().min(1).optional(),
   userId: z.string().min(1).optional(),
-  content: z.string().min(1),
+  content: z.string().optional(),
+  imageUrl: z.string().optional(),
+  audioUrl: z.string().optional(),
 }).refine((data) => data.chatId || data.userId, {
   message: 'Either chatId or userId is required',
   path: ['chatId'],

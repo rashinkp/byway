@@ -3,7 +3,17 @@ import { z } from 'zod';
 const ALLOWED_MIME_TYPES = {
   image: ['image/jpeg', 'image/png', 'image/gif', 'image/webp'],
   video: ['video/mp4', 'video/webm', 'video/quicktime'],
-  audio: ['audio/mpeg', 'audio/wav', 'audio/ogg'],
+  audio: [
+    'audio/mpeg', 
+    'audio/wav', 
+    'audio/ogg', 
+    'audio/webm',
+    'audio/webm;codecs=opus',
+    'audio/mp4',
+    'audio/mp4;codecs=mp4a',
+    'audio/ogg;codecs=opus',
+    'audio/ogg;codecs=vorbis'
+  ],
   document: ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'],
 };
 

@@ -9,6 +9,9 @@ interface ModernChatInputProps {
   onSendMessage: (content: string, imageUrl?: string, audioUrl?: string) => void;
   placeholder?: string;
   disabled?: boolean;
+  isNewChat?: boolean;
+  setPendingImageUrl?: (url: string) => void;
+  setPendingAudioUrl?: (url: string) => void;
 }
 
 type InputMode = 'text' | 'audio' | 'image';
@@ -16,7 +19,10 @@ type InputMode = 'text' | 'audio' | 'image';
 export function ModernChatInput({ 
   onSendMessage, 
   placeholder = "Type a message...",
-  disabled = false
+  disabled = false,
+  isNewChat = false,
+  setPendingImageUrl,
+  setPendingAudioUrl,
 }: ModernChatInputProps) {
   const [message, setMessage] = useState('');
   const [inputMode, setInputMode] = useState<InputMode>('text');
@@ -30,13 +36,23 @@ export function ModernChatInput({
   };
 
   const handleSendAudio = (audioUrl: string, duration: number) => {
-    onSendMessage('', undefined, audioUrl);
-    setInputMode('text');
+    if (isNewChat && setPendingAudioUrl) {
+      setPendingAudioUrl(audioUrl);
+      setInputMode('text');
+    } else {
+      onSendMessage('', undefined, audioUrl);
+      setInputMode('text');
+    }
   };
 
   const handleSendImage = (imageFile: File, imageUrl: string) => {
-    onSendMessage('', imageUrl);
-    setInputMode('text');
+    if (isNewChat && setPendingImageUrl) {
+      setPendingImageUrl(imageUrl);
+      setInputMode('text');
+    } else {
+      onSendMessage('', imageUrl);
+      setInputMode('text');
+    }
   };
 
   const handleCancel = () => {

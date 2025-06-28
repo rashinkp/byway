@@ -1,6 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Image as ImageIcon, X, Upload } from 'lucide-react';
+import { useFileUpload } from '@/hooks/file/useFileUpload';
 
 interface ModernImageUploaderProps {
   onSend: (imageFile: File, imageUrl: string) => void;
@@ -19,7 +20,7 @@ export function ModernImageUploader({
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isDragging, setIsDragging] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
+  const { uploadFile, progress, isUploading, error: uploadError, reset } = useFileUpload();
   
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -82,15 +83,21 @@ export function ModernImageUploader({
   };
 
   const handleSend = async () => {
-    if (!selectedImage || !imagePreview) return;
-    
-    setIsLoading(true);
+    if (!selectedImage) return;
+    setError(null);
+    reset();
     try {
-      await onSend(selectedImage, imagePreview);
+      // Upload to S3
+      const s3Url = await uploadFile(selectedImage);
+      // Call onSend with the S3 URL
+      console.log('[Debug] ImageUploaderChat onSend called with:', selectedImage, s3Url);
+      await onSend(selectedImage, s3Url);
+      // Optionally reset state after send
+      setSelectedImage(null);
+      setImagePreview(null);
+      reset();
     } catch (err) {
-      setError('Failed to send image. Please try again.');
-    } finally {
-      setIsLoading(false);
+      setError('Failed to upload image. Please try again.');
     }
   };
 
@@ -173,7 +180,14 @@ export function ModernImageUploader({
                 src={imagePreview}
                 alt="Preview"
                 className="w-full h-48 object-cover rounded-lg border"
+                style={{ opacity: isUploading ? 0.5 : 1 }}
               />
+            )}
+            {isUploading && (
+              <div className="absolute inset-0 flex flex-col items-center justify-center bg-white/60 rounded-lg">
+                <Upload className="w-8 h-8 text-blue-500 animate-bounce mb-2" />
+                <span className="text-sm text-blue-700 font-medium">Uploading... {progress}%</span>
+              </div>
             )}
             <button
               onClick={handleRemoveImage}
@@ -209,29 +223,28 @@ export function ModernImageUploader({
           </Button>
         </div>
       ) : (
-        <div className="flex gap-2">
+        <div className="flex gap-2 justify-end">
+          <Button
+            onClick={handleSend}
+            disabled={isUploading}
+            className="bg-blue-600 text-white hover:bg-blue-700"
+          >
+            {isUploading ? 'Uploading...' : 'Send'}
+          </Button>
           <Button
             onClick={onCancel}
             variant="outline"
-            className="flex-1"
-            disabled={isLoading}
+            disabled={isUploading}
           >
             Cancel
-          </Button>
-          <Button
-            onClick={handleSend}
-            className="flex-1 bg-blue-600 hover:bg-blue-700 text-white"
-            disabled={isLoading}
-          >
-            {isLoading ? 'Sending...' : 'Send Image'}
           </Button>
         </div>
       )}
 
       {/* Error Message */}
-      {error && (
+      {(error || uploadError) && (
         <div className="p-3 bg-red-50 border border-red-200 rounded-lg">
-          <p className="text-red-600 text-sm">{error}</p>
+          <p className="text-red-600 text-sm">{error || uploadError}</p>
         </div>
       )}
     </div>

@@ -14,6 +14,7 @@ import {
   getMessagesByChat,
   joinChat,
   sendMessage as sendMessageSocket,
+  markMessagesAsRead,
 } from '@/services/socketChat';
 import socket from '@/lib/socket';
 
@@ -30,6 +31,8 @@ export default function ChatPage() {
   const [hasMore, setHasMore] = useState(false);
   const [loading, setLoading] = useState(false);
   const [pendingMessage, setPendingMessage] = useState<string | null>(null);
+  const [pendingImageUrl, setPendingImageUrl] = useState<string | null>(null);
+  const [pendingAudioUrl, setPendingAudioUrl] = useState<string | null>(null);
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [isConnected, setIsConnected] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
@@ -96,7 +99,8 @@ export default function ChatPage() {
       joinChat(selectedChat.chatId);
       getMessagesByChat({ chatId: selectedChat.chatId, limit: 20 }, (result: any) => {
         const msgs = result?.body?.data || result?.data || result;
-        setMessages(Array.isArray(msgs) ? msgs.slice().reverse() : []);
+        // Backend now returns ASC order (oldest first), which matches display expectations
+        setMessages(Array.isArray(msgs) ? msgs : []);
         setHasMoreMessages(Array.isArray(msgs) && msgs.length === 20);
       });
     } else {
@@ -114,7 +118,7 @@ export default function ChatPage() {
       const msgs = result?.body?.data || result?.data || result;
       if (Array.isArray(msgs) && msgs.length > 0) {
         setMessages(prev => {
-          const newMsgs = msgs.reverse();
+          const newMsgs = msgs; // Backend now returns ASC order, no need to reverse
           const existingIds = new Set(prev.map(m => m.id));
           const uniqueNewMsgs = newMsgs.filter(m => !existingIds.has(m.id));
           return [...uniqueNewMsgs, ...prev];
@@ -132,6 +136,10 @@ export default function ChatPage() {
     const handleMessage = (msg: Message) => {
       if (msg.chatId === selectedChat?.chatId) {
         setMessages((prev) => prev.some(m => m.id === msg.id) ? prev : [...prev, msg]);
+        // Mark as read if the message is for the currently open chat and not sent by the current user
+        if (user && msg.senderId !== user.id) {
+          markMessagesAsRead(msg.chatId, user.id);
+        }
       };
     };
     import('@/lib/socket').then(({ default: socket }) => {
@@ -146,18 +154,38 @@ export default function ChatPage() {
     });
   }, [selectedChat]);
 
+  // Debug wrappers for pending media setters
+  const debugSetPendingImageUrl = (url: string) => {
+    console.log('[Debug] setPendingImageUrl called with:', url);
+    setPendingImageUrl(url);
+  };
+  const debugSetPendingAudioUrl = (url: string) => {
+    console.log('[Debug] setPendingAudioUrl called with:', url);
+    setPendingAudioUrl(url);
+  };
+
   // useEffect to send pending message after new chat is selected
   useEffect(() => {
-    if (pendingMessage && selectedChat && selectedChat.type === 'chat' && selectedChat.chatId) {
+    if ((pendingMessage || pendingImageUrl || pendingAudioUrl) && selectedChat && selectedChat.type === 'chat' && selectedChat.chatId) {
+      console.log('[Debug] About to send message:', {
+        pendingMessage,
+        pendingImageUrl,
+        pendingAudioUrl,
+        chatId: selectedChat.chatId,
+        userId: selectedChat.userId
+      });
       sendMessageSocket(
         {
           chatId: selectedChat.chatId,
           userId: selectedChat.userId, // recipient's userId
-          content: pendingMessage,
+          content: pendingMessage || '',
+          imageUrl: pendingImageUrl || undefined,
+          audioUrl: pendingAudioUrl || undefined,
         },
         (msg: Message) => {
           getMessagesByChat({ chatId: selectedChat.chatId }, (result: any) => {
             const msgs = result?.body?.data || result?.data || result;
+            // Backend now returns ASC order (oldest first), which matches display expectations
             setMessages(Array.isArray(msgs) ? msgs : []);
           });
         },
@@ -166,10 +194,13 @@ export default function ChatPage() {
         }
       );
       setPendingMessage(null);
+      setPendingImageUrl(null);
+      setPendingAudioUrl(null);
     }
-  }, [pendingMessage, selectedChat]);
+  }, [pendingMessage, pendingImageUrl, pendingAudioUrl, selectedChat]);
 
   const handleSelectChat = (chat: EnhancedChatItem) => {
+    console.log('[Debug] handleSelectChat called with:', chat);
     // Leave previous chat room if any
     if (previousChatIdRef.current && previousChatIdRef.current !== chat.chatId) {
       socket.emit('leave', previousChatIdRef.current);
@@ -190,6 +221,7 @@ export default function ChatPage() {
     if (selectedChat && selectedChat.type === 'chat' && selectedChat.chatId) {
       getMessagesByChat({ chatId: selectedChat.chatId }, (result: any) => {
         const msgs = result?.body?.data || result?.data || result;
+        // Backend now returns ASC order (oldest first), which matches display expectations
         setMessages(Array.isArray(msgs) ? msgs : []);
       });
       // Refresh chat list as well
@@ -225,6 +257,7 @@ export default function ChatPage() {
   // Restore handleSendMessage function
   const handleSendMessage = useCallback(
     (content: string, imageUrl?: string, audioUrl?: string) => {
+      console.log('[Debug] handleSendMessage called with:', { content, imageUrl, audioUrl, selectedChat });
       if (!user || !selectedChat) return;
       if (selectedChat.type === 'user') {
         sendMessageSocket(
@@ -232,6 +265,7 @@ export default function ChatPage() {
             userId: selectedChat.userId,
             content,
             imageUrl,
+            audioUrl,
           },
           (msg: Message) => {
             // After first message, join the new chat room and update selectedChat
@@ -261,6 +295,7 @@ export default function ChatPage() {
               });
               getMessagesByChat({ chatId: msg.chatId }, (result: any) => {
                 const msgs = result?.body?.data || result?.data || result;
+                // Backend now returns ASC order (oldest first), which matches display expectations
                 setMessages(Array.isArray(msgs) ? msgs : []);
               });
             }
@@ -272,11 +307,15 @@ export default function ChatPage() {
         return;
       }
       // Existing chat
+      const payload = {
+        chatId: selectedChat.chatId!,
+        content,
+        imageUrl,
+        audioUrl,
+      };
+      console.log('[Debug] Sending payload to sendMessageSocket:', payload);
       sendMessageSocket(
-        {
-          chatId: selectedChat.chatId!,
-          content,
-        },
+        payload,
         (msg: Message) => {
           setMessages((prev) => prev.some(m => m.id === msg.id) ? prev : [...prev, msg]);
           // Do not update chatItems here; rely on chatListUpdated event to refetch from backend
@@ -321,7 +360,7 @@ export default function ChatPage() {
         getMessagesByChat({ chatId }, (result: any) => {
           const msgs = result?.body?.data || result?.data || result;
           console.log('[SocketIO] Updated messages:', msgs);
-          setMessages(Array.isArray(msgs) ? msgs.slice().reverse() : []);
+          setMessages(Array.isArray(msgs) ? msgs : []);
         });
       }
       // Always refresh chat list to update unread counts
@@ -420,6 +459,8 @@ export default function ChatPage() {
                     setIsSidebarOpen(true);
                     setSelectedChat(null);
                   }}
+                  setPendingImageUrl={debugSetPendingImageUrl}
+                  setPendingAudioUrl={debugSetPendingAudioUrl}
                 />
               </div>
             )}

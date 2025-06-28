@@ -54,9 +54,9 @@ export function registerMessageHandlers(socket: Socket, io: SocketIOServer, chat
     }
   });
 
-  socket.on('sendMessage', async ({ chatId, userId, content }) => {
+  socket.on('sendMessage', async ({ chatId, userId, content, imageUrl, audioUrl }) => {
     try {
-      console.log('[SocketIO] sendMessage event received:', { chatId, userId, content });
+      console.log('[SocketIO] sendMessage event received:', { chatId, userId, content, imageUrl, audioUrl });
       const senderId = socket.data.user?.id;
       console.log('[SocketIO] senderId:', senderId);
       if (!senderId) {
@@ -64,7 +64,7 @@ export function registerMessageHandlers(socket: Socket, io: SocketIOServer, chat
         socket.emit('error', { message: 'Authentication required to send messages.' });
         return;
       }
-      const message = await chatController.handleNewMessage({ chatId, userId, senderId, content });
+      const message = await chatController.handleNewMessage({ chatId, userId, senderId, content, imageUrl, audioUrl });
       console.log('[SocketIO] message result from handleNewMessage:', message);
       if (!message) {
         console.log('[SocketIO] No message returned, emitting error');

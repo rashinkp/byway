@@ -54,7 +54,7 @@ export class MessageRepository implements IMessageRepository {
           },
         },
       },
-      orderBy: { createdAt: "desc" },
+      orderBy: { createdAt: "asc" },
       take: limit,
     });
 

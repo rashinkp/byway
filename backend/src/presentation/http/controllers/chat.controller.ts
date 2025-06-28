@@ -44,10 +44,10 @@ export class ChatController extends BaseController {
 
   async handleNewMessage(socketData: any) {
     const validated = sendMessageSocketSchema.parse(socketData);
-    const { chatId, content } = validated;
+    const { chatId, content, imageUrl, audioUrl } = validated;
     const senderId = socketData.senderId;
     const userId = socketData.userId;
-    const message = await this.sendMessageUseCase.execute({ chatId, userId, senderId, content });
+    const message = await this.sendMessageUseCase.execute({ chatId, userId, senderId, content, imageUrl, audioUrl });
     return message;
   }
 

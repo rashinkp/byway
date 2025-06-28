@@ -1,12 +1,30 @@
+"use client";
+
 import { Button } from "@/components/ui/button";
 import { Users } from "lucide-react";
 import { cn } from "@/utils/cn";
+import { useState, useCallback } from "react";
+import { useAuth } from "@/hooks/auth/useAuth";
+import { useCreateInstructor } from "@/hooks/instructor/useCreateInstructor";
+import { useGetInstructorByUserId } from "@/hooks/instructor/useGetInstructorByUserId";
+import { Loader2 } from "lucide-react";
+import {
+  InstructorFormModal,
+  InstructorSubmitData,
+} from "@/components/instructor/InstructorAdd";
 
 interface HeroSectionProps {
   className?: string;
 }
 
 export function HeroSection({ className }: HeroSectionProps) {
+  const { user, isLoading } = useAuth();
+  const { mutate: createInstructor, isPending: isCreatingInstructor } =
+    useCreateInstructor();
+  const { data: instructorData, isLoading: isInstructorLoading } =
+    useGetInstructorByUserId(false);
+  const [isInstructorModalOpen, setIsInstructorModalOpen] = useState(false);
+
   // Dummy data
   const headline = "Unlock Your Potential with Byway 🚀";
   const description =
@@ -33,60 +51,118 @@ export function HeroSection({ className }: HeroSectionProps) {
     },
   ];
 
+  const handleInstructorSubmit = useCallback(
+    async (data: InstructorSubmitData): Promise<void> => {
+      return new Promise((resolve) => {
+        createInstructor(data, {
+          onSuccess: () => {
+            setIsInstructorModalOpen(false);
+            resolve();
+          },
+          onError: () => {
+            resolve();
+          },
+        });
+      });
+    },
+    [createInstructor]
+  );
+
+  const handleInstructorButtonClick = () => {
+    if (!user) {
+      // If user is not logged in, redirect to login
+      window.location.href = "/login";
+      return;
+    }
+    
+    if (user.role === "INSTRUCTOR") {
+      // If user is already an instructor, redirect to instructor dashboard
+      window.location.href = "/instructor";
+      return;
+    }
+    
+    // Open the instructor modal
+    setIsInstructorModalOpen(true);
+  };
+
+  // Check if instructor application is pending
+  const isInstructorPending =
+    instructorData?.data?.status === "PENDING" || isInstructorLoading;
+
   return (
-    <section
-      className={cn(
-        "relative container mx-auto px-4 py-16 md:py-24 flex flex-col md:flex-row items-center",
-        className
-      )}
-    >
-      {/* Text Section */}
-      <div className="md:w-1/2 mb-12 md:mb-0">
-        <h1 className="text-4xl md:text-5xl font-bold text-gray-800 leading-tight mb-6">
-          {headline}
-        </h1>
-        <p className="text-lg text-gray-600 mb-8 leading-relaxed">
-          {description}
-        </p>
-        <Button className="bg-blue-600 hover:bg-blue-700 text-white rounded-lg px-6 py-3 text-lg font-medium">
-          Start your instructor journey
-        </Button>
-      </div>
-
-      {/* Image Section */}
-      <div className="md:w-1/2 relative h-64 md:h-96">
-        {images.map((image, index) => (
-          <div
-            key={index}
-            className={cn(
-              "absolute rounded-full border-4 border-white shadow-md overflow-hidden",
-              image.className,
-              image.bgColor
-            )}
+    <>
+      <section
+        className={cn(
+          "relative container mx-auto px-4 py-16 md:py-24 flex flex-col md:flex-row items-center",
+          className
+        )}
+      >
+        {/* Text Section */}
+        <div className="md:w-1/2 mb-12 md:mb-0">
+          <h1 className="text-4xl md:text-5xl font-bold text-gray-800 leading-tight mb-6">
+            {headline}
+          </h1>
+          <p className="text-lg text-gray-600 mb-8 leading-relaxed">
+            {description}
+          </p>
+          <Button 
+            className="bg-blue-600 hover:bg-blue-700 text-white rounded-lg px-6 py-3 text-lg font-medium"
+            onClick={handleInstructorButtonClick}
+            disabled={isCreatingInstructor}
           >
-            <img
-              src={image.src}
-              alt="Student"
-              className="w-full h-full object-cover"
-            />
-          </div>
-        ))}
+            {isCreatingInstructor ? (
+              <>
+                <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                Applying...
+              </>
+            ) : (
+              "Start your instructor journey"
+            )}
+          </Button>
+        </div>
 
-        {/* Community Stats */}
-        <div className="absolute bottom-0 right-0 bg-white shadow-lg rounded-lg p-4 flex items-center gap-3 border border-gray-100">
-          <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
-            <Users className="w-6 h-6 text-blue-500" />
-          </div>
-          <div>
-            <p className="text-sm font-medium text-gray-800">
-              {communityStats.label}
-            </p>
-            <p className="text-lg font-bold text-gray-800">
-              {communityStats.students.toLocaleString()} + Students
-            </p>
+        {/* Image Section */}
+        <div className="md:w-1/2 relative h-64 md:h-96">
+          {images.map((image, index) => (
+            <div
+              key={index}
+              className={cn(
+                "absolute rounded-full border-4 border-white shadow-md overflow-hidden",
+                image.className,
+                image.bgColor
+              )}
+            >
+              <img
+                src={image.src}
+                alt="Student"
+                className="w-full h-full object-cover"
+              />
+            </div>
+          ))}
+
+          {/* Community Stats */}
+          <div className="absolute bottom-0 right-0 bg-white shadow-lg rounded-lg p-4 flex items-center gap-3 border border-gray-100">
+            <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
+              <Users className="w-6 h-6 text-blue-500" />
+            </div>
+            <div>
+              <p className="text-sm font-medium text-gray-800">
+                {communityStats.label}
+              </p>
+              <p className="text-lg font-bold text-gray-800">
+                {communityStats.students.toLocaleString()} + Students
+              </p>
+            </div>
           </div>
         </div>
-      </div>
-    </section>
+      </section>
+      
+      <InstructorFormModal
+        open={isInstructorModalOpen}
+        onOpenChange={setIsInstructorModalOpen}
+        onSubmit={handleInstructorSubmit}
+        isSubmitting={isCreatingInstructor}
+      />
+    </>
   );
 }
