@@ -7,7 +7,6 @@ import { useCreateInstructor } from "@/hooks/instructor/useCreateInstructor";
 import { useGetInstructorByUserId } from "@/hooks/instructor/useGetInstructorByUserId";
 import { Button } from "@/components/ui/button";
 import {
-  Loader2,
   ShoppingCart,
   Bell,
   Menu,
@@ -15,6 +14,7 @@ import {
   LogOut,
   User,
   MessageSquare,
+  ChevronDown,
 } from "lucide-react";
 import { useState, useCallback, useEffect, useRef } from "react";
 import {
@@ -29,7 +29,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Badge } from "@/components/ui/badge";
 import { cn } from "@/utils/cn";
 import { useRouter } from "next/navigation";  
 import { useGlobalSearch } from "@/hooks/search/useGlobalSearch";
@@ -166,7 +165,7 @@ export function Header({ client, onNotificationClick }: HeaderProps = {}) {
       <header
         className={cn(
           "sticky top-0 z-50 w-full transition-all duration-300",
-          scrolled ? "bg-white shadow-md" : "bg-white/95"
+          scrolled ? "bg-[var(--background)] shadow-md" : "bg-[var(--background)]/95"
         )}
       >
         <div className="container mx-auto px-10 py-3">
@@ -175,17 +174,9 @@ export function Header({ client, onNotificationClick }: HeaderProps = {}) {
             <div className="flex items-center gap-10">
               <Link
                 href="/"
-                className="text-2xl font-bold text-blue-600 flex items-center gap-2 hover:text-blue-700 transition-colors"
+                className="text-2xl font-bold text-[var(--primary)] flex items-center gap-2 hover:text-[var(--primary-700)] transition-colors"
               >
                 Byway
-              </Link>
-              <Link href="/categories">
-                <Button
-                  variant="ghost"
-                  className="flex items-center gap-1 text-gray-700 hover:text-blue-600 hover:bg-gray-50 text-base font-medium"
-                >
-                  Categories
-                </Button>
               </Link>
             </div>
             {/* Modularized Search Bar */}
@@ -197,8 +188,31 @@ export function Header({ client, onNotificationClick }: HeaderProps = {}) {
               setShowSearchResults={setShowSearchResults}
               handleSearchItemClick={handleSearchItemClick}
             />
-            
+            {/* Courses and Pages links moved next to icons */}
             <nav className="flex items-center gap-4">
+              <Link href="/courses" className="text-base font-medium text-[var(--foreground)] px-2 py-1 rounded hover:bg-[var(--border)] hover:opacity-80 transition-colors">
+                Courses
+              </Link>
+              {/* Pages dropdown menu */}
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" className="flex items-center gap-1 text-base font-medium text-[var(--foreground)] px-2 py-1 rounded hover:bg-[var(--border)] hover:opacity-80 transition-colors focus:outline-none">
+                    Pages
+                    <ChevronDown className="w-4 h-4 transition-transform group-data-[state=open]:rotate-90" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="start" className="w-40 bg-[var(--background)] text-[var(--foreground)] border border-[var(--border)] shadow-lg">
+                  <DropdownMenuItem asChild>
+                    <Link href="/about">About</Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link href="/contact">Contact</Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link href="/faq">FAQ</Link>
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
               {isLoading ? (
                 <div className="flex items-center gap-4">
                   <Skeleton className="h-10 w-24" />
@@ -206,28 +220,11 @@ export function Header({ client, onNotificationClick }: HeaderProps = {}) {
                 </div>
               ) : user ? (
                 <>
-                  {user.role !== "INSTRUCTOR" && (
-                    <Button
-                      variant="ghost"
-                      onClick={() => setIsInstructorModalOpen(true)}
-                      disabled={isLoggingOut || isCreatingInstructor}
-                      className="text-gray-700 hover:text-blue-600 hover:bg-gray-50 text-base font-medium"
-                    >
-                      {isCreatingInstructor ? (
-                        <>
-                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                          Applying...
-                        </>
-                      ) : (
-                        "Teach on Byway"
-                      )}
-                    </Button>
-                  )}
                   <div className="flex items-center gap-5">
                     <div className="relative group">
                       <Link href="/chat">
                         <MessageSquare
-                          className="w-6 h-6 text-gray-600 group-hover:text-blue-500 transition-colors cursor-pointer"
+                          className="w-6 h-6 text-[var(--secondary)] group-hover:text-[var(--primary)] transition-colors cursor-pointer"
                           strokeWidth={1.5}
                         />
                       </Link>
@@ -235,7 +232,7 @@ export function Header({ client, onNotificationClick }: HeaderProps = {}) {
                     <div className="relative group">
                       <Link href="/user/cart">
                         <ShoppingCart
-                          className="w-6 h-6 text-gray-600 group-hover:text-blue-500 transition-colors cursor-pointer"
+                          className="w-6 h-6 text-[var(--secondary)] group-hover:text-[var(--primary)] transition-colors cursor-pointer"
                           strokeWidth={1.5}
                         />
                         {cartCount > 0 && (
@@ -247,7 +244,7 @@ export function Header({ client, onNotificationClick }: HeaderProps = {}) {
                     </div>
                     <div className="relative group">
                       <Bell
-                        className="w-6 h-6 text-gray-600 group-hover:text-yellow-500 transition-colors cursor-pointer"
+                        className="w-6 h-6 text-[var(--secondary)] group-hover:text-[var(--primary)] transition-colors cursor-pointer"
                         strokeWidth={1.5}
                         onClick={onNotificationClick}
                       />
@@ -255,13 +252,13 @@ export function Header({ client, onNotificationClick }: HeaderProps = {}) {
                     <DropdownMenu open={isDropdownOpen} onOpenChange={setIsDropdownOpen}>
                       <DropdownMenuTrigger asChild>
                         <div className="relative group cursor-pointer">
-                          <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-medium border-2 border-blue-200 group-hover:border-blue-300 transition-all">
+                          <div className="w-10 h-10 rounded-full bg-[var(--primary-50)] flex items-center justify-center text-[var(--primary)] font-medium border-2 border-[var(--primary-200)] group-hover:border-[var(--primary-300)] transition-all">
                             {user.name?.charAt(0) || "U"}
                           </div>
                         </div>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end" className="w-56">
-                        <DropdownMenuLabel className="text-gray-800 font-semibold">
+                        <DropdownMenuLabel className="text-[var(--foreground)] font-semibold">
                           {user.name || "User"}
                         </DropdownMenuLabel>
                         <DropdownMenuSeparator />
@@ -276,7 +273,7 @@ export function Header({ client, onNotificationClick }: HeaderProps = {}) {
                         <DropdownMenuItem
                           onClick={handleLogout}
                           disabled={isLoggingOut}
-                          className="text-gray-700 hover:text-red-600"
+                          className="text-[var(--foreground)] hover:text-[var(--primary-600)]"
                         >
                           <LogOut className="mr-2 h-4 w-4" />
                           {isLoggingOut ? "Logging out..." : "Logout"}
@@ -290,13 +287,13 @@ export function Header({ client, onNotificationClick }: HeaderProps = {}) {
                   <Link href="/login">
                     <Button
                       variant="ghost"
-                      className="text-gray-700 hover:text-blue-600 hover:bg-gray-50 text-base font-medium"
+                      className="text-[var(--foreground)] hover:text-[var(--primary)] hover:bg-[var(--primary-50)] text-base font-medium"
                     >
                       Login
                     </Button>
                   </Link>
                   <Link href="/signup">
-                    <Button className="bg-blue-600 hover:bg-blue-700 text-white rounded-lg px-5 py-2 text-base font-medium">
+                    <Button className="bg-[var(--primary)] hover:bg-[var(--primary-700)] text-[var(--background)] rounded-lg px-5 py-2 text-base font-medium">
                       Sign Up
                     </Button>
                   </Link>
@@ -310,7 +307,7 @@ export function Header({ client, onNotificationClick }: HeaderProps = {}) {
             <Button
               variant="ghost"
               size="icon"
-              className="text-gray-700"
+              className="text-[var(--foreground)]"
               onClick={() => setIsMenuOpen(!isMenuOpen)}
             >
               {isMenuOpen ? (
@@ -321,7 +318,7 @@ export function Header({ client, onNotificationClick }: HeaderProps = {}) {
             </Button>
             <Link
               href="/"
-              className="text-xl font-bold text-blue-600 flex items-center gap-2"
+              className="text-xl font-bold text-[var(--primary)] flex items-center gap-2"
             >
               Byway
             </Link>
@@ -331,7 +328,7 @@ export function Header({ client, onNotificationClick }: HeaderProps = {}) {
                   <div className="relative group">
                     <Link href="/chat">
                       <MessageSquare
-                        className="w-6 h-6 text-gray-600 group-hover:text-blue-500 transition-colors cursor-pointer"
+                        className="w-6 h-6 text-[var(--secondary)] group-hover:text-[var(--primary)] transition-colors cursor-pointer"
                         strokeWidth={1.5}
                       />
                     </Link>
@@ -339,7 +336,7 @@ export function Header({ client, onNotificationClick }: HeaderProps = {}) {
                   <div className="relative group">
                     <Link href="/user/cart">
                       <ShoppingCart
-                        className="w-6 h-6 text-gray-600 group-hover:text-blue-500 transition-colors cursor-pointer"
+                        className="w-6 h-6 text-[var(--secondary)] group-hover:text-[var(--primary)] transition-colors cursor-pointer"
                         strokeWidth={1.5}
                       />
                       {cartCount > 0 && (
@@ -351,14 +348,14 @@ export function Header({ client, onNotificationClick }: HeaderProps = {}) {
                   </div>
                   <div className="relative group">
                     <Bell
-                      className="w-6 h-6 text-gray-600 group-hover:text-yellow-500 transition-colors cursor-pointer"
+                      className="w-6 h-6 text-[var(--secondary)] group-hover:text-[var(--primary)] transition-colors cursor-pointer"
                       strokeWidth={1.5}
                       onClick={onNotificationClick}
                     />
                   </div>
                   <div className="relative group">
                     <Link href="/user/profile">
-                      <div className="w-9 h-9 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-medium border-2 border-blue-200 group-hover:border-blue-300 transition-all">
+                      <div className="w-9 h-9 rounded-full bg-[var(--primary-50)] flex items-center justify-center text-[var(--primary)] font-medium border-2 border-[var(--primary-200)] group-hover:border-[var(--primary-300)] transition-all">
                         {user.name?.charAt(0) || "U"}
                       </div>
                     </Link>
@@ -369,13 +366,13 @@ export function Header({ client, onNotificationClick }: HeaderProps = {}) {
                   <Link href="/login">
                     <Button
                       variant="ghost"
-                      className="text-gray-700 hover:text-blue-600 hover:bg-gray-50 text-base font-medium"
+                      className="text-[var(--foreground)] hover:text-[var(--primary)] hover:bg-[var(--primary-50)] text-base font-medium"
                     >
                       Login
                     </Button>
                   </Link>
                   <Link href="/signup">
-                    <Button className="bg-blue-600 hover:bg-blue-700 text-white rounded-lg px-5 py-2 text-base font-medium">
+                    <Button className="bg-[var(--primary)] hover:bg-[var(--primary-700)] text-[var(--background)] rounded-lg px-5 py-2 text-base font-medium">
                       Sign Up
                     </Button>
                   </Link>
@@ -389,11 +386,18 @@ export function Header({ client, onNotificationClick }: HeaderProps = {}) {
             <div className="md:hidden pt-4 pb-2 space-y-4 border-t mt-3">
               <div className="space-y-3">
                 <Link
-                  href="/categories"
-                  className="block px-2 py-1 text-gray-700 hover:text-blue-600 font-medium text-base"
+                  href="/courses"
+                  className="block px-2 py-1 text-[var(--foreground)] hover:text-[var(--primary)] font-medium text-base"
                   onClick={() => setIsMenuOpen(false)}
                 >
-                  Categories
+                  Courses
+                </Link>
+                <Link
+                  href="/pages"
+                  className="block px-2 py-1 text-[var(--foreground)] hover:text-[var(--primary)] font-medium text-base"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  Pages
                 </Link>
                 {isLoading ? (
                   <div className="space-y-3">
@@ -408,32 +412,18 @@ export function Header({ client, onNotificationClick }: HeaderProps = {}) {
                   <>
                     <Link
                       href="/user/profile"
-                      className="block px-2 py-1 text-gray-700 hover:text-blue-600 text-base"
+                      className="block px-2 py-1 text-[var(--foreground)] hover:text-[var(--primary)] text-base"
                       onClick={() => setIsMenuOpen(false)}
                     >
                       Profile
                     </Link>
                     <Link
                       href="/user/profile?section=courses"
-                      className="block px-2 py-1 text-gray-700 hover:text-blue-600 text-base"
+                      className="block px-2 py-1 text-[var(--foreground)] hover:text-[var(--primary)] text-base"
                       onClick={() => setIsMenuOpen(false)}
                     >
                       My Courses
                     </Link>
-                    {user.role !== "INSTRUCTOR" && (
-                      <button
-                        onClick={() => {
-                          setIsInstructorModalOpen(true);
-                          setIsMenuOpen(false);
-                        }}
-                        disabled={isLoggingOut || isCreatingInstructor}
-                        className="w-full text-left px-2 py-1 text-gray-700 hover:text-blue-600 text-base"
-                      >
-                        {isCreatingInstructor
-                          ? "Applying..."
-                          : "Teach on Byway"}
-                      </button>
-                    )}
                     <div className="flex justify-between items-center gap-2 mt-4">
                       <Button
                         variant="outline"
@@ -442,7 +432,7 @@ export function Header({ client, onNotificationClick }: HeaderProps = {}) {
                           setIsMenuOpen(false);
                         }}
                         disabled={isLoggingOut}
-                        className="w-full border-gray-300 text-gray-700 rounded-lg text-base"
+                        className="w-full border-[var(--primary-200)] text-[var(--foreground)] rounded-lg text-base"
                       >
                         {isLoggingOut ? "Logging out..." : "Logout"}
                       </Button>
@@ -453,7 +443,7 @@ export function Header({ client, onNotificationClick }: HeaderProps = {}) {
                     <Link href="/login" className="w-1/2">
                       <Button
                         variant="outline"
-                        className="w-full border-gray-300 text-gray-700 rounded-lg text-base"
+                        className="w-full border-[var(--primary-200)] text-[var(--foreground)] rounded-lg text-base"
                         onClick={() => setIsMenuOpen(false)}
                       >
                         Login
@@ -461,7 +451,7 @@ export function Header({ client, onNotificationClick }: HeaderProps = {}) {
                     </Link>
                     <Link href="/signup" className="w-1/2">
                       <Button 
-                        className="w-full bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-base"
+                        className="w-full bg-[var(--primary)] hover:bg-[var(--primary-700)] text-[var(--background)] rounded-lg text-base"
                         onClick={() => setIsMenuOpen(false)}
                       >
                         Sign Up

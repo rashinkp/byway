@@ -61,22 +61,22 @@ export const HeaderSearchBar: React.FC<HeaderSearchBarProps> = ({
           onChange={(e) => setSearchQuery(e.target.value)}
           onFocus={() => searchQuery && searchResults && setShowSearchResults(true)}
           placeholder="Search for courses, topics, instructors..."
-          className="w-full py-2.5 px-4 pl-10 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent text-gray-700 placeholder-gray-400 transition-all duration-300 shadow-sm"
+          className="w-full py-2.5 px-4 pl-10 border border-[var(--primary-200)] rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--primary-400)] focus:border-transparent text-[var(--foreground)] placeholder:[var(--primary-400)] transition-all duration-300 shadow-sm"
         />
-        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-[var(--primary-400)]" />
         {isSearching && (
-          <Loader2 className="absolute right-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 animate-spin" />
+          <Loader2 className="absolute right-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-[var(--primary-400)] animate-spin" />
         )}
         {/* Enhanced Search Results Dropdown */}
         {showSearchResults && searchResults && searchQuery && (
-          <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-lg shadow-xl border border-gray-200 max-h-96 overflow-hidden z-50">
+          <div className="absolute top-full left-0 right-0 mt-2 bg-[var(--background)] rounded-lg shadow-xl border border-[var(--primary-200)] max-h-96 overflow-hidden z-50">
             <div className="max-h-96 overflow-y-auto">
               {/* Instructors Section */}
               {searchResults.instructors.items.length > 0 && (
-                <div className="p-4 border-b border-gray-100">
+                <div className="p-4 border-b border-[var(--primary-100)]">
                   <div className="flex items-center gap-2 mb-3">
-                    <User className="w-4 h-4 text-blue-600" />
-                    <h3 className="text-sm font-semibold text-gray-800">Instructors</h3>
+                    <User className="w-4 h-4 text-[var(--primary)]" />
+                    <h3 className="text-sm font-semibold text-[var(--foreground)]">Instructors</h3>
                     <Badge variant="secondary" className="text-xs">
                       {searchResults.instructors.items.length}
                     </Badge>
@@ -87,20 +87,20 @@ export const HeaderSearchBar: React.FC<HeaderSearchBarProps> = ({
                         key={instructor.id}
                         href={`/instructors/${instructor.id}`}
                         onClick={handleSearchItemClick}
-                        className="flex items-center gap-3 p-3 hover:bg-blue-50 rounded-lg transition-colors group"
+                        className="flex items-center gap-3 p-3 hover:bg-[var(--primary-50)] rounded-lg transition-colors group"
                       >
-                        <div className="w-10 h-10 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center text-white font-semibold shadow-md">
+                        <div className="w-10 h-10 rounded-full bg-gradient-to-r from-[var(--primary-500)] to-[var(--primary-700)] flex items-center justify-center text-[var(--background)] font-semibold shadow-md">
                           {instructor.name.charAt(0)}
                         </div>
                         <div className="flex-1 min-w-0">
-                          <p className="text-sm font-medium text-gray-900 group-hover:text-blue-600 transition-colors">
+                          <p className="text-sm font-medium text-[var(--foreground)] group-hover:text-[var(--primary)] transition-colors">
                             {instructor.name}
                           </p>
-                          <p className="text-xs text-gray-500 truncate">
+                          <p className="text-xs text-[var(--primary-600)] truncate">
                             {instructor.shortBio || "Instructor"}
                           </p>
                         </div>
-                        <Users className="w-4 h-4 text-gray-400 group-hover:text-blue-500" />
+                        <Users className="w-4 h-4 text-[var(--primary-400)] group-hover:text-[var(--primary)]" />
                       </Link>
                     ))}
                   </div>
@@ -108,10 +108,10 @@ export const HeaderSearchBar: React.FC<HeaderSearchBarProps> = ({
               )}
               {/* Courses Section */}
               {searchResults.courses.items.length > 0 && (
-                <div className="p-4 border-b border-gray-100">
+                <div className="p-4 border-b border-[var(--primary-100)]">
                   <div className="flex items-center gap-2 mb-3">
-                    <BookOpen className="w-4 h-4 text-green-600" />
-                    <h3 className="text-sm font-semibold text-gray-800">Courses</h3>
+                    <BookOpen className="w-4 h-4 text-[var(--secondary)]" />
+                    <h3 className="text-sm font-semibold text-[var(--foreground)]">Courses</h3>
                     <Badge variant="secondary" className="text-xs">
                       {searchResults.courses.items.length}
                     </Badge>
@@ -122,9 +122,9 @@ export const HeaderSearchBar: React.FC<HeaderSearchBarProps> = ({
                         key={course.id}
                         href={`/courses/${course.id}`}
                         onClick={handleSearchItemClick}
-                        className="flex items-center gap-3 p-3 hover:bg-green-50 rounded-lg transition-colors group"
+                        className="flex items-center gap-3 p-3 hover:bg-[var(--secondary-50)] rounded-lg transition-colors group"
                       >
-                        <div className="w-12 h-8 rounded-md bg-gray-100 flex items-center justify-center shadow-sm overflow-hidden">
+                        <div className="w-12 h-8 rounded-md bg-[var(--primary-50)] flex items-center justify-center shadow-sm overflow-hidden">
                           {course.thumbnail ? (
                             <img 
                               src={course.thumbnail} 
@@ -132,31 +132,31 @@ export const HeaderSearchBar: React.FC<HeaderSearchBarProps> = ({
                               className="w-full h-full object-cover" 
                             />
                           ) : (
-                            <BookOpen className="w-5 h-5 text-gray-500" />
+                            <BookOpen className="w-5 h-5 text-[var(--primary-600)]" />
                           )}
                         </div>
                         <div className="flex-1 min-w-0">
-                          <p className="text-sm font-medium text-gray-900 group-hover:text-green-600 transition-colors truncate">
+                          <p className="text-sm font-medium text-[var(--foreground)] group-hover:text-[var(--secondary)] transition-colors truncate">
                             {course.title}
                           </p>
                           <div className="flex items-center gap-2 mt-1">
                             {course.offer ? (
                               <>
-                                <span className="text-sm font-semibold text-green-600">
+                                <span className="text-sm font-semibold text-[var(--secondary)]">
                                   ${course.offer}
                                 </span>
-                                <span className="text-sm text-gray-400 line-through">
+                                <span className="text-sm text-[var(--primary-400)] line-through">
                                   ${course.price}
                                 </span>
                               </>
                             ) : (
-                              <span className="text-sm font-semibold text-green-600">
+                              <span className="text-sm font-semibold text-[var(--secondary)]">
                                 ${course.price}
                               </span>
                             )}
                           </div>
                         </div>
-                        <Clock className="w-4 h-4 text-gray-400 group-hover:text-green-500" />
+                        <Clock className="w-4 h-4 text-[var(--primary-400)] group-hover:text-[var(--secondary)]" />
                       </Link>
                     ))}
                   </div>
@@ -164,10 +164,10 @@ export const HeaderSearchBar: React.FC<HeaderSearchBarProps> = ({
               )}
               {/* Certificates Section */}
               {searchResults.certificates && searchResults.certificates.items.length > 0 && (
-                <div className="p-4 border-b border-gray-100">
+                <div className="p-4 border-b border-[var(--primary-100)]">
                   <div className="flex items-center gap-2 mb-3">
-                    <BookOpen className="w-4 h-4 text-blue-600" />
-                    <h3 className="text-sm font-semibold text-gray-800">Certificates</h3>
+                    <BookOpen className="w-4 h-4 text-[var(--primary)]" />
+                    <h3 className="text-sm font-semibold text-[var(--foreground)]">Certificates</h3>
                     <Badge variant="secondary" className="text-xs">
                       {searchResults.certificates.items.length}
                     </Badge>
@@ -176,33 +176,31 @@ export const HeaderSearchBar: React.FC<HeaderSearchBarProps> = ({
                     {searchResults.certificates.items.map((cert) => (
                       <div
                         key={cert.id}
-                        className="flex items-center gap-3 p-3 hover:bg-blue-50 rounded-lg transition-colors group"
+                        className="flex items-center gap-3 p-3 hover:bg-[var(--primary-50)] rounded-lg transition-colors group"
                       >
-                        <div className="w-10 h-10 rounded-full bg-gradient-to-r from-blue-400 to-blue-600 flex items-center justify-center text-white font-semibold shadow-md">
+                        <div className="w-10 h-10 rounded-full bg-gradient-to-r from-[var(--primary-400)] to-[var(--primary-700)] flex items-center justify-center text-[var(--background)] font-semibold shadow-md">
                           <BookOpen className="w-5 h-5" />
                         </div>
                         <div className="flex-1 min-w-0">
-                          <p className="text-sm font-medium text-gray-900 group-hover:text-blue-600 transition-colors truncate">
+                          <p className="text-sm font-medium text-[var(--foreground)] group-hover:text-[var(--primary)] transition-colors truncate">
                             {cert.courseTitle}
                           </p>
-                          <p className="text-xs text-gray-500 truncate">
+                          <p className="text-xs text-[var(--primary-600)] truncate">
                             Certificate #: {cert.certificateNumber}
                           </p>
-                          <p className="text-xs text-gray-400">
+                          <p className="text-xs text-[var(--primary-400)]">
                             Issued: {cert.issuedAt ? new Date(cert.issuedAt).toLocaleDateString() : "-"}
                           </p>
                         </div>
-                        {cert.pdfUrl && (
-                          <a
-                            href={cert.pdfUrl}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="inline-block px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 text-xs font-medium transition"
-                            onClick={handleSearchItemClick}
-                          >
-                            Download
-                          </a>
-                        )}
+                        <a
+                          href={cert.pdfUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-block px-3 py-1 bg-[var(--primary)] text-[var(--background)] rounded hover:bg-[var(--primary-700)] text-xs font-medium transition"
+                          onClick={handleSearchItemClick}
+                        >
+                          Download
+                        </a>
                       </div>
                     ))}
                   </div>
@@ -212,8 +210,8 @@ export const HeaderSearchBar: React.FC<HeaderSearchBarProps> = ({
               {searchResults.categories.items.length > 0 && (
                 <div className="p-4">
                   <div className="flex items-center gap-2 mb-3">
-                    <Tag className="w-4 h-4 text-purple-600" />
-                    <h3 className="text-sm font-semibold text-gray-800">Categories</h3>
+                    <Tag className="w-4 h-4 text-[var(--primary-700)]" />
+                    <h3 className="text-sm font-semibold text-[var(--foreground)]">Categories</h3>
                     <Badge variant="secondary" className="text-xs">
                       {searchResults.categories.items.length}
                     </Badge>
@@ -224,12 +222,12 @@ export const HeaderSearchBar: React.FC<HeaderSearchBarProps> = ({
                         key={category.id}
                         href={`/courses?category=${category.id}`}
                         onClick={handleSearchItemClick}
-                        className="block p-3 hover:bg-purple-50 rounded-lg transition-colors group"
+                        className="block p-3 hover:bg-[var(--primary-50)] rounded-lg transition-colors group"
                       >
-                        <p className="text-sm font-medium text-gray-900 group-hover:text-purple-600 transition-colors">
+                        <p className="text-sm font-medium text-[var(--foreground)] group-hover:text-[var(--primary-700)] transition-colors">
                           {category.title}
                         </p>
-                        <p className="text-xs text-gray-500 mt-1 line-clamp-2">
+                        <p className="text-xs text-[var(--primary-600)] mt-1 line-clamp-2">
                           {category.description}
                         </p>
                       </Link>
@@ -243,9 +241,9 @@ export const HeaderSearchBar: React.FC<HeaderSearchBarProps> = ({
                searchResults.categories.items.length === 0 &&
                (!searchResults.certificates || searchResults.certificates.items.length === 0) && (
                 <div className="p-8 text-center">
-                  <Search className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-                  <p className="text-sm text-gray-500">No results found for "{searchQuery}"</p>
-                  <p className="text-xs text-gray-400 mt-1">Try different keywords or browse categories</p>
+                  <Search className="w-12 h-12 text-[var(--primary-100)] mx-auto mb-3" />
+                  <p className="text-sm text-[var(--primary-600)]">No results found for "{searchQuery}"</p>
+                  <p className="text-xs text-[var(--primary-400)] mt-1">Try different keywords or browse categories</p>
                 </div>
               )}
             </div>

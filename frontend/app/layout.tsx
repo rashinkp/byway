@@ -5,6 +5,7 @@ import { Toaster } from "sonner";
 import { Providers } from "@/components/providers";
 import { GoogleOAuthProvider } from "@react-oauth/google";
 import SocketProvider from '@/components/SocketProvider';
+import { ThemeProvider } from "@/components/Theme-Provider";
 
 // Load fonts
 const geistSans = Geist({
@@ -34,17 +35,22 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen flex flex-col`}
         suppressHydrationWarning
       >
-        <SocketProvider />
-        <Providers>
-          <GoogleOAuthProvider
-            clientId={process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID!}
-          >
-            <div className="flex-1 flex flex-col relative">
-              {children}
-            </div>
-          </GoogleOAuthProvider>
-        </Providers>
-        <Toaster richColors position="top-right" />
+        <ThemeProvider
+          attribute="data-theme"
+          defaultTheme="neutral"
+          enableSystem={false}
+          disableTransitionOnChange
+        >
+          <SocketProvider />
+          <Providers>
+            <GoogleOAuthProvider
+              clientId={process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID!}
+            >
+              <div className="flex-1 flex flex-col relative">{children}</div>
+            </GoogleOAuthProvider>
+          </Providers>
+          <Toaster richColors position="top-right" />
+        </ThemeProvider>
       </body>
     </html>
   );
