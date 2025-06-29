@@ -82,12 +82,6 @@ export function Message({ message, currentUserId, chat, onDelete }: MessageProps
           {/* Audio message */}
           {message.audioUrl && (
             <>
-              {/* Debug info - remove in production */}
-              {process.env.NODE_ENV === 'development' && (
-                <div className="text-xs text-gray-500 mb-1">
-                  Debug: {message.audioUrl.substring(0, 50)}...
-                </div>
-              )}
               <AudioMessage
                 audioUrl={message.audioUrl}
                 isMine={isMine}
