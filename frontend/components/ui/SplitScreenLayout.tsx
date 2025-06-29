@@ -15,13 +15,13 @@ export function SplitScreenLayout({
   children,
   title,
   description,
-  imageSrc = "/images/auth-bg.jpg", // Replace with your asset
+  imageSrc = "/AuthBanner1.jpg",
   imageAlt = "Illustration",
 }: SplitScreenLayoutProps) {
   return (
     <div className="flex flex-col lg:flex-row min-h-screen">
       {/* Left: Form Section */}
-      <div className="auth-container">{children}</div>
+      <div className="auth-container w-full lg:w-1/2 flex items-center justify-center">{children}</div>
 
       {/* Right: Image Section */}
       <div className="hidden lg:block lg:w-1/2 relative bg-gradient-to-r from-primary to-primary/80">

@@ -421,3 +421,47 @@
   --primary-muted: #fb7185;
 }
 
+[data-theme="shadcn"] {
+  --primary: #18181b; /* using primary-900 for deeper tone */
+  --secondary: #0f172a; /* strong contrast like header/nav */
+  --background: #ffffff;
+  --foreground: #000000;
+
+  --primary-50: #f9fafb;
+  --primary-100: #f3f4f6;
+  --primary-200: #e5e7eb;
+  --primary-300: #d1d5db;
+  --primary-400: #9ca3af;
+  --primary-500: #6b7280;
+  --primary-600: #4b5563;
+  --primary-700: #374151;
+  --primary-800: #1f2937;
+  --primary-900: #111827;
+  --primary-950: #030712;
+
+  --primary-hover: #374151; /* like 700 */
+  --primary-muted: #9ca3af; /* like 400 */
+}
+
+
+[data-theme="shadcn-dark"] {
+  --primary: #f4f4f5;            /* similar to primary-100 */
+  --secondary: #18181b;          /* like background panels */
+  --background: #09090b;         /* full black/near-black */
+  --foreground: #f4f4f5;         /* white text */
+
+  --primary-50: #09090b;
+  --primary-100: #18181b;
+  --primary-200: #27272a;
+  --primary-300: #3f3f46;
+  --primary-400: #52525b;
+  --primary-500: #71717a;
+  --primary-600: #a1a1aa;
+  --primary-700: #d4d4d8;
+  --primary-800: #e4e4e7;
+  --primary-900: #f4f4f5;
+  --primary-950: #ffffff;
+
+  --primary-hover: #d4d4d8;      /* 700 */
+  --primary-muted: #71717a;      /* 500 */
+}

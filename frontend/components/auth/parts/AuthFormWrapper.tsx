@@ -40,11 +40,11 @@ export function AuthFormWrapper({
   );
 
   if (noCard) {
-    return <div className="w-full max-w-md">{content}</div>;
+    return <div className="w-full max-w-lg px-4">{content}</div>;
   }
 
   return (
-    <Card className="shadow-none border-0 bg-card">
+    <Card className="shadow-none border-0 bg-card max-w-lg w-full mx-auto px-4">
       <CardContent className="p-0">{content}</CardContent>
     </Card>
   );

@@ -16,7 +16,30 @@ import ThemeDebug from "@/components/ThemeDebug";
 
 const themes = [
   "dark",
-  "neutral","stone","zinc","slate","gray","red","orange","amber","yellow","lime","green","emerald","teal","cyan","sky","blue","indigo","violet","purple","fuchsia","pink","rose"
+  "neutral",
+  "stone",
+  "zinc",
+  "slate",
+  "gray",
+  "red",
+  "orange",
+  "amber",
+  "yellow",
+  "lime",
+  "green",
+  "emerald",
+  "teal",
+  "cyan",
+  "sky",
+  "blue",
+  "indigo",
+  "violet",
+  "purple",
+  "fuchsia",
+  "pink",
+  "rose",
+  "shadcn",
+  "shadcn-dark",
 ];
 
 function ModeToggle() {

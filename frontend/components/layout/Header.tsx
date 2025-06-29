@@ -284,17 +284,10 @@ export function Header({ client, onNotificationClick }: HeaderProps = {}) {
                 </>
               ) : (
                 <>
-                  <Link href="/login">
-                    <Button
-                      variant="ghost"
-                      className="text-[var(--foreground)] hover:text-[var(--primary)] hover:bg-[var(--primary-50)] text-base font-medium"
-                    >
-                      Login
-                    </Button>
-                  </Link>
-                  <Link href="/signup">
-                    <Button className="bg-[var(--primary)] hover:bg-[var(--primary-700)] text-[var(--background)] rounded-lg px-5 py-2 text-base font-medium">
-                      Sign Up
+                  
+                  <Link href="/signin">
+                    <Button variant="default">
+                      Sign In
                     </Button>
                   </Link>
                 </>

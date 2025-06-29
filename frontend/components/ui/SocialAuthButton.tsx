@@ -16,13 +16,11 @@ export function SocialAuthButton({
   onClick,
   isSubmitting,
 }: SocialAuthButtonProps) {
-  const getProviderStyles = (provider: "google" | "facebook") => {
+  const getProviderProps = (provider: "google" | "facebook") => {
     switch (provider) {
       case "google":
         return {
-          bg: "bg-white hover:bg-gray-100",
-          text: "text-gray-800",
-          border: "border border-gray-300",
+          variant: "outline" as const,
           icon: (
             <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24">
               <path
@@ -46,9 +44,7 @@ export function SocialAuthButton({
         };
       case "facebook":
         return {
-          bg: "bg-blue-600 hover:bg-blue-700",
-          text: "text-white",
-          border: "border border-blue-600",
+          variant: "default" as const,
           icon: (
             <svg
               className="w-5 h-5 mr-2"
@@ -62,12 +58,13 @@ export function SocialAuthButton({
     }
   };
 
-  const { bg, text: textColor, border, icon } = getProviderStyles(provider);
+  const { variant, icon } = getProviderProps(provider);
 
   return (
     <Button
       type="button"
-      className={`w-full flex items-center justify-center ${bg} ${textColor} ${border} font-medium transition-colors`}
+      variant={variant}
+      className="w-full flex items-center justify-center font-medium transition-colors"
       onClick={onClick}
       disabled={isSubmitting}
     >

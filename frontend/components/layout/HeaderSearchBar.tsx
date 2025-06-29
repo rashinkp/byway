@@ -63,7 +63,7 @@ export const HeaderSearchBar: React.FC<HeaderSearchBarProps> = ({
             searchQuery && searchResults && setShowSearchResults(true)
           }
           placeholder="Search for courses, topics, instructors..."
-          className="w-full py-2.5 px-4 pl-10 border border-[var(--primary-200)] rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--primary-400)] focus:border-transparent text-[var(--foreground)] placeholder:[var(--primary-400)] transition-all duration-300 shadow-sm bg-white"
+          className="w-full py-2.5 px-4 pl-10 border border-[var(--primary-200)] rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--primary-400)] focus:border-transparent text-[var(--foreground)] placeholder:[var(--primary-400)] transition-all duration-300 shadow-sm "
         />
         <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-[var(--primary-400)]" />
         {isSearching && (
@@ -71,7 +71,7 @@ export const HeaderSearchBar: React.FC<HeaderSearchBarProps> = ({
         )}
         {/* Enhanced Search Results Dropdown */}
         {showSearchResults && searchResults && searchQuery && (
-          <div className="absolute top-full left-0 right-0 mt-2 rounded-lg shadow-xl border border-[var(--primary-200)] max-h-96 overflow-hidden z-50 bg-white">
+          <div className="absolute top-full left-0 right-0 mt-2 rounded-lg shadow-xl border border-[var(--primary-200)] max-h-96 overflow-hidden z-50">
             <div className="max-h-96 overflow-y-auto">
               {/* Instructors Section */}
               {searchResults.instructors.items.length > 0 && (
