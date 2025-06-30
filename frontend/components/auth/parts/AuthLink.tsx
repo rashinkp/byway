@@ -12,7 +12,7 @@ export function AuthLink({ text, linkText, href }: AuthLinkProps) {
       {text}{" "}
       <Link
         href={href}
-        className="text-primary hover:text-[var(--primary-hover)] font-medium"
+        className="text-[var(--primary-500)] hover:text-[var(--primary-600)] font-normal"
       >
         {linkText}
       </Link>

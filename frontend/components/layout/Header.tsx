@@ -11,8 +11,6 @@ import {
   Bell,
   Menu,
   X,
-  LogOut,
-  User,
   MessageSquare,
   ChevronDown,
 } from "lucide-react";
@@ -244,7 +242,7 @@ export function Header({ client, onNotificationClick }: HeaderProps = {}) {
                     <div className="relative group">
                       <Link href="/chat">
                         <MessageSquare
-                          className="w-6 h-6 text-[var(--foreground)] group-hover:text-[var(--primary)] transition-colors cursor-pointer"
+                          className="w-6 h-6 text-[var(--foreground)] group-hover:text-[var(--secondary-hover)] transition-colors cursor-pointer"
                           strokeWidth={1.5}
                         />
                       </Link>
@@ -252,7 +250,7 @@ export function Header({ client, onNotificationClick }: HeaderProps = {}) {
                     <div className="relative group">
                       <Link href="/user/cart">
                         <ShoppingCart
-                          className="w-6 h-6 text-[var(--foreground)] group-hover:text-[var(--primary)] transition-colors cursor-pointer"
+                          className="w-6 h-6 text-[var(--foreground)] group-hover:text-[var(--secondary-hover)] transition-colors cursor-pointer"
                           strokeWidth={1.5}
                         />
                         {cartCount > 0 && (
@@ -264,7 +262,7 @@ export function Header({ client, onNotificationClick }: HeaderProps = {}) {
                     </div>
                     <div className="relative group">
                       <Bell
-                        className="w-6 h-6 text-[var(--foreground)] group-hover:text-[var(--primary)] transition-colors cursor-pointer"
+                        className="w-6 h-6 text-[var(--foreground)] group-hover:text-[var(--secondary-hover)] transition-colors cursor-pointer"
                         strokeWidth={1.5}
                         onClick={onNotificationClick}
                       />
@@ -275,28 +273,28 @@ export function Header({ client, onNotificationClick }: HeaderProps = {}) {
                     >
                       <DropdownMenuTrigger asChild>
                         <div className="relative group cursor-pointer">
-                          <div className="w-10 h-10 rounded-full bg-[var(--primary-50)] flex items-center justify-center text-[var(--primary)] font-medium border-2 border-[var(--primary-200)] group-hover:border-[var(--primary-300)] transition-all">
+                          <div className="w-10 h-10 rounded-full bg-[var(--primary-50)] flex items-center justify-center text-[var(--primary-foreground)] font-medium border-2 border-[var(--primary-200)] group-hover:border-[var(--primary-300)] transition-all">
                             {user.name?.charAt(0) || "U"}
                           </div>
                         </div>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent
                         align="end"
-                        className="w-56 bg-[var(--background)] text-[var(--foreground)] shadow-lg border-0 p-1"
+                        className="w-56 bg-[var(--tertiary)] text-[var(--tertiary-foreground)] shadow-lg border-0 p-1"
                       >
-                        <DropdownMenuLabel className="text-[var(--foreground)] font-semibold">
+                        <DropdownMenuLabel className="text-[var(--tertiary-foreground)] font-semibold">
                           {user.name || "User"}
                         </DropdownMenuLabel>
                         <DropdownMenuSeparator />
                         <DropdownMenuItem
                           onClick={() => handleNavigation("/user/profile")}
-                          className="rounded hover:bg-[var(--primary-50)]"
+                          className="rounded hover:bg-[var(--tertiary-hover)]"
                         >
                           Profile
                         </DropdownMenuItem>
                         <DropdownMenuItem
                           onClick={() => handleNavigation("/user/my-courses")}
-                          className="rounded hover:bg-[var(--primary-50)]"
+                          className="rounded hover:bg-[var(--tertiary-hover)]"
                         >
                           My Courses
                         </DropdownMenuItem>
@@ -304,7 +302,7 @@ export function Header({ client, onNotificationClick }: HeaderProps = {}) {
                         <DropdownMenuItem
                           onClick={handleLogout}
                           disabled={isLoggingOut}
-                          className="text-[var(--foreground)] hover:text-[var(--primary-600)] rounded hover:bg-[var(--primary-50)]"
+                          className="rounded hover:bg-[var(--tertiary-hover)]"
                         >
                           {isLoggingOut ? "Logging out..." : "Logout"}
                         </DropdownMenuItem>
@@ -348,7 +346,7 @@ export function Header({ client, onNotificationClick }: HeaderProps = {}) {
                   <div className="relative group">
                     <Link href="/chat">
                       <MessageSquare
-                        className="w-6 h-6 text-[var(--secondary)] group-hover:text-[var(--primary)] transition-colors cursor-pointer"
+                        className="w-6 h-6 text-[var(--secondary)] group-hover:text-[var(--secondary-hover)] transition-colors cursor-pointer"
                         strokeWidth={1.5}
                       />
                     </Link>
@@ -356,7 +354,7 @@ export function Header({ client, onNotificationClick }: HeaderProps = {}) {
                   <div className="relative group">
                     <Link href="/user/cart">
                       <ShoppingCart
-                        className="w-6 h-6 text-[var(--secondary)] group-hover:text-[var(--primary)] transition-colors cursor-pointer"
+                        className="w-6 h-6 text-[var(--secondary)] group-hover:text-[var(--secondary-hover)] transition-colors cursor-pointer"
                         strokeWidth={1.5}
                       />
                       {cartCount > 0 && (
@@ -368,7 +366,7 @@ export function Header({ client, onNotificationClick }: HeaderProps = {}) {
                   </div>
                   <div className="relative group">
                     <Bell
-                      className="w-6 h-6 text-[var(--secondary)] group-hover:text-[var(--primary)] transition-colors cursor-pointer"
+                      className="w-6 h-6 text-[var(--secondary)] group-hover:text-[var(--secondary-hover)] transition-colors cursor-pointer"
                       strokeWidth={1.5}
                       onClick={onNotificationClick}
                     />

@@ -8,6 +8,7 @@
   () => import("@/components/auth/LoginForm").then((mod) => mod.LoginForm),
   {
     ssr: false,
+    loading: () => null,
   }
   );
 

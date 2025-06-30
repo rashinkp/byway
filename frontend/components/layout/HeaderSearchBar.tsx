@@ -75,15 +75,12 @@ export const HeaderSearchBar: React.FC<HeaderSearchBarProps> = ({
             <div className="max-h-96 overflow-y-auto">
               {/* Instructors Section */}
               {searchResults.instructors.items.length > 0 && (
-                <div className="p-4 border-b border-[var(--primary-100)] ">
+                <div className="p-4">
                   <div className="flex items-center gap-2 mb-3">
-                    <User className="w-4 h-4 text-[var(--primary)]" />
-                    <h3 className="text-sm font-semibold text-[var(--foreground)]">
+                    <h3 className="text-sm font-semibold text-[var(--foreground)] whitespace-nowrap">
                       Instructors
                     </h3>
-                    <Badge variant="secondary" className="text-xs bg-[var(--primary-50)] text-[var(--primary-700)] border border-[var(--primary-200)]">
-                      {searchResults.instructors.items.length}
-                    </Badge>
+                    <div className="flex-1 border-t border-[var(--primary-400)] ml-1" />
                   </div>
                   <div className="space-y-2">
                     {searchResults.instructors.items.map((instructor) => (
@@ -93,18 +90,18 @@ export const HeaderSearchBar: React.FC<HeaderSearchBarProps> = ({
                         onClick={handleSearchItemClick}
                         className="flex items-center gap-3 p-3 hover:bg-[var(--primary-50)] rounded-lg transition-colors group"
                       >
-                        <div className="w-10 h-10 rounded-full bg-gradient-to-r from-[var(--primary-500)] to-[var(--primary-700)] flex items-center justify-center text-[var(--background)] font-semibold shadow-md">
+                        <div className="w-10 h-10 rounded-full bg-gradient-to-r from-[var(--primary-500)] to-[var(--tertiary-700)] flex items-center justify-center text-[var(--background)] font-semibold shadow-md">
                           {instructor.name.charAt(0)}
                         </div>
                         <div className="flex-1 min-w-0">
-                          <p className="text-sm font-medium text-[var(--foreground)] group-hover:text-[var(--primary)] transition-colors">
+                          <p className="text-sm font-medium text-[var(--foreground)]  transition-colors">
                             {instructor.name}
                           </p>
                           <p className="text-xs text-[var(--primary-600)] truncate">
                             {instructor.shortBio || "Instructor"}
                           </p>
                         </div>
-                        <Users className="w-4 h-4 text-[var(--primary-400)] group-hover:text-[var(--primary)]" />
+                        <Users className="w-4 h-4 text-[var(--primary-400)] group-hover:text-[var(--tertiary-foreground)]" />
                       </Link>
                     ))}
                   </div>
@@ -114,13 +111,10 @@ export const HeaderSearchBar: React.FC<HeaderSearchBarProps> = ({
               {searchResults.courses.items.length > 0 && (
                 <div className="p-4 border-b border-[var(--primary-100)] ">
                   <div className="flex items-center gap-2 mb-3">
-                    <BookOpen className="w-4 h-4 text-[var(--foreground)]" />
-                    <h3 className="text-sm font-semibold text-[var(--foreground)]">
+                    <h3 className="text-sm font-semibold text-[var(--foreground)] whitespace-nowrap">
                       Courses
                     </h3>
-                    <Badge variant="secondary" className="text-xs bg-[var(--primary-50)] text-[var(--foreground)] border border-[var(--primary-200)]">
-                      {searchResults.courses.items.length}
-                    </Badge>
+                    <div className="flex-1 border-t  border-[var(--primary-400)] ml-1" />
                   </div>
                   <div className="space-y-2">
                     {searchResults.courses.items.map((course) => (
@@ -173,39 +167,30 @@ export const HeaderSearchBar: React.FC<HeaderSearchBarProps> = ({
                 searchResults.certificates.items.length > 0 && (
                   <div className="p-4 border-b border-[var(--primary-100)] ">
                     <div className="flex items-center gap-2 mb-3">
-                      <BookOpen className="w-4 h-4 text-[var(--primary)]" />
-                      <h3 className="text-sm font-semibold text-[var(--foreground)]">
+                      <h3 className="text-sm font-semibold text-[var(--foreground)] whitespace-nowrap">
                         Certificates
                       </h3>
-                      <Badge variant="secondary" className="text-xs bg-[var(--primary-50)] text-[var(--primary-700)] border border-[var(--primary-200)]">
-                        {searchResults.certificates.items.length}
-                      </Badge>
+                      <div className="flex-1 border-t  border-[var(--primary-400)] ml-1" />
                     </div>
                     <div className="space-y-2">
                       {searchResults.certificates.items.map((cert) => (
                         <div
                           key={cert.id}
-                          className="flex items-center gap-3 p-3 hover:bg-[var(--primary-50)] rounded-lg transition-colors group"
+                          className="flex items-center gap-3 p-3 hover:bg-[var(--primary-50)] rounded-lg transition-colors group cursor-pointer"
                         >
-                          <div className="w-10 h-10 rounded-full bg-gradient-to-r from-[var(--primary-400)] to-[var(--primary-700)] flex items-center justify-center text-[var(--background)] font-semibold shadow-md">
-                            <BookOpen className="w-5 h-5" />
-                          </div>
                           <div className="flex-1 min-w-0">
-                            <p className="text-sm font-medium text-[var(--foreground)] group-hover:text-[var(--primary)] transition-colors truncate">
+                            <p className="text-sm font-medium text-[var(--foreground)] transition-colors truncate">
                               {cert.courseTitle}
                             </p>
                             <p className="text-xs text-[var(--primary-600)] truncate">
                               Certificate #: {cert.certificateNumber}
-                            </p>
-                            <p className="text-xs text-[var(--primary-400)]">
-                              Issued: {cert.issuedAt ? new Date(cert.issuedAt).toLocaleDateString() : "-"}
                             </p>
                           </div>
                           <a
                             href={cert.pdfUrl}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="inline-block px-3 py-1 bg-[var(--primary)] text-[var(--background)] rounded hover:bg-[var(--primary-700)] text-xs font-medium transition"
+                            className="inline-block px-3 py-1 bg-[var(--primary)] text-[var(--foreground)] rounded  text-xs font-medium transition"
                             onClick={handleSearchItemClick}
                           >
                             Download
@@ -219,13 +204,10 @@ export const HeaderSearchBar: React.FC<HeaderSearchBarProps> = ({
               {searchResults.categories.items.length > 0 && (
                 <div className="p-4">
                   <div className="flex items-center gap-2 mb-3">
-                    <Tag className="w-4 h-4 text-[var(--primary-700)]" />
-                    <h3 className="text-sm font-semibold text-[var(--foreground)]">
+                    <h3 className="text-sm font-semibold text-[var(--foreground)] whitespace-nowrap">
                       Categories
                     </h3>
-                    <Badge variant="secondary" className="text-xs bg-[var(--primary-50)] text-[var(--primary-700)] border border-[var(--primary-200)]">
-                      {searchResults.categories.items.length}
-                    </Badge>
+                    <div className="flex-1 border-t  border-[var(--primary-400)] ml-1" />
                   </div>
                   <div className="space-y-2">
                     {searchResults.categories.items.map((category) => (
