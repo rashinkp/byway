@@ -10,7 +10,6 @@ export function useLogout() {
     mutationFn: () => logout(),
     onSuccess: () => {
       logoutUser();
-      toast.success("Logged out successfully");
     },
     onError: (error: any) => {
       toast.error("Logout failed", {

@@ -1,11 +1,11 @@
 "use client";
 
 import { cn } from "@/utils/cn";
-import { CourseCard } from "@/components/course/CourseCard";
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Course } from "@/types/course";
+import { CourseCard } from "./CourseCard";
 
 interface CourseGridProps {
   courses: Course[];

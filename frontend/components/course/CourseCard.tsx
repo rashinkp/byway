@@ -99,132 +99,52 @@ export function CourseCard({
   };
 
   return (
-    <div
-      className={cn(
-        "group relative bg-white rounded-xl border border-gray-100 shadow-sm hover:shadow-lg transition-all duration-300 cursor-pointer overflow-hidden h-full flex flex-col w-80",
-        className
-      )}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
-      onClick={handleCardClick}
+    <div className={cn(
+      "rounded-xl shadow-lg cursor-pointer overflow-hidden max-w-sm mx-auto hover:shadow-xl transition-shadow duration-300",
+      className
+    )}
+    style={{ background: "var(--tertiary)", color: "var(--foreground)", height: "400px", minHeight: "400px" }}
     >
-      {/* Thumbnail */}
-      <div className="relative aspect-video overflow-hidden">
+      {/* Hero Image */}
+      <div className="relative h-48 overflow-hidden">
         <img
           src={course.thumbnail || "/placeHolder.jpg"}
           alt={course.title}
-          className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+          className="w-full h-full object-cover"
         />
-        <div className="absolute inset-0 bg-black/20 group-hover:bg-black/30 transition-colors duration-300" />
-        
-        {/* Level Badge */}
-        <Badge 
-          variant="secondary" 
-          className="absolute top-3 left-3 bg-white/90 text-gray-700 hover:bg-white text-xs"
-        >
-          {course.level}
-        </Badge>
-
-        {/* Best Seller Badge */}
-        {course.bestSeller && (
-          <Badge 
-            variant="default" 
-            className="absolute top-3 right-3 bg-orange-500 hover:bg-orange-600 text-xs"
-          >
-            Best Seller
-          </Badge>
-        )}
       </div>
-
       {/* Content */}
-      <div className="p-4 flex-1 flex flex-col">
-        {/* Reviews */}
-        <div className="flex items-center gap-2 mb-2">
-          <div className="flex items-center gap-1">
-            {renderStars(course.reviewStats?.averageRating || 0)}
+      <div className="p-6 flex flex-col">
+        {/* Profile Section */}
+        <div className="flex items-center gap-2 mb-3">
+          <img
+            src={(course.instructor && 'profileImage' in course.instructor && (course.instructor as any).profileImage) || "/UserProfile.jpg"}
+            alt={course.instructor?.name || "Instructor"}
+            className="w-9 h-9 rounded-full object-cover"
+            style={{ border: "2px solid var(--primary)" }}
+          />
+          <div>
+             <h3 className="font-medium text-sm" style={{ color: "var(--primary-foreground)" }}>{course.instructor?.name || "Unknown"}</h3>
+             <p className="text-xs" style={{ color: "var(--primary-foreground)" }}>{(course.instructor && 'role' in course.instructor && (course.instructor as any).role) || "Instructor"}</p>
           </div>
-          <span className="text-sm text-gray-600">
+        </div>
+        {/* Title */}
+        <h2 className="text-xl font-bold mb-1 line-clamp-1" style={{ color: "var(--foreground)" }}>
+          {course.title}
+        </h2>
+        {/* Description */}
+        <p className="text-sm mb-1 leading-relaxed line-clamp-2" style={{ color: "var(--primary-600)" }}>
+          {course.description || "No description available."}
+        </p>
+        {/* Rating */}
+        <div className="flex items-center gap-2 mt-1">
+          <span className="text-2xl font-bold" style={{ color: "var(--primary-foreground)" }}>
             {course.reviewStats?.averageRating?.toFixed(1) || "0.0"}
           </span>
-          <span className="text-sm text-gray-500">
-            ({course.reviewStats?.totalReviews || 0})
+          <Star className="w-5 h-5" style={{ fill: "var(--warning)", color: "var(--warning)" }} />
+          <span className="text-sm" style={{ color: "var(--primary-foreground)" }}>
+            ({course.reviewStats?.totalReviews || 0} reviews)
           </span>
-        </div>
-
-        {/* Title */}
-        <h3 className="font-semibold text-gray-900 mb-2 line-clamp-2 group-hover:text-blue-600 transition-colors text-sm leading-tight">
-          {course.title}
-        </h3>
-
-        {/* Instructor */}
-        {course.instructor && (
-          <p className="text-xs text-gray-600 mb-2">
-            by {course.instructor.name}
-          </p>
-        )}
-
-        {/* Course Info */}
-        <div className="flex items-center gap-3 mb-3 text-xs text-gray-500">
-          <div className="flex items-center gap-1">
-            <BookOpen className="w-3 h-3" />
-            <span>{course.lessons || 0} lessons</span>
-          </div>
-          <div className="flex items-center gap-1">
-            <Clock className="w-3 h-3" />
-            <span>{course.duration || 0}h</span>
-          </div>
-        </div>
-
-        {/* Price */}
-        <div className="flex items-center gap-2 mb-3">
-          <span className="text-base font-bold text-gray-900">
-            {getDiscountedPrice()}
-          </span>
-          {getOriginalPrice() && (
-            <span className="text-sm text-gray-500 line-through">
-              {getOriginalPrice()}
-            </span>
-          )}
-        </div>
-
-        {/* Action Buttons */}
-        <div className="flex gap-2 mt-auto">
-          {course.isEnrolled ? (
-            <Button 
-              onClick={handleLearnNow}
-              className="flex-1 bg-blue-600 hover:bg-blue-700 text-xs py-2"
-            >
-              <Play className="w-3 h-3 mr-1" />
-              Learn Now
-            </Button>
-          ) : course.isInCart ? (
-            <Button 
-              onClick={handleGoToCart}
-              className="flex-1 bg-green-600 hover:bg-green-700 text-xs py-2"
-            >
-              <ShoppingCart className="w-3 h-3 mr-1" />
-              Go to Cart
-            </Button>
-          ) : (
-            <>
-              <Button 
-                onClick={handleAddToCart}
-                variant="outline"
-                className="flex-1 text-xs py-2"
-                disabled={isCartLoading}
-              >
-                <ShoppingCart className="w-3 h-3 mr-1" />
-                {isCartLoading ? "Adding..." : "Add to Cart"}
-              </Button>
-              <Button 
-                onClick={handleBuyNow}
-                className="flex-1 bg-blue-600 hover:bg-blue-700 text-xs py-2"
-              >
-                <ExternalLink className="w-3 h-3 mr-1" />
-                Buy Now
-              </Button>
-            </>
-          )}
         </div>
       </div>
     </div>

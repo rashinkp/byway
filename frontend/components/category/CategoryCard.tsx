@@ -16,7 +16,7 @@ interface CategoryCardProps {
 
 export function CategoryCard({ categories, className, onCategoryClick }: CategoryCardProps) {
   return (
-    <div className={cn("p-6", className)}>
+    <div className={cn(className)}>
       {/* Header removed */}
 
       {/* Categories Grid */}
@@ -25,16 +25,21 @@ export function CategoryCard({ categories, className, onCategoryClick }: Categor
           <div
             key={category.id}
             onClick={() => onCategoryClick?.(category.id)}
-            className="flex items-center gap-4 p-4 bg-blue-50 rounded-lg border border-blue-100 hover:bg-blue-100 transition-colors duration-200 cursor-pointer"
+            className="flex items-center gap-4 p-4 rounded-lg border transition-colors duration-200 cursor-pointer"
+            style={{
+              background: "var(--secondary)",
+              borderColor: "var(--primary-200)",
+            }}
           >
             {/* Icon */}
-            <div className="w-10 h-10 flex items-center justify-center bg-blue-100 rounded-full">
+            <div className="w-10 h-10 flex items-center justify-center rounded-full"
+                 style={{ background: "var(--primary-100)" }}>
               {category.icon}
             </div>
 
             {/* Category Info */}
             <div>
-              <h3 className="text-base font-medium text-gray-800">
+              <h3 className="text-base font-medium" style={{ color: "var(--foreground)" }}>
                 {category.name}
               </h3>
             </div>

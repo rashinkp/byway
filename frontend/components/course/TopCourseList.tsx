@@ -11,7 +11,7 @@ interface TopCoursesProps {
 
 export function TopCourses({ courses, className, variant = 'compact' }: TopCoursesProps) {
   return (
-    <div className={cn("p-6", className)}>
+    <div className={cn(className)}>
       {/* Header removed */}
 
       {/* Courses Grid */}

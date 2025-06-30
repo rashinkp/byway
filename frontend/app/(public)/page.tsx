@@ -71,20 +71,21 @@ export default function UserDashboard() {
   })) || [];
 
   return (
-    <div className="relative min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 pb-16">
+    <div className="relative min-h-screen pb-16" style={{ background: "var(--background)" }}>
       <div className="container mx-auto px-2 sm:px-4 py-6 sm:py-8">
         <HeroSection className="mb-10 sm:mb-16" />
         <section className="mb-8 sm:mb-12">
-          <StatsCard stats={stats} className="mb-0 shadow-md bg-white/80" />
+          <StatsCard stats={stats} className="mb-0 shadow-md" />
         </section>
         <section className="mb-8 sm:mb-12">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4 sm:mb-6">
-            <h2 className="text-xl sm:text-2xl font-bold text-gray-900 flex items-center gap-2">
-              <Sparkles className="w-6 h-6 text-blue-500" /> Top Categories
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6 mt-2 gap-2 sm:gap-0">
+            <h2 className="text-xl sm:text-2xl font-bold" style={{ color: "var(--foreground)" }}>
+              Top Categories
             </h2>
             <button
               onClick={() => router.push('/categories')}
-              className="px-4 py-2 rounded-full bg-blue-50 text-blue-700 hover:bg-blue-100 font-medium text-sm transition w-full sm:w-auto"
+              className="px-4 py-2 rounded-full font-medium text-sm transition w-full sm:w-auto mt-2 sm:mt-0"
+              style={{ background: "var(--secondary)", color: "var(--secondary-foreground)" }}
             >
               View All
             </button>
@@ -96,13 +97,14 @@ export default function UserDashboard() {
           />
         </section>
         <section className="mb-8 sm:mb-12">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4 sm:mb-6">
-            <h2 className="text-xl sm:text-2xl font-bold text-gray-900 flex items-center gap-2">
-              <Sparkles className="w-6 h-6 text-purple-500" /> Top Courses
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6 mt-2 gap-2 sm:gap-0">
+            <h2 className="text-xl sm:text-2xl font-bold" style={{ color: "var(--foreground)" }}>
+              Top Courses
             </h2>
             <button
               onClick={() => router.push('/courses')}
-              className="px-4 py-2 rounded-full bg-purple-50 text-purple-700 hover:bg-purple-100 font-medium text-sm transition w-full sm:w-auto"
+              className="px-4 py-2 rounded-full font-medium text-sm transition w-full sm:w-auto mt-2 sm:mt-0"
+              style={{ background: "var(--secondary)", color: "var(--secondary-foreground)" }}
             >
               View All
             </button>
@@ -110,13 +112,14 @@ export default function UserDashboard() {
           <TopCourses courses={topCourses} className="mb-0" variant="compact" />
         </section>
         <section className="mb-8 sm:mb-12">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4 sm:mb-6">
-            <h2 className="text-xl sm:text-2xl font-bold text-gray-900 flex items-center gap-2">
-              <Sparkles className="w-6 h-6 text-pink-500" /> Top Instructors
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6 mt-2 gap-2 sm:gap-0">
+            <h2 className="text-xl sm:text-2xl font-bold" style={{ color: "var(--foreground)" }}>
+              Top Instructors
             </h2>
             <button
               onClick={() => router.push('/instructors')}
-              className="px-4 py-2 rounded-full bg-pink-50 text-pink-700 hover:bg-pink-100 font-medium text-sm transition w-full sm:w-auto"
+              className="px-4 py-2 rounded-full font-medium text-sm transition w-full sm:w-auto mt-2 sm:mt-0"
+              style={{ background: "var(--secondary)", color: "var(--secondary-foreground)" }}
             >
               View All
             </button>
