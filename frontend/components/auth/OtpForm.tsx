@@ -152,7 +152,6 @@ export function VerifyOtpForm() {
           <Button
             type="button"
             variant="outline"
-            className="w-full py-4 text-base"
             onClick={handleResend}
             disabled={resendCooldown > 0 || isSubmitting || isResending}
           >

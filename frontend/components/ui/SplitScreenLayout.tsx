@@ -19,9 +19,9 @@ export function SplitScreenLayout({
   imageAlt = "Illustration",
 }: SplitScreenLayoutProps) {
   return (
-    <div className="flex flex-col lg:flex-row min-h-screen">
+    <div className="flex flex-col bg-[var(--background)] text-[var(--foreground)] lg:flex-row min-h-screen">
       {/* Left: Form Section */}
-      <div className="auth-container w-full lg:w-1/2 flex items-center justify-center">{children}</div>
+      <div className="w-full lg:w-1/2 flex items-center justify-center">{children}</div>
 
       {/* Right: Image Section */}
       <div className="hidden lg:block lg:w-1/2 relative bg-gradient-to-r from-primary to-primary/80">

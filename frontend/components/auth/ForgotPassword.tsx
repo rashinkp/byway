@@ -92,7 +92,6 @@ export function ForgotPasswordForm() {
             />
             <Button
               type="submit"
-              className="w-full"
               disabled={isPending}
             >
               {isPending ? "Sending..." : "Send Reset Code"}

@@ -87,7 +87,7 @@ export function ResetPasswordForm() {
           subtitle=""
           error="Invalid or expired reset link"
         >
-          <Button className="auth-button" asChild>
+          <Button asChild>
             <AuthLink
               text=""
               linkText="Back to forgot password"

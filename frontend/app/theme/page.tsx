@@ -15,7 +15,6 @@ import {
 import ThemeDebug from "@/components/ThemeDebug";
 
 const themes = [
-  "dark",
   "neutral",
   "stone",
   "zinc",
@@ -48,17 +47,19 @@ function ModeToggle() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="outline" size="icon">
+        <Button variant="outline" size="icon" aria-label="Toggle theme">
           <Sun className="h-[1.2rem] w-[1.2rem] scale-100 rotate-0 transition-all dark:scale-0 dark:-rotate-90" />
           <Moon className="absolute h-[1.2rem] w-[1.2rem] scale-0 rotate-90 transition-all dark:scale-100 dark:rotate-0" />
-          <span className="sr-only">Toggle theme</span>
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
         <DropdownMenuLabel>Theme</DropdownMenuLabel>
-        <DropdownMenuItem onClick={() => setTheme("light")}>Light</DropdownMenuItem>
-        <DropdownMenuItem onClick={() => setTheme("dark")}>Dark</DropdownMenuItem>
-        <DropdownMenuItem onClick={() => setTheme("system")}>System</DropdownMenuItem>
+        <DropdownMenuItem onClick={() => setTheme("light")}>
+          Light
+        </DropdownMenuItem>
+        <DropdownMenuItem onClick={() => setTheme("system")}>
+          System
+        </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuLabel>
           <Palette className="inline-block mr-2 h-4 w-4" />
@@ -80,8 +81,8 @@ function ModeToggle() {
 
 export default function ThemePage() {
   const { setTheme, theme: currentTheme, resolvedTheme } = useTheme();
-  // Force re-render on theme change for ThemeDebug
   const [themeVersion, setThemeVersion] = React.useState(0);
+
   React.useEffect(() => {
     setThemeVersion((v) => v + 1);
   }, [currentTheme, resolvedTheme]);
@@ -94,29 +95,26 @@ export default function ThemePage() {
             key={t}
             type="button"
             onClick={() => setTheme(t)}
-            className={`flex flex-col items-center p-2 border border-[var(--border)] rounded-lg transition ring-offset-2 focus:outline-none focus:ring-2 focus:ring-[var(--foreground)] ${currentTheme === t || resolvedTheme === t ? "ring-2 ring-[var(--foreground)] border-[var(--foreground)]" : ""}`}
+            className={`theme-preview flex flex-col items-center ${
+              currentTheme === t || resolvedTheme === t ? "selected" : ""
+            }`}
             aria-label={`Select ${t} theme`}
-            style={{ background: "var(--background)" }}
+            data-theme={t}
           >
             <div className="flex space-x-1 mb-2">
-              {t === "dark"
-                ? <span style={{width: 176, height: 16, borderRadius: 4, background: '#111'}} className="border border-[var(--border)]" />
-                : [50,100,200,300,400,500,600,700,800,900,950].map((shade) => (
+              {[50, 100, 200, 300, 400, 500, 600, 700, 800, 900, 950].map(
+                (shade) => (
                   <span
                     key={shade}
-                    style={{
-                      display: 'inline-block',
-                      width: 16,
-                      height: 16,
-                      borderRadius: 4,
-                      background: `var(--primary-${shade})`,
-                    }}
-                    className="border border-[var(--border)]"
-                    data-theme={t}
+                    className="theme-swatch"
+                    style={{ backgroundColor: `var(--primary-${shade})` }}
                   />
-                ))}
+                )
+              )}
             </div>
-            <span className="text-xs font-mono text-[var(--foreground)]">{t === "dark" ? "Dark" : t}</span>
+            <span className="theme-label">
+              {t.charAt(0).toUpperCase() + t.slice(1)}
+            </span>
           </button>
         ))}
       </div>

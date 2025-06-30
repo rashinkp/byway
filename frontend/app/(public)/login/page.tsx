@@ -1,20 +1,20 @@
-// src/components/auth/LoginPage.tsx
-"use client";
+  // src/components/auth/LoginPage.tsx
+  "use client";
 
-import dynamic from "next/dynamic";
-import { AuthPageWrapper } from "@/components/auth/AuthPageWrapper";
+  import dynamic from "next/dynamic";
+  import { AuthPageWrapper } from "@/components/auth/AuthPageWrapper";
 
-const LoginForm = dynamic(
+  const LoginForm = dynamic(
   () => import("@/components/auth/LoginForm").then((mod) => mod.LoginForm),
   {
     ssr: false,
   }
-);
+  );
 
-export default function LoginPage() {
+  export default function LoginPage() {
   return (
     <AuthPageWrapper redirectIfAuthenticated={true}>
       <LoginForm />
     </AuthPageWrapper>
   );
-}
+  }

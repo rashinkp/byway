@@ -165,7 +165,9 @@ export function Header({ client, onNotificationClick }: HeaderProps = {}) {
       <header
         className={cn(
           "sticky top-0 z-50 w-full transition-all duration-300",
-          scrolled ? "bg-[var(--background)] shadow-md" : "bg-[var(--background)]/95"
+          scrolled
+            ? "bg-[var(--background)] shadow-md"
+            : "bg-[var(--background)]"
         )}
       >
         <div className="container mx-auto px-10 py-3">
@@ -174,7 +176,7 @@ export function Header({ client, onNotificationClick }: HeaderProps = {}) {
             <div className="flex items-center gap-10">
               <Link
                 href="/"
-                className="text-2xl font-bold text-[var(--primary)] flex items-center gap-2 hover:text-[var(--primary-700)] transition-colors"
+                className="text-2xl font-bold text-[var(--primary-foreground)] flex items-center gap-2 hover:text-[var(--primary-hover)] transition-colors"
               >
                 Byway
               </Link>
@@ -190,25 +192,43 @@ export function Header({ client, onNotificationClick }: HeaderProps = {}) {
             />
             {/* Courses and Pages links moved next to icons */}
             <nav className="flex items-center gap-4">
-              <Link href="/courses" className="text-base font-medium text-[var(--foreground)] px-2 py-1 rounded hover:bg-[var(--border)] hover:opacity-80 transition-colors">
+              <Link
+                href="/courses"
+                className="text-base font-medium text-[var(--primary-foreground)] hover:text-[var(--primary-hover)] px-2 py-1 rounded transition-colors"
+              >
                 Courses
               </Link>
               {/* Pages dropdown menu */}
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" className="flex items-center gap-1 text-base font-medium text-[var(--foreground)] px-2 py-1 rounded hover:bg-[var(--border)] hover:opacity-80 transition-colors focus:outline-none">
+                  <Button
+                    variant="link"
+                    className="flex items-center gap-1 text-base font-medium text-[var(--primary-foreground)] hover:text-[var(--primary-hover)] px-2 py-1 rounded focus:outline-none shadow-none border-none bg-transparent"
+                  >
                     Pages
                     <ChevronDown className="w-4 h-4 transition-transform group-data-[state=open]:rotate-90" />
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="start" className="w-40 bg-[var(--background)] text-[var(--foreground)] border border-[var(--border)] shadow-lg">
-                  <DropdownMenuItem asChild>
+                <DropdownMenuContent
+                  align="start"
+                  className="w-40 bg-[var(--tertiary)] text-[var(--tertiary-foreground)] shadow-lg border-0 p-1"
+                >
+                  <DropdownMenuItem
+                    asChild
+                    className="rounded hover:bg-[var(--tertiary-hover)]"
+                  >
                     <Link href="/about">About</Link>
                   </DropdownMenuItem>
-                  <DropdownMenuItem asChild>
+                  <DropdownMenuItem
+                    asChild
+                    className="rounded hover:bg-[var(--tertiary-hover)]"
+                  >
                     <Link href="/contact">Contact</Link>
                   </DropdownMenuItem>
-                  <DropdownMenuItem asChild>
+                  <DropdownMenuItem
+                    asChild
+                    className="rounded hover:bg-[var(--tertiary-hover)]"
+                  >
                     <Link href="/faq">FAQ</Link>
                   </DropdownMenuItem>
                 </DropdownMenuContent>
@@ -224,7 +244,7 @@ export function Header({ client, onNotificationClick }: HeaderProps = {}) {
                     <div className="relative group">
                       <Link href="/chat">
                         <MessageSquare
-                          className="w-6 h-6 text-[var(--secondary)] group-hover:text-[var(--primary)] transition-colors cursor-pointer"
+                          className="w-6 h-6 text-[var(--foreground)] group-hover:text-[var(--primary)] transition-colors cursor-pointer"
                           strokeWidth={1.5}
                         />
                       </Link>
@@ -232,7 +252,7 @@ export function Header({ client, onNotificationClick }: HeaderProps = {}) {
                     <div className="relative group">
                       <Link href="/user/cart">
                         <ShoppingCart
-                          className="w-6 h-6 text-[var(--secondary)] group-hover:text-[var(--primary)] transition-colors cursor-pointer"
+                          className="w-6 h-6 text-[var(--foreground)] group-hover:text-[var(--primary)] transition-colors cursor-pointer"
                           strokeWidth={1.5}
                         />
                         {cartCount > 0 && (
@@ -244,12 +264,15 @@ export function Header({ client, onNotificationClick }: HeaderProps = {}) {
                     </div>
                     <div className="relative group">
                       <Bell
-                        className="w-6 h-6 text-[var(--secondary)] group-hover:text-[var(--primary)] transition-colors cursor-pointer"
+                        className="w-6 h-6 text-[var(--foreground)] group-hover:text-[var(--primary)] transition-colors cursor-pointer"
                         strokeWidth={1.5}
                         onClick={onNotificationClick}
                       />
                     </div>
-                    <DropdownMenu open={isDropdownOpen} onOpenChange={setIsDropdownOpen}>
+                    <DropdownMenu
+                      open={isDropdownOpen}
+                      onOpenChange={setIsDropdownOpen}
+                    >
                       <DropdownMenuTrigger asChild>
                         <div className="relative group cursor-pointer">
                           <div className="w-10 h-10 rounded-full bg-[var(--primary-50)] flex items-center justify-center text-[var(--primary)] font-medium border-2 border-[var(--primary-200)] group-hover:border-[var(--primary-300)] transition-all">
@@ -257,25 +280,32 @@ export function Header({ client, onNotificationClick }: HeaderProps = {}) {
                           </div>
                         </div>
                       </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end" className="w-56">
+                      <DropdownMenuContent
+                        align="end"
+                        className="w-56 bg-[var(--background)] text-[var(--foreground)] shadow-lg border-0 p-1"
+                      >
                         <DropdownMenuLabel className="text-[var(--foreground)] font-semibold">
                           {user.name || "User"}
                         </DropdownMenuLabel>
                         <DropdownMenuSeparator />
-                        <DropdownMenuItem onClick={() => handleNavigation("/user/profile")}>
-                          <User className="mr-2 h-4 w-4" />
+                        <DropdownMenuItem
+                          onClick={() => handleNavigation("/user/profile")}
+                          className="rounded hover:bg-[var(--primary-50)]"
+                        >
                           Profile
                         </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => handleNavigation("/user/my-courses")}>
+                        <DropdownMenuItem
+                          onClick={() => handleNavigation("/user/my-courses")}
+                          className="rounded hover:bg-[var(--primary-50)]"
+                        >
                           My Courses
                         </DropdownMenuItem>
                         <DropdownMenuSeparator />
                         <DropdownMenuItem
                           onClick={handleLogout}
                           disabled={isLoggingOut}
-                          className="text-[var(--foreground)] hover:text-[var(--primary-600)]"
+                          className="text-[var(--foreground)] hover:text-[var(--primary-600)] rounded hover:bg-[var(--primary-50)]"
                         >
-                          <LogOut className="mr-2 h-4 w-4" />
                           {isLoggingOut ? "Logging out..." : "Logout"}
                         </DropdownMenuItem>
                       </DropdownMenuContent>
@@ -284,17 +314,14 @@ export function Header({ client, onNotificationClick }: HeaderProps = {}) {
                 </>
               ) : (
                 <>
-                  
-                  <Link href="/signin">
-                    <Button variant="default">
-                      Sign In
-                    </Button>
+                  <Link href="/login">
+                    <Button>Sign In</Button>
                   </Link>
                 </>
               )}
             </nav>
           </div>
-          
+
           {/* Mobile Navigation */}
           <div className="flex md:hidden items-center justify-between">
             <Button
@@ -357,37 +384,29 @@ export function Header({ client, onNotificationClick }: HeaderProps = {}) {
               ) : (
                 <>
                   <Link href="/login">
-                    <Button
-                      variant="ghost"
-                      className="text-[var(--foreground)] hover:text-[var(--primary)] hover:bg-[var(--primary-50)] text-base font-medium"
-                    >
-                      Login
-                    </Button>
-                  </Link>
-                  <Link href="/signup">
                     <Button className="bg-[var(--primary)] hover:bg-[var(--primary-700)] text-[var(--background)] rounded-lg px-5 py-2 text-base font-medium">
-                      Sign Up
+                      Sign In
                     </Button>
                   </Link>
                 </>
               )}
             </div>
           </div>
-          
+
           {/* Mobile Menu */}
           {isMenuOpen && (
             <div className="md:hidden pt-4 pb-2 space-y-4 border-t mt-3">
               <div className="space-y-3">
                 <Link
                   href="/courses"
-                  className="block px-2 py-1 text-[var(--foreground)] hover:text-[var(--primary)] font-medium text-base"
+                  className="block px-2 py-1 text-[var(--foreground)]  font-medium text-base"
                   onClick={() => setIsMenuOpen(false)}
                 >
                   Courses
                 </Link>
                 <Link
                   href="/pages"
-                  className="block px-2 py-1 text-[var(--foreground)] hover:text-[var(--primary)] font-medium text-base"
+                  className="block px-2 py-1 text-[var(--foreground)]  font-medium text-base"
                   onClick={() => setIsMenuOpen(false)}
                 >
                   Pages
@@ -401,56 +420,38 @@ export function Header({ client, onNotificationClick }: HeaderProps = {}) {
                       <Skeleton className="h-10 w-1/2" />
                     </div>
                   </div>
-                ) : user ? (
-                  <>
-                    <Link
-                      href="/user/profile"
-                      className="block px-2 py-1 text-[var(--foreground)] hover:text-[var(--primary)] text-base"
-                      onClick={() => setIsMenuOpen(false)}
-                    >
-                      Profile
-                    </Link>
-                    <Link
-                      href="/user/profile?section=courses"
-                      className="block px-2 py-1 text-[var(--foreground)] hover:text-[var(--primary)] text-base"
-                      onClick={() => setIsMenuOpen(false)}
-                    >
-                      My Courses
-                    </Link>
-                    <div className="flex justify-between items-center gap-2 mt-4">
-                      <Button
-                        variant="outline"
-                        onClick={() => {
-                          logout();
-                          setIsMenuOpen(false);
-                        }}
-                        disabled={isLoggingOut}
-                        className="w-full border-[var(--primary-200)] text-[var(--foreground)] rounded-lg text-base"
-                      >
-                        {isLoggingOut ? "Logging out..." : "Logout"}
-                      </Button>
-                    </div>
-                  </>
                 ) : (
-                  <div className="flex justify-between items-center gap-2 mt-4">
-                    <Link href="/login" className="w-1/2">
-                      <Button
-                        variant="outline"
-                        className="w-full border-[var(--primary-200)] text-[var(--foreground)] rounded-lg text-base"
+                  user && (
+                    <>
+                      <Link
+                        href="/user/profile"
+                        className="block px-2 py-1 text-[var(--foreground)] hover:text-[var(--primary)] text-base"
                         onClick={() => setIsMenuOpen(false)}
                       >
-                        Login
-                      </Button>
-                    </Link>
-                    <Link href="/signup" className="w-1/2">
-                      <Button 
-                        className="w-full bg-[var(--primary)] hover:bg-[var(--primary-700)] text-[var(--background)] rounded-lg text-base"
+                        Profile
+                      </Link>
+                      <Link
+                        href="/user/profile?section=courses"
+                        className="block px-2 py-1 text-[var(--foreground)] hover:text-[var(--primary)] text-base"
                         onClick={() => setIsMenuOpen(false)}
                       >
-                        Sign Up
-                      </Button>
-                    </Link>
-                  </div>
+                        My Courses
+                      </Link>
+                      <div className="flex justify-between items-center gap-2 mt-4">
+                        <Button
+                          variant="outline"
+                          onClick={() => {
+                            logout();
+                            setIsMenuOpen(false);
+                          }}
+                          disabled={isLoggingOut}
+                          className="w-full border-[var(--primary-200)] text-[var(--foreground)] rounded-lg text-base"
+                        >
+                          {isLoggingOut ? "Logging out..." : "Logout"}
+                        </Button>
+                      </div>
+                    </>
+                  )
                 )}
               </div>
             </div>

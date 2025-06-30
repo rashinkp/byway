@@ -1,25 +1,25 @@
 import * as React from "react"
 import { Slot } from "@radix-ui/react-slot"
 import { cva, type VariantProps } from "class-variance-authority"
-import { cn } from "@/utils/cn"
 
+import { cn } from "@/lib/utils"
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-lg text-sm font-medium transition-all disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive rounded-md",
+  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-all disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive",
   {
     variants: {
       variant: {
         default:
-          "bg-[var(--primary)] text-[var(--background)] shadow-xs hover:bg-[var(--primary-700)]",
+          "bg-[var(--secondary)] text-[var(--secondary-foreground)] shadow-xs hover:bg-[var(--secondary-hover)] cursor-pointer",
         destructive:
-          "bg-destructive text-white shadow-xs hover:bg-destructive/90 focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40 dark:bg-destructive/60",
+          "bg-[var(--destructive,#ef4444)] text-white shadow-xs hover:bg-[var(--destructive-hover,#dc2626)] focus-visible:ring-[var(--destructive,#ef4444)]/20 dark:focus-visible:ring-[var(--destructive,#ef4444)]/40 dark:bg-[var(--destructive,#ef4444)]/60",
         outline:
-          "border border-[var(--primary)] text-[var(--primary)] bg-transparent shadow-xs hover:bg-[var(--primary-100)] hover:text-[var(--primary)]",
+          "border border-[var(--primary-200)] bg-[var(--background)] text-[var(--foreground)] shadow-xs hover:bg-[var(--primary-50)] hover:text-[var(--primary)] dark:bg-[var(--input,transparent)] dark:border-[var(--primary-200)] dark:hover:bg-[var(--primary-100)]",
         secondary:
-          "bg-secondary text-secondary-foreground shadow-xs hover:bg-secondary/80",
+          "bg-[var(--secondary)] text-[var(--secondary-foreground,#fff)] shadow-xs hover:bg-[var(--secondary-hover,#0f172a)]",
         ghost:
-          "text-[var(--primary)] bg-transparent hover:bg-[var(--primary-100)]",
-        link: "text-[var(--primary)] underline-offset-4 hover:underline",
+          "bg-transparent text-[var(--primary)] hover:bg-[var(--primary-50)] hover:text-[var(--primary-hover)] dark:hover:bg-[var(--primary-100)]",
+        link: "text-[var(--primary)] cursor-pointer",
       },
       size: {
         default: "h-9 px-4 py-2 has-[>svg]:px-3",
@@ -33,7 +33,7 @@ const buttonVariants = cva(
       size: "default",
     },
   }
-);
+)
 
 function Button({
   className,
