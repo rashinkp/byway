@@ -28,14 +28,14 @@ export default function PublicLayout({
   // Check if current page is an authentication page
   const isAuthPage = authPages.includes(pathname);
   
-  const shouldShowLayout = !isAuthPage || (isAuthPage && !!children && children !== null && children !== undefined);
   return (
     <div className="flex flex-col min-h-screen">
-      {shouldShowLayout && <Header onNotificationClick={() => setNotificationOpen(true)} />}
+      <Header onNotificationClick={() => setNotificationOpen(true)} />
+      {!isAuthPage && <Header onNotificationClick={() => setNotificationOpen(true)} />}
       {!isAuthPage && <TopNavbar pathname={pathname} navItems={[]} noMargin />}
       <NotificationModal open={notificationOpen} onOpenChange={setNotificationOpen} />
       <main className="flex-1">{children}</main>
-      {shouldShowLayout && <BywayFooter />}
+      <BywayFooter />
     </div>
   );
 }

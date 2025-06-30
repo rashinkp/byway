@@ -13,6 +13,7 @@ import {
   X,
   MessageSquare,
   ChevronDown,
+  Loader2,
 } from "lucide-react";
 import { useState, useCallback, useEffect, useRef } from "react";
 import {
@@ -211,30 +212,24 @@ export function Header({ client, onNotificationClick }: HeaderProps = {}) {
                   align="start"
                   className="w-40 bg-[var(--tertiary)] text-[var(--tertiary-foreground)] shadow-lg border-0 p-1"
                 >
+                
                   <DropdownMenuItem
                     asChild
                     className="rounded hover:bg-[var(--tertiary-hover)]"
                   >
-                    <Link href="/about">About</Link>
+                    <Link href="/categories">Categories</Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem
                     asChild
                     className="rounded hover:bg-[var(--tertiary-hover)]"
                   >
-                    <Link href="/contact">Contact</Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem
-                    asChild
-                    className="rounded hover:bg-[var(--tertiary-hover)]"
-                  >
-                    <Link href="/faq">FAQ</Link>
+                    <Link href="/instructors">Instructors</Link>
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
               {isLoading ? (
-                <div className="flex items-center gap-4">
-                  <Skeleton className="h-10 w-24" />
-                  <Skeleton className="h-10 w-24" />
+                <div className="flex items-center justify-center w-20 h-10">
+                  <Loader2 className="w-6 h-6 text-[var(--primary-400)] animate-spin" />
                 </div>
               ) : user ? (
                 <>
@@ -325,7 +320,7 @@ export function Header({ client, onNotificationClick }: HeaderProps = {}) {
             <Button
               variant="ghost"
               size="icon"
-              className="text-[var(--foreground)]"
+              className="text-[var(--primary-foreground)]"
               onClick={() => setIsMenuOpen(!isMenuOpen)}
             >
               {isMenuOpen ? (
@@ -336,7 +331,7 @@ export function Header({ client, onNotificationClick }: HeaderProps = {}) {
             </Button>
             <Link
               href="/"
-              className="text-xl font-bold text-[var(--primary)] flex items-center gap-2"
+              className="text-2xl font-bold text-[var(--primary-foreground)] flex items-center gap-2 hover:text-[var(--primary-hover)] transition-colors"
             >
               Byway
             </Link>
@@ -346,7 +341,7 @@ export function Header({ client, onNotificationClick }: HeaderProps = {}) {
                   <div className="relative group">
                     <Link href="/chat">
                       <MessageSquare
-                        className="w-6 h-6 text-[var(--secondary)] group-hover:text-[var(--secondary-hover)] transition-colors cursor-pointer"
+                        className="w-6 h-6 text-[var(--primary-foreground)] group-hover:text-[var(--primary-hover)] transition-colors cursor-pointer"
                         strokeWidth={1.5}
                       />
                     </Link>
@@ -354,7 +349,7 @@ export function Header({ client, onNotificationClick }: HeaderProps = {}) {
                   <div className="relative group">
                     <Link href="/user/cart">
                       <ShoppingCart
-                        className="w-6 h-6 text-[var(--secondary)] group-hover:text-[var(--secondary-hover)] transition-colors cursor-pointer"
+                        className="w-6 h-6 text-[var(--primary-foreground)] group-hover:text-[var(--primary-hover)] transition-colors cursor-pointer"
                         strokeWidth={1.5}
                       />
                       {cartCount > 0 && (
@@ -366,14 +361,14 @@ export function Header({ client, onNotificationClick }: HeaderProps = {}) {
                   </div>
                   <div className="relative group">
                     <Bell
-                      className="w-6 h-6 text-[var(--secondary)] group-hover:text-[var(--secondary-hover)] transition-colors cursor-pointer"
+                      className="w-6 h-6 text-[var(--primary-foreground)] group-hover:text-[var(--primary-hover)] transition-colors cursor-pointer"
                       strokeWidth={1.5}
                       onClick={onNotificationClick}
                     />
                   </div>
                   <div className="relative group">
                     <Link href="/user/profile">
-                      <div className="w-9 h-9 rounded-full bg-[var(--primary-50)] flex items-center justify-center text-[var(--primary)] font-medium border-2 border-[var(--primary-200)] group-hover:border-[var(--primary-300)] transition-all">
+                      <div className="w-9 h-9 rounded-full bg-[var(--primary-50)] flex items-center justify-center text-[var(--primary-foreground)] font-medium border-2 border-[var(--primary-200)] group-hover:border-[var(--primary-300)] transition-all">
                         {user.name?.charAt(0) || "U"}
                       </div>
                     </Link>
@@ -382,7 +377,7 @@ export function Header({ client, onNotificationClick }: HeaderProps = {}) {
               ) : (
                 <>
                   <Link href="/login">
-                    <Button className="bg-[var(--primary)] hover:bg-[var(--primary-700)] text-[var(--background)] rounded-lg px-5 py-2 text-base font-medium">
+                    <Button >
                       Sign In
                     </Button>
                   </Link>
@@ -403,11 +398,18 @@ export function Header({ client, onNotificationClick }: HeaderProps = {}) {
                   Courses
                 </Link>
                 <Link
-                  href="/pages"
-                  className="block px-2 py-1 text-[var(--foreground)]  font-medium text-base"
+                  href="/categories"
+                  className="block px-2 py-1 text-[var(--foreground)] font-medium text-base"
                   onClick={() => setIsMenuOpen(false)}
                 >
-                  Pages
+                  Categories
+                </Link>
+                <Link
+                  href="/instructors"
+                  className="block px-2 py-1 text-[var(--foreground)] font-medium text-base"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  Instructors
                 </Link>
                 {isLoading ? (
                   <div className="space-y-3">

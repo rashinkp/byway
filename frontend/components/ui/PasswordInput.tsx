@@ -19,7 +19,7 @@ export function PasswordInput({ className, ...props }: PasswordInputProps) {
   };
 
   return (
-    <div className="relative">
+    <div className="relative group">
       <Input
         type={showPassword ? "text" : "password"}
         className={cn("pr-10", className)}
@@ -34,9 +34,9 @@ export function PasswordInput({ className, ...props }: PasswordInputProps) {
         aria-label={showPassword ? "Hide password" : "Show password"}
       >
         {showPassword ? (
-          <EyeOff className="h-4 w-4 text-muted-foreground" />
+          <EyeOff className="h-4 w-4 text-[var(--primary-400)] group-hover:text-[var(--primary-700)] transition-colors" />
         ) : (
-          <Eye className="h-4 w-4 text-muted-foreground" />
+          <Eye className="h-4 w-4 text-[var(--primary-400)] group-hover:text-[var(--primary-700)] transition-colors" />
         )}
       </Button>
     </div>

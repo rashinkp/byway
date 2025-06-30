@@ -58,13 +58,13 @@ export function AuthForm<T extends FieldValues>({
   extraLink,
 }: AuthFormProps<T>) {
   return (
-    <div className="mx-auto flex w-full flex-col justify-center space-y-6 sm:w-[350px]">
+    <div className="mx-auto flex w-full flex-col justify-center space-y-6 sm:w-[350px] px-4 sm:px-0">
       <div className="flex flex-col space-y-2 text-center">
         <h1 className="text-2xl font-semibold tracking-tight">{title}</h1>
         <p className="text-sm text-muted-foreground">{subtitle}</p>
       </div>
       {error && (
-        <div className="text-center text-sm text-destructive font-medium">
+        <div className="text-center text-sm text-[var(--danger)] rounded py-2 px-3 mb-2">
           {error}
         </div>
       )}
@@ -92,7 +92,7 @@ export function AuthForm<T extends FieldValues>({
                       />
                     )}
                   </FormControl>
-                  <FormMessage />
+                  <FormMessage className="text-[var(--danger)]" />
                 </FormItem>
               )}
             />

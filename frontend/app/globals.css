@@ -19,6 +19,8 @@
   --background: #09090b; 
   --foreground: #f4f4f5;
 
+  --warning: #facc15; /* yellow-400 */
+  --danger: #ef4444; /* red-500 */
 
   --primary-50: #09090b;
   --primary-100: #18181b;
@@ -39,5 +41,9 @@
 [data-theme] {
   --card: var(--background);
   --card-foreground: var(--foreground);
+  --warning: #facc15;
+  --warning-foreground: #78350f;
+  --danger: #ef4444;
+  --danger-foreground: #fef2f2;
 }
 

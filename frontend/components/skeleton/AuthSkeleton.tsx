@@ -9,7 +9,7 @@ const AuthSkeleton: React.FC = () => {
       description="Join thousands of students and instructors on our platform to unlock your potential."
       imageAlt="Learning platform illustration"
     >
-      <div className="min-h-screen flex items-center justify-center bg-gray-50/50 p-4">
+      <div className="min-h-screen flex items-center justify-center bg-[var(--background)] p-4">
         <div className="w-full max-w-md">
           {/* Header Section */}
           <div className="text-center mb-8">
@@ -29,7 +29,7 @@ const AuthSkeleton: React.FC = () => {
               <Skeleton className="w-full h-px" />
             </div>
             <div className="relative flex justify-center text-xs uppercase">
-              <Skeleton className="h-4 w-24 bg-card px-2" />
+              <Skeleton className="h-4 w-24 bg-[var(--primary-200)] px-2" />
             </div>
           </div>
 

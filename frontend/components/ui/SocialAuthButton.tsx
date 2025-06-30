@@ -64,7 +64,11 @@ export function SocialAuthButton({
     <Button
       type="button"
       variant={variant}
-      className="w-full flex items-center justify-center font-medium transition-colors"
+      className={
+        provider === "google"
+          ? "w-full flex items-center justify-center font-medium transition-colors hover:bg-[var(--primary-100)] hover:text-[var(--primary-foreground)] cursor-pointer"
+          : "w-full flex items-center justify-center font-medium transition-colors"
+      }
       onClick={onClick}
       disabled={isSubmitting}
     >

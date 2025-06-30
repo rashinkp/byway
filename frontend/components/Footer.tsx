@@ -43,7 +43,7 @@ const BywayFooter = () => {
                 <li key={index}>
                   <Link 
                     href={link.href}
-                    className="text-[var(--foreground)]/70 hover:text-[var(--primary)] transition-colors text-sm"
+                    className="text-[var(--foreground)]/70 hover:text-[var(--primary-foreground)] transition-colors text-sm"
                   >
                     {link.name}
                   </Link>

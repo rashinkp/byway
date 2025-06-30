@@ -51,16 +51,16 @@ export function AuthPageWrapper({
 
   // Show appropriate skeleton while loading or during redirects
   if (isLoading) {
-    return null;
+    return getSkeletonType() === "otp" ? <OtpSkeleton /> : <AuthSkeleton />;
   }
 
   // Don't render children if we're redirecting
   if (requireAuth && !isAuthenticated) {
-    return null;
+    return getSkeletonType() === "otp" ? <OtpSkeleton /> : <AuthSkeleton />;
   }
 
   if (redirectIfAuthenticated && isAuthenticated) {
-    return null;
+    return getSkeletonType() === "otp" ? <OtpSkeleton /> : <AuthSkeleton />;
   }
 
   return <>{children}</>;

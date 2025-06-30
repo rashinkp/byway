@@ -9,7 +9,7 @@ const OtpSkeleton: React.FC = () => {
       description="Complete the verification process to access your new account and start your learning journey."
       imageAlt="Verification illustration"
     >
-      <div className="min-h-screen flex items-center justify-center bg-gray-50/50 p-4">
+      <div className="min-h-screen flex items-center justify-center bg-[var(--background)] p-4">
         <div className="w-full max-w-md">
           {/* Header Section */}
           <div className="text-center mb-8">
