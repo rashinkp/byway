@@ -82,40 +82,82 @@ function ModeToggle() {
 export default function ThemePage() {
   const { setTheme, theme: currentTheme, resolvedTheme } = useTheme();
   const [themeVersion, setThemeVersion] = React.useState(0);
+  const [computedVars, setComputedVars] = React.useState<Record<string, string>>({});
+  const [mounted, setMounted] = React.useState(false);
+
+  React.useEffect(() => {
+    setMounted(true);
+  }, []);
 
   React.useEffect(() => {
     setThemeVersion((v) => v + 1);
+    // Update computedVars for the selected theme
+    const vars: Record<string, string> = {};
+    themeVars.forEach((v) => {
+      vars[v] = typeof window !== 'undefined' ? getComputedStyle(document.documentElement).getPropertyValue(`--${v}`).trim() : '';
+    });
+    setComputedVars(vars);
   }, [currentTheme, resolvedTheme]);
+
+  React.useEffect(() => {
+    if (mounted) {
+      // Debug print: log current theme and <body> data-theme attribute
+      const bodyTheme = typeof window !== 'undefined' ? document.body.getAttribute('data-theme') : null;
+      // eslint-disable-next-line no-console
+      console.log('Current theme:', currentTheme, '| Resolved theme:', resolvedTheme, '| <body> data-theme:', bodyTheme);
+    }
+  }, [currentTheme, resolvedTheme, mounted]);
+
+  // List of important theme variables to preview
+  const themeVars = [
+    'primary', 'primary-foreground', 'primary-hover',
+    'secondary', 'secondary-foreground', 'secondary-hover',
+    'tertiary', 'tertiary-foreground', 'tertiary-hover',
+    'background', 'foreground', 'warning', 'danger',
+    ...[50,100,200,300,400,500,600,700,800,900,950].map(s => `primary-${s}`)
+  ];
+
+  if (!mounted) return null;
 
   return (
     <div className="space-y-8">
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4 mt-8">
         {themes.map((t) => (
-          <button
-            key={t}
-            type="button"
-            onClick={() => setTheme(t)}
-            className={`theme-preview flex flex-col items-center ${
-              currentTheme === t || resolvedTheme === t ? "selected" : ""
-            }`}
-            aria-label={`Select ${t} theme`}
-            data-theme={t}
-          >
-            <div className="flex space-x-1 mb-2">
-              {[50, 100, 200, 300, 400, 500, 600, 700, 800, 900, 950].map(
-                (shade) => (
+          <div key={t} data-theme={t} className="w-full">
+            <button
+              type="button"
+              onClick={() => setTheme(t)}
+              className={`theme-preview flex flex-col items-center ${
+                currentTheme === t || resolvedTheme === t ? "selected" : ""
+              }`}
+              aria-label={`Select ${t} theme`}
+            >
+              <div className="flex flex-wrap gap-1 mb-2 justify-center">
+                {themeVars.map((v) => (
                   <span
-                    key={shade}
-                    className="theme-swatch"
-                    style={{ backgroundColor: `var(--primary-${shade})` }}
+                    key={v}
+                    className="theme-swatch w-5 h-5 rounded border border-[var(--primary-200)]"
+                    title={v}
+                    style={{ backgroundColor: `var(--${v})` }}
                   />
-                )
+                ))}
+              </div>
+              <span className="theme-label font-semibold">
+                {t.charAt(0).toUpperCase() + t.slice(1)}
+              </span>
+              {(currentTheme === t || resolvedTheme === t) && (
+                <div className="mt-2 text-xs text-center w-full">
+                  {themeVars.map((v) => (
+                    <div key={v} className="flex items-center gap-2 justify-center">
+                      <span className="w-32 text-right text-muted-foreground">{v}</span>
+                      <span className="w-5 h-5 rounded border border-[var(--primary-200)]" style={{ backgroundColor: computedVars[v] }} />
+                      <span className="text-xs text-muted-foreground">{computedVars[v]}</span>
+                    </div>
+                  ))}
+                </div>
               )}
-            </div>
-            <span className="theme-label">
-              {t.charAt(0).toUpperCase() + t.slice(1)}
-            </span>
-          </button>
+            </button>
+          </div>
         ))}
       </div>
       <ThemeDebug key={themeVersion} />
