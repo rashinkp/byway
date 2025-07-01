@@ -20,17 +20,17 @@ const BywayFooter = () => {
   ];
 
   return (
-    <footer className="bg-[var(--background)] text-[var(--foreground)] py-12 px-4 w-full mt-auto border-t border-[var(--primary-200)]">
+    <footer className="bg-[var(--color-background)] text-[var(--color-foreground)] py-12 px-4 w-full mt-auto ">
       <div className="container mx-auto max-w-6xl">
         {/* Main Footer Content */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
           {/* Brand Section */}
           <div>
             <h2 className="text-2xl font-bold mb-4">Byway</h2>
-            <p className="text-[var(--foreground)]/70 text-sm mb-4">
+            <p className="text-[var(--color-foreground)]/70 text-sm mb-4">
               Empowering learners worldwide with accessible, high-quality education.
             </p>
-            <p className="text-[var(--foreground)]/50 text-sm">
+            <p className="text-[var(--color-foreground)]/50 text-sm">
               support@byway.com
             </p>
           </div>
@@ -43,7 +43,7 @@ const BywayFooter = () => {
                 <li key={index}>
                   <Link 
                     href={link.href}
-                    className="text-[var(--foreground)]/70 hover:text-[var(--primary)] transition-colors text-sm"
+                    className="text-[var(--color-foreground)]/70 hover:text-[var(--color-primary)] transition-colors text-sm"
                   >
                     {link.name}
                   </Link>
@@ -62,10 +62,10 @@ const BywayFooter = () => {
                   href={social.href}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="w-10 h-10 bg-[var(--primary-50)] rounded-lg flex items-center justify-center hover:bg-[var(--primary-100)] transition-colors"
+                  className="w-10 h-10 bg-[var(--color-primary-light)] rounded-lg flex items-center justify-center hover:bg-[var(--color-primary-dark)] transition-colors"
                   aria-label={social.label}
                 >
-                  <social.icon className="w-5 h-5 text-[var(--primary-400)]" />
+                  <social.icon className="w-5 h-5 text-[var(--color-surface)]" />
                 </a>
               ))}
             </div>
@@ -73,8 +73,8 @@ const BywayFooter = () => {
         </div>
 
         {/* Copyright */}
-        <div className="border-t border-[var(--primary-200)] pt-6 text-center">
-          <p className="text-sm text-[var(--foreground)]/50">
+        <div className="border-t border-[var(--color-primary-light)] pt-6 text-center">
+          <p className="text-sm text-[var(--color-foreground)]/50">
             © {currentYear} Byway. All Rights Reserved.
           </p>
         </div>

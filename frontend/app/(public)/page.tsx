@@ -1,16 +1,17 @@
 'use client'
 
 import { CategoryCard } from "@/components/category/CategoryCard";
-import { TopCourses } from "@/components/course/TopCourseList";
 import { StatsCard } from "@/components/DashboardStats";
-import { HeroSection } from "@/components/HeroSection";
 import { TopInstructors } from "@/components/instructor/TopInstructor";
-import { Code, Sparkles } from "lucide-react";
+import { Code,  ChevronLeft, ChevronRight } from "lucide-react";
 import { useCategories } from "@/hooks/category/useCategories";
 import { useRouter } from "next/navigation";
 import { useGetAllCourses } from "@/hooks/course/useGetAllCourse";
 import { useGetAllInstructors } from "@/hooks/instructor/useGetAllInstructor";
-import { Skeleton } from "@/components/ui/skeleton";
+import KnowledgeBanner from "@/components/banners/KnowledgePluseBanner";
+import { CourseCard } from "@/components/course/CourseCard";
+import { Button } from "@/components/ui/button";
+import { TopCourses } from "@/components/course/TopCourseList";
 
 export default function UserDashboard() {
   const router = useRouter();
@@ -71,55 +72,50 @@ export default function UserDashboard() {
   })) || [];
 
   return (
-    <div className="relative min-h-screen pb-16" style={{ background: "var(--background)" }}>
+    <div
+      className="relative min-h-screen pb-16"
+      style={{ background: "var(--color-background)" }}
+    >
       <div className="container mx-auto px-2 sm:px-4 py-6 sm:py-8">
-        <HeroSection className="mb-10 sm:mb-16" />
+        <KnowledgeBanner />
         <section className="mb-8 sm:mb-12">
           <StatsCard stats={stats} className="mb-0 shadow-md" />
         </section>
         <section className="mb-8 sm:mb-12">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6 mt-2 gap-2 sm:gap-0">
-            <h2 className="text-xl sm:text-2xl font-bold" style={{ color: "var(--foreground)" }}>
+            <h2
+              className="text-xl sm:text-2xl font-bold"
+              style={{ color: "var(--color-primary-dark)" }}
+            >
               Top Categories
             </h2>
             <button
-              onClick={() => router.push('/categories')}
-              className="px-4 py-2 rounded-full font-medium text-sm transition w-full sm:w-auto mt-2 sm:mt-0"
-              style={{ background: "var(--secondary)", color: "var(--secondary-foreground)" }}
+              onClick={() => router.push("/categories")}
+              className="px-4 py-2 rounded-full font-medium text-sm transition w-full sm:w-auto mt-2 sm:mt-0 bg-[var(--color-primary-dark)] text-[var(--color-surface)] hover:bg-[var(--color-primary-light)] shadow-md"
             >
               View All
             </button>
           </div>
-          <CategoryCard 
-            categories={categories} 
-            className="mb-0" 
+          <CategoryCard
+            categories={categories}
+            className="mb-0"
             onCategoryClick={handleCategoryClick}
           />
         </section>
         <section className="mb-8 sm:mb-12">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6 mt-2 gap-2 sm:gap-0">
-            <h2 className="text-xl sm:text-2xl font-bold" style={{ color: "var(--foreground)" }}>
-              Top Courses
-            </h2>
-            <button
-              onClick={() => router.push('/courses')}
-              className="px-4 py-2 rounded-full font-medium text-sm transition w-full sm:w-auto mt-2 sm:mt-0"
-              style={{ background: "var(--secondary)", color: "var(--secondary-foreground)" }}
-            >
-              View All
-            </button>
-          </div>
-          <TopCourses courses={topCourses} className="mb-0" variant="compact" />
+          <TopCourses courses={topCourses} router={router} />
         </section>
         <section className="mb-8 sm:mb-12">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6 mt-2 gap-2 sm:gap-0">
-            <h2 className="text-xl sm:text-2xl font-bold" style={{ color: "var(--foreground)" }}>
+            <h2
+              className="text-xl sm:text-2xl font-bold"
+              style={{ color: "var(--color-primary-dark)" }}
+            >
               Top Instructors
             </h2>
             <button
-              onClick={() => router.push('/instructors')}
-              className="px-4 py-2 rounded-full font-medium text-sm transition w-full sm:w-auto mt-2 sm:mt-0"
-              style={{ background: "var(--secondary)", color: "var(--secondary-foreground)" }}
+              onClick={() => router.push("/instructors")}
+              className="px-4 py-2 rounded-full font-medium text-sm transition w-full sm:w-auto mt-2 sm:mt-0 bg-[var(--color-primary-dark)] text-[var(--color-surface)] hover:bg-[var(--color-primary-light)] shadow-md"
             >
               View All
             </button>

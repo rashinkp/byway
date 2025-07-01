@@ -1,11 +1,11 @@
 "use client";
 
 import { Header } from "@/components/layout/Header";
-import BywayFooter from "@/components/Footer";
 import NotificationModal from '@/components/notifications/NotificationModal';
 import { useState } from 'react';
 import { usePathname } from "next/navigation";
 import { TopNavbar } from "@/components/common/layout/TopNavbar";
+import BywayFooter from "@/components/layout/Footer";
 
 export default function PublicLayout({
   children,

@@ -37,7 +37,7 @@ export default function RootLayout({
       >
         <ThemeProvider
           attribute="data-theme"
-          defaultTheme="shadcn-dark"
+          defaultTheme="nature"
           enableSystem={false}
           disableTransitionOnChange
         >

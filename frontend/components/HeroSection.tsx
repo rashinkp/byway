@@ -99,14 +99,14 @@ export function HeroSection({ className }: HeroSectionProps) {
       >
         {/* Text Section */}
         <div className="md:w-1/2 mb-12 md:mb-0">
-          <h1 className="text-4xl md:text-5xl font-bold text-gray-800 leading-tight mb-6">
+          <h1 className="text-4xl md:text-5xl font-bold text-[var(--color-primary-dark)] leading-tight mb-6">
             {headline}
           </h1>
-          <p className="text-lg text-gray-600 mb-8 leading-relaxed">
+          <p className="text-lg text-[var(--color-primary-light)] mb-8 leading-relaxed">
             {description}
           </p>
           <Button 
-            className="bg-blue-600 hover:bg-blue-700 text-white rounded-lg px-6 py-3 text-lg font-medium"
+            className="bg-[var(--color-primary-dark)] hover:bg-[var(--color-primary-light)] text-[var(--color-surface)] rounded-lg px-6 py-3 text-lg font-medium shadow-md"
             onClick={handleInstructorButtonClick}
             disabled={isCreatingInstructor}
           >
@@ -127,10 +127,10 @@ export function HeroSection({ className }: HeroSectionProps) {
             <div
               key={index}
               className={cn(
-                "absolute rounded-full border-4 border-white shadow-md overflow-hidden",
-                image.className,
-                image.bgColor
+                "absolute rounded-full border-4 border-[var(--color-surface)] shadow-md overflow-hidden",
+                image.className
               )}
+              style={{ background: 'var(--color-primary-light)' }}
             >
               <img
                 src={image.src}
@@ -141,15 +141,15 @@ export function HeroSection({ className }: HeroSectionProps) {
           ))}
 
           {/* Community Stats */}
-          <div className="absolute bottom-0 right-0 bg-white shadow-lg rounded-lg p-4 flex items-center gap-3 border border-gray-100">
-            <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
-              <Users className="w-6 h-6 text-blue-500" />
+          <div className="absolute bottom-0 right-0 bg-[var(--color-surface)] shadow-lg rounded-lg p-4 flex items-center gap-3 border border-[var(--color-primary-light)]">
+            <div className="w-12 h-12 bg-[var(--color-primary-light)] rounded-full flex items-center justify-center">
+              <Users className="w-6 h-6 text-[var(--color-primary-dark)]" />
             </div>
             <div>
-              <p className="text-sm font-medium text-gray-800">
+              <p className="text-sm font-medium text-[var(--color-primary-dark)]">
                 {communityStats.label}
               </p>
-              <p className="text-lg font-bold text-gray-800">
+              <p className="text-lg font-bold text-[var(--color-primary-dark)]">
                 {communityStats.students.toLocaleString()} + Students
               </p>
             </div>

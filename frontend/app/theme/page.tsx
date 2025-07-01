@@ -1,82 +1,18 @@
 "use client";
 
 import * as React from "react";
-import { Moon, Sun, Palette } from "lucide-react";
 import { useTheme } from "next-themes";
-import { Button } from "@/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-  DropdownMenuSeparator,
-  DropdownMenuLabel,
-} from "@/components/ui/dropdown-menu";
-import ThemeDebug from "@/components/ThemeDebug";
 
 const themes = [
-  "neutral",
-  "stone",
-  "zinc",
-  "slate",
-  "gray",
-  "red",
-  "orange",
-  "amber",
-  "yellow",
-  "lime",
-  "green",
-  "emerald",
-  "teal",
-  "cyan",
-  "sky",
-  "blue",
-  "indigo",
-  "violet",
-  "purple",
-  "fuchsia",
-  "pink",
-  "rose",
-  "shadcn",
-  "shadcn-dark",
+  "nature",
 ];
 
-function ModeToggle() {
-  const { setTheme, theme: currentTheme } = useTheme();
-
-  return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button variant="outline" size="icon" aria-label="Toggle theme">
-          <Sun className="h-[1.2rem] w-[1.2rem] scale-100 rotate-0 transition-all dark:scale-0 dark:-rotate-90" />
-          <Moon className="absolute h-[1.2rem] w-[1.2rem] scale-0 rotate-90 transition-all dark:scale-100 dark:rotate-0" />
-        </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align="end">
-        <DropdownMenuLabel>Theme</DropdownMenuLabel>
-        <DropdownMenuItem onClick={() => setTheme("light")}>
-          Light
-        </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => setTheme("system")}>
-          System
-        </DropdownMenuItem>
-        <DropdownMenuSeparator />
-        <DropdownMenuLabel>
-          <Palette className="inline-block mr-2 h-4 w-4" />
-          Color Theme
-        </DropdownMenuLabel>
-        {themes.map((t) => (
-          <DropdownMenuItem
-            key={t}
-            onClick={() => setTheme(t)}
-            className={currentTheme === t ? "font-bold" : ""}
-          >
-            {t.charAt(0).toUpperCase() + t.slice(1)}
-          </DropdownMenuItem>
-        ))}
-      </DropdownMenuContent>
-    </DropdownMenu>
-  );
+// Helper to format variable names for display
+function formatVarName(varName: string) {
+  return varName
+    .replace('color-', '')
+    .replace(/-/g, ' ')
+    .replace(/\b\w/g, c => c.toUpperCase());
 }
 
 export default function ThemePage() {
@@ -110,11 +46,9 @@ export default function ThemePage() {
 
   // List of important theme variables to preview
   const themeVars = [
-    'primary', 'primary-foreground', 'primary-hover',
-    'secondary', 'secondary-foreground', 'secondary-hover',
-    'tertiary', 'tertiary-foreground', 'tertiary-hover',
-    'background', 'foreground', 'warning', 'danger',
-    ...[50,100,200,300,400,500,600,700,800,900,950].map(s => `primary-${s}`)
+    'color-primary-dark', 'color-primary-light',
+    'color-background', 'color-surface',
+    'color-accent', 'color-warning', 'color-danger',
   ];
 
   if (!mounted) return null;
@@ -136,8 +70,8 @@ export default function ThemePage() {
                 {themeVars.map((v) => (
                   <span
                     key={v}
-                    className="theme-swatch w-5 h-5 rounded border border-[var(--primary-200)]"
-                    title={v}
+                    className="theme-swatch w-5 h-5 rounded border border-[var(--color-primary-light)]"
+                    title={formatVarName(v)}
                     style={{ backgroundColor: `var(--${v})` }}
                   />
                 ))}
@@ -149,8 +83,8 @@ export default function ThemePage() {
                 <div className="mt-2 text-xs text-center w-full">
                   {themeVars.map((v) => (
                     <div key={v} className="flex items-center gap-2 justify-center">
-                      <span className="w-32 text-right text-muted-foreground">{v}</span>
-                      <span className="w-5 h-5 rounded border border-[var(--primary-200)]" style={{ backgroundColor: computedVars[v] }} />
+                      <span className="w-32 text-right text-muted-foreground">{formatVarName(v)}</span>
+                      <span className="w-5 h-5 rounded border border-[var(--color-primary-light)]" style={{ backgroundColor: computedVars[v] }} />
                       <span className="text-xs text-muted-foreground">{computedVars[v]}</span>
                     </div>
                   ))}
@@ -160,7 +94,6 @@ export default function ThemePage() {
           </div>
         ))}
       </div>
-      <ThemeDebug key={themeVersion} />
     </div>
   );
 }

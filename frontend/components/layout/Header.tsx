@@ -165,8 +165,8 @@ export function Header({ client, onNotificationClick }: HeaderProps = {}) {
         className={cn(
           "sticky top-0 z-50 w-full transition-all duration-300",
           scrolled
-            ? "bg-[var(--background)] shadow-md"
-            : "bg-[var(--background)]"
+            ? "bg-[var(--color-background)] shadow-md"
+            : "bg-[var(--color-background)]"
         )}
       >
         <div className="container mx-auto px-10 py-3">
@@ -175,7 +175,7 @@ export function Header({ client, onNotificationClick }: HeaderProps = {}) {
             <div className="flex items-center gap-10">
               <Link
                 href="/"
-                className="text-2xl font-bold text-[var(--primary-foreground)] flex items-center gap-2 hover:text-[var(--primary-hover)] transition-colors"
+                className="text-2xl font-bold text-[var(--color-primary-dark)] flex items-center gap-2 hover:text-[var(--color-primary-light)] transition-colors"
               >
                 Byway
               </Link>
@@ -193,7 +193,7 @@ export function Header({ client, onNotificationClick }: HeaderProps = {}) {
             <nav className="flex items-center gap-4">
               <Link
                 href="/courses"
-                className="text-base font-medium text-[var(--primary-foreground)] hover:text-[var(--primary-hover)] px-2 py-1 rounded transition-colors"
+                className="text-base font-medium text-[var(--color-primary-dark)] hover:text-[var(--color-primary-light)] px-2 py-1 rounded transition-colors"
               >
                 Courses
               </Link>
@@ -202,7 +202,7 @@ export function Header({ client, onNotificationClick }: HeaderProps = {}) {
                 <DropdownMenuTrigger asChild>
                   <Button
                     variant="link"
-                    className="flex items-center gap-1 text-base font-medium text-[var(--primary-foreground)] hover:text-[var(--primary-hover)] px-2 py-1 rounded focus:outline-none shadow-none border-none bg-transparent"
+                    className="flex items-center gap-1 text-base font-medium text-[var(--color-primary-dark)] hover:text-[var(--color-primary-light)] px-2 py-1 rounded focus:outline-none shadow-none border-none bg-transparent"
                   >
                     Pages
                     <ChevronDown className="w-4 h-4 transition-transform group-data-[state=open]:rotate-90" />
@@ -210,18 +210,18 @@ export function Header({ client, onNotificationClick }: HeaderProps = {}) {
                 </DropdownMenuTrigger>
                 <DropdownMenuContent
                   align="start"
-                  className="w-40 bg-[var(--tertiary)] text-[var(--tertiary-foreground)] shadow-lg border-0 p-1"
+                  className="w-40 bg-[var(--color-surface)] text-[var(--color-primary-dark)] shadow-lg border-0 p-1"
                 >
                 
                   <DropdownMenuItem
                     asChild
-                    className="rounded hover:bg-[var(--tertiary-hover)]"
+                    className="rounded hover:bg-[var(--color-background)]"
                   >
                     <Link href="/categories">Categories</Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem
                     asChild
-                    className="rounded hover:bg-[var(--tertiary-hover)]"
+                    className="rounded hover:bg-[var(--color-background)]"
                   >
                     <Link href="/instructors">Instructors</Link>
                   </DropdownMenuItem>
@@ -229,7 +229,7 @@ export function Header({ client, onNotificationClick }: HeaderProps = {}) {
               </DropdownMenu>
               {isLoading ? (
                 <div className="flex items-center justify-center w-20 h-10">
-                  <Loader2 className="w-6 h-6 text-[var(--primary-400)] animate-spin" />
+                  <Loader2 className="w-6 h-6 text-[var(--color-accent)] animate-spin" />
                 </div>
               ) : user ? (
                 <>
@@ -237,16 +237,18 @@ export function Header({ client, onNotificationClick }: HeaderProps = {}) {
                     <div className="relative group">
                       <Link href="/chat">
                         <MessageSquare
-                          className="w-6 h-6 text-[var(--foreground)] group-hover:text-[var(--secondary-hover)] transition-colors cursor-pointer"
+                          className="w-6 h-6 text-[var(--color-primary-dark)] group-hover:text-[var(--color-primary-light)] transition-colors cursor-pointer"
                           strokeWidth={1.5}
+                          style={{ color: 'var(--color-primary-dark)' }}
                         />
                       </Link>
                     </div>
                     <div className="relative group">
                       <Link href="/user/cart">
                         <ShoppingCart
-                          className="w-6 h-6 text-[var(--foreground)] group-hover:text-[var(--secondary-hover)] transition-colors cursor-pointer"
+                          className="w-6 h-6 text-[var(--color-primary-dark)] group-hover:text-[var(--color-primary-light)] transition-colors cursor-pointer"
                           strokeWidth={1.5}
+                          style={{ color: 'var(--color-primary-dark)' }}
                         />
                         {cartCount > 0 && (
                           <span className="absolute -top-2 -right-2 w-5 h-5 p-0 flex items-center justify-center text-xs rounded-full bg-black text-white font-semibold border-2 border-white shadow">
@@ -257,9 +259,10 @@ export function Header({ client, onNotificationClick }: HeaderProps = {}) {
                     </div>
                     <div className="relative group">
                       <Bell
-                        className="w-6 h-6 text-[var(--foreground)] group-hover:text-[var(--secondary-hover)] transition-colors cursor-pointer"
+                        className="w-6 h-6 text-[var(--color-primary-dark)] group-hover:text-[var(--color-primary-light)] transition-colors cursor-pointer"
                         strokeWidth={1.5}
                         onClick={onNotificationClick}
+                        style={{ color: 'var(--color-primary-dark)' }}
                       />
                     </div>
                     <DropdownMenu
@@ -268,28 +271,28 @@ export function Header({ client, onNotificationClick }: HeaderProps = {}) {
                     >
                       <DropdownMenuTrigger asChild>
                         <div className="relative group cursor-pointer">
-                          <div className="w-10 h-10 rounded-full bg-[var(--primary-50)] flex items-center justify-center text-[var(--primary-foreground)] font-medium border-2 border-[var(--primary-200)] group-hover:border-[var(--primary-300)] transition-all">
+                          <div className="w-10 h-10 rounded-full bg-[var(--color-primary-50)] flex items-center justify-center text-[var(--color-primary-foreground)] font-medium border-2 border-[var(--color-primary-200)] group-hover:border-[var(--color-primary-300)] transition-all">
                             {user.name?.charAt(0) || "U"}
                           </div>
                         </div>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent
                         align="end"
-                        className="w-56 bg-[var(--tertiary)] text-[var(--tertiary-foreground)] shadow-lg border-0 p-1"
+                        className="w-56 bg-[var(--color-surface)] text-[var(--color-primary-dark)] shadow-lg border-0 p-1"
                       >
-                        <DropdownMenuLabel className="text-[var(--tertiary-foreground)] font-semibold">
+                        <DropdownMenuLabel className="text-[var(--color-primary-dark)] font-semibold">
                           {user.name || "User"}
                         </DropdownMenuLabel>
                         <DropdownMenuSeparator />
                         <DropdownMenuItem
                           onClick={() => handleNavigation("/user/profile")}
-                          className="rounded hover:bg-[var(--tertiary-hover)]"
+                          className="rounded hover:bg-[var(--color-background)]"
                         >
                           Profile
                         </DropdownMenuItem>
                         <DropdownMenuItem
                           onClick={() => handleNavigation("/user/my-courses")}
-                          className="rounded hover:bg-[var(--tertiary-hover)]"
+                          className="rounded hover:bg-[var(--color-background)]"
                         >
                           My Courses
                         </DropdownMenuItem>
@@ -297,7 +300,7 @@ export function Header({ client, onNotificationClick }: HeaderProps = {}) {
                         <DropdownMenuItem
                           onClick={handleLogout}
                           disabled={isLoggingOut}
-                          className="rounded hover:bg-[var(--tertiary-hover)]"
+                          className="rounded hover:bg-[var(--color-background)]"
                         >
                           {isLoggingOut ? "Logging out..." : "Logout"}
                         </DropdownMenuItem>
@@ -308,7 +311,7 @@ export function Header({ client, onNotificationClick }: HeaderProps = {}) {
               ) : (
                 <>
                   <Link href="/login">
-                    <Button>Sign In</Button>
+                    <Button >Sign In</Button>
                   </Link>
                 </>
               )}
@@ -320,7 +323,7 @@ export function Header({ client, onNotificationClick }: HeaderProps = {}) {
             <Button
               variant="ghost"
               size="icon"
-              className="text-[var(--primary-foreground)]"
+              className="text-[var(--color-primary-dark)]"
               onClick={() => setIsMenuOpen(!isMenuOpen)}
             >
               {isMenuOpen ? (
@@ -331,7 +334,7 @@ export function Header({ client, onNotificationClick }: HeaderProps = {}) {
             </Button>
             <Link
               href="/"
-              className="text-2xl font-bold text-[var(--primary-foreground)] flex items-center gap-2 hover:text-[var(--primary-hover)] transition-colors"
+              className="text-2xl font-bold text-[var(--color-primary-dark)] flex items-center gap-2 hover:text-[var(--color-primary-light)] transition-colors"
             >
               Byway
             </Link>
@@ -341,16 +344,18 @@ export function Header({ client, onNotificationClick }: HeaderProps = {}) {
                   <div className="relative group">
                     <Link href="/chat">
                       <MessageSquare
-                        className="w-6 h-6 text-[var(--primary-foreground)] group-hover:text-[var(--primary-hover)] transition-colors cursor-pointer"
+                        className="w-6 h-6 text-[var(--color-primary-dark)] group-hover:text-[var(--color-primary-light)] transition-colors cursor-pointer"
                         strokeWidth={1.5}
+                        style={{ color: 'var(--color-primary-dark)' }}
                       />
                     </Link>
                   </div>
                   <div className="relative group">
                     <Link href="/user/cart">
                       <ShoppingCart
-                        className="w-6 h-6 text-[var(--primary-foreground)] group-hover:text-[var(--primary-hover)] transition-colors cursor-pointer"
+                        className="w-6 h-6 text-[var(--color-primary-dark)] group-hover:text-[var(--color-primary-light)] transition-colors cursor-pointer"
                         strokeWidth={1.5}
+                        style={{ color: 'var(--color-primary-dark)' }}
                       />
                       {cartCount > 0 && (
                         <span className="absolute -top-2 -right-2 w-5 h-5 p-0 flex items-center justify-center text-xs rounded-full bg-black text-white font-semibold border-2 border-white shadow">
@@ -361,14 +366,15 @@ export function Header({ client, onNotificationClick }: HeaderProps = {}) {
                   </div>
                   <div className="relative group">
                     <Bell
-                      className="w-6 h-6 text-[var(--primary-foreground)] group-hover:text-[var(--primary-hover)] transition-colors cursor-pointer"
+                      className="w-6 h-6 text-[var(--color-primary-dark)] group-hover:text-[var(--color-primary-light)] transition-colors cursor-pointer"
                       strokeWidth={1.5}
                       onClick={onNotificationClick}
+                      style={{ color: 'var(--color-primary-dark)' }}
                     />
                   </div>
                   <div className="relative group">
                     <Link href="/user/profile">
-                      <div className="w-9 h-9 rounded-full bg-[var(--primary-50)] flex items-center justify-center text-[var(--primary-foreground)] font-medium border-2 border-[var(--primary-200)] group-hover:border-[var(--primary-300)] transition-all">
+                      <div className="w-9 h-9 rounded-full bg-[var(--color-primary-50)] flex items-center justify-center text-[var(--color-primary-foreground)] font-medium border-2 border-[var(--color-primary-200)] group-hover:border-[var(--color-primary-300)] transition-all">
                         {user.name?.charAt(0) || "U"}
                       </div>
                     </Link>
@@ -377,7 +383,7 @@ export function Header({ client, onNotificationClick }: HeaderProps = {}) {
               ) : (
                 <>
                   <Link href="/login">
-                    <Button >
+                    <Button>
                       Sign In
                     </Button>
                   </Link>
@@ -392,21 +398,24 @@ export function Header({ client, onNotificationClick }: HeaderProps = {}) {
               <div className="space-y-3">
                 <Link
                   href="/courses"
-                  className="block px-2 py-1 text-[var(--foreground)]  font-medium text-base"
+                  className="block px-2 py-1 text-[var(--color-primary-dark)]  font-medium text-base"
+                  style={{ color: 'var(--color-primary-dark)' }}
                   onClick={() => setIsMenuOpen(false)}
                 >
                   Courses
                 </Link>
                 <Link
                   href="/categories"
-                  className="block px-2 py-1 text-[var(--foreground)] font-medium text-base"
+                  className="block px-2 py-1 text-[var(--color-primary-dark)] font-medium text-base"
+                  style={{ color: 'var(--color-primary-dark)' }}
                   onClick={() => setIsMenuOpen(false)}
                 >
                   Categories
                 </Link>
                 <Link
                   href="/instructors"
-                  className="block px-2 py-1 text-[var(--foreground)] font-medium text-base"
+                  className="block px-2 py-1 text-[var(--color-primary-dark)] font-medium text-base"
+                  style={{ color: 'var(--color-primary-dark)' }}
                   onClick={() => setIsMenuOpen(false)}
                 >
                   Instructors
@@ -425,14 +434,16 @@ export function Header({ client, onNotificationClick }: HeaderProps = {}) {
                     <>
                       <Link
                         href="/user/profile"
-                        className="block px-2 py-1 text-[var(--foreground)] hover:text-[var(--primary)] text-base"
+                        className="block px-2 py-1 text-[var(--color-primary-dark)] hover:text-[var(--color-primary)] text-base"
+                        style={{ color: 'var(--color-primary-dark)' }}
                         onClick={() => setIsMenuOpen(false)}
                       >
                         Profile
                       </Link>
                       <Link
                         href="/user/profile?section=courses"
-                        className="block px-2 py-1 text-[var(--foreground)] hover:text-[var(--primary)] text-base"
+                        className="block px-2 py-1 text-[var(--color-primary-dark)] hover:text-[var(--color-primary)] text-base"
+                        style={{ color: 'var(--color-primary-dark)' }}
                         onClick={() => setIsMenuOpen(false)}
                       >
                         My Courses
@@ -445,7 +456,8 @@ export function Header({ client, onNotificationClick }: HeaderProps = {}) {
                             setIsMenuOpen(false);
                           }}
                           disabled={isLoggingOut}
-                          className="w-full border-[var(--primary-200)] text-[var(--foreground)] rounded-lg text-base"
+                          className="w-full border-[var(--color-primary-200)] text-[var(--color-primary-dark)] rounded-lg text-base"
+                          style={{ color: 'var(--color-primary-dark)' }}
                         >
                           {isLoggingOut ? "Logging out..." : "Logout"}
                         </Button>

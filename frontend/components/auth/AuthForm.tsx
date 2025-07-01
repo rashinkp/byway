@@ -64,7 +64,7 @@ export function AuthForm<T extends FieldValues>({
         <p className="text-sm text-muted-foreground">{subtitle}</p>
       </div>
       {error && (
-        <div className="text-center text-sm text-[var(--danger)] rounded py-2 px-3 mb-2">
+        <div className="text-center text-sm text-[var(--color-danger)] rounded py-2 px-3 mb-2">
           {error}
         </div>
       )}
@@ -92,7 +92,7 @@ export function AuthForm<T extends FieldValues>({
                       />
                     )}
                   </FormControl>
-                  <FormMessage className="text-[var(--danger)]" />
+                  <FormMessage className="text-[var(--color-danger)]" />
                 </FormItem>
               )}
             />
@@ -119,11 +119,11 @@ export function AuthForm<T extends FieldValues>({
         </form>
       </Form>
       <div className="flex items-center gap-2">
-        <span className="flex-1 border-t border-[var(--primary-200)]" />
+        <span className="flex-1 border-t border-[var(--color-primary-light)]" />
         <span className="text-xs uppercase text-muted-foreground whitespace-nowrap px-2 bg-background">
           Or continue with
         </span>
-        <span className="flex-1 border-t border-[var(--primary-200)]" />
+        <span className="flex-1 border-t border-[var(--color-primary-light)]" />
       </div>
       <div className="flex flex-col gap-2">
         {googleAuthText && (

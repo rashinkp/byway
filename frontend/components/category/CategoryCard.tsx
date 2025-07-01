@@ -25,21 +25,16 @@ export function CategoryCard({ categories, className, onCategoryClick }: Categor
           <div
             key={category.id}
             onClick={() => onCategoryClick?.(category.id)}
-            className="flex items-center gap-4 p-4 rounded-lg border transition-colors duration-200 cursor-pointer"
-            style={{
-              background: "var(--secondary)",
-              borderColor: "var(--primary-200)",
-            }}
+            className="flex items-center gap-4 p-4 rounded-lg border transition-colors duration-200 cursor-pointer bg-[var(--color-surface)] border-[var(--color-primary-light)] hover:bg-[var(--color-background)] shadow-sm"
           >
             {/* Icon */}
-            <div className="w-10 h-10 flex items-center justify-center rounded-full"
-                 style={{ background: "var(--primary-100)" }}>
+            <div className="w-10 h-10 flex items-center justify-center rounded-full bg-[var(--color-primary-light)]">
               {category.icon}
             </div>
 
             {/* Category Info */}
             <div>
-              <h3 className="text-base font-medium" style={{ color: "var(--foreground)" }}>
+              <h3 className="text-base font-medium text-[var(--color-primary-dark)]">
                 {category.name}
               </h3>
             </div>
