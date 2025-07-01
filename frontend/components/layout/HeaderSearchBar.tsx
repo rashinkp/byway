@@ -12,6 +12,7 @@ interface HeaderSearchBarProps {
   showSearchResults: boolean;
   setShowSearchResults: (v: boolean) => void;
   handleSearchItemClick: () => void;
+  inputRef?: React.RefObject<HTMLInputElement>;
 }
 
 export const HeaderSearchBar: React.FC<HeaderSearchBarProps> = ({
@@ -21,6 +22,7 @@ export const HeaderSearchBar: React.FC<HeaderSearchBarProps> = ({
   showSearchResults,
   setShowSearchResults,
   handleSearchItemClick,
+  inputRef,
 }) => {
   const debouncedSearchQuery = useDebounce(searchQuery, 500);
    const { data: searchResults, isLoading: isSearching } = useGlobalSearch({
@@ -68,6 +70,7 @@ export const HeaderSearchBar: React.FC<HeaderSearchBarProps> = ({
             background: 'var(--color-surface)',
             color: 'var(--color-muted)',
           }}
+          ref={inputRef}
         />
         <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-[var(--color-muted)]" />
         {isSearching && (

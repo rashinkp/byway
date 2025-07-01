@@ -95,11 +95,15 @@ export function CourseCard({
   };
 
   return (
-    <div className={cn(
-      "rounded-lg shadow-lg cursor-pointer overflow-hidden max-w-sm mx-auto hover:shadow-xl transition-shadow duration-300 ",
-      className
-    )}
-    style={{ background: "var(--color-surface)", color: "var(--color-primary-dark)", height: "400px", minHeight: "400px" }}
+    <div
+      className={cn(
+        "rounded-2xl shadow-lg cursor-pointer overflow-hidden hover:shadow-xl transition-shadow duration-300 ",
+        className
+      )}
+      style={{ background: "var(--color-surface)", color: "var(--color-primary-dark)", height: "400px", minHeight: "400px" }}
+      onClick={handleCardClick}
+      role="button"
+      tabIndex={0}
     >
       {/* Hero Image */}
       <div className="relative h-48 overflow-hidden">

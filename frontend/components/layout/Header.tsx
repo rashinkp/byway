@@ -64,6 +64,7 @@ export function Header({ client, onNotificationClick }: HeaderProps = {}) {
   
   // Refs for click outside handling
   const searchContainerRef = useRef<HTMLDivElement>(null);
+  const searchInputRef = useRef<HTMLInputElement>(null);
 
   const cartCount = useCartStore((state) => state.count);
   const setCartCount = useCartStore((state) => state.setCount);
@@ -159,6 +160,17 @@ export function Header({ client, onNotificationClick }: HeaderProps = {}) {
   const isInstructorPending =
     instructorData?.data?.status === "PENDING" || isInstructorLoading;
 
+  // Listen for focus-header-search-bar event
+  useEffect(() => {
+    const handler = () => {
+      if (searchInputRef.current) {
+        searchInputRef.current.focus();
+      }
+    };
+    window.addEventListener('focus-header-search-bar', handler);
+    return () => window.removeEventListener('focus-header-search-bar', handler);
+  }, []);
+
   return (
     <>
       <header
@@ -188,6 +200,7 @@ export function Header({ client, onNotificationClick }: HeaderProps = {}) {
               showSearchResults={showSearchResults}
               setShowSearchResults={setShowSearchResults}
               handleSearchItemClick={handleSearchItemClick}
+              inputRef={searchInputRef}
             />
             {/* Courses and Pages links moved next to icons */}
             <nav className="flex items-center gap-4">

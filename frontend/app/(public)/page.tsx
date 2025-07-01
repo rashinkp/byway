@@ -21,7 +21,7 @@ export default function UserDashboard() {
 
   const { data: coursesData, isLoading: isCoursesLoading } = useGetAllCourses({
     page: 1,
-    limit: 4,
+    limit: 10,
     role: "USER"
   });
 
@@ -96,15 +96,7 @@ export default function UserDashboard() {
           <div className="max-w-7xl mx-auto px-4">
             <SectionGrid
               title={<span>Meet our professional <span className="inline-block relative">mentors.<svg className="absolute -bottom-2 left-0 w-full h-3" viewBox="0 0 120 12" fill="none"><path d="M0 10 Q60 0 120 10" stroke="var(--color-primary-dark)" strokeWidth="2" fill="none"/></svg></span></span>}
-              items={topInstructors.map(i => ({
-                id: i.id,
-                name: i.user.name,
-                role: i.areaOfExpertise,
-                description: i.professionalExperience,
-                image: i.user.avatar,
-                rating: 4.8,
-                reviewCount: 44000,
-              }))}
+              items={topInstructors}
               renderCard={instructor => <InstructorCard instructor={instructor} />}
               showNavigation={true}
             />

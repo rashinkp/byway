@@ -6,8 +6,8 @@ import { useAuthStore } from "@/stores/auth.store";
 import { useLogout } from "@/hooks/auth/useLogout";
 import { CommonSidebar } from "@/components/common/layout/CommonSidebar";
 import { TopNavbar } from "@/components/common/layout/TopNavbar";
-import BywayFooter from "@/components/Footer";
 import NotificationModal from '@/components/notifications/NotificationModal';
+import BywayFooter from "@/components/layout/Footer";
 
 interface CommonLayoutProps {
   children: React.ReactNode;
