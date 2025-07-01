@@ -20,7 +20,7 @@ const BywayFooter = () => {
   ];
 
   return (
-    <footer className="bg-[var(--color-background)] text-[var(--color-foreground)] py-12 px-4 w-full mt-auto ">
+    <footer className="bg-[var(--color-primary-dark)] text-[var(--color-surface)] py-12 px-4 w-full mt-auto ">
       <div className="container mx-auto max-w-6xl">
         {/* Main Footer Content */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
@@ -62,7 +62,7 @@ const BywayFooter = () => {
                   href={social.href}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="w-10 h-10 bg-[var(--color-primary-light)] rounded-lg flex items-center justify-center hover:bg-[var(--color-primary-dark)] transition-colors"
+                  className="w-10 h-10 bg-[var(--color-primary-light)] rounded-lg flex items-center justify-center transition-colors"
                   aria-label={social.label}
                 >
                   <social.icon className="w-5 h-5 text-[var(--color-surface)]" />

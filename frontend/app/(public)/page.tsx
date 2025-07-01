@@ -1,18 +1,15 @@
 'use client'
 
-import { CategoryCard } from "@/components/category/CategoryCard";
-import { TopInstructors } from "@/components/instructor/TopInstructor";
-import { Code,  ChevronLeft, ChevronRight } from "lucide-react";
 import { useCategories } from "@/hooks/category/useCategories";
 import { useRouter } from "next/navigation";
 import { useGetAllCourses } from "@/hooks/course/useGetAllCourse";
 import { useGetAllInstructors } from "@/hooks/instructor/useGetAllInstructor";
 import KnowledgeBanner from "@/components/banners/KnowledgePluseBanner";
-import { CourseCard } from "@/components/course/CourseCard";
-import { Button } from "@/components/ui/button";
 import { TopCourses } from "@/components/course/TopCourseList";
 import { CategoriesSection } from "@/components/category/CategorySection";
 import { HowItWorksSection } from "@/components/common/HowItWorksSection";
+import { SectionGrid } from "@/components/common/SectionGrid";
+import { InstructorCard } from "@/components/instructor/InstructorCard";
 
 export default function UserDashboard() {
   const router = useRouter();
@@ -67,13 +64,13 @@ export default function UserDashboard() {
 
   return (
     <div
-      className="relative min-h-screen px-10 pb-16 "
+      className="relative min-h-screen px-10"
       style={{ background: "var(--color-background)" }}
     >
-      <div className="container mx-auto px-2 sm:px-4 py-6 sm:py-8">
+      <div className="container mx-auto px-2 sm:px-4 pt-6 sm:pt-8">
         <KnowledgeBanner />
         {/* Categories Section as a full-width white section (true edge-to-edge) */}
-        <section className="w-screen relative left-1/2 right-1/2 -mx-[50vw] bg-[var(--color-surface)] rounded-2xl shadow-lg py-10 sm:py-16 my-16">
+        <section className="w-screen relative left-1/2 right-1/2 -mx-[50vw] bg-[var(--color-surface)] rounded-2xl shadow-lg py-10 sm:py-16 my-26">
           <div className="max-w-7xl mx-auto px-4">
             <CategoriesSection
               categories={categories}
@@ -94,22 +91,41 @@ export default function UserDashboard() {
             <HowItWorksSection />
           </div>
         </section>
-        <section className="mb-8 sm:mb-12">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6 mt-2 gap-2 sm:gap-0">
-            <h2
-              className="text-xl sm:text-2xl font-bold"
-              style={{ color: "var(--color-primary-dark)" }}
-            >
-              Top Instructors
-            </h2>
-            <button
-              onClick={() => router.push("/instructors")}
-              className="px-4 py-2 rounded-full font-medium text-sm transition w-full sm:w-auto mt-2 sm:mt-0 bg-[var(--color-primary-dark)] text-[var(--color-surface)] hover:bg-[var(--color-primary-light)] shadow-md"
-            >
-              View All
-            </button>
+        {/* Instructors Section */}
+        <section className="my-16">
+          <div className="max-w-7xl mx-auto px-4">
+            <SectionGrid
+              title={<span>Meet our professional <span className="inline-block relative">mentors.<svg className="absolute -bottom-2 left-0 w-full h-3" viewBox="0 0 120 12" fill="none"><path d="M0 10 Q60 0 120 10" stroke="var(--color-primary-dark)" strokeWidth="2" fill="none"/></svg></span></span>}
+              items={topInstructors.map(i => ({
+                id: i.id,
+                name: i.user.name,
+                role: i.areaOfExpertise,
+                description: i.professionalExperience,
+                image: i.user.avatar,
+                rating: 4.8,
+                reviewCount: 44000,
+              }))}
+              renderCard={instructor => <InstructorCard instructor={instructor} />}
+              showNavigation={true}
+            />
           </div>
-          <TopInstructors instructors={topInstructors} className="mb-0" />
+        </section>
+        {/* Testimonial Section */}
+        <section className="w-screen relative left-1/2 right-1/2 -mx-[50vw] bg-[var(--color-surface)] rounded-2xl shadow-lg py-10 sm:py-16">
+          <div className="max-w-2xl mx-auto px-4 text-left">
+            <div className="flex justify-start mb-4">
+              <svg width="56" height="40" viewBox="0 0 56 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <text x="0" y="32" fontSize="56" fill="var(--color-background)" fontWeight="bold">“</text>
+              </svg>
+            </div>
+            <h2 className="text-2xl font-bold mb-4 text-[var(--color-primary-dark)]">Testimonial</h2>
+            <p className="text-lg text-[var(--color-primary-dark)] mb-8 font-medium">
+              “Since implementing Byway, our organization has witnessed a remarkable transformation in how we approach learning. The platform's simplicity belies its powerful capabilities, offering a seamless and enjoyable educational experience. The efficiency with which we can now manage courses, track progress, and foster collaboration among learners is truly impressive.”
+            </p>
+            <div className="flex flex-col items-start gap-2">
+              <span className="font-semibold text-[var(--color-primary-dark)]">Byway</span>
+            </div>
+          </div>
         </section>
       </div>
     </div>

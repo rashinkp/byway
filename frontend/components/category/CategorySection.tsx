@@ -25,6 +25,15 @@ export function CategoriesSection({ categories, isLoading, onCategoryClick, clas
           Explore & Find the perfect category to guide <br className="hidden sm:block" /> your learning journey.
         </h2>
       </div>
+      <div className="flex justify-end mb-4">
+        <Button
+          variant="link"
+          size="default"
+          onClick={() => router.push('/categories')}
+        >
+          See More
+        </Button>
+      </div>
       <CategoryCard
         categories={categories}
         className="mb-0"

@@ -19,7 +19,7 @@ const buttonVariants = cva(
           "bg-[var(--color-primary-light)] text-[var(--color-surface)] shadow-xs hover:bg-[var(--color-primary-dark)]",
         ghost:
           "bg-transparent text-[var(--color-primary-dark)] hover:bg-[var(--color-surface)] hover:text-[var(--color-primary-light)]",
-        link: "text-[var(--color-accent)] cursor-pointer",
+        link: "text-[var(--color-primary-dark)] cursor-pointer hover:underline",
       },
       size: {
         default: "h-9 px-4 py-2 has-[>svg]:px-3",
