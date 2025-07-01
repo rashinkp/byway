@@ -1,11 +1,10 @@
 import { cn } from "@/utils/cn";
-import Link from "next/link";
+import React from "react";
 
 interface Category {
   id: string;
   name: string;
-  courseCount: number;
-  icon: React.ReactNode;
+  description?: string;
 }
 
 interface CategoryCardProps {
@@ -17,27 +16,26 @@ interface CategoryCardProps {
 export function CategoryCard({ categories, className, onCategoryClick }: CategoryCardProps) {
   return (
     <div className={cn(className)}>
-      {/* Header removed */}
-
-      {/* Categories Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         {categories.map((category) => (
           <div
             key={category.id}
             onClick={() => onCategoryClick?.(category.id)}
-            className="flex items-center gap-4 p-4 rounded-lg border transition-colors duration-200 cursor-pointer bg-[var(--color-surface)] border-[var(--color-primary-light)] hover:bg-[var(--color-background)] shadow-sm"
+            className="group bg-[var(--color-background)] flex flex-col items-center justify-center gap-2 p-6 rounded-2xl  backdrop-blur-md shadow-lg hover:shadow-2xl hover:scale-[1.04] transition-all duration-200 cursor-pointer relative overflow-hidden"
+            style={{ minHeight: 140 }}
           >
-            {/* Icon */}
-            <div className="w-10 h-10 flex items-center justify-center rounded-full bg-[var(--color-primary-light)]">
-              {category.icon}
-            </div>
-
-            {/* Category Info */}
-            <div>
-              <h3 className="text-base font-medium text-[var(--color-primary-dark)]">
-                {category.name}
-              </h3>
-            </div>
+            {/* Category Name */}
+            <h2 className="text-xl font-bold mb-1 line-clamp-1 text-[var(--color-primary-dark)]">
+              {category.name}
+            </h2>
+            {/* Category Description */}
+            {category.description && (
+              <p className="text-sm text-center text-[var(--color-primary-light)] opacity-90 mt-1 line-clamp-2">
+                {category.description}
+              </p>
+            )}
+            {/* Decorative Blur/Glass Effect */}
+            <div className="absolute inset-0 pointer-events-none rounded-2xl bg-white/30 opacity-60 blur-lg z-0" />
           </div>
         ))}
       </div>

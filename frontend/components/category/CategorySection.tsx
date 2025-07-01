@@ -1,0 +1,35 @@
+import React from "react";
+import { CategoryCard } from "@/components/category/CategoryCard";
+import { Button } from "@/components/ui/button";
+import { useRouter } from "next/navigation";
+
+interface Category {
+  id: string;
+  name: string;
+  description?: string;
+}
+
+interface CategoriesSectionProps {
+  categories: Category[];
+  isLoading?: boolean;
+  onCategoryClick?: (categoryId: string) => void;
+  className?: string;
+}
+
+export function CategoriesSection({ categories, isLoading, onCategoryClick, className }: CategoriesSectionProps) {
+  const router = useRouter();
+  return (
+    <section className={`mb-0 ${className || ''}`}>
+      <div className="mb-16">
+        <h2 className="text-3xl sm:text-4xl font-bold mb-4 text-[var(--color-primary-dark)]">
+          Explore & Find the perfect category to guide <br className="hidden sm:block" /> your learning journey.
+        </h2>
+      </div>
+      <CategoryCard
+        categories={categories}
+        className="mb-0"
+        onCategoryClick={onCategoryClick}
+      />
+    </section>
+  );
+} 

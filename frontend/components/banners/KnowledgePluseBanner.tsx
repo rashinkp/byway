@@ -1,111 +1,38 @@
 import React from "react";
+import { Input } from "@/components/ui/input";
+import { Search } from "lucide-react";
 
-interface BannerProps {
-  title?: string;
-  subtitle?: string;
-  description?: string;
-  className?: string;
-}
-
-const KnowledgeBanner: React.FC<BannerProps> = ({
-  title = "KNOWLEDGEPULSE",
-  subtitle = "Knowledge Meets Innovation",
-  description = "This platform's simplicity belies its powerful capabilities, offering a seamless and enjoyable educational experience.",
-  className = "",
-}) => {
+export default function KnowledgeBanner() {
   return (
-    <div
-      className={`relative overflow-hidden rounded-2xl p-8 md:p-12 ${className}`}
-      style={{
-        background: "linear-gradient(135deg, var(--primary-800), var(--primary-600))"
-      }}
-    >
-      {/* Background decorative elements */}
-      <div className="absolute top-8 right-8 w-24 h-24 rounded-full opacity-80" style={{ background: "var(--warning)" }}></div>
-      <div className="absolute bottom-16 right-32 w-16 h-16 rounded-full opacity-60" style={{ background: "var(--primary-400)" }}></div>
-      <div className="absolute top-20 right-48 w-8 h-8 rounded-full opacity-70" style={{ background: "var(--warning)" }}></div>
-
-      <div className="relative z-10 flex flex-col lg:flex-row items-center justify-between">
-        {/* Left content */}
-        <div className="flex-1 mb-8 lg:mb-0 lg:pr-12" style={{ color: "var(--foreground)" }}>
-          <div className="text-sm font-medium tracking-widest mb-4" style={{ color: "var(--warning)" }}>
-            {title}
-          </div>
-
-          <h1 className="text-4xl lg:text-5xl xl:text-6xl font-bold mb-6 leading-tight" style={{ color: "var(--foreground)" }}>
-            {subtitle}
-          </h1>
-
-          <p className="text-lg lg:text-xl max-w-lg leading-relaxed" style={{ color: "var(--primary-700)" }}>
-            {description}
-          </p>
-
-          <div className="mt-8 flex flex-wrap gap-4">
-            <button className="font-semibold px-6 py-3 rounded-lg transition-colors duration-200" style={{ background: "var(--warning)", color: "var(--primary)", border: "none" }}>
-              Get Started
-            </button>
-            <button className="font-semibold px-6 py-3 rounded-lg transition-all duration-200 border-2" style={{ borderColor: "var(--warning)", color: "var(--warning)", background: "transparent" }}
-              onMouseOver={e => { e.currentTarget.style.background = 'var(--warning)'; e.currentTarget.style.color = 'var(--primary)'; }}
-              onMouseOut={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = 'var(--warning)'; }}
-            >
-              Learn More
-            </button>
-          </div>
+    <section className="w-full mt-10 bg-[#0B3C3C] rounded-2xl p-6 sm:p-12 flex flex-col sm:flex-row items-center justify-between gap-8 min-h-[320px] relative overflow-hidden" style={{background: '#0B3C3C'}}>
+      {/* Left Content */}
+      <div className="flex-1 z-10">
+        <div className="mb-2">
+          <span className="tracking-[0.3em] text-xs font-semibold text-white opacity-80">KNOWLEDGEPULSE</span>
         </div>
-
-        {/* Right image section */}
-        <div className="relative flex-shrink-0">
-          {/* Large yellow circle background */}
-          <div className="w-80 h-80 rounded-full relative" style={{ background: "var(--warning)" }}>
-            {/* Student image placeholder */}
-            <div className="absolute inset-4 rounded-full flex items-center justify-center overflow-hidden" style={{ background: "linear-gradient(135deg, var(--primary-400), var(--primary-600))" }}>
-              {/* Simulated photo - person with books */}
-              <div className="w-full h-full relative" style={{ background: "linear-gradient(135deg, var(--primary-300), var(--primary-500), var(--primary-600))" }}>
-                {/* Person silhouette */}
-                <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-32 h-40 rounded-t-full" style={{ background: "linear-gradient(to top, var(--primary-100), var(--primary-300))" }}></div>
-
-                {/* Head */}
-                <div className="absolute bottom-36 left-1/2 transform -translate-x-1/2 w-16 h-16 rounded-full" style={{ background: "linear-gradient(135deg, var(--primary-700), var(--primary-900))" }}></div>
-
-                {/* Curly hair */}
-                <div className="absolute bottom-44 left-1/2 transform -translate-x-1/2 w-20 h-12 rounded-t-full" style={{ background: "linear-gradient(135deg, var(--primary-900), var(--primary-100))" }}></div>
-                <div className="absolute bottom-42 left-8 w-3 h-3 rounded-full" style={{ background: "var(--primary-900)" }}></div>
-                <div className="absolute bottom-44 right-8 w-3 h-3 rounded-full" style={{ background: "var(--primary-900)" }}></div>
-                <div className="absolute bottom-46 left-10 w-2 h-2 rounded-full" style={{ background: "var(--primary-900)" }}></div>
-                <div className="absolute bottom-46 right-10 w-2 h-2 rounded-full" style={{ background: "var(--primary-900)" }}></div>
-
-                {/* Books */}
-                <div className="absolute bottom-8 right-16 w-8 h-12 rounded" style={{ background: "var(--secondary)" }}></div>
-                <div className="absolute bottom-6 right-14 w-8 h-12 rounded" style={{ background: "var(--primary-400)" }}></div>
-                <div className="absolute bottom-4 right-12 w-8 h-12 rounded" style={{ background: "var(--primary-500)" }}></div>
-
-                {/* Backpack strap */}
-                <div className="absolute bottom-20 left-12 w-3 h-16 rounded" style={{ background: "var(--primary-200)" }}></div>
-
-                {/* Shirt details */}
-                <div className="absolute bottom-12 left-1/2 transform -translate-x-1/2 w-24 h-20 rounded-t-lg" style={{ background: "var(--primary-600)" }}></div>
-                <div className="absolute bottom-16 left-1/2 transform -translate-x-1/2 w-20 h-8 rounded" style={{ background: "var(--background)" }}></div>
-              </div>
-            </div>
-          </div>
-
-          {/* Floating elements */}
-          <div
-            className="absolute -top-4 -left-4 w-12 h-12 rounded-full animate-bounce"
-            style={{ background: "var(--warning)", animationDelay: "0s" }}
-          ></div>
-          <div
-            className="absolute -bottom-8 -right-8 w-8 h-8 rounded-full animate-bounce"
-            style={{ background: "var(--primary-400)", animationDelay: "1s" }}
-          ></div>
-          <div className="absolute top-1/2 -left-8 w-6 h-6 rounded-full animate-pulse" style={{ background: "var(--danger)" }}></div>
-        </div>
+        <h1 className="text-3xl sm:text-5xl font-bold text-white mb-4 leading-tight">
+          Knowledge Meets <br className="hidden sm:block" /> Innovation
+        </h1>
+        <p className="text-white/80 mb-8 max-w-md">
+          This platform's simplicity belies its powerful capabilities, offering a seamless and enjoyable educational experience.
+        </p>
       </div>
-
-      {/* Bottom wave decoration */}
-      <div className="absolute bottom-0 left-0 right-0 h-16 opacity-50 rounded-b-2xl" style={{ background: "linear-gradient(90deg, var(--primary-800), var(--primary-600))" }}></div>
-    </div>
+      {/* Right Image & Shapes */}
+      <div className="flex-1 flex items-end justify-end relative min-w-[220px] min-h-[220px] h-full z-10">
+        {/* Yellow semi-circle behind image */}
+        <div className="absolute bottom-0 right-6 sm:right-10 w-60 h-32 sm:w-80 sm:h-40 bg-[#F8E71C] rounded-t-full z-0" style={{}} />
+        {/* White quarter-circle top right */}
+        <div className="absolute top-0 right-0 w-16 h-16 sm:w-24 sm:h-24 bg-[#E6F4F1] rounded-bl-full z-0" />
+        {/* Student Image */}
+        <img
+          src="/boyholdingbook.png"
+          alt="Student"
+          className="relative z-20 w-56 h-56 sm:w-72 sm:h-72 object-cover rounded"
+          style={{background: 'transparent'}}
+        />
+      </div>
+      {/* Background shape for the whole banner */}
+      <div className="absolute inset-0 bg-[#0B3C3C] rounded-2xl opacity-90 z-0" />
+    </section>
   );
-};
-
-export default KnowledgeBanner;
+}

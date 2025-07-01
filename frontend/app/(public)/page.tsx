@@ -1,7 +1,6 @@
 'use client'
 
 import { CategoryCard } from "@/components/category/CategoryCard";
-import { StatsCard } from "@/components/DashboardStats";
 import { TopInstructors } from "@/components/instructor/TopInstructor";
 import { Code,  ChevronLeft, ChevronRight } from "lucide-react";
 import { useCategories } from "@/hooks/category/useCategories";
@@ -12,6 +11,8 @@ import KnowledgeBanner from "@/components/banners/KnowledgePluseBanner";
 import { CourseCard } from "@/components/course/CourseCard";
 import { Button } from "@/components/ui/button";
 import { TopCourses } from "@/components/course/TopCourseList";
+import { CategoriesSection } from "@/components/category/CategorySection";
+import { HowItWorksSection } from "@/components/common/HowItWorksSection";
 
 export default function UserDashboard() {
   const router = useRouter();
@@ -40,18 +41,11 @@ export default function UserDashboard() {
     router.push(`/courses?category=${categoryId}`);
   };
 
-  const stats = [
-    { value: "250+", description: "Courses by our best mentors" },
-    { value: "1000+", description: "Courses by our best mentors" },
-    { value: "15+", description: "Courses by our best mentors" },
-    { value: "2400+", description: "Courses by our best mentors" },
-  ];
 
   const categories = categoriesData?.items.map(category => ({
     id: category.id,
     name: category.name,
-    courseCount: 0, // This will need to be updated when we have course count data
-    icon: <Code className="w-5 h-5 text-blue-500" />, // Default icon, can be customized based on category
+    description: category.description || "",
   })) || [];
 
   const topCourses = coursesData?.items || [];
@@ -73,37 +67,32 @@ export default function UserDashboard() {
 
   return (
     <div
-      className="relative min-h-screen pb-16"
+      className="relative min-h-screen px-10 pb-16 "
       style={{ background: "var(--color-background)" }}
     >
       <div className="container mx-auto px-2 sm:px-4 py-6 sm:py-8">
         <KnowledgeBanner />
-        <section className="mb-8 sm:mb-12">
-          <StatsCard stats={stats} className="mb-0 shadow-md" />
-        </section>
-        <section className="mb-8 sm:mb-12">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6 mt-2 gap-2 sm:gap-0">
-            <h2
-              className="text-xl sm:text-2xl font-bold"
-              style={{ color: "var(--color-primary-dark)" }}
-            >
-              Top Categories
-            </h2>
-            <button
-              onClick={() => router.push("/categories")}
-              className="px-4 py-2 rounded-full font-medium text-sm transition w-full sm:w-auto mt-2 sm:mt-0 bg-[var(--color-primary-dark)] text-[var(--color-surface)] hover:bg-[var(--color-primary-light)] shadow-md"
-            >
-              View All
-            </button>
+        {/* Categories Section as a full-width white section (true edge-to-edge) */}
+        <section className="w-screen relative left-1/2 right-1/2 -mx-[50vw] bg-[var(--color-surface)] rounded-2xl shadow-lg py-10 sm:py-16 my-16">
+          <div className="max-w-7xl mx-auto px-4">
+            <CategoriesSection
+              categories={categories}
+              isLoading={isCategoriesLoading}
+              onCategoryClick={handleCategoryClick}
+            />
           </div>
-          <CategoryCard
-            categories={categories}
-            className="mb-0"
-            onCategoryClick={handleCategoryClick}
-          />
         </section>
-        <section className="mb-8 sm:mb-12">
-          <TopCourses courses={topCourses} router={router} />
+        {/* Top Courses Section with matching alignment and spacing */}
+        <section className="my-16">
+          <div className="max-w-7xl mx-auto px-4">
+            <TopCourses courses={topCourses} router={router} />
+          </div>
+        </section>
+        {/* How It Works Section */}
+        <section className="w-screen relative left-1/2 right-1/2 -mx-[50vw] bg-[var(--color-surface)] rounded-2xl shadow-lg py-10 sm:py-16 my-16">
+          <div className="max-w-7xl mx-auto px-4">
+            <HowItWorksSection />
+          </div>
         </section>
         <section className="mb-8 sm:mb-12">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6 mt-2 gap-2 sm:gap-0">
