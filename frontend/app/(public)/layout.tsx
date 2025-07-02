@@ -4,7 +4,6 @@ import { Header } from "@/components/layout/Header";
 import NotificationModal from '@/components/notifications/NotificationModal';
 import { useState } from 'react';
 import { usePathname } from "next/navigation";
-import { TopNavbar } from "@/components/common/layout/TopNavbar";
 import BywayFooter from "@/components/layout/Footer";
 
 export default function PublicLayout({
@@ -31,8 +30,6 @@ export default function PublicLayout({
   return (
     <div className="flex flex-col min-h-screen">
       <Header onNotificationClick={() => setNotificationOpen(true)} />
-      {!isAuthPage && <Header onNotificationClick={() => setNotificationOpen(true)} />}
-      {!isAuthPage && <TopNavbar pathname={pathname} navItems={[]} noMargin />}
       <NotificationModal open={notificationOpen} onOpenChange={setNotificationOpen} />
       <main className="flex-1">{children}</main>
       <BywayFooter />

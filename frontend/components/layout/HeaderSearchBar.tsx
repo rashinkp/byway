@@ -12,7 +12,7 @@ interface HeaderSearchBarProps {
   showSearchResults: boolean;
   setShowSearchResults: (v: boolean) => void;
   handleSearchItemClick: () => void;
-  inputRef?: React.RefObject<HTMLInputElement>;
+  inputRef?: React.RefObject<HTMLInputElement | null>;
 }
 
 export const HeaderSearchBar: React.FC<HeaderSearchBarProps> = ({

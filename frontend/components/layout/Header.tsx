@@ -228,13 +228,13 @@ export function Header({ client, onNotificationClick }: HeaderProps = {}) {
                 
                   <DropdownMenuItem
                     asChild
-                    className="rounded hover:bg-[var(--color-background)]"
+                    className="rounded"
                   >
                     <Link href="/categories">Categories</Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem
                     asChild
-                    className="rounded hover:bg-[var(--color-background)]"
+                    className="rounded"
                   >
                     <Link href="/instructors">Instructors</Link>
                   </DropdownMenuItem>
@@ -242,7 +242,7 @@ export function Header({ client, onNotificationClick }: HeaderProps = {}) {
               </DropdownMenu>
               {isLoading ? (
                 <div className="flex items-center justify-center w-20 h-10">
-                  <Loader2 className="w-6 h-6 text-[var(--color-accent)] animate-spin" />
+                  <Loader2 className="w-6 h-6 text-[var(--color-primary-dark)] animate-spin" />
                 </div>
               ) : user ? (
                 <>
@@ -284,7 +284,7 @@ export function Header({ client, onNotificationClick }: HeaderProps = {}) {
                     >
                       <DropdownMenuTrigger asChild>
                         <div className="relative group cursor-pointer">
-                          <div className="w-10 h-10 rounded-full bg-[var(--color-primary-50)] flex items-center justify-center text-[var(--color-primary-foreground)] font-medium border-2 border-[var(--color-primary-200)] group-hover:border-[var(--color-primary-300)] transition-all">
+                          <div className="w-10 h-10 rounded-full bg-[var(--color-primary-light)] flex items-center justify-center text-[var(--color-surface)] font-medium  group-hover:border-[var(--color-primary-300)] transition-all">
                             {user.name?.charAt(0) || "U"}
                           </div>
                         </div>
@@ -299,13 +299,13 @@ export function Header({ client, onNotificationClick }: HeaderProps = {}) {
                         <DropdownMenuSeparator />
                         <DropdownMenuItem
                           onClick={() => handleNavigation("/user/profile")}
-                          className="rounded hover:bg-[var(--color-background)]"
+                          className="rounded"
                         >
                           Profile
                         </DropdownMenuItem>
                         <DropdownMenuItem
                           onClick={() => handleNavigation("/user/my-courses")}
-                          className="rounded hover:bg-[var(--color-background)]"
+                          className="rounded"
                         >
                           My Courses
                         </DropdownMenuItem>
@@ -313,7 +313,7 @@ export function Header({ client, onNotificationClick }: HeaderProps = {}) {
                         <DropdownMenuItem
                           onClick={handleLogout}
                           disabled={isLoggingOut}
-                          className="rounded hover:bg-[var(--color-background)]"
+                          className="rounded"
                         >
                           {isLoggingOut ? "Logging out..." : "Logout"}
                         </DropdownMenuItem>
