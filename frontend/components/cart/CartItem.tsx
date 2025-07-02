@@ -1,6 +1,7 @@
 import type { ICart } from "@/types/cart";
 import { Award, BookOpen, Clock, Trash2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { motion } from "framer-motion";
 
 interface CartItemProps {
   item: ICart;
@@ -8,7 +9,6 @@ interface CartItemProps {
   onRemove: (courseId: string) => void;
 }
 
-// Single Cart Item Component
 export function CartItem({ item, isRemoving, onRemove }: CartItemProps) {
   const course = item.course;
   if (!course) return null;
@@ -32,60 +32,67 @@ export function CartItem({ item, isRemoving, onRemove }: CartItemProps) {
   );
 
   return (
-    <div className="p-6 border-b last:border-b-0 hover:bg-blue-50/50 transition-colors">
-      <div className="flex gap-4">
-        <img
-          src={course.thumbnail}
-          alt={course.title}
-          className="w-32 h-20 object-cover rounded-lg bg-blue-50 flex-shrink-0"
-        />
-        <div className="flex-1">
-          <div className="flex justify-between items-start">
-            <div>
-              <h3 className="font-semibold text-lg text-gray-800">
-                {course.title}
-              </h3>
-              <p className="text-gray-500 text-sm mt-1">{course.creator?.name}</p>
-            </div>
-            <button
-              onClick={() => course.id && onRemove(course.id)}
-              className="text-gray-400 hover:text-red-500 flex-shrink-0 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-              title="Remove from cart"
-              disabled={isRemoving}
-            >
-              <Trash2 size={18} />
-            </button>
+    <motion.div
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.3 }}
+      className="flex flex-col sm:flex-row gap-4 p-4 sm:p-6 bg-[var(--color-surface)] border border-[var(--color-border)] rounded-lg shadow-sm hover:shadow-md transition-all duration-300 mb-4"
+    >
+      <img
+        src={course.thumbnail}
+        alt={course.title}
+        className="w-full sm:w-28 sm:h-16 object-cover rounded-md bg-[var(--color-background)] flex-shrink-0"
+      />
+      <div className="flex-1 space-y-2">
+        <div className="flex justify-between items-start">
+          <div className="space-y-1">
+            <h3 className="text-base sm:text-lg font-medium text-[var(--color-primary-dark)] leading-tight">
+              {course.title}
+            </h3>
+            <p className="text-xs sm:text-sm text-[var(--color-muted)]">{course.creator?.name}</p>
           </div>
-          <div className="flex items-center mt-3 text-sm text-gray-500 space-x-4">
-            <span className="flex items-center">
-              <Clock size={16} className="mr-1 text-blue-600" />
-              {course.duration}
-            </span>
-            <span className="flex items-center">
-              <BookOpen size={16} className="mr-1 text-blue-600" />
-              {course.lectures || 0} lectures
-            </span>
-            <span className="flex items-center">
-              <Award size={16} className="mr-1 text-blue-600" />
-              {course.level}
-            </span>
-          </div>
-        </div>
-        <div className="text-right min-w-[120px]">
-          <div className="font-bold text-lg text-blue-700">${Number(offerPrice || 0).toFixed(2)}</div>
-          <div className="text-gray-500 line-through text-sm">
-            ${originalPrice.toFixed(2)}
-          </div>
-          <Badge 
-            variant="outline"
-            className="bg-red-50 text-red-600 border-red-200 mt-1"
+          <button
+            onClick={() => course.id && onRemove(course.id)}
+            className="p-2 text-[var(--color-danger)] hover:bg-[var(--color-danger)]/10 rounded-full transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+            title="Remove from cart"
+            disabled={isRemoving}
           >
-            {discountPercentage}% OFF
-          </Badge>
+            <Trash2 size={16} />
+          </button>
+        </div>
+        <div className="flex flex-wrap items-center gap-3 text-xs sm:text-sm text-[var(--color-muted)]">
+          <span className="flex items-center gap-1">
+            <Clock size={14} className="text-[var(--color-primary-light)]" />
+            {course.duration}
+          </span>
+          <span className="flex items-center gap-1">
+            <BookOpen size={14} className="text-[var(--color-primary-light)]" />
+            {course.lectures || 0} lectures
+          </span>
+          <span className="flex items-center gap-1">
+            <Award size={14} className="text-[var(--color-accent)]" />
+            {course.level}
+          </span>
         </div>
       </div>
-    </div>
+      <div className="text-right space-y-1 min-w-[100px]">
+        <div className="text-base sm:text-lg font-semibold text-[var(--color-primary-light)]">
+          ${Number(offerPrice || 0).toFixed(2)}
+        </div>
+        {discountPercentage > 0 && (
+          <>
+            <div className="text-xs text-[var(--color-muted)] line-through">
+              ${originalPrice.toFixed(2)}
+            </div>
+            <Badge
+              variant="outline"
+              className="text-xs bg-[var(--color-danger)]/10 text-[var(--color-danger)] border-[var(--color-danger)]"
+            >
+              {discountPercentage}% OFF
+            </Badge>
+          </>
+        )}
+      </div>
+    </motion.div>
   );
 }
-
-

@@ -17,7 +17,7 @@ export function CartItems({
   onRemoveCourse,
 }: CartItemsProps) {
   return (
-    <>
+    <div className="space-y-4">
       {cart.map((item, index) => (
         <div key={index}>
           {isRemoving && removingCourseId === item.courseId ? (
@@ -31,6 +31,6 @@ export function CartItems({
           )}
         </div>
       ))}
-    </>
+    </div>
   );
 }
