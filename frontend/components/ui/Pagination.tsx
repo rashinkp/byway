@@ -30,7 +30,7 @@ export function Pagination({
         size="sm"
         onClick={() => onPageChange(currentPage - 1)}
         disabled={currentPage === 1}
-        className="bg-white/60 backdrop-blur-sm border border-gray-200/50 hover:bg-white/80 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+        className="bg-[var(--color-surface)] border border-[var(--color-background)] text-[var(--color-muted)] hover:bg-[var(--color-background)] transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
       >
         <ChevronLeft className="h-4 w-4 mr-1" />
         Previous
@@ -45,8 +45,8 @@ export function Pagination({
           className={`
             w-10 h-10 p-0
             ${currentPage === page 
-              ? "bg-blue-600 hover:bg-blue-700 text-white" 
-              : "bg-white/60 backdrop-blur-sm border border-gray-200/50 hover:bg-white/80 transition-all duration-200"
+              ? "bg-[var(--color-primary-dark)] text-[var(--color-surface)] hover:bg-[var(--color-primary-light)]" 
+              : "bg-[var(--color-surface)] border border-[var(--color-background)] text-[var(--color-primary-dark)] hover:bg-[var(--color-background)] transition-all duration-200"
             }
           `}
         >
@@ -59,7 +59,7 @@ export function Pagination({
         size="sm"
         onClick={() => onPageChange(currentPage + 1)}
         disabled={currentPage === totalPages}
-        className="bg-white/60 backdrop-blur-sm border border-gray-200/50 hover:bg-white/80 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+        className="bg-[var(--color-surface)] border border-[var(--color-background)] text-[var(--color-muted)] hover:bg-[var(--color-background)] transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
       >
         Next
         <ChevronRight className="h-4 w-4 ml-1" />

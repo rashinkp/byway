@@ -11,6 +11,7 @@ import {
 import { CategoryListSkeleton } from "./skeletons/CategoryListSkeleton";
 import { formatDate } from "@/utils";
 import { Skeleton } from "@/components/ui/skeleton";
+import { CategoryCard } from "@/components/category/CategoryCard";
 
 interface CategoryListProps {
   categories: Category[];
@@ -36,25 +37,12 @@ export function CategoryList({
   if (!categories.length) {
     return (
       <div className="text-center py-10">
-        <p className="text-gray-500">No categories found</p>
+        <p className="text-[var(--color-muted)]">No categories found</p>
       </div>
     );
   }
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-      {categories.map((category) => (
-        <div
-          key={category.id}
-          onClick={() => onCategoryClick?.(category.id)}
-          className="bg-white p-6 rounded-lg shadow-sm border border-gray-100 cursor-pointer hover:shadow-md transition-shadow"
-        >
-          <h3 className="text-lg font-semibold text-gray-800 mb-2">
-            {category.name}
-          </h3>
-          <p className="text-gray-600 text-sm">{category.description}</p>
-        </div>
-      ))}
-    </div>
+    <CategoryCard categories={categories} onCategoryClick={onCategoryClick} wide={true} />
   );
 } 

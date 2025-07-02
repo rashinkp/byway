@@ -4,7 +4,7 @@ import { useCategories } from "@/hooks/category/useCategories";
 import { useRouter } from "next/navigation";
 import { useGetAllCourses } from "@/hooks/course/useGetAllCourse";
 import { useGetAllInstructors } from "@/hooks/instructor/useGetAllInstructor";
-import KnowledgeBanner from "@/components/banners/KnowledgePluseBanner";
+import KnowledgePluseBanner from "@/components/banners/KnowledgePluseBanner";
 import { TopCourses } from "@/components/course/TopCourseList";
 import { CategoriesSection } from "@/components/category/CategorySection";
 import { HowItWorksSection } from "@/components/common/HowItWorksSection";
@@ -68,8 +68,7 @@ export default function UserDashboard() {
       style={{ background: "var(--color-background)" }}
     >
       <div className="container mx-auto px-2 sm:px-4 pt-6 sm:pt-8">
-        <KnowledgeBanner />
-        {/* Categories Section as a full-width white section (true edge-to-edge) */}
+        <KnowledgePluseBanner />
         <section className="w-screen relative left-1/2 right-1/2 -mx-[50vw] bg-[var(--color-surface)] rounded-2xl shadow-lg py-10 sm:py-16 my-26">
           <div className="max-w-7xl mx-auto px-4">
             <CategoriesSection
