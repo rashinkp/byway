@@ -31,7 +31,7 @@ export function InstructorCard({ instructor }: InstructorCardProps) {
         <img
           src={instructor.user.avatar}
           alt={instructor.user.name}
-          className="w-full h-full object-cover"
+          className="w-full h-full object-cover p-5"
         />
       </div>
       <div className="p-6 flex flex-col flex-1">

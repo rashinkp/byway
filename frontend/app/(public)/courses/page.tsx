@@ -121,7 +121,7 @@ export default function CourseListingPage() {
   }
 
   return (
-    <div className="container mx-auto px-4 py-2">
+    <div className="container mx-auto px-4 py-2 bg-[var(--color-background)]">
       <div className="flex flex-col lg:flex-row gap-4">
         <div className="lg:w-1/5">
           {isLoading ? (
@@ -133,17 +133,15 @@ export default function CourseListingPage() {
             />
           )}
         </div>
-        <div className="lg:w-4/5">
+        <div className="lg:w-4/5 flex flex-col items-center">
           <CourseGrid courses={courses} isLoading={isLoading} variant="default" />
-          {!isLoading && data && data.totalPages > 1 && (
-            <div className="flex justify-center items-center mt-8 mb-4">
-              <Pagination
-                totalPages={data.totalPages}
-                currentPage={currentPage}
-                onPageChange={handlePageChange}
-              />
-            </div>
-          )}
+          <div className="flex justify-center items-center mt-8 mb-4">
+            <Pagination
+              totalPages={data?.totalPages || 1}
+              currentPage={currentPage}
+              onPageChange={handlePageChange}
+            />
+          </div>
         </div>
       </div>
     </div>

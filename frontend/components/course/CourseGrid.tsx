@@ -54,7 +54,7 @@ export function CourseGrid({
   // Grid layout based on variant
   const getGridClasses = () => {
     if (variant === 'default') {
-      return "flex flex-wrap gap-4 md:gap-6 justify-start";
+      return "flex flex-wrap gap-4 md:gap-6 justify-center";
     }
     return "flex flex-wrap gap-4 md:gap-6 justify-center";
   };
@@ -99,9 +99,9 @@ export function CourseGrid({
   // Handle empty state
   if (!isLoading && courses.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center py-20 px-4 bg-gray-50 rounded-lg border border-gray-100 shadow-sm">
+      <div className="flex flex-col items-center justify-center min-h-[400px] py-24 px-8 bg-[var(--color-background)] rounded-2xl lg w-full">
         <svg
-          className="w-16 h-16 text-gray-300 mb-4"
+          className="w-24 h-24 text-[var(--color-muted)] mb-6"
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
@@ -114,11 +114,11 @@ export function CourseGrid({
             d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
           />
         </svg>
-        <h3 className="text-lg font-medium text-gray-700 mb-2">
+        <h3 className="text-2xl font-bold text-[var(--color-primary-dark)] mb-4">
           No courses found
         </h3>
-        <p className="text-gray-500 text-center">
-          Try adjusting your filters or search criteria
+        <p className="text-lg text-[var(--color-muted)] text-center max-w-xl">
+          Try adjusting your filters or search criteria to find available courses. If you believe this is an error, please contact support.
         </p>
       </div>
     );
