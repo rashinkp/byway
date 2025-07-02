@@ -10,11 +10,9 @@ import WalletSection from "@/components/profile/WalletSection";
 import TransactionsSection from "@/components/profile/TransactionsSection";
 import OrdersSection from "@/components/profile/OrdersSection";
 import CertificatesSection from "@/components/profile/CertificatesSection";
-import { Loader2, Menu } from "lucide-react";
-import { useSearchParams, useRouter, usePathname } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
 import ErrorDisplay from "@/components/ErrorDisplay";
 import { Skeleton } from "@/components/ui/skeleton";
-import { TopNavbar } from "@/components/common/layout/TopNavbar";
 
 export default function ProfilePage() {
   const { data: user, isLoading, error } = useDetailedUserData();
@@ -24,7 +22,6 @@ export default function ProfilePage() {
   const [loadingSection, setLoadingSection] = useState<string | null>(null);
   const searchParams = useSearchParams();
   const router = useRouter();
-  const pathname = usePathname();
 
   // Expand sidebar by default on desktop
   useEffect(() => {
@@ -162,8 +159,8 @@ export default function ProfilePage() {
         )}
 
         {/* Main Content */}
-        <main className="flex-1 transition-all duration-300 p-4 md:p-8 min-w-0">
-          <div className="max-w-5xl mx-auto">
+        <main className="flex-1 transition-all duration-300  md:p-8 min-w-0 ">
+          <div className="">
             {activeSection === "profile" && (
               <ProfileSection user={user} setIsModalOpen={setIsModalOpen} />
             )}

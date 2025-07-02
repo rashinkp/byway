@@ -26,12 +26,12 @@ export default function CertificatesSection() {
 
   return (
     <div className="w-full">
-      <div className="bg-white rounded-xl border border-gray-200 p-6 mb-8">
-        <h1 className="text-2xl font-bold text-gray-800 mb-2">My Certificates</h1>
-        <p className="text-gray-600">View and download your course completion certificates</p>
+      <div className="bg-[var(--color-background)] rounded-xl  p-6 mb-8">
+        <h1 className="text-2xl font-bold text-[var(--color-primary-dark)] mb-2">My Certificates</h1>
+        <p className="text-[var(--color-muted)]">View and download your course completion certificates</p>
       </div>
 
-      <div className="bg-white rounded-xl border border-gray-200 p-6">
+      <div className="rounded-xl p-6">
         {/* Results area */}
         {loading ? (
           <div className="space-y-4">
@@ -46,17 +46,17 @@ export default function CertificatesSection() {
         ) : (
           <>
             {certificates.map(cert => (
-              <div key={cert.id} className="flex flex-col md:flex-row md:items-center justify-between bg-blue-50/60 border border-blue-100 rounded-lg p-4 mb-4">
+              <div key={cert.id} className="flex flex-col md:flex-row md:items-center justify-between bg-[var(--color-background)] rounded-lg p-4 mb-4">
                 <div>
-                  <div className="font-semibold text-blue-900">{cert.courseTitle || cert.courseId}</div>
-                  <div className="text-sm text-gray-600">Issued: {cert.issuedAt ? new Date(cert.issuedAt).toLocaleDateString() : "-"}</div>
-                  <div className="text-xs text-gray-400">Certificate #: {cert.certificateNumber}</div>
+                  <div className="font-semibold text-[var(--color-primary-dark)]">{cert.courseTitle || cert.courseId}</div>
+                  <div className="text-sm text-[var(--color-muted)]">Issued: {cert.issuedAt ? new Date(cert.issuedAt).toLocaleDateString() : "-"}</div>
+                  <div className="text-xs text-[var(--color-muted)]">Certificate #: {cert.certificateNumber}</div>
                 </div>
                 <div className="mt-2 md:mt-0">
                   {cert.pdfUrl ? (
-                    <a href={cert.pdfUrl} target="_blank" rel="noopener noreferrer" className="inline-block px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition">Download</a>
+                    <a href={cert.pdfUrl} target="_blank" rel="noopener noreferrer" className="inline-block px-4 py-2 bg-[var(--color-primary-dark)] text-[var(--color-surface)] rounded hover:bg-[var(--color-primary-light)] transition">Download</a>
                   ) : (
-                    <span className="text-gray-400">Not available</span>
+                    <span className="text-[var(--color-muted)]">Not available</span>
                   )}
                 </div>
               </div>

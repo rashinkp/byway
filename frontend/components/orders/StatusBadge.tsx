@@ -23,36 +23,36 @@ export const StatusBadge: React.FC<StatusBadgeProps> = ({
         case "COMPLETED":
           return {
             icon: CheckCircle,
-            color: "text-green-600",
-            bg: "bg-green-50",
+            color: "text-[var(--color-primary-light)]",
+            bg: "bg-[var(--color-primary-light)]/10",
             text: "Paid",
           };
         case "PENDING":
           return {
             icon: Clock,
-            color: "text-yellow-600",
-            bg: "bg-yellow-50",
+            color: "text-[var(--color-warning)]",
+            bg: "bg-[var(--color-warning)]/10",
             text: "Pending",
           };
         case "FAILED":
           return {
             icon: XCircle,
-            color: "text-red-600",
-            bg: "bg-red-50",
+            color: "text-[var(--color-danger)]",
+            bg: "bg-[var(--color-danger)]/10",
             text: "Failed",
           };
         case "REFUNDED":
           return {
             icon: AlertCircle,
-            color: "text-purple-600",
-            bg: "bg-purple-50",
+            color: "text-[var(--color-accent)]",
+            bg: "bg-[var(--color-accent)]/10",
             text: "Refunded",
           };
         default:
           return {
             icon: AlertCircle,
-            color: "text-gray-600",
-            bg: "bg-gray-50",
+            color: "text-[var(--color-muted)]",
+            bg: "bg-[var(--color-surface)]",
             text: status,
           };
       }
@@ -61,43 +61,43 @@ export const StatusBadge: React.FC<StatusBadgeProps> = ({
         case "COMPLETED":
           return {
             icon: CheckCircle,
-            color: "text-green-600",
-            bg: "bg-green-50",
+            color: "text-[var(--color-primary-light)]",
+            bg: "bg-[var(--color-primary-light)]/10",
             text: "Completed",
           };
         case "PENDING":
           return {
             icon: Clock,
-            color: "text-yellow-600",
-            bg: "bg-yellow-50",
+            color: "text-[var(--color-warning)]",
+            bg: "bg-[var(--color-warning)]/10",
             text: "Pending",
           };
         case "CONFIRMED":
           return {
             icon: CheckCircle,
-            color: "text-blue-600",
-            bg: "bg-blue-50",
+            color: "text-[var(--color-primary-dark)]",
+            bg: "bg-[var(--color-primary-dark)]/10",
             text: "Confirmed",
           };
         case "FAILED":
           return {
             icon: XCircle,
-            color: "text-red-600",
-            bg: "bg-red-50",
+            color: "text-[var(--color-danger)]",
+            bg: "bg-[var(--color-danger)]/10",
             text: "Failed",
           };
         case "CANCELLED":
           return {
             icon: XCircle,
-            color: "text-gray-600",
-            bg: "bg-gray-50",
+            color: "text-[var(--color-muted)]",
+            bg: "bg-[var(--color-surface)]",
             text: "Cancelled",
           };
         default:
           return {
             icon: AlertCircle,
-            color: "text-gray-600",
-            bg: "bg-gray-50",
+            color: "text-[var(--color-muted)]",
+            bg: "bg-[var(--color-surface)]",
             text: status,
           };
       }

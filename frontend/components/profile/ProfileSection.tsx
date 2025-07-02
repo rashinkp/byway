@@ -2,7 +2,6 @@
 
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
 import {
   Edit2,
   Mail,
@@ -59,7 +58,7 @@ export default function ProfileSection({
   const skillsArray = getSkillsArray(user.skills);
 
   return (
-    <div className="min-h-screen bg-gray-50/50 p-6">
+    <div className="min-h-screen">
       <div className="max-w-7xl">
         {/* Header Section */}
         <div className="p-6">
@@ -75,25 +74,25 @@ export default function ProfileSection({
                     />
                   </div>
                 ) : (
-                  <div className="w-20 h-20 rounded-xl bg-blue-50 flex items-center justify-center text-blue-600 text-2xl font-bold">
+                  <div className="w-20 h-20 rounded-xl bg-[var(--color-primary-light)] flex items-center justify-center text-[var(--color-primary-dark)] text-2xl font-bold">
                     {user.name ? getInitials(user.name) : "U"}
                   </div>
                 )}
                 {user.isVerified && (
-                  <div className="absolute -bottom-2 -right-2 bg-green-500 rounded-full p-1.5">
-                    <CheckCircle2 className="w-4 h-4 text-white" />
+                  <div className="absolute -bottom-2 -right-2 bg-[var(--color-primary-dark)] rounded-full p-1.5">
+                    <CheckCircle2 className="w-4 h-4 text-[var(--color-surface)]" />
                   </div>
                 )}
               </div>
               <div className="space-y-2">
-                <h1 className="text-2xl font-semibold text-gray-900">
+                <h1 className="text-2xl font-semibold text-[var(--color-primary-dark)]">
                   {user.name || "Anonymous User"}
                 </h1>
-                <p className="text-gray-600">{user.email}</p>
+                <p className="text-[var(--color-muted)]">{user.email}</p>
                 <div className="flex items-center gap-3">
                   <Badge
                     variant="outline"
-                    className="capitalize bg-blue-50 text-blue-700 border-blue-200"
+                    className="capitalize bg-[var(--color-primary-light)]/10 text-[var(--color-primary-light)] border-[var(--color-primary-light)]"
                   >
                     <Shield className="w-3 h-3 mr-1" />
                     {user.role.toLowerCase()}
@@ -102,8 +101,8 @@ export default function ProfileSection({
                     variant="outline"
                     className={
                       user.isVerified
-                        ? "bg-green-50 text-green-700 border-green-200"
-                        : "bg-orange-50 text-orange-700 border-orange-200"
+                        ? "bg-[var(--color-primary-light)]/10 text-[var(--color-primary-light)]"
+                        : "bg-[var(--color-warning)]/10 text-[var(--color-warning)] border-[var(--color-warning)]"
                     }
                   >
                     {user.isVerified ? (
@@ -120,7 +119,7 @@ export default function ProfileSection({
                   </Badge>
                   <Badge
                     variant="outline"
-                    className="bg-purple-50 text-purple-700 border-purple-200"
+                    className="bg-[var(--color-primary-light)]/10 text-[var(--color-primary-light)]"
                   >
                     <UserCircle className="w-3 h-3 mr-1" />
                     {user.gender ? user.gender.toLowerCase() : "Not specified"}
@@ -132,7 +131,7 @@ export default function ProfileSection({
               onClick={() => setIsModalOpen(true)}
               size="lg"
               variant="outline"
-              className="bg-blue-50 text-blue-700 border-blue-200 hover:bg-blue-100"
+              className="bg-[var(--color-primary-light)]/10 text-[var(--color-primary-light)] border-[var(--color-primary-light)] hover:bg-[var(--color-primary-light)]/20"
             >
               <Edit2 className="w-4 h-4 mr-2" />
               Edit Profile
@@ -146,17 +145,17 @@ export default function ProfileSection({
           <div className="lg:col-span-2 space-y-6">
             {/* About Section */}
             <div className="p-6 space-y-6">
-              <div className="flex items-center gap-2 text-gray-900">
+              <div className="flex items-center gap-2 text-[var(--color-primary-dark)]">
                 <User className="w-5 h-5" />
                 <h2 className="text-lg font-semibold">About Me</h2>
               </div>
               <div>
-                <h3 className="text-sm font-medium text-gray-500 uppercase tracking-wide mb-2">
+                <h3 className="text-sm font-medium text-[var(--color-muted)] uppercase tracking-wide mb-2">
                   Biography
                 </h3>
-                <p className="text-gray-800 leading-relaxed">
+                <p className="text-[var(--color-primary-dark)] leading-relaxed">
                   {user.bio || (
-                    <span className="italic text-gray-400">
+                    <span className="italic text-[var(--color-muted)]">
                       No biography provided yet
                     </span>
                   )}
@@ -165,16 +164,16 @@ export default function ProfileSection({
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="flex items-start gap-3">
-                  <div className="bg-blue-50 p-2 rounded-lg">
-                    <GraduationCap className="w-5 h-5 text-blue-600" />
+                  <div className="bg-[var(--color-primary-light)]/10 p-2 rounded-lg">
+                    <GraduationCap className="w-5 h-5 text-[var(--color-primary)]" />
                   </div>
                   <div className="flex-1">
-                    <h3 className="text-sm font-medium text-gray-500 uppercase tracking-wide mb-1">
+                    <h3 className="text-sm font-medium text-[var(--color-muted)] uppercase tracking-wide mb-1">
                       Education
                     </h3>
-                    <p className="text-gray-800">
+                    <p className="text-[var(--color-primary-dark)]">
                       {user.education || (
-                        <span className="italic text-gray-400">
+                        <span className="italic text-[var(--color-muted)]">
                           Not specified
                         </span>
                       )}
@@ -183,18 +182,18 @@ export default function ProfileSection({
                 </div>
 
                 <div className="flex items-start gap-3">
-                  <div className="bg-blue-50 p-2 rounded-lg">
-                    <Calendar className="w-5 h-5 text-blue-600" />
+                  <div className="bg-[var(--color-primary-light)]/10 p-2 rounded-lg">
+                    <Calendar className="w-5 h-5 text-[var(--color-primary)]" />
                   </div>
                   <div className="flex-1">
-                    <h3 className="text-sm font-medium text-gray-500 uppercase tracking-wide mb-1">
+                    <h3 className="text-sm font-medium text-[var(--color-muted)] uppercase tracking-wide mb-1">
                       Date of Birth
                     </h3>
-                    <p className="text-gray-800">
+                    <p className="text-[var(--color-primary-dark)]">
                       {user.dateOfBirth ? (
                         formatDate(user.dateOfBirth)
                       ) : (
-                        <span className="italic text-gray-400">
+                        <span className="italic text-[var(--color-muted)]">
                           Not specified
                         </span>
                       )}
@@ -204,11 +203,11 @@ export default function ProfileSection({
               </div>
 
               <div className="flex items-start gap-3">
-                <div className="bg-blue-50 p-2 rounded-lg">
-                  <Briefcase className="w-5 h-5 text-blue-600" />
+                <div className="bg-[var(--color-primary-light)]/10 p-2 rounded-lg">
+                  <Briefcase className="w-5 h-5 text-[var(--color-primary)]" />
                 </div>
                 <div className="flex-1">
-                  <h3 className="text-sm font-medium text-gray-500 uppercase tracking-wide mb-3">
+                  <h3 className="text-sm font-medium text-[var(--color-muted)] uppercase tracking-wide mb-3">
                     Skills & Expertise
                   </h3>
                   {skillsArray.length > 0 ? (
@@ -217,7 +216,7 @@ export default function ProfileSection({
                         <Badge
                           key={index}
                           variant="outline"
-                          className="bg-blue-50 text-blue-700 border-blue-200"
+                          className="bg-[var(--color-primary-light)]/10 text-[var(--color-primary)] border-[var(--color-primary-light)]"
                         >
                           {skill}
                         </Badge>
@@ -237,34 +236,34 @@ export default function ProfileSection({
           <div className="space-y-6">
             {/* Contact Information */}
             <div className="p-6 space-y-6">
-              <div className="flex items-center gap-2 text-gray-900">
+              <div className="flex items-center gap-2 text-[var(--color-primary-dark)]">
                 <Mail className="w-5 h-5" />
                 <h2 className="text-lg font-semibold">Contact Info</h2>
               </div>
               <div className="space-y-4">
                 <div className="flex items-start gap-3">
-                  <div className="bg-blue-50 p-2 rounded-lg">
-                    <Mail className="w-4 h-4 text-blue-600" />
+                  <div className="bg-[var(--color-primary-light)]/10 p-2 rounded-lg">
+                    <Mail className="w-4 h-4 text-[var(--color-primary)]" />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-gray-500 mb-1">
+                    <p className="text-sm font-medium text-[var(--color-muted)] mb-1">
                       Email Address
                     </p>
-                    <p className="text-gray-800 break-all">{user.email}</p>
+                    <p className="text-[var(--color-primary-dark)] break-all">{user.email}</p>
                   </div>
                 </div>
 
                 <div className="flex items-start gap-3">
-                  <div className="bg-blue-50 p-2 rounded-lg">
-                    <Phone className="w-4 h-4 text-blue-600" />
+                  <div className="bg-[var(--color-primary-light)]/10 p-2 rounded-lg">
+                    <Phone className="w-4 h-4 text-[var(--color-primary)]" />
                   </div>
                   <div className="flex-1">
-                    <p className="text-sm font-medium text-gray-500 mb-1">
+                    <p className="text-sm font-medium text-[var(--color-muted)] mb-1">
                       Phone Number
                     </p>
-                    <p className="text-gray-800">
+                    <p className="text-[var(--color-primary-dark)]">
                       {user.phoneNumber || (
-                        <span className="italic text-gray-400">
+                        <span className="italic text-[var(--color-muted)]">
                           Not provided
                         </span>
                       )}
@@ -273,21 +272,21 @@ export default function ProfileSection({
                 </div>
 
                 <div className="flex items-start gap-3">
-                  <div className="bg-blue-50 p-2 rounded-lg">
-                    <MapPin className="w-4 h-4 text-blue-600" />
+                  <div className="bg-[var(--color-primary-light)]/10 p-2 rounded-lg">
+                    <MapPin className="w-4 h-4 text-[var(--color-primary)]" />
                   </div>
                   <div className="flex-1">
-                    <p className="text-sm font-medium text-gray-500 mb-1">
+                    <p className="text-sm font-medium text-[var(--color-muted)] mb-1">
                       Location
                     </p>
-                    <p className="text-gray-800">
+                    <p className="text-[var(--color-primary-dark)]">
                       {[user.address, user.city, user.country].filter(Boolean)
                         .length > 0 ? (
                         [user.address, user.city, user.country]
                           .filter(Boolean)
                           .join(", ")
                       ) : (
-                        <span className="italic text-gray-400">
+                        <span className="italic text-[var(--color-muted)]">
                           Not specified
                         </span>
                       )}

@@ -54,7 +54,7 @@ export default function WalletSection() {
   if (walletLoading) {
     return (
       <div className="w-full space-y-6">
-        <div className="bg-white rounded-xl border border-gray-200 p-6">
+        <div className="bg-[var(--color-surface)] rounded-xl  p-6">
           <div className="space-y-4">
             <Skeleton className="h-8 w-1/3" />
             <Skeleton className="h-4 w-2/3" />
@@ -68,19 +68,19 @@ export default function WalletSection() {
   return (
     <div className="w-full space-y-6">
       {/* Header Section */}
-      <div className="bg-white rounded-xl border border-gray-200 p-4 sm:p-6">
+      <div className="bg-[var(--color-background)] rounded-xl p-4 sm:p-6">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
-            <h1 className="text-xl sm:text-2xl font-bold text-gray-800 mb-2">
+            <h1 className="text-xl sm:text-2xl font-bold text-[var(--color-primary-dark)] mb-2">
               Wallet
             </h1>
-            <p className="text-sm sm:text-base text-gray-600">
+            <p className="text-sm sm:text-base text-[var(--color-muted)]">
               Manage your wallet balance and transactions
             </p>
           </div>
           <Button
             onClick={() => setShowTopUpForm(!showTopUpForm)}
-            className="bg-blue-600 hover:bg-blue-700 text-white flex items-center gap-2 w-full sm:w-auto"
+            className="bg-[var(--color-primary-dark)] hover:bg-[var(--color-primary-light)] text-white flex items-center gap-2 w-full sm:w-auto"
           >
             <Plus className="w-4 h-4" />
             Add Funds
@@ -89,17 +89,17 @@ export default function WalletSection() {
       </div>
 
       {/* Balance Card */}
-      <div className="bg-gradient-to-br from-blue-600 to-blue-700 rounded-xl p-6 sm:p-8 text-white relative overflow-hidden">
+      <div className="bg-gradient-to-br from-[var(--color-primary-dark)] to-[var(--color-primary-light)] rounded-xl p-6 sm:p-8 text-[var(--color-surface)] relative overflow-hidden">
         <div className="absolute top-0 right-0 opacity-10">
           <Wallet className="w-32 h-32 sm:w-48 sm:h-48" />
         </div>
         <div className="relative z-10">
           <div className="flex items-center gap-3 mb-4">
-            <div className="bg-white/20 p-2 rounded-lg">
+            <div className="bg-[var(--color-primary-light)] p-2 rounded-lg">
               <Wallet className="w-6 h-6" />
             </div>
             <div>
-              <p className="text-blue-100 text-sm font-medium">
+              <p className="text-[var(--color-muted)] text-sm font-medium">
                 Current Balance
               </p>
               <h2 className="text-3xl sm:text-4xl font-bold">
@@ -107,54 +107,19 @@ export default function WalletSection() {
               </h2>
             </div>
           </div>
-          <div className="flex items-center gap-2 text-blue-100 text-sm">
+          <div className="flex items-center gap-2 text-[var(--color-surface)] text-sm">
             <Shield className="w-4 h-4" />
             <span>Secured & Protected</span>
           </div>
         </div>
       </div>
 
-      {/* Quick Stats */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-        <div className="bg-white rounded-xl border border-gray-200 p-4 sm:p-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-gray-500 mb-1">
-                Available Balance
-              </p>
-              <p className="text-xl sm:text-2xl font-bold text-gray-900">
-                ${wallet?.balance?.toFixed(2) || "0.00"}
-              </p>
-            </div>
-            <div className="bg-green-50 p-3 rounded-lg">
-              <DollarSign className="w-6 h-6 text-green-600" />
-            </div>
-          </div>
-        </div>
-
-       
-
-        <div className="bg-white rounded-xl border border-gray-200 p-4 sm:p-6 sm:col-span-2 lg:col-span-1">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-gray-500 mb-1">Status</p>
-              <p className="text-xl sm:text-2xl font-bold text-green-600">
-                Active
-              </p>
-            </div>
-            <div className="bg-green-50 p-3 rounded-lg">
-              <Zap className="w-6 h-6 text-green-600" />
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Top Up Form */}
+    
       {showTopUpForm && (
-        <div className="bg-white rounded-xl border border-gray-200 p-4 sm:p-6">
+        <div className="bg-[var(--color-background)] rounded-xl  p-4 sm:p-6">
           <div className="flex items-center gap-2 mb-6">
-            <CreditCard className="w-5 h-5 text-gray-700" />
-            <h2 className="text-lg font-semibold text-gray-800">
+            <CreditCard className="w-5 h-5 text-[var(--color-primary-dark)]" />
+            <h2 className="text-lg font-semibold text-[var(--color-primary-dark)]">
               Add Funds to Wallet
             </h2>
           </div>
@@ -162,7 +127,7 @@ export default function WalletSection() {
           <div className="space-y-6">
             {/* Quick Amount Selection */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-3">
+              <label className="block text-sm font-medium text-[var(--color-primary-light)] mb-3">
                 Quick Select Amount
               </label>
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
@@ -173,8 +138,8 @@ export default function WalletSection() {
                     onClick={() => setAmount(quickAmount.toString())}
                     className={`h-12 ${
                       amount === quickAmount.toString()
-                        ? "border-blue-500 bg-blue-50 text-blue-700"
-                        : "hover:border-gray-300"
+                        ? "border-[var(--color-primary-dark)] bg-[var(--color-primary-light)] text-[var(--color-surface)]"
+                        : "hover:border-[var(--color-muted)]"
                     }`}
                   >
                     ${quickAmount}
@@ -187,12 +152,12 @@ export default function WalletSection() {
             <div>
               <label
                 htmlFor="amount"
-                className="block text-sm font-medium text-gray-700 mb-2"
+                className="block text-sm font-medium text-[var(--color-primary-light)] mb-2"
               >
                 Or Enter Custom Amount
               </label>
               <div className="relative">
-                <DollarSign className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                <DollarSign className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[var(--color-muted)] w-5 h-5" />
                 <Input
                   id="amount"
                   type="number"
@@ -204,22 +169,22 @@ export default function WalletSection() {
                   placeholder="0.00"
                 />
               </div>
-              <p className="text-xs text-gray-500 mt-1">
+              <p className="text-xs text-[var(--color-muted)] mt-1">
                 Minimum amount: $1.00
               </p>
             </div>
 
             {/* Payment Method Info */}
-            <div className="bg-gray-50 p-4 rounded-lg">
+            <div className="p-4 rounded-lg">
               <div className="flex items-start gap-3">
-                <div className="bg-blue-50 p-2 rounded-lg">
-                  <Shield className="w-5 h-5 text-blue-600" />
+                <div className="bg-[var(--color-surface)] p-2 rounded-lg">
+                  <Shield className="w-5 h-5 text-[var(--color-primary-dark)]" />
                 </div>
                 <div>
-                  <h4 className="font-medium text-gray-900 mb-1">
+                  <h4 className="font-medium text-[var(--color-primary-dark)] mb-1">
                     Secure Payment
                   </h4>
-                  <p className="text-sm text-gray-600">
+                  <p className="text-sm text-[var(--color-muted)]">
                     Payments are processed securely through Stripe. Your payment
                     information is encrypted and protected.
                   </p>
@@ -232,11 +197,11 @@ export default function WalletSection() {
               <Button
                 onClick={handleTopUp}
                 disabled={isToppingUp || !amount || parseFloat(amount) < 1}
-                className="flex-1 h-12 bg-blue-600 hover:bg-blue-700 text-white"
+                className="flex-1 h-12 bg-[var(--color-primary-dark)] hover:bg-[var(--color-primary-light)] text-[var(--color-surface)]"
               >
                 {isToppingUp ? (
                   <div className="flex items-center gap-2">
-                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    <div className="w-4 h-4 border-2 border-[var(--color-primary-dark)] border-t-transparent rounded-full animate-spin" />
                     Processing...
                   </div>
                 ) : (
@@ -263,16 +228,16 @@ export default function WalletSection() {
 
       {/* Information Cards */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
-        <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 sm:p-6">
+        <div className="bg-[var(--color-surface)] border border-[var(--color-muted)] rounded-xl p-4 sm:p-6">
           <div className="flex items-start gap-3">
-            <div className="bg-blue-100 p-2 rounded-lg">
-              <ArrowUpRight className="w-5 h-5 text-blue-600" />
+            <div className="bg-[var(--color-background)] p-2 rounded-lg">
+              <ArrowUpRight className="w-5 h-5 text-[var(--color-primary-dark)]" />
             </div>
             <div>
-              <h3 className="font-semibold text-blue-900 mb-2">
+              <h3 className="font-semibold text-[var(--color-primary-dark)] mb-2">
                 How to Use Your Wallet
               </h3>
-              <p className="text-sm text-blue-700 leading-relaxed">
+              <p className="text-sm text-[var(--color-muted)] leading-relaxed">
                 Use your wallet balance to purchase courses, premium features,
                 or other services on our platform. Funds are instantly available
                 after adding them.
@@ -281,16 +246,16 @@ export default function WalletSection() {
           </div>
         </div>
 
-        <div className="bg-green-50 border border-green-200 rounded-xl p-4 sm:p-6">
+        <div className="bg-[var(--color-background)] border border-[var(--color-muted)] rounded-xl p-4 sm:p-6">
           <div className="flex items-start gap-3">
-            <div className="bg-green-100 p-2 rounded-lg">
-              <ArrowDownRight className="w-5 h-5 text-green-600" />
+            <div className="bg-[var(--color-surface)] p-2 rounded-lg">
+              <ArrowDownRight className="w-5 h-5 text-[var(--color-primary-dark)]" />
             </div>
             <div>
-              <h3 className="font-semibold text-green-900 mb-2">
+              <h3 className="font-semibold text-[var(--color-primary-dark)] mb-2">
                 Secure & Protected
               </h3>
-              <p className="text-sm text-green-700 leading-relaxed">
+              <p className="text-sm text-[var(--color-muted)] leading-relaxed">
                 Your wallet is protected with bank-level security. All
                 transactions are encrypted and monitored for suspicious
                 activity.

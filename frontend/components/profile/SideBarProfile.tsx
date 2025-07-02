@@ -38,14 +38,14 @@ const Sidebar: FC<SidebarProps> = ({ activeSection, setActiveSection, isInstruct
 
   return (
     <div className={cn(
-      "w-full h-full bg-white border-r border-gray-200 flex flex-col relative transition-all duration-300",
+      "w-full h-full bg-[var(--color-surface)]  flex flex-col relative transition-all duration-300",
       "shadow-lg",
       "z-[60]"
     )}>
       {/* Collapse/Expand Chevron - always visible on mobile, at the very top when collapsed or expanded */}
       {collapsed ? (
         <button
-          className="md:hidden w-full h-14 flex items-center justify-center border-b border-gray-200 bg-white focus:outline-none z-20"
+          className="md:hidden w-full h-14 flex items-center justify-center border-b border-[var(--color-muted)] bg-[var(--color-surface)] focus:outline-none z-20"
           onClick={toggleCollapse}
           aria-label="Expand sidebar"
           type="button"
@@ -54,7 +54,7 @@ const Sidebar: FC<SidebarProps> = ({ activeSection, setActiveSection, isInstruct
         </button>
       ) : (
         <button
-          className="md:hidden w-full h-14 flex items-center justify-center border-b border-gray-200 bg-white focus:outline-none z-20"
+          className="md:hidden w-full h-14 flex items-center justify-center border-b border-[var(--color-muted)] bg-[var(--color-surface)] focus:outline-none z-20"
           onClick={toggleCollapse}
           aria-label="Collapse sidebar"
           type="button"
@@ -77,16 +77,16 @@ const Sidebar: FC<SidebarProps> = ({ activeSection, setActiveSection, isInstruct
               className={cn(
                 "flex items-center gap-3 w-full rounded-lg transition-all duration-200",
                 collapsed ? "justify-center p-0 w-12 h-12" : "px-4 py-3 text-sm font-medium",
-                "hover:bg-gray-50 active:bg-gray-100",
+                "hover:bg-[var(--color-background)] active:bg-[var(--color-primary-light)]",
                 activeSection === item.id
-                  ? "bg-blue-50 text-blue-700"
-                  : "text-gray-600"
+                  ? "bg-[var(--color-primary-light)]/20 text-[var(--color-primary-light)]"
+                  : "text-[var(--color-muted)]"
               )}
               title={item.label}
               disabled={isLoading}
             >
               {isLoading ? (
-                <Loader2 className="w-5 h-5 animate-spin text-blue-500" />
+                <Loader2 className="w-5 h-5 animate-spin text-[var(--color-primary-light)]" />
               ) : (
                 <Icon className="w-5 h-5 flex-shrink-0" />
               )}
@@ -96,7 +96,7 @@ const Sidebar: FC<SidebarProps> = ({ activeSection, setActiveSection, isInstruct
           );
         })}
         {/* Logout Button - now directly after menu */}
-        <div className={cn("mt-4 border-t border-gray-200 pt-3 w-full", collapsed ? "flex flex-col items-center" : "")}> 
+        <div className={cn("mt-4 border-t border-[var(--color-muted)] pt-3 w-full", collapsed ? "flex flex-col items-center" : "")}> 
           <button
             onClick={() => {
               logout(undefined, {
@@ -108,8 +108,8 @@ const Sidebar: FC<SidebarProps> = ({ activeSection, setActiveSection, isInstruct
             disabled={isLoggingOut}
             className={cn(
               "flex items-center gap-3 w-full rounded-lg transition-all duration-200",
-              collapsed ? "justify-center p-0 w-12 h-12 mt-2" : "px-4 py-3 text-red-600 hover:bg-red-50 mt-2",
-              "hover:bg-red-50 disabled:opacity-50"
+              collapsed ? "justify-center p-0 w-12 h-12 mt-2" : "px-4 py-3 text-[var(--color-danger)] hover:bg-[var(--color-danger)]/10 mt-2",
+              "hover:bg-[var(--color-danger)]/10 disabled:opacity-50"
             )}
             title="Logout"
           >

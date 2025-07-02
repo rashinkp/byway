@@ -14,100 +14,6 @@ import { Pagination } from "@/components/ui/Pagination";
 import ErrorDisplay from "@/components/ErrorDisplay";
 import { Skeleton } from "@/components/ui/skeleton";
 
-interface StatusBadgeProps {
-  status: string;
-  type?: "order" | "payment";
-}
-
-const StatusBadge: React.FC<StatusBadgeProps> = ({
-  status,
-  type = "order",
-}) => {
-  interface StatusConfig {
-    icon: React.ComponentType<{ className?: string }>;
-    color: string;
-    bg: string;
-    text: string;
-  }
-
-  const getStatusConfig = (): StatusConfig => {
-    if (type === "payment") {
-      switch (status) {
-        case "COMPLETED":
-          return {
-            icon: CheckCircle,
-            color: "text-green-600",
-            bg: "bg-green-50",
-            text: "Paid",
-          };
-        case "PENDING":
-          return {
-            icon: Clock,
-            color: "text-yellow-600",
-            bg: "bg-yellow-50",
-            text: "Pending",
-          };
-        case "FAILED":
-          return {
-            icon: XCircle,
-            color: "text-red-600",
-            bg: "bg-red-50",
-            text: "Failed",
-          };
-        default:
-          return {
-            icon: AlertCircle,
-            color: "text-gray-600",
-            bg: "bg-gray-50",
-            text: status,
-          };
-      }
-    } else {
-      switch (status) {
-        case "COMPLETED":
-          return {
-            icon: CheckCircle,
-            color: "text-green-600",
-            bg: "bg-green-50",
-            text: "Completed",
-          };
-        case "PENDING":
-          return {
-            icon: Clock,
-            color: "text-yellow-600",
-            bg: "bg-yellow-50",
-            text: "Pending",
-          };
-        case "FAILED":
-          return {
-            icon: XCircle,
-            color: "text-red-600",
-            bg: "bg-red-50",
-            text: "Failed",
-          };
-        default:
-          return {
-            icon: AlertCircle,
-            color: "text-gray-600",
-            bg: "bg-gray-50",
-            text: status,
-          };
-      }
-    }
-  };
-
-  const { icon: Icon, color, bg, text } = getStatusConfig();
-
-  return (
-    <span
-      className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${color} ${bg}`}
-    >
-      <Icon className="w-3 h-3" />
-      {text}
-    </span>
-  );
-};
-
 export default function OrdersSection() {
   const [currentPage, setCurrentPage] = useState(1);
   const [ordersPerPage] = useState(10);
@@ -125,9 +31,9 @@ export default function OrdersSection() {
   if (isLoading) {
     return (
       <div className="w-full">
-        <div className="bg-white rounded-xl border border-gray-200 p-6 mb-8">
-          <h1 className="text-2xl font-bold text-gray-800 mb-2">My Orders</h1>
-          <p className="text-gray-600">Track your course purchases and enrollments</p>
+        <div className="bg-[var(--color-background)] rounded-xl  p-6 mb-8">
+          <h1 className="text-2xl font-bold text-[var(--color-primary-dark)] mb-2">My Orders</h1>
+          <p className="text-[var(--color-muted)]">Track your course purchases and enrollments</p>
         </div>
         <div className="space-y-4">
           {[1, 2, 3].map((i) => (
@@ -140,9 +46,9 @@ export default function OrdersSection() {
 
   return (
     <div className="w-full">
-      <div className="bg-white rounded-xl border border-gray-200 p-6 mb-8">
-        <h1 className="text-2xl font-bold text-gray-800 mb-2">My Orders</h1>
-        <p className="text-gray-600">Track your course purchases and enrollments</p>
+      <div className="bg-[var(--color-background)] rounded-xl  p-6 mb-8">
+        <h1 className="text-2xl font-bold text-[var(--color-primary-dark)] mb-2">My Orders</h1>
+        <p className="text-[var(--color-muted)]">Track your course purchases and enrollments</p>
       </div>
 
       {error && (
@@ -151,16 +57,16 @@ export default function OrdersSection() {
 
       {!orders || !orders.orders?.length ? (
         <div className="text-center py-12">
-          <div className="w-24 h-24 mx-auto mb-4 text-gray-300">
+          <div className="w-24 h-24 mx-auto mb-4 text-[var(--color-muted)]">
             <CreditCard className="w-full h-full" />
           </div>
-          <h3 className="text-lg font-medium text-gray-900">No orders found</h3>
-          <p className="mt-2 text-sm text-gray-500">
+          <h3 className="text-lg font-medium text-[var(--color-primary-dark)]">No orders found</h3>
+          <p className="mt-2 text-sm text-[var(--color-muted)]">
             You haven't placed any orders yet.
           </p>
         </div>
       ) : (
-        <div className="bg-white rounded-xl border border-gray-200 p-6">
+        <div className="p-6">
           <div className="space-y-6">
             {orders.orders.map((order) => (
               <OrderCard key={order.id} order={order} />

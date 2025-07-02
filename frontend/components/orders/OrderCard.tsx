@@ -23,25 +23,25 @@ export function OrderCard({ order }: OrderCardProps) {
   const getLevelColor = (level: string): string => {
     switch (level) {
       case "BEGINNER":
-        return "text-green-600 bg-green-50";
+        return "text-[var(--color-primary-light)] bg-[var(--color-primary-light)]/10";
       case "MEDIUM":
-        return "text-blue-600 bg-blue-50";
+        return "text-[var(--color-primary-dark)] bg-[var(--color-primary-dark)]/10";
       case "ADVANCED":
-        return "text-purple-600 bg-purple-50";
+        return "text-[var(--color-accent)] bg-[var(--color-accent)]/10";
       default:
-        return "text-gray-600 bg-gray-50";
+        return "text-[var(--color-muted)] bg-[var(--color-surface)]";
     }
   };
 
   return (
-    <div className="bg-white border border-gray-200 rounded-lg overflow-hidden">
-      <div className="p-4 border-b border-gray-200">
+    <div className="bg-[var(--color-background)]  rounded-lg overflow-hidden">
+      <div className="p-4 ">
         <div className="flex justify-between items-start">
           <div>
-            <h3 className="text-sm font-medium text-gray-900">
+            <h3 className="text-sm font-medium text-[var(--color-primary-dark)]">
               Order #{order.id.slice(0, 8)}
             </h3>
-            <p className="text-sm text-gray-500 mt-1">
+            <p className="text-sm text-[var(--color-muted)] mt-1">
               {formatDate(order.createdAt)}
             </p>
           </div>
@@ -53,7 +53,7 @@ export function OrderCard({ order }: OrderCardProps) {
                 size="sm"
                 onClick={handleRetry}
                 disabled={isRetrying}
-                className="text-blue-600 hover:text-blue-700"
+                className="text-[var(--color-primary)] hover:text-[var(--color-primary-dark)]"
               >
                 {isRetrying ? (
                   <>
@@ -72,7 +72,7 @@ export function OrderCard({ order }: OrderCardProps) {
         </div>
       </div>
 
-      <div className="divide-y divide-gray-200">
+      <div className="divide-y ">
         {order.items.map((item) => (
           <div key={item.orderId} className="p-4 flex items-start justify-between">
             <div className="flex gap-4">
@@ -84,19 +84,19 @@ export function OrderCard({ order }: OrderCardProps) {
                 />
               </div>
               <div>
-                <h4 className="text-sm font-medium text-gray-900">{item.title}</h4>
-                <p className="text-xs text-gray-500 mt-1">
+                <h4 className="text-sm font-medium text-[var(--color-primary-dark)]">{item.title}</h4>
+                <p className="text-xs text-[var(--color-muted)] mt-1">
                   Level: {item.level}
                 </p>
                 <div className="mt-2 flex items-center gap-2">
-                  <span className="text-sm text-gray-500 line-through">
+                  <span className="text-sm text-[var(--color-muted)] line-through">
                     {formatPrice(item.price || 0)}
                   </span>
-                  <span className="text-sm font-medium text-green-600">
+                  <span className="text-sm font-medium text-[--color-primary-dark]">
                     {formatPrice(item.coursePrice)}
                   </span>
                   {item.discount && item.discount > 0 && (
-                    <span className="text-xs text-green-600">
+                    <span className="text-xs text-[--color-danger] font-medium">
                       (-{item.discount}%)
                     </span>
                   )}
@@ -104,10 +104,10 @@ export function OrderCard({ order }: OrderCardProps) {
               </div>
             </div>
             <div className="text-right">
-              <p className="text-sm font-medium text-gray-900">
+              <p className="text-sm font-medium text-[var(--color-primary-dark)]">
                 {formatPrice(item.coursePrice)}
               </p>
-              <p className="text-xs text-gray-500 mt-1">
+              <p className="text-xs text-[var(--color-muted)] mt-1">
                 {item.approvalStatus === "APPROVED" ? "Approved" : "Pending Approval"}
               </p>
             </div>
@@ -115,11 +115,11 @@ export function OrderCard({ order }: OrderCardProps) {
         ))}
       </div>
 
-      <div className="p-4 bg-gray-50 border-t border-gray-200">
+      <div className="p-4 bg-[var(--color-background)] ">
         <div className="flex justify-between items-center">
           <div>
-            <p className="text-sm text-gray-500">Total Amount</p>
-            <p className="text-lg font-semibold text-gray-900">
+            <p className="text-sm text-[var(--color-muted)]">Total Amount</p>
+            <p className="text-lg font-semibold text-[var(--color-primary-dark)]">
               {formatPrice(order.amount)}
             </p>
           </div>

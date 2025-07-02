@@ -3,8 +3,6 @@ import { cn } from "@/utils/cn";
 import { Star,} from "lucide-react";
 import { useRouter } from "next/navigation";
 import { Course } from "@/types/course";
-import { useAddToCart } from "@/hooks/cart/useAddToCart";
-import { useAuth } from "@/hooks/auth/useAuth";
 
 interface CourseCardProps {
   course: Course;
@@ -16,83 +14,13 @@ export function CourseCard({
   className,
 }: CourseCardProps) {
   const router = useRouter();
-  const { user } = useAuth();
-  const { mutate: addToCart, isPending: isCartLoading } = useAddToCart();
 
-  // Format price to display with 2 decimal places
-  const formatPrice = (price: number | string | null | undefined): string => {
-    if (price === null || price === undefined) return "Free";
-    const numPrice = typeof price === 'string' ? parseFloat(price) : price;
-    return numPrice === 0 ? "Free" : `$${numPrice.toFixed(2)}`;
-  };
 
-  // Calculate discounted price
-  const getDiscountedPrice = (): string => {
-    const price = typeof course.price === 'number' ? course.price : parseFloat(course.price || '0');
-    const offer = typeof course.offer === 'number' ? course.offer : parseFloat(course.offer || '0');
-    
-    if (offer > 0 && offer < price) {
-      return formatPrice(offer);
-    }
-    return formatPrice(price);
-  };
-
-  const getOriginalPrice = (): string => {
-    const price = typeof course.price === 'number' ? course.price : parseFloat(course.price || '0');
-    const offer = typeof course.offer === 'number' ? course.offer : parseFloat(course.offer || '0');
-    
-    if (offer > 0 && offer < price) {
-      return formatPrice(price);
-    }
-    return "";
-  };
-
-  const renderStars = (rating: number) => {
-    return Array.from({ length: 5 }, (_, i) => (
-      <Star
-        key={i}
-        className={`w-4 h-4 ${
-          i < rating ? "text-yellow-400 fill-current" : "text-gray-300"
-        }`}
-      />
-    ));
-  };
 
   const handleCardClick = () => {
     router.push(`/courses/${course.id}`);
   };
 
-  const handleAddToCart = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    if (!user) {
-      router.push("/login");
-      return;
-    }
-    if (course?.id) {
-      addToCart({ courseId: course.id });
-    }
-  };
-
-  const handleBuyNow = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    if (!user) {
-      router.push("/login");
-      return;
-    }
-    if (course?.id) {
-      router.push(`/user/checkout?courseId=${course.id}`);
-    }
-  };
-
-  const handleLearnNow = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    router.push(`/user/my-courses/${course.id}`);
-  };
-
-  const handleGoToCart = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    router.push('/user/cart');
-  };
 
   return (
     <div

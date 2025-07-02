@@ -53,18 +53,18 @@ export default function MyCoursesSection() {
   if (!isLoading && (!courses || courses.length === 0)) {
     return (
       <div className="text-center py-12">
-        <div className="w-24 h-24 mx-auto mb-4 text-gray-300">
+        <div className="w-24 h-24 mx-auto mb-4 text-[var(--color-primary)]">
           <BookOpen className="w-full h-full" />
         </div>
-        <h3 className="text-lg font-medium text-gray-900 mb-2">
+        <h3 className="text-lg font-medium text-[var(--color-primary-dark)] mb-2">
           No courses enrolled yet
         </h3>
-        <p className="text-gray-600 mb-4">
+        <p className="text-[var(--color-muted)] mb-4">
           Start your learning journey by enrolling in your first course!
         </p>
-        <Link 
-          href="/courses" 
-          className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+        <Link
+          href="/courses"
+          className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-[var(--color-surface)] bg-[var(--color-primary)] hover:bg-[var(--color-primary-dark)] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[var(--color-primary)] transition-colors duration-200"
         >
           Browse Courses
         </Link>
@@ -85,9 +85,9 @@ export default function MyCoursesSection() {
 
   return (
     <div className="w-full">
-      <div className="bg-white rounded-xl border border-gray-200 p-6 mb-8">
-        <h1 className="text-2xl font-bold text-gray-800 mb-2">My Courses</h1>
-        <p className="text-gray-600">
+      <div className="bg-[var(--color-background)] rounded-xl p-6 mb-8">
+        <h1 className="text-2xl font-bold text-[var(--color-primary-dark)] mb-2">My Courses</h1>
+        <p className="text-[var(--color-muted)]">
           Access all your enrolled courses here. Continue your learning journey and track your progress across all your courses.
         </p>
       </div>
@@ -116,7 +116,7 @@ export default function MyCoursesSection() {
               <Link href={`/courses/${course.id}`} className="block h-full">
                 <CourseCard
                   course={course}
-                  className="w-full h-full hover:shadow-lg transition-shadow duration-300"
+                  className="w-full h-full hover:shadow-lg transition-shadow duration-300 bg-[var(--color-background)]"
                 />
               </Link>
             </motion.div>
