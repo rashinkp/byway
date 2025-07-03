@@ -57,8 +57,8 @@ export default function PaymentMethodSelection({
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center gap-2 text-gray-900 mb-4">
-        <CreditCard className="w-5 h-5 text-blue-600" />
+      <div className="flex items-center gap-2 text-[var(--color-primary-dark)] mb-4">
+        <CreditCard className="w-5 h-5 text-[var(--color-primary-light)]" />
         <h2 className="text-lg font-semibold">Payment Method</h2>
       </div>
       <Separator />
@@ -69,49 +69,49 @@ export default function PaymentMethodSelection({
             onClick={() => handleMethodSelect(method.id)}
             className={`p-4 rounded-xl border-2 transition-all ${
               method.disabled 
-                ? "border-gray-100 bg-gray-50 cursor-not-allowed opacity-75"
+                ? "border-[var(--color-surface)] bg-[var(--color-muted)]/10 cursor-not-allowed opacity-75"
                 : selectedMethod === method.id
-                ? "border-blue-600 bg-blue-50 cursor-pointer"
-                : "border-gray-200 hover:border-blue-200 hover:bg-blue-50/50 cursor-pointer"
+                ? "border-[var(--color-primary-light)] bg-[var(--color-background)] cursor-pointer"
+                : "border-[var(--color-primary-light)]/20  hover:bg-[var(--color-background)]/70 cursor-pointer"
             }`}
           >
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-4">
                 <div className={`p-2 rounded-lg ${
                   method.disabled 
-                    ? "bg-gray-100"
+                    ? "bg-[var(--color-background)]"
                     : selectedMethod === method.id 
-                    ? "bg-blue-100" 
-                    : "bg-gray-100"
+                    ? "bg-[var(--color-primary-light)]/10" 
+                    : "bg-[var(--color-background)]"
                 }`}>
                   <method.icon className={`w-5 h-5 ${
                     method.disabled 
-                      ? "text-gray-400"
+                      ? "text-[var(--color-muted)]"
                       : selectedMethod === method.id 
-                      ? "text-blue-600" 
-                      : "text-gray-600"
+                      ? "text-[var(--color-primary-light)]" 
+                      : "text-[var(--color-muted)]"
                   }`} />
                 </div>
                 <div>
                   <div className="flex items-center gap-2">
                     <h3 className={`font-medium ${
-                      method.disabled ? "text-gray-500" : "text-gray-900"
+                      method.disabled ? "text-[var(--color-muted)]" : "text-[var(--color-primary-dark)]"
                     }`}>
                       {method.name}
                     </h3>
                     {method.disabled && (
-                      <Badge variant="outline" className="bg-yellow-50 text-yellow-600 border-yellow-200">
+                      <Badge variant="outline" className="bg-[var(--color-warning)]/20 text-[var(--color-muted)] border-[var(--color-muted)]/40">
                         <AlertCircle className="w-3 h-3 mr-1" />
                         {method.disabledReason}
                       </Badge>
                     )}
                   </div>
                   <p className={`text-sm ${
-                    method.disabled ? "text-gray-400" : "text-gray-600"
+                    method.disabled ? "text-[var(--color-muted)]" : "text-[var(--color-muted)]"
                   }`}>
                     {method.description}
                     {method.disabled && method.id === "PAYPAL" && (
-                      <span className="block mt-1 text-yellow-600">
+                      <span className="block mt-1 text-[var(--color-danger)]">
                         We're working on fixing some technical issues. Please use other payment methods for now.
                       </span>
                     )}
@@ -119,7 +119,7 @@ export default function PaymentMethodSelection({
                 </div>
               </div>
               {!method.disabled && selectedMethod === method.id && (
-                <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">
+                <Badge variant="outline" className="bg-[var(--color-primary-light)]/10 text-[var(--color-primary-light)] border-[var(--color-primary-light)]/40">
                   <CheckCircle2 className="w-3 h-3 mr-1" />
                   Selected
                 </Badge>

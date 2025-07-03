@@ -104,7 +104,6 @@ export default function CheckoutPage() {
 
   const handleProceedToPayment = async () => {
     if (!user) {
-      toast.error("Please login to continue");
       router.push("/login");
       return;
     }
@@ -154,20 +153,20 @@ export default function CheckoutPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50/50 p-6">
+    <div className="min-h-screen bg-[var(--color-surface)] p-4 sm:p-6">
       <div className="max-w-7xl mx-auto space-y-6">
         {/* Header */}
-        <Card className="bg-white/80 backdrop-blur-sm border border-gray-100 shadow-sm rounded-xl p-6">
+        <Card className="bg-[var(--color-primary-dark)] rounded-lg p-6">
           <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
             <div>
-              <h1 className="text-2xl font-semibold text-gray-900">Checkout</h1>
-              <p className="text-gray-600 mt-1">
+              <h1 className="text-2xl font-semibold text-[var(--color-surface)]">Checkout</h1>
+              <p className="text-[var(--color-surface)]/70 mt-1">
                 Complete your purchase to access your courses
               </p>
             </div>
             <Badge
               variant="outline"
-              className="bg-blue-50 text-blue-700 border-blue-200"
+              className="bg-[var(--color-surface)] text-[var(--color-primary-dark)] border-[var(--color-primary-light)] px-3 py-1 rounded-full text-sm font-medium"
             >
               {courseDetails.length}{" "}
               {courseDetails.length === 1 ? "Course" : "Courses"}
@@ -180,7 +179,7 @@ export default function CheckoutPage() {
           {/* Left Column - Order Details & Payment */}
           <div className="lg:col-span-2 space-y-6">
             {/* Order Details */}
-            <Card className="bg-white/80 backdrop-blur-sm border border-gray-100 shadow-sm rounded-xl p-6">
+            <Card className="bg-[var(--color-surface)] rounded-lg border border-[var(--color-primary-light)]/20 shadow-sm p-6">
               {isLoading ? (
                 <OrderDetailsSkeleton />
               ) : (
@@ -189,7 +188,7 @@ export default function CheckoutPage() {
             </Card>
 
             {/* Payment Method */}
-            <Card className="bg-white/80 backdrop-blur-sm border border-gray-100 shadow-sm rounded-xl p-6">
+            <Card className="bg-[var(--color-surface)] rounded-lg border border-[var(--color-primary-light)]/20 shadow-sm p-6">
               {isLoading ? (
                 <PaymentMethodSkeleton />
               ) : (
@@ -202,7 +201,7 @@ export default function CheckoutPage() {
 
           {/* Right Column - Order Summary */}
           <div className="lg:col-span-1">
-            <Card className="bg-white/80 backdrop-blur-sm border border-gray-100 shadow-sm rounded-xl p-6 sticky top-6">
+            <Card className="bg-[var(--color-surface)] rounded-lg border border-[var(--color-primary-light)]/20 shadow-sm p-6 sticky top-6">
               {isLoading ? (
                 <OrderSummarySkeleton />
               ) : (

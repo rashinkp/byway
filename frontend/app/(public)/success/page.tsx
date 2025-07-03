@@ -65,10 +65,10 @@ const SuccessPage = () => {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-[var(--color-surface)] flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-700 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Verifying your payment...</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[var(--color-primary-light)] mx-auto"></div>
+          <p className="mt-4 text-[var(--color-muted)]">Verifying your payment...</p>
         </div>
       </div>
     );
@@ -81,28 +81,28 @@ const SuccessPage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50/50 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-[var(--color-surface)] flex items-center justify-center p-4">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
-        className="max-w-md w-full bg-white rounded-xl shadow-lg p-8 text-center"
+        className="max-w-md w-full bg-[var(--color-surface)] rounded-xl shadow-lg p-8 text-center border border-[var(--color-primary-light)]/20"
       >
         <div className="flex justify-center mb-6">
           <motion.div
             initial={{ scale: 0 }}
             animate={{ scale: 1 }}
-            transition={{ delay: 0.2, type: "spring" }}
+            transition={{ delay: 0.2, type: 'spring' }}
           >
             {isWalletTopUp ? (
-              <WalletIcon className="h-16 w-16 text-green-500" />
+              <WalletIcon className="h-16 w-16 text-[var(--color-primary-light)]" />
             ) : (
-              <CheckCircleIcon className="h-16 w-16 text-green-500" />
+              <CheckCircleIcon className="h-16 w-16 text-[var(--color-primary-light)]" />
             )}
           </motion.div>
         </div>
 
-        <h1 className="text-2xl font-bold text-gray-900 mb-4">
+        <h1 className="text-2xl font-bold text-[var(--color-primary-dark)] mb-4">
           {isWalletTopUp
             ? "Wallet Top-up Successful!"
             : isWalletPayment
@@ -110,7 +110,7 @@ const SuccessPage = () => {
             : "Payment Successful!"}
         </h1>
 
-        <p className="text-gray-600 mb-8">
+        <p className="text-[var(--color-muted)] mb-8">
           {isWalletTopUp
             ? "Your wallet has been topped up successfully."
             : isWalletPayment
@@ -122,14 +122,14 @@ const SuccessPage = () => {
           {!isWalletTopUp && (
             <button
               onClick={handleGoToCourses}
-              className="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors"
+              className="w-full bg-[var(--color-primary-light)] text-[var(--color-surface)] py-2 px-4 rounded-lg hover:bg-[var(--color-primary-dark)] transition-colors"
             >
               Go to My Courses
             </button>
           )}
           <button
             onClick={handleGoToWallet}
-            className="w-full bg-gray-100 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-200 transition-colors"
+            className="w-full bg-[var(--color-background)] text-[var(--color-primary-dark)] py-2 px-4 rounded-lg hover:bg-[var(--color-primary-light)]/10 transition-colors"
           >
             Go to Wallet
           </button>

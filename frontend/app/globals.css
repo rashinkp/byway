@@ -4,7 +4,6 @@
 
 
 [data-theme="nature"] {
-  
   --color-primary-dark: #093B3B;       
   --color-primary-light: #136E61;     
 
@@ -15,7 +14,6 @@
   --color-accent: #EAF141;            
   --color-warning: #FFC107;          
   --color-danger: #DC3545; 
-
 }
 
 

@@ -20,12 +20,12 @@ export default function PaymentFailedPage() {
   }, [searchParams]);
 
   return (
-    <div className="min-h-screen bg-gray-50/50 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-[var(--color-surface)] flex items-center justify-center p-4">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
-        className="max-w-md w-full bg-white rounded-xl shadow-lg p-8 text-center"
+        className="max-w-md w-full bg-[var(--color-surface)] rounded-xl shadow-lg p-8 text-center border border-[var(--color-primary-light)]/20"
       >
         <div className="flex justify-center mb-6">
           <motion.div
@@ -33,11 +33,11 @@ export default function PaymentFailedPage() {
             animate={{ scale: 1 }}
             transition={{ delay: 0.2, type: "spring" }}
           >
-            <AlertCircle className="h-16 w-16 text-red-500" />
+            <AlertCircle className="h-16 w-16 text-[var(--color-danger)]" />
           </motion.div>
         </div>
 
-        <h1 className="text-2xl font-bold text-gray-900 mb-4">Payment Failed</h1>
+        <h1 className="text-2xl font-bold text-[var(--color-danger)] mb-4">Payment Failed</h1>
         {error && (
           <ErrorDisplay error={error} title="Payment Failed" description="There was a problem processing your payment." compact />
         )}
@@ -45,7 +45,7 @@ export default function PaymentFailedPage() {
         <div className="space-y-4">
           <Link href="/user/my-orders" className="block">
             <Button
-              className="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors flex items-center justify-center gap-2"
+              className="w-full bg-[var(--color-primary-light)] text-[var(--color-surface)] py-2 px-4 rounded-lg hover:bg-[var(--color-primary-dark)] transition-colors flex items-center justify-center gap-2"
             >
               <ShoppingBag className="h-4 w-4" />
               View Orders
@@ -54,7 +54,7 @@ export default function PaymentFailedPage() {
 
           <Link href="/" className="block">
             <Button
-              className="w-full bg-gray-100 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-200 transition-colors flex items-center justify-center gap-2"
+              className="w-full bg-[var(--color-background)] text-[var(--color-primary-dark)] py-2 px-4 rounded-lg hover:bg-[var(--color-primary-light)]/10 transition-colors flex items-center justify-center gap-2"
             >
               <ArrowLeft className="h-4 w-4" />
               Back to Home
@@ -62,9 +62,9 @@ export default function PaymentFailedPage() {
           </Link>
         </div>
 
-        <div className="mt-8 text-center text-sm text-gray-500">
+        <div className="mt-8 text-center text-sm text-[var(--color-muted)]">
           <p>Need help? Contact our support team</p>
-          <Link href="/contact" className="text-blue-600 hover:underline">
+          <Link href="/contact" className="text-[var(--color-primary-light)] hover:underline">
             Contact Support
           </Link>
         </div>
