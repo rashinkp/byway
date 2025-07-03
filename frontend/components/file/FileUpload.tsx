@@ -57,13 +57,13 @@ export function FileUpload({
   return (
     <div className={cn("space-y-2", className)}>
       {label && (
-        <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+        <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 text-[var(--color-primary-dark)]">
           {label}
         </label>
       )}
       
       {description && (
-        <p className="text-sm text-muted-foreground">{description}</p>
+        <p className="text-sm text-[var(--color-muted)]">{description}</p>
       )}
 
       <div className="flex items-center gap-4">
@@ -73,7 +73,7 @@ export function FileUpload({
           onChange={handleFileChange}
           accept={accept}
           disabled={disabled || isUploading}
-          className="flex-1 cursor-pointer file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-primary/10 file:text-primary hover:file:bg-primary/20"
+          className="flex-1 cursor-pointer file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-[var(--color-primary-light)]/10 file:text-[var(--color-primary-light)] hover:file:bg-[var(--color-primary-light)]/20 border border-[var(--color-primary-200)] bg-[var(--color-surface)] text-[var(--color-primary-dark)]"
         />
         <Button
           type="button"
@@ -81,6 +81,7 @@ export function FileUpload({
           disabled={disabled || isUploading}
           variant="outline"
           size="sm"
+          className="border-[var(--color-primary-200)] text-[var(--color-primary-dark)]"
         >
           <Upload className="w-4 h-4 mr-2" />
           {isUploading ? "Uploading..." : "Browse"}
@@ -89,8 +90,8 @@ export function FileUpload({
 
       {isUploading && (
         <div className="space-y-2">
-          <Progress value={progress} className="w-full h-2" />
-          <p className="text-sm text-muted-foreground">
+          <Progress value={progress} className="w-full h-2 bg-[var(--color-primary-50)] [&_.bg-primary]:bg-[var(--color-primary-light)]" />
+          <p className="text-sm text-[var(--color-muted)]">
             Uploading... {Math.round(progress)}%
           </p>
         </div>

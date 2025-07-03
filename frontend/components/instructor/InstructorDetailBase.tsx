@@ -82,22 +82,22 @@ export const InstructorDetailBase: React.FC<InstructorDetailBaseProps> = ({
         return (
           <div className="space-y-6">
             <div className="space-y-4">
-              <h3 className="text-lg font-semibold text-gray-900">About</h3>
-              <p className="text-gray-600 leading-relaxed">
+              <h3 className="text-lg font-semibold text-[var(--color-foreground)]">About</h3>
+              <p className="text-[var(--color-primary-light)] leading-relaxed">
                 {instructor.about || "No bio available"}
               </p>
             </div>
             <div className="space-y-4">
-              <h3 className="text-lg font-semibold text-gray-900">Contact Information</h3>
+              <h3 className="text-lg font-semibold text-[var(--color-foreground)]">Contact Information</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="flex items-center space-x-2 text-gray-600">
-                  <Mail className="w-5 h-5" />
+                <div className="flex items-center space-x-2 text-[var(--color-primary-light)]">
+                  <Mail className="w-5 h-5 text-[var(--color-primary-light)]" />
                   <span>{instructor.email}</span>
                 </div>
                 {instructor.website && (
-                  <div className="flex items-center space-x-2 text-gray-600">
-                    <Globe className="w-5 h-5" />
-                    <a href={instructor.website} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">
+                  <div className="flex items-center space-x-2 text-[var(--color-primary-light)]">
+                    <Globe className="w-5 h-5 text-[var(--color-primary-light)]" />
+                    <a href={instructor.website} target="_blank" rel="noopener noreferrer" className="text-[var(--color-primary)] hover:underline">
                       {instructor.website}
                     </a>
                   </div>
@@ -109,32 +109,32 @@ export const InstructorDetailBase: React.FC<InstructorDetailBaseProps> = ({
       case "education":
         return (
           <div className="space-y-6">
-            <h3 className="text-lg font-semibold text-gray-900">Education</h3>
+            <h3 className="text-lg font-semibold text-[var(--color-foreground)]">Education</h3>
             {education.length > 0 ? (
               <div className="space-y-4">
                 {education.map((edu, index) => (
-                  <div key={index} className="bg-gray-50 p-4 rounded-lg">
-                    <h4 className="font-medium text-gray-900">{edu}</h4>
+                  <div key={index} className="bg-[var(--color-surface)] p-4 rounded-lg">
+                    <h4 className="font-medium text-[var(--color-foreground)]">{edu}</h4>
                   </div>
                 ))}
               </div>
             ) : (
-              <p className="text-gray-600">No education information available</p>
+              <p className="text-[var(--color-primary-light)]">No education information available</p>
             )}
           </div>
         );
       case "experience":
         return (
           <div className="space-y-6">
-            <h3 className="text-lg font-semibold text-gray-900">Experience</h3>
+            <h3 className="text-lg font-semibold text-[var(--color-foreground)]">Experience</h3>
             <div className="space-y-4">
-              <div className="bg-gray-50 p-4 rounded-lg">
-                <h4 className="font-medium text-gray-900 mb-2">Area of Expertise</h4>
-                <p className="text-gray-600">{instructor.areaOfExpertise}</p>
+              <div className="bg-[var(--color-surface)] p-4 rounded-lg">
+                <h4 className="font-medium text-[var(--color-foreground)] mb-2">Area of Expertise</h4>
+                <p className="text-[var(--color-primary-light)]">{instructor.areaOfExpertise}</p>
               </div>
-              <div className="bg-gray-50 p-4 rounded-lg">
-                <h4 className="font-medium text-gray-900 mb-2">Professional Experience</h4>
-                <p className="text-gray-600 whitespace-pre-line">{instructor.professionalExperience}</p>
+              <div className="bg-[var(--color-surface)] p-4 rounded-lg">
+                <h4 className="font-medium text-[var(--color-foreground)] mb-2">Professional Experience</h4>
+                <p className="text-[var(--color-primary-light)] whitespace-pre-line">{instructor.professionalExperience}</p>
               </div>
             </div>
           </div>
@@ -142,7 +142,7 @@ export const InstructorDetailBase: React.FC<InstructorDetailBaseProps> = ({
       case "courses":
         return (
           <div className="space-y-6">
-            <h3 className="text-lg font-semibold text-gray-900">Courses</h3>
+            <h3 className="text-lg font-semibold text-[var(--color-foreground)]">Courses</h3>
             {isCoursesLoading ? (
               <div className={`grid gap-6 ${
                 userRole === "ADMIN" 
@@ -151,9 +151,9 @@ export const InstructorDetailBase: React.FC<InstructorDetailBaseProps> = ({
               }`}>
                 {Array.from({ length: 3 }).map((_, index) => (
                   <div key={index} className="p-4">
-                    <div className="h-6 w-3/4 bg-gray-200 rounded animate-pulse" />
-                    <div className="h-4 w-full mt-2 bg-gray-200 rounded animate-pulse" />
-                    <div className="h-4 w-2/3 mt-2 bg-gray-200 rounded animate-pulse" />
+                    <div className="h-6 w-3/4 bg-[var(--color-primary-light)]/50 rounded animate-pulse" />
+                    <div className="h-4 w-full mt-2 bg-[var(--color-primary-light)]/50 rounded animate-pulse" />
+                    <div className="h-4 w-2/3 mt-2 bg-[var(--color-primary-light)]/50 rounded animate-pulse" />
                   </div>
                 ))}
               </div>
@@ -170,7 +170,7 @@ export const InstructorDetailBase: React.FC<InstructorDetailBaseProps> = ({
                 ))}
               </div>
             ) : (
-              <p className="text-gray-600">No courses available</p>
+              <p className="text-[var(--color-primary-light)]">No courses available</p>
             )}
           </div>
         );
@@ -180,95 +180,87 @@ export const InstructorDetailBase: React.FC<InstructorDetailBaseProps> = ({
   };
 
   return (
-    <div className="min-h-screen bg-gray-50/50 p-6">
-      <div className="max-w-7xl mx-auto space-y-6">
+    <div className="min-h-screen bg-[var(--color-surface)] p-0 md:p-8 flex flex-col items-center">
+      <div className="w-full max-w-5xl mx-auto space-y-8">
         {/* Header Section */}
-        <Card className="bg-white/80 backdrop-blur-sm border border-gray-100 shadow-sm rounded-xl p-6">
-          <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6">
-            <div className="flex items-center gap-6">
-              <div className="relative">
-                <div className="w-20 h-20 rounded-xl bg-blue-50 flex items-center justify-center text-blue-600 text-2xl font-bold">
+        <Card className="bg-[var(--color-surface)]/95 shadow-xl border border-[var(--color-primary-light)]/20 rounded-2xl p-8 mt-8">
+          <div className="flex flex-col md:flex-row justify-between items-center gap-8">
+            {/* Avatar/Initial */}
+            <div className="flex-shrink-0 flex flex-col items-center gap-2">
+              {instructor.avatar ? (
+                <img
+                  src={instructor.avatar}
+                  alt={instructor.name}
+                  className="w-24 h-24 rounded-full object-cover border-4 border-[var(--color-primary-light)] shadow-md bg-[var(--color-background)]"
+                />
+              ) : (
+                <div className="w-24 h-24 rounded-full flex items-center justify-center text-4xl font-bold bg-[var(--color-primary-light)] text-[var(--color-surface)] border-4 border-[var(--color-primary-light)] shadow-md">
                   {instructor?.name?.charAt(0) || "I"}
                 </div>
-              </div>
-              <div className="space-y-2">
-                <h1 className="text-2xl font-semibold text-gray-900">{instructor.name}</h1>
-                <p className="text-gray-600">{instructor.areaOfExpertise}</p>
-                <div className="flex items-center gap-3">
-                  <Badge 
-                    variant="outline"
-                    className="capitalize bg-blue-50 text-blue-700 border-blue-200"
-                  >
-                    <Calendar className="w-3 h-3 mr-1" />
-                    Joined {new Date(instructor.createdAt).toLocaleDateString()}
-                  </Badge>
-                  <Badge 
-                    variant="outline"
-                    className="bg-green-50 text-green-700 border-green-200"
-                  >
-                    <BookOpen className="w-3 h-3 mr-1" />
-                    {courses?.length || 0} Courses
-                  </Badge>
-                  <Badge 
-                    variant="outline"
-                    className="bg-purple-50 text-purple-700 border-purple-200"
-                  >
-                    <Users className="w-3 h-3 mr-1" />
-                    {instructor.totalStudents || 0} Students
-                  </Badge>
-                  {renderStatusBadges?.()}
-                </div>
-              </div>
+              )}
+              <span className="text-xs text-[var(--color-muted)] mt-1">Instructor</span>
             </div>
-            <div className="flex items-center gap-3">
-              {instructor.website && (
-                <Badge 
-                  variant="outline"
-                  className="bg-blue-50 text-blue-700 border-blue-200"
-                >
-                  <Globe className="w-3 h-3 mr-1" />
-                  <a
-                    href={instructor.website}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="hover:underline"
-                  >
-                    Visit Website
-                  </a>
+            {/* Main Info */}
+            <div className="flex-1 flex flex-col items-center md:items-start gap-2">
+              <h1 className="text-3xl font-bold text-[var(--color-primary-dark)] mb-1 text-center md:text-left">{instructor.name}</h1>
+              <p className="text-lg text-[var(--color-muted)] mb-2 text-center md:text-left">{instructor.areaOfExpertise}</p>
+              <div className="flex flex-wrap items-center gap-3 justify-center md:justify-start">
+                <Badge variant="outline" className="bg-[var(--color-primary-light)]/10 text-[var(--color-primary-light)] border-[var(--color-primary-light)]/40">
+                  <Calendar className="w-3 h-3 mr-1" />
+                  Joined {new Date(instructor.createdAt).toLocaleDateString()}
                 </Badge>
+                <Badge variant="outline" className="bg-[var(--color-primary-light)]/10 text-[var(--color-primary-light)] border-[var(--color-primary-light)]/40">
+                  <BookOpen className="w-3 h-3 mr-1" />
+                  {courses?.length || 0} Courses
+                </Badge>
+                <Badge variant="outline" className="bg-[var(--color-primary-light)]/10 text-[var(--color-primary-light)] border-[var(--color-primary-light)]/40">
+                  <Users className="w-3 h-3 mr-1" />
+                  {instructor.totalStudents || 0} Students
+                </Badge>
+                {renderStatusBadges?.()}
+              </div>
+              {instructor.website && (
+                <a
+                  href={instructor.website}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1 mt-2 text-sm text-[var(--color-primary-light)] hover:text-[var(--color-primary-dark)] hover:underline transition-colors"
+                >
+                  <Globe className="w-4 h-4" /> Visit Website
+                </a>
               )}
             </div>
           </div>
         </Card>
 
-        <div className="flex flex-col lg:flex-row gap-6">
+        <div className="flex flex-col lg:flex-row gap-8">
           {/* Main Content Section */}
-          <div className={`space-y-6 ${userRole === "ADMIN" ? "lg:w-3/4" : "w-full"}`}>
-            <Card className="bg-white/80 backdrop-blur-sm border border-gray-100 shadow-sm rounded-xl overflow-hidden">
+          <div className={`space-y-8 ${userRole === "ADMIN" ? "lg:w-3/4" : "w-full"}`}>
+            <Card className="bg-[var(--color-surface)]/95 border border-[var(--color-primary-light)]/20 shadow-lg rounded-2xl overflow-hidden">
               {/* Tabs Section */}
-              <div className="border-b border-gray-100">
+              <div className="border-b border-[var(--color-primary-light)]/20 b">
                 <div className="flex space-x-8 px-6 py-4 overflow-x-auto whitespace-nowrap scrollbar-thin tab-scrollbar md:overflow-visible md:whitespace-normal relative">
                   {tabs.map((tab) => (
                     <button
                       key={tab.id}
                       onClick={() => setActiveTab(tab.id)}
-                      className={`flex items-center space-x-2 py-2 px-1 border-b-2 transition-colors ${
+                      className={`flex items-center space-x-2 py-2 px-1 border-b-2 transition-colors font-medium text-base ${
                         activeTab === tab.id
-                          ? "border-blue-600 text-blue-600"
-                          : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+                          ? "border-[var(--color-primary-light)] text-[var(--color-primary-dark)] bg-[var(--color-surface)]  rounded-t"
+                          : "border-transparent text-[var(--color-muted)] hover:text-[var(--color-primary-light)] hover:border-[var(--color-primary-light)]/40"
                       }`}
                     >
                       {tab.icon}
-                      <span className="font-medium">{tab.label}</span>
+                      <span>{tab.label}</span>
                     </button>
                   ))}
                   {/* Right fade for scroll cue */}
-                  <div className="pointer-events-none absolute right-0 top-0 h-full w-8 bg-gradient-to-l from-white/90 to-transparent hidden sm:block" />
+                  <div className="pointer-events-none absolute right-0 top-0 h-full w-8 bg-gradient-to-l from-[var(--color-background)]/90 to-transparent hidden sm:block" />
                 </div>
               </div>
 
               {/* Content Section */}
-              <div className="p-6">
+              <div className="p-8 bg-[var(--color-surface)]/90">
                 {renderTabContent()}
               </div>
             </Card>

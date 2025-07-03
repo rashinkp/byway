@@ -24,9 +24,9 @@ export default function Banner({
     "This platform's simplicity belies its powerful capabilities, offering a seamless and enjoyable educational experience.",
   imageSrc = "/boyholdingbook.png",
   imageAlt = "Student",
-  bgColor = "#0B3C3C",
-  yellowShapeColor = "#F8E71C",
-  whiteShapeColor = "#E6F4F1",
+  bgColor = "var(--color-primary-dark)",
+  yellowShapeColor = "var(--color-accent)",
+  whiteShapeColor = "var(--color-background)",
   className = "",
   hideImage = false,
 }: BannerProps) {
@@ -38,14 +38,14 @@ export default function Banner({
       {/* Left Content */}
       <div className={`flex-1 z-10 ${hideImage ? '' : 'sm:pr-8'}`}>
         <div className="mb-2">
-          <span className="tracking-[0.3em] text-xs font-semibold text-white opacity-80">
+          <span className="tracking-[0.3em] text-xs font-semibold text-[var(--color-surface)] opacity-80">
             {subtitle}
           </span>
         </div>
-        <h1 className="text-3xl sm:text-5xl font-bold text-white mb-4 leading-tight">
+        <h1 className="text-3xl sm:text-5xl font-bold text-[var(--color-surface)] mb-4 leading-tight">
           {title}
         </h1>
-        <p className="text-white/80 mb-8 max-w-md">{description}</p>
+        <p className="text-[var(--color-surface)]/80 mb-8 max-w-md">{description}</p>
       </div>
       {/* Right Image & Shapes (or just shapes if hideImage) */}
       <div className="flex-1 flex items-end justify-end relative min-w-[220px] min-h-[220px] h-full z-10">

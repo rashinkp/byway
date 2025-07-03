@@ -25,12 +25,12 @@ export default function InstructorSidebar({
   }
 
   return (
-    <div className="bg-white/80 backdrop-blur-sm border border-gray-100 shadow-sm rounded-xl p-6 sticky top-6">
-      <div className="space-y-6">
+    <div className="bg-[var(--color-surface)]/95 border border-[var(--color-primary-light)]/20 shadow-lg rounded-2xl p-6 sticky top-8">
+      <div className="space-y-8">
         {/* Admin Actions */}
         {adminActions && (
-          <div className="space-y-3">
-            <h4 className="font-medium text-gray-900">Admin Actions</h4>
+          <div className="space-y-4">
+            <h4 className="font-semibold text-[var(--color-primary-dark)] uppercase tracking-wide text-xs">Admin Actions</h4>
             {adminActions}
           </div>
         )}
@@ -38,24 +38,24 @@ export default function InstructorSidebar({
         {/* Instructor Stats - Only show for non-admin users */}
         {userRole !== "ADMIN" && (
           <>
-            <div className="space-y-3">
-              <h4 className="font-medium text-gray-900">Instructor Stats</h4>
-              <div className="space-y-3">
+            <div className="space-y-4">
+              <h4 className="font-semibold text-[var(--color-primary-dark)] uppercase tracking-wide text-xs">Instructor Stats</h4>
+              <div className="space-y-2">
                 <div className="flex items-center justify-between">
-                  <span className="text-sm text-gray-600">Total Courses</span>
-                  <span className="text-sm font-medium text-gray-900">
+                  <span className="text-xs text-[var(--color-muted)]">Total Courses</span>
+                  <span className="text-base font-semibold text-[var(--color-primary-light)]">
                     {instructor.totalCourses || 0}
                   </span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-sm text-gray-600">Total Students</span>
-                  <span className="text-sm font-medium text-gray-900">
+                  <span className="text-xs text-[var(--color-muted)]">Total Students</span>
+                  <span className="text-base font-semibold text-[var(--color-accent)]">
                     {instructor.totalStudents || 0}
                   </span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-sm text-gray-600">Joined</span>
-                  <span className="text-sm font-medium text-gray-900">
+                  <span className="text-xs text-[var(--color-muted)]">Joined</span>
+                  <span className="text-xs font-medium text-[var(--color-primary-dark)]">
                     {new Date(instructor.createdAt).toLocaleDateString()}
                   </span>
                 </div>
@@ -63,20 +63,20 @@ export default function InstructorSidebar({
             </div>
 
             {/* Contact Information */}
-            <div className="space-y-3">
-              <h4 className="font-medium text-gray-900">Contact</h4>
+            <div className="space-y-3 pt-4 border-t border-dashed border-[var(--color-primary-light)]/20">
+              <h4 className="font-semibold text-[var(--color-primary-dark)] uppercase tracking-wide text-xs">Contact</h4>
               <div className="space-y-2">
-                <div className="text-sm text-gray-600">
+                <div className="text-xs text-[var(--color-muted)]">
                   <span className="font-medium">Email:</span> {instructor.email}
                 </div>
                 {instructor.website && (
-                  <div className="text-sm text-gray-600">
+                  <div className="text-xs text-[var(--color-muted)]">
                     <span className="font-medium">Website:</span>{" "}
                     <a
                       href={instructor.website}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-blue-600 hover:underline"
+                      className="text-[var(--color-primary-light)] hover:text-[var(--color-primary-dark)] hover:underline transition-colors"
                     >
                       Visit Website
                     </a>

@@ -238,6 +238,12 @@ export function Header({ client, onNotificationClick }: HeaderProps = {}) {
                   >
                     <Link href="/instructors">Instructors</Link>
                   </DropdownMenuItem>
+                  <DropdownMenuItem
+                    asChild
+                    className="rounded"
+                  >
+                    <Link href="/theme">Theme</Link>
+                  </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
               {isLoading ? (
@@ -308,6 +314,12 @@ export function Header({ client, onNotificationClick }: HeaderProps = {}) {
                           className="rounded"
                         >
                           My Courses
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                          onClick={() => setIsInstructorModalOpen(true)}
+                          className="rounded"
+                        >
+                          Teach on Byway
                         </DropdownMenuItem>
                         <DropdownMenuSeparator />
                         <DropdownMenuItem

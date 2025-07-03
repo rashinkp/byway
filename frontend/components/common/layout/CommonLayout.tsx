@@ -5,7 +5,6 @@ import { useState, useEffect } from "react";
 import { useAuthStore } from "@/stores/auth.store";
 import { useLogout } from "@/hooks/auth/useLogout";
 import { CommonSidebar } from "@/components/common/layout/CommonSidebar";
-import { TopNavbar } from "@/components/common/layout/TopNavbar";
 import NotificationModal from '@/components/notifications/NotificationModal';
 import BywayFooter from "@/components/layout/Footer";
 
@@ -115,12 +114,6 @@ export default function CommonLayout({
       />
       <NotificationModal open={notificationOpen} onOpenChange={setNotificationOpen} />
       <div className="flex-1 flex flex-col min-h-screen">
-        <TopNavbar
-          pathname={pathname}
-          navItems={navItems}
-          isCollapsible={isCollapsible}
-          collapsed={collapsed}
-        />
         <main
           className={`flex-1 transition-all duration-300 ease-in-out ${
             isCollapsible

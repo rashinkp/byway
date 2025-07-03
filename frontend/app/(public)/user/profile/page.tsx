@@ -15,7 +15,7 @@ import ErrorDisplay from "@/components/ErrorDisplay";
 import { Skeleton } from "@/components/ui/skeleton";
 
 export default function ProfilePage() {
-  const { data: user, isLoading, error } = useDetailedUserData();
+  const { data: user, isLoading, error , refetch } = useDetailedUserData();
   const [activeSection, setActiveSection] = useState("profile");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(true); // collapsed by default on mobile
@@ -105,7 +105,12 @@ export default function ProfilePage() {
   if (error) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-gray-50">
-        <ErrorDisplay error={error} title="Something went wrong" description="An error occurred while loading your profile." />
+        <ErrorDisplay
+          error={error}
+          title="Something went wrong"
+          description="An error occurred while loading your profile."
+          onRetry={refetch}
+        />
       </div>
     );
   }
@@ -113,7 +118,7 @@ export default function ProfilePage() {
   if (!user) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-gray-50">
-        <ErrorDisplay error={"No user data found"} title="No user data found" description="Please try logging in again." />
+        <ErrorDisplay error={"No user data found"} title="No user data found" description="Please try logging in again." onRetry={refetch}  />
       </div>
     );
   }
@@ -125,7 +130,7 @@ export default function ProfilePage() {
         <aside className={`hidden md:flex transition-all duration-300 ${sidebarCollapsed ? 'w-14' : 'w-64'} bg-white border-r border-gray-200 shadow-lg flex-col z-30`}>
           <Sidebar
             activeSection={activeSection}
-            setActiveSection={handleSectionChange}
+            setActiveSection={handleSectionChange} 
             collapsed={sidebarCollapsed}
             toggleCollapse={() => setSidebarCollapsed((c) => !c)}
             loadingSection={loadingSection}

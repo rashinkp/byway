@@ -2,7 +2,6 @@
 
 import { z } from "zod";
 import { FormModal, FormFieldConfig } from "@/components/ui/FormModal";
-import { Path } from "react-hook-form";
 import { useGetInstructorByUserId } from "@/hooks/instructor/useGetInstructorByUserId";
 import { useAuthStore } from "@/stores/auth.store";
 import { useEffect, useState } from "react";
