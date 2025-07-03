@@ -346,9 +346,9 @@ export function ModernAudioRecorder({
 
   if (error) {
     return (
-      <div className="flex items-center justify-center p-4 bg-red-50 border border-red-200 rounded-lg">
+      <div className="flex items-center justify-center p-4 bg-[var(--color-danger-bg,#fef2f2)] border border-[var(--color-danger,#ef4444)]/20 rounded-lg">
         <div className="text-center">
-          <p className="text-red-600 text-sm mb-2">{error}</p>
+          <p className="text-[var(--color-danger,#ef4444)] text-sm mb-2">{error}</p>
           <Button variant="outline" size="sm" onClick={onCancel}>
             Close
           </Button>
@@ -358,18 +358,18 @@ export function ModernAudioRecorder({
   }
 
   return (
-    <div className="flex flex-col gap-3 p-4 bg-white border border-gray-200 rounded-lg shadow-sm">
+    <div className="flex flex-col gap-3 p-4 bg-[var(--color-surface)] border border-[var(--color-primary-light)]/20 rounded-lg shadow-sm">
       {/* Recording State */}
       {isRecording && (
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="flex items-center gap-2">
-              <div className="w-3 h-3 bg-red-500 rounded-full animate-pulse" />
-              <span className="text-sm font-medium text-gray-700">Recording...</span>
+              <div className="w-3 h-3 bg-[var(--color-danger,#ef4444)] rounded-full animate-pulse" />
+              <span className="text-sm font-medium text-[var(--color-primary-dark)]">Recording...</span>
             </div>
           </div>
           <div className="flex items-center gap-2">
-            <Button onClick={stopRecording} size="sm" className="bg-red-500 hover:bg-red-600 text-white">
+            <Button onClick={stopRecording} size="sm" className="bg-[var(--color-danger,#ef4444)] hover:bg-[var(--color-danger,#ef4444)]/80 text-[var(--color-surface)]">
               <Square className="w-4 h-4 mr-1" />
               Stop
             </Button>
@@ -384,13 +384,13 @@ export function ModernAudioRecorder({
       {audioUrl && !isRecording && (
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3 flex-1">
-            <Button onClick={togglePlayback} size="sm" variant="outline" className="p-2">
+            <Button onClick={togglePlayback} size="sm" variant="outline" className="p-2 text-[var(--color-primary-light)]">
               {isPlaying ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
             </Button>
             <div className="flex-1">
               <div className="flex items-center justify-between text-sm">
-                <span className="text-gray-600">Voice message</span>
-                <span className="text-gray-500 font-mono">{formatTime(duration)}</span>
+                <span className="text-[var(--color-muted)]">Voice message</span>
+                <span className="text-[var(--color-muted)] font-mono">{formatTime(duration)}</span>
               </div>
             </div>
           </div>
@@ -398,12 +398,12 @@ export function ModernAudioRecorder({
             <Button 
               onClick={handleSend} 
               size="sm" 
-              className="bg-green-500 hover:bg-green-600 text-white"
+              className="bg-[var(--color-primary-light)] hover:bg-[var(--color-primary-dark)] text-[var(--color-surface)]"
               disabled={isUploading}
             >
               {isUploading ? (
                 <>
-                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-1" />
+                  <div className="w-4 h-4 border-2 border-[var(--color-surface)] border-t-transparent rounded-full animate-spin mr-1" />
                   Uploading...
                 </>
               ) : (

@@ -111,24 +111,26 @@ export function Message({ message, currentUserId, chat, onDelete }: MessageProps
                     Failed to load image
                   </div>
                 )}
-                <img
-                  src={message.imageUrl}
-                  alt="Sent image"
-                  className={`max-w-xs w-full object-cover transition-opacity duration-300 ${imgLoaded ? 'opacity-100' : 'opacity-0'}`}
-                  onLoad={() => setImgLoaded(true)}
-                  onError={() => setImgError(true)}
-                  style={{ display: imgError ? 'none' : undefined }}
-                />
-                {/* Read/Unread tick for image messages (isMine only) */}
-                {isMine && imgLoaded && (
-                  <span className="absolute bottom-2 right-2 bg-white/80 rounded-full p-0.5">
-                    {message.isRead ? (
-                      <CheckCheck className="inline w-4 h-4 text-[var(--color-primary-light)]" />
-                    ) : (
-                      <Check className="inline w-4 h-4 text-[var(--color-muted)]" />
-                    )}
-                  </span>
-                )}
+                <div className="relative px-1 pt-1 pb-5 bg-[var(--color-primary-light)]/10 rounded-2xl shadow-md border border-[var(--color-primary-light)]/20 overflow-hidden">
+                  <img
+                    src={message.imageUrl}
+                    alt="Sent image"
+                    className={`max-w-xs w-full object-cover transition-opacity duration-300 rounded-xl ${imgLoaded ? 'opacity-100' : 'opacity-0'}`}
+                    onLoad={() => setImgLoaded(true)}
+                    onError={() => setImgError(true)}
+                    style={{ display: imgError ? 'none' : undefined }}
+                  />
+                  {/* Read/Unread tick for image messages (isMine only) */}
+                  {isMine && imgLoaded && (
+                    <span className="absolute bottom-0 right-4">
+                      {message.isRead ? (
+                        <CheckCheck className="inline w-4 h-4 text-[var(--color-surface)]" />
+                      ) : (
+                        <Check className="inline w-4 h-4 text-[var(--color-surface)]" />
+                      )}
+                    </span>
+                  )}
+                </div>
               </div>
               {/* Image Preview Modal */}
               {showImagePreview && (
@@ -161,9 +163,9 @@ export function Message({ message, currentUserId, chat, onDelete }: MessageProps
               {isMine && (
                 <span className="ml-2 align-middle">
                   {message.isRead ? (
-                    <CheckCheck className="inline w-4 h-4 text-[var(--color-primary-light)]" />
+                    <CheckCheck className="inline w-4 h-4 text-[var(--color-surface)]" />
                   ) : (
-                    <Check className="inline w-4 h-4 text-[var(--color-muted)]" />
+                    <Check className="inline w-4 h-4 text-[var(--color-surface)]" />
                   )}
                 </span>
               )}
@@ -396,8 +398,8 @@ function AudioMessage({ audioUrl, isMine, isRead }: { audioUrl: string; isMine: 
       <div
         className={`flex items-center gap-3 px-4 py-2 whitespace-pre-wrap break-words text-sm rounded-2xl shadow transition-all duration-200 flex-1 ${
           isMine
-            ? 'bg-red-500 text-white rounded-br-md'
-            : 'bg-red-50 border border-red-200 text-red-700 rounded-bl-md'
+            ? 'bg-[var(--color-danger, #ef4444)] text-[var(--color-surface)] rounded-br-md'
+            : 'bg-[var(--color-danger-bg, #fef2f2)] border border-[var(--color-danger, #ef4444)]/20 text-[var(--color-danger, #ef4444)] rounded-bl-md'
         }`}
         style={{ minWidth: 220, maxWidth: 360 }}
       >
@@ -407,9 +409,9 @@ function AudioMessage({ audioUrl, isMine, isRead }: { audioUrl: string; isMine: 
         {isMine && (
           <span className="ml-2 align-middle">
             {isRead ? (
-              <CheckCheck className="inline w-4 h-4 text-green-200" />
+              <CheckCheck className="inline w-4 h-4 text-[var(--color-surface)]" />
             ) : (
-              <Check className="inline w-4 h-4 text-white/70" />
+              <Check className="inline w-4 h-4 text-[var(--color-surface)]" />
             )}
           </span>
         )}
@@ -421,8 +423,8 @@ function AudioMessage({ audioUrl, isMine, isRead }: { audioUrl: string; isMine: 
     <div
       className={`flex items-center gap-3 px-4 py-2 whitespace-pre-wrap break-words text-sm rounded-2xl shadow transition-all duration-200 flex-1 ${
         isMine
-          ? 'bg-blue-500 text-white rounded-br-md'
-          : 'bg-white border border-gray-200 text-gray-900 rounded-bl-md'
+          ? 'bg-[var(--color-primary-light)] text-[var(--color-surface)] rounded-br-md'
+          : 'bg-[var(--color-background)] border border-[var(--color-primary-light)]/20 text-[var(--color-primary-dark)] rounded-bl-md'
       }`}
       style={{ minWidth: 220, maxWidth: 360 }}
     >
@@ -439,7 +441,7 @@ function AudioMessage({ audioUrl, isMine, isRead }: { audioUrl: string; isMine: 
         onClick={togglePlayback}
         disabled={isLoading}
         className={`focus:outline-none flex-shrink-0 hover:scale-110 transition-transform duration-150 ${
-          isMine ? 'text-white' : 'text-blue-600'
+          isMine ? 'text-[var(--color-surface)]' : 'text-[var(--color-primary-light)]'
         } ${isLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
         aria-label={isPlaying ? 'Pause' : 'Play'}
         type="button"
@@ -454,16 +456,16 @@ function AudioMessage({ audioUrl, isMine, isRead }: { audioUrl: string; isMine: 
         )}
       </button>
       {/* Time */}
-      <span className="text-xs font-mono min-w-[60px] text-right">
+      <span className="text-xs font-mono min-w-[60px] text-right text-[var(--color-surface)]">
         {isLoading ? 'Loading...' : `${formatTime(currentTime)} / ${formatTime(duration)}`}
       </span>
       {/* Read/Unread tick for isMine only */}
       {isMine && (
         <span className="ml-2 align-middle">
           {isRead ? (
-            <CheckCheck className="inline w-4 h-4 text-green-200" />
+            <CheckCheck className="inline w-4 h-4 text-[var(--color-surface)]" />
           ) : (
-            <Check className="inline w-4 h-4 text-white/70" />
+            <Check className="inline w-4 h-4 text-[var(--color-surface)]" />
           )}
         </span>
       )}
