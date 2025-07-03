@@ -210,142 +210,56 @@ export function ChatWindow({ chat, messages, onSendMessage, currentUserId, onDel
   };
 
   return (
-    <div className="flex flex-col h-full min-h-0 bg-white">
+    <div className="flex flex-col h-full bg-[var(--color-surface)]">
       {/* Header */}
-      <div
-        className="flex-shrink-0 flex items-center justify-between px-4 py-3 border-b border-gray-200 bg-white"
-        style={{ minHeight: 64 }}
-      >
-        <div className="flex items-center space-x-3">
-          {/* Back Button for mobile */}
-          {showBackButton && (
-            <button
-              className="md:hidden mr-2 p-2 rounded-full hover:bg-gray-100 focus:outline-none"
-              onClick={onBack}
-              aria-label="Back to chat list"
-            >
-              <ArrowLeft className="w-5 h-5 text-gray-600" />
-            </button>
-          )}
-          {/* Avatar */}
-          <div className="relative">
-            <div
-              className={`w-10 h-10 ${getRoleColor(
-                chat.role
-              )} rounded-full flex items-center justify-center text-white font-medium text-sm`}
-            >
-              {(chat.displayName?.charAt(0) || "?").toUpperCase()}
-            </div>
-          </div>
-
-          {/* User Info */}
-          <div>
-            <div className="flex items-center space-x-2">
-              <h3 className="text-sm font-semibold text-gray-900">
-                {chat.displayName || "Unknown User"}
-              </h3>
-              {chat.role !== "USER" && (
-                <Badge
-                  className={`text-xs px-2 py-0.5 border ${getRoleBadgeColor(
-                    chat.role
-                  )} rounded-md`}
-                >
-                  {chat.role.charAt(0).toUpperCase() +
-                    chat.role.slice(1).toLowerCase()}
-                </Badge>
-              )}
-            </div>
-          </div>
-        </div>
-
-        {/* Header Actions */}
-        <div className="relative flex items-center space-x-1">
-          <Button
-            variant="ghost"
-            size="sm"
-            className="h-8 w-8 p-0 hover:bg-gray-100"
-            onClick={() => setMenuOpen((open) => !open)}
-            aria-label="Chat options"
-          >
-            <MoreVertical className="h-4 w-4 text-gray-600" />
+      <div className="flex items-center justify-between px-6 py-4 border-b border-[var(--color-primary-light)]/20 bg-[var(--color-background)]">
+        {showBackButton && (
+          <Button variant="ghost" size="sm" className="mr-2" onClick={onBack}>
+            <ArrowLeft className="w-5 h-5 text-[var(--color-muted)]" />
           </Button>
-          {menuOpen && canViewProfile && (
-            <div className="absolute right-0 top-10 z-20 bg-white border border-gray-200 rounded shadow-lg min-w-[160px]">
-              <Link
-                href={getProfileLink()!}
-                className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-t"
-                onClick={() => setMenuOpen(false)}
-              >
-                View Profile
-              </Link>
-            </div>
-          )}
+        )}
+        <div className="flex items-center gap-3">
+          <div className={`w-10 h-10 bg-[var(--color-primary-light)] rounded-full flex items-center justify-center text-[var(--color-surface)] font-medium text-lg`}>
+            {(chat.displayName?.charAt(0) || '?').toUpperCase()}
+          </div>
+          <div className="flex flex-col">
+            <span className="font-semibold text-[var(--color-primary-dark)] text-base">{chat.displayName}</span>
+            {chat.role !== 'USER' && (
+              <Badge className="text-xs px-2 py-0.5 bg-[var(--color-primary-light)]/10 text-[var(--color-primary-light)] rounded-md w-fit">
+                {chat.role.charAt(0).toUpperCase() + chat.role.slice(1).toLowerCase()}
+              </Badge>
+            )}
+          </div>
+        </div>
+        {canViewProfile && (
+          <Link href={getProfileLink()!} className="ml-4 text-[var(--color-primary-light)] hover:text-[var(--color-primary-dark)] underline text-sm font-medium transition-colors">View Profile</Link>
+        )}
+        <div className="flex-1" />
+        <div className="relative">
+          <Button variant="ghost" size="icon" className="rounded-full">
+            <MoreVertical className="w-5 h-5 text-[var(--color-muted)]" />
+          </Button>
         </div>
       </div>
-
       {/* Messages Area */}
-      <div ref={messagesContainerRef} className="flex-1 min-h-0 overflow-y-auto px-4 py-4 bg-gray-50">
-        {chat.type === "user" ? (
-          <div className="flex items-center justify-center h-full">
-            <div className="text-center space-y-4 max-w-sm">
-              <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto">
-                <Send className="w-8 h-8 text-blue-500" />
-              </div>
-              <div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                  Start a conversation
-                </h3>
-                <p className="text-gray-600 text-sm leading-relaxed">
-                  Send a message to begin your conversation with{" "}
-                  <span className="font-medium">{chat.displayName}</span>.
-                </p>
-              </div>
-            </div>
-          </div>
-        ) : (
-          <div className="space-y-4">
-            {onLoadMoreMessages && (
-              <div className="flex justify-center mb-4">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={onLoadMoreMessages}
-                  disabled={loadingMoreMessages}
-                  className="text-xs"
-                >
-                  {loadingMoreMessages ? 'Loading...' : 'View more'}
-                </Button>
-              </div>
-            )}
-            {groupedMessages.map((group, groupIdx) => (
-              <div key={group.date + "-" + groupIdx}>
-                {/* Date Separator */}
-                <div className="flex justify-center my-6">
-                  <span className="bg-white text-gray-600 text-xs px-3 py-1 rounded-full border shadow-sm">
-                    {group.date}
-                  </span>
-                </div>
-
-                {/* Messages */}
-                <div className="space-y-4">
-                  {group.messages.map((message) => (
-                    <MessageComponent
-                      key={message.id}
-                      message={message}
-                      currentUserId={currentUserId}
-                      chat={chat}
-                      onDelete={() => handleDeleteMessage(message.id)}
-                    />
-                  ))}
-                </div>
-              </div>
+      <div ref={messagesContainerRef} className="flex-1 overflow-y-auto px-6 py-4 space-y-6 bg-[var(--color-surface)]" onDrop={handleDrop} onDragOver={handleDragOver}>
+        {groupedMessages.map((group, idx) => (
+          <div key={idx} className="space-y-4">
+            <div className="text-center text-xs text-[var(--color-muted)] mb-2">{group.date}</div>
+            {group.messages.map((msg) => (
+              <MessageComponent
+                key={msg.id}
+                message={msg}
+                currentUserId={currentUserId}
+                chat={chat}
+                onDelete={onDeleteMessage ? () => onDeleteMessage(msg.id) : undefined}
+              />
             ))}
-            <div ref={messagesEndRef} />
           </div>
-        )}
+        ))}
+        <div ref={messagesEndRef} />
       </div>
-
-      {/* Input Area - use ModernChatInput only */}
+      {/* Chat Input */}
       <ModernChatInput
         onSendMessage={onSendMessage}
         disabled={false}
@@ -353,7 +267,6 @@ export function ChatWindow({ chat, messages, onSendMessage, currentUserId, onDel
         setPendingImageUrl={props.setPendingImageUrl}
         setPendingAudioUrl={props.setPendingAudioUrl}
       />
-
     </div>
   );
 }

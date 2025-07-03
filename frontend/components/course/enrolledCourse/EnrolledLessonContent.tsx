@@ -90,19 +90,19 @@ export function LessonContent({
   return (
     <>
       <div className="flex justify-between items-center mb-8">
-        <h1 className="text-3xl font-bold text-gray-800 truncate">
+        <h1 className="text-3xl font-bold text-[var(--color-primary-dark)] truncate">
           {selectedLesson.title}
         </h1>
         <div className="flex space-x-3">
           <button
-            className="px-5 py-2 border border-gray-300 rounded-lg text-gray-600 hover:bg-gray-100 disabled:opacity-50 transition-colors"
+            className="px-5 py-2 border border-[var(--color-primary-light)]/40 rounded-lg text-[var(--color-muted)] hover:bg-[var(--color-primary-light)]/10 disabled:opacity-50 transition-colors"
             disabled={currentLessonIndex === 0}
             onClick={goToPrevLesson}
           >
             Previous
           </button>
           <button
-            className="px-5 py-2 bg-black text-white rounded-lg hover:bg-black disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
+            className="px-5 py-2 bg-[var(--color-primary-light)] text-[var(--color-surface)] rounded-lg hover:bg-[var(--color-primary-dark)] disabled:bg-[var(--color-muted)] disabled:cursor-not-allowed transition-colors"
             disabled={
               currentLessonIndex === allLessons.length - 1 ||
               !selectedLesson.completed
@@ -113,19 +113,19 @@ export function LessonContent({
           </button>
         </div>
       </div>
-      <div className="bg-white shadow-xl rounded-xl overflow-hidden">
+      <div className="bg-[var(--color-surface)] shadow-xl rounded-xl overflow-hidden">
         <div className="p-6">
-          <h3 className="text-lg font-semibold text-gray-800 mb-3 truncate">
+          <h3 className="text-lg font-semibold text-[var(--color-primary-dark)] mb-3 truncate">
             {selectedLesson.title}
           </h3>
-          <p className="text-gray-600 leading-relaxed mb-4 line-clamp-2">
+          <p className="text-[var(--color-muted)] leading-relaxed mb-4 line-clamp-2">
             {selectedLesson.description || "No description available."}
           </p>
         </div>
         {isContentError ? (
           <ErrorDisplay error={contentError} title="Lesson Content Error" description="There was a problem loading this lesson content. Please try again." />
         ) : !content ? (
-          <div className="p-6 text-gray-600">No content available.</div>
+          <div className="p-6 text-[var(--color-muted)]">No content available.</div>
         ) : (
           <>
             {content.type === "VIDEO" && (
@@ -153,11 +153,11 @@ export function LessonContent({
               </div>
             )}
             {content.type === "DOCUMENT" && (
-              <div className="border-b border-gray-200">
+              <div className="border-b border-[var(--color-primary-light)]/20">
                 <div className="p-5 flex items-center justify-between">
                   <div className="flex items-center">
-                    <FileText size={26} className="text-blue-600 mr-3" />
-                    <span className="font-semibold text-gray-800">
+                    <FileText size={26} className="text-[var(--color-primary-light)] mr-3" />
+                    <span className="font-semibold text-[var(--color-primary-dark)]">
                       Document
                     </span>
                   </div>
@@ -165,7 +165,7 @@ export function LessonContent({
                     <a
                       href={content.fileUrl}
                       download
-                      className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                      className="px-4 py-2 bg-[var(--color-primary-light)] text-[var(--color-surface)] rounded-lg hover:bg-[var(--color-primary-dark)] transition-colors"
                     >
                       Download{" "}
                       {getFileType(content.fileUrl) === "pdf"
@@ -174,8 +174,8 @@ export function LessonContent({
                     </a>
                   )}
                 </div>
-                <div className="p-6 bg-gray-50">
-                  <div className="border border-gray-200 rounded-lg p-5 bg-white min-h-64">
+                <div className="p-6 bg-[var(--color-background)]">
+                  <div className="border border-[var(--color-primary-light)]/20 rounded-lg p-5 bg-[var(--color-surface)] min-h-64">
                     {content.fileUrl ? (
                       getFileType(content.fileUrl) === "pdf" ? (
                         <>
@@ -187,7 +187,7 @@ export function LessonContent({
                               console.error("Iframe load error:", e);
                             }}
                           />
-                          <p className="text-gray-500 text-sm mt-2">
+                          <p className="text-[var(--color-muted)] text-sm mt-2">
                             If the PDF doesn't load, use the download button
                             above.
                           </p>
@@ -196,12 +196,12 @@ export function LessonContent({
                         <div className="text-center py-8">
                           <FileText
                             size={48}
-                            className="text-gray-400 mx-auto mb-4"
+                            className="text-[var(--color-muted)] mx-auto mb-4"
                           />
-                          <p className="text-gray-700 font-medium">
+                          <p className="text-[var(--color-primary-dark)] font-medium">
                             Word documents cannot be previewed in the browser.
                           </p>
-                          <p className="text-gray-500 text-sm mt-2">
+                          <p className="text-[var(--color-muted)] text-sm mt-2">
                             Please download the document to view it.
                           </p>
                         </div>
@@ -213,7 +213,7 @@ export function LessonContent({
                         className="w-full object-contain mb-4 rounded"
                       />
                     )}
-                    <p className="text-gray-700 leading-relaxed">
+                    <p className="text-[var(--color-primary-dark)] leading-relaxed">
                       {content.description || "No description available."}
                     </p>
                     {!content.fileUrl && (
@@ -227,7 +227,7 @@ export function LessonContent({
             )}
             {content.type === "QUIZ" && (
               <div className="p-6">
-                <h3 className="text-xl font-semibold text-gray-800 mb-4">
+                <h3 className="text-xl font-semibold text-[var(--color-primary-dark)] mb-4">
                   Quiz: {content.title}
                 </h3>
                 {selectedLesson.completed && selectedLesson.score !== undefined && (
@@ -255,7 +255,7 @@ export function LessonContent({
                     
                     return (
                       <div key={question.id} className="bg-blue-50 p-6 rounded-xl border border-blue-200">
-                        <h3 className="text-lg font-medium text-gray-800 mb-4">
+                        <h3 className="text-lg font-medium text-[var(--color-primary-dark)] mb-4">
                           Question {index + 1}: {question.question}
                         </h3>
                         <ul className="space-y-3 mb-4">

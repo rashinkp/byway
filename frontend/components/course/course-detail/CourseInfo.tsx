@@ -60,14 +60,24 @@ export default function CourseInfo({
   };
 
   return (
-    <div className="bg-white/80 backdrop-blur-sm border border-gray-100 shadow-sm rounded-xl p-6">
+    <div className="bg-[var(--color-surface)] border border-[var(--color-primary-light)]/20 shadow-sm rounded-xl p-6">
+      {/* Course Thumbnail */}
+      <div className="flex justify-center mb-6">
+        <div className="w-32 h-32 rounded-lg overflow-hidden border border-[var(--color-primary-light)]/20 bg-[var(--color-background)]">
+          <img
+            src={course?.thumbnail || '/placeholder-course.jpg'}
+            alt={course?.title || 'Course Thumbnail'}
+            className="object-cover w-full h-full"
+          />
+        </div>
+      </div>
       {/* Main Course Header */}
       <div className="space-y-4">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">
+          <h1 className="text-3xl font-bold text-[var(--color-primary-dark)] mb-2">
             {course?.title}
           </h1>
-          <p className="text-lg text-gray-600 mb-4">
+          <p className="text-lg text-[var(--color-muted)] mb-4">
             {course?.description}
           </p>
         </div>
@@ -116,29 +126,29 @@ export default function CourseInfo({
 
         {/* Course Stats Badges */}
         <div className="flex flex-wrap items-center gap-3">
-          <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">
+          <Badge variant="outline" className="bg-[var(--color-primary-light)]/10 text-[var(--color-primary-light)] border-[var(--color-primary-light)]/40">
             <BookOpen className="w-3 h-3 mr-1" />
             {lessonsLength || 0} Lessons
           </Badge>
           
           {course?.duration && (
-            <Badge variant="outline" className="bg-purple-50 text-purple-700 border-purple-200">
+            <Badge variant="outline" className="bg-[var(--color-accent)]/10 text-[var(--color-accent)] border-[var(--color-accent)]/40">
               <Clock className="w-3 h-3 mr-1" />
               {course.duration} min
             </Badge>
           )}
           
-          <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">
+          <Badge variant="outline" className="bg-[var(--color-primary-light)]/10 text-[var(--color-primary-light)] border-[var(--color-primary-light)]/40">
             <Award className="w-3 h-3 mr-1" />
             {course?.level || "All Levels"}
           </Badge>
 
           {course?.price && (
-            <Badge variant="outline" className="bg-orange-50 text-orange-700 border-orange-200">
+            <Badge variant="outline" className="bg-[var(--color-warning)]/10 text-[var(--color-warning)] border-[var(--color-warning)]/40">
               <DollarSign className="w-3 h-3 mr-1" />
               {formatPrice(course.price)}
               {course.offer && course.offer !== course.price && (
-                <span className="ml-1 line-through text-gray-500">
+                <span className="ml-1 line-through text-[var(--color-muted)]">
                   {formatPrice(course.offer)}
                 </span>
               )}
@@ -146,7 +156,7 @@ export default function CourseInfo({
           )}
 
           {!course?.reviewStats || course.reviewStats.totalReviews === 0 && (
-            <Badge variant="outline" className="bg-gray-50 text-gray-600 border-gray-200">
+            <Badge variant="outline" className="bg-[var(--color-surface)] text-[var(--color-muted)] border-[var(--color-primary-light)]/20">
               <Star className="w-3 h-3 mr-1" />
               No reviews yet
             </Badge>
@@ -157,27 +167,27 @@ export default function CourseInfo({
         {userRole === "ADMIN" && course && (
           <>
             <Separator className="my-4" />
-            <div className="bg-gray-50/50 rounded-lg p-4">
-              <h4 className="text-sm font-semibold text-gray-700 mb-3">Admin Details</h4>
+            <div className="bg-[var(--color-background)] rounded-lg p-4">
+              <h4 className="text-sm font-semibold text-[var(--color-primary-dark)] mb-3">Admin Details</h4>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
                 
                 <div>
-                  <span className="text-gray-500">Status:</span>
+                  <span className="text-[var(--color-muted)]">Status:</span>
                   <p className={`font-medium ${
-                    course.status === 'PUBLISHED' ? 'text-green-600' :
-                    course.status === 'DRAFT' ? 'text-yellow-600' :
-                    'text-gray-600'
+                    course.status === 'PUBLISHED' ? 'text-[var(--color-primary-light)]' :
+                    course.status === 'DRAFT' ? 'text-[var(--color-warning)]' :
+                    'text-[var(--color-muted)]'
                   }`}>
                     {course.status} / {course.approvalStatus}
                   </p>
                 </div>
                 <div>
-                  <span className="text-gray-500">Admin Share:</span>
-                  <p className="font-medium text-blue-600">{course.adminSharePercentage}%</p>
+                  <span className="text-[var(--color-muted)]">Admin Share:</span>
+                  <p className="font-medium text-[var(--color-primary-light)]">{course.adminSharePercentage}%</p>
                 </div>
                 <div>
-                  <span className="text-gray-500">Created:</span>
-                  <p className="text-gray-900">{new Date(course.createdAt).toLocaleDateString()}</p>
+                  <span className="text-[var(--color-muted)]">Created:</span>
+                  <p className="text-[var(--color-primary-dark)]">{new Date(course.createdAt).toLocaleDateString()}</p>
                 </div>
               </div>
             </div>

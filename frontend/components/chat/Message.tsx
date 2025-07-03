@@ -23,13 +23,13 @@ export function Message({ message, currentUserId, chat, onDelete }: MessageProps
   const getRoleColor = (role: string) => {
     switch (role.toLowerCase()) {
       case "admin":
-        return "bg-red-500";
+        return "bg-[var(--color-primary-dark)]";
       case "instructor":
-        return "bg-blue-500";
+        return "bg-[var(--color-primary-light)]";
       case "user":
-        return "bg-green-500";
+        return "bg-[var(--color-primary-light)]/60";
       default:
-        return "bg-gray-500";
+        return "bg-[var(--color-muted)]";
     }
   };
 
@@ -55,7 +55,7 @@ export function Message({ message, currentUserId, chat, onDelete }: MessageProps
           <div
             className={`w-8 h-8 ${getRoleColor(
               chat.role
-            )} rounded-full flex items-center justify-center text-white font-medium text-xs`}
+            )} rounded-full flex items-center justify-center text-[var(--color-surface)] font-medium text-xs`}
           >
             {(chat.displayName?.charAt(0) || "?").toUpperCase()}
           </div>
@@ -71,7 +71,7 @@ export function Message({ message, currentUserId, chat, onDelete }: MessageProps
         {/* Sender Name - only show for other users */}
         {!isMine && (
           <div className="mb-1 px-1">
-            <span className="text-xs font-medium text-gray-700">
+            <span className="text-xs font-medium text-[var(--color-muted)]">
               {chat.displayName || "Unknown User"}
             </span>
           </div>
@@ -95,8 +95,8 @@ export function Message({ message, currentUserId, chat, onDelete }: MessageProps
               <div
                 className={`relative max-w-xs rounded-2xl overflow-hidden shadow transition-all duration-200 cursor-pointer ${
                   isMine
-                    ? 'bg-blue-500 text-white rounded-br-md'
-                    : 'bg-white border border-gray-200 text-gray-900 rounded-bl-md'
+                    ? 'bg-[var(--color-primary-light)] text-[var(--color-surface)] rounded-br-md'
+                    : 'bg-[var(--color-background)] border border-[var(--color-primary-light)]/20 text-[var(--color-primary-dark)] rounded-bl-md'
                 }`}
                 style={{ minWidth: '2.5rem' }}
                 onClick={() => setShowImagePreview(true)}
@@ -123,9 +123,9 @@ export function Message({ message, currentUserId, chat, onDelete }: MessageProps
                 {isMine && imgLoaded && (
                   <span className="absolute bottom-2 right-2 bg-white/80 rounded-full p-0.5">
                     {message.isRead ? (
-                      <CheckCheck className="inline w-4 h-4 text-green-500" />
+                      <CheckCheck className="inline w-4 h-4 text-[var(--color-primary-light)]" />
                     ) : (
-                      <Check className="inline w-4 h-4 text-gray-400" />
+                      <Check className="inline w-4 h-4 text-[var(--color-muted)]" />
                     )}
                   </span>
                 )}
@@ -151,8 +151,8 @@ export function Message({ message, currentUserId, chat, onDelete }: MessageProps
             <div
               className={`px-4 py-2 rounded-2xl max-w-full whitespace-pre-wrap break-words text-sm ${
                 isMine
-                  ? "bg-blue-500 text-white rounded-br-md"
-                  : "bg-white border border-gray-200 text-gray-900 rounded-bl-md"
+                  ? "bg-[var(--color-primary-light)] text-[var(--color-surface)] rounded-br-md"
+                  : "bg-[var(--color-background)] border border-[var(--color-primary-light)]/20 text-[var(--color-primary-dark)] rounded-bl-md"
               }`}
               style={{ minWidth: "2.5rem" }}
             >
@@ -161,9 +161,9 @@ export function Message({ message, currentUserId, chat, onDelete }: MessageProps
               {isMine && (
                 <span className="ml-2 align-middle">
                   {message.isRead ? (
-                    <CheckCheck className="inline w-4 h-4 text-green-500" />
+                    <CheckCheck className="inline w-4 h-4 text-[var(--color-primary-light)]" />
                   ) : (
-                    <Check className="inline w-4 h-4 text-gray-400" />
+                    <Check className="inline w-4 h-4 text-[var(--color-muted)]" />
                   )}
                 </span>
               )}
@@ -172,17 +172,17 @@ export function Message({ message, currentUserId, chat, onDelete }: MessageProps
           {isMine && (
             <div className="relative">
               <button
-                className="p-1 rounded-full hover:bg-blue-600/20 opacity-0 group-hover:opacity-100 transition-opacity"
+                className="p-1 rounded-full hover:bg-[var(--color-primary-light)]/20 opacity-0 group-hover:opacity-100 transition-opacity"
                 onClick={() => setMenuOpen((open) => !open)}
                 tabIndex={-1}
                 aria-label="Message options"
                 type="button"
               >
-                <MoreVertical className="w-4 h-4 text-gray-500" />
+                <MoreVertical className="w-4 h-4 text-[var(--color-muted)]" />
               </button>
               {/* Menu dropdown */}
               {menuOpen && (
-                <div className="absolute right-0 top-full mt-1 bg-white border border-gray-200 rounded shadow-lg min-w-[120px] z-20">
+                <div className="absolute right-0 top-full mt-1 bg-[var(--color-surface)] border border-[var(--color-primary-light)]/20 rounded shadow-lg min-w-[120px] z-20">
                   <button
                     className="flex items-center w-full px-4 py-2 text-sm text-red-600 hover:bg-red-50 gap-2"
                     onClick={() => {

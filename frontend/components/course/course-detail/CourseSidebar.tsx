@@ -61,12 +61,12 @@ export default function CourseSidebar({
   }
 
   return (
-    <div className="bg-white/80 backdrop-blur-sm border border-gray-100 shadow-sm rounded-xl p-6 sticky top-6">
+    <div className="bg-[var(--color-surface)] border border-[var(--color-primary-light)]/20 shadow-sm rounded-xl p-6 sticky top-6">
       <div className="space-y-6">
         {/* Admin Actions */}
         {adminActions && (
           <div className="space-y-3">
-            <h4 className="font-medium text-gray-900">Admin Actions</h4>
+            <h4 className="font-medium text-[var(--color-primary-dark)]">Admin Actions</h4>
             {adminActions}
           </div>
         )}
@@ -74,7 +74,7 @@ export default function CourseSidebar({
         {/* Instructor Actions */}
         {instructorActions && (
           <div className="space-y-3">
-            <h4 className="font-medium text-gray-900">Instructor Actions</h4>
+            <h4 className="font-medium text-[var(--color-primary-dark)]">Instructor Actions</h4>
             {instructorActions}
           </div>
         )}
@@ -82,16 +82,16 @@ export default function CourseSidebar({
         {/* Review Stats */}
         {course?.reviewStats && course.reviewStats.totalReviews > 0 && (
           <div className="space-y-3">
-            <h4 className="font-medium text-gray-900">Student Reviews</h4>
+            <h4 className="font-medium text-[var(--color-primary-dark)]">Student Reviews</h4>
             <div className="flex items-center gap-2">
               <div className="flex items-center gap-1">
                 {renderStars(course.reviewStats.averageRating)}
               </div>
-              <span className="text-sm font-medium text-gray-700">
+              <span className="text-sm font-medium text-[var(--color-primary-dark)]">
                 {course.reviewStats.averageRating.toFixed(1)}
               </span>
             </div>
-            <div className="flex items-center gap-2 text-sm text-gray-600">
+            <div className="flex items-center gap-2 text-sm text-[var(--color-muted)]">
               <Users className="w-4 h-4" />
               <span>
                 {course.reviewStats.totalReviews} {course.reviewStats.totalReviews === 1 ? 'student' : 'students'} enrolled
@@ -103,13 +103,13 @@ export default function CourseSidebar({
         {/* Course Price - Only show for public users */}
         {userRole === "USER" && !adminActions && !instructorActions && (
           <div className="space-y-2">
-            <h3 className="text-xl font-semibold text-gray-900">Course Price</h3>
+            <h3 className="text-xl font-semibold text-[var(--color-primary-dark)]">Course Price</h3>
             <div className="flex items-baseline gap-2">
-              <span className="text-3xl font-bold text-blue-600">
+              <span className="text-3xl font-bold text-[var(--color-primary-light)]">
                 {formatPrice(course?.offer || course?.price)}
               </span>
               {course?.offer && course?.price && (
-                <span className="text-lg text-gray-500 line-through">
+                <span className="text-lg text-[var(--color-muted)] line-through">
                   {formatPrice(course?.price)}
                 </span>
               )}
@@ -121,9 +121,9 @@ export default function CourseSidebar({
         {userRole === "USER" && !adminActions && !instructorActions && (
           <>
             {isEnrolled ? (
-              <div className="text-center text-green-600 font-medium">
+              <div className="text-center text-[var(--color-primary-light)] font-medium">
                 <Button
-                  className="w-full mt-4 bg-green-600 hover:bg-green-700 text-white"
+                  className="w-full mt-4 bg-[var(--color-primary-light)] hover:bg-[var(--color-primary-dark)] text-[var(--color-surface)]"
                   onClick={() => router.push(`/user/my-courses/${course?.id}`)}
                 >
                   Learn Now
@@ -132,7 +132,7 @@ export default function CourseSidebar({
             ) : course?.isInCart ? (
               <div className="space-y-4">
                 <Button
-                  className="w-full bg-green-600 hover:bg-green-700 text-white"
+                  className="w-full bg-[var(--color-primary-light)] hover:bg-[var(--color-primary-dark)] text-[var(--color-surface)]"
                   onClick={handleGoToCart}
                 >
                   <ShoppingCart className="w-4 h-4 mr-2" />
@@ -140,7 +140,7 @@ export default function CourseSidebar({
                 </Button>
 
                 <Button
-                  className="w-full bg-gray-100 hover:bg-gray-200 text-gray-700"
+                  className="w-full bg-[var(--color-background)] hover:bg-[var(--color-primary-light)]/10 text-[var(--color-primary-dark)]"
                   onClick={handleEnroll}
                 >
                   <Lock className="w-4 h-4 mr-2" />
@@ -150,7 +150,7 @@ export default function CourseSidebar({
             ) : (
               <div className="space-y-4">
                 <Button
-                  className="w-full bg-blue-600 hover:bg-blue-700 text-white"
+                  className="w-full bg-[var(--color-primary-light)] hover:bg-[var(--color-primary-dark)] text-[var(--color-surface)]"
                   onClick={handleAddToCart}
                   disabled={isCartLoading}
                 >
@@ -159,7 +159,7 @@ export default function CourseSidebar({
                 </Button>
 
                 <Button
-                  className="w-full bg-gray-100 hover:bg-gray-200 text-gray-700"
+                  className="w-full bg-[var(--color-background)] hover:bg-[var(--color-primary-light)]/10 text-[var(--color-primary-dark)]"
                   onClick={handleEnroll}
                 >
                   <Lock className="w-4 h-4 mr-2" />
@@ -173,22 +173,22 @@ export default function CourseSidebar({
         {/* Course Features - Only show for public users */}
         {userRole === "USER" && !adminActions && !instructorActions && (
           <div className="space-y-4">
-            <h4 className="font-medium text-gray-900">This course includes:</h4>
+            <h4 className="font-medium text-[var(--color-primary-dark)]">This course includes:</h4>
             <ul className="space-y-3">
-              <li className="flex items-center text-gray-600">
-                <Check className="w-4 h-4 mr-2 text-green-600" />
+              <li className="flex items-center text-[var(--color-muted)]">
+                <Check className="w-4 h-4 mr-2 text-[var(--color-primary-light)]" />
                 Full lifetime access
               </li>
-              <li className="flex items-center text-gray-600">
-                <Check className="w-4 h-4 mr-2 text-green-600" />
+              <li className="flex items-center text-[var(--color-muted)]">
+                <Check className="w-4 h-4 mr-2 text-[var(--color-primary-light)]" />
                 All course materials
               </li>
-              <li className="flex items-center text-gray-600">
-                <Check className="w-4 h-4 mr-2 text-green-600" />
+              <li className="flex items-center text-[var(--color-muted)]">
+                <Check className="w-4 h-4 mr-2 text-[var(--color-primary-light)]" />
                 Certificate of completion
               </li>
-              <li className="flex items-center text-gray-600">
-                <Check className="w-4 h-4 mr-2 text-green-600" />
+              <li className="flex items-center text-[var(--color-muted)]">
+                <Check className="w-4 h-4 mr-2 text-[var(--color-primary-light)]" />
                 Downloadable resources
               </li>
             </ul>

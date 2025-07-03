@@ -11,7 +11,7 @@ export const ImageSection = ({
   alt,
 }: ImageSectionProps) => {
   return (
-    <div className="relative w-48 h-48 rounded-lg overflow-hidden border border-gray-200">
+    <div className="relative w-48 h-48 rounded-lg overflow-hidden border border-[var(--color-primary-light)]/20">
       <img
         src={typeof src === "string" ? src : (src as StaticImageData).src}
         alt={alt}

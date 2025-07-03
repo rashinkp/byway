@@ -2,10 +2,8 @@ import { useState } from "react";
 import { Course } from "@/types/course";
 import { useAuth } from "@/hooks/auth/useAuth";
 import { useGetCourseReviews } from "@/hooks/course-review/useGetCourseReviews";
-import ReviewStats from "./ReviewStats";
 import AddReviewForm from "./AddReviewForm";
 import ReviewList from "./ReviewList";
-import ReviewListSkeleton from "./ReviewListSkeleton";
 import { Star } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 
@@ -57,7 +55,7 @@ export default function CourseReviews({
       <Star
         key={i}
         className={`w-4 h-4 ${
-          i < rating ? "text-yellow-400 fill-current" : "text-gray-300"
+          i < rating ? "text-[var(--color-warning)] fill-current" : "text-[var(--color-muted)]"
         }`}
       />
     ));
@@ -69,18 +67,18 @@ export default function CourseReviews({
       <div className="space-y-6">
         {/* Review Stats for Instructor */}
         {reviewStats && reviewStats.totalReviews > 0 && (
-          <div className="bg-gray-50/50 rounded-lg p-6">
-            <h3 className="text-sm font-semibold text-gray-900 mb-4">Review Statistics</h3>
+          <div className="bg-[var(--color-background)] rounded-lg p-6">
+            <h3 className="text-sm font-semibold text-[var(--color-primary-dark)] mb-4">Review Statistics</h3>
             <div className="flex items-start space-x-6">
               {/* Average Rating */}
               <div className="text-center">
-                <div className="text-3xl font-bold text-gray-900">
+                <div className="text-3xl font-bold text-[var(--color-primary-dark)]">
                   {reviewStats.averageRating.toFixed(1)}
                 </div>
                 <div className="flex justify-center mt-1">
                   {renderStars(Math.round(reviewStats.averageRating))}
                 </div>
-                <div className="text-sm text-gray-600 mt-1">
+                <div className="text-sm text-[var(--color-muted)] mt-1">
                   {reviewStats.totalReviews} {reviewStats.totalReviews === 1 ? 'review' : 'reviews'}
                 </div>
               </div>
@@ -90,16 +88,16 @@ export default function CourseReviews({
                 {[5, 4, 3, 2, 1].map((rating) => (
                   <div key={rating} className="flex items-center space-x-2">
                     <div className="flex items-center space-x-1 w-8">
-                      <span className="text-sm text-gray-600">{rating}</span>
-                      <Star className="w-3 h-3 text-yellow-400 fill-current" />
+                      <span className="text-sm text-[var(--color-muted)]">{rating}</span>
+                      <Star className="w-3 h-3 text-[var(--color-warning)] fill-current" />
                     </div>
-                    <div className="flex-1 bg-gray-200 rounded-full h-2">
+                    <div className="flex-1 bg-[var(--color-background)] rounded-full h-2">
                       <div
-                        className="bg-yellow-400 h-2 rounded-full transition-all duration-300"
+                        className="bg-[var(--color-warning)] h-2 rounded-full transition-all duration-300"
                         style={{ width: `${reviewStats.ratingPercentages?.[rating] ?? 0}%` }}
                       />
                     </div>
-                    <div className="w-8 text-sm text-gray-600 text-right">
+                    <div className="w-8 text-sm text-[var(--color-muted)] text-right">
                       {reviewStats.ratingDistribution?.[rating] ?? 0}
                     </div>
                   </div>
@@ -112,12 +110,12 @@ export default function CourseReviews({
         {/* Reviews List */}
         <div className="space-y-4">
           <div className="flex items-center justify-between">
-            <h3 className="text-sm font-semibold text-gray-900">
+            <h3 className="text-sm font-semibold text-[var(--color-primary-dark)]">
               Student Reviews
             </h3>
             
             {reviewsData?.total && (
-              <span className="text-xs text-gray-500">
+              <span className="text-xs text-[var(--color-muted)]">
                 {reviewsData.total} {reviewsData.total === 1 ? 'review' : 'reviews'}
               </span>
             )}
@@ -142,13 +140,13 @@ export default function CourseReviews({
     <div className="space-y-8">
       {/* Add Review Section - Only for users */}
       {canReview && (
-        <div className="border border-gray-200 rounded-lg p-6 bg-gray-50/50">
+        <div className="border border-[var(--color-primary-light)]/20 rounded-lg p-6 bg-[var(--color-background)]">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-semibold text-gray-900">Write a Review</h3>
+            <h3 className="text-lg font-semibold text-[var(--color-primary-dark)]">Write a Review</h3>
             {!showAddReview && (
               <button
                 onClick={() => setShowAddReview(true)}
-                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                className="px-4 py-2 bg-[var(--color-primary-light)] text-[var(--color-surface)] rounded-lg hover:bg-[var(--color-primary-dark)] transition-colors"
               >
                 Add Review
               </button>
@@ -168,7 +166,7 @@ export default function CourseReviews({
       {/* Reviews List */}
       <div className="space-y-4">
         <div className="flex items-center justify-between">
-          <h3 className="text-lg font-semibold text-gray-900">
+          <h3 className="text-lg font-semibold text-[var(--color-primary-dark)]">
             {userRole === "USER" ? "Student Reviews" : "Course Reviews"}
           </h3>
           
@@ -179,8 +177,8 @@ export default function CourseReviews({
                 onClick={() => setActiveFilter('all')}
                 className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
                   activeFilter === 'all'
-                    ? 'bg-blue-100 text-blue-700'
-                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                    ? 'bg-[var(--color-primary-light)]/10 text-[var(--color-primary-light)]'
+                    : 'bg-[var(--color-background)] text-[var(--color-muted)] hover:bg-[var(--color-primary-light)]/10'
                 }`}
               >
                 All Reviews
@@ -191,8 +189,8 @@ export default function CourseReviews({
                 onClick={() => setActiveFilter('my')}
                 className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
                   activeFilter === 'my'
-                    ? 'bg-blue-100 text-blue-700'
-                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                    ? 'bg-[var(--color-primary-light)]/10 text-[var(--color-primary-light)]'
+                    : 'bg-[var(--color-background)] text-[var(--color-muted)] hover:bg-[var(--color-primary-light)]/10'
                 }`}
               >
                 My Reviews
@@ -206,8 +204,8 @@ export default function CourseReviews({
                   onClick={() => setDisabledFilter('all')}
                   className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
                     disabledFilter === 'all'
-                      ? 'bg-blue-100 text-blue-700'
-                      : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                      ? 'bg-[var(--color-primary-light)]/10 text-[var(--color-primary-light)]'
+                      : 'bg-[var(--color-background)] text-[var(--color-muted)] hover:bg-[var(--color-primary-light)]/10'
                   }`}
                 >
                   All
@@ -216,8 +214,8 @@ export default function CourseReviews({
                   onClick={() => setDisabledFilter('disabled')}
                   className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
                     disabledFilter === 'disabled'
-                      ? 'bg-red-100 text-red-700'
-                      : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                      ? 'bg-[var(--color-warning)] text-[var(--color-surface)]'
+                      : 'bg-[var(--color-background)] text-[var(--color-muted)] hover:bg-[var(--color-warning)]'
                   }`}
                 >
                   Disabled

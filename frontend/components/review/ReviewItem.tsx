@@ -55,8 +55,8 @@ export default function ReviewItem({
       <div className="flex items-start space-x-4">
         {/* Avatar */}
         <div className="flex-shrink-0">
-          <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
-            <span className="text-blue-600 font-semibold text-sm">
+          <div className="w-10 h-10 bg-[var(--color-primary-light)]/10 rounded-full flex items-center justify-center">
+            <span className="text-[var(--color-primary-light)] font-semibold text-sm">
               {review.user?.name?.charAt(0).toUpperCase() || "U"}
             </span>
           </div>
@@ -67,37 +67,37 @@ export default function ReviewItem({
           <div className="flex items-start justify-between">
             <div className="flex-1">
               <div className="flex items-center space-x-2">
-                <h4 className="text-sm font-semibold text-gray-900">
+                <h4 className="text-sm font-semibold text-[var(--color-primary-dark)]">
                   {review.user?.name || "Anonymous"}
                 </h4>
                 <div className="flex items-center space-x-1">
                   {renderStars(review.rating)}
                 </div>
                 {isDisabled && (
-                  <span className="text-xs bg-red-100 text-red-600 px-2 py-1 rounded">
+                  <span className="text-xs bg-[var(--color-danger)]/10 text-[var(--color-danger)] px-2 py-1 rounded">
                     Disabled
                   </span>
                 )}
                 {userRole === "ADMIN" && !isDisabled && (
-                  <span className="text-xs bg-green-100 text-green-600 px-2 py-1 rounded">
+                  <span className="text-xs bg-[var(--color-primary-light)]/10 text-[var(--color-primary-light)] px-2 py-1 rounded">
                     Enabled
                   </span>
                 )}
               </div>
               
               {review.title && (
-                <h5 className="text-sm font-medium text-gray-800 mt-1">
+                <h5 className="text-sm font-medium text-[var(--color-primary-dark)] mt-1">
                   {review.title}
                 </h5>
               )}
               
               {review.comment && (
-                <p className="text-sm text-gray-600 mt-2 leading-relaxed">
+                <p className="text-sm text-[var(--color-muted)] mt-2 leading-relaxed">
                   {review.comment}
                 </p>
               )}
               
-              <p className="text-xs text-gray-500 mt-2">
+              <p className="text-xs text-[var(--color-muted)] mt-2">
                 {formatDate(review.createdAt)}
               </p>
             </div>
@@ -107,20 +107,20 @@ export default function ReviewItem({
               <div className="relative">
                 <button
                   onClick={() => setShowMenu(!showMenu)}
-                  className="p-1 text-gray-400 hover:text-gray-600 transition-colors"
+                  className="p-1 text-[var(--color-muted)] hover:text-[var(--color-primary-dark)] transition-colors"
                 >
                   <MoreVertical className="w-4 h-4" />
                 </button>
 
                 {showMenu && (
-                  <div className="absolute right-0 top-8 w-40 bg-white border border-gray-200 rounded-lg shadow-lg z-10">
+                  <div className="absolute right-0 top-8 w-40 bg-[var(--color-surface)] border border-[var(--color-primary-light)]/20 rounded-lg shadow-lg z-10">
                     {canEdit && (
                       <button
                         onClick={() => {
                           onEdit();
                           setShowMenu(false);
                         }}
-                        className="w-full px-3 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 flex items-center space-x-2"
+                        className="w-full px-3 py-2 text-left text-sm text-[var(--color-primary-dark)] hover:bg-[var(--color-background)] flex items-center space-x-2"
                       >
                         <Edit className="w-4 h-4" />
                         <span>Edit</span>
@@ -133,7 +133,7 @@ export default function ReviewItem({
                           setShowMenu(false);
                         }}
                         disabled={isDisabling}
-                        className="w-full px-3 py-2 text-left text-sm text-orange-600 hover:bg-orange-50 flex items-center space-x-2 disabled:opacity-50"
+                        className="w-full px-3 py-2 text-left text-sm text-[var(--color-warning)] hover:bg-[var(--color-warning)]/10 flex items-center space-x-2 disabled:opacity-50"
                       >
                         {isDisabled ? (
                           <>
@@ -155,7 +155,7 @@ export default function ReviewItem({
                           setShowMenu(false);
                         }}
                         disabled={isDeleting}
-                        className="w-full px-3 py-2 text-left text-sm text-red-600 hover:bg-red-50 flex items-center space-x-2 disabled:opacity-50"
+                        className="w-full px-3 py-2 text-left text-sm text-[var(--color-danger)] hover:bg-[var(--color-danger)]/10 flex items-center space-x-2 disabled:opacity-50"
                       >
                         <Trash2 className="w-4 h-4" />
                         <span>{isDeleting ? "Deleting..." : "Delete"}</span>

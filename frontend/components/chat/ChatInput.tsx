@@ -93,7 +93,7 @@ export function ModernChatInput({
               value={message}
               onChange={(e) => setMessage(e.target.value)}
               disabled={disabled}
-              className="flex-1 border-gray-300 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+              className="flex-1 border-[var(--color-primary-light)]/30 focus:border-[var(--color-primary-light)] focus:ring-1 focus:ring-[var(--color-primary-light)]"
             />
 
             {/* Media Buttons (moved to right) */}
@@ -104,10 +104,10 @@ export function ModernChatInput({
                 size="sm"
                 onClick={() => setInputMode('image')}
                 disabled={disabled}
-                className="p-2 h-9 w-9 hover:bg-gray-100"
+                className="p-2 h-9 w-9 hover:bg-[var(--color-primary-light)]/10"
                 title="Add image"
               >
-                <ImageIcon className="w-4 h-4 text-gray-600" />
+                <ImageIcon className="w-4 h-4 text-[var(--color-muted)]" />
               </Button>
               <Button
                 type="button"
@@ -115,10 +115,10 @@ export function ModernChatInput({
                 size="sm"
                 onClick={() => setInputMode('audio')}
                 disabled={disabled}
-                className="p-2 h-9 w-9 hover:bg-gray-100"
+                className="p-2 h-9 w-9 hover:bg-[var(--color-primary-light)]/10"
                 title="Record audio"
               >
-                <Mic className="w-4 h-4 text-gray-600" />
+                <Mic className="w-4 h-4 text-[var(--color-muted)]" />
               </Button>
             </div>
 
@@ -126,7 +126,7 @@ export function ModernChatInput({
             <Button
               type="submit"
               disabled={!message.trim() || disabled}
-              className="bg-blue-600 hover:bg-blue-700 disabled:bg-gray-300 px-4 py-2 h-9"
+              className="bg-[var(--color-primary-light)] hover:bg-[var(--color-primary-dark)] disabled:bg-[var(--color-muted)] px-4 py-2 h-9 text-[var(--color-surface)]"
             >
               <Send className="w-4 h-4" />
             </Button>
@@ -136,7 +136,7 @@ export function ModernChatInput({
   };
 
   return (
-    <div className="flex-shrink-0 px-4 py-3 bg-white border-t border-gray-200">
+    <div className="flex-shrink-0 px-4 py-3 bg-[var(--color-surface)] border-t border-[var(--color-primary-light)]/20">
       {renderInputContent()}
     </div>
   );

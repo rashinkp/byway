@@ -50,17 +50,17 @@ export function LessonList({
           disabled={lesson.isLocked}
           className={`w-full text-left px-4 py-2 rounded-lg transition-colors ${
             selectedLesson?.id === lesson.id
-              ? "bg-blue-50 text-blue-700"
-              : "hover:bg-gray-50"
+              ? "bg-[var(--color-primary-light)]/10 text-[var(--color-primary-light)]"
+              : "hover:bg-[var(--color-background)]"
           } ${lesson.isLocked ? "opacity-50 cursor-not-allowed" : ""}`}
         >
           {children ? children(lesson) : (
             <div className="flex items-center justify-between">
-              <span className="text-sm text-gray-600 truncate">
+              <span className="text-sm text-[var(--color-muted)] truncate">
                 {lesson.title}
               </span>
               {lesson.completed && (
-                <CheckCircle className="w-4 h-4 text-green-500" />
+                <CheckCircle className="w-4 h-4 text-[var(--color-primary-light)]" />
               )}
             </div>
           )}

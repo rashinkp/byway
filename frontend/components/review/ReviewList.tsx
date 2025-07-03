@@ -165,8 +165,8 @@ export default function ReviewList({
     }
     
     return (
-      <div className="bg-white/60 backdrop-blur-sm border border-gray-200/50 rounded-xl p-8 text-center">
-        <p className="text-gray-500 text-sm">{message}</p>
+      <div className="bg-[var(--color-surface)] border border-[var(--color-primary-light)]/20 rounded-xl p-8 text-center">
+        <p className="text-[var(--color-muted)] text-sm">{message}</p>
       </div>
     );
   }
@@ -176,7 +176,7 @@ export default function ReviewList({
       {/* Reviews */}
       <div className="space-y-4">
         {filteredReviews.map((review) => (
-          <div key={review.id} className="bg-white/60 backdrop-blur-sm border border-gray-200/50 rounded-xl p-4 hover:bg-white/80 transition-all duration-200">
+          <div key={review.id} className="bg-[var(--color-surface)] border border-[var(--color-primary-light)]/20 rounded-xl p-4 hover:bg-[var(--color-background)] transition-all duration-200">
             {editingReview === review.id ? (
               <EditReviewForm
                 review={review}

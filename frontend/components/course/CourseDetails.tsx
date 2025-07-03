@@ -28,10 +28,10 @@ export function CourseDetails({
 
   if (isLoading) {
     return (
-      <div className="bg-white/80 backdrop-blur-sm border border-gray-100 shadow-sm rounded-xl p-6">
+      <div className="bg-[var(--color-surface)] border border-[var(--color-primary-light)]/20 shadow-sm rounded-xl p-6">
         <div className="animate-pulse space-y-4">
-          <div className="h-32 w-32 bg-gray-200 rounded"></div>
-          <div className="h-4 w-3/4 bg-gray-200 rounded"></div>
+          <div className="h-32 w-32 bg-[var(--color-background)] rounded"></div>
+          <div className="h-4 w-3/4 bg-[var(--color-background)] rounded"></div>
         </div>
       </div>
     );
@@ -39,7 +39,7 @@ export function CourseDetails({
 
   return (
     <div className="space-y-6">
-      <div className="bg-white/80 backdrop-blur-sm border border-gray-100 shadow-sm rounded-xl p-6">
+      <div className="bg-[var(--color-surface)] border border-[var(--color-primary-light)]/20 shadow-sm rounded-xl p-6">
         <div className="flex flex-col md:flex-row gap-6">
           <ImageSection
             src={src}
@@ -54,7 +54,7 @@ export function CourseDetails({
  
       
       {course && (
-        <div className="bg-white/80 backdrop-blur-sm border border-gray-100 shadow-sm rounded-xl p-6">
+        <div className="bg-[var(--color-surface)] border border-[var(--color-primary-light)]/20 shadow-sm rounded-xl p-6">
           <ActionSection
             course={course}
             isUpdating={false}

@@ -56,12 +56,12 @@ export default function CourseTabs({
 
   if (isLoading) {
     return (
-      <div className="border-b border-gray-100">
+      <div className="border-b border-[var(--color-primary-light)]/20">
         <div className="flex space-x-8 px-6 py-4">
           {tabs.map((_, i) => (
             <div
               key={i}
-              className="h-8 bg-gray-200 rounded w-24 animate-pulse"
+              className="h-8 bg-[var(--color-background)] rounded w-24 animate-pulse"
             ></div>
           ))}
         </div>
@@ -70,7 +70,7 @@ export default function CourseTabs({
   }
 
   return (
-    <div className="border-b border-gray-100">
+    <div className="border-b border-[var(--color-primary-light)]/20">
       <div className="flex space-x-8 px-6 py-4">
         {tabs.map((tab) => (
           <button
@@ -78,8 +78,8 @@ export default function CourseTabs({
             onClick={() => setActiveTab(tab.id)}
             className={`flex items-center space-x-2 py-2 px-1 border-b-2 transition-colors ${
               activeTab === tab.id
-                ? "border-blue-600 text-blue-600"
-                : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+                ? "border-[var(--color-primary-light)] text-[var(--color-primary-light)]"
+                : "border-transparent text-[var(--color-muted)] hover:text-[var(--color-primary-dark)] hover:border-[var(--color-primary-light)]/40"
             }`}
           >
             {tab.icon}
