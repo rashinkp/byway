@@ -6,8 +6,7 @@ import {
   IPaginatedResponse,
   IUserRepository,
 } from "../../app/repositories/user.repository";
-import { IUserStats, IGetUserStatsInput } from "../../app/usecases/user/interfaces/get-user-stats.usecase.interface";
-import { ITopInstructor, IGetTopInstructorsInput } from "../../app/usecases/user/interfaces/get-top-instructors.usecase.interface";
+import { IUserStats } from "../../app/usecases/user/interfaces/get-user-stats.usecase.interface";
 
 export class UserRepository implements IUserRepository {
   constructor(private prisma: PrismaClient) {}
@@ -141,7 +140,7 @@ export class UserRepository implements IUserRepository {
     return UserProfile.fromPrisma(created);
   }
 
-  async getUserStats(input: IGetUserStatsInput): Promise<IUserStats> {
+  async getUserStats(): Promise<IUserStats> {
     const [totalUsers, activeUsers, inactiveUsers, totalInstructors, activeInstructors, inactiveInstructors] = await Promise.all([
       this.prisma.user.count(),
       this.prisma.user.count({ where: { deletedAt: null } }),

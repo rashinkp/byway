@@ -1,6 +1,5 @@
-import { Request, Response, NextFunction } from "express";
+import { Request, Response } from "express";
 import { ZodError } from "zod";
-import { HttpErrors } from "../../http/http.errors";
 import { HttpError } from "../../http/errors/http-error";
 import { ApiResponse } from "../../http/interfaces/ApiResponse";
 
@@ -8,9 +7,7 @@ export function errorMiddleware(
   err: Error,
   req: Request,
   res: Response,
-  next: NextFunction
 ): void {
-  const httpErrors = new HttpErrors();
 
   // Log the error for debugging
   console.error("Error details:", {

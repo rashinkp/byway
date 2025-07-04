@@ -53,7 +53,6 @@ export function createCourseDependencies(
   );
   const deleteCourseUseCase = new DeleteCourseUseCase(
     courseRepository,
-    userRepository,
     deps.createNotificationsForUsersUseCase
   );
   const getEnrolledCoursesUseCase = new GetEnrolledCoursesUseCase(

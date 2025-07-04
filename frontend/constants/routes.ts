@@ -1,6 +1,6 @@
 export const ROUTES = {
-  ADMIN: "/admin",
-  INSTRUCTOR: "/instructor",
-  USER: "/",
-  DEFAULT: "/",
+	ADMIN: "/admin",
+	INSTRUCTOR: "/instructor",
+	USER: "/",
+	DEFAULT: "/",
 };

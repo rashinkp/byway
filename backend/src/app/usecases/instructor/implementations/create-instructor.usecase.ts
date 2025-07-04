@@ -1,6 +1,5 @@
 import { CreateInstructorRequestDTO } from "../../../../domain/dtos/instructor/instructor.dto";
 import { Instructor } from "../../../../domain/entities/instructor.entity";
-import { User } from "../../../../domain/entities/user.entity";
 import { Role } from "../../../../domain/enum/role.enum";
 import { JwtPayload } from "../../../../presentation/express/middlewares/auth.middleware";
 import { HttpError } from "../../../../presentation/http/errors/http-error";

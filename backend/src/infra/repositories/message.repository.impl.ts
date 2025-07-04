@@ -113,23 +113,19 @@ export class MessageRepository implements IMessageRepository {
   }
 
   async create(message: Message): Promise<void> {
-    try {
-      await prisma.message.create({
-        data: {
-          id: message.id.value,
-          chatId: message.chatId.value,
-          senderId: message.senderId.value,
-          content: message.content?.value || null,
-          imageUrl: message.imageUrl?.toString() || null,
-          audioUrl: message.audioUrl?.toString() || null,
-          type: message.type as PrismaMessageType,
-          isRead: message.isRead,
-          createdAt: message.createdAt.value,
-        },
-      });
-    } catch (err) {
-      throw err;
-    }
+    await prisma.message.create({
+      data: {
+        id: message.id.value,
+        chatId: message.chatId.value,
+        senderId: message.senderId.value,
+        content: message.content?.value || null,
+        imageUrl: message.imageUrl?.toString() || null,
+        audioUrl: message.audioUrl?.toString() || null,
+        type: message.type as PrismaMessageType,
+        isRead: message.isRead,
+        createdAt: message.createdAt.value,
+      },
+    });
   }
 
   async save(message: Message): Promise<void> {

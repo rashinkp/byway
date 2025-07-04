@@ -1,8 +1,4 @@
-import {
-  PrismaClient,
-  User as PrismaUser,
-  UserVerification as PrismaVerification,
-} from "@prisma/client";
+import { PrismaClient } from "@prisma/client";
 import { User } from "../../domain/entities/user.entity";
 import { UserVerification } from "../../domain/entities/user-verification.entity";
 import { IAuthRepository } from "../../app/repositories/auth.repository";

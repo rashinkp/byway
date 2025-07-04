@@ -1,7 +1,6 @@
 import { IOrderRepository } from "../../../repositories/order.repository";
 import { IGetAllOrdersUseCase } from "../interfaces/get-all-orders.usecase.interface";
 import { GetAllOrdersDto } from "../../../../domain/dtos/order/order.dto";
-import { Order } from "../../../../domain/entities/order.entity";
 
 export class GetAllOrdersUseCase implements IGetAllOrdersUseCase {
   constructor(private orderRepository: IOrderRepository) {}
@@ -60,7 +59,7 @@ export class GetAllOrdersUseCase implements IGetAllOrdersUseCase {
         limit,
         totalPages: Math.ceil(total / limit),
       };
-    } catch (error) {
+    } catch {
       throw new Error("Failed to fetch orders");
     }
   }

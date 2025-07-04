@@ -66,8 +66,8 @@ export class SendMessageUseCase implements ISendMessageUseCase {
     );
     try {
       await this.messageRepository.create(message);
-    } catch (err) {
-      throw err;
+    } catch {
+      throw new Error('Failed to create message');
     }
     if (chatId && (input.chatId || input.userId)) {
       let chat = input.chatId ? await this.chatRepository.findById(chatId) : null;
@@ -89,7 +89,7 @@ export class SendMessageUseCase implements ISendMessageUseCase {
     let enrichedMessage: any = null;
     try {
       enrichedMessage = await this.messageRepository.findByIdWithUserData(message.id);
-    } catch (err) {
+    } catch {
       // Optionally handle error, but no log needed
     }
     if (!enrichedMessage) {

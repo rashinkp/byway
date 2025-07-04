@@ -1,4 +1,4 @@
-import { PrismaClient, Cart as PrismaCart, Prisma } from "@prisma/client";
+import { PrismaClient, Prisma } from "@prisma/client";
 import { Cart } from "../../domain/entities/cart.entity";
 import { ICartRepository } from "../../app/repositories/cart.repository";
 

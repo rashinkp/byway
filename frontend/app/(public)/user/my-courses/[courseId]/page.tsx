@@ -18,452 +18,521 @@ import { IQuizAnswer } from "@/types/progress";
 import { useCertificate } from "@/hooks/certificate/useCertificate";
 
 interface LessonWithCompletion extends ILesson {
-  completed: boolean;
-  isLocked?: boolean;
-  score?: number;
-  totalQuestions?: number;
-  answers?: IQuizAnswer[];
+	completed: boolean;
+	isLocked?: boolean;
+	score?: number;
+	totalQuestions?: number;
+	answers?: IQuizAnswer[];
 }
 
 export default function CourseContent() {
-  const [selectedLesson, setSelectedLesson] =
-    useState<LessonWithCompletion | null>(null);
-  const [lessonsWithCompletion, setLessonsWithCompletion] = useState<
-    LessonWithCompletion[]
-  >([]);
-  const [page, setPage] = useState(1);
-  const limit = 10;
+	const [selectedLesson, setSelectedLesson] =
+		useState<LessonWithCompletion | null>(null);
+	const [lessonsWithCompletion, setLessonsWithCompletion] = useState<
+		LessonWithCompletion[]
+	>([]);
+	const [page, setPage] = useState(1);
+	const limit = 10;
 
-  const params = useParams();
-  const courseId = params.courseId as string;
-  const router = useRouter();
+	const params = useParams();
+	const courseId = params.courseId as string;
+	const router = useRouter();
 
-  // Fetch lessons
-  const { data, isLoading, isError, error } = useGetAllLessonsInCourse({
-    courseId,
-    page,
-    limit,
-    sortBy: "order",
-    sortOrder: "asc",
-    filterBy: "PUBLISHED",
-    includeDeleted: false,
-  });
+	// Fetch lessons
+	const { data, isLoading, isError, error } = useGetAllLessonsInCourse({
+		courseId,
+		page,
+		limit,
+		sortBy: "order",
+		sortOrder: "asc",
+		filterBy: "PUBLISHED",
+		includeDeleted: false,
+	});
 
-  // Fetch progress
-  const { data: progressData, isLoading: isProgressLoading } = useProgress({
-    courseId,
-  });
-  const { mutate: updateProgress, isLoading: isUpdatingProgress } =
-    useUpdateProgress();
+	// Fetch progress
+	const { data: progressData, isLoading: isProgressLoading } = useProgress({
+		courseId,
+	});
+	const { mutate: updateProgress } = useUpdateProgress();
 
-  // Fetch content for the selected lesson
-  const {
-    data: content,
-    isLoading: isContentLoading,
-    isError: isContentError,
-    error: contentError,
-  } = useGetContentByLessonId(selectedLesson?.id || "");
+	// Fetch content for the selected lesson
+	const {
+		data: content,
+		isLoading: isContentLoading,
+		isError: isContentError,
+		error: contentError,
+	} = useGetContentByLessonId(selectedLesson?.id || "");
 
-  // Fetch certificate
-  const { certificate, loading: certLoading, error: certError, fetchCertificate, createCertificate } = useCertificate(courseId);
+	// Fetch certificate
+	const {
+		certificate,
+		loading: certLoading,
+		error: certError,
+		fetchCertificate,
+		createCertificate,
+	} = useCertificate(courseId);
 
-  // Handle content errors
-  useEffect(() => {
-    if (isContentError && contentError) {
-      console.log("contentError", contentError);
-      const axiosError = contentError as AxiosError<{ message: string }>;
-      const errorMessage =
-        axiosError.response?.data?.message ||
-        axiosError.message ||
-        "Unknown error";
-      console.log("errorMessage", errorMessage);
+	// Handle content errors
+	useEffect(() => {
+		if (isContentError && contentError) {
+			console.log("contentError", contentError);
+			const axiosError = contentError as AxiosError<{ message: string }>;
+			const errorMessage =
+				axiosError.response?.data?.message ||
+				axiosError.message ||
+				"Unknown error";
+			console.log("errorMessage", errorMessage);
 
-      if (
-        errorMessage.toLowerCase().includes("not enrolled") ||
-        errorMessage.toLowerCase().includes("don't have permission") ||
-        errorMessage.toLowerCase().includes("not active")
-      ) {
-        toast.error("You need to enroll in this course to access the content");
-        setTimeout(() => {
-          router.push(`/courses/${courseId}`);
-        }, 2000);
-      } else {
-       console.log("errorMessage", errorMessage);
-      } 
-    }
-  }, [isContentError, contentError, courseId, router]);
+			if (
+				errorMessage.toLowerCase().includes("not enrolled") ||
+				errorMessage.toLowerCase().includes("don't have permission") ||
+				errorMessage.toLowerCase().includes("not active")
+			) {
+				toast.error("You need to enroll in this course to access the content");
+				setTimeout(() => {
+					router.push(`/courses/${courseId}`);
+				}, 2000);
+			} else {
+				console.log("errorMessage", errorMessage);
+			}
+		}
+	}, [isContentError, contentError, courseId, router]);
 
-  // Initialize lessons with completion status and locked state
-  useEffect(() => {
-    if (data?.lessons) {
-      // First, create the array with completion status
-      const lessonsWithCompletion: LessonWithCompletion[] = data.lessons.map(
-        (lesson) => {
-          const lessonProgress = progressData?.lessonProgress?.find(
-            (p) => p.lessonId === lesson.id
-          );
+	// Initialize lessons with completion status and locked state
+	useEffect(() => {
+		if (data?.lessons) {
+			// First, create the array with completion status
+			const lessonsWithCompletion: LessonWithCompletion[] = data.lessons.map(
+				(lesson) => {
+					const lessonProgress = progressData?.lessonProgress?.find(
+						(p) => p.lessonId === lesson.id,
+					);
 
-          return {
-            ...lesson,
-            completed: lessonProgress?.completed || false,
-            score: lessonProgress?.score,
-            totalQuestions: lessonProgress?.totalQuestions,
-            answers: lessonProgress?.answers,
-            isLocked: false // Initialize as false, we'll update this in the next step
-          };
-        }
-      );
+					return {
+						...lesson,
+						completed: lessonProgress?.completed || false,
+						score: lessonProgress?.score,
+						totalQuestions: lessonProgress?.totalQuestions,
+						answers: lessonProgress?.answers,
+						isLocked: false, // Initialize as false, we'll update this in the next step
+					};
+				},
+			);
 
-      // Then, update the locked state based on previous lesson completion
-      const lessonsWithLockedState = lessonsWithCompletion.map((lesson, index) => {
-        const isLocked = index > 0 && !lessonsWithCompletion[index - 1].completed;
-        return {
-          ...lesson,
-          isLocked
-        };
-      });
+			// Then, update the locked state based on previous lesson completion
+			const lessonsWithLockedState = lessonsWithCompletion.map(
+				(lesson, index) => {
+					const isLocked =
+						index > 0 && !lessonsWithCompletion[index - 1].completed;
+					return {
+						...lesson,
+						isLocked,
+					};
+				},
+			);
 
-      setLessonsWithCompletion(lessonsWithLockedState);
+			setLessonsWithCompletion(lessonsWithLockedState);
 
-      // Find the next lesson to learn
-      const nextLessonToLearn = lessonsWithLockedState.find(lesson => !lesson.completed && !lesson.isLocked);
-      
-      if (nextLessonToLearn) {
-        // If there's a lesson to learn, select it
-        setSelectedLesson(nextLessonToLearn);
-      } else if (lessonsWithLockedState.every(lesson => lesson.completed)) {
-        // If all lessons are completed, select the last lesson
-        setSelectedLesson(lessonsWithLockedState[lessonsWithLockedState.length - 1]);
-      } else if (progressData?.lastLessonId) {
-        // If not all completed, try to select the last lesson from progress
-        const lastLesson = lessonsWithLockedState.find(
-          (lesson) => lesson.id === progressData.lastLessonId
-        );
-        if (lastLesson) {
-          setSelectedLesson(lastLesson);
-        } else if (lessonsWithLockedState.length > 0) {
-          setSelectedLesson(lessonsWithLockedState[0]);
-        }
-      } else if (lessonsWithLockedState.length > 0) {
-        setSelectedLesson(lessonsWithLockedState[0]);
-      }
-    }
-  }, [data, progressData]);
+			// Find the next lesson to learn
+			const nextLessonToLearn = lessonsWithLockedState.find(
+				(lesson) => !lesson.completed && !lesson.isLocked,
+			);
 
-  // Handle access status
-  useEffect(() => {
-    if (progressData?.accessStatus === "BLOCKED") {
-      toast.error("Access Denied", {
-        description:
-          "Your access to this course has been blocked. Please contact support.",
-      });
-      router.push("/user/profile?section=courses");
-    } else if (progressData?.accessStatus === "EXPIRED") {
-      toast.error("Access Expired", {
-        description:
-          "Your access to this course has expired. Please renew your enrollment.",
-      });
-      router.push("/user/profile?section=courses");
-    }
-  }, [progressData?.accessStatus, router]);
+			if (nextLessonToLearn) {
+				// If there's a lesson to learn, select it
+				setSelectedLesson(nextLessonToLearn);
+			} else if (lessonsWithLockedState.every((lesson) => lesson.completed)) {
+				// If all lessons are completed, select the last lesson
+				setSelectedLesson(
+					lessonsWithLockedState[lessonsWithLockedState.length - 1],
+				);
+			} else if (progressData?.lastLessonId) {
+				// If not all completed, try to select the last lesson from progress
+				const lastLesson = lessonsWithLockedState.find(
+					(lesson) => lesson.id === progressData.lastLessonId,
+				);
+				if (lastLesson) {
+					setSelectedLesson(lastLesson);
+				} else if (lessonsWithLockedState.length > 0) {
+					setSelectedLesson(lessonsWithLockedState[0]);
+				}
+			} else if (lessonsWithLockedState.length > 0) {
+				setSelectedLesson(lessonsWithLockedState[0]);
+			}
+		}
+	}, [data, progressData]);
 
-  // Fetch certificate when all lessons are completed
-  useEffect(() => {
-    if (lessonsWithCompletion.length > 0 && lessonsWithCompletion.every(lesson => lesson.completed)) {
-      fetchCertificate();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [lessonsWithCompletion]);
+	// Handle access status
+	useEffect(() => {
+		if (progressData?.accessStatus === "BLOCKED") {
+			toast.error("Access Denied", {
+				description:
+					"Your access to this course has been blocked. Please contact support.",
+			});
+			router.push("/user/profile?section=courses");
+		} else if (progressData?.accessStatus === "EXPIRED") {
+			toast.error("Access Expired", {
+				description:
+					"Your access to this course has expired. Please renew your enrollment.",
+			});
+			router.push("/user/profile?section=courses");
+		}
+	}, [progressData?.accessStatus, router]);
 
-  // Add certificate as a pseudo-lesson
-  const certificateStep: LessonWithCompletion = {
-    id: "certificate",
-    title: "🎓 Certificate",
-    completed: !!certificate,
-    isLocked: !lessonsWithCompletion.every(lesson => lesson.completed),
-    courseId: courseId,
-    order: lessonsWithCompletion.length + 1,
-    status: LessonStatus.PUBLISHED,
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-  };
+	// Fetch certificate when all lessons are completed
+	useEffect(() => {
+		if (
+			lessonsWithCompletion.length > 0 &&
+			lessonsWithCompletion.every((lesson) => lesson.completed)
+		) {
+			fetchCertificate();
+		}
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [lessonsWithCompletion]);
 
-  const allItems = [...lessonsWithCompletion, certificateStep];
+	// Add certificate as a pseudo-lesson
+	const certificateStep: LessonWithCompletion = {
+		id: "certificate",
+		title: "🎓 Certificate",
+		completed: !!certificate,
+		isLocked: !lessonsWithCompletion.every((lesson) => lesson.completed),
+		courseId: courseId,
+		order: lessonsWithCompletion.length + 1,
+		status: LessonStatus.PUBLISHED,
+		createdAt: new Date().toISOString(),
+		updatedAt: new Date().toISOString(),
+	};
 
-  const currentLessonIndex = allItems.findIndex(
-    (lesson) => lesson.id === selectedLesson?.id
-  );
+	const allItems = [...lessonsWithCompletion, certificateStep];
 
-  const handleLessonSelect = (lesson: LessonWithCompletion | typeof certificateStep) => {
-    setSelectedLesson(lesson);
-  };
+	const currentLessonIndex = allItems.findIndex(
+		(lesson) => lesson.id === selectedLesson?.id,
+	);
 
-  const markLessonComplete = (quizData?: { 
-    answers: IQuizAnswer[], 
-    score: number, 
-    totalQuestions: number 
-  }) => {
-    if (!selectedLesson || !courseId) return;
+	const handleLessonSelect = (
+		lesson: LessonWithCompletion | typeof certificateStep,
+	) => {
+		setSelectedLesson(lesson);
+	};
 
-    // Update progress in the backend
-    updateProgress({
-      courseId: courseId,
-      lessonId: selectedLesson.id,
-      completed: true,
-      ...(quizData && {
-        quizAnswers: quizData.answers,
-        score: quizData.score,
-        totalQuestions: quizData.totalQuestions,
-      }),
-    });
+	const markLessonComplete = (quizData?: {
+		answers: IQuizAnswer[];
+		score: number;
+		totalQuestions: number;
+	}) => {
+		if (!selectedLesson || !courseId) return;
 
-    // Update local state
-    setLessonsWithCompletion((prevLessons) =>
-      prevLessons.map((lesson) =>
-        lesson.id === selectedLesson.id
-          ? { 
-              ...lesson, 
-              completed: true,
-              ...(quizData && {
-                score: quizData.score,
-                totalQuestions: quizData.totalQuestions,
-                answers: quizData.answers,
-              }),
-            }
-          : lesson
-      )
-    );
-  };
+		// Update progress in the backend
+		updateProgress({
+			courseId: courseId,
+			lessonId: selectedLesson.id,
+			completed: true,
+			...(quizData && {
+				quizAnswers: quizData.answers,
+				score: quizData.score,
+				totalQuestions: quizData.totalQuestions,
+			}),
+		});
 
-  const goToNextLesson = () => {
-    if (currentLessonIndex < allItems.length - 1) {
-      setSelectedLesson(allItems[currentLessonIndex + 1]);
-    }
-  };
+		// Update local state
+		setLessonsWithCompletion((prevLessons) =>
+			prevLessons.map((lesson) =>
+				lesson.id === selectedLesson.id
+					? {
+							...lesson,
+							completed: true,
+							...(quizData && {
+								score: quizData.score,
+								totalQuestions: quizData.totalQuestions,
+								answers: quizData.answers,
+							}),
+						}
+					: lesson,
+			),
+		);
+	};
 
-  const goToPrevLesson = () => {
-    if (currentLessonIndex > 0) {
-      setSelectedLesson(allItems[currentLessonIndex - 1]);
-    }
-  };
+	const goToNextLesson = () => {
+		if (currentLessonIndex < allItems.length - 1) {
+			setSelectedLesson(allItems[currentLessonIndex + 1]);
+		}
+	};
 
-  const goToPreviousPage = () => {
-    if (page > 1) {
-      setPage(page - 1);
-    }
-  };
+	const goToPrevLesson = () => {
+		if (currentLessonIndex > 0) {
+			setSelectedLesson(allItems[currentLessonIndex - 1]);
+		}
+	};
 
-  const goToNextPage = () => {
-    if (data && page < data.totalPages) {
-      setPage(page + 1);
-    }
-  };
+	const goToPreviousPage = () => {
+		if (page > 1) {
+			setPage(page - 1);
+		}
+	};
 
-  const completedLessons = progressData?.completedLessons || 0;
-  const totalLessons = progressData?.totalLessons || allItems.length;
-  const progressPercentage =
-    totalLessons > 0 ? Math.round((completedLessons / totalLessons) * 100) : 0;
+	const goToNextPage = () => {
+		if (data && page < data.totalPages) {
+			setPage(page + 1);
+		}
+	};
 
-  return (
-    <div className="flex flex-col lg:flex-row w-full bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 min-h-screen">
-      <EnrolledCourseSidebar
-        courseTitle="Introduction to User Experience Design"
-        progressPercentage={progressPercentage}
-        isLoading={isLoading || isProgressLoading}
-        isError={isError}
-        error={error}
-        allLessons={allItems}
-        selectedLesson={selectedLesson}
-        handleLessonSelect={handleLessonSelect}
-        data={data}
-        page={page}
-        goToPreviousPage={goToPreviousPage}
-        goToNextPage={goToNextPage}
-      />
-      <div className="flex-1 p-4 lg:p-8 xl:p-12">
-        {isError ? (
-          <div className="flex flex-col items-center justify-center h-full space-y-6 animate-fade-in">
-            <div className="w-24 h-24 rounded-full bg-red-100 flex items-center justify-center mb-4">
-              <svg className="w-12 h-12 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
-              </svg>
-            </div>
-            <h3 className="text-2xl font-bold text-gray-800 mb-2">Unable to Load Course</h3>
-            <p className="text-gray-600 text-center max-w-md">
-              We're having trouble loading the course content. Please try again or return to your courses.
-            </p>
-            <button
-              onClick={() => router.push("/user/profile?section=courses")}
-              className="px-8 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-semibold rounded-xl hover:from-blue-700 hover:to-indigo-700 transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl"
-            >
-              Return to My Courses
-            </button>
-          </div>
-        ) : isLoading || isProgressLoading ? (
-          <LessonContentSkeleton />
-        ) : selectedLesson?.id === "certificate" ? (
-          <div className="max-w-3xl mx-auto relative animate-fade-in">
-            {/* Celebration Header */}
-            <div className="text-center mb-8">
-              <div className="inline-flex items-center justify-center p-4 bg-[var(--color-primary-light)]/20 rounded-full mb-4">
-                <span className="text-4xl">🎉</span>
-              </div>
-              <h1 className="text-4xl lg:text-5xl font-bold text-[var(--color-primary-dark)] mb-2">
-                Congratulations!
-              </h1>
-              <p className="text-xl text-[var(--color-muted)]">You've successfully completed the course</p>
-            </div>
+	const completedLessons = progressData?.completedLessons || 0;
+	const totalLessons = progressData?.totalLessons || allItems.length;
+	const progressPercentage =
+		totalLessons > 0 ? Math.round((completedLessons / totalLessons) * 100) : 0;
 
-            {/* Certificate Container */}
-            <div className="relative overflow-hidden rounded-2xl bg-[var(--color-surface)] shadow-xl border border-[var(--color-primary-light)]/20">
-              {/* Header Section */}
-              <div className="px-8 py-8 text-center border-b border-[var(--color-primary-light)]/10">
-                <div className="mb-4">
-                  <div className="w-16 h-16 mx-auto bg-[var(--color-primary-light)]/10 rounded-full flex items-center justify-center mb-2">
-                    <span className="text-3xl">🎓</span>
-                  </div>
-                  <h2 className="text-2xl lg:text-3xl font-bold text-[var(--color-primary-dark)] mb-1">Certificate of Completion</h2>
-                  <div className="w-16 h-1 bg-[var(--color-primary-light)]/30 mx-auto rounded-full"></div>
-                </div>
-                <div className="space-y-2">
-                  <p className="text-base text-[var(--color-muted)]">This is to certify that</p>
-                  <h3 className="text-xl lg:text-2xl font-bold text-[var(--color-primary-light)]">
-                    {certificate?.userName || "Student Name"}
-                  </h3>
-                  <p className="text-base text-[var(--color-muted)]">has successfully completed</p>
-                  <h4 className="text-lg lg:text-xl font-semibold text-[var(--color-primary-dark)]">
-                    {certificate?.courseTitle || "Course Title"}
-                  </h4>
-                </div>
-              </div>
+	return (
+		<div className="flex flex-col lg:flex-row w-full bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 min-h-screen">
+			<EnrolledCourseSidebar
+				courseTitle="Introduction to User Experience Design"
+				progressPercentage={progressPercentage}
+				isLoading={isLoading || isProgressLoading}
+				isError={isError}
+				error={error}
+				allLessons={allItems}
+				selectedLesson={selectedLesson}
+				handleLessonSelect={handleLessonSelect}
+				data={data}
+				page={page}
+				goToPreviousPage={goToPreviousPage}
+				goToNextPage={goToNextPage}
+			/>
+			<div className="flex-1 p-4 lg:p-8 xl:p-12">
+				{isError ? (
+					<div className="flex flex-col items-center justify-center h-full space-y-6 animate-fade-in">
+						<div className="w-24 h-24 rounded-full bg-red-100 flex items-center justify-center mb-4">
+							<svg
+								className="w-12 h-12 text-red-500"
+								fill="none"
+								stroke="currentColor"
+								viewBox="0 0 24 24"
+							>
+								<path
+									strokeLinecap="round"
+									strokeLinejoin="round"
+									strokeWidth={2}
+									d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"
+								/>
+							</svg>
+						</div>
+						<h3 className="text-2xl font-bold text-gray-800 mb-2">
+							Unable to Load Course
+						</h3>
+						<p className="text-gray-600 text-center max-w-md">
+							We're having trouble loading the course content. Please try again
+							or return to your courses.
+						</p>
+						<button
+							onClick={() => router.push("/user/profile?section=courses")}
+							className="px-8 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-semibold rounded-xl hover:from-blue-700 hover:to-indigo-700 transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl"
+						>
+							Return to My Courses
+						</button>
+					</div>
+				) : isLoading || isProgressLoading ? (
+					<LessonContentSkeleton />
+				) : selectedLesson?.id === "certificate" ? (
+					<div className="max-w-3xl mx-auto relative animate-fade-in">
+						{/* Celebration Header */}
+						<div className="text-center mb-8">
+							<div className="inline-flex items-center justify-center p-4 bg-[var(--color-primary-light)]/20 rounded-full mb-4">
+								<span className="text-4xl">🎉</span>
+							</div>
+							<h1 className="text-4xl lg:text-5xl font-bold text-[var(--color-primary-dark)] mb-2">
+								Congratulations!
+							</h1>
+							<p className="text-xl text-[var(--color-muted)]">
+								You've successfully completed the course
+							</p>
+						</div>
 
-              {/* Content Section */}
-              <div className="px-8 py-8 grid lg:grid-cols-2 gap-8 items-center">
-                {/* Certificate Preview/Actions */}
-                <div className="space-y-6">
-                  {certLoading && (
-                    <div className="flex items-center justify-center p-6 bg-[var(--color-background)] rounded-xl">
-                      <div className="flex items-center space-x-3">
-                        <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-[var(--color-primary-light)]"></div>
-                        <span className="text-[var(--color-primary-light)] font-medium">Preparing your certificate...</span>
-                      </div>
-                    </div>
-                  )}
+						{/* Certificate Container */}
+						<div className="relative overflow-hidden rounded-2xl bg-[var(--color-surface)] shadow-xl border border-[var(--color-primary-light)]/20">
+							{/* Header Section */}
+							<div className="px-8 py-8 text-center border-b border-[var(--color-primary-light)]/10">
+								<div className="mb-4">
+									<div className="w-16 h-16 mx-auto bg-[var(--color-primary-light)]/10 rounded-full flex items-center justify-center mb-2">
+										<span className="text-3xl">🎓</span>
+									</div>
+									<h2 className="text-2xl lg:text-3xl font-bold text-[var(--color-primary-dark)] mb-1">
+										Certificate of Completion
+									</h2>
+									<div className="w-16 h-1 bg-[var(--color-primary-light)]/30 mx-auto rounded-full"></div>
+								</div>
+								<div className="space-y-2">
+									<p className="text-base text-[var(--color-muted)]">
+										This is to certify that
+									</p>
+									<h3 className="text-xl lg:text-2xl font-bold text-[var(--color-primary-light)]">
+										{certificate?.userName || "Student Name"}
+									</h3>
+									<p className="text-base text-[var(--color-muted)]">
+										has successfully completed
+									</p>
+									<h4 className="text-lg lg:text-xl font-semibold text-[var(--color-primary-dark)]">
+										{certificate?.courseTitle || "Course Title"}
+									</h4>
+								</div>
+							</div>
 
-                  {certError && (
-                    <div className="p-4 bg-red-50 border border-red-200 rounded-xl">
-                      <div className="flex items-center space-x-2">
-                        <span className="text-red-500">⚠️</span>
-                        <span className="text-red-700 font-medium">{certError}</span>
-                      </div>
-                    </div>
-                  )}
+							{/* Content Section */}
+							<div className="px-8 py-8 grid lg:grid-cols-2 gap-8 items-center">
+								{/* Certificate Preview/Actions */}
+								<div className="space-y-6">
+									{certLoading && (
+										<div className="flex items-center justify-center p-6 bg-[var(--color-background)] rounded-xl">
+											<div className="flex items-center space-x-3">
+												<div className="animate-spin rounded-full h-6 w-6 border-b-2 border-[var(--color-primary-light)]"></div>
+												<span className="text-[var(--color-primary-light)] font-medium">
+													Preparing your certificate...
+												</span>
+											</div>
+										</div>
+									)}
 
-                  {certificate?.pdfUrl ? (
-                    <a
-                      href={certificate.pdfUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center justify-center w-full px-8 py-4 bg-[var(--color-primary-light)] text-[var(--color-surface)] font-semibold rounded-xl hover:bg-[var(--color-primary-dark)] transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                      <span className="mr-2 text-lg">📄</span>
-                      View & Download Certificate
-                    </a>
-                  ) : (
-                    <button
-                      className="inline-flex items-center justify-center w-full px-8 py-4 bg-[var(--color-primary-light)] text-[var(--color-surface)] font-semibold rounded-xl hover:bg-[var(--color-primary-dark)] transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
-                      onClick={createCertificate}
-                      disabled={certLoading}
-                    >
-                      <span className="mr-2 text-lg">✨</span>
-                      {certLoading ? "Generating..." : "Generate Certificate"}
-                    </button>
-                  )}
-                </div>
+									{certError && (
+										<div className="p-4 bg-red-50 border border-red-200 rounded-xl">
+											<div className="flex items-center space-x-2">
+												<span className="text-red-500">⚠️</span>
+												<span className="text-red-700 font-medium">
+													{certError}
+												</span>
+											</div>
+										</div>
+									)}
 
-                {/* Achievement Stats */}
-                <div className="space-y-6">
-                  <div className="bg-[var(--color-background)] rounded-xl p-6 border border-[var(--color-primary-light)]/10">
-                    <h4 className="text-lg font-semibold text-[var(--color-primary-dark)] mb-4 flex items-center">
-                      <span className="mr-2">📊</span>
-                      Achievement Summary
-                    </h4>
-                    <div className="space-y-4">
-                      <div className="flex justify-between items-center">
-                        <span className="text-[var(--color-muted)]">Lessons Completed</span>
-                        <span className="font-bold text-[var(--color-primary-light)]">{completedLessons}/{totalLessons}</span>
-                      </div>
-                      <div className="flex justify-between items-center">
-                        <span className="text-[var(--color-muted)]">Progress</span>
-                        <span className="font-bold text-[var(--color-primary-dark)]">{progressPercentage}%</span>
-                      </div>
-                      <div className="w-full bg-[var(--color-surface)] rounded-full h-3">
-                        <div 
-                          className="bg-[var(--color-primary-light)] h-3 rounded-full transition-all duration-1000 ease-out"
-                          style={{ width: `${progressPercentage}%` }}
-                        ></div>
-                      </div>
-                    </div>
-                  </div>
+									{certificate?.pdfUrl ? (
+										<a
+											href={certificate.pdfUrl}
+											target="_blank"
+											rel="noopener noreferrer"
+											className="inline-flex items-center justify-center w-full px-8 py-4 bg-[var(--color-primary-light)] text-[var(--color-surface)] font-semibold rounded-xl hover:bg-[var(--color-primary-dark)] transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+										>
+											<span className="mr-2 text-lg">📄</span>
+											View & Download Certificate
+										</a>
+									) : (
+										<button
+											className="inline-flex items-center justify-center w-full px-8 py-4 bg-[var(--color-primary-light)] text-[var(--color-surface)] font-semibold rounded-xl hover:bg-[var(--color-primary-dark)] transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+											onClick={createCertificate}
+											disabled={certLoading}
+										>
+											<span className="mr-2 text-lg">✨</span>
+											{certLoading ? "Generating..." : "Generate Certificate"}
+										</button>
+									)}
+								</div>
 
-                  {certificate && (
-                    <div className="bg-[var(--color-background)] rounded-xl p-6 border border-[var(--color-primary-light)]/10">
-                      <h4 className="text-lg font-semibold text-[var(--color-primary-dark)] mb-4 flex items-center">
-                        <span className="mr-2">🔖</span>
-                        Certificate Details
-                      </h4>
-                      <div className="space-y-3 text-sm">
-                        <div className="flex justify-between items-center">
-                          <span className="text-[var(--color-muted)]">Certificate No:</span>
-                          <span className="font-mono text-xs bg-[var(--color-surface)] px-2 py-1 rounded">
-                            {certificate.certificateNumber}
-                          </span>
-                        </div>
-                        <div className="flex justify-between items-center">
-                          <span className="text-[var(--color-muted)]">Issue Date:</span>
-                          <span className="font-medium text-[var(--color-primary-dark)]">
-                            {certificate.issuedAt && new Date(certificate.issuedAt).toLocaleDateString()}
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-                </div>
-              </div>
-            </div>
-          </div>
-        ) : selectedLesson ? (
-          <div className="max-w-5xl mx-auto relative">
-            <LessonContent
-              selectedLesson={selectedLesson}
-              content={content}
-              isContentLoading={isContentLoading}
-              isContentError={isContentError}
-              contentError={contentError}
-              currentLessonIndex={currentLessonIndex}
-              allLessons={allItems}
-              goToPrevLesson={goToPrevLesson}
-              goToNextLesson={goToNextLesson}
-              markLessonComplete={markLessonComplete}
-            />
-            {selectedLesson.isLocked && (
-              <LockOverlay message="Complete the previous lesson to unlock this content" />
-            )}
-          </div>
-        ) : (
-          <div className="flex flex-col items-center justify-center h-full space-y-6 animate-fade-in">
-            <div className="w-32 h-32 rounded-full bg-gradient-to-br from-blue-100 to-indigo-100 flex items-center justify-center mb-4">
-              <svg className="w-16 h-16 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-              </svg>
-            </div>
-            <h3 className="text-2xl font-bold text-gray-800 mb-2">Ready to Learn?</h3>
-            <p className="text-gray-600 text-center max-w-md">
-              Select a lesson from the sidebar to begin your learning journey
-            </p>
-          </div>
-        )}
-      </div>
-    </div>
-  );
+								{/* Achievement Stats */}
+								<div className="space-y-6">
+									<div className="bg-[var(--color-background)] rounded-xl p-6 border border-[var(--color-primary-light)]/10">
+										<h4 className="text-lg font-semibold text-[var(--color-primary-dark)] mb-4 flex items-center">
+											<span className="mr-2">📊</span>
+											Achievement Summary
+										</h4>
+										<div className="space-y-4">
+											<div className="flex justify-between items-center">
+												<span className="text-[var(--color-muted)]">
+													Lessons Completed
+												</span>
+												<span className="font-bold text-[var(--color-primary-light)]">
+													{completedLessons}/{totalLessons}
+												</span>
+											</div>
+											<div className="flex justify-between items-center">
+												<span className="text-[var(--color-muted)]">
+													Progress
+												</span>
+												<span className="font-bold text-[var(--color-primary-dark)]">
+													{progressPercentage}%
+												</span>
+											</div>
+											<div className="w-full bg-[var(--color-surface)] rounded-full h-3">
+												<div
+													className="bg-[var(--color-primary-light)] h-3 rounded-full transition-all duration-1000 ease-out"
+													style={{ width: `${progressPercentage}%` }}
+												></div>
+											</div>
+										</div>
+									</div>
+
+									{certificate && (
+										<div className="bg-[var(--color-background)] rounded-xl p-6 border border-[var(--color-primary-light)]/10">
+											<h4 className="text-lg font-semibold text-[var(--color-primary-dark)] mb-4 flex items-center">
+												<span className="mr-2">🔖</span>
+												Certificate Details
+											</h4>
+											<div className="space-y-3 text-sm">
+												<div className="flex justify-between items-center">
+													<span className="text-[var(--color-muted)]">
+														Certificate No:
+													</span>
+													<span className="font-mono text-xs bg-[var(--color-surface)] px-2 py-1 rounded">
+														{certificate.certificateNumber}
+													</span>
+												</div>
+												<div className="flex justify-between items-center">
+													<span className="text-[var(--color-muted)]">
+														Issue Date:
+													</span>
+													<span className="font-medium text-[var(--color-primary-dark)]">
+														{certificate.issuedAt &&
+															new Date(
+																certificate.issuedAt,
+															).toLocaleDateString()}
+													</span>
+												</div>
+											</div>
+										</div>
+									)}
+								</div>
+							</div>
+						</div>
+					</div>
+				) : selectedLesson ? (
+					<div className="max-w-5xl mx-auto relative">
+						<LessonContent
+							selectedLesson={selectedLesson}
+							content={content}
+							isContentLoading={isContentLoading}
+							isContentError={isContentError}
+							contentError={contentError}
+							currentLessonIndex={currentLessonIndex}
+							allLessons={allItems}
+							goToPrevLesson={goToPrevLesson}
+							goToNextLesson={goToNextLesson}
+							markLessonComplete={markLessonComplete}
+						/>
+						{selectedLesson.isLocked && (
+							<LockOverlay message="Complete the previous lesson to unlock this content" />
+						)}
+					</div>
+				) : (
+					<div className="flex flex-col items-center justify-center h-full space-y-6 animate-fade-in">
+						<div className="w-32 h-32 rounded-full bg-gradient-to-br from-blue-100 to-indigo-100 flex items-center justify-center mb-4">
+							<svg
+								className="w-16 h-16 text-blue-500"
+								fill="none"
+								stroke="currentColor"
+								viewBox="0 0 24 24"
+							>
+								<path
+									strokeLinecap="round"
+									strokeLinejoin="round"
+									strokeWidth={1.5}
+									d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
+								/>
+							</svg>
+						</div>
+						<h3 className="text-2xl font-bold text-gray-800 mb-2">
+							Ready to Learn?
+						</h3>
+						<p className="text-gray-600 text-center max-w-md">
+							Select a lesson from the sidebar to begin your learning journey
+						</p>
+					</div>
+				)}
+			</div>
+		</div>
+	);
 }

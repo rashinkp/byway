@@ -4,27 +4,27 @@ import { useRouter } from "next/navigation";
 import { useAuthActions } from "./useAuthActions";
 
 export function useLogin() {
-  const { loginUser } = useAuthActions();
-  const router = useRouter();
+	const { loginUser } = useAuthActions();
+	const router = useRouter();
 
-  return useMutation({
-    mutationFn: ({ email, password }: { email: string; password: string }) =>
-      login(email, password),
-    onSuccess: (user) => {
-      console.log("Login success, user:", user);
-      
-      loginUser(user);
-      
-      const redirectPath =
-        user.role === "ADMIN"
-          ? "/admin"
-          : user.role === "INSTRUCTOR"
-          ? "/instructor"
-          : "/";
-      router.push(redirectPath);
-    },
-    onError: (error: any) => {
-      console.error("Login failed:", error.message);
-    },
-  });
+	return useMutation({
+		mutationFn: ({ email, password }: { email: string; password: string }) =>
+			login(email, password),
+		onSuccess: (user) => {
+			console.log("Login success, user:", user);
+
+			loginUser(user);
+
+			const redirectPath =
+				user.role === "ADMIN"
+					? "/admin"
+					: user.role === "INSTRUCTOR"
+						? "/instructor"
+						: "/";
+			router.push(redirectPath);
+		},
+		onError: (error: any) => {
+			console.error("Login failed:", error.message);
+		},
+	});
 }

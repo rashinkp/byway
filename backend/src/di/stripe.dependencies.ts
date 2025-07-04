@@ -1,7 +1,5 @@
-import { PrismaClient } from "@prisma/client";
 import { StripeController } from "../presentation/http/controllers/stripe.controller";
 import { SharedDependencies } from "./shared.dependencies";
-import { IPaymentService } from "../app/services/payment/interfaces/payment.service.interface";
 
 export interface StripeDependencies {
   stripeController: StripeController;

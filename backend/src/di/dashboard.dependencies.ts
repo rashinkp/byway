@@ -7,7 +7,6 @@ import { GetEnrollmentStatsUseCase } from "../app/usecases/enrollment/implementa
 import { GetDashboardUseCase } from "../app/usecases/dashboard/implementations/get-dashboard.usecase";
 import { GetInstructorDashboardUseCase } from "../app/usecases/dashboard/implementations/get-instructor-dashboard.usecase";
 import { DashboardController } from "../presentation/http/controllers/dashboard.controller";
-import { GetLatestRevenueUseCase } from "../app/usecases/revenue/implementations/get-latest-revenue.usecase";
 
 export const createDashboardDependencies = (sharedDeps: SharedDependencies) => {
   const { 
@@ -26,7 +25,6 @@ export const createDashboardDependencies = (sharedDeps: SharedDependencies) => {
   const getUserStatsUseCase = new GetUserStatsUseCase(userRepository);
   const getTopInstructorsUseCase = new GetTopInstructorsUseCase(instructorRepository);
   const getEnrollmentStatsUseCase = new GetEnrollmentStatsUseCase(enrollmentRepository);
-  const getLatestRevenueUseCase = new GetLatestRevenueUseCase(revenueRepository);
 
   // Create main dashboard use case
   const getDashboardUseCase = new GetDashboardUseCase(

@@ -6,18 +6,17 @@ export function socketHandler(
   io?: SocketIOServer
 ) {
   return async function (this: Socket, data: any) {
-    const socket = this;
     try {
-      const result = await handler(data, socket, io!);
+      const result = await handler(data, this, io!);
       if (emitEvent && result !== undefined) {
         if (emitEvent === 'broadcast') {
           io!.to(data.chatId).emit("message", result);
         } else {
-          socket.emit(emitEvent, result);
+          this.emit(emitEvent, result);
         }
       }
     } catch (err: any) {
-      socket.emit("error", { message: err.message || "Operation failed" });
+      this.emit("error", { message: err.message || "Operation failed" });
     }
   };
 } 

@@ -1,1 +1,1 @@
-export { SkeletonLayout } from './SkeletonLayout'; 
+export { SkeletonLayout } from "./SkeletonLayout";

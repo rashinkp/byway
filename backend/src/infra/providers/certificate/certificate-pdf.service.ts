@@ -152,7 +152,6 @@ export class CertificatePdfService implements CertificatePdfServiceInterface {
     doc.circle(centerX, centerY, 3).fill();
 
     // Side flourishes
-    const length = 30;
     const curves = 5;
 
     for (let side = -1; side <= 1; side += 2) {

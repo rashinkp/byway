@@ -11,12 +11,10 @@ import { IDeleteMessageUseCase } from "../../../app/usecases/message/interfaces/
 import { IMarkReadMessagesUseCase } from '../../../app/usecases/message/interfaces/mark-read-messages.usecase.interface';
 import { UserId } from "../../../domain/value-object/UserId";
 import { ChatId } from "../../../domain/value-object/ChatId";
-import { MessageContent } from "../../../domain/value-object/MessageContent";
 import { MessageId } from "../../../domain/value-object/MessageId";
 import { IHttpRequest } from "../interfaces/http-request.interface";
 import { IHttpResponse } from "../interfaces/http-response.interface";
 import {
-  sendMessageSchema,
   sendMessageSocketSchema,
   createChatSchema,
   getChatHistorySchema,

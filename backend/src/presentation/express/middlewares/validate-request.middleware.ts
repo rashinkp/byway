@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import { StatusCodes } from "http-status-codes";
-import { z, ZodError, ZodSchema } from "zod";
+import {  ZodError, ZodSchema } from "zod";
 import { HttpError } from "../../http/errors/http-error";
 
 interface ValidationSchema {

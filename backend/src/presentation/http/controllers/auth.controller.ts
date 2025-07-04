@@ -123,7 +123,7 @@ export class AuthController extends BaseController {
   }
 
   async logout(httpRequest: IHttpRequest): Promise<IHttpResponse> {
-    return this.handleRequest(httpRequest, async (request) => {
+    return this.handleRequest(httpRequest, async () => {
       await this.logoutUseCase.execute();
       return {
         statusCode: 200,

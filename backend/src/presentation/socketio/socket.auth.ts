@@ -31,7 +31,7 @@ export async function socketAuthMiddleware(socket: Socket, next: (err?: Error) =
     }
     
     next();
-  } catch (err) {
+  } catch {
     next();
   }
 } 

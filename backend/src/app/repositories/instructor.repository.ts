@@ -1,5 +1,4 @@
 import { Instructor } from "../../domain/entities/instructor.entity";
-import { APPROVALSTATUS } from "../../domain/enum/approval-status.enum";
 import { IGetTopInstructorsInput, ITopInstructor } from "../usecases/user/interfaces/get-top-instructors.usecase.interface";
 
 export interface IInstructorRepository {

@@ -9,9 +9,6 @@ import {
 } from "../../domain/dtos/course/course.dto";
 import { CourseLevel } from "../../domain/enum/course-level.enum";
 import { CourseStatus } from "../../domain/enum/course-status.enum";
-import { Price } from "../../domain/value-object/price";
-import { Duration } from "../../domain/value-object/duration";
-import { Offer } from "../../domain/value-object/offer";
 
 interface ValidationSchema {
   body?: z.ZodSchema;

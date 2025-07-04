@@ -1,6 +1,5 @@
 import { Router } from "express";
 import { restrictTo, optionalAuth } from "../middlewares/auth.middleware";
-import { validateRequest } from "../middlewares/validate-request.middleware";
 
 import { CourseReviewController } from "../../http/controllers/course-review.controller";
 import { expressAdapter } from "../../adapters/express.adapter";

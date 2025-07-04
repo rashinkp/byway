@@ -213,7 +213,7 @@ export class CourseController extends BaseController {
       const io = getSocketIOInstance();
       if (io && course.createdBy) {
         io.to(course.createdBy).emit('newNotification', {
-          message: `Your course \"${course.title}\" has been approved!`,
+          message: `Your course "${course.title}" has been approved!`,
           type: 'COURSE_APPROVED',
           courseId: course.id,
           courseTitle: course.title,
@@ -241,7 +241,7 @@ export class CourseController extends BaseController {
       const io = getSocketIOInstance();
       if (io && course.createdBy) {
         io.to(course.createdBy).emit('newNotification', {
-          message: `Your course \"${course.title}\" has been declined. Please review and update as needed.`,
+          message: `Your course "${course.title}" has been declined. Please review and update as needed.`,
           type: 'COURSE_DECLINED',
           courseId: course.id,
           courseTitle: course.title,
@@ -270,7 +270,7 @@ export class CourseController extends BaseController {
   }
 
   async getCourseStats(httpRequest: IHttpRequest): Promise<IHttpResponse> {
-    return this.handleRequest(httpRequest, async (request) => {
+    return this.handleRequest(httpRequest, async () => {
       const stats = await this.getCourseStatsUseCase.execute({ isAdmin: true });
       return this.success_200(stats, "Course statistics retrieved successfully");
     });

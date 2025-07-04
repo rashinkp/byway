@@ -11,7 +11,7 @@ export class JwtProvider implements IJwtProvider {
   verify(token: string): object | null {
     try {
       return jwt.verify(token, envConfig.JWT_SECRET) as object;
-    } catch (error) {
+    } catch {
       return null;
     }
   }

@@ -9,9 +9,6 @@ import { ResetPasswordUseCase } from "../app/usecases/auth/implementations/reset
 import { VerifyOtpUseCase } from "../app/usecases/auth/implementations/verify-otp.usecase";
 import { GetVerificationStatusUseCase } from "../app/usecases/auth/get-verification-status.usecase";
 import { AuthController } from "../presentation/http/controllers/auth.controller";
-import { HttpErrors } from "../presentation/http/http.errors";
-import { HttpSuccess } from "../presentation/http/http.success";
-import { CookieService } from "../presentation/http/utils/cookie.service";
 import { SharedDependencies } from "./shared.dependencies";
 
 export interface AuthDependencies {

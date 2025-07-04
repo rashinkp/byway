@@ -1,5 +1,3 @@
-import { Course } from "../entities/course.entity";
-
 export class WebhookMetadata {
   private constructor(
     public readonly userId?: string,

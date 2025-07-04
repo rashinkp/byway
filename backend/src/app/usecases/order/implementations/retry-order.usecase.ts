@@ -5,10 +5,8 @@ import { ICreateTransactionUseCase } from "../../transaction/interfaces/create-t
 import { TransactionType } from "../../../../domain/enum/transaction-type.enum";
 import { TransactionStatus } from "../../../../domain/enum/transaction-status.enum";
 import { PaymentGateway } from "../../../../domain/enum/payment-gateway.enum";
-import { OrderStatus } from "../../../../domain/enum/order-status.enum";
 import { HttpError } from "../../../../presentation/http/errors/http-error";
 import { StatusCodes } from "http-status-codes";
-import { CreateCheckoutSessionDto } from "../../../../domain/dtos/stripe/create-checkout-session.dto";
 
 export class RetryOrderUseCase implements IRetryOrderUseCase {
   constructor(

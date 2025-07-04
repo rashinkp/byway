@@ -8,8 +8,6 @@ import { registerNotificationHandlers } from "./handlers/notification.handlers";
 import { ChatController } from "../http/controllers/chat.controller";
 import { NotificationController } from '../http/controllers/notification.controller';
 import { WinstonLogger } from "../../infra/providers/logging/winston.logger";
-import { GetUserNotificationsUseCaseInterface } from "../../app/usecases/notification/interfaces/get-user-notifications.usecase.interface";
-
 let ioInstance: SocketIOServer | null = null;
 
 export function setupSocketIO(
@@ -35,7 +33,7 @@ export function setupSocketIO(
     }
 
     // Register modular handlers
-    registerRoomHandlers(socket, io);
+    registerRoomHandlers(socket);
     registerChatHandlers(socket, io, chatController);
     registerMessageHandlers(socket, io, chatController);
     registerNotificationHandlers(socket, io, notificationController);

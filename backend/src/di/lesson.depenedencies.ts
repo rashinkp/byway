@@ -14,7 +14,7 @@ export interface LessonDependencies {
 export function createLessonDependencies(
   deps: SharedDependencies
 ): LessonDependencies {
-  const { lessonRepository, lessonContentRepository } = deps;
+  const { lessonRepository } = deps;
 
   const createLessonUseCase = new CreateLessonUseCase(
     lessonRepository,

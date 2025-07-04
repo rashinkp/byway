@@ -5,102 +5,104 @@ import { IGetAllCoursesInput, Course, CourseApiResponse } from "@/types/course";
 import { getAllCourses } from "@/api/course";
 
 interface UseCoursesReturn {
-  data: { items: Course[]; total: number; totalPages: number } | undefined;
-  isLoading: boolean;
-  error: { message: string } | null;
-  refetch: () => void;
+	data: { items: Course[]; total: number; totalPages: number } | undefined;
+	isLoading: boolean;
+	error: { message: string } | null;
+	refetch: () => void;
 }
 
-export function useGetAllCourses({
-  page = 1,
-  limit = 10,
-  search = "",
-  includeDeleted = false,
-  sortOrder = "asc",
-  sortBy = "title",
-  filterBy = "All",
-  myCourses = false,
-  role = "USER",
-  level = "All",
-  duration = "All",
-  price = "All",
-  categoryId,
-}: IGetAllCoursesInput = {}): UseCoursesReturn {
-  let adjustedSortBy: IGetAllCoursesInput["sortBy"] = sortBy;
-  let adjustedSortOrder: IGetAllCoursesInput["sortOrder"] = sortOrder;
+export function useGetAllCourses(
+	{
+		page = 1,
+		limit = 10,
+		search = "",
+		includeDeleted = false,
+		sortOrder = "asc",
+		sortBy = "title",
+		filterBy = "All",
+		myCourses = false,
+		role = "USER",
+		level = "All",
+		duration = "All",
+		price = "All",
+		categoryId,
+	}: IGetAllCoursesInput = {} as IGetAllCoursesInput,
+): UseCoursesReturn {
+	let adjustedSortBy: IGetAllCoursesInput["sortBy"] = sortBy;
+	let adjustedSortOrder: IGetAllCoursesInput["sortOrder"] = sortOrder;
 
-  // Handle negative sortBy (e.g., "-title" for descending)
-  if (sortBy?.startsWith("-")) {
-    adjustedSortBy = sortBy.slice(1) as IGetAllCoursesInput["sortBy"];
-    adjustedSortOrder = sortOrder === "asc" ? "desc" : "asc";
-  }
+	// Handle negative sortBy (e.g., "-title" for descending)
+	if (sortBy?.startsWith("-")) {
+		adjustedSortBy = sortBy.slice(1) as IGetAllCoursesInput["sortBy"];
+		adjustedSortOrder = sortOrder === "asc" ? "desc" : "asc";
+	}
 
-  // Adjust includeDeleted based on filterBy
-  const shouldIncludeDeleted =
-    filterBy === "Inactive"
-      ? true
-      : filterBy === "Active"
-      ? false
-      : includeDeleted;
+	// Adjust includeDeleted based on filterBy
+	const shouldIncludeDeleted =
+		filterBy === "Inactive"
+			? true
+			: filterBy === "Active"
+				? false
+				: includeDeleted;
 
-  const { data, isLoading, error, refetch } = useQuery<CourseApiResponse>({
-    queryKey: [
-      "courses",
-      {
-        page,
-        limit,
-        search,
-        sortBy,
-        sortOrder,
-        filterBy,
-        myCourses,
-        role,
-        level,
-        duration,
-        price,
-        includeDeleted: shouldIncludeDeleted,
-        categoryId,
-      },
-    ],
-    queryFn: async () => {
-      const response = await getAllCourses({
-        page,
-        limit,
-        search,
-        includeDeleted: shouldIncludeDeleted,
-        sortOrder: adjustedSortOrder,
-        sortBy: adjustedSortBy,
-        filterBy,
-        myCourses,
-        role,
-        level,
-        duration,
-        price,
-        categoryId,
-      });
-      return response;
-    },
-  });
+	const { data, isLoading, error, refetch } = useQuery<CourseApiResponse>({
+		queryKey: [
+			"courses",
+			{
+				page,
+				limit,
+				search,
+				sortBy,
+				sortOrder,
+				filterBy,
+				myCourses,
+				role,
+				level,
+				duration,
+				price,
+				includeDeleted: shouldIncludeDeleted,
+				categoryId,
+			},
+		],
+		queryFn: async () => {
+			const response = await getAllCourses({
+				page,
+				limit,
+				search,
+				includeDeleted: shouldIncludeDeleted,
+				sortOrder: adjustedSortOrder,
+				sortBy: adjustedSortBy,
+				filterBy,
+				myCourses,
+				role,
+				level,
+				duration,
+				price,
+				categoryId,
+			});
+			return response;
+		},
+	});
 
-  const mappedError = error
-    ? {
-        message:
-          error instanceof Error
-            ? error.message
-            : "An unexpected error occurred",
-      }
-    : null;
+	const mappedError = error
+		? {
+				message:
+					error instanceof Error
+						? error.message
+						: "An unexpected error occurred",
+			}
+		: null;
 
-  return {
-    data: data
-      ? {
-          items: data.courses,
-          total: data.total,
-          totalPages: data.totalPage,
-        }
-      : undefined,
-    isLoading,
-    error: mappedError,
-    refetch,
-  };
+	return {
+		data: data
+			? {
+					items: data.courses,
+					total: data.total,
+					totalPages: data.totalPage,
+				}
+			: undefined,
+		isLoading,
+		error: mappedError,
+		refetch,
+	};
 }

@@ -11,8 +11,8 @@ export class Message {
     public readonly chatId: ChatId,
     public readonly senderId: UserId,
     public readonly content: MessageContent | null,
-    public readonly imageUrl: String | null,
-    public readonly audioUrl: String | null,
+    public readonly imageUrl: string | null,
+    public readonly audioUrl: string | null,
     public readonly type: MessageType,
     public readonly isRead: boolean,
     public readonly createdAt: Timestamp

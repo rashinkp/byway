@@ -2,7 +2,6 @@ import { GetAllUsersDto } from "../../domain/dtos/user/user.dto";
 import { User } from "../../domain/entities/user.entity";
 import { UserProfile } from "../../domain/entities/user-profile.entity";
 import { IUserStats, IGetUserStatsInput } from "../usecases/user/interfaces/get-user-stats.usecase.interface";
-import { ITopInstructor, IGetTopInstructorsInput } from "../usecases/user/interfaces/get-top-instructors.usecase.interface";
 
 export interface IPaginatedResponse<T> {
   items: T[];

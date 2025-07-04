@@ -1,38 +1,26 @@
 "use client";
 
 import { Header } from "@/components/layout/Header";
-import NotificationModal from '@/components/notifications/NotificationModal';
-import { useState } from 'react';
-import { usePathname } from "next/navigation";
+import NotificationModal from "@/components/notifications/NotificationModal";
+import { useState } from "react";
 import BywayFooter from "@/components/layout/Footer";
 
 export default function PublicLayout({
-  children,
+	children,
 }: {
-  children: React.ReactNode;
+	children: React.ReactNode;
 }) {
-  const [notificationOpen, setNotificationOpen] = useState(false);
-  const pathname = usePathname();
-  
-  // Define authentication pages where breadcrumb should be hidden
-  const authPages = [
-    '/login',
-    '/signup', 
-    '/forgot-password',
-    '/reset-password',
-    '/verify-otp',
-    '/'
-  ];
-  
-  // Check if current page is an authentication page
-  const isAuthPage = authPages.includes(pathname);
-  
-  return (
-    <div className="flex flex-col min-h-screen">
-      <Header onNotificationClick={() => setNotificationOpen(true)} />
-      <NotificationModal open={notificationOpen} onOpenChange={setNotificationOpen} />
-      <main className="flex-1">{children}</main>
-      <BywayFooter />
-    </div>
-  );
+	const [notificationOpen, setNotificationOpen] = useState(false);
+
+	return (
+		<div className="flex flex-col min-h-screen">
+			<Header onNotificationClick={() => setNotificationOpen(true)} />
+			<NotificationModal
+				open={notificationOpen}
+				onOpenChange={setNotificationOpen}
+			/>
+			<main className="flex-1">{children}</main>
+			<BywayFooter />
+		</div>
+	);
 }

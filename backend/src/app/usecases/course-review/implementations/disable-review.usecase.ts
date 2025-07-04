@@ -6,7 +6,7 @@ export class DisableReviewUseCase implements IDisableReviewUseCase {
     private readonly courseReviewRepository: ICourseReviewRepository
   ) {}
 
-  async execute(reviewId: string, adminId: string): Promise<{ action: 'disabled' | 'enabled' }> {
+  async execute(reviewId: string): Promise<{ action: 'disabled' | 'enabled' }> {
     // Find the review
     const review = await this.courseReviewRepository.findById(reviewId);
     if (!review) {

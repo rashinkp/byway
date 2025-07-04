@@ -16,7 +16,7 @@ export class GetMessagesByChatUseCase implements IGetMessagesByChatUseCase {
     if (!chat) return [];
     return messages.map((msg) => {
       // Infer receiverId: the other participant in the chat
-      let receiverId = chat.user1Id.value === msg.senderId ? chat.user2Id.value : chat.user1Id.value;
+      const receiverId = chat.user1Id.value === msg.senderId ? chat.user2Id.value : chat.user1Id.value;
       return {
         id: msg.id,
         chatId: msg.chatId,

@@ -67,7 +67,7 @@ export class GetEnrolledCoursesUseCase implements IGetEnrolledCoursesUseCase {
         ...result,
         courses: enhancedCourses,
       };
-    } catch (error) {
+    } catch {
       throw new HttpError("Failed to retrieve enrolled courses", 500);
     }
   }

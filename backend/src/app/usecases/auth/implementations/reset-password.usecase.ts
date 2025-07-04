@@ -1,4 +1,3 @@
-import { User } from "../../../../domain/entities/user.entity";
 import { IAuthRepository } from "../../../repositories/auth.repository";
 import { HttpError } from "../../../../presentation/http/errors/http-error";
 import * as bcrypt from "bcrypt";

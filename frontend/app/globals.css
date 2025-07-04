@@ -1,131 +1,128 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 
-
-
 /* ───────────────────── Nature (your original for reference) ─────────────────── */
 [data-theme="nature"] {
-  --color-primary-dark: #093B3B;
-  --color-primary-light: #136E61;
+	--color-primary-dark: #093b3b;
+	--color-primary-light: #136e61;
 
-  --color-background: #E8F6F3;
-  --color-surface: #FFFFFF;
-  --color-muted: #7C8685;
+	--color-background: #e8f6f3;
+	--color-surface: #ffffff;
+	--color-muted: #7c8685;
 
-  --color-accent: #EAF141;
-  --color-warning: #FFC107;
-  --color-danger:  #DC3545;
+	--color-accent: #eaf141;
+	--color-warning: #ffc107;
+	--color-danger: #dc3545;
 }
 
 /* ───────────────────────────── Sunrise ───────────────────────────── */
 [data-theme="sunrise"] {
-  --color-primary-dark: #9A3412;   /* orange-800 */
-  --color-primary-light: #FB923C;  /* orange-400 */
+	--color-primary-dark: #9a3412; /* orange-800 */
+	--color-primary-light: #fb923c; /* orange-400 */
 
-  --color-background: #FFF7ED;     /* orange-50  */
-  --color-surface:    #FFFFFF;
-  --color-muted:      #FED7AA;     /* orange-200 */
+	--color-background: #fff7ed; /* orange-50  */
+	--color-surface: #ffffff;
+	--color-muted: #fed7aa; /* orange-200 */
 
-  --color-accent:  #F59E0B;        /* amber-500  */
-  --color-warning: #EAB308;        /* yellow-500 */
-  --color-danger:  #DC2626;        /* red-600    */
+	--color-accent: #f59e0b; /* amber-500  */
+	--color-warning: #eab308; /* yellow-500 */
+	--color-danger: #dc2626; /* red-600    */
 }
 
 /* ───────────────────────────── Ocean ─────────────────────────────── */
 [data-theme="ocean"] {
-  --color-primary-dark: #075985;   /* sky-800   */
-  --color-primary-light: #38BDF8;  /* sky-400   */
+	--color-primary-dark: #075985; /* sky-800   */
+	--color-primary-light: #38bdf8; /* sky-400   */
 
-  --color-background: #F0F9FF;     /* sky-50    */
-  --color-surface:    #FFFFFF;
-  --color-muted:      #BAE6FD;     /* sky-200   */
+	--color-background: #f0f9ff; /* sky-50    */
+	--color-surface: #ffffff;
+	--color-muted: #bae6fd; /* sky-200   */
 
-  --color-accent:  #14B8A6;        /* teal-500  */
-  --color-warning: #F59E0B;        /* amber-500 */
-  --color-danger:  #EF4444;        /* red-500   */
+	--color-accent: #14b8a6; /* teal-500  */
+	--color-warning: #f59e0b; /* amber-500 */
+	--color-danger: #ef4444; /* red-500   */
 }
 
 /* ───────────────────────────── Forest ────────────────────────────── */
 [data-theme="forest"] {
-  --color-primary-dark: #14532D;   /* green-900 */
-  --color-primary-light: #4ADE80;  /* green-400 */
+	--color-primary-dark: #14532d; /* green-900 */
+	--color-primary-light: #4ade80; /* green-400 */
 
-  --color-background: #F0FDF4;     /* green-50  */
-  --color-surface:    #FFFFFF;
-  --color-muted:      #BBF7D0;     /* green-200 */
+	--color-background: #f0fdf4; /* green-50  */
+	--color-surface: #ffffff;
+	--color-muted: #bbf7d0; /* green-200 */
 
-  --color-accent:  #84CC16;        /* lime-500  */
-  --color-warning: #FBBF24;        /* amber-400 */
-  --color-danger:  #DC2626;        /* red-600   */
+	--color-accent: #84cc16; /* lime-500  */
+	--color-warning: #fbbf24; /* amber-400 */
+	--color-danger: #dc2626; /* red-600   */
 }
 
 /* ──────────────────────────── Midnight ───────────────────────────── */
 [data-theme="midnight"] {
-  --color-primary-dark: #0F172A;   /* slate-900 */
-  --color-primary-light: #475569;  /* slate-600 */
+	--color-primary-dark: #0f172a; /* slate-900 */
+	--color-primary-light: #475569; /* slate-600 */
 
-  --color-background: #020617;     /* slate-950 */
-  --color-surface:    #1E293B;     /* slate-800 */
-  --color-muted:      #64748B;     /* slate-500 */
+	--color-background: #020617; /* slate-950 */
+	--color-surface: #1e293b; /* slate-800 */
+	--color-muted: #64748b; /* slate-500 */
 
-  --color-accent:  #8B5CF6;        /* violet-500 */
-  --color-warning: #EAB308;        /* yellow-500 */
-  --color-danger:  #F43F5E;        /* rose-500   */
+	--color-accent: #8b5cf6; /* violet-500 */
+	--color-warning: #eab308; /* yellow-500 */
+	--color-danger: #f43f5e; /* rose-500   */
 }
 
 /* ───────────────────────────── Rose ──────────────────────────────── */
 [data-theme="rose"] {
-  --color-primary-dark: #9F1239;   /* rose-800 */
-  --color-primary-light: #FB7185;  /* rose-400 */
+	--color-primary-dark: #9f1239; /* rose-800 */
+	--color-primary-light: #fb7185; /* rose-400 */
 
-  --color-background: #FFF1F2;     /* rose-50  */
-  --color-surface:    #FFFFFF;
-  --color-muted:      #FECDD3;     /* rose-200 */
+	--color-background: #fff1f2; /* rose-50  */
+	--color-surface: #ffffff;
+	--color-muted: #fecdd3; /* rose-200 */
 
-  --color-accent:  #F472B6;        /* pink-400  */
-  --color-warning: #FCD34D;        /* amber-300 */
-  --color-danger:  #E11D48;        /* rose-600  */
+	--color-accent: #f472b6; /* pink-400  */
+	--color-warning: #fcd34d; /* amber-300 */
+	--color-danger: #e11d48; /* rose-600  */
 }
 
 /* ───────────────────────────── Sand ──────────────────────────────── */
 [data-theme="sand"] {
-  --color-primary-dark: #1C1917;   /* stone-900 */
-  --color-primary-light: #A8A29E;  /* stone-400 */
+	--color-primary-dark: #1c1917; /* stone-900 */
+	--color-primary-light: #a8a29e; /* stone-400 */
 
-  --color-background: #FAFAF9;     /* stone-50  */
-  --color-surface:    #FFFFFF;
-  --color-muted:      #D6D3D1;     /* stone-300 */
+	--color-background: #fafaf9; /* stone-50  */
+	--color-surface: #ffffff;
+	--color-muted: #d6d3d1; /* stone-300 */
 
-  --color-accent:  #FBBF24;        /* amber-400 */
-  --color-warning: #EAB308;        /* yellow-500 */
-  --color-danger:  #DC2626;        /* red-600    */
+	--color-accent: #fbbf24; /* amber-400 */
+	--color-warning: #eab308; /* yellow-500 */
+	--color-danger: #dc2626; /* red-600    */
 }
 
 /* ───────────────────────────── Tech ──────────────────────────────── */
 [data-theme="tech"] {
-  --color-primary-dark: #3730A3;   /* indigo-800 */
-  --color-primary-light: #818CF8;  /* indigo-400 */
+	--color-primary-dark: #3730a3; /* indigo-800 */
+	--color-primary-light: #818cf8; /* indigo-400 */
 
-  --color-background: #EEF2FF;     /* indigo-50  */
-  --color-surface:    #FFFFFF;
-  --color-muted:      #C7D2FE;     /* indigo-200 */
+	--color-background: #eef2ff; /* indigo-50  */
+	--color-surface: #ffffff;
+	--color-muted: #c7d2fe; /* indigo-200 */
 
-  --color-accent:  #06B6D4;        /* cyan-500   */
-  --color-warning: #FACC15;        /* yellow-400 */
-  --color-danger:  #EF4444;        /* red-500    */
+	--color-accent: #06b6d4; /* cyan-500   */
+	--color-warning: #facc15; /* yellow-400 */
+	--color-danger: #ef4444; /* red-500    */
 }
 
 /* ───────────────────────────── Lime ──────────────────────────────── */
 [data-theme="lime"] {
-  --color-primary-dark: #3F6212;   /* lime-800 */
-  --color-primary-light: #A3E635;  /* lime-400 */
+	--color-primary-dark: #3f6212; /* lime-800 */
+	--color-primary-light: #a3e635; /* lime-400 */
 
-  --color-background: #F7FEE7;     /* lime-50  */
-  --color-surface:    #FFFFFF;
-  --color-muted:      #D9F99D;     /* lime-200 */
+	--color-background: #f7fee7; /* lime-50  */
+	--color-surface: #ffffff;
+	--color-muted: #d9f99d; /* lime-200 */
 
-  --color-accent:  #84CC16;        /* lime-500  */
-  --color-warning: #FBBF24;        /* amber-400 */
-  --color-danger:  #DC2626;        /* red-600   */
+	--color-accent: #84cc16; /* lime-500  */
+	--color-warning: #fbbf24; /* amber-400 */
+	--color-danger: #dc2626; /* red-600   */
 }
-

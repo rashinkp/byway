@@ -31,17 +31,9 @@ export class ChatRepository implements IChatRepository {
     return chats.map(this.toDomain);
   }
 
-  async findEnhancedChatList(userId: UserId, page: number = 1, limit: number = 10, search?: string, sort?: string, filter?: string): Promise<PaginatedChatListDTO> {
+  async findEnhancedChatList(userId: UserId, page: number = 1, limit: number = 10, search?: string, sort?: string): Promise<PaginatedChatListDTO> {
     const offset = (page - 1) * limit;
     
-    // Build where clause for search
-    const chatWhere: any = {
-      OR: [
-        { user1Id: userId.value },
-        { user2Id: userId.value },
-      ],
-    };
-
     let chatItems: EnhancedChatListItemDTO[] = [];
     if (search) {
       const normalizedSearch = search.trim().toLowerCase();
@@ -236,11 +228,6 @@ export class ChatRepository implements IChatRepository {
         };
       }));
     }
-
-    // Determine sort order
-    let orderBy: any = { updatedAt: 'desc' };
-    if (sort === 'name') orderBy = { user1: { name: 'asc' } };
-    if (sort === 'updatedAt') orderBy = { updatedAt: 'desc' };
 
     // If we have fewer chats than the limit, fill with other users
     let userItems: EnhancedChatListItemDTO[] = [];

@@ -6,18 +6,11 @@ import { IUpdateUserUseCase } from "../../../app/usecases/user/interfaces/update
 import { IGetPublicUserUseCase } from "../../../app/usecases/user/interfaces/get-user-public.usecase.interface";
 import { IGetUserAdminDetailsUseCase } from "../../../app/usecases/user/interfaces/get-user-admin-details.usecase.interface";
 import {
-  ApiResponse,
-  PublicUserResponse,
-  UserResponse,
-} from "../interfaces/ApiResponse";
-import {
   validateGetAllUsers,
   validateGetUser,
   validateToggleDeleteUser,
   validateUpdateUser,
 } from "../../validators/user.validator";
-import { StatusCodes } from "http-status-codes";
-import { ZodError } from "zod";
 import { IHttpErrors } from "../interfaces/http-errors.interface";
 import { IHttpSuccess } from "../interfaces/http-success.interface";
 import { IHttpRequest } from "../interfaces/http-request.interface";

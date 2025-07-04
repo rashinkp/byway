@@ -4,6 +4,7 @@ import { WinstonLogger } from "../../../infra/providers/logging/winston.logger";
 import { PrismaDatabaseProvider } from "../../../infra/database/postgres/prisma.database.provider";
 import { setupSocketIO } from "../../socketio";
 import { createAppDependencies } from "../../../di/app.dependencies";
+import { createApp } from "./app";
 
 const startServer = async (): Promise<void> => {
   const logger = new WinstonLogger();
@@ -12,7 +13,7 @@ const startServer = async (): Promise<void> => {
   try {
     await databaseProvider.connect();
     const deps = createAppDependencies();
-    const app = require("./app").createApp(deps);
+    const app = createApp(deps);
     const server = http.createServer(app);
 
     const PORT = envConfig.PORT || 5001;

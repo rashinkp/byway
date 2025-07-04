@@ -1,12 +1,11 @@
-import { User } from "../../../../domain/entities/user.entity";
 import { IAuthRepository } from "../../../repositories/auth.repository";
-
 import { IUpdateUserRequestDTO } from "../../../../domain/entities/user.entity";
 import { IGoogleAuthUseCase } from "../interfaces/google-auth.usecase.interface";
 import { Role } from "../../../../domain/enum/role.enum";
 import { AuthProvider } from "../../../../domain/enum/auth-provider.enum";
 import { GoogleAuthGateway, GoogleUserInfo } from "../../../providers/I.google-auth.provider";
 import { HttpError } from "../../../../presentation/http/errors/http-error";
+import { User } from "../../../../domain/entities/user.entity";
 
 export class GoogleAuthUseCase implements IGoogleAuthUseCase {
   constructor(
@@ -18,7 +17,7 @@ export class GoogleAuthUseCase implements IGoogleAuthUseCase {
     let googleUser: GoogleUserInfo;
     try {
       googleUser = await this.googleAuthGateway.getUserInfo(accessToken);
-    } catch (error) {
+    } catch {
       throw new HttpError("Invalid Google access token", 401);
     }
 

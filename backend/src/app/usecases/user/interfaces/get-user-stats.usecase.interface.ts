@@ -7,7 +7,7 @@ export interface IUserStats {
   inactiveInstructors: number;
 }
 
-export interface IGetUserStatsInput {}
+export type IGetUserStatsInput = object;
 
 export interface IGetUserStatsUseCase {
   execute(input: IGetUserStatsInput): Promise<IUserStats>;

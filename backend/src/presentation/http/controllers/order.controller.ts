@@ -5,7 +5,6 @@ import { IRetryOrderUseCase } from "../../../app/usecases/order/interfaces/retry
 import { IHttpErrors } from "../interfaces/http-errors.interface";
 import { IHttpSuccess } from "../interfaces/http-success.interface";
 import { validateGetAllOrders } from "../../validators/order.validators";
-import { GetAllOrdersDtoSchema } from "../../../domain/dtos/order/order.dto";
 import { CreateOrderDtoSchema } from "../../../domain/dtos/order/create-order.dto";
 import { IHttpRequest } from "../interfaces/http-request.interface";
 import { IHttpResponse } from "../interfaces/http-response.interface";

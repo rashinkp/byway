@@ -8,7 +8,6 @@ import { IUpdateCourseUseCase } from "../interfaces/update-course.usecase.interf
 import { Price } from "../../../../domain/value-object/price";
 import { Duration } from "../../../../domain/value-object/duration";
 import { Offer } from "../../../../domain/value-object/offer";
-import { Course } from "../../../../domain/entities/course.entity";
 
 export class UpdateCourseUseCase implements IUpdateCourseUseCase {
   constructor(

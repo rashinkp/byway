@@ -14,7 +14,7 @@ export class GetInstructorDashboardUseCase implements IGetInstructorDashboardUse
   ) {}
 
   async execute(input: IGetInstructorDashboardInput): Promise<IInstructorDashboardResponse> {
-    const { instructorId, limit = 5, startDate, endDate } = input;
+    const { instructorId, limit = 5 } = input;
 
     // Get all courses by this instructor (including deleted courses)
     const coursesResponse = await this.courseRepository.findAll({ 
@@ -55,7 +55,7 @@ export class GetInstructorDashboardUseCase implements IGetInstructorDashboardUse
     let totalRevenue = 0;
     try {
       totalRevenue = await this.revenueRepository.getTotalRevenue(instructorId);
-    } catch (error) {
+    } catch {
       // Fallback: calculate from enrollments if revenue method not available
       totalRevenue = enrollments.reduce((sum: number, e: any) => {
         if (e.orderItem && e.orderItem.order && e.orderItem.order.paymentStatus === 'COMPLETED') {

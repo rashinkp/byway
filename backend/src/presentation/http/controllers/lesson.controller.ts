@@ -9,9 +9,7 @@ import { IGetLessonByIdUseCase } from "../../../app/usecases/lesson/interfaces/g
 import { IGetAllLessonsUseCase } from "../../../app/usecases/lesson/interfaces/get-all-lessons.usecase.interface";
 import { IDeleteLessonUseCase } from "../../../app/usecases/lesson/interfaces/delete-lesson.usecase.interface";
 import { IGetPublicLessonsUseCase } from "../../../app/usecases/lesson/interfaces/get-public-lessons.usecase.interface";
-import { ILessonListOutputDTO, ILessonOutputDTO, IPublicLessonListOutputDTO } from "../../../domain/dtos/lesson/lesson.dto";
 import { validateCreateLesson, validateDeleteLesson, validateGetAllLessons, validateGetLessonById, validateGetPublicLessons, validateUpdateLesson } from "../../validators/lesson.validators";
-import { HttpError } from "../errors/http-error";
 import { BaseController } from "./base.controller";
 
 export class LessonController extends BaseController {

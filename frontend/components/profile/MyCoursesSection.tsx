@@ -11,129 +11,132 @@ import Link from "next/link";
 import { BookOpen } from "lucide-react";
 
 export default function MyCoursesSection() {
-  const itemsPerPage = 8;
-  const [currentPage, setCurrentPage] = useState(1);
-  const [isLoaded, setIsLoaded] = useState(false);
+	const itemsPerPage = 8;
+	const [currentPage, setCurrentPage] = useState(1);
+	const [isLoaded, setIsLoaded] = useState(false);
 
-  const { data, isLoading, error } = useGetEnrolledCourses({
-    page: currentPage,
-    limit: itemsPerPage,
-    sortBy: "enrolledAt",
-    sortOrder: "desc",
-    search: "",
-    level: "All",
-  });
+	const { data, isLoading, error } = useGetEnrolledCourses({
+		page: currentPage,
+		limit: itemsPerPage,
+		sortBy: "enrolledAt",
+		sortOrder: "desc",
+		search: "",
+		level: "All",
+	});
 
-  const courses: Course[] = data?.items ?? [];
+	const courses: Course[] = data?.items ?? [];
 
-  // Calculate pagination values
-  const totalPages = data?.totalPages ?? 1;
+	// Calculate pagination values
+	const totalPages = data?.totalPages ?? 1;
 
-  // Handle animation loading state
-  useEffect(() => {
-    if (!isLoading) {
-      setIsLoaded(true);
-    }
-  }, [isLoading]);
+	// Handle animation loading state
+	useEffect(() => {
+		if (!isLoading) {
+			setIsLoaded(true);
+		}
+	}, [isLoading]);
 
-  const handlePageChange = (page: number) => {
-    setCurrentPage(page);
-  };
+	const handlePageChange = (page: number) => {
+		setCurrentPage(page);
+	};
 
-  if (error) {
-    return (
-      <ErrorDisplay
-        title="My Courses Error"
-        description="Error occurred while getting your courses"
-        error={error}
-      />
-    );
-  }
+	if (error) {
+		return (
+			<ErrorDisplay
+				title="My Courses Error"
+				description="Error occurred while getting your courses"
+				error={error}
+			/>
+		);
+	}
 
-  if (!isLoading && (!courses || courses.length === 0)) {
-    return (
-      <div className="text-center py-12">
-        <div className="w-24 h-24 mx-auto mb-4 text-[var(--color-primary)]">
-          <BookOpen className="w-full h-full" />
-        </div>
-        <h3 className="text-lg font-medium text-[var(--color-primary-dark)] mb-2">
-          No courses enrolled yet
-        </h3>
-        <p className="text-[var(--color-muted)] mb-4">
-          Start your learning journey by enrolling in your first course!
-        </p>
-        <Link
-          href="/courses"
-          className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-[var(--color-surface)] bg-[var(--color-primary)] hover:bg-[var(--color-primary-dark)] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[var(--color-primary)] transition-colors duration-200"
-        >
-          Browse Courses
-        </Link>
-      </div>
-    );
-  }
+	if (!isLoading && (!courses || courses.length === 0)) {
+		return (
+			<div className="text-center py-12">
+				<div className="w-24 h-24 mx-auto mb-4 text-[var(--color-primary)]">
+					<BookOpen className="w-full h-full" />
+				</div>
+				<h3 className="text-lg font-medium text-[var(--color-primary-dark)] mb-2">
+					No courses enrolled yet
+				</h3>
+				<p className="text-[var(--color-muted)] mb-4">
+					Start your learning journey by enrolling in your first course!
+				</p>
+				<Link
+					href="/courses"
+					className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-[var(--color-surface)] bg-[var(--color-primary)] hover:bg-[var(--color-primary-dark)] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[var(--color-primary)] transition-colors duration-200"
+				>
+					Browse Courses
+				</Link>
+			</div>
+		);
+	}
 
-  // Animation variants for staggered appearance (from CourseGrid)
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    show: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.1,
-      },
-    },
-  };
+	// Animation variants for staggered appearance (from CourseGrid)
+	const containerVariants = {
+		hidden: { opacity: 0 },
+		show: {
+			opacity: 1,
+			transition: {
+				staggerChildren: 0.1,
+			},
+		},
+	};
 
-  return (
-    <div className="w-full">
-      <div className="bg-[var(--color-background)] rounded-xl p-6 mb-8">
-        <h1 className="text-2xl font-bold text-[var(--color-primary-dark)] mb-2">My Courses</h1>
-        <p className="text-[var(--color-muted)]">
-          Access all your enrolled courses here. Continue your learning journey and track your progress across all your courses.
-        </p>
-      </div>
+	return (
+		<div className="w-full">
+			<div className="bg-[var(--color-background)] rounded-xl p-6 mb-8">
+				<h1 className="text-2xl font-bold text-[var(--color-primary-dark)] mb-2">
+					My Courses
+				</h1>
+				<p className="text-[var(--color-muted)]">
+					Access all your enrolled courses here. Continue your learning journey
+					and track your progress across all your courses.
+				</p>
+			</div>
 
-      {/* Course Grid */}
-      <motion.div
-        className="w-full"
-        variants={containerVariants}
-        initial="hidden"
-        animate={isLoaded ? "show" : "hidden"}
-      >
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
-          {courses.map((course) => (
-            <motion.div
-              key={course.id}
-              className="w-full"
-              variants={{
-                hidden: { opacity: 0, y: 20 },
-                show: {
-                  opacity: 1,
-                  y: 0,
-                  transition: { duration: 0.4, ease: "easeOut" },
-                },
-              }}
-            >
-              <Link href={`/courses/${course.id}`} className="block h-full">
-                <CourseCard
-                  course={course}
-                  className="w-full h-full hover:shadow-lg transition-shadow duration-300 bg-[var(--color-background)]"
-                />
-              </Link>
-            </motion.div>
-          ))}
-        </div>
-      </motion.div>
+			{/* Course Grid */}
+			<motion.div
+				className="w-full"
+				variants={containerVariants}
+				initial="hidden"
+				animate={isLoaded ? "show" : "hidden"}
+			>
+				<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
+					{courses.map((course) => (
+						<motion.div
+							key={course.id}
+							className="w-full"
+							variants={{
+								hidden: { opacity: 0, y: 20 },
+								show: {
+									opacity: 1,
+									y: 0,
+									transition: { duration: 0.4, ease: "easeOut" },
+								},
+							}}
+						>
+							<Link href={`/courses/${course.id}`} className="block h-full">
+								<CourseCard
+									course={course}
+									className="w-full h-full hover:shadow-lg transition-shadow duration-300 bg-[var(--color-background)]"
+								/>
+							</Link>
+						</motion.div>
+					))}
+				</div>
+			</motion.div>
 
-      {/* Pagination */}
-      {totalPages > 1 && (
-        <div className="mt-8">
-          <Pagination
-            totalPages={totalPages}
-            currentPage={currentPage}
-            onPageChange={handlePageChange}
-          />
-        </div>
-      )}
-    </div>
-  );
-} 
+			{/* Pagination */}
+			{totalPages > 1 && (
+				<div className="mt-8">
+					<Pagination
+						totalPages={totalPages}
+						currentPage={currentPage}
+						onPageChange={handlePageChange}
+					/>
+				</div>
+			)}
+		</div>
+	);
+}

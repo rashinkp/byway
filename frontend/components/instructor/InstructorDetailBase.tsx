@@ -1,284 +1,328 @@
 import React, { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { 
-  Calendar, 
-  BookOpen, 
-  Users, 
-  Globe, 
-  GraduationCap, 
-  Briefcase,
-  Mail,
-  FileText,
+import {
+	Calendar,
+	BookOpen,
+	Users,
+	Globe,
+	GraduationCap,
+	Briefcase,
+	Mail,
+	FileText,
 } from "lucide-react";
 import { IInstructorDetails } from "@/types/instructor";
 import { Course } from "@/types/course";
 import { CourseCard } from "@/components/course/CourseCard";
 import Link from "next/link";
 import InstructorSidebar from "./InstructorSidebar";
+import Image from "next/image";
 
 interface InstructorDetailBaseProps {
-  instructor: IInstructorDetails;
-  courses?: Course[];
-  isCoursesLoading?: boolean;
-  renderHeaderActions?: () => React.ReactNode;
-  renderStatusBadges?: () => React.ReactNode;
-  sidebarProps?: {
-    adminActions?: React.ReactNode;
-    userRole?: "USER" | "ADMIN" | "INSTRUCTOR";
-  };
+	instructor: IInstructorDetails;
+	courses?: Course[];
+	isCoursesLoading?: boolean;
+	renderHeaderActions?: () => React.ReactNode;
+	renderStatusBadges?: () => React.ReactNode;
+	sidebarProps?: {
+		adminActions?: React.ReactNode;
+		userRole?: "USER" | "ADMIN" | "INSTRUCTOR";
+	};
 }
 
 export const InstructorDetailBase: React.FC<InstructorDetailBaseProps> = ({
-  instructor,
-  courses,
-  isCoursesLoading,
-  renderHeaderActions,
-  renderStatusBadges,
-  sidebarProps,
+	instructor,
+	courses,
+	isCoursesLoading,
+	renderStatusBadges,
+	sidebarProps,
 }) => {
-  const [activeTab, setActiveTab] = useState("about");
-  const userRole = sidebarProps?.userRole || "USER";
+	const [activeTab, setActiveTab] = useState("about");
+	const userRole = sidebarProps?.userRole || "USER";
 
-  const certifications = instructor.certifications
-    ? instructor.certifications
-        .split("\n")
-        .map((cert) => cert.replace("- ", "").trim())
-        .filter(Boolean)
-    : [];
-  const education = instructor.education
-    ? instructor.education
-        .split("\n")
-        .map((edu) => edu.replace("- ", "").trim())
-        .filter(Boolean)
-    : [];
 
-  const tabs = [
-    {
-      id: "about",
-      label: "About",
-      icon: <FileText className="w-4 h-4" />,
-    },
-    {
-      id: "education",
-      label: "Education",
-      icon: <GraduationCap className="w-4 h-4" />,
-    },
-    {
-      id: "experience",
-      label: "Experience",
-      icon: <Briefcase className="w-4 h-4" />,
-    },
-    {
-      id: "courses",
-      label: "Courses",
-      icon: <BookOpen className="w-4 h-4" />,
-    },
-  ];
 
-  const renderTabContent = () => {
-    switch (activeTab) {
-      case "about":
-        return (
-          <div className="space-y-6">
-            <div className="space-y-4">
-              <h3 className="text-lg font-semibold text-[var(--color-foreground)]">About</h3>
-              <p className="text-[var(--color-primary-light)] leading-relaxed">
-                {instructor.about || "No bio available"}
-              </p>
-            </div>
-            <div className="space-y-4">
-              <h3 className="text-lg font-semibold text-[var(--color-foreground)]">Contact Information</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="flex items-center space-x-2 text-[var(--color-primary-light)]">
-                  <Mail className="w-5 h-5 text-[var(--color-primary-light)]" />
-                  <span>{instructor.email}</span>
-                </div>
-                {instructor.website && (
-                  <div className="flex items-center space-x-2 text-[var(--color-primary-light)]">
-                    <Globe className="w-5 h-5 text-[var(--color-primary-light)]" />
-                    <a href={instructor.website} target="_blank" rel="noopener noreferrer" className="text-[var(--color-primary)] hover:underline">
-                      {instructor.website}
-                    </a>
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
-        );
-      case "education":
-        return (
-          <div className="space-y-6">
-            <h3 className="text-lg font-semibold text-[var(--color-foreground)]">Education</h3>
-            {education.length > 0 ? (
-              <div className="space-y-4">
-                {education.map((edu, index) => (
-                  <div key={index} className="bg-[var(--color-surface)] p-4 rounded-lg">
-                    <h4 className="font-medium text-[var(--color-foreground)]">{edu}</h4>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <p className="text-[var(--color-primary-light)]">No education information available</p>
-            )}
-          </div>
-        );
-      case "experience":
-        return (
-          <div className="space-y-6">
-            <h3 className="text-lg font-semibold text-[var(--color-foreground)]">Experience</h3>
-            <div className="space-y-4">
-              <div className="bg-[var(--color-surface)] p-4 rounded-lg">
-                <h4 className="font-medium text-[var(--color-foreground)] mb-2">Area of Expertise</h4>
-                <p className="text-[var(--color-primary-light)]">{instructor.areaOfExpertise}</p>
-              </div>
-              <div className="bg-[var(--color-surface)] p-4 rounded-lg">
-                <h4 className="font-medium text-[var(--color-foreground)] mb-2">Professional Experience</h4>
-                <p className="text-[var(--color-primary-light)] whitespace-pre-line">{instructor.professionalExperience}</p>
-              </div>
-            </div>
-          </div>
-        );
-      case "courses":
-        return (
-          <div className="space-y-6">
-            <h3 className="text-lg font-semibold text-[var(--color-foreground)]">Courses</h3>
-            {isCoursesLoading ? (
-              <div className={`grid gap-6 ${
-                userRole === "ADMIN" 
-                  ? "grid-cols-1 sm:grid-cols-2 lg:grid-cols-2" 
-                  : "grid-cols-1 md:grid-cols-2 lg:grid-cols-3"
-              }`}>
-                {Array.from({ length: 3 }).map((_, index) => (
-                  <div key={index} className="p-4">
-                    <div className="h-6 w-3/4 bg-[var(--color-primary-light)]/50 rounded animate-pulse" />
-                    <div className="h-4 w-full mt-2 bg-[var(--color-primary-light)]/50 rounded animate-pulse" />
-                    <div className="h-4 w-2/3 mt-2 bg-[var(--color-primary-light)]/50 rounded animate-pulse" />
-                  </div>
-                ))}
-              </div>
-            ) : courses && courses.length > 0 ? (
-              <div className={`grid gap-6 ${
-                userRole === "ADMIN" 
-                  ? "grid-cols-1 sm:grid-cols-2 lg:grid-cols-2" 
-                  : "grid-cols-1 md:grid-cols-2 lg:grid-cols-3"
-              }`}>
-                {courses.map((course: Course) => (
-                  <Link key={course.id} href={`/courses/${course.id}`}>
-                    <CourseCard course={course} />
-                  </Link>
-                ))}
-              </div>
-            ) : (
-              <p className="text-[var(--color-primary-light)]">No courses available</p>
-            )}
-          </div>
-        );
-      default:
-        return null;
-    }
-  };
+	const tabs = [
+		{
+			id: "about",
+			label: "About",
+			icon: <FileText className="w-4 h-4" />,
+		},
+		{
+			id: "education",
+			label: "Education",
+			icon: <GraduationCap className="w-4 h-4" />,
+		},
+		{
+			id: "experience",
+			label: "Experience",
+			icon: <Briefcase className="w-4 h-4" />,
+		},
+		{
+			id: "courses",
+			label: "Courses",
+			icon: <BookOpen className="w-4 h-4" />,
+		},
+	];
 
-  return (
-    <div className="min-h-screen bg-[var(--color-surface)] p-0 md:p-8 flex flex-col items-center">
-      <div className="w-full max-w-5xl mx-auto space-y-8">
-        {/* Header Section */}
-        <Card className="bg-[var(--color-surface)]/95 shadow-xl border border-[var(--color-primary-light)]/20 rounded-2xl p-8 mt-8">
-          <div className="flex flex-col md:flex-row justify-between items-center gap-8">
-            {/* Avatar/Initial */}
-            <div className="flex-shrink-0 flex flex-col items-center gap-2">
-              {instructor.avatar ? (
-                <img
-                  src={instructor.avatar}
-                  alt={instructor.name}
-                  className="w-24 h-24 rounded-full object-cover border-4 border-[var(--color-primary-light)] shadow-md bg-[var(--color-background)]"
-                />
-              ) : (
-                <div className="w-24 h-24 rounded-full flex items-center justify-center text-4xl font-bold bg-[var(--color-primary-light)] text-[var(--color-surface)] border-4 border-[var(--color-primary-light)] shadow-md">
-                  {instructor?.name?.charAt(0) || "I"}
-                </div>
-              )}
-              <span className="text-xs text-[var(--color-muted)] mt-1">Instructor</span>
-            </div>
-            {/* Main Info */}
-            <div className="flex-1 flex flex-col items-center md:items-start gap-2">
-              <h1 className="text-3xl font-bold text-[var(--color-primary-dark)] mb-1 text-center md:text-left">{instructor.name}</h1>
-              <p className="text-lg text-[var(--color-muted)] mb-2 text-center md:text-left">{instructor.areaOfExpertise}</p>
-              <div className="flex flex-wrap items-center gap-3 justify-center md:justify-start">
-                <Badge variant="outline" className="bg-[var(--color-primary-light)]/10 text-[var(--color-primary-light)] border-[var(--color-primary-light)]/40">
-                  <Calendar className="w-3 h-3 mr-1" />
-                  Joined {new Date(instructor.createdAt).toLocaleDateString()}
-                </Badge>
-                <Badge variant="outline" className="bg-[var(--color-primary-light)]/10 text-[var(--color-primary-light)] border-[var(--color-primary-light)]/40">
-                  <BookOpen className="w-3 h-3 mr-1" />
-                  {courses?.length || 0} Courses
-                </Badge>
-                <Badge variant="outline" className="bg-[var(--color-primary-light)]/10 text-[var(--color-primary-light)] border-[var(--color-primary-light)]/40">
-                  <Users className="w-3 h-3 mr-1" />
-                  {instructor.totalStudents || 0} Students
-                </Badge>
-                {renderStatusBadges?.()}
-              </div>
-              {instructor.website && (
-                <a
-                  href={instructor.website}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1 mt-2 text-sm text-[var(--color-primary-light)] hover:text-[var(--color-primary-dark)] hover:underline transition-colors"
-                >
-                  <Globe className="w-4 h-4" /> Visit Website
-                </a>
-              )}
-            </div>
-          </div>
-        </Card>
+	const renderTabContent = () => {
+		switch (activeTab) {
+			case "about":
+				return (
+					<div className="space-y-6">
+						<div className="space-y-4">
+							<h3 className="text-lg font-semibold text-[var(--color-foreground)]">
+								About
+							</h3>
+							<p className="text-[var(--color-primary-light)] leading-relaxed">
+								{instructor.about || "No bio available"}
+							</p>
+						</div>
+						<div className="space-y-4">
+							<h3 className="text-lg font-semibold text-[var(--color-foreground)]">
+								Contact Information
+							</h3>
+							<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+								<div className="flex items-center space-x-2 text-[var(--color-primary-light)]">
+									<Mail className="w-5 h-5 text-[var(--color-primary-light)]" />
+									<span>{instructor.email}</span>
+								</div>
+								{instructor.website && (
+									<div className="flex items-center space-x-2 text-[var(--color-primary-light)]">
+										<Globe className="w-5 h-5 text-[var(--color-primary-light)]" />
+										<a
+											href={instructor.website}
+											target="_blank"
+											rel="noopener noreferrer"
+											className="text-[var(--color-primary)] hover:underline"
+										>
+											{instructor.website}
+										</a>
+									</div>
+								)}
+							</div>
+						</div>
+					</div>
+				);
+			case "education":
+				return (
+					<div className="space-y-6">
+						<h3 className="text-lg font-semibold text-[var(--color-foreground)]">
+							Education
+						</h3>
+						{Array.isArray(instructor.education) && instructor.education.length > 0 ? (
+							<div className="space-y-4">
+								{instructor.education.map((edu: string, index: number) => (
+									<div
+										key={index}
+										className="bg-[var(--color-surface)] p-4 rounded-lg"
+									>
+										<h4 className="font-medium text-[var(--color-foreground)]">
+											{edu}
+										</h4>
+									</div>
+								))}
+							</div>
+						) : (
+							<p className="text-[var(--color-primary-light)]">
+								No education information available
+							</p>
+						)}
+					</div>
+				);
+			case "experience":
+				return (
+					<div className="space-y-6">
+						<h3 className="text-lg font-semibold text-[var(--color-foreground)]">
+							Experience
+						</h3>
+						<div className="space-y-4">
+							<div className="bg-[var(--color-surface)] p-4 rounded-lg">
+								<h4 className="font-medium text-[var(--color-foreground)] mb-2">
+									Area of Expertise
+								</h4>
+								<p className="text-[var(--color-primary-light)]">
+									{instructor.areaOfExpertise}
+								</p>
+							</div>
+							<div className="bg-[var(--color-surface)] p-4 rounded-lg">
+								<h4 className="font-medium text-[var(--color-foreground)] mb-2">
+									Professional Experience
+								</h4>
+								<p className="text-[var(--color-primary-light)] whitespace-pre-line">
+									{instructor.professionalExperience}
+								</p>
+							</div>
+						</div>
+					</div>
+				);
+			case "courses":
+				return (
+					<div className="space-y-6">
+						<h3 className="text-lg font-semibold text-[var(--color-foreground)]">
+							Courses
+						</h3>
+						{isCoursesLoading ? (
+							<div
+								className={`grid gap-6 ${
+									userRole === "ADMIN"
+										? "grid-cols-1 sm:grid-cols-2 lg:grid-cols-2"
+										: "grid-cols-1 md:grid-cols-2 lg:grid-cols-3"
+								}`}
+							>
+								{Array.from({ length: 3 }).map((_, index) => (
+									<div key={index} className="p-4">
+										<div className="h-6 w-3/4 bg-[var(--color-primary-light)]/50 rounded animate-pulse" />
+										<div className="h-4 w-full mt-2 bg-[var(--color-primary-light)]/50 rounded animate-pulse" />
+										<div className="h-4 w-2/3 mt-2 bg-[var(--color-primary-light)]/50 rounded animate-pulse" />
+									</div>
+								))}
+							</div>
+						) : courses && courses.length > 0 ? (
+							<div
+								className={`grid gap-6 ${
+									userRole === "ADMIN"
+										? "grid-cols-1 sm:grid-cols-2 lg:grid-cols-2"
+										: "grid-cols-1 md:grid-cols-2 lg:grid-cols-3"
+								}`}
+							>
+								{courses.map((course: Course) => (
+									<Link key={course.id} href={`/courses/${course.id}`}>
+										<CourseCard course={course} />
+									</Link>
+								))}
+							</div>
+						) : (
+							<p className="text-[var(--color-primary-light)]">
+								No courses available
+							</p>
+						)}
+					</div>
+				);
+			default:
+				return null;
+		}
+	};
 
-        <div className="flex flex-col lg:flex-row gap-8">
-          {/* Main Content Section */}
-          <div className={`space-y-8 ${userRole === "ADMIN" ? "lg:w-3/4" : "w-full"}`}>
-            <Card className="bg-[var(--color-surface)]/95 border border-[var(--color-primary-light)]/20 shadow-lg rounded-2xl overflow-hidden">
-              {/* Tabs Section */}
-              <div className="border-b border-[var(--color-primary-light)]/20 b">
-                <div className="flex space-x-8 px-6 py-4 overflow-x-auto whitespace-nowrap scrollbar-thin tab-scrollbar md:overflow-visible md:whitespace-normal relative">
-                  {tabs.map((tab) => (
-                    <button
-                      key={tab.id}
-                      onClick={() => setActiveTab(tab.id)}
-                      className={`flex items-center space-x-2 py-2 px-1 border-b-2 transition-colors font-medium text-base ${
-                        activeTab === tab.id
-                          ? "border-[var(--color-primary-light)] text-[var(--color-primary-dark)] bg-[var(--color-surface)]  rounded-t"
-                          : "border-transparent text-[var(--color-muted)] hover:text-[var(--color-primary-light)] hover:border-[var(--color-primary-light)]/40"
-                      }`}
-                    >
-                      {tab.icon}
-                      <span>{tab.label}</span>
-                    </button>
-                  ))}
-                  {/* Right fade for scroll cue */}
-                  <div className="pointer-events-none absolute right-0 top-0 h-full w-8 bg-gradient-to-l from-[var(--color-background)]/90 to-transparent hidden sm:block" />
-                </div>
-              </div>
+	return (
+		<div className="min-h-screen bg-[var(--color-surface)] p-0 md:p-8 flex flex-col items-center">
+			<div className="w-full max-w-5xl mx-auto space-y-8">
+				{/* Header Section */}
+				<Card className="bg-[var(--color-surface)]/95 shadow-xl border border-[var(--color-primary-light)]/20 rounded-2xl p-8 mt-8">
+					<div className="flex flex-col md:flex-row justify-between items-center gap-8">
+						{/* Avatar/Initial */}
+						<div className="flex-shrink-0 flex flex-col items-center gap-2">
+							{instructor.avatar ? (
+								<Image
+									src={instructor.avatar}
+									alt={instructor.name}
+									className="w-24 h-24 rounded-full object-cover border-4 border-[var(--color-primary-light)] shadow-md bg-[var(--color-background)]"
+									width={96}
+									height={96}
+								/>
+							) : (
+								<div className="w-24 h-24 rounded-full flex items-center justify-center text-4xl font-bold bg-[var(--color-primary-light)] text-[var(--color-surface)] border-4 border-[var(--color-primary-light)] shadow-md">
+									{instructor?.name?.charAt(0) || "I"}
+								</div>
+							)}
+							<span className="text-xs text-[var(--color-muted)] mt-1">
+								Instructor
+							</span>
+						</div>
+						{/* Main Info */}
+						<div className="flex-1 flex flex-col items-center md:items-start gap-2">
+							<h1 className="text-3xl font-bold text-[var(--color-primary-dark)] mb-1 text-center md:text-left">
+								{instructor.name}
+							</h1>
+							<p className="text-lg text-[var(--color-muted)] mb-2 text-center md:text-left">
+								{instructor.areaOfExpertise}
+							</p>
+							<div className="flex flex-wrap items-center gap-3 justify-center md:justify-start">
+								<Badge
+									variant="outline"
+									className="bg-[var(--color-primary-light)]/10 text-[var(--color-primary-light)] border-[var(--color-primary-light)]/40"
+								>
+									<Calendar className="w-3 h-3 mr-1" />
+									Joined {new Date(instructor.createdAt).toLocaleDateString()}
+								</Badge>
+								<Badge
+									variant="outline"
+									className="bg-[var(--color-primary-light)]/10 text-[var(--color-primary-light)] border-[var(--color-primary-light)]/40"
+								>
+									<BookOpen className="w-3 h-3 mr-1" />
+									{courses?.length || 0} Courses
+								</Badge>
+								<Badge
+									variant="outline"
+									className="bg-[var(--color-primary-light)]/10 text-[var(--color-primary-light)] border-[var(--color-primary-light)]/40"
+								>
+									<Users className="w-3 h-3 mr-1" />
+									{instructor.totalStudents || 0} Students
+								</Badge>
+								{renderStatusBadges?.()}
+							</div>
+							{instructor.website && (
+								<a
+									href={instructor.website}
+									target="_blank"
+									rel="noopener noreferrer"
+									className="inline-flex items-center gap-1 mt-2 text-sm text-[var(--color-primary-light)] hover:text-[var(--color-primary-dark)] hover:underline transition-colors"
+								>
+									<Globe className="w-4 h-4" /> Visit Website
+								</a>
+							)}
+						</div>
+					</div>
+				</Card>
 
-              {/* Content Section */}
-              <div className="p-8 bg-[var(--color-surface)]/90">
-                {renderTabContent()}
-              </div>
-            </Card>
-          </div>
+				<div className="flex flex-col lg:flex-row gap-8">
+					{/* Main Content Section */}
+					<div
+						className={`space-y-8 ${userRole === "ADMIN" ? "lg:w-3/4" : "w-full"}`}
+					>
+						<Card className="bg-[var(--color-surface)]/95 border border-[var(--color-primary-light)]/20 shadow-lg rounded-2xl overflow-hidden">
+							{/* Tabs Section */}
+							<div className="border-b border-[var(--color-primary-light)]/20 b">
+								<div className="flex space-x-8 px-6 py-4 overflow-x-auto whitespace-nowrap scrollbar-thin tab-scrollbar md:overflow-visible md:whitespace-normal relative">
+									{tabs.map((tab) => (
+										<button
+											key={tab.id}
+											onClick={() => setActiveTab(tab.id)}
+											className={`flex items-center space-x-2 py-2 px-1 border-b-2 transition-colors font-medium text-base ${
+												activeTab === tab.id
+													? "border-[var(--color-primary-light)] text-[var(--color-primary-dark)] bg-[var(--color-surface)]  rounded-t"
+													: "border-transparent text-[var(--color-muted)] hover:text-[var(--color-primary-light)] hover:border-[var(--color-primary-light)]/40"
+											}`}
+										>
+											{tab.icon}
+											<span>{tab.label}</span>
+										</button>
+									))}
+									{/* Right fade for scroll cue */}
+									<div className="pointer-events-none absolute right-0 top-0 h-full w-8 bg-gradient-to-l from-[var(--color-background)]/90 to-transparent hidden sm:block" />
+								</div>
+							</div>
 
-          {/* Sidebar - Only show for admin users */}
-          {userRole === "ADMIN" && (
-            <div className="lg:w-1/4">
-              <InstructorSidebar
-                instructor={instructor}
-                isLoading={false}
-                adminActions={sidebarProps?.adminActions}
-                userRole={userRole}
-              />
-            </div>
-          )}
-        </div>
-      </div>
-    </div>
-  );
-}; 
+							{/* Content Section */}
+							<div className="p-8 bg-[var(--color-surface)]/90">
+								{renderTabContent()}
+							</div>
+						</Card>
+					</div>
+
+					{/* Sidebar - Only show for admin users */}
+					{userRole === "ADMIN" && (
+						<div className="lg:w-1/4">
+							<InstructorSidebar
+								instructor={instructor}
+								isLoading={false}
+								adminActions={sidebarProps?.adminActions}
+								userRole={userRole}
+							/>
+						</div>
+					)}
+				</div>
+			</div>
+		</div>
+	);
+};

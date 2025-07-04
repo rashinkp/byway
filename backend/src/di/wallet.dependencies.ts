@@ -1,4 +1,3 @@
-import { PrismaClient } from "@prisma/client";
 import { WalletRepository } from "../infra/repositories/wallet.repository";
 import { GetWalletUseCase } from "../app/usecases/wallet/implementation/get-wallet.usecase";
 import { AddMoneyUseCase } from "../app/usecases/wallet/implementation/add-money.usecase";

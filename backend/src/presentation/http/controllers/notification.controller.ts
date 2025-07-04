@@ -6,7 +6,6 @@ import { IHttpRequest } from "../interfaces/http-request.interface";
 import { IHttpResponse } from "../interfaces/http-response.interface";
 import { validateGetUserNotifications } from "../../validators/notification.validators";
 import { UnauthorizedError } from "../errors/unautherized-error";
-import { BadRequestError } from "../errors/bad-request-error";
 
 export class NotificationController extends BaseController {
   constructor(

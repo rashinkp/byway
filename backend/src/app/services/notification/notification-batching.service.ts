@@ -126,7 +126,7 @@ export class NotificationBatchingService {
 
   // Method to check if user has pending notifications for a specific chat
   hasPendingNotifications(userId: string, chatId: string): boolean {
-    for (const [key, notification] of this.pendingNotifications.entries()) {
+    for (const [, notification] of this.pendingNotifications.entries()) {
       if (notification.userId === userId && notification.chatId === chatId) {
         return true;
       }
@@ -137,7 +137,7 @@ export class NotificationBatchingService {
   // Method to get pending notification count for a user
   getPendingNotificationCount(userId: string): number {
     let count = 0;
-    for (const [key, notification] of this.pendingNotifications.entries()) {
+    for (const [, notification] of this.pendingNotifications.entries()) {
       if (notification.userId === userId) {
         count += notification.messageCount;
       }

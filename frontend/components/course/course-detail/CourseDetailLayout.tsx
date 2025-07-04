@@ -13,141 +13,148 @@ import CourseReviews from "@/components/review/CourseReviews";
 import ErrorDisplay from "@/components/ErrorDisplay";
 
 interface CourseDetailLayoutProps {
-  course: Course | undefined;
-  instructor: (User | PublicUser) | undefined;
-  lessons: (ILesson | PublicLesson)[] | undefined;
-  isLoading: {
-    course: boolean;
-    instructor: boolean;
-    lessons: boolean;
-    user: boolean;
-  };
-  error: any;
-  sidebarProps: {
-    isCartLoading?: boolean;
-    handleAddToCart?: () => void;
-    isEnrolled?: boolean;
-    userLoading?: boolean;
-    adminActions?: ReactNode;
-    instructorActions?: ReactNode;
-  };
-  tabContent?: {
-    [key: string]: ReactNode;
-  };
-  showReviews?: boolean;
-  customTabs?: Array<{
-    id: string;
-    label: string;
-    icon: React.ReactNode;
-  }>;
+	course: Course | undefined;
+	instructor: (User | PublicUser) | undefined;
+	lessons: (ILesson | PublicLesson)[] | undefined;
+	isLoading: {
+		course: boolean;
+		instructor: boolean;
+		lessons: boolean;
+		user: boolean;
+	};
+	error: any;
+	sidebarProps: {
+		isCartLoading?: boolean;
+		handleAddToCart?: () => void;
+		isEnrolled?: boolean;
+		userLoading?: boolean;
+		adminActions?: ReactNode;
+		instructorActions?: ReactNode;
+	};
+	tabContent?: {
+		[key: string]: ReactNode;
+	};
+	showReviews?: boolean;
+	customTabs?: Array<{
+		id: string;
+		label: string;
+		icon: React.ReactNode;
+	}>;
 }
 
 export default function CourseDetailLayout({
-  course,
-  instructor,
-  lessons,
-  isLoading,
-  error,
-  sidebarProps,
-  tabContent,
-  showReviews = true,
-  customTabs = [],
+	course,
+	instructor,
+	lessons,
+	isLoading,
+	error,
+	sidebarProps,
+	tabContent,
+	showReviews = true,
+	customTabs = [],
 }: CourseDetailLayoutProps) {
-  const [activeTab, setActiveTab] = React.useState("description");
-  const { user } = useAuthStore();
-  const userRole = user?.role || "USER";
+	const [activeTab, setActiveTab] = React.useState("description");
+	const { user } = useAuthStore();
+	const userRole = user?.role || "USER";
 
-  if (error) {
-    return (
-      <ErrorDisplay error={error} title="Course Error" description="Error occurred while loading the course." />
-    );
-  }
+	if (error) {
+		return (
+			<ErrorDisplay
+				error={error}
+				title="Course Error"
+				description="Error occurred while loading the course."
+			/>
+		);
+	}
 
-  return (
-    <div className="min-h-screen bg-gray-50/50 p-6">
-      <div className="max-w-7xl mx-auto space-y-6">
-        <div className="flex flex-col lg:flex-row gap-6">
-          <div className={`space-y-6 ${userRole === "USER" || userRole === "ADMIN" ? "lg:w-3/4" : "w-full"}`}>
-            <CourseInfo
-              course={course}
-              instructor={instructor as User}
-              lessonsLength={lessons?.length}
-              courseLoading={isLoading.course}
-              instructorLoading={isLoading.instructor}
-              isEnrolled={course?.isEnrolled || false}
-              userRole={userRole}
-            />
-            
-            <div className="bg-white/80 backdrop-blur-sm border border-gray-100 shadow-sm rounded-xl overflow-hidden">
-              <CourseTabs
-                activeTab={activeTab}
-                setActiveTab={setActiveTab}
-                isLoading={isLoading.course}
-                course={course}
-                showReviews={showReviews}
-                customTabs={customTabs}
-              />
-              
-              <div className="p-6">
-                {activeTab === "description" && (
-                  tabContent?.description || (
-                    <CourseDescription course={course} isLoading={isLoading.course} />
-                  )
-                )}
-                {activeTab === "instructor" && (
-                  tabContent?.instructor || (
-                    <CourseInstructor
-                      instructor={instructor as User}
-                      isLoading={isLoading.instructor}
-                      userRole={userRole}
-                    />
-                  )
-                )}
-                {activeTab === "syllabus" && (
-                  tabContent?.syllabus || (
-                    <CourseSyllabus
-                      lessons={lessons}
-                      isLoading={isLoading.lessons}
-                    />
-                  )
-                )}
-                {activeTab === "reviews" && showReviews && (
-                  tabContent?.reviews || (
-                    <CourseReviews
-                      course={course}
-                      isLoading={isLoading.course}
-                      userRole={userRole}
-                    />
-                  )
-                )}
-                {/* Render custom tab content if provided */}
-                {tabContent && Object.keys(tabContent).map((tabKey) => {
-                  if (activeTab === tabKey && tabContent[tabKey]) {
-                    return <div key={tabKey}>{tabContent[tabKey]}</div>;
-                  }
-                  return null;
-                })}
-              </div>
-            </div>
-          </div>
-          
-          {/* Show sidebar for users and admins */}
-          {(userRole === "USER" || userRole === "ADMIN") && (
-            <div className="lg:w-1/4">
-              <CourseSidebar
-                course={course}
-                isLoading={isLoading.course || isLoading.user}
-                isCartLoading={sidebarProps.isCartLoading}
-                handleAddToCart={sidebarProps.handleAddToCart}
-                isEnrolled={sidebarProps.isEnrolled || false}
-                adminActions={sidebarProps.adminActions}
-                instructorActions={sidebarProps.instructorActions}
-                userRole={userRole}
-              />
-            </div>
-          )}
-        </div>
-      </div>
-    </div>
-  );
-} 
+	return (
+		<div className="min-h-screen bg-gray-50/50 p-6">
+			<div className="max-w-7xl mx-auto space-y-6">
+				<div className="flex flex-col lg:flex-row gap-6">
+					<div
+						className={`space-y-6 ${userRole === "USER" || userRole === "ADMIN" ? "lg:w-3/4" : "w-full"}`}
+					>
+						<CourseInfo
+							course={course}
+							instructor={instructor as User}
+							lessonsLength={lessons?.length}
+							courseLoading={isLoading.course}
+							instructorLoading={isLoading.instructor}
+							isEnrolled={course?.isEnrolled || false}
+							userRole={userRole}
+						/>
+
+						<div className="bg-white/80 backdrop-blur-sm border border-gray-100 shadow-sm rounded-xl overflow-hidden">
+							<CourseTabs
+								activeTab={activeTab}
+								setActiveTab={setActiveTab}
+								isLoading={isLoading.course}
+								course={course}
+								showReviews={showReviews}
+								customTabs={customTabs}
+							/>
+
+							<div className="p-6">
+								{activeTab === "description" &&
+									(tabContent?.description || (
+										<CourseDescription
+											course={course}
+											isLoading={isLoading.course}
+										/>
+									))}
+								{activeTab === "instructor" &&
+									(tabContent?.instructor || (
+										<CourseInstructor
+											instructor={instructor as User}
+											isLoading={isLoading.instructor}
+											userRole={userRole}
+										/>
+									))}
+								{activeTab === "syllabus" &&
+									(tabContent?.syllabus || (
+										<CourseSyllabus
+											lessons={lessons}
+											isLoading={isLoading.lessons}
+										/>
+									))}
+								{activeTab === "reviews" &&
+									showReviews &&
+									(tabContent?.reviews || (
+										<CourseReviews
+											course={course}
+											isLoading={isLoading.course}
+											userRole={userRole}
+										/>
+									))}
+								{/* Render custom tab content if provided */}
+								{tabContent &&
+									Object.keys(tabContent).map((tabKey) => {
+										if (activeTab === tabKey && tabContent[tabKey]) {
+											return <div key={tabKey}>{tabContent[tabKey]}</div>;
+										}
+										return null;
+									})}
+							</div>
+						</div>
+					</div>
+
+					{/* Show sidebar for users and admins */}
+					{(userRole === "USER" || userRole === "ADMIN") && (
+						<div className="lg:w-1/4">
+							<CourseSidebar
+								course={course}
+								isLoading={isLoading.course || isLoading.user}
+								isCartLoading={sidebarProps.isCartLoading}
+								handleAddToCart={sidebarProps.handleAddToCart}
+								isEnrolled={sidebarProps.isEnrolled || false}
+								adminActions={sidebarProps.adminActions}
+								instructorActions={sidebarProps.instructorActions}
+								userRole={userRole}
+							/>
+						</div>
+					)}
+				</div>
+			</div>
+		</div>
+	);
+}

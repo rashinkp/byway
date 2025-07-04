@@ -1,6 +1,6 @@
-import { Socket, Server as SocketIOServer } from 'socket.io';
+import { Socket } from 'socket.io';
 
-export function registerRoomHandlers(socket: Socket, io: SocketIOServer) {
+export function registerRoomHandlers(socket: Socket) {
   socket.on('join', (roomId: string) => {
     socket.join(roomId);
   });

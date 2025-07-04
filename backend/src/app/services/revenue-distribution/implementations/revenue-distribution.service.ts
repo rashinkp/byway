@@ -8,7 +8,6 @@ import { StatusCodes } from "http-status-codes";
 import { IRevenueDistributionService } from "../interfaces/revenue-distribution.service.interface";
 import { IOrderRepository } from "../../../repositories/order.repository";
 import { Transaction } from "../../../../domain/entities/transaction.entity";
-import { Money } from "../../../../domain/value-object/money.value-object";
 import { Wallet } from "../../../../domain/entities/wallet.entity";
 import { IUserRepository } from "../../../repositories/user.repository";
 import { CreateNotificationsForUsersUseCase } from "../../../usecases/notification/implementations/create-notifications-for-users.usecase";

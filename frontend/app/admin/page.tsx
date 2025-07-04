@@ -6,272 +6,312 @@ import { DashboardSection } from "@/components/dashboard/DashboardSection";
 import { StatCard } from "@/components/dashboard/StatCard";
 import { useRouter } from "next/navigation";
 import {
-  BookOpen,
-  GraduationCap,
-  Users,
-  DollarSign,
-  TrendingUp,
-  AlertCircle,
-  CheckCircle,
-  Clock,
-  UserCheck,
-  UserX,
-  BarChart3,
-  Star,
-  MessageSquare,
+	BookOpen,
+	GraduationCap,
+	Users,
+	DollarSign,
+	TrendingUp,
+	AlertCircle,
+	CheckCircle,
+	UserCheck,
+	UserX,
+	BarChart3,
+	MessageSquare,
 } from "lucide-react";
 
 // Function to truncate to 2 decimal places without rounding
 const truncateToTwoDecimals = (num: number): string => {
-  const str = num.toString();
-  const decimalIndex = str.indexOf('.');
-  if (decimalIndex === -1) {
-    return str + '.00';
-  }
-  const truncated = str.substring(0, decimalIndex + 3); // Include 2 decimal places
-  return truncated.padEnd(decimalIndex + 3, '0'); // Pad with zeros if needed
+	const str = num.toString();
+	const decimalIndex = str.indexOf(".");
+	if (decimalIndex === -1) {
+		return str + ".00";
+	}
+	const truncated = str.substring(0, decimalIndex + 3); // Include 2 decimal places
+	return truncated.padEnd(decimalIndex + 3, "0"); // Pad with zeros if needed
 };
 
 export default function AdminDashboard() {
-  const { data, isLoading, error } = useAdminDashboard();
-  const router = useRouter();
+	const { data, isLoading, error } = useAdminDashboard();
+	const router = useRouter();
 
-  const handleCourseClick = (courseId: string) => {
-    router.push(`/admin/courses/${courseId}`);
-  };
+	const handleCourseClick = (courseId: string) => {
+		router.push(`/admin/courses/${courseId}`);
+	};
 
-  return (
-    <DashboardLayout
-      title="Admin Dashboard"
-      subtitle="Comprehensive overview of platform performance and analytics"
-      isLoading={isLoading}
-      error={error}
-      data={data}
-    >
-      {data && (
-        <>
-          {/* Statistics Cards Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {/* Courses Stats */}
-            <StatCard
-              icon={BookOpen}
-              iconColor="text-blue-600"
-              title="Total Courses"
-              value={data.stats.courseStats.totalCourses}
-              badges={[
-                {
-                  label: `${data.stats.courseStats.activeCourses} Active`,
-                  variant: "outline",
-                  icon: CheckCircle,
-                },
-                {
-                  label: `${data.stats.courseStats.pendingCourses} Pending`,
-                  variant: "secondary",
-                  icon: AlertCircle,
-                },
-              ]}
-            />
+	return (
+		<DashboardLayout
+			title="Admin Dashboard"
+			subtitle="Comprehensive overview of platform performance and analytics"
+			isLoading={isLoading}
+			error={error}
+			data={data}
+		>
+			{data && (
+				<>
+					{/* Statistics Cards Grid */}
+					<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+						{/* Courses Stats */}
+						<StatCard
+							icon={BookOpen}
+							iconColor="text-blue-600"
+							title="Total Courses"
+							value={data.stats.courseStats.totalCourses}
+							badges={[
+								{
+									label: `${data.stats.courseStats.activeCourses} Active`,
+									variant: "outline",
+									icon: CheckCircle,
+								},
+								{
+									label: `${data.stats.courseStats.pendingCourses} Pending`,
+									variant: "secondary",
+									icon: AlertCircle,
+								},
+							]}
+						/>
 
-            {/* Instructors Stats */}
-            <StatCard
-              icon={GraduationCap}
-              iconColor="text-purple-600"
-              title="Instructors"
-              value={data.stats.userStats.totalInstructors}
-              badges={[
-                {
-                  label: `${data.stats.userStats.activeInstructors} Active`,
-                  variant: "outline",
-                  icon: CheckCircle,
-                },
-                {
-                  label: `${data.stats.userStats.inactiveInstructors} Inactive`,
-                  variant: "secondary",
-                  icon: UserX,
-                },
-              ]}
-            />
+						{/* Instructors Stats */}
+						<StatCard
+							icon={GraduationCap}
+							iconColor="text-purple-600"
+							title="Instructors"
+							value={data.stats.userStats.totalInstructors}
+							badges={[
+								{
+									label: `${data.stats.userStats.activeInstructors} Active`,
+									variant: "outline",
+									icon: CheckCircle,
+								},
+								{
+									label: `${data.stats.userStats.inactiveInstructors} Inactive`,
+									variant: "secondary",
+									icon: UserX,
+								},
+							]}
+						/>
 
-            {/* Users Stats */}
-            <StatCard
-              icon={Users}
-              iconColor="text-green-600"
-              title="Total Users"
-              value={data.stats.userStats.totalUsers}
-              badges={[
-                {
-                  label: `${data.stats.userStats.activeUsers} Active`,
-                  variant: "outline",
-                  icon: UserCheck,
-                },
-                {
-                  label: `${data.stats.userStats.inactiveUsers} Inactive`,
-                  variant: "secondary",
-                  icon: UserX,
-                },
-              ]}
-            />
+						{/* Users Stats */}
+						<StatCard
+							icon={Users}
+							iconColor="text-green-600"
+							title="Total Users"
+							value={data.stats.userStats.totalUsers}
+							badges={[
+								{
+									label: `${data.stats.userStats.activeUsers} Active`,
+									variant: "outline",
+									icon: UserCheck,
+								},
+								{
+									label: `${data.stats.userStats.inactiveUsers} Inactive`,
+									variant: "secondary",
+									icon: UserX,
+								},
+							]}
+						/>
 
-            {/* Revenue Stats */}
-            <StatCard
-              icon={DollarSign}
-              iconColor="text-yellow-600"
-              title="Total Revenue"
-              value={`$${truncateToTwoDecimals(data.stats.totalRevenue)}`}
-              badges={[
-                {
-                  label: "Revenue",
-                  variant: "default",
-                  icon: TrendingUp,
-                },
-              ]}
-            />
-          </div>
+						{/* Revenue Stats */}
+						<StatCard
+							icon={DollarSign}
+							iconColor="text-yellow-600"
+							title="Total Revenue"
+							value={`$${truncateToTwoDecimals(data.stats.totalRevenue)}`}
+							badges={[
+								{
+									label: "Revenue",
+									variant: "default",
+									icon: TrendingUp,
+								},
+							]}
+						/>
+					</div>
 
-          {/* Enrollments Stats */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <StatCard
-              icon={Users}
-              iconColor="text-indigo-600"
-              title="Total Enrollments"
-              value={data.stats.enrollmentStats.totalEnrollments}
-            />
-          </div>
+					{/* Enrollments Stats */}
+					<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+						<StatCard
+							icon={Users}
+							iconColor="text-indigo-600"
+							title="Total Enrollments"
+							value={data.stats.enrollmentStats.totalEnrollments}
+						/>
+					</div>
 
-          {/* Top Enrolled Courses Section */}
-          <DashboardSection
-            icon={TrendingUp}
-            iconColor="text-blue-600"
-            iconBgColor="bg-blue-50"
-            title="Top Enrolled Courses"
-            subtitle="Most popular courses by enrollment count and revenue"
-          >
-            <div className="space-y-4">
-              {data.topEnrolledCourses.map((course, index) => (
-                <div key={course.courseId} className="bg-white/60 backdrop-blur-sm border border-gray-200/50 rounded-xl p-4">
-                  <div className="flex items-center space-x-4">
-                    <div className="w-10 h-10 bg-blue-50 rounded-lg flex items-center justify-center">
-                      <span className="text-sm font-semibold text-blue-600">#{index + 1}</span>
-                    </div>
-                    <div className="flex-1 space-y-2">
-                      <div className="flex items-center gap-2">
-                        <span className="text-sm font-medium text-gray-500">#{index + 1}</span>
-                        <button
-                          onClick={() => handleCourseClick(course.courseId)}
-                          className="text-lg font-semibold text-gray-900 hover:text-blue-600 hover:underline transition-colors cursor-pointer"
-                        >
-                          {course.courseTitle}
-                        </button>
-                        <span className="text-sm text-gray-500">by {course.instructorName}</span>
-                      </div>
-                      <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
-                        <div className="flex items-center space-x-2">
-                          <Users className="w-4 h-4 text-gray-400" />
-                          <div>
-                            <p className="text-xs text-gray-500">Enrollments</p>
-                            <p className="text-sm font-medium">{course.enrollmentCount}</p>
-                          </div>
-                        </div>
-                        <div className="flex items-center space-x-2">
-                          <DollarSign className="w-4 h-4 text-gray-400" />
-                          <div>
-                            <p className="text-xs text-gray-500">Revenue</p>
-                            <p className="text-sm font-medium">${truncateToTwoDecimals(course.revenue)}</p>
-                          </div>
-                        </div>
-                        <div className="flex items-center space-x-2">
-                          <BarChart3 className="w-4 h-4 text-gray-400" />
-                          <div>
-                            <p className="text-xs text-gray-500">Rating</p>
-                            <p className="text-sm font-medium">{course.rating}/5</p>
-                          </div>
-                        </div>
-                        <div className="flex items-center space-x-2">
-                          <MessageSquare className="w-4 h-4 text-gray-400" />
-                          <div>
-                            <p className="text-xs text-gray-500">Reviews</p>
-                            <p className="text-sm font-medium">{course.reviewCount}</p>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </DashboardSection>
+					{/* Top Enrolled Courses Section */}
+					<DashboardSection
+						icon={TrendingUp}
+						iconColor="text-blue-600"
+						iconBgColor="bg-blue-50"
+						title="Top Enrolled Courses"
+						subtitle="Most popular courses by enrollment count and revenue"
+					>
+						<div className="space-y-4">
+							{data.topEnrolledCourses.map((course, index) => (
+								<div
+									key={course.courseId}
+									className="bg-white/60 backdrop-blur-sm border border-gray-200/50 rounded-xl p-4"
+								>
+									<div className="flex items-center space-x-4">
+										<div className="w-10 h-10 bg-blue-50 rounded-lg flex items-center justify-center">
+											<span className="text-sm font-semibold text-blue-600">
+												#{index + 1}
+											</span>
+										</div>
+										<div className="flex-1 space-y-2">
+											<div className="flex items-center gap-2">
+												<span className="text-sm font-medium text-gray-500">
+													#{index + 1}
+												</span>
+												<button
+													onClick={() => handleCourseClick(course.courseId)}
+													className="text-lg font-semibold text-gray-900 hover:text-blue-600 hover:underline transition-colors cursor-pointer"
+												>
+													{course.courseTitle}
+												</button>
+												<span className="text-sm text-gray-500">
+													by {course.instructorName}
+												</span>
+											</div>
+											<div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+												<div className="flex items-center space-x-2">
+													<Users className="w-4 h-4 text-gray-400" />
+													<div>
+														<p className="text-xs text-gray-500">Enrollments</p>
+														<p className="text-sm font-medium">
+															{course.enrollmentCount}
+														</p>
+													</div>
+												</div>
+												<div className="flex items-center space-x-2">
+													<DollarSign className="w-4 h-4 text-gray-400" />
+													<div>
+														<p className="text-xs text-gray-500">Revenue</p>
+														<p className="text-sm font-medium">
+															${truncateToTwoDecimals(course.revenue)}
+														</p>
+													</div>
+												</div>
+												<div className="flex items-center space-x-2">
+													<BarChart3 className="w-4 h-4 text-gray-400" />
+													<div>
+														<p className="text-xs text-gray-500">Rating</p>
+														<p className="text-sm font-medium">
+															{course.rating}/5
+														</p>
+													</div>
+												</div>
+												<div className="flex items-center space-x-2">
+													<MessageSquare className="w-4 h-4 text-gray-400" />
+													<div>
+														<p className="text-xs text-gray-500">Reviews</p>
+														<p className="text-sm font-medium">
+															{course.reviewCount}
+														</p>
+													</div>
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
+							))}
+						</div>
+					</DashboardSection>
 
-          {/* Top Instructors Section */}
-          <DashboardSection
-            icon={GraduationCap}
-            iconColor="text-purple-600"
-            iconBgColor="bg-purple-50"
-            title="Top Performing Instructors"
-            subtitle="Instructors with highest selling rates and revenue"
-          >
-            <div className="space-y-4">
-              {data.topInstructors.map((instructor, index) => (
-                <div key={instructor.instructorId} className="bg-white/60 backdrop-blur-sm border border-gray-200/50 rounded-xl p-4">
-                  <div className="flex items-center space-x-4">
-                    <div className="w-10 h-10 bg-purple-50 rounded-lg flex items-center justify-center">
-                      <span className="text-sm font-semibold text-purple-600">#{index + 1}</span>
-                    </div>
-                    <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center">
-                      <span className="text-sm font-semibold text-gray-600">
-                        {instructor.instructorName.split(' ').map(n => n[0]).join('')}
-                      </span>
-                    </div>
-                    <div className="flex-1 space-y-2">
-                      <div className="flex items-center gap-2">
-                        <span className="text-sm font-medium text-gray-500">#{index + 1}</span>
-                        <h3 className="text-lg font-semibold text-gray-900">{instructor.instructorName}</h3>
-                        <span className="text-sm text-gray-500">{instructor.email}</span>
-                        <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${
-                          instructor.isActive 
-                            ? 'bg-green-50 text-green-700 border border-green-200' 
-                            : 'bg-red-50 text-red-700 border border-red-200'
-                        }`}>
-                          {instructor.isActive ? 'Active' : 'Inactive'}
-                        </span>
-                      </div>
-                      <div className="grid grid-cols-1 md:grid-cols-6 gap-4">
-                        <div className="flex items-center space-x-2">
-                          <BookOpen className="w-4 h-4 text-gray-400" />
-                          <div>
-                            <p className="text-xs text-gray-500">Courses</p>
-                            <p className="text-sm font-medium">{instructor.courseCount}</p>
-                          </div>
-                        </div>
-                        <div className="flex items-center space-x-2">
-                          <Users className="w-4 h-4 text-gray-400" />
-                          <div>
-                            <p className="text-xs text-gray-500">Enrollments</p>
-                            <p className="text-sm font-medium">{instructor.totalEnrollments}</p>
-                          </div>
-                        </div>
-                        <div className="flex items-center space-x-2">
-                          <DollarSign className="w-4 h-4 text-gray-400" />
-                          <div>
-                            <p className="text-xs text-gray-500">Revenue</p>
-                            <p className="text-sm font-medium">${truncateToTwoDecimals(instructor.totalRevenue)}</p>
-                          </div>
-                        </div>
-                        <div className="flex items-center space-x-2">
-                          <BarChart3 className="w-4 h-4 text-gray-400" />
-                          <div>
-                            <p className="text-xs text-gray-500">Rating</p>
-                            <p className="text-sm font-medium">{truncateToTwoDecimals(instructor.averageRating)}/5</p>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </DashboardSection>
-        </>
-      )}
-    </DashboardLayout>
-  );
+					{/* Top Instructors Section */}
+					<DashboardSection
+						icon={GraduationCap}
+						iconColor="text-purple-600"
+						iconBgColor="bg-purple-50"
+						title="Top Performing Instructors"
+						subtitle="Instructors with highest selling rates and revenue"
+					>
+						<div className="space-y-4">
+							{data.topInstructors.map((instructor, index) => (
+								<div
+									key={instructor.instructorId}
+									className="bg-white/60 backdrop-blur-sm border border-gray-200/50 rounded-xl p-4"
+								>
+									<div className="flex items-center space-x-4">
+										<div className="w-10 h-10 bg-purple-50 rounded-lg flex items-center justify-center">
+											<span className="text-sm font-semibold text-purple-600">
+												#{index + 1}
+											</span>
+										</div>
+										<div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center">
+											<span className="text-sm font-semibold text-gray-600">
+												{instructor.instructorName
+													.split(" ")
+													.map((n) => n[0])
+													.join("")}
+											</span>
+										</div>
+										<div className="flex-1 space-y-2">
+											<div className="flex items-center gap-2">
+												<span className="text-sm font-medium text-gray-500">
+													#{index + 1}
+												</span>
+												<h3 className="text-lg font-semibold text-gray-900">
+													{instructor.instructorName}
+												</h3>
+												<span className="text-sm text-gray-500">
+													{instructor.email}
+												</span>
+												<span
+													className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${
+														instructor.isActive
+															? "bg-green-50 text-green-700 border border-green-200"
+															: "bg-red-50 text-red-700 border border-red-200"
+													}`}
+												>
+													{instructor.isActive ? "Active" : "Inactive"}
+												</span>
+											</div>
+											<div className="grid grid-cols-1 md:grid-cols-6 gap-4">
+												<div className="flex items-center space-x-2">
+													<BookOpen className="w-4 h-4 text-gray-400" />
+													<div>
+														<p className="text-xs text-gray-500">Courses</p>
+														<p className="text-sm font-medium">
+															{instructor.courseCount}
+														</p>
+													</div>
+												</div>
+												<div className="flex items-center space-x-2">
+													<Users className="w-4 h-4 text-gray-400" />
+													<div>
+														<p className="text-xs text-gray-500">Enrollments</p>
+														<p className="text-sm font-medium">
+															{instructor.totalEnrollments}
+														</p>
+													</div>
+												</div>
+												<div className="flex items-center space-x-2">
+													<DollarSign className="w-4 h-4 text-gray-400" />
+													<div>
+														<p className="text-xs text-gray-500">Revenue</p>
+														<p className="text-sm font-medium">
+															${truncateToTwoDecimals(instructor.totalRevenue)}
+														</p>
+													</div>
+												</div>
+												<div className="flex items-center space-x-2">
+													<BarChart3 className="w-4 h-4 text-gray-400" />
+													<div>
+														<p className="text-xs text-gray-500">Rating</p>
+														<p className="text-sm font-medium">
+															{truncateToTwoDecimals(instructor.averageRating)}
+															/5
+														</p>
+													</div>
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
+							))}
+						</div>
+					</DashboardSection>
+				</>
+			)}
+		</DashboardLayout>
+	);
 }

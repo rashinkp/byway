@@ -1,4 +1,4 @@
-import { PrismaClient, LessonContent as PrismaLessonContent } from "@prisma/client";
+import { PrismaClient } from "@prisma/client";
 import { ContentStatus, ContentType } from "../../domain/enum/content.enum";
 import { LessonContent, QuizQuestion } from "../../domain/entities/lesson-content.entity";
 import { ILessonContentRepository } from "../../app/repositories/content.repository";

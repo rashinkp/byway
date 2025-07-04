@@ -2,7 +2,6 @@ import { HttpError } from "../../../../presentation/http/errors/http-error";
 import { ICourseRepository } from "../../../repositories/course.repository.interface";
 import { IDeleteCourseUseCase } from "../interfaces/delete-course.usecase.interface";
 import { ICourseWithDetailsDTO } from "../../../../domain/dtos/course/course.dto";
-import { IUserRepository } from '../../../repositories/user.repository';
 import { CreateNotificationsForUsersUseCase } from '../../notification/implementations/create-notifications-for-users.usecase';
 import { NotificationEventType } from '../../../../domain/enum/notification-event-type.enum';
 import { NotificationEntityType } from '../../../../domain/enum/notification-entity-type.enum';
@@ -10,7 +9,6 @@ import { NotificationEntityType } from '../../../../domain/enum/notification-ent
 export class DeleteCourseUseCase implements IDeleteCourseUseCase {
   constructor(
     private courseRepository: ICourseRepository,
-    private userRepository: IUserRepository,
     private createNotificationsForUsersUseCase: CreateNotificationsForUsersUseCase
   ) {}
 
@@ -38,7 +36,6 @@ export class DeleteCourseUseCase implements IDeleteCourseUseCase {
     const updatedCourse = await this.courseRepository.softDelete(course);
 
     // Determine the action and notify the instructor
-    const action = isCurrentlyDeleted ? 'enabled' : 'disabled';
     const eventType = isCurrentlyDeleted ? NotificationEventType.COURSE_ENABLED : NotificationEventType.COURSE_DISABLED;
     const message = isCurrentlyDeleted 
       ? `Your course "${course.title}" has been enabled and is now available to students.`

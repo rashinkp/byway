@@ -1,4 +1,3 @@
-import { CreateOrderDto } from "../../../../domain/dtos/order/create-order.dto";
 import { WebhookEvent } from "../../../../domain/value-object/webhook-event.value-object";
 import { Transaction } from "../../../../domain/entities/transaction.entity";
 import { CreateCheckoutSessionDto } from "../../../../domain/dtos/stripe/create-checkout-session.dto";

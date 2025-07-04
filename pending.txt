@@ -1,0 +1,18 @@
+stripe webhook portal = stripe listen --forward-to localhost:5001/api/v1/stripe/webhook 
+
+pendings :
+while approving course not refetching the data (low level);
+while reload without login redirecting to login page without any reason.
+lesson count in (cart)
+too many auth/me and socket io connection
+
+
+style and ui:
+reloading add loading state in navbar in user side
+while auth and otp few ui redirection loading issue
+while login loading the skeleton keep the button spinner while submitting
+while cliking from the mobile search list is not working
+
+features: 
+coupon
+favorites

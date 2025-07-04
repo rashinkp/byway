@@ -1,5 +1,3 @@
-import { InstructorDetails } from "@prisma/client";
-
 export interface GetInstructorDetailsUseCase {
   execute(instructorId: string): Promise<{
     userId: string;

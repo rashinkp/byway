@@ -28,7 +28,7 @@ export const restrictTo =
       }
       req.user = payload;
       next();
-    } catch (error) {
+    } catch {
       throw new HttpError("Invalid or expired token", 401);
     }
   };
@@ -36,7 +36,7 @@ export const restrictTo =
 // Optional authentication
 export const optionalAuth = async (
   req: Request,
-  res: Response,
+  _res: Response,
   next: NextFunction
 ): Promise<void> => {
   const token = req.cookies.jwt;
@@ -47,18 +47,16 @@ export const optionalAuth = async (
       if (payload) {
         req.user = payload;
       }
-    } catch (error) {
-      
+    } catch {
+      // Swallow error for optional auth
     }
   }
   next();
 };
 
-// Extend Express Request interface
-declare global {
-  namespace Express {
-    interface Request {
-      user?: JwtPayload;
-    }
+// Extend Express Request interface using module augmentation
+declare module 'express-serve-static-core' {
+  interface Request {
+    user?: JwtPayload;
   }
 }
