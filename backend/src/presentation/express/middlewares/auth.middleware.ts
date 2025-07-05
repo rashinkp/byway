@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import { JwtProvider } from "../../../infra/providers/auth/jwt.provider";
-import { CookieService } from "../../http/utils/cookie.service";
 import { HttpError } from "../../http/errors/http-error";
+import { CookieUtils } from "./cookie.utils";
 
 export interface JwtPayload {
   id: string;
@@ -74,7 +74,7 @@ export const authenticate = async (req: Request, res: Response, next: NextFuncti
   }
 
   // 1. Try access token first
-  let payload = accessToken ? jwtProvider.verifyAccessToken(accessToken) as JwtPayload : null;
+  const payload = accessToken ? jwtProvider.verifyAccessToken(accessToken) as JwtPayload : null;
 
   // 2. If access token is valid, proceed
   if (payload && payload.id && payload.email && payload.role) {
@@ -96,21 +96,8 @@ export const authenticate = async (req: Request, res: Response, next: NextFuncti
         console.log("[Auth] Using recently issued tokens for already used refresh token");
         
         // Set the recently issued tokens
-        console.log("[CookieService] Setting recently issued access_token cookie");
-        res.cookie("access_token", recentTokens.accessToken, {
-          httpOnly: process.env.NODE_ENV === "production",
-          secure: process.env.NODE_ENV === "production",
-          sameSite: "lax",
-          maxAge: 1 * 60 * 1000, // 1 minute
-        });
-        
-        console.log("[CookieService] Setting recently issued refresh_token cookie");
-        res.cookie("refresh_token", recentTokens.refreshToken, {
-          httpOnly: process.env.NODE_ENV === "production",
-          secure: process.env.NODE_ENV === "production",
-          sameSite: "lax",
-          maxAge: 24 * 60 * 60 * 1000, // 1 day
-        });
+        console.log("[CookieService] Setting recently issued tokens");
+        CookieUtils.setAuthCookies(res, recentTokens.accessToken, recentTokens.refreshToken);
         
         req.user = recentTokens.user;
         return next();
@@ -150,21 +137,8 @@ export const authenticate = async (req: Request, res: Response, next: NextFuncti
         const { accessToken: newAccessToken, refreshToken: newRefreshToken, user } = await refreshPromise;
         
         // Set new cookies
-        console.log("[CookieService] Setting new access_token cookie");
-        res.cookie("access_token", newAccessToken, {
-          httpOnly: process.env.NODE_ENV === "production",
-          secure: process.env.NODE_ENV === "production",
-          sameSite: "lax",
-          maxAge: 1 * 60 * 1000, // 1 minute
-        });
-        
-        console.log("[CookieService] Setting new refresh_token cookie");
-        res.cookie("refresh_token", newRefreshToken, {
-          httpOnly: process.env.NODE_ENV === "production",
-          secure: process.env.NODE_ENV === "production",
-          sameSite: "lax",
-          maxAge: 24 * 60 * 60 * 1000, // 1 day
-        });
+        console.log("[CookieService] Setting new tokens");
+        CookieUtils.setAuthCookies(res, newAccessToken, newRefreshToken);
         
         console.log("[Auth] New tokens created and set successfully");
         
@@ -191,11 +165,11 @@ export const restrictTo =
       const refreshToken = req.cookies.refresh_token;
 
       if (!accessToken && !refreshToken) {
-        throw new HttpError("No token provided", 401);
+        return next(new HttpError("No token provided", 401));
       }
 
       // 1. Try access token first
-      let payload = accessToken ? jwtProvider.verifyAccessToken(accessToken) as JwtPayload : null;
+      const payload = accessToken ? jwtProvider.verifyAccessToken(accessToken) as JwtPayload : null;
 
       // 2. If access token is valid, proceed
       if (payload && payload.id && payload.email && payload.role) {
@@ -214,25 +188,12 @@ export const restrictTo =
             console.log("[Auth] Using recently issued tokens for already used refresh token (restrictTo)");
             
             // Set the recently issued tokens
-            console.log("[CookieService] Setting recently issued access_token cookie");
-            res.cookie("access_token", recentTokens.accessToken, {
-              httpOnly: process.env.NODE_ENV === "production",
-              secure: process.env.NODE_ENV === "production",
-              sameSite: "lax",
-              maxAge: 1 * 60 * 1000, // 1 minute
-            });
-            
-            console.log("[CookieService] Setting recently issued refresh_token cookie");
-            res.cookie("refresh_token", recentTokens.refreshToken, {
-              httpOnly: process.env.NODE_ENV === "production",
-              secure: process.env.NODE_ENV === "production",
-              sameSite: "lax",
-              maxAge: 24 * 60 * 60 * 1000, // 1 day
-            });
+            console.log("[CookieService] Setting recently issued tokens");
+            CookieUtils.setAuthCookies(res, recentTokens.accessToken, recentTokens.refreshToken);
             
             req.user = recentTokens.user;
           } else {
-            throw new HttpError("Refresh token already used", 401);
+            return next(new HttpError("Refresh token already used", 401));
           }
         } else {
           const refreshPayload = jwtProvider.verifyRefreshToken(refreshToken);
@@ -266,48 +227,35 @@ export const restrictTo =
               const { accessToken: newAccessToken, refreshToken: newRefreshToken, user } = await refreshPromise;
               
               // Set new cookies
-              console.log("[CookieService] Setting new access_token cookie");
-              res.cookie("access_token", newAccessToken, {
-                httpOnly: process.env.NODE_ENV === "production",
-                secure: process.env.NODE_ENV === "production",
-                sameSite: "lax",
-                maxAge: 1 * 60 * 1000, // 1 minute
-              });
-              
-              console.log("[CookieService] Setting new refresh_token cookie");
-              res.cookie("refresh_token", newRefreshToken, {
-                httpOnly: process.env.NODE_ENV === "production",
-                secure: process.env.NODE_ENV === "production",
-                sameSite: "lax",
-                maxAge: 24 * 60 * 60 * 1000, // 1 day
-              });
+              console.log("[CookieService] Setting new tokens");
+              CookieUtils.setAuthCookies(res, newAccessToken, newRefreshToken);
               
               console.log("[Auth] New tokens created and set successfully (restrictTo)");
               
               req.user = user;
             } catch (error) {
               console.error("[Auth] Error creating new tokens (restrictTo):", error);
-              throw new HttpError("Failed to refresh tokens", 500);
+              return next(new HttpError("Failed to refresh tokens", 500));
             }
           } else {
             console.log("[Auth] Invalid refresh token (restrictTo)");
-            throw new HttpError("Invalid refresh token", 401);
+            return next(new HttpError("Invalid refresh token", 401));
           }
         }
       } else {
-        throw new HttpError("Invalid or expired token", 401);
+        return next(new HttpError("Invalid or expired token", 401));
       }
 
       // 4. Check role permissions
       if (!req.user || !req.user.role) {
-        throw new HttpError("Invalid token", 401);
+        return next(new HttpError("Invalid token", 401));
       }
       if (!roles.includes(req.user.role)) {
-        throw new HttpError("Insufficient permissions", 403);
+        return next(new HttpError("Insufficient permissions", 403));
       }
 
       next();
-    };
+  };
 
 export const optionalAuth = async (
   req: Request,

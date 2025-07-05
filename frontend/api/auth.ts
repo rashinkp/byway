@@ -1,5 +1,6 @@
-import { api, getTokenServer } from "@/api/api";
+import { api } from "@/api/api";
 import { User } from "@/types/user";
+import { useAuthStore } from "@/stores/auth.store";
 
 interface ApiResponse<T> {
 	statusCode: number;
@@ -42,7 +43,13 @@ export async function login(email: string, password: string) {
 			email,
 			password,
 		});
-		return response.data.data;
+		const user = response.data.data;
+		if (typeof window !== "undefined") {
+			localStorage.setItem("auth_user", JSON.stringify(user));
+			console.log("[auth.ts] Stored user in localStorage after login");
+		}
+		useAuthStore.getState().setUser(user);
+		return user;
 	} catch (error: any) {
 		throw new Error(
 			error.response?.data?.message ||
@@ -59,6 +66,12 @@ export async function googleAuth(
 		const response = await api.post<ApiResponse<User>>("/auth/google", {
 			accessToken: access_token,
 		});
+		const user = response.data.data;
+		if (typeof window !== "undefined") {
+			localStorage.setItem("auth_user", JSON.stringify(user));
+			console.log("[auth.ts] Stored user in localStorage after Google auth");
+		}
+		useAuthStore.getState().setUser(user);
 		return response.data;
 	} catch (error: any) {
 		throw new Error(
@@ -137,11 +150,20 @@ export async function resetPassword(
 export async function getCurrentUser(): Promise<User | null> {
 	try {
 		const response = await api.get<ApiResponse<User>>("/user/me");
-		return response.data.data;
+		const user = response.data.data;
+		if (typeof window !== "undefined") {
+			localStorage.setItem("auth_user", JSON.stringify(user));
+			console.log("[auth.ts] Stored user in localStorage after getCurrentUser");
+		}
+		useAuthStore.getState().setUser(user);
+		return user;
 	} catch (error: any) {
+		useAuthStore.getState().handleAuthError(error);
+		
 		if (error.response?.status === 401) {
 			return null;
 		}
+		
 		throw new Error(
 			error.response?.data?.message ||
 				error.response?.data?.error ||
@@ -153,6 +175,12 @@ export async function getCurrentUser(): Promise<User | null> {
 export async function logout(): Promise<void> {
 	try {
 		await api.post<ApiResponse<unknown>>("/auth/logout");
+		if (typeof window !== "undefined") {
+			localStorage.removeItem("auth_user");
+			localStorage.removeItem("auth_email");
+			console.log("[auth.ts] Cleared user and email from localStorage on logout");
+		}
+		useAuthStore.getState().clearAuth();
 	} catch (error: any) {
 		throw new Error(
 			error.response?.data?.message ||
@@ -165,14 +193,19 @@ export async function logout(): Promise<void> {
 export async function getCurrentUserServer(
 	cookies: string,
 ): Promise<User | null> {
-		const token = getTokenServer(cookies);
+	try {
 		const response = await api.get<ApiResponse<User>>("/user/me", {
 			headers: {
 				Cookie: cookies,
-				...(token ? { Authorization: `Bearer ${token}` } : {}),
 			},
 		});
 		return response.data.data;
+	} catch (error: any) {
+		if (error.response?.status === 401) {
+			return null;
+		}
+		throw error;
+	}
 }
 
 export async function facebookAuth(
@@ -180,6 +213,12 @@ export async function facebookAuth(
 ): Promise<ApiResponse<User>> {
 	try {
 		const response = await api.post<ApiResponse<User>>("/auth/facebook", data);
+		const user = response.data.data;
+		if (typeof window !== "undefined") {
+			localStorage.setItem("auth_user", JSON.stringify(user));
+			console.log("[auth.ts] Stored user in localStorage after Facebook auth");
+		}
+		useAuthStore.getState().setUser(user);
 		return response.data;
 	} catch (error: any) {
 		console.error("Facebook auth error:", {

@@ -34,7 +34,7 @@ interface ListPageProps<T> {
 	};
 	columns: Column<T>[];
 	actions: Action<T>[];
-	stats: (items: T[], total: number) => Stat<T>[];
+	stats: (items: T[], total: number) => Stat[];
 	sortOptions: SortOption<T>[];
 	addButton?: {
 		label: string;

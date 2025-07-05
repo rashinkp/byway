@@ -4,6 +4,7 @@ import { Header } from "@/components/layout/Header";
 import NotificationModal from "@/components/notifications/NotificationModal";
 import { useState } from "react";
 import BywayFooter from "@/components/layout/Footer";
+import { PublicRouteWrapper } from "@/components/auth/PublicRouteWrapper";
 
 export default function PublicLayout({
 	children,
@@ -19,7 +20,11 @@ export default function PublicLayout({
 				open={notificationOpen}
 				onOpenChange={setNotificationOpen}
 			/>
-			<main className="flex-1">{children}</main>
+			<main className="flex-1">
+				<PublicRouteWrapper>
+					{children}
+				</PublicRouteWrapper>
+			</main>
 			<BywayFooter />
 		</div>
 	);

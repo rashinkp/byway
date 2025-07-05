@@ -50,10 +50,10 @@ export class AuthController extends BaseController {
       const validated = validateFacebookAuth(request.body);
       const user = await this.facebookAuthUseCase.execute(validated);
       const data = {
-        id: user.id,
-        name: user.name,
-        email: user.email,
-        role: user.role,
+          id: user.id,
+          name: user.name,
+          email: user.email,
+          role: user.role,
       };
       const response = this.success_200(data, "Facebook authentication successful");
       return {
@@ -111,10 +111,10 @@ export class AuthController extends BaseController {
     return this.handleRequest(httpRequest, async (request) => {
       const user = this.getUserFromRefreshToken(request);
       const data = {
-        id: user.id,
-        name: user.name,
-        email: user.email,
-        role: user.role,
+          id: user.id,
+          name: user.name,
+          email: user.email,
+          role: user.role,
       };
       const response = this.success_200(data, "Tokens issued");
       return {
@@ -129,11 +129,11 @@ export class AuthController extends BaseController {
       const validated = validateLogin(request.body);
       const { user, cartCount } = await this.loginUseCase.execute(validated);
       const data = {
-        id: user.id,
-        name: user.name,
-        email: user.email,
-        role: user.role,
-        cartCount,
+          id: user.id,
+          name: user.name,
+          email: user.email,
+          role: user.role,
+          cartCount,
       };
       const response = this.success_200(data, "Login successful");
       return {
@@ -159,10 +159,10 @@ export class AuthController extends BaseController {
       const validated = validateRegister(request.body);
       const user = await this.registerUseCase.execute(validated);
       const data = {
-        id: user.id,
-        name: user.name,
-        email: user.email,
-        role: user.role,
+          id: user.id,
+          name: user.name,
+          email: user.email,
+          role: user.role,
       };
       return this.success_201(data, "Registration successful");
     });

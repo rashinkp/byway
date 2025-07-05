@@ -6,7 +6,7 @@ export interface IHttpRequest {
   body?: any;
   params: Record<string, string>;
   query?: Record<string, string>;
-  user?: JwtPayload;
+  user?: JwtPayload; 
   cookies?: Record<string, any>;
   res?: Response;
 }

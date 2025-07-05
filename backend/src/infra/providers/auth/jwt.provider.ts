@@ -5,7 +5,7 @@ import { IJwtProvider } from "../../../app/providers/I.jwt.provider";
 export class JwtProvider implements IJwtProvider {
   signAccessToken(payload: object): string {
     return jwt.sign(payload, envConfig.ACCESS_TOKEN_SIGNATURE, {
-      expiresIn: "1m",
+      expiresIn: "2h",
       algorithm: "HS256",
       issuer: "byway",
     });
@@ -13,7 +13,7 @@ export class JwtProvider implements IJwtProvider {
 
   signRefreshToken(payload: object): string {
     return jwt.sign(payload, envConfig.REFRESH_TOKEN_SIGNATURE, {
-      expiresIn: "1d",
+      expiresIn: "7d",
       algorithm: "HS256",
       issuer: "byway",
     });

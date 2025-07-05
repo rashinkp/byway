@@ -1,6 +1,12 @@
 import { Response } from "express";
 import { JwtProvider } from "../../../infra/providers/auth/jwt.provider";
+import { CookieUtils } from "../../express/middlewares/cookie.utils";
 
+/**
+ * CookieService - HTTP layer interface for cookie operations
+ * This service delegates to CookieUtils to maintain separation of concerns
+ * while ensuring consistent cookie management across the application
+ */
 export class CookieService {
   /**
    * Sets both access and refresh tokens as cookies. Used for login and token refresh flows.
@@ -10,37 +16,15 @@ export class CookieService {
     user: { id: string; email: string; role: string },
     jwtProvider: JwtProvider
   ): void {
-    const accessToken = jwtProvider.signAccessToken(user);
-    const refreshToken = jwtProvider.signRefreshToken(user);
-
-    console.log("[CookieService] Setting access_token cookie");
-    res.cookie("access_token", accessToken, {
-      httpOnly: process.env.NODE_ENV === "production",
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
-      maxAge: 1 * 60 * 1000, // 1 minute
-    });
-    console.log("[CookieService] Setting refresh_token cookie");
-    res.cookie("refresh_token", refreshToken, {
-      httpOnly: process.env.NODE_ENV === "production",
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
-      maxAge: 24 * 60 * 60 * 1000, // 1 day
-    });
+    console.log("[CookieService] Setting auth cookies for user:", user.email);
+    CookieUtils.setAuthCookiesFromUser(res, user, jwtProvider);
   }
 
+  /**
+   * Clear authentication cookies
+   */
   static clearAuthCookies(res: Response): void {
-    console.log("[CookieService] Clearing access_token cookie");
-    res.clearCookie("access_token", {
-      httpOnly: process.env.NODE_ENV === "production",
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
-    });
-    console.log("[CookieService] Clearing refresh_token cookie");
-    res.clearCookie("refresh_token", {
-      httpOnly: process.env.NODE_ENV === "production",
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
-    });
+    console.log("[CookieService] Clearing auth cookies");
+    CookieUtils.clearAuthCookies(res);
   }
 }

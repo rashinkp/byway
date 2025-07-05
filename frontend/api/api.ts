@@ -1,5 +1,4 @@
-import axios, { type AxiosError, type InternalAxiosRequestConfig } from "axios";
-import { logout } from "@/api/auth";
+import axios, { type AxiosError } from "axios";
 import { useAuthStore } from "@/stores/auth.store";
 
 interface ApiErrorResponse {
@@ -7,38 +6,23 @@ interface ApiErrorResponse {
 	error?: string;
 }
 
-interface ExtendedAxiosRequestConfig extends InternalAxiosRequestConfig {
-	_retry?: boolean;
-}
 
 export const api = axios.create({
-	baseURL:
-		process.env.NEXT_PUBLIC_AUTH_API_URL || "http://localhost:5001/api/v1",
-	withCredentials: true,
-	headers: {
-		"Cache-Control": "no-cache",
-	},
+  baseURL: process.env.NEXT_PUBLIC_API_URL,
+  withCredentials: true,
+  headers: {
+    "Cache-Control": "no-cache",
+  },
 });
 
-let isLoggingOut = false;
-
-const getTokenClient = () => {
-	if (typeof document === "undefined") return null;
-	const cookies = document.cookie.split(";");
-	const jwtCookie = cookies.find((cookie) => cookie.trim().startsWith("access_token="));
-	return jwtCookie ? jwtCookie.split("=")[1] : null;
-};
-
-export const getTokenServer = (cookieHeader: string) => {
-	const cookies = cookieHeader.split(";");
-	const jwtCookie = cookies.find((cookie) => cookie.trim().startsWith("access_token="));
-	return jwtCookie ? jwtCookie.split("=")[1] : null;
-};
-
 api.interceptors.request.use((config) => {
-	const token = getTokenClient();
-	if (token) {
-		config.headers.Authorization = `Bearer ${token}`;
+	if (typeof window !== "undefined") {
+		const user = localStorage.getItem("auth_user");
+		if (user) {
+			config.headers = config.headers || {};
+			config.headers["x-user"] = user;
+			console.log("[API] Set x-user header from localStorage");
+		}
 	}
 	console.log("Request sent:", { url: config.url, method: config.method });
 	return config;
@@ -53,16 +37,12 @@ api.interceptors.response.use(
 		return response;
 	},
 	async (error: AxiosError<ApiErrorResponse>) => {
-		const originalRequest = error.config as ExtendedAxiosRequestConfig;
-
 		console.log("Interceptor error:", {
 			status: error.response?.status,
 			url: error.config?.url,
-			retry: originalRequest._retry,
-			isLoggingOut,
 		});
 
-		// List of endpoints that should not trigger logout on 401
+		// List of endpoints that should not trigger auth clearing on 401
 		const guestAccessibleEndpoints = [
 			"/reviews/course/",
 			"/courses/",
@@ -74,51 +54,23 @@ api.interceptors.response.use(
 			(endpoint) => error.config?.url?.includes(endpoint),
 		);
 
+		// Handle 401 errors (unauthorized/disabled user)
 		if (
 			error.response?.status === 401 &&
-			!originalRequest._retry &&
 			!error.config?.url?.includes("/auth/logout") &&
 			!isGuestAccessibleEndpoint
 		) {
 			console.log("Handling 401 for:", error.config?.url);
-			if (isLoggingOut) {
-				console.log("Already logging out, rejecting error");
-				return Promise.reject(error);
+			console.log("[API] Calling clearAuth for 401");
+			useAuthStore.getState().clearAuth();
+			if (typeof window !== "undefined" && !window.location.pathname.includes("/login")) {
+				console.log("[API] Redirecting to /login due to 401 error");
+				window.location.href = "/login";
 			}
-
-			isLoggingOut = true;
-			originalRequest._retry = true;
-
-			try {
-				if (typeof window !== "undefined") {
-					useAuthStore.getState().clearAuth();
-					await logout();
-					console.log("Logout successful, redirecting to /login");
-					if (!window.location.pathname.includes("/login")) {
-						window.location.href = "/login";
-					} else {
-						console.log("Already on /login, no redirect needed");
-					}
-				} else {
-					console.log("Skipping logout/redirect: SSR context");
-				}
-			} catch (logoutError) {
-				console.error("Logout failed during 401 handling:", logoutError);
-			} finally {
-				isLoggingOut = false;
-				console.log("Reset isLoggingOut flag");
-			}
-
-			const errorMessage =
-				error.response?.data?.message ||
-				error.response?.data?.error ||
-				"Session invalidated. Please log in again.";
-			const enhancedError = new Error(
-				errorMessage,
-			) as AxiosError<ApiErrorResponse>;
-			enhancedError.response = error.response;
-			enhancedError.config = error.config;
-			return Promise.reject(enhancedError);
+		} else {
+			// For non-401 errors, use handleAuthError to preserve user data
+			console.log("[API] Calling handleAuthError for non-401");
+			useAuthStore.getState().handleAuthError(error);
 		}
 
 		const errorMessage =
@@ -127,7 +79,7 @@ api.interceptors.response.use(
 			error.message ||
 			"An unexpected error occurred";
 
-		console.log("Non-401 error:", errorMessage);
+		console.log("Error details:", errorMessage);
 		const enhancedError = new Error(
 			errorMessage,
 		) as AxiosError<ApiErrorResponse>;

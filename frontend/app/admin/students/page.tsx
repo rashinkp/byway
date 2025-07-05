@@ -11,8 +11,8 @@ export default function StudentsPage() {
 
 	// Move useGetAllUsers out of the callback
 	const allUsersHook = useGetAllUsers({
-		// Provide default params or state if needed
-		// ...
+		includeDeleted:true,
+		role:'USER'
 	});
 
 	return (

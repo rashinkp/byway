@@ -17,7 +17,7 @@ export class GetCurrentUserUseCase implements IGetCurrentUserUseCase {
     }
 
     if (user.deletedAt) {
-      throw new HttpError("User not found", 401);
+      throw new HttpError("User account is disabled", 401);
     }
     const cartCount = await this.cartRepository.countByUserId(userId);
     return { user, cartCount };

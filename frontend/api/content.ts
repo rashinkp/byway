@@ -14,10 +14,6 @@ export async function createContent(
 		console.log("Content creation response:", response.data);
 		return response.data.data;
 	} catch (error: any) {
-		if (error.response?.status === 401) {
-			throw new Error("Authentication required. Please log in again.");
-		}
-
 		if (error.response?.status === 403) {
 			throw new Error("You don't have permission to create content.");
 		}
@@ -68,10 +64,6 @@ export async function updateContent(
 			message: error.message,
 		});
 
-		if (error.response?.status === 401) {
-			throw new Error("Authentication required. Please log in again.");
-		}
-
 		if (error.response?.status === 403) {
 			throw new Error("You don't have permission to update content.");
 		}
@@ -98,10 +90,6 @@ export async function getContentByLessonId(
 		console.log("Content fetch response:", response.data);
 		return response.data.data;
 	} catch (error: any) {
-		if (error.response?.status === 401) {
-			throw new Error("Authentication required. Please log in again.");
-		}
-
 		if (error.response?.status === 403) {
 			throw new Error("You don't have permission to view this content.");
 		}
@@ -128,10 +116,6 @@ export async function deleteContent(contentId: string): Promise<void> {
 			data: error.response?.data,
 			message: error.message,
 		});
-
-		if (error.response?.status === 401) {
-			throw new Error("Authentication required. Please log in again.");
-		}
 
 		if (error.response?.status === 403) {
 			throw new Error("You don't have permission to delete this content.");

@@ -145,7 +145,7 @@ export default function UserDashboard() {
 									fill="var(--color-background)"
 									fontWeight="bold"
 								>
-									“
+									"
 								</text>
 							</svg>
 						</div>
@@ -153,12 +153,12 @@ export default function UserDashboard() {
 							Testimonial
 						</h2>
 						<p className="text-lg text-[var(--color-primary-dark)] mb-8 font-medium">
-							“Since implementing Byway, our organization has witnessed a
+							"Since implementing Byway, our organization has witnessed a
 							remarkable transformation in how we approach learning. The
 							platform&apos;s simplicity belies its powerful capabilities,
 							offering a seamless and enjoyable educational experience. The
 							efficiency with which we can now manage courses, track progress,
-							and foster collaboration among learners is truly impressive.”
+							and foster collaboration among learners is truly impressive."
 						</p>
 						<div className="flex flex-col items-start gap-2">
 							<span className="font-semibold text-[var(--color-primary-dark)]">

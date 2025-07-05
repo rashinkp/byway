@@ -3,7 +3,7 @@ import { getInstructorProfile } from "@/api/instructor.api";
 import { useAuth } from "../auth/useAuth";
 
 export function useDetailedInstructorData() {
-	const { user } = useAuth();
+	const { user, isLoading: authLoading, isAuthenticated } = useAuth();
 
 	return useQuery({
 		queryKey: ["instructor", user?.id],
@@ -12,6 +12,14 @@ export function useDetailedInstructorData() {
 			const response = await getInstructorProfile(user.id);
 			return response.data;
 		},
-		enabled: !!user?.id,
+		enabled: !!user?.id && isAuthenticated && !authLoading,
+		staleTime: 5 * 60 * 1000,
+		gcTime: 10 * 60 * 1000,
+		retry: (failureCount, error) => {
+			if (error.message.includes("401") || error.message.includes("403")) {
+				return false;
+			}
+			return failureCount < 3;
+		},
 	});
 }
