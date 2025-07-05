@@ -12,19 +12,24 @@ export default function CoursesPage() {
 	const router = useRouter();
 	const { data: statsData } = useGetCourseStats();
 
-	// Move useGetAllCourses out of the callback
-	const allCoursesHook = useGetAllCourses({
-		// Provide default params or state if needed
-		// ...
-	});
-
 	return (
 		<ListPage<Course>
 			title="Course Management"
 			description="Manage courses and their visibility"
 			entityName="Course"
 			role={user?.role as "ADMIN" | "USER" | "INSTRUCTOR" | undefined}
-			useDataHook={() => allCoursesHook}
+			useDataHook={params => {
+				// Only allow valid sortBy values
+				const validSortBy = ["title", "price", "createdAt"];
+				const sortBy = validSortBy.includes(params.sortBy) ? (params.sortBy as "title" | "price" | "createdAt") : "title";
+				const validFilterBy = [
+					"All", "Active", "Inactive", "Approved", "Declined", "Pending", "Published", "Draft", "Archived"
+				] as const;
+				const filterBy = validFilterBy.includes(params.filterBy as typeof validFilterBy[number])
+					? (params.filterBy as "All" | "Active" | "Inactive" | "Approved" | "Declined" | "Pending" | "Published" | "Draft" | "Archived")
+					: "All";
+				return useGetAllCourses({ ...params, sortBy, filterBy, role: user?.role || "ADMIN" });
+			}}
 			columns={[
 				{
 					header: "Title",

@@ -79,19 +79,23 @@ export default function CategoriesPage() {
 		</div>
 	);
 
-	// Move useCategories out of the callback
-	const categoriesHook = useCategories({
-		// Provide default params or state if needed
-		// ...
-	});
-
 	return (
 		<>
 			<ListPage<Category>
 				title="Category Management"
 				description="Manage course categories and their settings"
 				entityName="Category"
-				useDataHook={() => categoriesHook}
+				useDataHook={params => {
+					const validSortBy = ["name", "createdAt"] as const;
+					const sortBy = validSortBy.includes(params.sortBy as typeof validSortBy[number])
+						? (params.sortBy as typeof validSortBy[number])
+						: "name";
+					const validFilterBy = ["All", "Active", "Inactive"] as const;
+					const filterBy = validFilterBy.includes(params.filterBy as typeof validFilterBy[number])
+						? (params.filterBy as typeof validFilterBy[number])
+						: "All";
+					return useCategories({ ...params, sortBy, filterBy });
+				}}
 				filterOptions={[
 					{ label: "All", value: "All" },
 					{ label: "Active", value: "Active" },

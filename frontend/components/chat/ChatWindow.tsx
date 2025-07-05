@@ -23,20 +23,12 @@ interface ChatWindowProps {
 }
 
 export function ChatWindow({ chat, messages, onSendMessage, currentUserId, onDeleteMessage, onLoadMoreMessages, loadingMoreMessages, showBackButton, onBack, ...props }: ChatWindowProps & { setPendingImageUrl?: (url: string) => void, setPendingAudioUrl?: (url: string) => void, isNewChat?: boolean }) {
-  const [newMessage, setNewMessage] = useState('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const messagesContainerRef = useRef<HTMLDivElement>(null);
-  const [menuOpen, setMenuOpen] = useState(false);
   const { user: currentUser } = useAuth();
   const prevMessagesLength = useRef(messages.length);
   const prevScrollHeight = useRef<number | null>(null);
-  const [imageModalOpen, setImageModalOpen] = useState(false);
-  const [selectedImage, setSelectedImage] = useState<File | null>(null);
-  const [imagePreview, setImagePreview] = useState<string | null>(null);
-  const [imageError, setImageError] = useState<string | null>(null);
-  const fileInputRef = useRef<HTMLInputElement>(null);
   const MAX_SIZE_MB = 2;
-  const [showAudioRecorder, setShowAudioRecorder] = useState(false);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -67,39 +59,7 @@ export function ChatWindow({ chat, messages, onSendMessage, currentUserId, onDel
     }
   }, [messages, loadingMoreMessages]);
 
-  const handleSendMessage = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (newMessage.trim()) {
-      onSendMessage(newMessage.trim());
-      setNewMessage('');
-    }
-  };
 
-  const getRoleColor = (role: string) => {
-    switch (role.toLowerCase()) {
-      case 'admin':
-        return 'bg-red-500';
-      case 'instructor':
-        return 'bg-blue-500';
-      case 'user':
-        return 'bg-green-500';
-      default:
-        return 'bg-gray-500';
-    }
-  };
-
-  const getRoleBadgeColor = (role: string) => {
-    switch (role.toLowerCase()) {
-      case 'admin':
-        return 'bg-red-50 text-red-700 border-red-200';
-      case 'instructor':
-        return 'bg-blue-50 text-blue-700 border-blue-200';
-      case 'user':
-        return 'bg-green-50 text-green-700 border-green-200';
-      default:
-        return 'bg-gray-50 text-gray-700 border-gray-200';
-    }
-  };
 
   // Group messages by date
   const groupedMessages: { date: string; messages: Message[] }[] = [];
@@ -147,11 +107,6 @@ export function ChatWindow({ chat, messages, onSendMessage, currentUserId, onDel
   };
   const canViewProfile = Boolean(getProfileLink());
 
-  const handleDeleteMessage = (messageId: string) => {
-    deleteMessage({ messageId }, () => {
-      if (onDeleteMessage) onDeleteMessage(messageId);
-    });
-  };
 
   // Handle file selection and validation
   const handleFileChange = (file: File | null) => {
@@ -180,34 +135,7 @@ export function ChatWindow({ chat, messages, onSendMessage, currentUserId, onDel
     e.preventDefault();
   };
 
-  // Optional: compress image (stub)
-  const compressImage = async (file: File): Promise<File> => {
-    // For now, just return the file. Add real compression logic if needed.
-    return file;
-  };
 
-  // Handle send image (stub)
-  const handleSendImage = async () => {
-    if (!selectedImage) return;
-    // Compress and send logic here (stub)
-    setImageModalOpen(false);
-    setSelectedImage(null);
-    setImagePreview(null);
-    setImageError(null);
-  };
-
-  const handleCloseModal = () => {
-    setImageModalOpen(false);
-    setSelectedImage(null);
-    setImagePreview(null);
-    setImageError(null);
-  };
-
-  // Dummy send audio handler for AudioRecorder
-  const handleSendRecordedAudio = (audioUrl: string, duration: number) => {
-    onSendMessage('', undefined, audioUrl);
-    setShowAudioRecorder(false);
-  };
 
   return (
     <div className="flex flex-col h-full bg-[var(--color-surface)]">
@@ -243,20 +171,35 @@ export function ChatWindow({ chat, messages, onSendMessage, currentUserId, onDel
       </div>
       {/* Messages Area */}
       <div ref={messagesContainerRef} className="flex-1 overflow-y-auto px-6 py-4 space-y-6 bg-[var(--color-surface)]" onDrop={handleDrop} onDragOver={handleDragOver}>
-        {groupedMessages.map((group, idx) => (
-          <div key={idx} className="space-y-4">
-            <div className="text-center text-xs text-[var(--color-muted)] mb-2">{group.date}</div>
-            {group.messages.map((msg) => (
-              <MessageComponent
-                key={msg.id}
-                message={msg}
-                currentUserId={currentUserId}
-                chat={chat}
-                onDelete={onDeleteMessage ? () => onDeleteMessage(msg.id) : undefined}
-              />
-            ))}
+        {messages.length === 0 ? (
+          <div className="flex flex-col items-center justify-center h-full py-16 text-center text-[var(--color-muted)]">
+            <svg width="80" height="80" fill="none" viewBox="0 0 80 80" className="mx-auto mb-6">
+              <rect width="80" height="80" rx="16" fill="#EEF2FF"/>
+              <path d="M24 56V32a8 8 0 0 1 8-8h16a8 8 0 0 1 8 8v24l-8-4-8 4-8-4-8 4Z" fill="#6366F1"/>
+              <circle cx="32" cy="40" r="2" fill="#fff"/>
+              <circle cx="40" cy="40" r="2" fill="#fff"/>
+              <circle cx="48" cy="40" r="2" fill="#fff"/>
+            </svg>
+            <h3 className="text-lg font-semibold mb-2 text-[var(--color-primary-dark)]">No messages yet</h3>
+            <p className="mb-4 text-sm">Start the conversation! Say hello and break the ice.</p>
+            <span className="inline-block px-4 py-2 bg-[var(--color-primary-light)]/10 text-[var(--color-primary-light)] rounded-full text-xs font-medium">Type your first message below</span>
           </div>
-        ))}
+        ) : (
+          groupedMessages.map((group, idx) => (
+            <div key={idx} className="space-y-4">
+              <div className="text-center text-xs text-[var(--color-muted)] mb-2">{group.date}</div>
+              {group.messages.map((msg) => (
+                <MessageComponent
+                  key={msg.id}
+                  message={msg}
+                  currentUserId={currentUserId}
+                  chat={chat}
+                  onDelete={onDeleteMessage ? () => onDeleteMessage(msg.id) : undefined}
+                />
+              ))}
+            </div>
+          ))
+        )}
         <div ref={messagesEndRef} />
       </div>
       {/* Chat Input */}

@@ -72,27 +72,33 @@ export default function InstructorsPage() {
 		{ label: "Email", value: "user" },
 	];
 
-	const { data, isLoading, error, refetch } = useGetAllInstructors({
-		page: 1,
-		limit: 10,
-		search: "",
-		sortBy: "createdAt",
-		sortOrder: "desc",
-		filterBy: "All",
-		includeDeleted: true,
-	});
-
 	return (
 		<ListPage<IInstructorWithUserDetails>
 			title="Instructor Management"
 			description="Manage instructor accounts and their approval status"
 			entityName="Instructor"
-			useDataHook={() => {
+			useDataHook={params => {
+				const validSortBy = ["createdAt", "status", "areaOfExpertise", "user"] as const;
+				const sortBy = validSortBy.includes(params.sortBy as typeof validSortBy[number])
+					? (params.sortBy as typeof validSortBy[number])
+					: "createdAt";
+				const validFilterBy = ["All", "Pending", "Approved", "Declined"] as const;
+				const filterBy = validFilterBy.includes(params.filterBy as typeof validFilterBy[number])
+					? (params.filterBy as typeof validFilterBy[number])
+					: "All";
+				const query = useGetAllInstructors({ ...params, sortBy, filterBy });
+
 				return {
-					data: data?.data,
-					isLoading,
-					error: error ? { message: error.message } : null,
-					refetch,
+					data: query.data
+						? {
+							items: query.data.data.items,
+							total: query.data.data.total,
+							totalPages: query.data.data.totalPages,
+						}
+						: undefined,
+					isLoading: query.isLoading,
+					error: query.error ? { message: query.error.message } : null,
+					refetch: query.refetch,
 				};
 			}}
 			columns={columns}

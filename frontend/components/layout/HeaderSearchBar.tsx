@@ -77,9 +77,8 @@ export const HeaderSearchBar: React.FC<HeaderSearchBarProps> = ({
 				<Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-[var(--color-muted)]" />
 				{isSearching && (
 					<Loader2
-						className="absolute right-3 top-1/2 transform -translate-y-1/2 w-5 h-5"
+						className="absolute right-3 top-1/2 transform -translate-y-1/2 w-5 h-5 animate-spin"
 						style={{ color: "var(--color-muted)" }}
-						animate-spin
 					/>
 				)}
 				{/* Enhanced Search Results Dropdown */}

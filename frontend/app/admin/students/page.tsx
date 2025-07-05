@@ -9,18 +9,22 @@ import ListPage from "@/components/ListingPage";
 export default function StudentsPage() {
 	const { mutate: toggleDeleteUser } = useToggleDeleteUser();
 
-	// Move useGetAllUsers out of the callback
-	const allUsersHook = useGetAllUsers({
-		includeDeleted:true,
-		role:'USER'
-	});
-
 	return (
 		<ListPage<User>
 			title="Student Management"
 			description="Manage student accounts and their access"
 			entityName="Student"
-			useDataHook={() => allUsersHook}
+			useDataHook={params => {
+				const validSortBy = ["name", "email", "createdAt"] as const;
+				const sortBy = validSortBy.includes(params.sortBy as typeof validSortBy[number])
+					? (params.sortBy as typeof validSortBy[number])
+					: "name";
+				const validFilterBy = ["All", "Active", "Inactive"] as const;
+				const filterBy = validFilterBy.includes(params.filterBy as typeof validFilterBy[number])
+					? (params.filterBy as typeof validFilterBy[number])
+					: "All";
+				return useGetAllUsers({ ...params, sortBy, filterBy, role: 'USER' });
+			}}
 			columns={[
 				{
 					header: "Name",
