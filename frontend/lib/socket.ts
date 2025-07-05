@@ -5,7 +5,7 @@ const getJwtToken = (): string | null => {
 	if (typeof document === "undefined") return null;
 
 	const cookies = document.cookie.split(";");
-	const jwtCookie = cookies.find((cookie) => cookie.trim().startsWith("jwt="));
+	const jwtCookie = cookies.find((cookie) => cookie.trim().startsWith("access_token="));
 
 	if (!jwtCookie) return null;
 

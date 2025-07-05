@@ -18,12 +18,12 @@ export async function socketAuthMiddleware(socket: Socket, next: (err?: Error) =
     // Try cookies
     if (!token && socket.handshake.headers.cookie) {
       const cookies = cookie.parse(socket.handshake.headers.cookie);
-      token = cookies.jwt;
+      token = cookies.access_token;
     }
     
     if (token) {
       const jwtProvider = new JwtProvider();
-      const payload = await jwtProvider.verify(token);
+      const payload = jwtProvider.verifyAccessToken(token);
       
       if (payload) {
         socket.data.user = payload;

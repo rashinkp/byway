@@ -35,7 +35,7 @@ export function getTokenFromCookies(
 	if (!cookieHeader) return null;
 
 	const cookies = cookieHeader.split(";");
-	const jwtCookie = cookies.find((cookie) => cookie.trim().startsWith("jwt="));
+	const jwtCookie = cookies.find((cookie) => cookie.trim().startsWith("access_token="));
 
 	if (!jwtCookie) return null;
 

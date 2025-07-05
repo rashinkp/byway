@@ -7,12 +7,12 @@ export async function POST() {
 			message: "Logged out successfully",
 		});
 
-		response.cookies.set("jwt", "", {
-			path: "/",
-			expires: new Date(0),
+		response.cookies.set("access_token", "", {
 			httpOnly: true,
-			sameSite: process.env.NODE_ENV === "production" ? "strict" : "lax",
 			secure: process.env.NODE_ENV === "production",
+			sameSite: "lax",
+			path: "/",
+			maxAge: 0,
 		});
 
 		return response;

@@ -8,6 +8,11 @@ export function errorMiddleware(
   req: Request,
   res: Response,
 ): void {
+  // Type guard: ensure res is an Express Response
+  if (typeof res.status !== "function") {
+    console.error("errorMiddleware called with invalid res object:", res);
+    return;
+  }
 
   // Log the error for debugging
   console.error("Error details:", {
@@ -36,7 +41,7 @@ export function errorMiddleware(
     res.status(400).json(response);
   } else {
     // Handle specific error cases
-    if (err.message.includes("not found")) {
+    if (typeof err.message === "string" && err.message.includes("not found")) {
       const response: ApiResponse<null> = {
         statusCode: 404,
         success: false,
@@ -44,7 +49,7 @@ export function errorMiddleware(
         data: null,
       };
       res.status(404).json(response);
-    } else if (err.message.includes("unauthorized") || err.message.includes("invalid token")) {
+    } else if (typeof err.message === "string" && (err.message.includes("unauthorized") || err.message.includes("invalid token"))) {
       const response: ApiResponse<null> = {
         statusCode: 401,
         success: false,
@@ -52,7 +57,7 @@ export function errorMiddleware(
         data: null,
       };
       res.status(401).json(response);
-    } else if (err.message.includes("forbidden") || err.message.includes("permission denied")) {
+    } else if (typeof err.message === "string" && (err.message.includes("forbidden") || err.message.includes("permission denied"))) {
       const response: ApiResponse<null> = {
         statusCode: 403,
         success: false,

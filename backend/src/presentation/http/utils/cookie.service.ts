@@ -1,34 +1,43 @@
 import { Response } from "express";
-import jwt from "jsonwebtoken";
+import { JwtProvider } from "../../../infra/providers/auth/jwt.provider";
 
 export class CookieService {
-  private static generateToken(user: {
-    id: string;
-    email: string;
-    role: string;
-  }): string {
-    return jwt.sign(
-      { id: user.id, email: user.email, role: user.role },
-      process.env.JWT_SECRET || "secret",
-      { expiresIn: "1h" }
-    );
-  }
-
-  static setAuthCookie(
+  /**
+   * Sets both access and refresh tokens as cookies. Used for login and token refresh flows.
+   */
+  static setAuthCookies(
     res: Response,
-    user: { id: string; email: string; role: string }
+    user: { id: string; email: string; role: string },
+    jwtProvider: JwtProvider
   ): void {
-    const token = this.generateToken(user);
-    res.cookie("jwt", token, {
+    const accessToken = jwtProvider.signAccessToken(user);
+    const refreshToken = jwtProvider.signRefreshToken(user);
+
+    console.log("[CookieService] Setting access_token cookie");
+    res.cookie("access_token", accessToken, {
       httpOnly: process.env.NODE_ENV === "production",
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
-      maxAge: 60 * 60 * 1000, 
+      maxAge: 1 * 60 * 1000, // 1 minute
+    });
+    console.log("[CookieService] Setting refresh_token cookie");
+    res.cookie("refresh_token", refreshToken, {
+      httpOnly: process.env.NODE_ENV === "production",
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      maxAge: 24 * 60 * 60 * 1000, // 1 day
     });
   }
 
-  static clearAuthCookie(res: Response): void {
-    res.clearCookie("jwt", {
+  static clearAuthCookies(res: Response): void {
+    console.log("[CookieService] Clearing access_token cookie");
+    res.clearCookie("access_token", {
+      httpOnly: process.env.NODE_ENV === "production",
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+    });
+    console.log("[CookieService] Clearing refresh_token cookie");
+    res.clearCookie("refresh_token", {
       httpOnly: process.env.NODE_ENV === "production",
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",

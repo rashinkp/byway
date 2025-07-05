@@ -2,15 +2,34 @@ import jwt from "jsonwebtoken";
 import { envConfig } from "../../../presentation/express/configs/env.config";
 import { IJwtProvider } from "../../../app/providers/I.jwt.provider";
 
-
 export class JwtProvider implements IJwtProvider {
-  sign(payload: object): string {
-    return jwt.sign(payload, envConfig.JWT_SECRET, { expiresIn: "1d" });
+  signAccessToken(payload: object): string {
+    return jwt.sign(payload, envConfig.ACCESS_TOKEN_SIGNATURE, {
+      expiresIn: "1m",
+      algorithm: "HS256",
+      issuer: "byway",
+    });
   }
 
-  verify(token: string): object | null {
+  signRefreshToken(payload: object): string {
+    return jwt.sign(payload, envConfig.REFRESH_TOKEN_SIGNATURE, {
+      expiresIn: "1d",
+      algorithm: "HS256",
+      issuer: "byway",
+    });
+  }
+
+  verifyAccessToken(token: string): object | null {
     try {
-      return jwt.verify(token, envConfig.JWT_SECRET) as object;
+      return jwt.verify(token, envConfig.ACCESS_TOKEN_SIGNATURE) as object;
+    } catch {
+      return null;
+    }
+  }
+
+  verifyRefreshToken(token: string): object | null {
+    try {
+      return jwt.verify(token, envConfig.REFRESH_TOKEN_SIGNATURE) as object;
     } catch {
       return null;
     }

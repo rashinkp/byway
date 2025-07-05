@@ -25,13 +25,13 @@ let isLoggingOut = false;
 const getTokenClient = () => {
 	if (typeof document === "undefined") return null;
 	const cookies = document.cookie.split(";");
-	const jwtCookie = cookies.find((cookie) => cookie.trim().startsWith("jwt="));
+	const jwtCookie = cookies.find((cookie) => cookie.trim().startsWith("access_token="));
 	return jwtCookie ? jwtCookie.split("=")[1] : null;
 };
 
 export const getTokenServer = (cookieHeader: string) => {
 	const cookies = cookieHeader.split(";");
-	const jwtCookie = cookies.find((cookie) => cookie.trim().startsWith("jwt="));
+	const jwtCookie = cookies.find((cookie) => cookie.trim().startsWith("access_token="));
 	return jwtCookie ? jwtCookie.split("=")[1] : null;
 };
 

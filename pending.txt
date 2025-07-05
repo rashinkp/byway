@@ -6,6 +6,8 @@ while reload without login redirecting to login page without any reason.
 lesson count in (cart)
 too many auth/me and socket io connection
 
+env config
+
 
 style and ui:
 reloading add loading state in navbar in user side

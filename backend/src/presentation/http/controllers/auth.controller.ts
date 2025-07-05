@@ -25,6 +25,7 @@ import { IHttpRequest } from "../interfaces/http-request.interface";
 import { IHttpResponse } from "../interfaces/http-response.interface";
 import { BadRequestError } from "../errors/bad-request-error";
 import { BaseController } from "./base.controller";
+import { JwtProvider } from "../../../infra/providers/auth/jwt.provider";
 
 export class AuthController extends BaseController {
   constructor(
@@ -48,21 +49,16 @@ export class AuthController extends BaseController {
     return this.handleRequest(httpRequest, async (request) => {
       const validated = validateFacebookAuth(request.body);
       const user = await this.facebookAuthUseCase.execute(validated);
-      const response: ApiResponse<UserResponse> = {
-        statusCode: 200,
-        success: true,
-        message: "Facebook authentication successful",
-        data: {
-          id: user.id,
-          name: user.name,
-          email: user.email,
-          role: user.role,
-        },
+      const data = {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
       };
+      const response = this.success_200(data, "Facebook authentication successful");
       return {
-        statusCode: 200,
-        body: response,
-        cookie: { action: 'set', user }
+        ...response,
+        cookie: this.getCookieResponse(user),
       };
     });
   }
@@ -79,21 +75,51 @@ export class AuthController extends BaseController {
     return this.handleRequest(httpRequest, async (request) => {
       const validated = validateGoogleAuth(request.body);
       const user = await this.googleAuthUseCase.execute(validated.accessToken);
-      const response: ApiResponse<UserResponse> = {
-        statusCode: 200,
-        success: true,
-        message: "Google authentication successful",
-        data: {
-          id: user.id,
-          name: user.name,
-          email: user.email,
-          role: user.role,
-        },
+      const data = {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
       };
+      const response = this.success_200(data, "Google authentication successful");
       return {
-        statusCode: 200,
-        body: response,
-        cookie: { action: "set", user },
+        ...response,
+        cookie: this.getCookieResponse(user),
+      };
+    });
+  }
+
+  private getCookieResponse(user: any): { action: "set"; user: any } {
+    return { action: "set", user };
+  }
+
+  private getUserFromRefreshToken(request: IHttpRequest): any {
+    const jwtProvider = new JwtProvider();
+    const refreshToken = request.cookies?.refresh_token;
+    if (!refreshToken) {
+      throw new BadRequestError("No refresh token provided");
+    }
+    const payload = jwtProvider.verifyRefreshToken(refreshToken);
+    if (!payload || typeof payload !== 'object' || !('email' in payload && 'id' in payload && 'name' in payload && 'role' in payload)) {
+      throw new BadRequestError("Invalid refresh token");
+    }
+    const { id, name, email, role } = payload as { id: string; name: string; email: string; role: string };
+    return { id, name, email, role };
+  }
+
+  async token(httpRequest: IHttpRequest): Promise<IHttpResponse> {
+    return this.handleRequest(httpRequest, async (request) => {
+      const user = this.getUserFromRefreshToken(request);
+      const data = {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+      };
+      const response = this.success_200(data, "Tokens issued");
+      return {
+        ...response,
+        cookie: this.getCookieResponse(user),
       };
     });
   }
@@ -102,22 +128,17 @@ export class AuthController extends BaseController {
     return this.handleRequest(httpRequest, async (request) => {
       const validated = validateLogin(request.body);
       const { user, cartCount } = await this.loginUseCase.execute(validated);
-      const response: ApiResponse<UserResponse> = {
-        statusCode: 200,
-        success: true,
-        message: "Login successful",
-        data: {
-          id: user.id,
-          name: user.name,
-          email: user.email,
-          role: user.role,
-          cartCount,
-        },
+      const data = {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        cartCount,
       };
+      const response = this.success_200(data, "Login successful");
       return {
-        statusCode: 200,
-        body: response,
-        cookie: { action: "set", user },
+        ...response,
+        cookie: this.getCookieResponse(user),
       };
     });
   }
@@ -125,24 +146,10 @@ export class AuthController extends BaseController {
   async logout(httpRequest: IHttpRequest): Promise<IHttpResponse> {
     return this.handleRequest(httpRequest, async () => {
       await this.logoutUseCase.execute();
+      const response = this.success_200(null, "Logout successful");
       return {
-        statusCode: 200,
-        body: {
-          statusCode: 200,
-          success: true,
-          message: "Logout successful",
-          data: null,
-        },
-        cookie: { 
-          action: "clear",
-          name: "jwt",
-          options: {
-            httpOnly: true,
-            secure: process.env.NODE_ENV === "production",
-            sameSite: process.env.NODE_ENV === "production" ? "strict" : "lax",
-            path: "/",
-          }
-        },
+        ...response,
+        cookie: { action: "clear" },
       };
     });
   }
@@ -151,13 +158,13 @@ export class AuthController extends BaseController {
     return this.handleRequest(httpRequest, async (request) => {
       const validated = validateRegister(request.body);
       const user = await this.registerUseCase.execute(validated);
-      const response = {
-          id: user.id,
-          name: user.name,
-          email: user.email,
-          role: user.role,
+      const data = {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
       };
-      return this.success_201(response, "Registration successful");
+      return this.success_201(data, "Registration successful");
     });
   }
 
@@ -181,24 +188,22 @@ export class AuthController extends BaseController {
     return this.handleRequest(httpRequest, async (request) => {
       const validated = validateVerifyOtp(request.body);
       const user = await this.verifyOtpUseCase.execute(validated);
-      const response = {
+      const data = {
         id: user.id,
         name: user.name,
         email: user.email,
         role: user.role,
       };
-      return this.success_200(response, "OTP verification successful");
-    })
+      return this.success_200(data, "OTP verification successful");
+    });
   }
 
   async getVerificationStatus(httpRequest: IHttpRequest): Promise<IHttpResponse> {
     return this.handleRequest(httpRequest, async (request) => {
       const email = request.query?.email as string;
-      
       if (!email) {
         throw new BadRequestError("Email is required");
       }
-
       const result = await this.getVerificationStatusUseCase.execute(email);
       return this.success_200(result, "Verification status retrieved successfully");
     });

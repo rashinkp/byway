@@ -25,12 +25,12 @@ export async function middleware(request: NextRequest) {
 				);
 				const response = NextResponse.redirect(new URL("/login", request.url));
 				// Clear JWT cookie
-				response.cookies.set("jwt", "", {
-					path: "/",
-					expires: new Date(0),
+				response.cookies.set("access_token", "", {
 					httpOnly: true,
-					sameSite: process.env.NODE_ENV === "production" ? "strict" : "lax",
 					secure: process.env.NODE_ENV === "production",
+					sameSite: "lax",
+					path: "/",
+					maxAge: 0,
 				});
 				return response;
 			}
@@ -38,12 +38,12 @@ export async function middleware(request: NextRequest) {
 			console.error("Error verifying user in middleware:", error);
 			const response = NextResponse.redirect(new URL("/login", request.url));
 			// Clear JWT cookie on error
-			response.cookies.set("jwt", "", {
-				path: "/",
-				expires: new Date(0),
+			response.cookies.set("access_token", "", {
 				httpOnly: true,
-				sameSite: process.env.NODE_ENV === "production" ? "strict" : "lax",
 				secure: process.env.NODE_ENV === "production",
+				sameSite: "lax",
+				path: "/",
+				maxAge: 0,
 			});
 			return response;
 		}

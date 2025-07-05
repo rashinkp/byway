@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import { IHttpRequest } from "../http/interfaces/http-request.interface";
 import { IHttpResponse } from "../http/interfaces/http-response.interface";
 import { CookieService } from "../http/utils/cookie.service";
+import { JwtProvider } from "../../infra/providers/auth/jwt.provider";
 
 export async function expressAdapter(
   request: Request,
@@ -14,14 +15,18 @@ export async function expressAdapter(
     params: request.params,
     query: request.query as Record<string, string>,
     user: request.user, // Pass req.user to httpRequest.user
+    cookies: request.cookies,
+    res: response,
   };
   const httpResponse = await handler(httpRequest);
 
   if (httpResponse.cookie) {
     if (httpResponse.cookie.action === "set" && httpResponse.cookie.user) {
-      CookieService.setAuthCookie(response, httpResponse.cookie.user);
+      const jwtProvider = new JwtProvider();
+      const { id, email, role } = httpResponse.cookie.user;
+      CookieService.setAuthCookies(response, { id, email, role }, jwtProvider);
     } else if (httpResponse.cookie.action === "clear") {
-      CookieService.clearAuthCookie(response);
+      CookieService.clearAuthCookies(response);
     }
   }
 

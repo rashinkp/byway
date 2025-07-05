@@ -14,6 +14,8 @@ export const envConfig = {
 
   // JWT authentication
   JWT_SECRET: process.env.JWT_SECRET || "secret",
+  ACCESS_TOKEN_SIGNATURE: process.env.ACCESS_TOKEN_SIGNATURE || "access_secret",
+  REFRESH_TOKEN_SIGNATURE: process.env.REFRESH_TOKEN_SIGNATURE || "refresh_secret",
 
   // CORS settings
   CORS_ORIGIN: process.env.CORS_ORIGIN || "http://localhost:3000",
