@@ -12,11 +12,56 @@ export interface JwtPayload {
 // In-memory store for used refresh tokens (use Redis/database in production)
 const usedRefreshTokens = new Set<string>();
 
+// Track ongoing refresh operations to prevent race conditions
+const ongoingRefreshes = new Map<string, Promise<{ accessToken: string; refreshToken: string; user: JwtPayload }>>();
+
+// Track recently issued tokens to handle frontend using old tokens
+const recentlyIssuedTokens = new Map<string, { accessToken: string; refreshToken: string; user: JwtPayload; timestamp: number }>();
+
 // Extend Express Request interface using module augmentation
 declare module 'express-serve-static-core' {
   interface Request {
     user?: JwtPayload;
   }
+}
+
+// Helper function to perform token refresh
+async function performTokenRefresh(
+  refreshToken: string,
+  refreshPayload: JwtPayload,
+  jwtProvider: JwtProvider
+): Promise<{ accessToken: string; refreshToken: string; user: JwtPayload }> {
+  // Create clean payload for new tokens
+  const cleanPayload = {
+    id: refreshPayload.id,
+    email: refreshPayload.email,
+    role: refreshPayload.role,
+  };
+  
+  const accessToken = jwtProvider.signAccessToken(cleanPayload);
+  const newRefreshToken = jwtProvider.signRefreshToken(cleanPayload);
+  
+  // Mark the old refresh token as used
+  usedRefreshTokens.add(refreshToken);
+  
+  const result = { accessToken, refreshToken: newRefreshToken, user: cleanPayload };
+  
+  // Store recently issued tokens for a short time to handle frontend using old tokens
+  recentlyIssuedTokens.set(refreshToken, {
+    ...result,
+    timestamp: Date.now()
+  });
+  
+  return result;
+}
+
+// Helper function to check if we have recently issued tokens for this user
+function getRecentlyIssuedTokens(refreshToken: string): { accessToken: string; refreshToken: string; user: JwtPayload } | null {
+  const recent = recentlyIssuedTokens.get(refreshToken);
+  if (recent && Date.now() - recent.timestamp < 5000) { // 5 seconds window
+    return recent;
+  }
+  return null;
 }
 
 export const authenticate = async (req: Request, res: Response, next: NextFunction) => {
@@ -44,6 +89,33 @@ export const authenticate = async (req: Request, res: Response, next: NextFuncti
     // Check if refresh token was already used
     if (usedRefreshTokens.has(refreshToken)) {
       console.log("[Auth] Refresh token already used:", refreshToken.substring(0, 10) + "...");
+      
+      // Check if we have recently issued tokens for this refresh token
+      const recentTokens = getRecentlyIssuedTokens(refreshToken);
+      if (recentTokens) {
+        console.log("[Auth] Using recently issued tokens for already used refresh token");
+        
+        // Set the recently issued tokens
+        console.log("[CookieService] Setting recently issued access_token cookie");
+        res.cookie("access_token", recentTokens.accessToken, {
+          httpOnly: process.env.NODE_ENV === "production",
+          secure: process.env.NODE_ENV === "production",
+          sameSite: "lax",
+          maxAge: 1 * 60 * 1000, // 1 minute
+        });
+        
+        console.log("[CookieService] Setting recently issued refresh_token cookie");
+        res.cookie("refresh_token", recentTokens.refreshToken, {
+          httpOnly: process.env.NODE_ENV === "production",
+          secure: process.env.NODE_ENV === "production",
+          sameSite: "lax",
+          maxAge: 24 * 60 * 60 * 1000, // 1 day
+        });
+        
+        req.user = recentTokens.user;
+        return next();
+      }
+      
       return next(new HttpError("Refresh token already used", 401));
     }
 
@@ -58,19 +130,24 @@ export const authenticate = async (req: Request, res: Response, next: NextFuncti
       console.log("[Auth] Refresh token valid, creating new tokens");
       
       try {
-        // Immediately mark refresh token as used to prevent reuse
-        usedRefreshTokens.add(refreshToken);
+        // Check if there's already an ongoing refresh for this token
+        let refreshPromise = ongoingRefreshes.get(refreshToken);
         
-        // Create clean payload for new tokens
-        const cleanPayload = {
-          id: (refreshPayload as any).id,
-          email: (refreshPayload as any).email,
-          role: (refreshPayload as any).role,
-        };
+        if (!refreshPromise) {
+          // Start a new refresh operation
+          refreshPromise = performTokenRefresh(refreshToken, refreshPayload as JwtPayload, jwtProvider);
+          ongoingRefreshes.set(refreshToken, refreshPromise);
+          
+          // Clean up the promise from the map after completion
+          refreshPromise.finally(() => {
+            ongoingRefreshes.delete(refreshToken);
+          });
+        } else {
+          console.log("[Auth] Waiting for ongoing refresh operation");
+        }
         
-        // Create new tokens
-        const newAccessToken = jwtProvider.signAccessToken(cleanPayload);
-        const newRefreshToken = jwtProvider.signRefreshToken(cleanPayload);
+        // Wait for the refresh operation to complete
+        const { accessToken: newAccessToken, refreshToken: newRefreshToken, user } = await refreshPromise;
         
         // Set new cookies
         console.log("[CookieService] Setting new access_token cookie");
@@ -91,7 +168,7 @@ export const authenticate = async (req: Request, res: Response, next: NextFuncti
         
         console.log("[Auth] New tokens created and set successfully");
         
-        req.user = cleanPayload;
+        req.user = user;
         return next();
       } catch (error) {
         console.error("[Auth] Error creating new tokens:", error);
@@ -130,61 +207,92 @@ export const restrictTo =
         // Check if refresh token was already used
         if (usedRefreshTokens.has(refreshToken)) {
           console.log("[Auth] Refresh token already used (restrictTo):", refreshToken.substring(0, 10) + "...");
-          throw new HttpError("Refresh token already used", 401);
-        }
-
-        const refreshPayload = jwtProvider.verifyRefreshToken(refreshToken);
-        if (
-          refreshPayload &&
-          typeof refreshPayload === "object" &&
-          "id" in refreshPayload &&
-          "email" in refreshPayload &&
-          "role" in refreshPayload
-        ) {
-          console.log("[Auth] Refresh token valid, creating new tokens (restrictTo)");
           
-          try {
-            // Immediately mark refresh token as used to prevent reuse
-            usedRefreshTokens.add(refreshToken);
+          // Check if we have recently issued tokens for this refresh token
+          const recentTokens = getRecentlyIssuedTokens(refreshToken);
+          if (recentTokens) {
+            console.log("[Auth] Using recently issued tokens for already used refresh token (restrictTo)");
             
-            // Create clean payload for new tokens
-            const cleanPayload = {
-              id: (refreshPayload as any).id,
-              email: (refreshPayload as any).email,
-              role: (refreshPayload as any).role,
-            };
-            
-            // Create new tokens
-            const newAccessToken = jwtProvider.signAccessToken(cleanPayload);
-            const newRefreshToken = jwtProvider.signRefreshToken(cleanPayload);
-            
-            // Set new cookies
-            console.log("[CookieService] Setting new access_token cookie");
-            res.cookie("access_token", newAccessToken, {
+            // Set the recently issued tokens
+            console.log("[CookieService] Setting recently issued access_token cookie");
+            res.cookie("access_token", recentTokens.accessToken, {
               httpOnly: process.env.NODE_ENV === "production",
               secure: process.env.NODE_ENV === "production",
               sameSite: "lax",
               maxAge: 1 * 60 * 1000, // 1 minute
             });
             
-            console.log("[CookieService] Setting new refresh_token cookie");
-            res.cookie("refresh_token", newRefreshToken, {
+            console.log("[CookieService] Setting recently issued refresh_token cookie");
+            res.cookie("refresh_token", recentTokens.refreshToken, {
               httpOnly: process.env.NODE_ENV === "production",
               secure: process.env.NODE_ENV === "production",
               sameSite: "lax",
               maxAge: 24 * 60 * 60 * 1000, // 1 day
             });
             
-            console.log("[Auth] New tokens created and set successfully (restrictTo)");
-            
-            req.user = cleanPayload;
-          } catch (error) {
-            console.error("[Auth] Error creating new tokens (restrictTo):", error);
-            throw new HttpError("Failed to refresh tokens", 500);
+            req.user = recentTokens.user;
+          } else {
+            throw new HttpError("Refresh token already used", 401);
           }
         } else {
-          console.log("[Auth] Invalid refresh token (restrictTo)");
-          throw new HttpError("Invalid refresh token", 401);
+          const refreshPayload = jwtProvider.verifyRefreshToken(refreshToken);
+          if (
+            refreshPayload &&
+            typeof refreshPayload === "object" &&
+            "id" in refreshPayload &&
+            "email" in refreshPayload &&
+            "role" in refreshPayload
+          ) {
+            console.log("[Auth] Refresh token valid, creating new tokens (restrictTo)");
+            
+            try {
+              // Check if there's already an ongoing refresh for this token
+              let refreshPromise = ongoingRefreshes.get(refreshToken);
+              
+              if (!refreshPromise) {
+                // Start a new refresh operation
+                refreshPromise = performTokenRefresh(refreshToken, refreshPayload as JwtPayload, jwtProvider);
+                ongoingRefreshes.set(refreshToken, refreshPromise);
+                
+                // Clean up the promise from the map after completion
+                refreshPromise.finally(() => {
+                  ongoingRefreshes.delete(refreshToken);
+                });
+              } else {
+                console.log("[Auth] Waiting for ongoing refresh operation (restrictTo)");
+              }
+              
+              // Wait for the refresh operation to complete
+              const { accessToken: newAccessToken, refreshToken: newRefreshToken, user } = await refreshPromise;
+              
+              // Set new cookies
+              console.log("[CookieService] Setting new access_token cookie");
+              res.cookie("access_token", newAccessToken, {
+                httpOnly: process.env.NODE_ENV === "production",
+                secure: process.env.NODE_ENV === "production",
+                sameSite: "lax",
+                maxAge: 1 * 60 * 1000, // 1 minute
+              });
+              
+              console.log("[CookieService] Setting new refresh_token cookie");
+              res.cookie("refresh_token", newRefreshToken, {
+                httpOnly: process.env.NODE_ENV === "production",
+                secure: process.env.NODE_ENV === "production",
+                sameSite: "lax",
+                maxAge: 24 * 60 * 60 * 1000, // 1 day
+              });
+              
+              console.log("[Auth] New tokens created and set successfully (restrictTo)");
+              
+              req.user = user;
+            } catch (error) {
+              console.error("[Auth] Error creating new tokens (restrictTo):", error);
+              throw new HttpError("Failed to refresh tokens", 500);
+            }
+          } else {
+            console.log("[Auth] Invalid refresh token (restrictTo)");
+            throw new HttpError("Invalid refresh token", 401);
+          }
         }
       } else {
         throw new HttpError("Invalid or expired token", 401);
@@ -221,8 +329,10 @@ export const optionalAuth = async (
   next();
 };
 
-// Clean up used refresh tokens periodically (every hour)
+// Clean up used refresh tokens, ongoing refreshes, and recently issued tokens periodically (every hour)
 setInterval(() => {
   usedRefreshTokens.clear();
-  console.log("[Auth] Cleared used refresh tokens cache");
+  ongoingRefreshes.clear();
+  recentlyIssuedTokens.clear();
+  console.log("[Auth] Cleared used refresh tokens cache, ongoing refreshes, and recently issued tokens");
 }, 60 * 60 * 1000);
