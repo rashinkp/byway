@@ -252,6 +252,7 @@ export const restrictTo =
         const { checkUserActiveUseCase } = getAppDependencies();
         await checkUserActiveUseCase.execute(req.user.id);
       } catch (err) {
+        console.log("[restrictTo] Passing error to next:", err);
         return next(err);
       }
       // --- END NEW ---

@@ -6,8 +6,8 @@ import { optionalAuth } from "../middlewares/auth.middleware";
 export function searchRouter(searchController: SearchController): Router {
   const router = Router();
 
-  router.get("/", optionalAuth, (req, res) =>
-    expressAdapter(req, res, searchController.globalSearch.bind(searchController))
+  router.get("/global", (req, res, next) =>
+    expressAdapter(req, res, searchController.globalSearch.bind(searchController), next)
   );
 
   return router;

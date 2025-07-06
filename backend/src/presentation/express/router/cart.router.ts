@@ -9,20 +9,20 @@ export function cartRouter(cartController: CartController): Router {
   router.use(restrictTo("USER", "INSTRUCTOR", "ADMIN"));
 
   // Cart routes
-  router.post("/", (req, res) => 
-    expressAdapter(req, res, cartController.addToCart.bind(cartController))
+  router.post("/", (req, res, next) => 
+    expressAdapter(req, res, cartController.addToCart.bind(cartController), next)
   );
-  router.get("/", (req, res) => 
-    expressAdapter(req, res, cartController.getCart.bind(cartController))
+  router.get("/", (req, res, next) => 
+    expressAdapter(req, res, cartController.getCart.bind(cartController), next)
   );
-  router.post("/apply-coupon", (req, res) => 
-    expressAdapter(req, res, cartController.applyCoupon.bind(cartController))
+  router.post("/apply-coupon", (req, res, next) => 
+    expressAdapter(req, res, cartController.applyCoupon.bind(cartController), next)
   );
-  router.delete("/", (req, res) => 
-    expressAdapter(req, res, cartController.clearCart.bind(cartController))
+  router.delete("/", (req, res, next) => 
+    expressAdapter(req, res, cartController.clearCart.bind(cartController), next)
   );
-  router.delete("/:courseId", (req, res) => 
-    expressAdapter(req, res, cartController.removeFromCart.bind(cartController))
+  router.delete("/:courseId", (req, res, next) => 
+    expressAdapter(req, res, cartController.removeFromCart.bind(cartController), next)
   );
 
   return router;

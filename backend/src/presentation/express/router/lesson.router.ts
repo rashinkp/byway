@@ -7,55 +7,61 @@ export default function lessonRouter(
 ): Router {
   const router = Router();
 
-  router.post("/", restrictTo('INSTRUCTOR'), (req, res) =>
+  router.post("/", restrictTo('INSTRUCTOR'), (req, res, next) =>
     expressAdapter(
       req,
       res,
-      lessonController.createLesson.bind(lessonController)
+      lessonController.createLesson.bind(lessonController),
+      next
     )
   );
 
-  router.put("/:lessonId", restrictTo("INSTRUCTOR"), (req, res) =>
+  router.put("/:lessonId", restrictTo("INSTRUCTOR"), (req, res, next) =>
     expressAdapter(
       req,
       res,
-      lessonController.updateLesson.bind(lessonController)
+      lessonController.updateLesson.bind(lessonController),
+      next
     )
   );
 
-  router.delete("/:lessonId", restrictTo("INSTRUCTOR"), (req, res) =>
+  router.delete("/:lessonId", restrictTo("INSTRUCTOR"), (req, res, next) =>
     expressAdapter(
       req,
       res,
-      lessonController.deleteLesson.bind(lessonController)
+      lessonController.deleteLesson.bind(lessonController),
+      next
     )
   );
 
   // Authenticated user endpoints
-  router.get("/:lessonId", restrictTo('ADMIN' , 'USER' , 'INSTRUCTOR'), (req, res) =>
+  router.get("/:lessonId", restrictTo('ADMIN' , 'USER' , 'INSTRUCTOR'), (req, res, next) =>
     expressAdapter(
       req,
       res,
-      lessonController.getLessonById.bind(lessonController)
+      lessonController.getLessonById.bind(lessonController),
+      next
     )
   );
 
   router.get(
     "/:courseId/lessons",
     restrictTo("ADMIN", "USER", "INSTRUCTOR"),
-    (req, res) =>
+    (req, res, next) =>
       expressAdapter(
         req,
         res,
-        lessonController.getAllLessons.bind(lessonController)
+        lessonController.getAllLessons.bind(lessonController),
+        next
       )
   );
 
-  router.get("/:courseId/public-lessons", (req, res) =>
+  router.get("/:courseId/public-lessons", (req, res, next) =>
     expressAdapter(
       req,
       res,
-      lessonController.getPublicLessons.bind(lessonController)
+      lessonController.getPublicLessons.bind(lessonController),
+      next
     )
   );
 

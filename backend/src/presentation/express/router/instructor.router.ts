@@ -10,63 +10,70 @@ export function instructorRouter(
   const router = Router();
 
   // Get instructors (public with optional admin access)
-  router.get("/instructors", (req, res) =>
+  router.get("/instructors", (req, res, next) =>
     expressAdapter(
       req,
       res,
-      instructorController.getAllInstructors.bind(instructorController)
+      instructorController.getAllInstructors.bind(instructorController),
+      next
     )
   );
 
   // Admin routes
-  router.post("/approve", restrictTo("ADMIN"), (req, res) =>
+  router.post("/approve", restrictTo("ADMIN"), (req, res, next) =>
     expressAdapter(
       req,
       res,
-      instructorController.approveInstructor.bind(instructorController)
+      instructorController.approveInstructor.bind(instructorController),
+      next
     )
   );
 
-  router.post("/decline", restrictTo("ADMIN"), (req, res) =>
+  router.post("/decline", restrictTo("ADMIN"), (req, res, next) =>
     expressAdapter(
       req,
       res,
-      instructorController.declineInstructor.bind(instructorController)
+      instructorController.declineInstructor.bind(instructorController),
+      next
     )
   );
 
   // User/Instructor routes
-  router.post("/create", restrictTo("USER", "INSTRUCTOR"), (req, res) =>
+  router.post("/create", restrictTo("USER", "INSTRUCTOR"), (req, res, next) =>
     expressAdapter(
       req,
       res,
-      instructorController.createInstructor.bind(instructorController)
+      instructorController.createInstructor.bind(instructorController),
+      next
     )
   );
 
-  router.put("/update", restrictTo("INSTRUCTOR", "ADMIN"), (req, res) =>
+  router.put("/update", restrictTo("INSTRUCTOR", "ADMIN"), (req, res, next) =>
     expressAdapter(
       req,
       res,
-      instructorController.updateInstructor.bind(instructorController)
+      instructorController.updateInstructor.bind(instructorController),
+      next
     )
   );
 
   // Get current user's instructor data (must come before /:userId)
-  router.get("/me", restrictTo("INSTRUCTOR", "ADMIN", "USER"), (req, res) =>
+  router.get("/me", restrictTo("INSTRUCTOR", "ADMIN", "USER"), (req, res, next) =>
     expressAdapter(
       req,
       res,
-      instructorController.getInstructorByUserId.bind(instructorController)
+      instructorController.getInstructorByUserId.bind(instructorController),
+      next
     )
   );
 
   // Get instructor details (public with optional auth) - must come after specific routes
-  router.get("/:userId", optionalAuth, (req, res) =>
+  router.get("/:userId", optionalAuth, (req, res, next) =>
     expressAdapter(
       req,
       res,
-      instructorController.getInstructorDetails.bind(instructorController)
+      instructorController.getInstructorDetails.bind(instructorController),
+      next
     )
   );
 

@@ -1,4 +1,4 @@
-import { Request, Response } from "express";
+import { Request, Response, NextFunction } from "express";
 import { ZodError } from "zod";
 import { HttpError } from "../../http/errors/http-error";
 import { ApiResponse } from "../../http/interfaces/ApiResponse";
@@ -24,8 +24,14 @@ export function errorMiddleware(
   err: Error,
   req: Request,
   res: Response,
+  next: NextFunction
 ): void {
-  // Type guard: ensure res is an Express Response
+
+  console.log("[ErrorMiddleware] Handling error:", err);
+
+
+
+// Type guard: ensure res is an Express Response
   if (typeof res.status !== "function") {
     console.error("errorMiddleware called with invalid res object:", res);
     return;
@@ -40,13 +46,18 @@ export function errorMiddleware(
     method: req.method
   });
 
-  if (err instanceof HttpError) {
-    // Clear auth cookies for any 401 error (unauthorized/disabled user)
-    if (err.statusCode === 401) {
-      handleUnauthorizedError(res, err.message);
-      return;
-    }
+  if (
+    (err instanceof HttpError && err.statusCode === 401) ||
+    (typeof err.message === "string" && (
+      err.message.toLowerCase().includes("unauthorized") ||
+      err.message.toLowerCase().includes("invalid token")
+    ))
+  ) {
+    handleUnauthorizedError(res, err.message);
+    return;
+  }
 
+  if (err instanceof HttpError) {
     const response: ApiResponse<null> = {
       statusCode: err.statusCode,
       success: false,
@@ -72,9 +83,6 @@ export function errorMiddleware(
         data: null,
       };
       res.status(404).json(response);
-    } else if (typeof err.message === "string" && (err.message.includes("unauthorized") || err.message.includes("invalid token"))) {
-      // Clear auth cookies for unauthorized errors
-      handleUnauthorizedError(res, err.message);
     } else if (typeof err.message === "string" && (err.message.includes("forbidden") || err.message.includes("permission denied"))) {
       const response: ApiResponse<null> = {
         statusCode: 403,
@@ -95,34 +103,3 @@ export function errorMiddleware(
     }
   }
 }
-
-export const errorHandler = (
-  error: any,
-  req: Request,
-  res: Response,
-) => {
-  console.error("Error middleware caught:", error);
-
-  // Clear auth cookies for any 401 error
-  if (error instanceof HttpError && error.statusCode === 401) {
-    handleUnauthorizedError(res, error.message);
-    return;
-  }
-
-  // Handle HttpError instances
-  if (error instanceof HttpError) {
-    return res.status(error.statusCode).json({
-      success: false,
-      message: error.message,
-      error: error.message,
-    });
-  }
-
-  // Handle other errors
-  console.error("Unhandled error:", error);
-  return res.status(500).json({
-    success: false,
-    message: "Internal server error",
-    error: process.env.NODE_ENV === "development" ? error.message : "Something went wrong",
-  });
-};

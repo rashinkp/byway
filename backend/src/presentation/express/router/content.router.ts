@@ -8,27 +8,30 @@ export default function lessonContentRouter(
 ): Router {
   const router = Router();
 
-  router.post("/", restrictTo("INSTRUCTOR"), (req, res) =>
+  router.post("/", restrictTo("INSTRUCTOR"), (req, res, next) =>
     expressAdapter(
       req,
       res,
-      lessonContentController.createLessonContent.bind(lessonContentController)
+      lessonContentController.createLessonContent.bind(lessonContentController),
+      next
     )
   );
 
-  router.put("/:contentId", restrictTo("INSTRUCTOR"), (req, res) =>
+  router.put("/:contentId", restrictTo("INSTRUCTOR"), (req, res, next) =>
     expressAdapter(
       req,
       res,
-      lessonContentController.updateLessonContent.bind(lessonContentController)
+      lessonContentController.updateLessonContent.bind(lessonContentController),
+      next
     )
   );
 
-  router.delete("/:contentId", restrictTo("ADMIN", "INSTRUCTOR"), (req, res) =>
+  router.delete("/:contentId", restrictTo("ADMIN", "INSTRUCTOR"), (req, res, next) =>
     expressAdapter(
       req,
       res,
-      lessonContentController.deleteLessonContent.bind(lessonContentController)
+      lessonContentController.deleteLessonContent.bind(lessonContentController),
+      next
     )
   );
 
@@ -36,13 +39,14 @@ export default function lessonContentRouter(
   router.get(
     "/:lessonId",
     restrictTo("ADMIN", "USER", "INSTRUCTOR"),
-    (req, res) =>
+    (req, res, next) =>
       expressAdapter(
         req,
         res,
         lessonContentController.getLessonContentByLessonId.bind(
           lessonContentController
-        )
+        ),
+        next
       )
   );
 

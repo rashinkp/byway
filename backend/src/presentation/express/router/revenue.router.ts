@@ -8,21 +8,21 @@ export function revenueRouter(
 ): Router {
   const router = Router();
 
-  router.get("/overall", restrictTo("ADMIN", "INSTRUCTOR"), (req, res) =>
+  router.get("/overall", restrictTo("ADMIN", "INSTRUCTOR"), (req, res, next) =>
     expressAdapter(req, res, (httpRequest) =>
-      revenueController.getOverallRevenue(httpRequest)
+      revenueController.getOverallRevenue(httpRequest), next
     )
   );
 
-  router.get("/courses", restrictTo("ADMIN", "INSTRUCTOR"), (req, res) =>
+  router.get("/courses", restrictTo("ADMIN", "INSTRUCTOR"), (req, res, next) =>
     expressAdapter(req, res, (httpRequest) =>
-      revenueController.getCourseRevenue(httpRequest)
+      revenueController.getCourseRevenue(httpRequest), next
     )
   );
 
-  router.get("/latest", restrictTo("ADMIN", 'INSTRUCTOR'), (req, res) =>
+  router.get("/latest", restrictTo("ADMIN", 'INSTRUCTOR'), (req, res, next) =>
     expressAdapter(req, res, (httpRequest) =>
-      revenueController.getLatestRevenue(httpRequest)
+      revenueController.getLatestRevenue(httpRequest), next
     )
   );
 

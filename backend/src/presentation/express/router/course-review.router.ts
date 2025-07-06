@@ -13,11 +13,11 @@ export default function courseReviewRouter(
   router.post(
     "/",
     restrictTo("USER", "INSTRUCTOR", "ADMIN"),
-    (req, res) =>
+    (req, res , next) =>
       expressAdapter(
         req,
         res,
-        courseReviewController.createReview.bind(courseReviewController)
+        courseReviewController.createReview.bind(courseReviewController) , next
       )
   );
 
@@ -34,20 +34,20 @@ export default function courseReviewRouter(
   router.get(
     "/my-reviews",
     restrictTo("USER", "INSTRUCTOR", "ADMIN"),
-    (req, res) =>
+    (req, res , next) =>
       expressAdapter(
         req,
         res,
-        courseReviewController.getUserReviews.bind(courseReviewController)
+        courseReviewController.getUserReviews.bind(courseReviewController) , next
       )
   );
 
 
-  router.get("/course/:courseId", optionalAuth, (req, res) =>
+  router.get("/course/:courseId", optionalAuth, (req, res , next) =>
     expressAdapter(
       req,
       res,
-      courseReviewController.getCourseReviews.bind(courseReviewController)
+      courseReviewController.getCourseReviews.bind(courseReviewController) , next
     )
   );
 
@@ -55,11 +55,11 @@ export default function courseReviewRouter(
   router.get(
     "/course/:courseId/stats",
     optionalAuth,
-    (req, res) =>
+    (req, res , next) =>
       expressAdapter(
         req,
         res,
-        courseReviewController.getCourseReviewStats.bind(courseReviewController)
+        courseReviewController.getCourseReviewStats.bind(courseReviewController) , next
       )
   );
 
@@ -67,11 +67,11 @@ export default function courseReviewRouter(
   router.patch(
     "/:id/disable",
     restrictTo("ADMIN"),
-    (req, res) =>
+    (req, res , next) =>
       expressAdapter(
         req,
         res,
-        courseReviewController.disableReview.bind(courseReviewController)
+        courseReviewController.disableReview.bind(courseReviewController) , next
       )
   );
 
@@ -79,21 +79,21 @@ export default function courseReviewRouter(
 
 
 
-  router.delete("/:id", restrictTo("USER", "INSTRUCTOR", "ADMIN"), (req, res) =>
+  router.delete("/:id", restrictTo("USER", "INSTRUCTOR", "ADMIN"), (req, res , next) =>
     expressAdapter(
       req,
       res,
-      courseReviewController.deleteReview.bind(courseReviewController)
+      courseReviewController.deleteReview.bind(courseReviewController) , next
     )
   );
 
 
 
-  router.put("/:id", restrictTo("USER", "INSTRUCTOR", "ADMIN"), (req, res) =>
+  router.put("/:id", restrictTo("USER", "INSTRUCTOR", "ADMIN"), (req, res , next) =>
     expressAdapter(
       req,
       res,
-      courseReviewController.updateReview.bind(courseReviewController)
+      courseReviewController.updateReview.bind(courseReviewController) ,next
     )
   );
 

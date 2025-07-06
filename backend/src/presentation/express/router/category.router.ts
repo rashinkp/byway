@@ -8,46 +8,52 @@ export default function categoryRouter(
 ): Router {
   const router = Router();
 
-  router.post("/", restrictTo("ADMIN"), (req, res) =>
+  router.post("/", restrictTo("ADMIN"), (req, res, next) =>
     expressAdapter(
       req,
       res,
-      categoryController.createCategory.bind(categoryController)
+      categoryController.createCategory.bind(categoryController),
+      next
     )
   );
-  router.get("/", (req, res) =>
+  router.get("/", (req, res, next) =>
     expressAdapter(
       req,
       res,
-      categoryController.getAllCategories.bind(categoryController)
+      categoryController.getAllCategories.bind(categoryController),
+      next
     )
   );
-  router.get("/:id", (req, res) =>
+  router.get("/:id", (req, res, next) =>
     expressAdapter(
       req,
       res,
-      categoryController.getCategoryById.bind(categoryController)
+      categoryController.getCategoryById.bind(categoryController),
+      next
     )
   );
-  router.put("/:categoryId", (req, res) =>
+  router.put("/:categoryId", (req, res, next) =>
     expressAdapter(
       req,
       res,
-      categoryController.updateCategory.bind(categoryController)
+      categoryController.updateCategory.bind(categoryController),
+      next
     )
   );
-  router.delete("/:categoryId", (req, res) =>
+  router.delete("/:categoryId", (req, res, next) =>
     expressAdapter(
       req,
       res,
-      categoryController.deleteCategory.bind(categoryController)
+      categoryController.deleteCategory.bind(categoryController),
+      next
     )
   );
-  router.patch("/:categoryId/recover", (req, res) =>
+  router.patch("/:categoryId/recover", (req, res, next) =>
     expressAdapter(
       req,
       res,
-      categoryController.recoverCategory.bind(categoryController)
+      categoryController.recoverCategory.bind(categoryController),
+      next
     )
   );
 

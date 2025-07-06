@@ -16,11 +16,12 @@ export const createApp = (deps: AppDependencies): Application => {
   app.post(
     "/api/v1/stripe/webhook",
     express.raw({ type: "application/json" }),
-    (req, res) =>
+    (req, res , next) =>
       expressAdapter(
         req,
         res,
-        deps.stripeController.handleWebhook.bind(deps.stripeController)
+        deps.stripeController.handleWebhook.bind(deps.stripeController),
+        next
       )
   );
 

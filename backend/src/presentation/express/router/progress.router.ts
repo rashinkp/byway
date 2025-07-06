@@ -10,16 +10,15 @@ export const progressRouter = (progressController: ProgressController): Router =
   router.patch(
     "/:courseId/progress",
     restrictTo("USER", "INSTRUCTOR", "ADMIN"),
-    (req, res) => expressAdapter(req, res, progressController.updateProgress.bind(progressController))
+    (req, res, next) => expressAdapter(req, res, progressController.updateProgress.bind(progressController), next)
   );
 
   // Get course progress
   router.get(
     "/:courseId/progress",
     restrictTo("USER", "INSTRUCTOR", "ADMIN"),
-    (req, res) => expressAdapter(req, res, progressController.getProgress.bind(progressController))
+    (req, res, next) => expressAdapter(req, res, progressController.getProgress.bind(progressController), next)
   );
-
 
   return router;
 }; 
