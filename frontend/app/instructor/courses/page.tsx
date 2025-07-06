@@ -16,12 +16,6 @@ export default function CoursesPage() {
 	const [isModalOpen, setIsModalOpen] = useState(false);
 	const { data: statsData } = useGetCourseStats();
 
-	// Move useGetAllCourses out of the callback
-	const instructorCoursesHook = useGetAllCourses({
-		// Provide default params or state if needed
-		// ...
-	});
-
 	return (
 		<>
 			<ListPage<Course>
@@ -29,7 +23,19 @@ export default function CoursesPage() {
 				description="Manage and monitor your course performance"
 				entityName="Course"
 				role={user?.role as "ADMIN" | "USER" | "INSTRUCTOR" | undefined}
-				useDataHook={() => instructorCoursesHook}
+				useDataHook={params => {
+					const validSortBy = ["title", "createdAt", "price"] as const;
+					const sortBy = validSortBy.includes(params.sortBy as typeof validSortBy[number])
+						? (params.sortBy as typeof validSortBy[number])
+						: "title";
+					const validFilterBy = [
+						"All", "Active", "Inactive", "Approved", "Declined", "Pending", "Published", "Draft", "Archived"
+					] as const;
+					const filterBy = validFilterBy.includes(params.filterBy as typeof validFilterBy[number])
+						? (params.filterBy as typeof validFilterBy[number])
+						: "All";
+					return useGetAllCourses({ ...params, sortBy, filterBy, role: user?.role || "INSTRUCTOR" });
+				}}
 				columns={[
 					{
 						header: "Title",

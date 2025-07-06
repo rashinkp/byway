@@ -381,7 +381,7 @@ function AudioMessage({ audioUrl, isMine, isRead }: { audioUrl: string; isMine: 
   };
 
   const formatTime = (s: number) => {
-    if (isNaN(s) || s < 0) return '0:00';
+    if (!isFinite(s) || isNaN(s) || s < 0) return '0:00';
     const mins = Math.floor(s / 60);
     const secs = Math.floor(s % 60);
     return `${mins}:${secs.toString().padStart(2, '0')}`;

@@ -1,6 +1,5 @@
 "use client";
 import { cn } from "@/utils/cn";
-import { Star } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { Course } from "@/types/course";
 import Image from "next/image";
@@ -15,6 +14,24 @@ export function CourseCard({ course, className }: CourseCardProps) {
 
 	const handleCardClick = () => {
 		router.push(`/courses/${course.id}`);
+	};
+
+	// Calculate price display
+	const originalPrice = course.price ? Number(course.price) : 0;
+	const offerPrice = course.offer ? Number(course.offer) : 0;
+	const hasDiscount = offerPrice > 0 && offerPrice < originalPrice;
+	const discountPercentage = hasDiscount 
+		? Math.round(((originalPrice - offerPrice) / originalPrice) * 100) 
+		: 0;
+
+	// Format price to currency
+	const formatPrice = (price: number) => {
+		return new Intl.NumberFormat('en-US', {
+			style: 'currency',
+			currency: 'USD',
+			minimumFractionDigits: 0,
+			maximumFractionDigits: 0,
+		}).format(price);
 	};
 
 	return (
@@ -42,6 +59,12 @@ export function CourseCard({ course, className }: CourseCardProps) {
 					width={400}
 					height={192}
 				/>
+				{/* Discount Badge */}
+				{hasDiscount && (
+					<div className="absolute top-3 left-3 bg-red-500 text-white px-2 py-1 rounded-md text-xs font-bold">
+						-{discountPercentage}%
+					</div>
+				)}
 			</div>
 			{/* Content */}
 			<div className="p-6 flex flex-col">
@@ -84,16 +107,32 @@ export function CourseCard({ course, className }: CourseCardProps) {
 				<p className="text-sm mb-1 leading-relaxed line-clamp-2 text-[var(--color-primary-light)]">
 					{course.description || "No description available."}
 				</p>
-				{/* Rating */}
-				<div className="flex items-center gap-2 mt-1">
-					<span className="text-2xl font-bold text-[var(--color-primary-dark)]">
-						{course.reviewStats?.averageRating?.toFixed(1) || "0.0"}
-					</span>
-					<Star className="w-5 h-5 text-[var(--color-primary-light)]" />
-					<span className="text-sm text-[var(--color-primary-light)]">
-						({course.reviewStats?.totalReviews || 0} reviews)
-					</span>
+				{/* Price Section */}
+				<div className="flex items-center gap-2 mb-2">
+					{originalPrice > 0 ? (
+						<>
+							{hasDiscount ? (
+								<>
+									<span className="text-lg font-bold text-[var(--color-primary-dark)]">
+										{formatPrice(offerPrice)}
+									</span>
+									<span className="text-sm text-[var(--color-primary-light)] line-through">
+										{formatPrice(originalPrice)}
+									</span>
+								</>
+							) : (
+								<span className="text-lg font-bold text-[var(--color-primary-dark)]">
+									{formatPrice(originalPrice)}
+								</span>
+							)}
+						</>
+					) : (
+						<span className="text-lg font-bold text-green-600">
+							Free
+						</span>
+					)}
 				</div>
+
 			</div>
 		</div>
 	);

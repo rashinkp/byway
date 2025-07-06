@@ -1,13 +1,11 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, {  useRef, useEffect, useState } from 'react';
 import { EnhancedChatItem, Message } from '@/types/chat';
 import { Message as MessageComponent } from './Message';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Send, MoreVertical, ArrowLeft, Image as ImageIcon, X, Mic, StopCircle } from 'lucide-react';
 import Link from 'next/link';
 import { useAuth } from '@/hooks/auth/useAuth';
-import { deleteMessage } from '@/services/socketChat';
 import { ModernChatInput } from './ChatInput';
 
 interface ChatWindowProps {
@@ -29,6 +27,11 @@ export function ChatWindow({ chat, messages, onSendMessage, currentUserId, onDel
   const prevMessagesLength = useRef(messages.length);
   const prevScrollHeight = useRef<number | null>(null);
   const MAX_SIZE_MB = 2;
+
+  // Add missing state for image handling
+  const [imageError, setImageError] = useState<string | null>(null);
+  const [selectedImage, setSelectedImage] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
