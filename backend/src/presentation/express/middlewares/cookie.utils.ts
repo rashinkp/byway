@@ -1,11 +1,12 @@
 import { Response } from "express";
+import { envConfig } from "../configs/env.config";
 
 /**
  * Centralized cookie configuration
  */
 const COOKIE_CONFIG = {
-  httpOnly: process.env.NODE_ENV === "production",
-  secure: process.env.NODE_ENV === "production",
+  httpOnly: envConfig.NODE_ENV === "production",
+  secure: envConfig.NODE_ENV === "production",
   sameSite: "lax" as const,
   path: "/",
 };

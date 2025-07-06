@@ -18,7 +18,7 @@ export async function getPresignedUrl(
 ): Promise<PresignedUrlResponse> {
 	try {
 		const response = await api.post<ApiResponse<PresignedUrlResponse>>(
-			"/files/presigned-url",
+			"/files/generate-presigned-url",
 			{
 				fileName,
 				fileType,

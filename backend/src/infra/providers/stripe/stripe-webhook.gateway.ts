@@ -4,12 +4,13 @@ import { WebhookMetadata } from "../../../domain/value-object/webhook-metadata.v
 import Stripe from "stripe";
 import { HttpError } from "../../../presentation/http/errors/http-error";
 import { StatusCodes } from "http-status-codes";
+import { envConfig } from "../../presentation/express/configs/env.config";
 
 export class StripeWebhookGateway implements WebhookGateway {
   private stripe: Stripe;
 
   constructor() {
-    const stripeKey = process.env.STRIPE_SECRET_KEY;
+    const stripeKey = envConfig.STRIPE_SECRET_KEY;
     if (!stripeKey) {
       throw new Error("STRIPE_SECRET_KEY is not defined");
     }
@@ -23,7 +24,7 @@ export class StripeWebhookGateway implements WebhookGateway {
     event: string | Buffer,
     signature: string
   ): Promise<WebhookEvent> {
-    const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
+    const webhookSecret = envConfig.STRIPE_WEBHOOK_SECRET;
     if (!webhookSecret) {
       throw new HttpError(
         "Webhook secret not configured",

@@ -3,6 +3,7 @@ import nodemailer from "nodemailer";
 import { UserVerification } from "../../../domain/entities/user-verification.entity";
 import { IAuthRepository } from "../../../app/repositories/auth.repository";
 import { IOtpProvider } from "../../../app/providers/I.otp-provider";
+import { envConfig } from "../../presentation/express/configs/env.config";
 
 
 export class OtpProvider implements IOtpProvider {
@@ -12,8 +13,8 @@ export class OtpProvider implements IOtpProvider {
     this.transporter = nodemailer.createTransport({
       service: "gmail",
       auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS,
+        user: envConfig.EMAIL_USER,
+        pass: envConfig.EMAIL_PASS,
       },
     });
   }

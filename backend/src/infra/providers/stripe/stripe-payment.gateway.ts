@@ -6,12 +6,13 @@ import {
 import { CreateCheckoutSessionDto } from "../../../domain/dtos/stripe/create-checkout-session.dto";
 import { HttpError } from "../../../presentation/http/errors/http-error";
 import { StatusCodes } from "http-status-codes";
+import { envConfig } from "../../presentation/express/configs/env.config";
 
 export class StripePaymentGateway implements PaymentGateway {
   private stripe: Stripe;
 
   constructor() {
-    const stripeKey = process.env.STRIPE_SECRET_KEY;
+    const stripeKey = envConfig.STRIPE_SECRET_KEY;
     if (!stripeKey) {
       throw new Error("STRIPE_SECRET_KEY is not defined");
     }
@@ -29,7 +30,7 @@ export class StripePaymentGateway implements PaymentGateway {
     const { courses, couponCode, isWalletTopUp, amount } = input;
 
     // Validate FRONTEND_URL
-    const frontendUrl = process.env.FRONTEND_URL;
+    const frontendUrl = envConfig.FRONTEND_URL;
     if (!frontendUrl) {
       throw new HttpError(
         "Server configuration error: FRONTEND_URL is missing",

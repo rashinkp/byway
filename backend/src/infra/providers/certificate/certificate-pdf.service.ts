@@ -271,7 +271,6 @@ export class CertificatePdfService implements CertificatePdfServiceInterface {
     const centerX = doc.page.width / 2;
     const margin = 50;
     let currentY = 250;
-    const maxY = doc.page.height - margin;
     const clampY = (y: number) => this.clampY(doc, y, margin);
 
     // Ceremonial text
@@ -364,7 +363,6 @@ export class CertificatePdfService implements CertificatePdfServiceInterface {
     doc: PDFKit.PDFDocument,
     data: CertificateTemplateData
   ): void {
-    const centerX = doc.page.width / 2;
     const margin = 50;
     const footerY = Math.min(doc.page.height - 130, doc.page.height - margin);
     const leftX = 150;
