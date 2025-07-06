@@ -14,7 +14,7 @@ import { orderRouter } from "./order.router";
 import { fileRouter } from "./file.router";
 import { progressRouter } from "./progress.router";
 import { walletRouter } from "./wallet.router";
-import {revenueRouter} from "./revenue.router";
+import { revenueRouter } from "./revenue.router";
 import { certificateRouter } from "./certificate.router";
 
 export const createRouter = (deps: AppDependencies): Router => {
@@ -41,4 +41,4 @@ export const createRouter = (deps: AppDependencies): Router => {
   router.use("/reviews", deps.courseReviewRouter);
 
   return router;
-}; 
+};

@@ -4,7 +4,7 @@ import { createUserDependencies } from "./user.dependencies";
 import { createInstructorDependencies } from "./instructor.dependencies";
 import { createCategoryDependencies } from "./category.dependencies";
 import { createCourseDependencies } from "./course.dependencies";
-import { createLessonDependencies } from "./lesson.depenedencies";
+import { createLessonDependencies } from "./lesson.dependencies";
 import { createLessonContentDependencies } from "./content.dependencies";
 import { createCartDependencies } from "./cart.dependencies";
 import { createStripeDependencies } from "./stripe.dependencies";
@@ -15,7 +15,6 @@ import { createProgressDependencies } from "./progress.dependencies";
 import { createCourseReviewDependencies } from "./course-review.dependencies";
 import { SearchRepository } from "../infra/repositories/search.repository.impl";
 import { GlobalSearchUseCase } from "../app/usecases/search/implementation/global-search.usecase";
-import { SearchController } from "../presentation/http/controllers/search.controller";
 import { searchRouter } from "../presentation/express/router/search.router";
 import { createWalletDependencies } from "./wallet.dependencies";
 import { createRevenueDependencies } from "./revenue.dependencies";
@@ -27,61 +26,120 @@ import { createChatDependencies } from "./chat.dependencies";
 import { createNotificationDependencies } from "./notification.dependencies";
 import { createCertificateDependencies } from "./certificate.dependencies";
 import { CertificateController } from "../presentation/http/controllers/certificate.controller";
+import { AuthController } from "../presentation/http/controllers/auth.controller";
+import { UserController } from "../presentation/http/controllers/user.controller";
+import { InstructorController } from "../presentation/http/controllers/instructor.controller";
+import { CategoryController } from "../presentation/http/controllers/category.controller";
+import { CourseController } from "../presentation/http/controllers/course.controller";
+import { LessonController } from "../presentation/http/controllers/lesson.controller";
+import { CartController } from "../presentation/http/controllers/cart.controller";
+import { StripeController } from "../presentation/http/controllers/stripe.controller";
+import { TransactionController } from "../presentation/http/controllers/transaction.controller";
+import { OrderController } from "../presentation/http/controllers/order.controller";
+import { FileController } from "../presentation/http/controllers/file.controller";
+import { ProgressController } from "../presentation/http/controllers/progress.controller";
+import { SearchController } from "../presentation/http/controllers/search.controller";
+import { WalletController } from "../presentation/http/controllers/wallet.controller";
+import { RevenueController } from "../presentation/http/controllers/revenue.controller";
+import { DashboardController } from "../presentation/http/controllers/dashboard.controller";
+import { CourseReviewController } from "../presentation/http/controllers/course-review.controller";
+import { ChatController } from "../presentation/http/controllers/chat.controller";
+import { NotificationController } from "../presentation/http/controllers/notification.controller";
+import { CreateNotificationsForUsersUseCase } from "../app/usecases/notification/implementations/create-notifications-for-users.usecase";
+import { GetUserNotificationsUseCase } from "../app/usecases/notification/implementations/get-user-notifications.usecase";
+import { HttpErrors } from "../presentation/http/http.errors";
+import { HttpSuccess } from "../presentation/http/http.success";
+import { ICourseRepository } from "../app/repositories/course.repository.interface";
+import { ICategoryRepository } from "../app/repositories/category.repository";
+import { IUserRepository } from "../app/repositories/user.repository";
+import { IEnrollmentRepository } from "../app/repositories/enrollment.repository.interface";
+import { ICartRepository } from "../app/repositories/cart.repository";
+import { ICourseReviewRepository } from "../app/repositories/course-review.repository.interface";
+import { ILessonRepository } from "../app/repositories/lesson.repository";
+import { Router } from "express";
+import { RevenueDistributionService } from "../app/services/revenue-distribution/implementations/revenue-distribution.service";
+import { PaymentService } from "../app/services/payment/implementations/payment.service";
+
 export interface AppDependencies {
-  authController: any;
-  userController: any;
-  instructorController: any;
-  categoryController: any;
-  courseController: any;
-  lessonController: any;
+  authController: AuthController;
+  userController: UserController;
+  checkUserActiveUseCase: any;
+  instructorController: InstructorController;
+  categoryController: CategoryController;
+  courseController: CourseController;
+  lessonController: LessonController;
   lessonContentController: any;
-  cartController: any;
-  stripeController: any;
-  transactionController: any;
-  orderController: any;
-  fileController: any;
-  progressController: any;
-  searchController: any;
-  searchRouter: any;
-  walletController: any;
-  revenueController: any;
-  revenueRouter: any;
-  dashboardController: any;
-  dashboardRouter: any;
-  courseReviewController: any;
-  courseReviewRouter: any;
-  chatController: any;
+  cartController: CartController;
+  stripeController: StripeController;
+  transactionController: TransactionController;
+  orderController: OrderController;
+  fileController: FileController;
+  progressController: ProgressController;
+  searchController: SearchController;
+  searchRouter: Router;
+  walletController: WalletController;
+  revenueController: RevenueController;
+  revenueRouter: Router;
+  dashboardController: DashboardController;
+  dashboardRouter: Router;
+  courseReviewController: CourseReviewController;
+  courseReviewRouter: Router;
+  chatController: ChatController;
   sendMessageUseCase: any;
   createChatUseCase: any;
   messageRepository: any;
-  httpErrors: any;
-  httpSuccess: any;
-  getUserNotificationsUseCase: any;
-  notificationController: any;
-  createNotificationsForUsersUseCase: any;
-  courseRepository: any;
-  categoryRepository: any;
-  userRepository: any;
-  enrollmentRepository: any;
-  cartRepository: any;
-  courseReviewRepository: any;
-  lessonRepository: any;
+  httpErrors: HttpErrors;
+  httpSuccess: HttpSuccess;
+  getUserNotificationsUseCase: GetUserNotificationsUseCase;
+  notificationController: NotificationController;
+  createNotificationsForUsersUseCase: CreateNotificationsForUsersUseCase;
+  courseRepository: ICourseRepository;
+  categoryRepository: ICategoryRepository;
+  userRepository: IUserRepository;
+  enrollmentRepository: IEnrollmentRepository;
+  cartRepository: ICartRepository;
+  courseReviewRepository: ICourseReviewRepository;
+  lessonRepository: ILessonRepository;
   certificateController: CertificateController;
 }
 
 export function createAppDependencies(): AppDependencies {
-  const notificationDeps = createNotificationDependencies(createSharedDependencies());
-  const shared = createSharedDependencies(notificationDeps.createNotificationsForUsersUseCase);
+  const shared = createSharedDependencies();
+  const notificationDeps = createNotificationDependencies(shared);
   const { prisma, httpErrors, httpSuccess } = shared;
 
+  // Create the real RevenueDistributionService
+  const revenueDistributionService = new RevenueDistributionService(
+    shared.walletRepository,
+    shared.transactionRepository,
+    shared.orderRepository,
+    shared.userRepository,
+    notificationDeps.createNotificationsForUsersUseCase
+  );
+
+  // Create the real PaymentService
+  const paymentService = new PaymentService(
+    shared.walletRepository,
+    shared.orderRepository,
+    shared.transactionRepository,
+    shared.enrollmentRepository,
+    shared.paymentGateway,
+    shared.webhookGateway,
+    shared.userRepository,
+    revenueDistributionService
+  );
+
+  // Override the paymentService in shared
+  shared.paymentService = paymentService;
+
   const authDeps = createAuthDependencies(shared);
-  const userDeps = createUserDependencies(shared);
-  const instructorDeps = createInstructorDependencies(shared);
+  const userDeps = createUserDependencies(shared, notificationDeps.createNotificationsForUsersUseCase);
+  const instructorDeps = createInstructorDependencies(shared, notificationDeps.createNotificationsForUsersUseCase);
   const categoryDeps = createCategoryDependencies(shared);
-  const courseDeps = createCourseDependencies({
-    ...shared,
-    createNotificationsForUsersUseCase: notificationDeps.createNotificationsForUsersUseCase,
-  });
+  const courseDeps = createCourseDependencies(
+    shared,
+    notificationDeps.createNotificationsForUsersUseCase
+  );
   const lessonDeps = createLessonDependencies(shared);
   const lessonContentDeps = createLessonContentDependencies(shared);
   const cartDeps = createCartDependencies(shared);
@@ -127,6 +185,7 @@ export function createAppDependencies(): AppDependencies {
     ...courseDeps,
     authController: authDeps.authController,
     userController: userDeps.userController,
+    checkUserActiveUseCase: userDeps.checkUserActiveUseCase,
     instructorController: instructorDeps.instructorController,
     categoryController: categoryDeps.categoryController,
     courseController: courseDeps.courseController,
@@ -163,4 +222,12 @@ export function createAppDependencies(): AppDependencies {
     lessonRepository: shared.lessonRepository,
     certificateController: certificateDeps.certificateController,
   };
+}
+
+let appDependenciesSingleton: AppDependencies | null = null;
+export function getAppDependencies(): AppDependencies {
+  if (!appDependenciesSingleton) {
+    appDependenciesSingleton = createAppDependencies();
+  }
+  return appDependenciesSingleton;
 }

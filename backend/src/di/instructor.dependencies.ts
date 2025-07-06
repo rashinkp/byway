@@ -8,15 +8,17 @@ import { GetAllInstructorsUseCase } from "../app/usecases/instructor/implementat
 import { UpdateUserUseCase } from "../app/usecases/user/implementations/update-user.usecase";
 import { SharedDependencies } from "./shared.dependencies";
 import { GetInstructorDetailsUseCaseImpl } from "../app/usecases/instructor/implementations/get-instructor-details.usecase";
+import { CreateNotificationsForUsersUseCase } from "../app/usecases/notification/implementations/create-notifications-for-users.usecase";
 
 export interface InstructorDependencies {
   instructorController: InstructorController;
 }
 
 export function createInstructorDependencies(
-  deps: SharedDependencies
+  deps: SharedDependencies,
+  createNotificationsForUsersUseCase: CreateNotificationsForUsersUseCase
 ): InstructorDependencies {
-  const { instructorRepository, userRepository, createNotificationsForUsersUseCase } = deps;
+  const { instructorRepository, userRepository } = deps;
 
   const updateUserUseCase = new UpdateUserUseCase(userRepository);
   const createInstructorUseCase = new CreateInstructorUseCase(

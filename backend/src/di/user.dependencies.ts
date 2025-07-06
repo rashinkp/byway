@@ -7,15 +7,19 @@ import { UpdateUserUseCase } from "../app/usecases/user/implementations/update-u
 import { GetPublicUserUseCase } from "../app/usecases/user/implementations/get-user-public.usecase";
 import { GetUserAdminDetailsUseCase } from "../app/usecases/user/implementations/get-user-admin-details.usecase";
 import { SharedDependencies } from "./shared.dependencies";
+import { CreateNotificationsForUsersUseCase } from "../app/usecases/notification/implementations/create-notifications-for-users.usecase";
+import { CheckUserActiveUseCase } from "../app/usecases/user/implementations/check-user-active.usecase";
 
 export interface UserDependencies {
   userController: UserController;
+  checkUserActiveUseCase: CheckUserActiveUseCase;
 }
 
 export function createUserDependencies(
-  deps: SharedDependencies
+  deps: SharedDependencies,
+  createNotificationsForUsersUseCase: CreateNotificationsForUsersUseCase
 ): UserDependencies {
-  const { userRepository, instructorRepository, createNotificationsForUsersUseCase } = deps;
+  const { userRepository, instructorRepository } = deps;
 
   // Initialize use cases
   const getAllUsersUseCase = new GetAllUsersUseCase(userRepository);
@@ -25,6 +29,7 @@ export function createUserDependencies(
   const updateUserUseCase = new UpdateUserUseCase(userRepository);
   const getPublicUserUseCase = new GetPublicUserUseCase(userRepository);
   const getUserAdminDetailsUseCase = new GetUserAdminDetailsUseCase(userRepository, instructorRepository);
+  const checkUserActiveUseCase = new CheckUserActiveUseCase(userRepository);
 
   // Initialize controller
   const userController = new UserController(
@@ -41,5 +46,6 @@ export function createUserDependencies(
 
   return {
     userController,
+    checkUserActiveUseCase,
   };
 }

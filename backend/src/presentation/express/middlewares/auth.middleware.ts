@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from "express";
 import { JwtProvider } from "../../../infra/providers/auth/jwt.provider";
 import { HttpError } from "../../http/errors/http-error";
 import { CookieUtils } from "./cookie.utils";
+import { getAppDependencies } from '../../../di/app.dependencies';
 
 export interface JwtPayload {
   id: string;
@@ -245,6 +246,15 @@ export const restrictTo =
       } else {
         return next(new HttpError("Invalid or expired token", 401));
       }
+
+      // --- NEW: Check if user is active (not deleted) ---
+      try {
+        const { checkUserActiveUseCase } = getAppDependencies();
+        await checkUserActiveUseCase.execute(req.user.id);
+      } catch (err) {
+        return next(err);
+      }
+      // --- END NEW ---
 
       // 4. Check role permissions
       if (!req.user || !req.user.role) {

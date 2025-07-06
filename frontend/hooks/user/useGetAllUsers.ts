@@ -11,7 +11,7 @@ import {
 	UserRoleType,
 } from "@/types/user";
 
-type FilterBy =
+export type FilterBy =
 	| "All"
 	| "Active"
 	| "Inactive"

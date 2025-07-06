@@ -1,0 +1,7 @@
+socket io
+google auth api
+facebook auth api
+stripe webhook
+sql - (prisma)
+nextjs
+clean architecture

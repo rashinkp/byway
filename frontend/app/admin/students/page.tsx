@@ -1,30 +1,33 @@
 "use client";
 
-import { User } from "@/types/user";
+import React from "react";
+import { User, SortByField, NegativeSortByField } from "@/types/user";
+import type { FilterBy } from "@/hooks/user/useGetAllUsers";
 import { useGetAllUsers } from "@/hooks/user/useGetAllUsers";
 import { useToggleDeleteUser } from "@/hooks/user/useToggleDeleteUser";
 import { StatusBadge } from "@/components/ui/StatusBadge";
 import ListPage from "@/components/ListingPage";
 
+
 export default function StudentsPage() {
 	const { mutate: toggleDeleteUser } = useToggleDeleteUser();
+
+	// Just pass the hook, ListPage will call it with the right params
+	const useDataHook = (params: any) =>
+		useGetAllUsers({
+			...params,
+			sortBy: params.sortBy as SortByField | NegativeSortByField,
+			filterBy: params.filterBy as FilterBy,
+			role: "USER",
+			includeDeleted: params.filterBy === "All",
+		});
 
 	return (
 		<ListPage<User>
 			title="Student Management"
 			description="Manage student accounts and their access"
 			entityName="Student"
-			useDataHook={params => {
-				const validSortBy = ["name", "email", "createdAt"] as const;
-				const sortBy = validSortBy.includes(params.sortBy as typeof validSortBy[number])
-					? (params.sortBy as typeof validSortBy[number])
-					: "name";
-				const validFilterBy = ["All", "Active", "Inactive"] as const;
-				const filterBy = validFilterBy.includes(params.filterBy as typeof validFilterBy[number])
-					? (params.filterBy as typeof validFilterBy[number])
-					: "All";
-				return useGetAllUsers({ ...params, sortBy, filterBy, role: 'USER' });
-			}}
+			useDataHook={useDataHook}
 			columns={[
 				{
 					header: "Name",

@@ -32,7 +32,7 @@ import { PaymentService } from "../app/services/payment/implementations/payment.
 import { IPaymentService } from "../app/services/payment/interfaces/payment.service.interface";
 import { StripePaymentGateway } from "../infra/providers/stripe-payment.gateway";
 import { StripeWebhookGateway } from "../infra/providers/stripe-webhook.gateway";
-import { RevenueDistributionService } from "../app/services/revenue-distribution/implementations/revenue-distribution.service";
+import { IRevenueDistributionService } from "../app/services/revenue-distribution/interfaces/revenue-distribution.service.interface";
 import { IUserRepository } from "@/app/repositories/user.repository";
 import { PrismaRevenueRepository } from "../infra/repositories/revenue.repository";
 import { IRevenueRepository } from "../app/repositories/revenue.repository";
@@ -42,8 +42,6 @@ import { LessonProgressRepository } from "../infra/repositories/lesson-progress.
 import { ILessonProgressRepository } from "../app/repositories/lesson-progress.repository.interface";
 import { PrismaCertificateRepository } from "../infra/repositories/certificate-repository.prisma";
 import { CertificateRepositoryInterface } from "../app/repositories/certificate-repository.interface";
-import { CreateNotificationsForUsersUseCase } from "../app/usecases/notification/implementations/create-notifications-for-users.usecase";
-
 export interface SharedDependencies {
   prisma: typeof prismaClient;
   userRepository: IUserRepository;
@@ -66,12 +64,13 @@ export interface SharedDependencies {
   cookieService: CookieService;
   walletRepository: IWalletRepository;
   paymentService: IPaymentService;
-  createNotificationsForUsersUseCase: CreateNotificationsForUsersUseCase;
+  paymentGateway: StripePaymentGateway;
+  webhookGateway: StripeWebhookGateway;
   lessonProgressRepository: ILessonProgressRepository;
   certificateRepository: CertificateRepositoryInterface;
 }
 
-export function createSharedDependencies(createNotificationsForUsersUseCase?: CreateNotificationsForUsersUseCase): SharedDependencies {
+export function createSharedDependencies(): SharedDependencies {
   const userRepository = new UserRepository(prismaClient);
   const categoryRepository = new CategoryRepository(prismaClient);
   const courseRepository = new CourseRepository(prismaClient);
@@ -89,13 +88,15 @@ export function createSharedDependencies(createNotificationsForUsersUseCase?: Cr
   const walletRepository = new WalletRepository(prismaClient);
   const paymentGateway = new StripePaymentGateway();
   const webhookGateway = new StripeWebhookGateway();
-  const revenueDistributionService = new RevenueDistributionService(
-    walletRepository,
-    transactionRepository,
-    orderRepository,
-    userRepository,
-    createNotificationsForUsersUseCase!
-  );
+  
+  // Create a temporary mock revenue distribution service
+  // This will be replaced with the real one in app.dependencies.ts
+  const mockRevenueDistributionService: IRevenueDistributionService = {
+    distributeRevenue: async () => {
+      console.warn('Revenue distribution service not properly initialized');
+    }
+  };
+  
   const paymentService = new PaymentService(
     walletRepository,
     orderRepository,
@@ -104,7 +105,7 @@ export function createSharedDependencies(createNotificationsForUsersUseCase?: Cr
     paymentGateway,
     webhookGateway,
     userRepository,
-    revenueDistributionService
+    mockRevenueDistributionService
   );
 
   const httpErrors = new HttpErrors();
@@ -137,7 +138,8 @@ export function createSharedDependencies(createNotificationsForUsersUseCase?: Cr
     cookieService,
     walletRepository,
     paymentService,
-    createNotificationsForUsersUseCase: createNotificationsForUsersUseCase!,
+    paymentGateway,
+    webhookGateway,
     lessonProgressRepository,
     certificateRepository,
   };
