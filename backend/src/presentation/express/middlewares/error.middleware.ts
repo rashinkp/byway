@@ -102,4 +102,7 @@ export function errorMiddleware(
       res.status(500).json(response);
     }
   }
+
+  // To avoid linter error for unused 'next' argument
+  void next;
 }

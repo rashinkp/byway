@@ -13,9 +13,11 @@ import CertificatesSection from "@/components/profile/CertificatesSection";
 import { useSearchParams, useRouter } from "next/navigation";
 import ErrorDisplay from "@/components/ErrorDisplay";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useAuthStore } from "@/stores/auth.store";
 
 export default function ProfilePage() {
   const { data: user, isLoading, error } = useDetailedUserData();
+  const { isInitialized, isLoading: authLoading } = useAuthStore();
   const [activeSection, setActiveSection] = useState("profile");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(true); // collapsed by default on mobile
@@ -75,7 +77,8 @@ export default function ProfilePage() {
     }
   }, [isLoading, loadingSection]);
 
-  if (isLoading) {
+  // Show loading skeleton until auth is initialized and not loading
+  if (isLoading || authLoading || !isInitialized) {
     return (
       <div className="min-h-screen bg-[var(--color-surface)] flex flex-row">
         {/* Sidebar skeleton */}
