@@ -43,12 +43,32 @@ export class GenerateCertificateUseCase implements IGenerateCertificateUseCase {
       // 2. Check if certificate already exists
       console.log(`[Certificate] Checking for existing certificate: userId=${userId}, courseId=${courseId}`);
       const existingCertificate = await this.certificateRepository.findByUserIdAndCourseId(userId, courseId);
+      let certificate;
+      let isUpdate = false;
+      let oldCertificateId = undefined;
       if (existingCertificate) {
-        console.log(`[Certificate] Certificate already exists for userId=${userId}, courseId=${courseId}`);
-        return {
-          success: false,
-          error: 'Certificate already exists for this course'
-        };
+        // Restrict regeneration to once every 30 days
+        const lastUpdated = new Date(existingCertificate.updatedAt);
+        const now = new Date();
+        const daysSinceUpdate = (now.getTime() - lastUpdated.getTime()) / (1000 * 60 * 60 * 24);
+        if (daysSinceUpdate < 30) {
+          return {
+            success: false,
+            error: `Certificate can only be regenerated once every 30 days. Please try again after ${Math.ceil(30 - daysSinceUpdate)} day(s).`
+          };
+        }
+        // Delete from S3 if pdfUrl exists
+        if (existingCertificate.pdfUrl) {
+          try {
+            await this.cloudStorageService.deleteCertificate(existingCertificate.pdfUrl);
+            console.log(`[Certificate] Deleted old certificate PDF from S3: ${existingCertificate.pdfUrl}`);
+          } catch (err) {
+            console.error(`[Certificate] Failed to delete old certificate PDF from S3:`, err);
+          }
+        }
+        // Prepare to update existing certificate
+        isUpdate = true;
+        oldCertificateId = existingCertificate.id;
       }
 
       // 3. Check if course is completed
@@ -83,14 +103,22 @@ export class GenerateCertificateUseCase implements IGenerateCertificateUseCase {
       const certificateNumber = this.generateCertificateNumber();
       console.log(`[Certificate] Generating certificate: certificateNumber=${certificateNumber}`);
 
-      // 7. Create certificate entity
-      const certificate = Certificate.create({
+      // 7. Create or update certificate entity
+      certificate = Certificate.create({
         userId,
         courseId,
         enrollmentId: enrollment.userId, // This should be the enrollment ID
         certificateNumber,
         status: CertificateStatus.PENDING
       });
+      if (isUpdate && oldCertificateId) {
+        // Use the same id as the old certificate
+        certificate = new Certificate({
+          ...certificate.toJSON(),
+          id: oldCertificateId,
+          createdAt: existingCertificate && existingCertificate.createdAt ? new Date(existingCertificate.createdAt) : new Date(),
+        });
+      }
 
       // 8. Generate PDF
       console.log(`[Certificate] Generating PDF for certificateNumber=${certificateNumber}`);
@@ -128,10 +156,15 @@ export class GenerateCertificateUseCase implements IGenerateCertificateUseCase {
         generatedAt: new Date().toISOString()
       });
 
-      // 11. Save certificate to database
-      console.log(`[Certificate] Saving certificate to database: certificateNumber=${certificateNumber}`);
-      const savedCertificate = await this.certificateRepository.create(certificate);
-      console.log(`[Certificate] Certificate generation completed: certificateNumber=${certificateNumber}`);
+      // 11. Save certificate to database (update if exists, create if not)
+      let savedCertificate;
+      if (isUpdate && oldCertificateId) {
+        savedCertificate = await this.certificateRepository.update(certificate);
+        console.log(`[Certificate] Certificate updated in database: certificateNumber=${certificateNumber}`);
+      } else {
+        savedCertificate = await this.certificateRepository.create(certificate);
+        console.log(`[Certificate] Certificate generation completed: certificateNumber=${certificateNumber}`);
+      }
 
       return {
         success: true,

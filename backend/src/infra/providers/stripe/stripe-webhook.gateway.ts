@@ -1,8 +1,8 @@
-import { WebhookGateway } from "../../app/providers/webhook-gateway.interface";
-import { WebhookEvent } from "../../domain/value-object/webhook-event.value-object";
-import { WebhookMetadata } from "../../domain/value-object/webhook-metadata.value-object";
+import { WebhookGateway } from "../../../app/providers/webhook-gateway.interface";
+import { WebhookEvent } from "../../../domain/value-object/webhook-event.value-object";
+import { WebhookMetadata } from "../../../domain/value-object/webhook-metadata.value-object";
 import Stripe from "stripe";
-import { HttpError } from "../../presentation/http/errors/http-error";
+import { HttpError } from "../../../presentation/http/errors/http-error";
 import { StatusCodes } from "http-status-codes";
 
 export class StripeWebhookGateway implements WebhookGateway {
@@ -55,7 +55,7 @@ export class StripeWebhookGateway implements WebhookGateway {
       // Ensure all metadata values are strings
       const stringifiedMetadata: Record<string, string> = {};
       for (const [key, value] of Object.entries(metadata)) {
-        if (typeof value === 'object') {
+        if (typeof value === "object") {
           stringifiedMetadata[key] = JSON.stringify(value);
         } else {
           stringifiedMetadata[key] = String(value);
@@ -63,9 +63,9 @@ export class StripeWebhookGateway implements WebhookGateway {
       }
       return WebhookMetadata.create(stringifiedMetadata);
     } catch (error) {
-      console.error('Error parsing webhook metadata:', error);
+      console.error("Error parsing webhook metadata:", error);
       throw new HttpError(
-        'Failed to parse webhook metadata',
+        "Failed to parse webhook metadata",
         StatusCodes.BAD_REQUEST
       );
     }
@@ -103,7 +103,9 @@ export class StripeWebhookGateway implements WebhookGateway {
   ): Promise<WebhookMetadata> {
     try {
       // First try to get the payment intent to get the latest charge
-      const paymentIntent = await this.stripe.paymentIntents.retrieve(paymentIntentId);
+      const paymentIntent = await this.stripe.paymentIntents.retrieve(
+        paymentIntentId
+      );
       const latestCharge = paymentIntent.latest_charge;
 
       // Try to find session using the payment intent
@@ -114,7 +116,9 @@ export class StripeWebhookGateway implements WebhookGateway {
 
       // If no session found, try to find it using the charge
       if (!sessions.data.length && latestCharge) {
-        const charge = await this.stripe.charges.retrieve(latestCharge as string);
+        const charge = await this.stripe.charges.retrieve(
+          latestCharge as string
+        );
         if (charge.metadata?.orderId) {
           return this.parseMetadata(charge.metadata);
         }

@@ -6,7 +6,7 @@ import { IHttpSuccess } from "../interfaces/http-success.interface";
 import { UnauthorizedError } from "../errors/unautherized-error";
 import { IPaymentService } from "../../../app/services/payment/interfaces/payment.service.interface";
 import { createCheckoutSessionSchema } from "../../../domain/dtos/stripe/create-checkout-session.dto";
-import { StripeWebhookGateway } from "../../../infra/providers/stripe-webhook.gateway";
+import { StripeWebhookGateway } from "../../../infra/providers/stripe/stripe-webhook.gateway";
 
 export class StripeController extends BaseController {
   private webhookGateway: StripeWebhookGateway;
@@ -20,7 +20,9 @@ export class StripeController extends BaseController {
     this.webhookGateway = new StripeWebhookGateway();
   }
 
-  async createCheckoutSession(httpRequest: IHttpRequest): Promise<IHttpResponse> {
+  async createCheckoutSession(
+    httpRequest: IHttpRequest
+  ): Promise<IHttpResponse> {
     return this.handleRequest(httpRequest, async (request) => {
       if (!request.user?.id) {
         throw new UnauthorizedError("User not authenticated");
@@ -33,24 +35,30 @@ export class StripeController extends BaseController {
         validatedData
       );
 
-      return this.success_200(response.data, "Checkout session created successfully");
+      return this.success_200(
+        response.data,
+        "Checkout session created successfully"
+      );
     });
   }
 
   async handleWebhook(httpRequest: IHttpRequest): Promise<IHttpResponse> {
     return this.handleRequest(httpRequest, async (request) => {
-      console.log('=== Webhook Controller ===');
-      console.log('Request Body:', request.body);
-      console.log('Request Headers:', request.headers);
-      
-      const signature = request.headers?.['stripe-signature'];
+      console.log("=== Webhook Controller ===");
+      console.log("Request Body:", request.body);
+      console.log("Request Headers:", request.headers);
+
+      const signature = request.headers?.["stripe-signature"];
       if (!signature) {
-        throw new Error('No signature found');
+        throw new Error("No signature found");
       }
 
-      const event = await this.webhookGateway.verifySignature(request.body, signature);
+      const event = await this.webhookGateway.verifySignature(
+        request.body,
+        signature
+      );
       const response = await this.paymentService.handleStripeWebhook(event);
       return this.success_200(response.data, response.message);
     });
   }
-} 
+}

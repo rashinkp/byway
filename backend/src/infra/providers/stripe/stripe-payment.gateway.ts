@@ -1,7 +1,10 @@
 import Stripe from "stripe";
-import { PaymentGateway, CheckoutSession } from "../../app/providers/payment-gateway.interface";
-import { CreateCheckoutSessionDto } from "../../domain/dtos/stripe/create-checkout-session.dto";
-import { HttpError } from "../../presentation/http/errors/http-error";
+import {
+  PaymentGateway,
+  CheckoutSession,
+} from "../../../app/providers/payment-gateway.interface";
+import { CreateCheckoutSessionDto } from "../../../domain/dtos/stripe/create-checkout-session.dto";
+import { HttpError } from "../../../presentation/http/errors/http-error";
 import { StatusCodes } from "http-status-codes";
 
 export class StripePaymentGateway implements PaymentGateway {
@@ -45,17 +48,19 @@ export class StripePaymentGateway implements PaymentGateway {
           );
         }
         // Create a single line item for wallet top-up
-        lineItems = [{
-          price_data: {
-            currency: "usd",
-            product_data: {
-              name: "Wallet Top-up",
-              description: "Adding funds to your wallet",
+        lineItems = [
+          {
+            price_data: {
+              currency: "usd",
+              product_data: {
+                name: "Wallet Top-up",
+                description: "Adding funds to your wallet",
+              },
+              unit_amount: Math.round(amount * 100), // Convert to cents
             },
-            unit_amount: Math.round(amount * 100), // Convert to cents
+            quantity: 1,
           },
-          quantity: 1,
-        }];
+        ];
       } else {
         // Create line items from course details
         if (!courses || !Array.isArray(courses) || courses.length === 0) {
@@ -88,7 +93,9 @@ export class StripePaymentGateway implements PaymentGateway {
                 ...(course.level && { level: course.level }),
               },
             },
-            unit_amount: Math.round((course?.offer || course?.price || 0) * 100),
+            unit_amount: Math.round(
+              (course?.offer || course?.price || 0) * 100
+            ),
           },
           quantity: 1,
         }));
@@ -98,7 +105,9 @@ export class StripePaymentGateway implements PaymentGateway {
         payment_method_types: ["card"],
         line_items: lineItems,
         mode: "payment",
-        success_url: `${frontendUrl}/success?session_id={CHECKOUT_SESSION_ID}${isWalletTopUp ? '&type=wallet-topup' : ''}`,
+        success_url: `${frontendUrl}/success?session_id={CHECKOUT_SESSION_ID}${
+          isWalletTopUp ? "&type=wallet-topup" : ""
+        }`,
         cancel_url: `${frontendUrl}/payment-failed?session_id={CHECKOUT_SESSION_ID}`,
         customer_email: customerEmail,
         metadata: {
@@ -126,4 +135,4 @@ export class StripePaymentGateway implements PaymentGateway {
       );
     }
   }
-} 
+}

@@ -16,6 +16,7 @@ import { AxiosError } from "axios";
 import { LockOverlay } from "@/components/ui/LockOverlay";
 import { IQuizAnswer } from "@/types/progress";
 import { useCertificate } from "@/hooks/certificate/useCertificate";
+import { CertificateActions } from "@/components/course/enrolledCourse/CertificateActions";
 
 interface LessonWithCompletion extends ILesson {
   completed: boolean;
@@ -66,6 +67,9 @@ export default function CourseContent() {
 
   // Fetch certificate
   const { certificate, loading: certLoading, error: certError, fetchCertificate, createCertificate } = useCertificate(courseId);
+
+  // Add state for error message
+  const [regenError, setRegenError] = useState<string | null>(null);
 
   // Handle content errors
   useEffect(() => {
@@ -302,136 +306,7 @@ export default function CourseContent() {
         ) : isLoading || isProgressLoading ? (
           <LessonContentSkeleton />
         ) : selectedLesson?.id === "certificate" ? (
-          <div className="max-w-3xl mx-auto relative animate-fade-in">
-            {/* Celebration Header */}
-            <div className="text-center mb-8">
-              <div className="inline-flex items-center justify-center p-4 bg-[var(--color-primary-light)]/20 rounded-full mb-4">
-                <span className="text-4xl">🎉</span>
-              </div>
-              <h1 className="text-4xl lg:text-5xl font-bold text-[var(--color-primary-dark)] mb-2">
-                Congratulations!
-              </h1>
-              <p className="text-xl text-[var(--color-muted)]">You've successfully completed the course</p>
-            </div>
-
-            {/* Certificate Container */}
-            <div className="relative overflow-hidden rounded-2xl bg-[var(--color-surface)] shadow-xl border border-[var(--color-primary-light)]/20">
-              {/* Header Section */}
-              <div className="px-8 py-8 text-center border-b border-[var(--color-primary-light)]/10">
-                <div className="mb-4">
-                  <div className="w-16 h-16 mx-auto bg-[var(--color-primary-light)]/10 rounded-full flex items-center justify-center mb-2">
-                    <span className="text-3xl">🎓</span>
-                  </div>
-                  <h2 className="text-2xl lg:text-3xl font-bold text-[var(--color-primary-dark)] mb-1">Certificate of Completion</h2>
-                  <div className="w-16 h-1 bg-[var(--color-primary-light)]/30 mx-auto rounded-full"></div>
-                </div>
-                <div className="space-y-2">
-                  <p className="text-base text-[var(--color-muted)]">This is to certify that</p>
-                  <h3 className="text-xl lg:text-2xl font-bold text-[var(--color-primary-light)]">
-                    {certificate?.userName || "Student Name"}
-                  </h3>
-                  <p className="text-base text-[var(--color-muted)]">has successfully completed</p>
-                  <h4 className="text-lg lg:text-xl font-semibold text-[var(--color-primary-dark)]">
-                    {certificate?.courseTitle || "Course Title"}
-                  </h4>
-                </div>
-              </div>
-
-              {/* Content Section */}
-              <div className="px-8 py-8 grid lg:grid-cols-2 gap-8 items-center">
-                {/* Certificate Preview/Actions */}
-                <div className="space-y-6">
-                  {certLoading && (
-                    <div className="flex items-center justify-center p-6 bg-[var(--color-background)] rounded-xl">
-                      <div className="flex items-center space-x-3">
-                        <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-[var(--color-primary-light)]"></div>
-                        <span className="text-[var(--color-primary-light)] font-medium">Preparing your certificate...</span>
-                      </div>
-                    </div>
-                  )}
-
-                  {certError && (
-                    <div className="p-4 bg-red-50 border border-red-200 rounded-xl">
-                      <div className="flex items-center space-x-2">
-                        <span className="text-red-500">⚠️</span>
-                        <span className="text-red-700 font-medium">{certError}</span>
-                      </div>
-                    </div>
-                  )}
-
-                  {certificate?.pdfUrl ? (
-                    <a
-                      href={certificate.pdfUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center justify-center w-full px-8 py-4 bg-[var(--color-primary-light)] text-[var(--color-surface)] font-semibold rounded-xl hover:bg-[var(--color-primary-dark)] transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                      <span className="mr-2 text-lg">📄</span>
-                      View & Download Certificate
-                    </a>
-                  ) : (
-                    <button
-                      className="inline-flex items-center justify-center w-full px-8 py-4 bg-[var(--color-primary-light)] text-[var(--color-surface)] font-semibold rounded-xl hover:bg-[var(--color-primary-dark)] transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
-                      onClick={createCertificate}
-                      disabled={certLoading}
-                    >
-                      <span className="mr-2 text-lg">✨</span>
-                      {certLoading ? "Generating..." : "Generate Certificate"}
-                    </button>
-                  )}
-                </div>
-
-                {/* Achievement Stats */}
-                <div className="space-y-6">
-                  <div className="bg-[var(--color-background)] rounded-xl p-6 border border-[var(--color-primary-light)]/10">
-                    <h4 className="text-lg font-semibold text-[var(--color-primary-dark)] mb-4 flex items-center">
-                      <span className="mr-2">📊</span>
-                      Achievement Summary
-                    </h4>
-                    <div className="space-y-4">
-                      <div className="flex justify-between items-center">
-                        <span className="text-[var(--color-muted)]">Lessons Completed</span>
-                        <span className="font-bold text-[var(--color-primary-light)]">{completedLessons}/{totalLessons}</span>
-                      </div>
-                      <div className="flex justify-between items-center">
-                        <span className="text-[var(--color-muted)]">Progress</span>
-                        <span className="font-bold text-[var(--color-primary-dark)]">{progressPercentage}%</span>
-                      </div>
-                      <div className="w-full bg-[var(--color-surface)] rounded-full h-3">
-                        <div 
-                          className="bg-[var(--color-primary-light)] h-3 rounded-full transition-all duration-1000 ease-out"
-                          style={{ width: `${progressPercentage}%` }}
-                        ></div>
-                      </div>
-                    </div>
-                  </div>
-
-                  {certificate && (
-                    <div className="bg-[var(--color-background)] rounded-xl p-6 border border-[var(--color-primary-light)]/10">
-                      <h4 className="text-lg font-semibold text-[var(--color-primary-dark)] mb-4 flex items-center">
-                        <span className="mr-2">🔖</span>
-                        Certificate Details
-                      </h4>
-                      <div className="space-y-3 text-sm">
-                        <div className="flex justify-between items-center">
-                          <span className="text-[var(--color-muted)]">Certificate No:</span>
-                          <span className="font-mono text-xs bg-[var(--color-surface)] px-2 py-1 rounded">
-                            {certificate.certificateNumber}
-                          </span>
-                        </div>
-                        <div className="flex justify-between items-center">
-                          <span className="text-[var(--color-muted)]">Issue Date:</span>
-                          <span className="font-medium text-[var(--color-primary-dark)]">
-                            {certificate.issuedAt && new Date(certificate.issuedAt).toLocaleDateString()}
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-                </div>
-              </div>
-            </div>
-          </div>
+          <CertificateActions courseId={courseId} />
         ) : selectedLesson ? (
           <div className="max-w-5xl mx-auto relative">
             <LessonContent

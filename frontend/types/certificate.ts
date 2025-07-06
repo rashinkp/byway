@@ -15,4 +15,7 @@ export interface CertificateDTO {
 	courseTitle?: string;
 	userName?: string;
 	userEmail?: string;
+	completionDate?: string;
+	averageScore?: number;
+	instructorName?: string;
 }

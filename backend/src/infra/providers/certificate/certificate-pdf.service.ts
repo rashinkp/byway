@@ -1,11 +1,19 @@
-import PDFDocument from 'pdfkit';
-import { CertificatePdfServiceInterface, CertificateTemplateData } from '../../../app/providers/generate-certificate.interface';
+import PDFDocument from "pdfkit";
+import {
+  CertificatePdfServiceInterface,
+  CertificateTemplateData,
+} from "../../../app/providers/generate-certificate.interface";
 
 export class CertificatePdfService implements CertificatePdfServiceInterface {
   private readonly platformName: string;
   private readonly certificateTemplate: string;
 
-  constructor(platformName: string = 'Byway Learning Platform') {
+  // Helper to clamp Y positions to avoid overflow
+  private clampY(doc: PDFKit.PDFDocument, y: number, margin: number = 50) {
+    return Math.min(y, doc.page.height - margin);
+  }
+
+  constructor(platformName: string = "Byway Learning Platform") {
     this.platformName = platformName;
     this.certificateTemplate = this.getDefaultTemplate();
   }
@@ -14,8 +22,8 @@ export class CertificatePdfService implements CertificatePdfServiceInterface {
     return new Promise((resolve, reject) => {
       try {
         const doc = new PDFDocument({
-          size: 'A4',
-          layout: 'landscape',
+          size: "A4",
+          layout: "landscape",
           margins: {
             top: 50,
             bottom: 50,
@@ -25,10 +33,12 @@ export class CertificatePdfService implements CertificatePdfServiceInterface {
         });
 
         const chunks: Buffer[] = [];
-        doc.on('data', (chunk) => chunks.push(chunk));
-        doc.on('end', () => resolve(Buffer.concat(chunks)));
+        doc.on("data", (chunk) => chunks.push(chunk));
+        doc.on("end", () => resolve(Buffer.concat(chunks)));
 
+        // Page 1: Certificate
         this.renderCertificate(doc, data);
+
         doc.end();
       } catch (error) {
         reject(error);
@@ -36,10 +46,12 @@ export class CertificatePdfService implements CertificatePdfServiceInterface {
     });
   }
 
-  generateCertificatePDFStream(data: CertificateTemplateData): PDFKit.PDFDocument {
+  generateCertificatePDFStream(
+    data: CertificateTemplateData
+  ): PDFKit.PDFDocument {
     const doc = new PDFDocument({
-      size: 'A4',
-      layout: 'landscape',
+      size: "A4",
+      layout: "landscape",
       margins: {
         top: 50,
         bottom: 50,
@@ -48,14 +60,19 @@ export class CertificatePdfService implements CertificatePdfServiceInterface {
       },
     });
 
+    // Page 1: Certificate
     this.renderCertificate(doc, data);
+
     doc.end();
 
     return doc;
   }
 
-  private renderCertificate(doc: PDFKit.PDFDocument, data: CertificateTemplateData): void {
-    // Background with elegant design
+  private renderCertificate(
+    doc: PDFKit.PDFDocument,
+    data: CertificateTemplateData
+  ): void {
+    // Background with blue/green gradient
     this.drawBackground(doc);
 
     // Decorative elements
@@ -67,30 +84,48 @@ export class CertificatePdfService implements CertificatePdfServiceInterface {
     // Header with logo area
     this.drawHeader(doc);
 
-    // Main content with elegant typography
+    // Main content with proper spacing
     this.drawMainContent(doc, data);
 
     // Footer with signatures
     this.drawFooter(doc, data);
+  }
 
-    // Certificate number with styling
-    this.drawCertificateNumber(doc, data.certificateNumber);
+  private renderBackPage(doc: PDFKit.PDFDocument): void {
+    // Simple background
+    const gradient = doc.linearGradient(0, 0, doc.page.width, doc.page.height);
+    gradient.stop(0, "#f0f8ff");
+    gradient.stop(0.5, "#e6f3ff");
+    gradient.stop(1, "#d4edda");
+    doc.rect(0, 0, doc.page.width, doc.page.height).fill(gradient);
 
-    // Watermark
-    this.drawWatermark(doc);
+    // Center "Byway" text
+    const centerX = doc.page.width / 2;
+    const centerY = doc.page.height / 2;
+
+    doc.fontSize(72);
+    doc.font("Helvetica-Bold");
+    doc.fillColor("#2c5282");
+    doc.text("Byway", centerX, centerY - 36, { align: "center" });
+
+    // Subtitle
+    doc.fontSize(24);
+    doc.font("Helvetica");
+    doc.fillColor("#38a169");
+    doc.text("Learning Platform", centerX, centerY + 50, { align: "center" });
   }
 
   private drawBackground(doc: PDFKit.PDFDocument): void {
-    // Elegant gradient background
+    // Blue-green gradient background
     const gradient = doc.linearGradient(0, 0, doc.page.width, doc.page.height);
-    gradient.stop(0, '#fdfcfb');
-    gradient.stop(0.5, '#f7f3f0');
-    gradient.stop(1, '#e8ddd4');
+    gradient.stop(0, "#f0f8ff");
+    gradient.stop(0.5, "#e6f3ff");
+    gradient.stop(1, "#d4edda");
     doc.rect(0, 0, doc.page.width, doc.page.height).fill(gradient);
 
     // Subtle pattern overlay
     doc.fillOpacity(0.03);
-    doc.fillColor('#8b4513');
+    doc.fillColor("#2c5282");
     for (let x = 0; x < doc.page.width; x += 40) {
       for (let y = 0; y < doc.page.height; y += 40) {
         doc.circle(x, y, 1).fill();
@@ -105,7 +140,7 @@ export class CertificatePdfService implements CertificatePdfServiceInterface {
     const margin = 40;
 
     // Top-left corner
-    doc.strokeColor('#d4af37');
+    doc.strokeColor("#38a169");
     doc.lineWidth(2);
     doc
       .moveTo(margin, margin + cornerSize)
@@ -144,9 +179,9 @@ export class CertificatePdfService implements CertificatePdfServiceInterface {
     centerX: number,
     centerY: number
   ): void {
-    doc.strokeColor('#d4af37');
+    doc.strokeColor("#38a169");
     doc.lineWidth(1.5);
-    doc.fillColor('#d4af37');
+    doc.fillColor("#38a169");
 
     // Central ornament
     doc.circle(centerX, centerY, 3).fill();
@@ -165,17 +200,17 @@ export class CertificatePdfService implements CertificatePdfServiceInterface {
 
   private drawBorder(doc: PDFKit.PDFDocument): void {
     // Outer decorative border
-    doc.strokeColor('#8b4513');
+    doc.strokeColor("#2c5282");
     doc.lineWidth(4);
     doc.rect(25, 25, doc.page.width - 50, doc.page.height - 50).stroke();
 
-    // Inner golden border
-    doc.strokeColor('#d4af37');
+    // Inner green border
+    doc.strokeColor("#38a169");
     doc.lineWidth(2);
     doc.rect(35, 35, doc.page.width - 70, doc.page.height - 70).stroke();
 
     // Innermost fine border
-    doc.strokeColor('#8b4513');
+    doc.strokeColor("#2c5282");
     doc.lineWidth(1);
     doc.rect(45, 45, doc.page.width - 90, doc.page.height - 90).stroke();
   }
@@ -184,13 +219,13 @@ export class CertificatePdfService implements CertificatePdfServiceInterface {
     const centerX = doc.page.width / 2;
 
     // Logo placeholder circle
-    doc.strokeColor('#d4af37');
+    doc.strokeColor("#38a169");
     doc.lineWidth(3);
-    doc.fillColor('#ffffff');
+    doc.fillColor("#ffffff");
     doc.circle(centerX, 90, 20).fillAndStroke();
 
     // Academy crest lines
-    doc.strokeColor('#8b4513');
+    doc.strokeColor("#2c5282");
     doc.lineWidth(2);
     doc
       .moveTo(centerX - 15, 85)
@@ -207,190 +242,161 @@ export class CertificatePdfService implements CertificatePdfServiceInterface {
 
     // Platform name with elegant font
     doc.fontSize(16);
-    doc.font('Helvetica');
-    doc.fillColor('#8b4513');
+    doc.font("Helvetica");
+    doc.fillColor("#2c5282");
     doc.text(this.platformName.toUpperCase(), centerX, 125, {
-      align: 'center',
+      align: "center",
       characterSpacing: 2,
     });
 
     // Certificate title with dramatic styling
     doc.fontSize(48);
-    doc.font('Helvetica-Bold');
-    doc.fillColor('#2c1810');
-    doc.text('CERTIFICATE', centerX, 150, { align: 'center' });
+    doc.font("Helvetica-Bold");
+    doc.fillColor("#1a365d");
+    doc.text("CERTIFICATE", centerX, 150, { align: "center" });
 
     doc.fontSize(24);
-    doc.font('Helvetica');
-    doc.fillColor('#8b4513');
-    doc.text('of Achievement', centerX, 200, {
-      align: 'center',
+    doc.font("Helvetica");
+    doc.fillColor("#2c5282");
+    doc.text("of Achievement", centerX, 200, {
+      align: "center",
       characterSpacing: 4,
     });
   }
 
-  private drawMainContent(doc: PDFKit.PDFDocument, data: CertificateTemplateData): void {
+  private drawMainContent(
+    doc: PDFKit.PDFDocument,
+    data: CertificateTemplateData
+  ): void {
     const centerX = doc.page.width / 2;
-    let currentY = 260;
+    const margin = 50;
+    let currentY = 250;
+    const maxY = doc.page.height - margin;
+    const clampY = (y: number) => this.clampY(doc, y, margin);
 
     // Ceremonial text
-    doc.fontSize(18);
-    doc.font('Helvetica');
-    doc.fillColor('#5d4037');
-    doc.text('This is to certify that', centerX, currentY, {
-      align: 'center',
+    doc.fontSize(16);
+    doc.font("Helvetica");
+    doc.fillColor("#2d3748");
+    doc.text("This is to certify that", centerX, clampY(currentY), {
+      align: "center",
       characterSpacing: 1,
     });
 
-    currentY += 45;
+    currentY += 35;
 
     // Student name with elegant styling
-    doc.fontSize(36);
-    doc.font('Helvetica-Bold');
-    doc.fillColor('#2c1810');
+    doc.fontSize(32);
+    doc.font("Helvetica-Bold");
+    doc.fillColor("#1a365d");
 
     // Name with underline decoration
     const nameWidth = doc.widthOfString(data.studentName);
     const nameX = centerX - nameWidth / 2;
-    doc.text(data.studentName, centerX, currentY, { align: 'center' });
+    doc.text(data.studentName, centerX, clampY(currentY), { align: "center" });
 
     // Decorative underline
-    doc.strokeColor('#d4af37');
+    doc.strokeColor("#38a169");
     doc.lineWidth(2);
     doc
-      .moveTo(nameX - 20, currentY + 45)
-      .lineTo(nameX + nameWidth + 20, currentY + 45)
+      .moveTo(nameX - 20, clampY(currentY + 40))
+      .lineTo(nameX + nameWidth + 20, clampY(currentY + 40))
       .stroke();
 
-    currentY += 70;
+    currentY += 60;
 
     // Achievement text
-    doc.fontSize(18);
-    doc.font('Helvetica');
-    doc.fillColor('#5d4037');
-    doc.text('has successfully completed the course', centerX, currentY, {
-      align: 'center',
+    doc.fontSize(16);
+    doc.font("Helvetica");
+    doc.fillColor("#2d3748");
+    doc.text("has successfully completed the course", centerX, clampY(currentY), {
+      align: "center",
       characterSpacing: 1,
     });
 
-    currentY += 45;
+    currentY += 35;
 
     // Course title with emphasis
-    doc.fontSize(28);
-    doc.font('Helvetica-Bold');
-    doc.fillColor('#8b4513');
-    doc.text(data.courseTitle, centerX, currentY, {
-      align: 'center',
+    doc.fontSize(24);
+    doc.font("Helvetica-Bold");
+    doc.fillColor("#2c5282");
+    doc.text(data.courseTitle, centerX, clampY(currentY), {
+      align: "center",
       characterSpacing: 1,
     });
 
-    currentY += 50;
+    currentY += 40;
 
-    // Performance metrics in elegant format
-    if (data.totalLessons && data.completedLessons) {
-      doc.fontSize(14);
-      doc.font('Helvetica');
-      doc.fillColor('#6d4c41');
-      doc.text(
-        `Completed ${data.completedLessons} of ${data.totalLessons} lessons`,
-        centerX,
-        currentY,
-        { align: 'center', characterSpacing: 0.5 }
-      );
-      currentY += 20;
-    }
+    // Show "Completed" instead of lesson numbers
+    doc.fontSize(14);
+    doc.font("Helvetica");
+    doc.fillColor("#38a169");
+    doc.text("✓ Completed", centerX, clampY(currentY), {
+      align: "center",
+      characterSpacing: 0.5,
+    });
 
+    currentY += 25;
+
+    // Average score if available
     if (data.averageScore) {
       doc.fontSize(14);
-      doc.font('Helvetica-Bold');
-      doc.fillColor('#8b4513');
-      doc.text(`Average Score: ${data.averageScore}%`, centerX, currentY, {
-        align: 'center',
+      doc.font("Helvetica-Bold");
+      doc.fillColor("#2c5282");
+      doc.text(`Average Score: ${data.averageScore}%`, centerX, clampY(currentY), {
+        align: "center",
         characterSpacing: 0.5,
       });
       currentY += 25;
     }
 
     // Completion date with formal styling
-    doc.fontSize(16);
-    doc.font('Helvetica');
-    doc.fillColor('#5d4037');
-    doc.text(`Completed on ${data.completionDate}`, centerX, currentY, {
-      align: 'center',
+    doc.fontSize(14);
+    doc.font("Helvetica");
+    doc.fillColor("#2d3748");
+    doc.text(`Completed on ${data.completionDate}`, centerX, clampY(currentY), {
+      align: "center",
       characterSpacing: 1,
     });
   }
 
-  private drawFooter(doc: PDFKit.PDFDocument, data: CertificateTemplateData): void {
+  private drawFooter(
+    doc: PDFKit.PDFDocument,
+    data: CertificateTemplateData
+  ): void {
     const centerX = doc.page.width / 2;
-    const footerY = doc.page.height - 140;
-    const leftX = 120;
-    const rightX = doc.page.width - 120;
+    const margin = 50;
+    const footerY = Math.min(doc.page.height - 130, doc.page.height - margin);
+    const leftX = 150;
+    const rightX = doc.page.width - 150;
+    const clampY = (y: number) => this.clampY(doc, y, margin);
 
     // Signature lines
-    doc.strokeColor('#8b4513');
+    doc.strokeColor("#2c5282");
     doc.lineWidth(1);
     doc
-      .moveTo(leftX - 50, footerY + 20)
-      .lineTo(leftX + 50, footerY + 20)
+      .moveTo(leftX - 50, footerY)
+      .lineTo(leftX + 50, footerY)
       .stroke();
     doc
-      .moveTo(rightX - 50, footerY + 20)
-      .lineTo(rightX + 50, footerY + 20)
+      .moveTo(rightX - 50, footerY)
+      .lineTo(rightX + 50, footerY)
       .stroke();
 
     // Signature labels
     doc.fontSize(12);
-    doc.font('Helvetica');
-    doc.fillColor('#6d4c41');
+    doc.font("Helvetica");
+    doc.fillColor("#2d3748");
 
     if (data.instructorName) {
-      doc.text(data.instructorName, leftX, footerY + 30, { align: 'center' });
-      doc.text('Course Instructor', leftX, footerY + 45, { align: 'center' });
+      doc.text(data.instructorName, leftX, clampY(footerY + 15), { align: "center" });
+      doc.text("Course Instructor", leftX, clampY(footerY + 30), { align: "center" });
     } else {
-      doc.text('Course Instructor', leftX, footerY + 30, { align: 'center' });
+      doc.text("Course Instructor", leftX, clampY(footerY + 15), { align: "center" });
     }
 
-    doc.text('Academic Director', rightX, footerY + 30, { align: 'center' });
-    doc.text(this.platformName, rightX, footerY + 45, { align: 'center' });
-
-    // Issued date centered
-    doc.fontSize(14);
-    doc.font('Helvetica');
-    doc.fillColor('#5d4037');
-    doc.text(`Issued: ${data.issuedDate}`, centerX, footerY + 60, {
-      align: 'center',
-      characterSpacing: 1,
-    });
-  }
-
-  private drawCertificateNumber(doc: PDFKit.PDFDocument, certificateNumber: string): void {
-    // Certificate number with decorative frame
-    const x = doc.page.width - 100;
-    const y = doc.page.height - 60;
-
-    doc.strokeColor('#d4af37');
-    doc.lineWidth(1);
-    doc.rect(x - 40, y - 15, 80, 25).stroke();
-
-    doc.fontSize(10);
-    doc.font('Helvetica');
-    doc.fillColor('#8b4513');
-    doc.text('Certificate No.', x, y - 10, { align: 'center' });
-    doc.text(certificateNumber, x, y + 2, { align: 'center' });
-  }
-
-  private drawWatermark(doc: PDFKit.PDFDocument): void {
-    // Subtle watermark
-    doc.fillOpacity(0.03);
-    doc.fontSize(120);
-    doc.font('Helvetica-Bold');
-    doc.fillColor('#8b4513');
-    doc.save();
-    doc.rotate(-15, { origin: [doc.page.width / 2, doc.page.height / 2 - 60] });
-    doc.text('CERTIFIED', doc.page.width / 2, doc.page.height / 2 - 60, { align: 'center' });
-    doc.restore();
-    doc.fillOpacity(1);
+    doc.text("Academic Director", rightX, clampY(footerY + 15), { align: "center" });
+    doc.text(this.platformName, rightX, clampY(footerY + 30), { align: "center" });
   }
 
   private getDefaultTemplate(): string {
@@ -405,11 +411,11 @@ export class CertificatePdfService implements CertificatePdfServiceInterface {
             font-family: 'Source Sans Pro', sans-serif; 
             margin: 0;
             padding: 0;
-            background: linear-gradient(135deg, #fdfcfb 0%, #e8ddd4 100%);
+            background: linear-gradient(135deg, #f0f8ff 0%, #d4edda 100%);
           }
           
           .certificate { 
-            border: 4px solid #8b4513;
+            border: 4px solid #2c5282;
             border-radius: 15px;
             padding: 60px; 
             text-align: center; 
@@ -429,21 +435,21 @@ export class CertificatePdfService implements CertificatePdfServiceInterface {
             right: 0;
             bottom: 0;
             background: 
-              radial-gradient(circle at 20% 80%, rgba(212, 175, 55, 0.1) 0%, transparent 50%),
-              radial-gradient(circle at 80% 20%, rgba(139, 69, 19, 0.1) 0%, transparent 50%);
+              radial-gradient(circle at 20% 80%, rgba(56, 161, 105, 0.1) 0%, transparent 50%),
+              radial-gradient(circle at 80% 20%, rgba(44, 82, 130, 0.1) 0%, transparent 50%);
             pointer-events: none;
           }
           
           .logo {
             width: 60px;
             height: 60px;
-            border: 3px solid #d4af37;
+            border: 3px solid #38a169;
             border-radius: 50%;
             margin: 0 auto 20px;
             display: flex;
             align-items: center;
             justify-content: center;
-            background: linear-gradient(45deg, #d4af37, #ffd700);
+            background: linear-gradient(45deg, #38a169, #48bb78);
             color: white;
             font-weight: bold;
             font-size: 24px;
@@ -451,7 +457,7 @@ export class CertificatePdfService implements CertificatePdfServiceInterface {
           
           .platform-name { 
             font-size: 16px; 
-            color: #8b4513; 
+            color: #2c5282; 
             font-weight: 300;
             letter-spacing: 3px;
             text-transform: uppercase;
@@ -462,14 +468,14 @@ export class CertificatePdfService implements CertificatePdfServiceInterface {
             font-family: 'Playfair Display', serif;
             font-size: 54px; 
             font-weight: 700; 
-            color: #2c1810;
+            color: #1a365d;
             margin: 20px 0 10px 0;
             text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
           }
           
           .subtitle {
             font-size: 24px;
-            color: #8b4513;
+            color: #2c5282;
             font-weight: 300;
             letter-spacing: 4px;
             margin-bottom: 40px;
@@ -477,96 +483,104 @@ export class CertificatePdfService implements CertificatePdfServiceInterface {
           }
           
           .certify-text {
-            font-size: 18px;
-            color: #5d4037;
-            margin: 30px 0;
+            font-size: 16px;
+            color: #2d3748;
+            margin: 25px 0;
             font-weight: 300;
             letter-spacing: 1px;
           }
           
           .name { 
             font-family: 'Playfair Display', serif;
-            font-size: 42px; 
+            font-size: 36px; 
             font-weight: 700; 
-            color: #2c1810;
-            margin: 30px 0;
-            border-bottom: 3px solid #d4af37;
+            color: #1a365d;
+            margin: 25px 0;
+            border-bottom: 3px solid #38a169;
             padding-bottom: 10px;
             display: inline-block;
           }
           
           .course { 
-            font-size: 28px; 
-            color: #8b4513;
+            font-size: 24px; 
+            color: #2c5282;
             font-weight: 600;
-            margin: 30px 0;
+            margin: 25px 0;
             letter-spacing: 1px;
           }
           
-          .metrics {
+          .completed-status {
             font-size: 14px;
-            color: #6d4c41;
-            margin: 20px 0;
-            font-weight: 400;
+            color: #38a169;
+            margin: 15px 0;
+            font-weight: 500;
           }
           
           .score {
-            font-size: 16px;
-            color: #8b4513;
+            font-size: 14px;
+            color: #2c5282;
             font-weight: 600;
             margin: 15px 0;
           }
           
           .date { 
-            font-size: 16px; 
-            color: #5d4037;
-            margin: 25px 0;
+            font-size: 14px; 
+            color: #2d3748;
+            margin: 20px 0;
             font-weight: 400;
           }
           
           .signatures {
             display: flex;
             justify-content: space-between;
-            margin-top: 60px;
+            margin-top: 50px;
             padding-top: 20px;
           }
           
           .signature {
             text-align: center;
             flex: 1;
-            margin: 0 30px;
+            margin: 0 40px;
           }
           
           .signature-line {
-            border-top: 2px solid #8b4513;
+            border-top: 2px solid #2c5282;
             margin-bottom: 10px;
-            width: 150px;
+            width: 120px;
             margin-left: auto;
             margin-right: auto;
           }
           
           .signature-name {
-            font-size: 14px;
-            color: #6d4c41;
+            font-size: 12px;
+            color: #2d3748;
             font-weight: 600;
+            margin-bottom: 5px;
           }
           
           .signature-title {
-            font-size: 12px;
-            color: #8b4513;
+            font-size: 11px;
+            color: #2c5282;
             font-weight: 300;
           }
           
           .number { 
             position: absolute;
-            bottom: 20px;
-            right: 30px;
-            font-size: 12px; 
-            color: #8b4513;
-            border: 1px solid #d4af37;
-            padding: 8px 15px;
+            bottom: 15px;
+            font-size: 10px; 
+            color: #2c5282;
+            border: 1px solid #38a169;
+            padding: 5px 10px;
             border-radius: 5px;
-            background: rgba(255,255,255,0.8);
+            background: rgba(255,255,255,0.9);
+          }
+          
+          .number.left {
+            left: 20px;
+          }
+          
+          .number.right {
+            right: 20px;
           }
           
           .decorative-elements {
@@ -582,7 +596,7 @@ export class CertificatePdfService implements CertificatePdfServiceInterface {
             position: absolute;
             width: 40px;
             height: 40px;
-            border: 2px solid #d4af37;
+            border: 2px solid #38a169;
           }
           
           .corner-decoration.top-left {
@@ -614,9 +628,15 @@ export class CertificatePdfService implements CertificatePdfServiceInterface {
           }
           
           .flourish {
-            color: #d4af37;
-            font-size: 30px;
-            margin: 20px 0;
+            color: #38a169;
+            font-size: 24px;
+            margin: 15px 0;
+          }
+          
+          .issued-date {
+            font-size: 12px;
+            color: #2d3748;
+            margin-top: 30px;
           }
         </style>
       </head>
@@ -640,7 +660,7 @@ export class CertificatePdfService implements CertificatePdfServiceInterface {
           <div class="certify-text">has successfully completed the course</div>
           <div class="course">{{courseTitle}}</div>
           
-          <div class="metrics">Completed {{completedLessons}} of {{totalLessons}} lessons</div>
+          <div class="completed-status">✓ Completed</div>
           <div class="score">Average Score: {{averageScore}}%</div>
           <div class="date">Completed on {{completionDate}}</div>
           
@@ -659,11 +679,13 @@ export class CertificatePdfService implements CertificatePdfServiceInterface {
             </div>
           </div>
           
-          <div class="date">Issued: {{issuedDate}}</div>
-          <div class="number">Certificate No. {{certificateNumber}}</div>
+          <div class="issued-date">Issued: {{issuedDate}}</div>
+          
+          <div class="number left">Certificate No. {{certificateNumber}}</div>
+          <div class="number right">Certificate No. {{certificateNumber}}</div>
         </div>
       </body>
       </html>
     `;
   }
-} 
+}

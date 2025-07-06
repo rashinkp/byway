@@ -30,8 +30,8 @@ import { IWalletRepository } from "../app/repositories/wallet.repository.interfa
 import { WalletRepository } from "../infra/repositories/wallet.repository";
 import { PaymentService } from "../app/services/payment/implementations/payment.service";
 import { IPaymentService } from "../app/services/payment/interfaces/payment.service.interface";
-import { StripePaymentGateway } from "../infra/providers/stripe-payment.gateway";
-import { StripeWebhookGateway } from "../infra/providers/stripe-webhook.gateway";
+import { StripePaymentGateway } from "../infra/providers/stripe/stripe-payment.gateway";
+import { StripeWebhookGateway } from "../infra/providers/stripe/stripe-webhook.gateway";
 import { IRevenueDistributionService } from "../app/services/revenue-distribution/interfaces/revenue-distribution.service.interface";
 import { IUserRepository } from "@/app/repositories/user.repository";
 import { PrismaRevenueRepository } from "../infra/repositories/revenue.repository";
@@ -88,15 +88,15 @@ export function createSharedDependencies(): SharedDependencies {
   const walletRepository = new WalletRepository(prismaClient);
   const paymentGateway = new StripePaymentGateway();
   const webhookGateway = new StripeWebhookGateway();
-  
+
   // Create a temporary mock revenue distribution service
   // This will be replaced with the real one in app.dependencies.ts
   const mockRevenueDistributionService: IRevenueDistributionService = {
     distributeRevenue: async () => {
-      console.warn('Revenue distribution service not properly initialized');
-    }
+      console.warn("Revenue distribution service not properly initialized");
+    },
   };
-  
+
   const paymentService = new PaymentService(
     walletRepository,
     orderRepository,
