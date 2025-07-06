@@ -32,7 +32,8 @@
 //   }
 
 //   async sendResetTokenEmail(email: string, token: string): Promise<void> {
-//     const resetUrl = `${envConfig.FRONTEND_URL}/reset-password?token=${token}`;
+//     const frontendBaseUrl = (envConfig.FRONTEND_URL || '').split(',')[0].trim();
+//     const resetUrl = `${frontendBaseUrl}/reset-password?token=${token}`;
 //     await this.transporter.sendMail({
 //       from: `"Byway" <${envConfig.SMTP_FROM}>`,
 //       to: email,

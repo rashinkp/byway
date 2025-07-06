@@ -26,7 +26,7 @@ export function createUserDependencies(
   const toggleDeleteUserUseCase = new ToggleDeleteUserUseCase(userRepository, createNotificationsForUsersUseCase);
   const getCurrentUserUseCase = new GetCurrentUserUseCase(userRepository, deps.cartRepository);
   const getUserByIdUseCase = new GetUserByIdUseCase(userRepository);
-  const updateUserUseCase = new UpdateUserUseCase(userRepository);
+  const updateUserUseCase = new UpdateUserUseCase(userRepository, deps.s3Service);
   const getPublicUserUseCase = new GetPublicUserUseCase(userRepository);
   const getUserAdminDetailsUseCase = new GetUserAdminDetailsUseCase(userRepository, instructorRepository);
   const checkUserActiveUseCase = new CheckUserActiveUseCase(userRepository);

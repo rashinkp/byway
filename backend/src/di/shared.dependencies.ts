@@ -42,6 +42,8 @@ import { LessonProgressRepository } from "../infra/repositories/lesson-progress.
 import { ILessonProgressRepository } from "../app/repositories/lesson-progress.repository.interface";
 import { PrismaCertificateRepository } from "../infra/repositories/certificate-repository.prisma";
 import { CertificateRepositoryInterface } from "../app/repositories/certificate-repository.interface";
+import { S3Service } from "../infra/providers/s3/s3.service";
+
 export interface SharedDependencies {
   prisma: typeof prismaClient;
   userRepository: IUserRepository;
@@ -68,6 +70,7 @@ export interface SharedDependencies {
   webhookGateway: StripeWebhookGateway;
   lessonProgressRepository: ILessonProgressRepository;
   certificateRepository: CertificateRepositoryInterface;
+  s3Service: S3Service;
 }
 
 export function createSharedDependencies(): SharedDependencies {
@@ -115,6 +118,7 @@ export function createSharedDependencies(): SharedDependencies {
   const revenueRepository = new PrismaRevenueRepository(prismaClient);
   const lessonProgressRepository = new LessonProgressRepository(prismaClient);
   const certificateRepository = new PrismaCertificateRepository(prismaClient);
+  const s3Service = new S3Service();
 
   return {
     prisma: prismaClient,
@@ -142,5 +146,6 @@ export function createSharedDependencies(): SharedDependencies {
     webhookGateway,
     lessonProgressRepository,
     certificateRepository,
+    s3Service,
   };
 }

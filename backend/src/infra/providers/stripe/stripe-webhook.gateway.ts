@@ -4,7 +4,7 @@ import { WebhookMetadata } from "../../../domain/value-object/webhook-metadata.v
 import Stripe from "stripe";
 import { HttpError } from "../../../presentation/http/errors/http-error";
 import { StatusCodes } from "http-status-codes";
-import { envConfig } from "../../presentation/express/configs/env.config";
+import { envConfig } from "../../../presentation/express/configs/env.config";
 
 export class StripeWebhookGateway implements WebhookGateway {
   private stripe: Stripe;

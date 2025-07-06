@@ -3,7 +3,7 @@ import nodemailer from "nodemailer";
 import { UserVerification } from "../../../domain/entities/user-verification.entity";
 import { IAuthRepository } from "../../../app/repositories/auth.repository";
 import { IOtpProvider } from "../../../app/providers/I.otp-provider";
-import { envConfig } from "../../presentation/express/configs/env.config";
+import { envConfig } from "../../../presentation/express/configs/env.config";
 
 
 export class OtpProvider implements IOtpProvider {

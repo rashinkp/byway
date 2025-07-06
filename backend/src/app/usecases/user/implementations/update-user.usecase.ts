@@ -5,9 +5,10 @@ import { Role } from "../../../../domain/enum/role.enum";
 import { HttpError } from "../../../../presentation/http/errors/http-error";
 import { IUserRepository } from "../../../repositories/user.repository";
 import { IUpdateUserUseCase } from "../interfaces/update-user.usecase.interface";
+import { S3ServiceInterface } from "../../../providers/s3.service.interface";
 
 export class UpdateUserUseCase implements IUpdateUserUseCase {
-  constructor(private userRepository: IUserRepository) {}
+  constructor(private userRepository: IUserRepository, private s3Service: S3ServiceInterface) {}
 
   async execute(
     dto: UpdateUserDto,
@@ -16,6 +17,20 @@ export class UpdateUserUseCase implements IUpdateUserUseCase {
     const user = await this.userRepository.findById(userId);
     if (!user) {
       throw new HttpError("User not found", 404);
+    }
+
+    if (
+      dto.avatar &&
+      user.avatar &&
+      dto.avatar !== user.avatar &&
+      user.avatar.includes(".s3.")
+    ) {
+      try {
+        await this.s3Service.deleteFile(user.avatar);
+        console.log('[Deleted] deleted old avatar')
+      } catch (err) {
+        console.error("Failed to delete old avatar from S3:", err);
+      }
     }
 
     const updatedUser = User.update(user, {

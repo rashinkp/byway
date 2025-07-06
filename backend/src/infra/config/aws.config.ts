@@ -14,6 +14,7 @@ export const awsConfig = {
 };
 
 if (!awsConfig.credentials.accessKeyId || !awsConfig.credentials.secretAccessKey || !awsConfig.bucketName) {
+  console.log('AWS Configuration:', awsConfig)
   throw new Error('Missing required AWS configuration in .env file');
 }
 

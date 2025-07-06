@@ -3,7 +3,6 @@ import { envConfig } from "./env.config";
 const allowedOrigins = [
   envConfig.CORS_ORIGIN,
   envConfig.FRONTEND_URL,
-  "http://localhost:3000",
 ].filter((origin) => origin && typeof origin === "string");
 
 export const corsConfig = {

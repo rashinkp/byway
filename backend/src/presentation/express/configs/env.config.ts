@@ -15,6 +15,9 @@ export const envConfig = {
   ACCESS_TOKEN_SIGNATURE: process.env.ACCESS_TOKEN_SIGNATURE || "",
   REFRESH_TOKEN_SIGNATURE: process.env.REFRESH_TOKEN_SIGNATURE || "",
 
+  // Cookie config
+  COOKIE_SECRET: process.env.COOKIE_SECRET || "",
+
   // CORS settings
   CORS_ORIGIN: process.env.CORS_ORIGIN || "",
   FRONTEND_URL: process.env.FRONTEND_URL || "",
@@ -28,11 +31,20 @@ export const envConfig = {
   LOG_FILE_PATH: process.env.LOG_FILE_PATH || "./logs/app.log",
 
   // Rate limiting for OTP resend
-  RATE_LIMIT_OTP_RESEND_WINDOW_MS: parseInt(process.env.RATE_LIMIT_OTP_RESEND_WINDOW_MS || "60000", 10),
-  RATE_LIMIT_OTP_RESEND_MAX: parseInt(process.env.RATE_LIMIT_OTP_RESEND_MAX || "1", 10),
+  RATE_LIMIT_OTP_RESEND_WINDOW_MS: parseInt(
+    process.env.RATE_LIMIT_OTP_RESEND_WINDOW_MS || "60000",
+    10
+  ),
+  RATE_LIMIT_OTP_RESEND_MAX: parseInt(
+    process.env.RATE_LIMIT_OTP_RESEND_MAX || "1",
+    10
+  ),
 
   // Rate limiting for login
-  RATE_LIMIT_LOGIN_WINDOW_MS: parseInt(process.env.RATE_LIMIT_LOGIN_WINDOW_MS || "900000", 10),
+  RATE_LIMIT_LOGIN_WINDOW_MS: parseInt(
+    process.env.RATE_LIMIT_LOGIN_WINDOW_MS || "900000",
+    10
+  ),
   RATE_LIMIT_LOGIN_MAX: parseInt(process.env.RATE_LIMIT_LOGIN_MAX || "5", 10),
 
   // Google OAuth

@@ -3,4 +3,5 @@ export interface S3ServiceInterface {
     uploadUrl: string;
     fileUrl: string;
   }>;
+  deleteFile(fileUrl: string): Promise<void>;
 } 
