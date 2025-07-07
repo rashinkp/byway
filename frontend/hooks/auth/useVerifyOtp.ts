@@ -25,15 +25,14 @@ export function useVerifyOtp() {
 			queryClient.invalidateQueries({ queryKey: ["auth"] });
 
 			if (variables.type === "password-reset") {
+				const resetToken = data?.data?.resetToken;
+				if (resetToken) {
+					sessionStorage.setItem("resetToken", resetToken);
+				}
 				toast.success("OTP verified", {
 					description: "Please set your new password.",
 				});
-
-				const params = new URLSearchParams({
-					email: variables.email,
-					otp: variables.otp,
-				});
-				router.push(`/reset-password?${params.toString()}`);
+				router.push("/reset-password");
 			} else {
 				toast.success("Email verified", {
 					description:

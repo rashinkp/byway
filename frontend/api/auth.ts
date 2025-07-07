@@ -128,14 +128,12 @@ export async function forgotPassword(email: string): Promise<void> {
 }
 
 export async function resetPassword(
-	email: string,
-	otp: string,
+	resetToken: string,
 	newPassword: string,
 ): Promise<void> {
 	try {
 		await api.post<ApiResponse<unknown>>("/auth/reset-password", {
-			email,
-			otp,
+			resetToken,
 			newPassword,
 		});
 	} catch (error: any) {

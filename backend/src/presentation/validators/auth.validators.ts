@@ -61,7 +61,7 @@ const resendOtpSchema = z.object({
 
 // ResetPasswordDto schema
 const resetPasswordSchema = z.object({
-  email: z.string().email("Invalid email address"),
+  resetToken: z.string().min(1, "Reset token is required"),
   newPassword: z.string().min(6, "New password must be at least 6 characters"),
 });
 

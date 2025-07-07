@@ -71,24 +71,6 @@ export async function middleware(request: NextRequest) {
 	});
 
 	if (isPublicRoute) {
-		// Handle specific public route validations
-		if (pathname === "/verify-otp" && !searchParams.get("email")) {
-			console.log("Missing email for /verify-otp, redirecting to /signup");
-			return NextResponse.redirect(new URL("/signup", request.url));
-		}
-
-		// For reset-password, only validate if directly accessing without parameters
-		if (
-			pathname === "/reset-password" &&
-			!searchParams.get("email") &&
-			!searchParams.get("otp")
-		) {
-			console.log(
-				"Missing params for /reset-password, redirecting to /forgot-password",
-			);
-			return NextResponse.redirect(new URL("/forgot-password", request.url));
-		}
-
 		// Handle role-based redirection for authenticated users on public routes
 		if (pathname === "/" && currentUser) {
 			console.log("Authenticated user on home page, checking for redirection");

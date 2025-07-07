@@ -42,13 +42,6 @@ export function ForgotPasswordForm() {
 		try {
 			setError(null);
 			forgotPassword(data.email, {
-				onSuccess: () => {
-					router.push(
-						`/verify-otp?email=${encodeURIComponent(
-							data.email,
-						)}&type=forgot-password`,
-					);
-				},
 				onError: (err: any) => {
 					setError(err.message || "Failed to send reset OTP");
 				},

@@ -2,15 +2,14 @@ import { User } from "../../../../domain/entities/user.entity";
 import { IAuthRepository } from "../../../repositories/auth.repository";
 import { HttpError } from "../../../../presentation/http/errors/http-error";
 import { VerifyOtpDto } from "../../../../domain/dtos/auth/verify-otp.dto";
+import { JwtProvider } from "../../../../infra/providers/auth/jwt.provider";
+import { IVerifyOtpUseCase } from "../interfaces/verify-otp.usecase.interface";
 
-export interface IVerifyOtpUseCase {
-  execute(dto: VerifyOtpDto): Promise<User>;
-}
 
 export class VerifyOtpUseCase implements IVerifyOtpUseCase {
   constructor(private authRepository: IAuthRepository) {}
 
-  async execute(dto: VerifyOtpDto): Promise<User> {
+  async execute(dto: VerifyOtpDto): Promise<{ user?: User; resetToken?: string }> {
     const verification = await this.authRepository.findVerificationByEmail(
       dto.email
     );
@@ -43,9 +42,21 @@ export class VerifyOtpUseCase implements IVerifyOtpUseCase {
 
     if (dto.type === "signup") {
       user.verifyEmail();
-      return await this.authRepository.updateUser(user);
+      await this.authRepository.updateUser(user);
+      return { user };
     }
 
-    return user;
+    // For password-reset, generate a JWT reset token
+    if (dto.type === "password-reset") {
+      const jwtProvider = new JwtProvider();
+      const resetToken = jwtProvider.signAccessToken({
+        email: user.email,
+        type: "password-reset",
+        iat: Math.floor(Date.now() / 1000),
+      });
+      return { resetToken };
+    }
+
+    return { user };
   }
 }

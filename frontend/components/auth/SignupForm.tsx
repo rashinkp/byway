@@ -49,7 +49,7 @@ export function SignupForm() {
 			{ name: data.name, email: data.email, password: data.password },
 			{
 				onSuccess: () => {
-					router.push(`/verify-otp?email=${encodeURIComponent(data.email)}`);
+					router.push(`/verify-otp?type=signup`);
 				},
 			},
 		);

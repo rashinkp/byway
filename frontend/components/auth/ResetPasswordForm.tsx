@@ -3,7 +3,7 @@
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { SplitScreenLayout } from "@/components/ui/SplitScreenLayout";
 import { AuthForm } from "@/components/auth/AuthForm";
 import { Button } from "@/components/ui/button";
@@ -28,9 +28,7 @@ type ResetPasswordFormData = z.infer<typeof resetPasswordSchema>;
 
 export function ResetPasswordForm() {
 	const router = useRouter();
-	const searchParams = useSearchParams();
-	const email = searchParams.get("email");
-	const otp = searchParams.get("otp");
+	const resetToken = typeof window !== "undefined" ? sessionStorage.getItem("resetToken") : null;
 	const { mutate: resetPassword, isPending, error } = useResetPassword();
 
 	const form = useForm<ResetPasswordFormData>({
@@ -42,11 +40,12 @@ export function ResetPasswordForm() {
 	});
 
 	const onSubmit = (data: ResetPasswordFormData) => {
-		if (!email || !otp) return;
+		if (!resetToken) return;
 		resetPassword(
-			{ email, otp, newPassword: data.newPassword },
+			{ resetToken, newPassword: data.newPassword },
 			{
 				onSuccess: () => {
+					sessionStorage.removeItem("resetToken");
 					router.push("/login");
 				},
 			},
@@ -74,8 +73,8 @@ export function ResetPasswordForm() {
 		);
 	}
 
-	// Show error if email or OTP is missing
-	if (!email || !otp) {
+	// Show error if resetToken is missing
+	if (!resetToken) {
 		return (
 			<SplitScreenLayout
 				title="Reset Password"

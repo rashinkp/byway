@@ -11,12 +11,13 @@ import { useResendOtp } from "@/hooks/auth/useResendOtp";
 import { useVerifyOtp } from "@/hooks/auth/useVerifyOtp";
 import { useAuthStore } from "@/stores/auth.store";
 import { useVerificationStatus } from "@/hooks/auth/useVerificationStatus";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 export function VerifyOtpForm() {
 	const searchParams = useSearchParams();
 	const type = searchParams.get("type") || "signup";
 	const email = useAuthStore((state) => state.email);
+	const initializeAuth = useAuthStore((state) => state.initializeAuth);
 	const { mutate: verifyOtp, isPending: isSubmitting, error } = useVerifyOtp();
 	const { mutate: resendOtp, isPending: isResending } = useResendOtp();
 	const {
@@ -31,6 +32,16 @@ export function VerifyOtpForm() {
 	});
 
 	const [localLoading, setLocalLoading] = useState(false);
+
+	useEffect(() => {
+		initializeAuth();
+	}, [initializeAuth]);
+
+	// Debug logs
+	useEffect(() => {
+		console.log("[OtpForm] email from store:", email);
+		console.log("[OtpForm] email from localStorage:", typeof window !== "undefined" ? localStorage.getItem("auth_email") : null);
+	}, [email]);
 
 	// Handle OTP submission
 	const handleSubmit = (otp: string) => {
@@ -90,13 +101,13 @@ export function VerifyOtpForm() {
 		return (
 			<SplitScreenLayout
 				title="Verification Required"
-				description="We need to verify your email address before you can access your account."
+				description="We need to verify your email address before you can continue."
 				imageAlt="Verification illustration"
 			>
 				<AuthFormWrapper
 					title="Verification Failed"
 					subtitle=""
-					error="No email provided"
+					error="No email provided. Please start the process again."
 				>
 					<Button className="auth-button" asChild>
 						<AuthLink

@@ -10,14 +10,12 @@ export function useResetPassword() {
 
 	return useMutation({
 		mutationFn: ({
-			email,
-			otp,
+			resetToken,
 			newPassword,
 		}: {
-			email: string;
-			otp: string;
+			resetToken: string;
 			newPassword: string;
-		}) => resetPassword(email, otp, newPassword),
+		}) => resetPassword(resetToken, newPassword),
 		onSuccess: () => {
 			setEmail(null);
 			queryClient.invalidateQueries({ queryKey: ["auth"] });

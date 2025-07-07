@@ -187,14 +187,21 @@ export class AuthController extends BaseController {
   async verifyOtp(httpRequest: IHttpRequest): Promise<IHttpResponse> {
     return this.handleRequest(httpRequest, async (request) => {
       const validated = validateVerifyOtp(request.body);
-      const user = await this.verifyOtpUseCase.execute(validated);
-      const data = {
-        id: user.id,
-        name: user.name,
-        email: user.email,
-        role: user.role,
-      };
-      return this.success_200(data, "OTP verification successful");
+      const result = await this.verifyOtpUseCase.execute(validated);
+      if (validated.type === "password-reset" && result.resetToken) {
+        return this.success_200({ resetToken: result.resetToken }, "OTP verification successful");
+      }
+      if (result.user) {
+        const user = result.user;
+        const data = {
+          id: user.id,
+          name: user.name,
+          email: user.email,
+          role: user.role,
+        };
+        return this.success_200(data, "OTP verification successful");
+      }
+      return this.success_200(null, "OTP verification successful");
     });
   }
 
