@@ -16,14 +16,6 @@ export const api = axios.create({
 });
 
 api.interceptors.request.use((config) => {
-	if (typeof window !== "undefined") {
-		const user = localStorage.getItem("auth_user");
-		if (user) {
-			config.headers = config.headers || {};
-			config.headers["x-user"] = user;
-			console.log("[API] Set x-user header from localStorage");
-		}
-	}
 	console.log("Request sent:", { url: config.url, method: config.method });
 	return config;
 });

@@ -5,3 +5,4 @@ stripe webhook
 sql - (prisma)
 nextjs
 clean architecture
+zustand (store)

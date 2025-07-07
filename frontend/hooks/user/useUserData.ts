@@ -14,7 +14,7 @@ export interface UseUserDataReturn {
 
 // Hook for fetching the current user's data
 export function useUserData(): UseUserDataReturn {
-	const { user, isInitialized, isLoading: authLoading } = useAuthStore();
+	const { user, isInitialized, isLoading: authLoading, isHydrating } = useAuthStore();
 
 	const { data, isLoading, error, refetch } = useQuery<User>({
 		queryKey: ["userData", user?.id],
@@ -22,7 +22,7 @@ export function useUserData(): UseUserDataReturn {
 			const userData = await getUserData();
 			return userData;
 		},
-		enabled: !!user?.id && isInitialized && !authLoading, // Only fetch when user is available and auth is initialized
+		enabled: !!user?.id && isInitialized && !authLoading && !isHydrating, // Only fetch when user is available, auth is initialized, and not hydrating
 		staleTime: 5 * 60 * 1000, // 5 minutes
 		gcTime: 10 * 60 * 1000, // 10 minutes
 		retry: (failureCount, error) => {

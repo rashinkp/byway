@@ -6,7 +6,13 @@ import { verifyOtp } from "@/api/auth";
 import { useAuthStore } from "@/stores/auth.store";
 import { useRouter } from "next/navigation";
 
-export function useVerifyOtp() {
+interface UseVerifyOtpOptions {
+	setRedirecting?: (val: boolean) => void;
+	setLocalError?: (val: string | null) => void;
+}
+
+export function useVerifyOtp(options: UseVerifyOtpOptions = {}) {
+	const { setRedirecting, setLocalError } = options;
 	const { clearAuth } = useAuthStore();
 	const queryClient = useQueryClient();
 	const router = useRouter();
@@ -23,7 +29,8 @@ export function useVerifyOtp() {
 		}) => verifyOtp(otp, email, type),
 		onSuccess: (data, variables) => {
 			queryClient.invalidateQueries({ queryKey: ["auth"] });
-
+			if (setLocalError) setLocalError(null);
+			if (setRedirecting) setRedirecting(true);
 			if (variables.type === "password-reset") {
 				const resetToken = data?.data?.resetToken;
 				if (resetToken) {
@@ -40,10 +47,11 @@ export function useVerifyOtp() {
 				});
 				router.push("/login");
 			}
-
 			clearAuth();
 		},
 		onError: (error: any) => {
+			if (setRedirecting) setRedirecting(false);
+			if (setLocalError) setLocalError(error.message || "The OTP you entered is incorrect.");
 			toast.error("Invalid OTP", {
 				description: error.message || "The OTP you entered is incorrect.",
 			});

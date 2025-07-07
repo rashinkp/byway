@@ -1,12 +1,14 @@
 import { create } from "zustand";
 import { User } from "@/types/user";
 import { clearAllCache } from "@/lib/utils";
+import { getUserData } from "@/api/users";
 
 interface AuthState {
 	user: User | null;
 	isInitialized: boolean;
 	isLoading: boolean;
 	email: string | null;
+	isHydrating: boolean;
 	setUser: (user: User | null) => void;
 	setEmail: (email: string) => void;
 	clearAuth: () => void;
@@ -71,6 +73,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 	isInitialized: false,
 	isLoading: true,
 	email: null,
+	isHydrating: false,
 	setUser: (user) => {
 		const currentUser = get().user;
 		const userIdChanged = currentUser?.id !== user?.id;
@@ -122,32 +125,29 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 	},
 	initializeAuth: async () => {
 		if (get().isInitialized) {
-			console.log("AuthStore: Already initialized, skipping");
 			return;
 		}
-		console.log("AuthStore: Starting initialization...");
-		set({ isLoading: true });
-		// Load email from localStorage
+		set({ isLoading: true, isHydrating: true });
+
 		const storedEmail = loadEmailFromStorage();
-		if (storedEmail) {
-			console.log("AuthStore: Loaded email from localStorage");
-			set({ email: storedEmail });
-		}
-		// Load user from localStorage (prioritize this)
+		if (storedEmail) set({ email: storedEmail });
+
 		const storedUser = loadUserFromStorage();
 		if (storedUser && storedUser.id && storedUser.role) {
-			console.log("AuthStore: Using stored user from localStorage:", storedUser.role, "ID:", storedUser.id);
 			set({
 				user: storedUser,
 				isInitialized: true,
 				isLoading: false,
+				isHydrating: false,
 			});
 			return;
-		} else {
-			console.log("AuthStore: No valid stored user found in localStorage");
 		}
-		// If no valid user, clear everything
-		console.log("AuthStore: No valid user found, clearing auth");
-		get().clearAuth();
+
+		// No backend fetch here; React Query will handle it
+		set({
+			isInitialized: true,
+			isLoading: false,
+			isHydrating: false,
+		});
 	},
 }));

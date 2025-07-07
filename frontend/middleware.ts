@@ -40,7 +40,8 @@ export async function middleware(request: NextRequest) {
 	const protectedRoutes = [
 		"/admin",
 		"/instructor", 
-		"/user"
+		"/user",
+		"/chat"
 	];
 
 	const isProtectedRoute = protectedRoutes.some((route) =>
@@ -134,5 +135,6 @@ export const config = {
 		"/admin/:path*",
 		"/instructor/:path*",
 		"/user/:path*",
+		"/chat/:path*",
 	],
 };

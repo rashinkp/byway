@@ -86,9 +86,9 @@ export async function verifyOtp(
 	otp: string,
 	email: string,
 	type: "signup" | "password-reset" = "signup",
-): Promise<ApiResponse<User>> {
+): Promise<ApiResponse<any>> {
 	try {
-		const response = await api.post<ApiResponse<User>>("/auth/verify-otp", {
+		const response = await api.post<ApiResponse<any>>("/auth/verify-otp", {
 			otp,
 			email,
 			type,

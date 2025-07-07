@@ -18,7 +18,9 @@ export function VerifyOtpForm() {
 	const type = searchParams.get("type") || "signup";
 	const email = useAuthStore((state) => state.email);
 	const initializeAuth = useAuthStore((state) => state.initializeAuth);
-	const { mutate: verifyOtp, isPending: isSubmitting, error } = useVerifyOtp();
+	const [redirecting, setRedirecting] = useState(false);
+	const [localError, setLocalError] = useState<string | null>(null);
+	const { mutate: verifyOtp, isPending: isSubmitting, error } = useVerifyOtp({ setRedirecting, setLocalError });
 	const { mutate: resendOtp, isPending: isResending } = useResendOtp();
 	const {
 		resendCooldown,
@@ -46,6 +48,7 @@ export function VerifyOtpForm() {
 	// Handle OTP submission
 	const handleSubmit = (otp: string) => {
 		if (!email) return;
+		setLocalError(null);
 		setLocalLoading(true);
 		// Map frontend type to backend type
 		const verificationType =
@@ -70,7 +73,7 @@ export function VerifyOtpForm() {
 	};
 
 	// Show loading state during submission or resend
-	if (localLoading || isSubmitting || isResending || isStatusLoading) {
+	if (redirecting || localLoading || isSubmitting || isResending || isStatusLoading) {
 		return (
 			<SplitScreenLayout
 				title={
@@ -107,7 +110,7 @@ export function VerifyOtpForm() {
 				<AuthFormWrapper
 					title="Verification Failed"
 					subtitle=""
-					error="No email provided. Please start the process again."
+					error={localError || error?.message}
 				>
 					<Button className="auth-button" asChild>
 						<AuthLink
@@ -141,7 +144,7 @@ export function VerifyOtpForm() {
 			<AuthFormWrapper
 				title="Verify Your Email"
 				subtitle={`Enter the 6-digit code sent to ${email}`}
-				error={error?.message}
+				error={localError || error?.message}
 				noCard
 			>
 				<div className="mb-8">
