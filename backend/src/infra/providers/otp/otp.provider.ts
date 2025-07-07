@@ -1,23 +1,11 @@
 import { v4 as uuidv4 } from "uuid";
-import nodemailer from "nodemailer";
 import { UserVerification } from "../../../domain/entities/user-verification.entity";
 import { IAuthRepository } from "../../../app/repositories/auth.repository";
 import { IOtpProvider } from "../../../app/providers/I.otp-provider";
-import { envConfig } from "../../../presentation/express/configs/env.config";
-
+import { EmailProvider } from "../../../app/providers/email.provider.interface";
 
 export class OtpProvider implements IOtpProvider {
-  private transporter;
-
-  constructor(private authRepository: IAuthRepository) {
-    this.transporter = nodemailer.createTransport({
-      service: "gmail",
-      auth: {
-        user: envConfig.EMAIL_USER,
-        pass: envConfig.EMAIL_PASS,
-      },
-    });
-  }
+  constructor(private authRepository: IAuthRepository, private emailProvider: EmailProvider) {}
 
   async generateOtp(
     email: string,
@@ -42,13 +30,8 @@ export class OtpProvider implements IOtpProvider {
     // Store verification
     await this.authRepository.createVerification(verification);
 
-    // Send OTP via email
-    await this.transporter.sendMail({
-      to: email,
-      subject:
-        type === "VERIFICATION" ? "Verify Your Email" : "Reset Your Password",
-      text: `Your OTP is ${otp}. It expires in 10 minutes.`,
-    });
+    // Send OTP via email using EmailProviderImpl
+    await this.emailProvider.sendOtpEmail(email, otp);
 
     return verification;
   }

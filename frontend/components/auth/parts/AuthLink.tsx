@@ -8,11 +8,11 @@ interface AuthLinkProps {
 
 export function AuthLink({ text, linkText, href }: AuthLinkProps) {
 	return (
-		<p className="auth-text">
+		<p className="auth-text text-[var-(--color-primary-dark)]">
 			{text}{" "}
 			<Link
 				href={href}
-				className="text-[var(--primary-500)] hover:text-[var(--primary-600)] font-normal"
+				className="text-[var(--color-primary-light)] hover:text-[var(--color-primary-dark)] hover:font-medium font-normal"
 			>
 				{linkText}
 			</Link>

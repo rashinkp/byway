@@ -70,7 +70,7 @@ export function OtpInput({
 					maxLength={length}
 					onChange={(e) => handleChange(index, e.target.value)}
 					onKeyDown={(e) => handleKeyDown(index, e)}
-					className="w-10 h-12 md:w-12 md:h-14 text-center text-lg border-2 rounded-lg focus:border-primary focus:ring-1 focus:ring-primary outline-none"
+					className="w-10 h-12 md:w-12 md:h-14 text-center text-lg border-2 rounded-lg bg-[var(--color-surface)] text-[var(--color-primary-dark)] border-[var(--color-primary-dark)] focus:border-[var(--color-primary-dark)] focus:ring-1 focus:ring-[var(--color-primary-dark)] outline-none transition-colors"
 					disabled={isSubmitting}
 				/>
 			))}

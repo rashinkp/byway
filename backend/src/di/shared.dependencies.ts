@@ -43,6 +43,7 @@ import { ILessonProgressRepository } from "../app/repositories/lesson-progress.r
 import { PrismaCertificateRepository } from "../infra/repositories/certificate-repository.prisma";
 import { CertificateRepositoryInterface } from "../app/repositories/certificate-repository.interface";
 import { S3Service } from "../infra/providers/s3/s3.service";
+import { EmailProviderImpl } from "../infra/providers/email/email.provider";
 
 export interface SharedDependencies {
   prisma: typeof prismaClient;
@@ -71,6 +72,7 @@ export interface SharedDependencies {
   lessonProgressRepository: ILessonProgressRepository;
   certificateRepository: CertificateRepositoryInterface;
   s3Service: S3Service;
+  emailProvider: EmailProviderImpl;
 }
 
 export function createSharedDependencies(): SharedDependencies {
@@ -86,7 +88,9 @@ export function createSharedDependencies(): SharedDependencies {
   const orderRepository = new OrderRepository(prismaClient);
   const transactionRepository = new TransactionRepository(prismaClient);
   const courseReviewRepository = new CourseReviewRepository(prismaClient);
-  const otpProvider = new OtpProvider(authRepository);
+  const s3Service = new S3Service();
+  const emailProvider = new EmailProviderImpl();
+  const otpProvider = new OtpProvider(authRepository, emailProvider);
   const googleAuthProvider = new GoogleAuthProvider(envConfig.GOOGLE_CLIENT_ID);
   const walletRepository = new WalletRepository(prismaClient);
   const paymentGateway = new StripePaymentGateway();
@@ -118,7 +122,6 @@ export function createSharedDependencies(): SharedDependencies {
   const revenueRepository = new PrismaRevenueRepository(prismaClient);
   const lessonProgressRepository = new LessonProgressRepository(prismaClient);
   const certificateRepository = new PrismaCertificateRepository(prismaClient);
-  const s3Service = new S3Service();
 
   return {
     prisma: prismaClient,
@@ -147,5 +150,6 @@ export function createSharedDependencies(): SharedDependencies {
     lessonProgressRepository,
     certificateRepository,
     s3Service,
+    emailProvider,
   };
 }

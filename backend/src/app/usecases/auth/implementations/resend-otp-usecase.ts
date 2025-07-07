@@ -18,7 +18,7 @@ export class ResendOtpUseCase implements IResendOtpUseCase {
 
     try {
       await this.otpProvider.generateOtp(user.email, user.id, "VERIFICATION");
-      // TODO: Implement email sending
+
       // await this.emailProvider.sendOtpEmail(user.email, verification.otp);
     } catch (error) {
       if (error instanceof Error) {

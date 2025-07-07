@@ -20,11 +20,11 @@ export function AuthFormWrapper({
 	const content = (
 		<>
 			<div className="text-center mb-8">
-				<h2 className="text-2xl md:text-3xl font-bold text-foreground">
+				<h2 className="text-2xl md:text-3xl font-bold text-[var(--color-primary-dark)]">
 					{title}
 				</h2>
 				{subtitle && (
-					<p className="mt-2 text-muted-foreground text-sm md:text-base">
+					<p className="mt-2 text-[var(--color-primary-light)] text-sm md:text-base">
 						{subtitle}
 					</p>
 				)}

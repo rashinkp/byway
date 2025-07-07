@@ -11,6 +11,7 @@ import { useResendOtp } from "@/hooks/auth/useResendOtp";
 import { useVerifyOtp } from "@/hooks/auth/useVerifyOtp";
 import { useAuthStore } from "@/stores/auth.store";
 import { useVerificationStatus } from "@/hooks/auth/useVerificationStatus";
+import { useState } from "react";
 
 export function VerifyOtpForm() {
 	const searchParams = useSearchParams();
@@ -29,15 +30,21 @@ export function VerifyOtpForm() {
 		onError: console.error,
 	});
 
+	const [localLoading, setLocalLoading] = useState(false);
+
 	// Handle OTP submission
 	const handleSubmit = (otp: string) => {
 		if (!email) return;
-
+		setLocalLoading(true);
 		// Map frontend type to backend type
 		const verificationType =
 			type === "forgot-password" ? "password-reset" : "signup";
-
-		verifyOtp({ email, otp, type: verificationType });
+		verifyOtp(
+			{ email, otp, type: verificationType },
+			{
+				onSettled: () => setLocalLoading(false),
+			}
+		);
 	};
 
 	// Handle OTP resend
@@ -52,7 +59,7 @@ export function VerifyOtpForm() {
 	};
 
 	// Show loading state during submission or resend
-	if (isSubmitting || isResending || isStatusLoading) {
+	if (localLoading || isSubmitting || isResending || isStatusLoading) {
 		return (
 			<SplitScreenLayout
 				title={
@@ -136,7 +143,7 @@ export function VerifyOtpForm() {
 							{resendCooldown > 0 ? (
 								<span>
 									Resend code in{" "}
-									<span className="font-medium">
+									<span className="font-medium text-[var(--color-primary-dark)]">
 										{formatTime(resendCooldown)}
 									</span>
 								</span>
@@ -150,6 +157,7 @@ export function VerifyOtpForm() {
 						variant="outline"
 						onClick={handleResend}
 						disabled={resendCooldown > 0 || isSubmitting || isResending}
+						className="w-full bg-[var(--color-primary-light)] text-[var(--color-surface)] hover:bg-[var(--color-primary-dark)] border-none"
 					>
 						{isResending ? (
 							<>
