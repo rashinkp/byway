@@ -51,7 +51,7 @@ export class LessonContentController extends BaseController {
 
   async getLessonContentByLessonId(httpRequest: IHttpRequest): Promise<IHttpResponse> {
     return this.handleRequest(httpRequest, async (request) => {
-      if (!request.user?.id) {
+      if (!request.user?.id || !request.user?.role) {
         throw new HttpError("Unauthorized", 401);
       }
 
@@ -60,7 +60,7 @@ export class LessonContentController extends BaseController {
       });
       const content = await this.getLessonContentByLessonIdUseCase.execute(
         validated.lessonId,
-        request.user.id
+        { id: request.user.id, role: request.user.role }
       );
       return this.success_200(content, "Lesson content retrieved successfully");
     });

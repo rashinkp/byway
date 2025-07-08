@@ -2,5 +2,5 @@ import { ILessonContentOutputDTO } from "../../../../domain/dtos/lesson/lesson.d
 
 
 export interface IGetContentByLessonIdUseCase {
-  execute(lessonId: string, userId: string): Promise<ILessonContentOutputDTO | null>;
+  execute(lessonId: string, user: { id: string; role: string }): Promise<ILessonContentOutputDTO | null>;
 }

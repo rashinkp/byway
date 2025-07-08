@@ -17,7 +17,7 @@ export default function lessonContentRouter(
     )
   );
 
-  router.put("/:contentId", restrictTo("INSTRUCTOR"), (req, res, next) =>
+  router.put("/:contentId", restrictTo("INSTRUC TOR"), (req, res, next) =>
     expressAdapter(
       req,
       res,
