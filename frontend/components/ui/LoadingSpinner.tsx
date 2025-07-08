@@ -27,16 +27,16 @@ export function LoadingSpinner({
 				className,
 			)}
 		>
-			<Loader2 className={cn("animate-spin text-primary", sizeClasses[size])} />
+			<Loader2 className={cn("animate-spin text-[var(--color-primary-dark)]", sizeClasses[size])} />
 			{text && (
-				<p className="text-sm text-muted-foreground animate-pulse">{text}</p>
+				<p className="text-sm text-[var(--color-muted)] animate-pulse">{text}</p>
 			)}
 		</div>
 	);
 
 	if (fullScreen) {
 		return (
-			<div className="fixed inset-0 flex items-center justify-center bg-background/80 backdrop-blur-sm">
+			<div className="fixed inset-0 flex items-center justify-center bg-[var(--color-background)]/80 backdrop-blur-sm">
 				{content}
 			</div>
 		);

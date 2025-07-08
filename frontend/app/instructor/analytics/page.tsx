@@ -13,6 +13,8 @@ import {
 	LatestRevenueList,
 } from "@/components/analytics";
 import { useAnalyticsState } from "@/hooks/revenue/useAnalyticsState";
+import PDFExportButton from "@/components/common/PDFExportButton";
+import { generateRevenueAnalyticsReport } from "@/lib/generateRevenueAnalyticsReport";
 
 export default function InstructorAnalytics() {
 	const {
@@ -85,6 +87,16 @@ export default function InstructorAnalytics() {
 	return (
 		<div className="min-h-screen bg-gray-50/50 p-6">
 			<div className="max-w-7xl mx-auto space-y-8">
+				{/* PDF Export Button */}
+				<PDFExportButton
+					onExport={() =>
+						overallData && courseData && generateRevenueAnalyticsReport(
+							overallData.data,
+							courseData.data,
+							latestData?.data
+						)
+					}
+				/>
 				{/* Header Section */}
 				<AnalyticsHeader
 					title="Instructor Analytics Dashboard"

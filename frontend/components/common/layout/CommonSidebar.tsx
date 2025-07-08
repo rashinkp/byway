@@ -41,7 +41,7 @@ export function CommonSidebar({
 }: CommonSidebarProps) {
 	return (
 		<aside
-			className={`fixed top-0 left-0 z-40 h-screen bg-black text-white shadow-xl transition-all duration-300 ease-in-out
+			className={`fixed top-0 left-0 z-40 h-screen bg-[var(--color-primary-dark)] text-[var(--color-surface)] shadow-xl transition-all duration-300 ease-in-out
         ${mobileMenuOpen ? "translate-x-0" : "-translate-x-full"}
         lg:translate-x-0 ${
 					isCollapsible
@@ -84,7 +84,7 @@ export function CommonSidebar({
 								<button
 									type="button"
 									onClick={onNotificationClick}
-									className={`flex items-center gap-2 rounded-lg px-3 py-2 transition-colors duration-200 hover:bg-zinc-800 text-yellow-400 hover:text-yellow-300 w-full ${collapsed ? "justify-center" : ""}`}
+									className={`flex items-center gap-2 rounded-lg px-3 py-2 transition-colors duration-200 hover:bg-[var(--color-primary-light)]/10 text-[var(--color-warning)] hover:text-[var(--color-accent)] w-full ${collapsed ? "justify-center" : ""}`}
 									aria-label="Notifications"
 								>
 									<Bell className="w-4 h-4" />
@@ -93,7 +93,7 @@ export function CommonSidebar({
 							</TooltipTrigger>
 							<TooltipContent
 								side="right"
-								className="bg-zinc-800 text-white border-zinc-700 px-3 py-1.5 rounded-lg"
+								className="bg-[var(--color-surface)] text-[var(--color-primary-dark)] border-[var(--color-muted)] px-3 py-1.5 rounded-lg"
 							>
 								Notifications
 							</TooltipContent>
@@ -102,7 +102,7 @@ export function CommonSidebar({
 				</div>
 
 				<div
-					className={`p-5 border-t border-zinc-800 ${
+					className={`p-5 border-t border-[var(--color-muted)] ${
 						collapsed
 							? "flex justify-center"
 							: "flex justify-center lg:justify-start"
@@ -114,7 +114,7 @@ export function CommonSidebar({
 								<Button
 									variant="ghost"
 									size="icon"
-									className="text-red-400 hover:bg-zinc-800 hover:text-red-300 w-full lg:w-auto transition-colors duration-200 rounded-lg flex items-center"
+									className="text-[var(--color-danger)] hover:bg-[var(--color-primary-light)]/10 hover:text-[var(--color-danger)] w-full lg:w-auto transition-colors duration-200 rounded-lg flex items-center"
 									onClick={handleLogout}
 								>
 									<LogOut className="h-5 w-5" />
@@ -127,7 +127,7 @@ export function CommonSidebar({
 							</TooltipTrigger>
 							<TooltipContent
 								side="right"
-								className={`bg-zinc-800 text-white border-zinc-700 px-3 py-1.5 rounded-lg ${
+								className={`bg-[var(--color-surface)] text-[var(--color-primary-dark)] border-[var(--color-muted)] px-3 py-1.5 rounded-lg ${
 									isCollapsible ? "" : "lg:block xl:hidden"
 								}`}
 							>

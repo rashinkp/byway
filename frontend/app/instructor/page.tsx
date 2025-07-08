@@ -18,6 +18,8 @@ import {
 	Star,
 	MessageSquare,
 } from "lucide-react";
+import PDFExportButton from "@/components/common/PDFExportButton";
+import { generateInstructorDashboardReport } from "@/lib/generateInstructorDashboardReport";
 
 // Function to truncate to 2 decimal places without rounding
 const truncateToTwoDecimals = (num: number): string => {
@@ -46,6 +48,12 @@ export default function InstructorDashboard() {
 			error={error}
 			data={data}
 		>
+			{/* PDF Export Button */}
+			{data && (
+				<div className="flex justify-end mb-4">
+					<PDFExportButton onExport={() => generateInstructorDashboardReport(data)} />
+				</div>
+			)}
 			{data && (
 				<>
 					{/* Statistics Cards Grid */}

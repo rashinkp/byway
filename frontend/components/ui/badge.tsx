@@ -3,18 +3,18 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/utils/cn";
 
 const badgeVariants = cva(
-	"inline-flex items-center justify-center rounded-lg border px-2 py-0.5 text-xs font-medium w-fit whitespace-nowrap shrink-0 [&>svg]:size-3 gap-1 [&>svg]:pointer-events-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive transition-[color,box-shadow] overflow-hidden",
+	"inline-flex items-center justify-center rounded-lg border px-2 py-0.5 text-xs font-medium w-fit whitespace-nowrap shrink-0 [&>svg]:size-3 gap-1 [&>svg]:pointer-events-none focus-visible:border-[var(--color-primary-dark)] focus-visible:ring-[var(--color-primary-dark)]/50 focus-visible:ring-[3px] aria-invalid:ring-[var(--color-danger)]/20 dark:aria-invalid:ring-[var(--color-danger)]/40 aria-invalid:border-[var(--color-danger)] transition-[color,box-shadow] overflow-hidden",
 	{
 		variants: {
 			variant: {
 				default:
-					"border-transparent bg-primary text-primary-foreground [a&]:hover:bg-primary/90",
+					"border-transparent bg-[var(--color-primary-dark)] text-[var(--color-surface)] [a&]:hover:bg-[var(--color-primary-light)]",
 				secondary:
-					"border-transparent bg-secondary text-secondary-foreground [a&]:hover:bg-secondary/90",
+					"border-transparent bg-[var(--color-primary-light)] text-[var(--color-surface)] [a&]:hover:bg-[var(--color-primary-dark)]",
 				destructive:
-					"border-transparent bg-destructive text-white [a&]:hover:bg-destructive/90 focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40 dark:bg-destructive/60",
+					"border-transparent bg-[var(--color-danger)] text-[var(--color-surface)] [a&]:hover:bg-[var(--color-danger)]/90 focus-visible:ring-[var(--color-danger)]/20 dark:focus-visible:ring-[var(--color-danger)]/40 dark:bg-[var(--color-danger)]/60",
 				outline:
-					"text-foreground [a&]:hover:bg-accent [a&]:hover:text-accent-foreground",
+					"text-[var(--color-primary-dark)] [a&]:hover:bg-[var(--color-accent)] [a&]:hover:text-[var(--color-surface)]",
 			},
 		},
 		defaultVariants: {

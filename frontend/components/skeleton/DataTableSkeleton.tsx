@@ -22,7 +22,7 @@ export function TableSkeleton({
 	return (
 		<Table>
 			<TableHeader>
-				<TableRow className="bg-gray-50/50 border-b border-gray-200/20">
+				<TableRow className="bg-[var(--color-surface)]/50">
 					{[...Array(columns - (hasActions ? 1 : 0))].map((_, i) => (
 						<TableHead key={i}>
 							<Skeleton className="h-6 w-24" />
@@ -37,7 +37,7 @@ export function TableSkeleton({
 			</TableHeader>
 			<TableBody>
 				{[...Array(rows)].map((_, rowIndex) => (
-					<TableRow key={rowIndex} className="border-b border-gray-200/20">
+					<TableRow key={rowIndex} className="border-b border-[var(--color-muted)]/20">
 						{[...Array(columns - (hasActions ? 1 : 0))].map((_, colIndex) => (
 							<TableCell key={colIndex}>
 								<Skeleton className="h-6 w-full" />

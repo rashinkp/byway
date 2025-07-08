@@ -7,6 +7,6 @@ interface LoaderProps {
 
 export function Loader({ size = 24, className }: LoaderProps) {
 	return (
-		<Loader2 className={`animate-spin text-primary ${className}`} size={size} />
+		<Loader2 className={`animate-spin text-[var(--color-primary-dark)] ${className}`} size={size} />
 	);
 }

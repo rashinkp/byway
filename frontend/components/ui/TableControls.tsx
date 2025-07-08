@@ -90,14 +90,14 @@ export function TableControls({
 		<div className="space-y-6">
 			{/* Header with Icon */}
 			<div className="flex items-center gap-3">
-				<div className="bg-blue-50 p-2 rounded-lg">
-					<Clock className="w-5 h-5 text-blue-600" />
+				<div className="bg-[var(--color-primary-light)]/10 p-2 rounded-lg">
+					<Clock className="w-5 h-5 text-[var(--color-primary-light)]" />
 				</div>
 				<div>
-					<h2 className="text-lg font-semibold text-gray-900">
+					<h2 className="text-lg font-semibold text-[var(--color-primary-dark)]">
 						Data Management
 					</h2>
-					<p className="text-sm text-gray-600">
+					<p className="text-sm text-[var(--color-muted)]">
 						Filter, search, and organize your data
 					</p>
 				</div>
@@ -144,7 +144,7 @@ export function TableControls({
 							variant="outline"
 							size="sm"
 							onClick={onRefresh}
-							className="flex items-center gap-1"
+							className="flex items-center gap-1 text-[var(--color-primary-dark)] border-[var(--color-primary-light)]"
 						>
 							<RefreshCcw className="h-4 w-4" />
 							Refresh
@@ -155,7 +155,7 @@ export function TableControls({
 								<Button
 									variant="outline"
 									size="sm"
-									className="flex items-center gap-1"
+									className="flex items-center gap-1 text-[var(--color-primary-dark)] border-[var(--color-primary-light)]"
 								>
 									<Filter className="h-4 w-4" />
 									Sort:{" "}
@@ -163,7 +163,7 @@ export function TableControls({
 										"Select"}
 								</Button>
 							</DropdownMenuTrigger>
-							<DropdownMenuContent align="end" className="w-48">
+							<DropdownMenuContent align="end" className="w-48 bg-[var(--color-surface)] text-[var(--color-primary-dark)] border-[var(--color-primary-light)]">
 								<DropdownMenuLabel>Sort by</DropdownMenuLabel>
 								<DropdownMenuSeparator />
 								<DropdownMenuRadioGroup
@@ -186,7 +186,7 @@ export function TableControls({
 							variant="outline"
 							size="sm"
 							onClick={() => setSortOrder(sortOrder === "asc" ? "desc" : "asc")}
-							className="flex items-center gap-1"
+							className="flex items-center gap-1 text-[var(--color-primary-dark)] border-[var(--color-primary-light)]"
 						>
 							{sortOrder === "asc" ? (
 								<ArrowUp className="h-4 w-4" />

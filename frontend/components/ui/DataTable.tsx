@@ -85,7 +85,7 @@ export function DataTable<T>({
 
 	return (
 		<div className="space-y-4">
-			<div className="bg-white/60 backdrop-blur-sm border border-gray-200/50 rounded-xl shadow-sm overflow-hidden">
+			<div className="backdrop-blur-sm rounded-xl shadow-sm overflow-hidden">
 				{isLoading ? (
 					<TableSkeleton
 						columns={columns.length}
@@ -94,17 +94,17 @@ export function DataTable<T>({
 				) : (
 					<Table>
 						<TableHeader>
-							<TableRow className="bg-gray-50/50 border-b border-gray-200/50 hover:bg-gray-50/70 transition-colors">
+							<TableRow className="bg-[var(--color-surface)]/50 hover:bg-[var(--color-surface)]/70 transition-colors">
 								{columns.map((column, index) => (
 									<TableHead
 										key={index}
-										className="text-gray-600 font-semibold text-sm tracking-tight py-4 px-6"
+										className="text-[var(--color-primary-dark)] font-semibold text-sm tracking-tight py-4 px-6"
 									>
 										{column.header}
 									</TableHead>
 								))}
 								{actions.length > 0 && (
-									<TableHead className="text-gray-600 font-semibold text-sm tracking-tight py-4 px-6">
+									<TableHead className="text-[var(--color-primary-dark)] font-semibold text-sm tracking-tight py-4 px-6">
 										Actions
 									</TableHead>
 								)}
@@ -116,13 +116,13 @@ export function DataTable<T>({
 									<TableRow>
 										<TableCell
 											colSpan={columns.length + (actions.length > 0 ? 1 : 0)}
-											className="text-center text-gray-500 py-12"
+											className="text-center text-[var(--color-muted)] py-12"
 										>
 											<div className="flex flex-col items-center space-y-2">
-												<div className="text-gray-400 text-lg">
+												<div className="text-[var(--color-muted)] text-lg">
 													No data found
 												</div>
-												<div className="text-sm">
+												<div className="text-sm text-[var(--color-muted)]">
 													Try adjusting your search or filters
 												</div>
 											</div>
@@ -137,9 +137,8 @@ export function DataTable<T>({
 											animate="visible"
 											exit="exit"
 											className={`
-                        border-b border-gray-200/50
                         transition-all duration-200
-                        hover:bg-white/80 hover:shadow-sm
+                        hover:bg-[var(--color-surface)]/80 hover:shadow-sm
                         ${onRowClick ? "cursor-pointer" : ""}
                       `}
 											onClick={() => onRowClick?.(item)}
@@ -147,7 +146,7 @@ export function DataTable<T>({
 											{columns.map((column, colIndex) => (
 												<TableCell
 													key={colIndex}
-													className="text-gray-800 text-sm py-4 px-6 max-w-xs truncate"
+													className="text-[var(--color-primary-dark)] text-sm py-4 px-6 max-w-xs truncate"
 													title={
 														column.render
 															? undefined
@@ -160,7 +159,7 @@ export function DataTable<T>({
 														<span className="block truncate">
 															{
 																item[
-																	column.accessor as keyof T
+																column.accessor as keyof T
 																] as React.ReactNode
 															}
 														</span>
@@ -191,12 +190,11 @@ export function DataTable<T>({
                                     rounded-lg
                                     transition-all duration-200
                                     hover:scale-105 hover:shadow-md
-                                    ${
-																			variant === "destructive"
-																				? "bg-red-50 text-red-600 hover:bg-red-100 border-red-200"
-																				: variant === "default"
-																					? "bg-blue-50 text-blue-600 hover:bg-blue-100 border-blue-200"
-																					: "bg-gray-50 text-gray-600 hover:bg-gray-100 border-gray-200"
+                                    ${variant === "destructive"
+																			? "bg-[var(--color-danger)]/10 text-[var(--color-danger)] hover:bg-[var(--color-danger)]/20 border-[var(--color-danger)]/30"
+																			: variant === "default"
+																				? "bg-[var(--color-accent)]/10 text-[var(--color-accent)] hover:bg-[var(--color-accent)]/20 border-[var(--color-accent)]/30"
+																				: "bg-[var(--color-primary-light)]/10 text-[var(--color-primary-light)] hover:bg-[var(--color-primary-light)]/20 border-[var(--color-primary-light)]/30"
 																		}
                                   `}
 																	onClick={(e) => {
@@ -234,8 +232,8 @@ export function DataTable<T>({
 						<AlertDialogDescription>
 							{confirmItem && confirmActionIndex !== null
 								? actions[confirmActionIndex]?.confirmationMessage?.(
-										confirmItem,
-									) || "Are you sure you want to perform this action?"
+									confirmItem,
+								) || "Are you sure you want to perform this action?"
 								: "Are you sure you want to perform this action?"}
 						</AlertDialogDescription>
 					</AlertDialogHeader>

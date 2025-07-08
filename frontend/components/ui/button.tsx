@@ -5,7 +5,7 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 
 const buttonVariants = cva(
-	"inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-all disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 aria-invalid:border-destructive",
+	"inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-all disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:border-[var(--color-primary-dark)] focus-visible:ring-[var(--color-primary-dark)]/50 focus-visible:ring-[3px] aria-invalid:ring-[var(--color-danger)]/20 aria-invalid:border-[var(--color-danger)]",
 	{
 		variants: {
 			variant: {
@@ -14,7 +14,7 @@ const buttonVariants = cva(
 				destructive:
 					"bg-[var(--color-danger)] text-[var(--color-surface)] shadow-xs hover:bg-[var(--color-warning)] focus-visible:ring-[var(--color-danger)]/20",
 				outline:
-					"bg-[var(--color-surface)] cursor-pointer text-[var(--color-foreground)] shadow-xs",
+					"bg-[var(--color-surface)] cursor-pointer text-[var(--color-primary-dark)] shadow-xs",
 				secondary:
 					"bg-[var(--color-primary-light)] text-[var(--color-surface)] shadow-xs hover:bg-[var(--color-primary-dark)]",
 				ghost:
