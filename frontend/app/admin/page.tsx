@@ -18,6 +18,8 @@ import {
 	BarChart3,
 	MessageSquare,
 } from "lucide-react";
+import { useRef } from "react";
+import PDFExportButton from "@/components/common/PDFExportButton";
 
 // Function to truncate to 2 decimal places without rounding
 const truncateToTwoDecimals = (num: number): string => {
@@ -30,9 +32,12 @@ const truncateToTwoDecimals = (num: number): string => {
 	return truncated.padEnd(decimalIndex + 3, "0"); // Pad with zeros if needed
 };
 
+
+
 export default function AdminDashboard() {
 	const { data, isLoading, error } = useAdminDashboard();
 	const router = useRouter();
+	const dashboardRef = useRef<HTMLDivElement>(null);
 
 	const handleCourseClick = (courseId: string) => {
 		router.push(`/admin/courses/${courseId}`);
@@ -46,8 +51,11 @@ export default function AdminDashboard() {
 			error={error}
 			data={data}
 		>
+			<div className="flex justify-end mb-4">
+				<PDFExportButton dashboardData={data} />
+			</div>
 			{data && (
-				<>
+				<div ref={dashboardRef} className="space-y-8">
 					{/* Statistics Cards Grid */}
 					<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
 						{/* Courses Stats */}
@@ -310,7 +318,7 @@ export default function AdminDashboard() {
 							))}
 						</div>
 					</DashboardSection>
-				</>
+				</div>
 			)}
 		</DashboardLayout>
 	);
