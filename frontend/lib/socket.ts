@@ -1,7 +1,7 @@
 import io from "socket.io-client";
 
 // Helper to get access_token from cookies
-const getToken = () => {
+export const getToken = () => {
 	if (typeof window !== "undefined") {
 		return document.cookie
 			.split("; ")
@@ -12,8 +12,8 @@ const getToken = () => {
 };
 
 // Create socket connection - cookies will be sent automatically by the browser
-const socket = io(process.env.NEXT_PUBLIC_SOCKET_URL || "", {
-	autoConnect: true,
+const socket: any = io(process.env.NEXT_PUBLIC_SOCKET_URL || "", {
+	autoConnect: false,
 	auth: {
 		token: getToken(),
 	},

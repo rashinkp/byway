@@ -156,6 +156,23 @@ export class MessageRepository implements IMessageRepository {
     });
   }
 
+  async getTotalUnreadCount(userId: UserId): Promise<number> {
+    // Count all unread messages for this user across all chats
+    const count = await prisma.message.count({
+      where: {
+        isRead: false,
+        senderId: { not: userId.value },
+        chat: {
+          OR: [
+            { user1Id: userId.value },
+            { user2Id: userId.value }
+          ]
+        }
+      }
+    });
+    return count;
+  }
+
   private toDomain(prismaMessage: any): Message {
     return new Message(
       new MessageId(prismaMessage.id),
@@ -166,7 +183,7 @@ export class MessageRepository implements IMessageRepository {
       prismaMessage.audioUrl ? prismaMessage.audioUrl : null,
       prismaMessage.type, 
       prismaMessage.isRead,
-      new Timestamp(prismaMessage.createdAt)
+      new Timestamp(prismaMessage.createdAt) 
     );
   }
 }

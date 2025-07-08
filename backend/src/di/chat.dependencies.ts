@@ -10,6 +10,7 @@ import { GetMessageByIdUseCase } from "../app/usecases/message/implementations/g
 import { ChatController } from "../presentation/http/controllers/chat.controller";
 import { DeleteMessageUseCase } from "../app/usecases/message/implementations/delete-message.usecase";
 import { MarkReadMessagesUseCase } from "../app/usecases/message/implementations/mark-read-messages.usecase";
+import { GetTotalUnreadCountUseCase } from "../app/usecases/message/implementations/get-total-unread-count.usecase";
 
 export function createChatDependencies(sharedDeps?: ReturnType<typeof createSharedDependencies>) {
   const deps = sharedDeps || createSharedDependencies();
@@ -23,6 +24,7 @@ export function createChatDependencies(sharedDeps?: ReturnType<typeof createShar
   const getMessageByIdUseCase = new GetMessageByIdUseCase(messageRepository);
   const deleteMessageUseCase = new DeleteMessageUseCase(messageRepository);
   const markReadMessagesUseCase = new MarkReadMessagesUseCase(messageRepository);
+  const getTotalUnreadCountUseCase = new GetTotalUnreadCountUseCase(messageRepository);
   const chatController = new ChatController(
     sendMessageUseCase,
     createChatUseCase,
@@ -32,6 +34,7 @@ export function createChatDependencies(sharedDeps?: ReturnType<typeof createShar
     getMessageByIdUseCase,
     deleteMessageUseCase,
     markReadMessagesUseCase,
+    getTotalUnreadCountUseCase,
     deps.httpErrors,
     deps.httpSuccess
   );
@@ -46,5 +49,6 @@ export function createChatDependencies(sharedDeps?: ReturnType<typeof createShar
     deleteMessageUseCase,
     chatRepository,
     messageRepository,
+    getTotalUnreadCountUseCase,
   };
 } 

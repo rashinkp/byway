@@ -17,4 +17,5 @@ export interface IMessageRepository {
   save(message: Message): Promise<void>;
   delete(id: MessageId): Promise<void>;
   markAllAsRead(chatId: ChatId, userId: UserId): Promise<void>;
+  getTotalUnreadCount(userId: UserId): Promise<number>;
 }

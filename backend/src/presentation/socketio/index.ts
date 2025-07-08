@@ -14,22 +14,26 @@ export function setupSocketIO(
   server: HTTPServer,
   logger: WinstonLogger,
   chatController: ChatController,
-  notificationController: NotificationController
+  notificationController: NotificationController,
 ) {
   const io = new SocketIOServer(server, {
     cors: { origin: "*" },
-  });
+});
   ioInstance = io;
 
   io.use(socketAuthMiddleware);
 
-  io.on("connection", (socket) => {
+  io.on("connection", async (socket) => {
     console.log("Socket connected: ", socket.id);
 
-    // Join user to their own room for targeted notifications
     const userId = socket.data.user?.id;
+    console.log("[SocketIO] userId on connection:", userId);
     if (userId) {
       socket.join(userId);
+      const unreadCount = await chatController.getTotalUnreadCount(userId);
+      console.log('starting socket io total unread count')
+      socket.emit("unreadMessageCount", { count: unreadCount });
+      console.log('over socket io total unread count' , unreadCount)
     }
 
     // Register modular handlers

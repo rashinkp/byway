@@ -34,6 +34,8 @@ import { useDebounce } from "@/hooks/useDebounce";
 import { Skeleton } from "@/components/ui/skeleton";
 import { HeaderSearchBar } from "@/components/layout/HeaderSearchBar";
 import { useCartStore } from "@/stores/cart.store";
+import { useChatStore } from "@/stores/chat.store";
+import { useUnreadMessageCount } from "@/hooks/chat/useUnreadMessageCount";
 
 interface HeaderProps {
 	client?: { id: string; name: string };
@@ -67,6 +69,11 @@ export function Header(
 
 	const cartCount = useCartStore((state) => state.count);
 	const setCartCount = useCartStore((state) => state.setCount);
+	const unreadCount = useChatStore((state) => state.unreadCount);
+	useUnreadMessageCount();
+
+
+	console.log("Header rendered with user:", unreadCount);
 
 	// Sync initial cart count from user data
 	useEffect(() => {
@@ -250,6 +257,11 @@ export function Header(
 													strokeWidth={1.5}
 													style={{ color: "var(--color-primary-dark)" }}
 												/>
+												{unreadCount > 0 && (
+													<span className="absolute -top-2 -right-2 w-5 h-5 p-0 flex items-center justify-center text-xs rounded-full bg-[var(--color-primary-light)] text-[var(--color-surface)] font-semibold shadow">
+														{unreadCount}
+													</span>
+												)}
 											</Link>
 										</div>
 										<div className="relative group">
@@ -363,6 +375,11 @@ export function Header(
 												strokeWidth={1.5}
 												style={{ color: "var(--color-primary-dark)" }}
 											/>
+											{unreadCount > 0 && (
+												<span className="absolute -top-2 -right-2 w-5 h-5 p-0 flex items-center justify-center text-xs rounded-full bg-[var(--color-primary-light)] text-[var(--color-surface)] font-semibold shadow">
+													{unreadCount}
+												</span>
+											)}
 										</Link>
 									</div>
 									<div className="relative group">

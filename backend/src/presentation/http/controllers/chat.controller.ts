@@ -23,6 +23,7 @@ import {
   getMessageByIdSchema,
   deleteMessageSchema,
 } from "../../validators/chat.validators";
+import { IGetTotalUnreadCountUseCase } from "@/app/usecases/message/interfaces/get-total-unread-count.usecase.interface";
 
 export class ChatController extends BaseController {
   constructor(
@@ -34,6 +35,7 @@ export class ChatController extends BaseController {
     private getMessageByIdUseCase: IGetMessageByIdUseCase,
     private deleteMessageUseCase: IDeleteMessageUseCase,
     private markReadMessagesUseCase: IMarkReadMessagesUseCase,
+    private getTotalUnreadCountUseCase: IGetTotalUnreadCountUseCase,
     httpErrors: IHttpErrors,
     httpSuccess: IHttpSuccess
   ) {
@@ -167,5 +169,11 @@ export class ChatController extends BaseController {
       new UserId(socketData.userId)
     );
     return { success: true };
+  }
+
+
+  // Add this method to ChatController
+  async getTotalUnreadCount(userId: string) {
+    return this.getTotalUnreadCountUseCase.execute(new UserId(userId));
   }
 } 

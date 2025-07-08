@@ -38,6 +38,11 @@ export function registerMessageHandlers(socket: Socket, io: SocketIOServer, chat
         // Mark all messages as read for this user in this chat
         await chatController.markMessagesAsRead({ chatId, userId });
 
+        // Emit updated unread count to the user
+        const unreadCount = await chatController.getTotalUnreadCount(userId);
+        io.to(userId).emit('unreadMessageCount', { count: unreadCount });
+        console.log('unread message count ----------> ' , unreadCount);
+
         // Emit updated chat list to the user
         io.to(userId).emit('chatListUpdated');
 
@@ -88,6 +93,10 @@ export function registerMessageHandlers(socket: Socket, io: SocketIOServer, chat
         console.log('[SocketIO] Emitting chatListUpdated after sendMessage to:', participants.user1Id, participants.user2Id);
         io.to(participants.user1Id).emit('chatListUpdated');
         io.to(participants.user2Id).emit('chatListUpdated');
+        // Emit unreadMessageCount to the recipient
+        const recipientId = participants.user1Id === senderId ? participants.user2Id : participants.user1Id;
+        const unreadCount = await chatController.getTotalUnreadCount(recipientId);
+        io.to(recipientId).emit('unreadMessageCount', { count: unreadCount });
       }
     } catch (err) {
       console.log('[SocketIO] Caught error in sendMessage:', err);
