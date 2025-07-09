@@ -1,8 +1,7 @@
 "use client";
 
-import React from "react";
-import { User, SortByField, NegativeSortByField } from "@/types/user";
-import type { FilterBy } from "@/hooks/user/useGetAllUsers";
+import React, { useState } from "react";
+import { User } from "@/types/user";
 import { useGetAllUsers } from "@/hooks/user/useGetAllUsers";
 import { useToggleDeleteUser } from "@/hooks/user/useToggleDeleteUser";
 import { StatusBadge } from "@/components/ui/StatusBadge";
@@ -12,22 +11,42 @@ import ListPage from "@/components/ListingPage";
 export default function StudentsPage() {
 	const { mutate: toggleDeleteUser } = useToggleDeleteUser();
 
-	// Just pass the hook, ListPage will call it with the right params
-	const useDataHook = (params: any) =>
-		useGetAllUsers({
-			...params,
-			sortBy: params.sortBy as SortByField | NegativeSortByField,
-			filterBy: params.filterBy as FilterBy,
-			role: "USER",
-			includeDeleted: params.filterBy === "All",
-		});
+	const [page, setPage] = useState(1);
+	const [searchTerm, setSearchTerm] = useState("");
+	const [filterStatus, setFilterStatus] = useState<string>("All");
+	const [sortBy, setSortBy] = useState<string>("name");
+	const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
+
+	const usersQuery = useGetAllUsers({
+		page,
+		limit: 10,
+		search: searchTerm,
+		sortBy: sortBy as "name" | "email" | "createdAt",
+		sortOrder,
+		role: "USER",
+		includeDeleted: filterStatus === "All",
+		filterBy: filterStatus as "All" | "Active" | "Inactive",
+	});
 
 	return (
 		<ListPage<User>
 			title="Student Management"
 			description="Manage student accounts and their access"
 			entityName="Student"
-			useDataHook={useDataHook}
+			data={usersQuery.data}
+			isLoading={usersQuery.isLoading}
+			error={usersQuery.error}
+			refetch={usersQuery.refetch}
+			page={page}
+			setPage={setPage}
+			searchTerm={searchTerm}
+			setSearchTerm={setSearchTerm}
+			filterStatus={filterStatus}
+			setFilterStatus={setFilterStatus}
+			sortBy={sortBy}
+			setSortBy={setSortBy}
+			sortOrder={sortOrder}
+			setSortOrder={setSortOrder}
 			columns={[
 				{
 					header: "Name",
@@ -56,12 +75,8 @@ export default function StudentsPage() {
 					variant: (user) => (user.deletedAt ? "default" : "destructive"),
 					confirmationMessage: (user) =>
 						user.deletedAt
-							? `Are you sure you want to unblock the student "${
-									user.name || user.email
-								}"?`
-							: `Are you sure you want to block the student "${
-									user.name || user.email
-								}"?`,
+							? `Are you sure you want to unblock the student "${user.name || user.email}"?`
+							: `Are you sure you want to block the student "${user.name || user.email}"?`,
 				},
 			]}
 			stats={(students, total) => [
@@ -82,8 +97,6 @@ export default function StudentsPage() {
 				{ value: "email", label: "Email (A-Z)" },
 				{ value: "createdAt", label: "Newest first" },
 			]}
-			defaultSortBy="name"
-			role="USER"
 			filterOptions={[
 				{ label: "All", value: "All" },
 				{ label: "Active", value: "Active" },

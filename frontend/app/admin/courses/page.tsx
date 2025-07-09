@@ -6,12 +6,29 @@ import { useGetCourseStats } from "@/hooks/course/useGetCourseStats";
 import ListPage from "@/components/ListingPage";
 import { Course } from "@/types/course";
 import { useAuth } from "@/hooks/auth/useAuth";
+import { useState } from "react";
 
 export default function CoursesPage() {
 	const { user } = useAuth();
 	const router = useRouter();
 	const { data: statsData } = useGetCourseStats();
-	// Removed unused data, isLoading, isError
+
+	const [page, setPage] = useState(1);
+	const [searchTerm, setSearchTerm] = useState("");
+	const [filterStatus, setFilterStatus] = useState<string>("All");
+	const [sortBy, setSortBy] = useState<string>("title");
+	const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
+
+	const coursesQuery = useGetAllCourses({
+		page,
+		limit: 10,
+		search: searchTerm,
+		sortBy: (["title", "price", "createdAt"] as const).includes(sortBy as any) ? (sortBy as "title" | "price" | "createdAt") : "title",
+		sortOrder,
+		role: user?.role || "ADMIN",
+		includeDeleted: filterStatus === "Inactive",
+		filterBy: (["All", "Active", "Inactive", "Approved", "Declined", "Pending", "Published", "Draft", "Archived"] as const).includes(filterStatus as any) ? (filterStatus as "All" | "Active" | "Inactive" | "Approved" | "Declined" | "Pending" | "Published" | "Draft" | "Archived") : "All",
+	});
 
 	return (
 		<ListPage<Course>
@@ -19,18 +36,20 @@ export default function CoursesPage() {
 			description="Manage courses and their visibility"
 			entityName="Course"
 			role={user?.role as "ADMIN" | "USER" | "INSTRUCTOR" | undefined}
-			useDataHook={params => {
-				// Only allow valid sortBy values
-				const validSortBy = ["title", "price", "createdAt"];
-				const sortBy = validSortBy.includes(params.sortBy) ? (params.sortBy as "title" | "price" | "createdAt") : "title";
-				const validFilterBy = [
-					"All", "Active", "Inactive", "Approved", "Declined", "Pending", "Published", "Draft", "Archived"
-				] as const;
-				const filterBy = validFilterBy.includes(params.filterBy as typeof validFilterBy[number])
-					? (params.filterBy as "All" | "Active" | "Inactive" | "Approved" | "Declined" | "Pending" | "Published" | "Draft" | "Archived")
-					: "All";
-				return useGetAllCourses({ ...params, sortBy, filterBy, role: user?.role || "ADMIN" });
-			}}
+			data={coursesQuery.data}
+			isLoading={coursesQuery.isLoading}
+			error={coursesQuery.error}
+			refetch={coursesQuery.refetch}
+			page={page}
+			setPage={setPage}
+			searchTerm={searchTerm}
+			setSearchTerm={setSearchTerm}
+			filterStatus={filterStatus}
+			setFilterStatus={setFilterStatus}
+			sortBy={sortBy}
+			setSortBy={setSortBy}
+			sortOrder={sortOrder}
+			setSortOrder={setSortOrder}
 			columns={[
 				{
 					header: "Title",

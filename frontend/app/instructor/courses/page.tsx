@@ -1,42 +1,52 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import { Info } from "lucide-react";
 import { useGetAllCourses } from "@/hooks/course/useGetAllCourse";
-import { useGetCourseStats } from "@/hooks/course/useGetCourseStats";
 import ListPage from "@/components/ListingPage";
 import { Course } from "@/types/course";
-import { useAuth } from "@/hooks/auth/useAuth";
 import { CourseFormModal } from "@/components/course/CourseFormModal";
+import { useRouter } from "next/navigation";
 
-export default function CoursesPage() {
-	const { user } = useAuth();
+export default function InstructorCoursesPage() {
 	const router = useRouter();
+	const [page, setPage] = useState(1);
+	const [searchTerm, setSearchTerm] = useState("");
+	const [filterStatus, setFilterStatus] = useState<string>("All");
+	const [sortBy, setSortBy] = useState<string>("title");
+	const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
 	const [isModalOpen, setIsModalOpen] = useState(false);
-	const { data: statsData } = useGetCourseStats();
-	// Removed unused data, isLoading, isError
+
+	const coursesQuery = useGetAllCourses({
+		page,
+		limit: 10,
+		search: searchTerm,
+		sortBy: (["title", "price", "createdAt"] as const).includes(sortBy as any) ? (sortBy as "title" | "price" | "createdAt") : "title",
+		sortOrder,
+		includeDeleted: filterStatus === "Inactive",
+		filterBy: (["All", "Active", "Inactive", "Approved", "Declined", "Pending", "Published", "Draft", "Archived"] as const).includes(filterStatus as any) ? (filterStatus as "All" | "Active" | "Inactive" | "Approved" | "Declined" | "Pending" | "Published" | "Draft" | "Archived") : "All",
+	});
 
 	return (
 		<>
 			<ListPage<Course>
-				title="My Courses"
-				description="Manage and monitor your course performance"
+				title="Instructor Course Management"
+				description="Manage your courses and their visibility"
 				entityName="Course"
-				role={user?.role as "ADMIN" | "USER" | "INSTRUCTOR" | undefined}
-				useDataHook={params => {
-					const validSortBy = ["title", "createdAt", "price"] as const;
-					const sortBy = validSortBy.includes(params.sortBy as typeof validSortBy[number])
-						? (params.sortBy as typeof validSortBy[number])
-						: "title";
-					const validFilterBy = [
-						"All", "Active", "Inactive", "Approved", "Declined", "Pending", "Published", "Draft", "Archived"
-					] as const;
-					const filterBy = validFilterBy.includes(params.filterBy as typeof validFilterBy[number])
-						? (params.filterBy as typeof validFilterBy[number])
-						: "All";
-					return useGetAllCourses({ ...params, sortBy, filterBy, role: user?.role || "INSTRUCTOR" });
-				}}
+				data={coursesQuery.data}
+				isLoading={coursesQuery.isLoading}
+				error={coursesQuery.error}
+				refetch={coursesQuery.refetch}
+				page={page}
+				setPage={setPage}
+				searchTerm={searchTerm}
+				setSearchTerm={setSearchTerm}
+				filterStatus={filterStatus}
+				setFilterStatus={setFilterStatus}
+				sortBy={sortBy}
+				setSortBy={setSortBy}
+				sortOrder={sortOrder}
+				setSortOrder={setSortOrder}
 				columns={[
 					{
 						header: "Title",
@@ -114,57 +124,52 @@ export default function CoursesPage() {
 						Icon: Info,
 					},
 				]}
-				stats={(courses: Course[], total: number) =>
-					statsData
-						? [
-								{
-									title: "Total Courses",
-									value: total,
-									icon: "list",
-								},
-								{
-									title: "Published Courses",
-									value: courses.filter(
-										(course) => course.status === "PUBLISHED",
-									).length,
-									icon: "check",
-								},
-								{
-									title: "Draft Courses",
-									value: courses.filter((course) => course.status === "DRAFT")
-										.length,
-									icon: "book",
-								},
-								{
-									title: "Approved Courses",
-									value: courses.filter(
-										(course) => course.approvalStatus === "APPROVED",
-									).length,
-									icon: "check",
-								},
-								{
-									title: "Pending Approval",
-									value: courses.filter(
-										(course) => course.approvalStatus === "PENDING",
-									).length,
-									icon: "clock",
-								},
-								{
-									title: "Declined Courses",
-									value: courses.filter(
-										(course) => course.approvalStatus === "DECLINED",
-									).length,
-									icon: "alert",
-								},
-							]
-						: []
-				}
+				stats={(courses: Course[], total: number) => [
+					{
+						title: "Total Courses",
+						value: total,
+						icon: "list",
+					},
+					{
+						title: "Published Courses",
+						value: courses.filter(
+							(course) => course.status === "PUBLISHED",
+						).length,
+						icon: "check",
+					},
+					{
+						title: "Draft Courses",
+						value: courses.filter((course) => course.status === "DRAFT")
+							.length,
+						icon: "book",
+					},
+					{
+						title: "Approved Courses",
+						value: courses.filter(
+							(course) => course.approvalStatus === "APPROVED",
+						).length,
+						icon: "check",
+					},
+					{
+						title: "Pending Approval",
+						value: courses.filter(
+							(course) => course.approvalStatus === "PENDING",
+						).length,
+						icon: "clock",
+					},
+					{
+						title: "Declined Courses",
+						value: courses.filter(
+							(course) => course.approvalStatus === "DECLINED",
+						).length,
+						icon: "alert",
+					},
+				]}
 				sortOptions={[
 					{ value: "title", label: "Title" },
 					{ value: "createdAt", label: "Date" },
 					{ value: "price", label: "Price" },
 				]}
-				defaultSortBy="title"
 				filterOptions={[
 					{ label: "All", value: "All" },
 					{ label: "Active", value: "Active" },

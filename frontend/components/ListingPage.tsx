@@ -1,6 +1,6 @@
 "use client";
 
-import { JSX, useState } from "react";
+import { JSX } from "react";
 import { Button } from "@/components/ui/button";
 import { Plus, BarChart3, Activity } from "lucide-react";
 import { StatsCards } from "@/components/ui/StatsCard";
@@ -17,21 +17,10 @@ interface ListPageProps<T> {
 	title: string;
 	description: string;
 	entityName: string;
-	useDataHook: (params: {
-		page: number;
-		limit: number;
-		search: string;
-		sortBy: string;
-		sortOrder: "asc" | "desc";
-		includeDeleted: boolean;
-		filterBy: string;
-		role?: string;
-	}) => {
-		data: { items: T[]; total: number; totalPages: number } | undefined;
-		isLoading: boolean;
-		error: { message: string } | null;
-		refetch: () => void;
-	};
+	data: { items: T[]; total: number; totalPages: number } | undefined;
+	isLoading: boolean;
+	error: { message: string } | null;
+	refetch: () => void;
 	columns: Column<T>[];
 	actions: Action<T>[];
 	stats: (items: T[], total: number) => Stat[];
@@ -41,47 +30,47 @@ interface ListPageProps<T> {
 		onClick: () => void;
 	};
 	extraButtons?: JSX.Element[];
-	defaultSortBy: Extract<keyof T, string> | `-${string}`;
 	itemsPerPage?: number;
-	role?: string;
 	filterOptions: Array<{ value: string; label: string }>;
+	page: number;
+	setPage: (page: number) => void;
+	searchTerm: string;
+	setSearchTerm: (term: string) => void;
+	filterStatus: string;
+	setFilterStatus: (status: string) => void;
+	sortBy: string;
+	setSortBy: (sortBy: string) => void;
+	sortOrder: "asc" | "desc";
+	setSortOrder: (order: "asc" | "desc") => void;
 }
 
 function ListPage<T>({
 	title,
 	description,
 	entityName,
-	useDataHook,
+	data,
+	isLoading,
+	error,
+	refetch,
 	columns,
 	actions,
 	stats,
 	sortOptions,
 	addButton,
 	extraButtons,
-	defaultSortBy,
 	itemsPerPage = 10,
-	role,
 	filterOptions,
+	page,
+	setPage,
+	searchTerm,
+	setSearchTerm,
+	filterStatus,
+	setFilterStatus,
+	sortBy,
+	setSortBy,
+	sortOrder,
+	setSortOrder,
 }: ListPageProps<T>) {
-	const [page, setPage] = useState(1);
-	const [searchTerm, setSearchTerm] = useState("");
-	const [filterStatus, setFilterStatus] = useState<string>("All");
-	const [sortBy, setSortBy] = useState<string>(defaultSortBy);
-	const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
-
-	console.log(filterStatus, "filter status ------------->");
-
-	const { data, isLoading, error, refetch } = useDataHook({
-		page,
-		limit: itemsPerPage,
-		search: searchTerm,
-		sortBy,
-		sortOrder,
-		includeDeleted: filterStatus === "Inactive" || filterStatus === "Declined",
-		filterBy: filterStatus,
-		role,
-	});
-
 	const items = data?.items || [];
 	const total = data?.total || 0;
 	const totalPages = data?.totalPages || 0;
@@ -145,11 +134,7 @@ function ListPage<T>({
 					searchTerm={searchTerm}
 					setSearchTerm={setSearchTerm}
 					filterStatus={filterStatus}
-					setFilterStatus={(status: string) =>
-						setFilterStatus(
-							status as "All" | "Active" | "Inactive" | "Declined",
-						)
-					}
+					setFilterStatus={setFilterStatus}
 					sortBy={sortBy}
 					setSortBy={setSortBy}
 					sortOrder={sortOrder}

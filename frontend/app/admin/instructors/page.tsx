@@ -7,9 +7,26 @@ import { StatusBadge } from "@/components/ui/StatusBadge";
 
 import ListPage from "@/components/ListingPage";
 import { Column, SortOption, Action } from "@/types/common";
+import { useState } from "react";
 
 export default function InstructorsPage() {
 	const router = useRouter();
+
+	const [page, setPage] = useState(1);
+	const [searchTerm, setSearchTerm] = useState("");
+	const [filterStatus, setFilterStatus] = useState<string>("All");
+	const [sortBy, setSortBy] = useState<string>("createdAt");
+	const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
+
+	const instructorsQuery = useGetAllInstructors({
+		page,
+		limit: 10,
+		search: searchTerm,
+		sortBy: (["createdAt", "status", "areaOfExpertise", "user"] as const).includes(sortBy as any) ? (sortBy as "createdAt" | "status" | "areaOfExpertise" | "user") : "createdAt",
+		sortOrder,
+		includeDeleted: filterStatus === "Inactive",
+		filterBy: (["All", "Pending", "Approved", "Declined"] as const).includes(filterStatus as any) ? (filterStatus as "All" | "Pending" | "Approved" | "Declined") : "All",
+	});
 
 	const columns: Column<IInstructorWithUserDetails>[] = [
 		{
@@ -78,63 +95,46 @@ export default function InstructorsPage() {
 			title="Instructor Management"
 			description="Manage instructor accounts and their approval status"
 			entityName="Instructor"
-			useDataHook={params => {
-				const validSortBy = ["createdAt", "status", "areaOfExpertise", "user"] as const;
-				const sortBy = validSortBy.includes(params.sortBy as typeof validSortBy[number])
-					? (params.sortBy as typeof validSortBy[number])
-					: "createdAt";
-				const validFilterBy = ["All", "Pending", "Approved", "Declined"] as const;
-				const filterBy = validFilterBy.includes(params.filterBy as typeof validFilterBy[number])
-					? (params.filterBy as typeof validFilterBy[number])
-					: "All";
-				const query = useGetAllInstructors({ ...params, sortBy, filterBy });
-
-				return {
-					data: query.data
-						? {
-							items: query.data.data.items,
-							total: query.data.data.total,
-							totalPages: query.data.data.totalPages,
-						}
-						: undefined,
-					isLoading: query.isLoading,
-					error: query.error ? { message: query.error.message } : null,
-					refetch: query.refetch,
-				};
-			}}
+			data={instructorsQuery.data ? instructorsQuery.data.data : undefined}
+			isLoading={instructorsQuery.isLoading}
+			error={instructorsQuery.error}
+			refetch={instructorsQuery.refetch}
+			page={page}
+			setPage={setPage}
+			searchTerm={searchTerm}
+			setSearchTerm={setSearchTerm}
+			filterStatus={filterStatus}
+			setFilterStatus={setFilterStatus}
+			sortBy={sortBy}
+			setSortBy={setSortBy}
+			sortOrder={sortOrder}
+			setSortOrder={setSortOrder}
 			columns={columns}
 			actions={actions}
 			stats={(instructors, total) => [
 				{ title: "Total Instructors", value: total },
 				{
 					title: "Active Instructors",
-					value: instructors.filter((instructor) => !instructor.user.deletedAt)
-						.length,
+					value: instructors.filter((instructor) => !instructor.user.deletedAt).length,
 					color: "text-green-600",
 				},
 				{
 					title: "Inactive Instructors",
-					value: instructors.filter((instructor) => instructor.user.deletedAt)
-						.length,
+					value: instructors.filter((instructor) => instructor.user.deletedAt).length,
 					color: "text-red-600",
 				},
 				{
 					title: "Pending Approvals",
-					value: instructors.filter(
-						(instructor) => instructor.status === "PENDING",
-					).length,
+					value: instructors.filter((instructor) => instructor.status === "PENDING").length,
 					color: "text-yellow-600",
 				},
 				{
 					title: "Declined Requests",
-					value: instructors.filter(
-						(instructor) => instructor.status === "DECLINED",
-					).length,
+					value: instructors.filter((instructor) => instructor.status === "DECLINED").length,
 					color: "text-red-600",
 				},
 			]}
 			sortOptions={sortOptions}
-			defaultSortBy="createdAt"
 			filterOptions={[
 				{ label: "All", value: "All" },
 				{ label: "Pending", value: "Pending" },

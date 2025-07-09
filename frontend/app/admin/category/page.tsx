@@ -22,11 +22,25 @@ export default function CategoriesPage() {
 		undefined,
 	);
 
+	const [page, setPage] = useState(1);
+	const [searchTerm, setSearchTerm] = useState("");
+	const [filterStatus, setFilterStatus] = useState<string>("All");
+	const [sortBy, setSortBy] = useState<string>("name");
+	const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
+
+	const categoriesQuery = useCategories({
+		page,
+		limit: 10,
+		search: searchTerm,
+		sortBy: (["name", "createdAt"] as const).includes(sortBy as any) ? (sortBy as "name" | "createdAt") : "name",
+		sortOrder,
+		includeDeleted: filterStatus === "Inactive",
+		filterBy: (["All", "Active", "Inactive"] as const).includes(filterStatus as any) ? (filterStatus as "All" | "Active" | "Inactive") : "All",
+	});
+
 	const { mutate: createCategory } = useCreateCategory();
 	const { mutate: updateCategory } = useUpdateCategory();
 	const { mutate: toggleDeleteCategory } = useToggleDeleteCategory();
-
-	// Removed unused data, isLoading, isError, and handleRefresh
 
 	const handleAddSubmit = async (data: CategoryFormData) => {
 		createCategory(data, {
@@ -87,17 +101,20 @@ export default function CategoriesPage() {
 				title="Category Management"
 				description="Manage course categories and their settings"
 				entityName="Category"
-				useDataHook={params => {
-					const validSortBy = ["name", "createdAt"] as const;
-					const sortBy = validSortBy.includes(params.sortBy as typeof validSortBy[number])
-						? (params.sortBy as typeof validSortBy[number])
-						: "name";
-					const validFilterBy = ["All", "Active", "Inactive"] as const;
-					const filterBy = validFilterBy.includes(params.filterBy as typeof validFilterBy[number])
-						? (params.filterBy as typeof validFilterBy[number])
-						: "All";
-					return useCategories({ ...params, sortBy, filterBy });
-				}}
+				data={categoriesQuery.data}
+				isLoading={categoriesQuery.isLoading}
+				error={categoriesQuery.error}
+				refetch={categoriesQuery.refetch}
+				page={page}
+				setPage={setPage}
+				searchTerm={searchTerm}
+				setSearchTerm={setSearchTerm}
+				filterStatus={filterStatus}
+				setFilterStatus={setFilterStatus}
+				sortBy={sortBy}
+				setSortBy={setSortBy}
+				sortOrder={sortOrder}
+				setSortOrder={setSortOrder}
 				filterOptions={[
 					{ label: "All", value: "All" },
 					{ label: "Active", value: "Active" },
@@ -172,7 +189,6 @@ export default function CategoriesPage() {
 					label: "Add Category",
 					onClick: () => setIsAddOpen(true),
 				}}
-				defaultSortBy="name"
 			/>
 
 			<CategoryFormModal
