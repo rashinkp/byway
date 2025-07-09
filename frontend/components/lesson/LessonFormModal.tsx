@@ -15,7 +15,6 @@ export const fields: FormFieldConfig<LessonFormData>[] = [
 		placeholder: "e.g., Introduction to React",
 		description: "Enter the title of your lesson.",
 		maxLength: 100,
-		column: "left",
 	},
 	{
 		name: "description",
@@ -24,7 +23,6 @@ export const fields: FormFieldConfig<LessonFormData>[] = [
 		placeholder: "e.g., Learn the basics of React components",
 		description: "Provide a brief description of the lesson (optional).",
 		maxLength: 1000,
-		column: "right",
 	},
 	{
 		name: "order",
@@ -33,7 +31,6 @@ export const fields: FormFieldConfig<LessonFormData>[] = [
 		fieldType: "number",
 		placeholder: "e.g., 1",
 		description: "Enter the order of the lesson.",
-		column: "left",
 	},
 ];
 

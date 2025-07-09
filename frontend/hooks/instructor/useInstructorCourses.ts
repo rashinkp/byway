@@ -7,7 +7,7 @@ export function useInstructorCourses() {
 		queryKey: ["instructor-courses"],
 		queryFn: async () => {
 			const response = await getInstructorCourses();
-			return response.data;
+			return response;
 		},
 	});
 }

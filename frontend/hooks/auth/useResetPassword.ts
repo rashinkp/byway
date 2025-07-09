@@ -17,7 +17,7 @@ export function useResetPassword() {
 			newPassword: string;
 		}) => resetPassword(resetToken, newPassword),
 		onSuccess: () => {
-			setEmail(null);
+			setEmail("");
 			queryClient.invalidateQueries({ queryKey: ["auth"] });
 			toast.success("Password updated", {
 				description: "Your password has been successfully updated.",

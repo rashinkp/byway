@@ -10,7 +10,7 @@ export function useDetailedInstructorData() {
 		queryFn: async () => {
 			if (!user?.id) throw new Error("User not authenticated");
 			const response = await getInstructorProfile(user.id);
-			return response.data;
+			return response;
 		},
 		enabled: !!user?.id && isAuthenticated && !authLoading,
 		staleTime: 5 * 60 * 1000,

@@ -35,7 +35,6 @@ export default function CoursesPage() {
 			title="Course Management"
 			description="Manage courses and their visibility"
 			entityName="Course"
-			role={user?.role as "ADMIN" | "USER" | "INSTRUCTOR" | undefined}
 			data={coursesQuery.data}
 			isLoading={coursesQuery.isLoading}
 			error={coursesQuery.error}
@@ -164,7 +163,6 @@ export default function CoursesPage() {
 				{ value: "title", label: "Title" },
 				{ value: "createdAt", label: "Date" },
 			]}
-			defaultSortBy="title"
 			filterOptions={[
 				{ label: "All", value: "All" },
 				{ label: "Active", value: "Active" },

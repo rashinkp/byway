@@ -61,6 +61,7 @@ export interface IInstructorDetails {
 	cv: string;
 	status: string;
 	totalStudents: number;
+	totalCourses?: number;
 	createdAt: string;
 	updatedAt: string;
 	deletedAt: string | null;

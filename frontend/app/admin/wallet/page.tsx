@@ -112,7 +112,7 @@ export default function AdminWalletPage() {
 				</Card>
 
 				<TransactionList
-					transactions={transactions ?? []}
+					transactions={transactions?.items ?? []}
 					isLoading={isTransactionsLoading}
 					error={transactionsError}
 					onRetry={transactionsRefetch}

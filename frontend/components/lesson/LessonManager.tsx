@@ -48,18 +48,18 @@ export function LessonManager({ courseId }: { courseId: string }) {
 			header: "Title",
 			accessor: "title" as keyof ILesson,
 			render: (lesson: ILesson) =>
-				lesson.title || <span className="text-gray-400">N/A</span>,
+				lesson.title ? <span>{lesson.title}</span> : <span className="text-gray-400">N/A</span>,
 		},
 		{
 			header: "Description",
 			accessor: "description" as keyof ILesson,
 			render: (lesson: ILesson) =>
-				lesson.description ? `${lesson.description}` : "N/A",
+				lesson.description ? <span>{lesson.description}</span> : <span className="text-gray-400">N/A</span>,
 		},
 		{
 			header: "Order",
 			accessor: "order" as keyof ILesson,
-			render: (lesson: ILesson) => lesson.order,
+			render: (lesson: ILesson) => <span>{lesson.order}</span>,
 		},
 		{
 			header: "Status",
@@ -119,7 +119,7 @@ export function LessonManager({ courseId }: { courseId: string }) {
 					setPage(1);
 				}}
 				sortBy={sortBy}
-				setSortBy={(sort: "order" | "title" | "createdAt") =>
+				setSortBy={(sort: string) =>
 					setSortBy(sort as "title" | "createdAt" | "order")
 				}
 				sortOrder={sortOrder}

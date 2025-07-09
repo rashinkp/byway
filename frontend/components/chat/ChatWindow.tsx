@@ -15,6 +15,8 @@ interface ChatWindowProps {
   currentUserId: string;
   onDeleteMessage?: (messageId: string) => void;
   loadingMoreMessages?: boolean;
+  showBackButton?: boolean;
+  onBack?: () => void;
 }
 
 export function ChatWindow({
