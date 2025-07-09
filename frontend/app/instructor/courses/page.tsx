@@ -15,6 +15,7 @@ export default function CoursesPage() {
 	const router = useRouter();
 	const [isModalOpen, setIsModalOpen] = useState(false);
 	const { data: statsData } = useGetCourseStats();
+	// Removed unused data, isLoading, isError
 
 	return (
 		<>

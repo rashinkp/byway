@@ -1,7 +1,7 @@
 import { BookOpen, Clock, Users, Award } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Course } from "@/types/cart";
+import Image from 'next/image';
 
 interface OrderDetailsProps {
   courseDetails: Course[];
@@ -25,11 +25,7 @@ return (
         {courseDetails.map((course) => (
           <div key={course.id} className="flex gap-4">
             <div className="w-24 h-24 rounded-lg overflow-hidden bg-[var(--color-background)]">
-              <img
-                src={course.thumbnail || "/placeholder-course.jpg"}
-                alt={course.title}
-                className="w-full h-full object-cover"
-              />
+              <Image src={course.thumbnail || "/placeholder-course.jpg"} alt={course.title} width={200} height={200} className="w-full h-full object-cover" />
             </div>
             <div className="flex-1">
               <h3 className="font-medium text-[var(--color-primary-dark)]">{course.title}</h3>

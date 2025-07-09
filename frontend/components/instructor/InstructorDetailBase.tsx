@@ -16,6 +16,7 @@ import { Course } from "@/types/course";
 import { CourseCard } from "@/components/course/CourseCard";
 import Link from "next/link";
 import InstructorSidebar from "./InstructorSidebar";
+import Image from 'next/image';
 
 interface InstructorDetailBaseProps {
   instructor: IInstructorDetails;
@@ -33,19 +34,12 @@ export const InstructorDetailBase: React.FC<InstructorDetailBaseProps> = ({
   instructor,
   courses,
   isCoursesLoading,
-  renderHeaderActions,
   renderStatusBadges,
   sidebarProps,
 }) => {
   const [activeTab, setActiveTab] = useState("about");
   const userRole = sidebarProps?.userRole || "USER";
 
-  const certifications = instructor.certifications
-    ? instructor.certifications
-        .split("\n")
-        .map((cert) => cert.replace("- ", "").trim())
-        .filter(Boolean)
-    : [];
   const education = instructor.education
     ? instructor.education
         .split("\n")
@@ -188,9 +182,11 @@ export const InstructorDetailBase: React.FC<InstructorDetailBaseProps> = ({
             {/* Avatar/Initial */}
             <div className="flex-shrink-0 flex flex-col items-center gap-2">
               {instructor.avatar ? (
-                <img
+                <Image
                   src={instructor.avatar}
                   alt={instructor.name}
+                  width={96}
+                  height={96}
                   className="w-24 h-24 rounded-full object-cover border-4 border-[var(--color-primary-light)] shadow-md bg-[var(--color-background)]"
                 />
               ) : (

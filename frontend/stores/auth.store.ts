@@ -1,7 +1,6 @@
 import { create } from "zustand";
 import { User } from "@/types/user";
 import { clearAllCache } from "@/lib/utils";
-import { getUserData } from "@/api/users";
 
 interface AuthState {
 	user: User | null;

@@ -1,6 +1,5 @@
-import { Receipt, Tag, CreditCard, ArrowRight } from "lucide-react";
+import { Receipt, CreditCard, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
 
@@ -17,11 +16,7 @@ interface OrderSummaryProps {
 
 export default function OrderSummary({
   subtotal,
-  discount,
   total,
-  onApplyCoupon,
-  couponCode,
-  onCouponChange,
   isPending,
   onSubmit,
 }: OrderSummaryProps) {

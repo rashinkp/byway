@@ -76,7 +76,7 @@ export default function ReviewList({
       setDeletingReview(null);
       setShowDeleteDialog(false);
       setReviewToDelete(null);
-    } catch (error) {
+    } catch  {
       // Error is handled by the hook
     }
   };
@@ -85,7 +85,7 @@ export default function ReviewList({
     try {
       await updateReview(reviewId, data);
       setEditingReview(null);
-    } catch (error) {
+    } catch {
       // Error is handled by the hook
     }
   };
@@ -96,7 +96,7 @@ export default function ReviewList({
       setDisablingReview(null);
       setShowDisableDialog(false);
       setReviewToDisable(null);
-    } catch (error) {
+    } catch {
       // Error is handled by the hook
     }
   };

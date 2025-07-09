@@ -12,11 +12,7 @@ export const ImageSection = ({
 }: ImageSectionProps) => {
   return (
     <div className="relative w-48 h-48 rounded-lg overflow-hidden border border-[var(--color-primary-light)]/20">
-      <img
-        src={typeof src === "string" ? src : (src as StaticImageData).src}
-        alt={alt}
-        className="object-cover w-full h-full"
-      />
+      <Image src={typeof src === "string" ? src : (src as StaticImageData).src} alt={alt} width={400} height={300} className="object-cover w-full h-full" />
     </div>
   );
 };

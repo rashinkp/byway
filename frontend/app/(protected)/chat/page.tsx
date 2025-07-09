@@ -36,6 +36,7 @@ export default function ChatPage() {
 	const [isSidebarOpen, setIsSidebarOpen] = useState(true);
 	const [searchQuery, setSearchQuery] = useState("");
 	const [isMobile, setIsMobile] = useState(false);
+	const [isSocketConnected, setIsSocketConnected] = useState(socket.connected);
 
 	// Track previous chatId for leave logic
 	const previousChatIdRef = React.useRef<string | null>(null);
@@ -47,10 +48,23 @@ export default function ChatPage() {
 		}
 	}, [isInitialized, isLoading, initializeAuth]);
 
-	// Fetch user chats on mount and when searchQuery changes
+	// Track socket connection state
+	useEffect(() => {
+		const handleConnect = () => setIsSocketConnected(true);
+		const handleDisconnect = () => setIsSocketConnected(false);
+		socket.on("connect", handleConnect);
+		socket.on("disconnect", handleDisconnect);
+		return () => {
+			socket.off("connect", handleConnect);
+			socket.off("disconnect", handleDisconnect);
+		};
+	}, []);
+
+	// Fetch user chats on mount and when searchQuery or socket connection changes
 	useEffect(() => {
 		if (!user) return;
 		if (!isInitialized) return;
+		if (!isSocketConnected) return;
 		setLoading(true);
 		try {
 			listUserChats(
@@ -70,7 +84,7 @@ export default function ChatPage() {
 		} catch {
 			setLoading(false);
 		}
-	}, [user, isInitialized, searchQuery]);
+	}, [user, isInitialized, searchQuery, isSocketConnected]);
 
 	// Load more chats
 	const loadMoreChats = useCallback(() => {
@@ -486,6 +500,16 @@ export default function ChatPage() {
 									setPendingImageUrl={debugSetPendingImageUrl}
 									setPendingAudioUrl={debugSetPendingAudioUrl}
 								/>
+							</div>
+						)}
+						{/* Fallback UI when no chat is selected */}
+						{!selectedChat && (!isMobile || (isMobile && !isSidebarOpen)) && (
+							<div className="flex-1 flex flex-col items-center justify-center h-full min-h-0 text-center text-slate-500 select-none">
+								<div className="mb-4">
+									<svg width="48" height="48" fill="none" viewBox="0 0 24 24" stroke="currentColor" className="mx-auto mb-2 text-slate-300"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M7 8h10M7 12h6m-6 4h8m-2 4.5V21a2 2 0 01-2 2H6a2 2 0 01-2-2V6a2 2 0 012-2h12a2 2 0 012 2v7" /></svg>
+									<h2 className="text-lg font-semibold">Select any chat to start conversation</h2>
+									<p className="text-sm text-slate-400">Choose a chat from the list or start a new one to begin messaging.</p>
+								</div>
 							</div>
 						)}
 					</div>

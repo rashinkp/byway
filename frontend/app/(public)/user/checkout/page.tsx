@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useCart } from "@/hooks/cart/useCart";
 import { useGetCourseById } from "@/hooks/course/useGetCourseById";
@@ -39,9 +39,10 @@ export default function CheckoutPage() {
 
   const isLoading = courseId ? isDirectCourseLoading : isCartLoading;
 
-  const courseDetails: CartCourse[] = courseId
-    ? directCourse
-      ? [
+  const courseDetails: CartCourse[] = useMemo(() => {
+    if (courseId) {
+      if (directCourse) {
+        return [
           {
             id: directCourse.id,
             title: directCourse.title,
@@ -56,11 +57,14 @@ export default function CheckoutPage() {
               name: directCourse.createdBy || "",
             },
           },
-        ]
-      : []
-    : cartData?.items
-        .map((item) => item.course)
-        .filter((course): course is CartCourse => course !== undefined) || [];
+        ];
+      }
+      return [];
+    }
+    return cartData?.items
+      .map((item) => item.course)
+      .filter((course): course is CartCourse => course !== undefined) || [];
+  }, [courseId, directCourse, cartData]);
 
   const totalDiscountedPrice = courseDetails.reduce(
     (total: number, course: CartCourse) => {
@@ -93,7 +97,7 @@ export default function CheckoutPage() {
       // TODO: Implement coupon validation and discount calculation
       setDiscount(10); // Placeholder discount
       toast.success("Coupon applied successfully!");
-    } catch (error) {
+    } catch {
       toast.error("Invalid coupon code");
     }
   };

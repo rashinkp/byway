@@ -11,6 +11,7 @@ export default function CoursesPage() {
 	const { user } = useAuth();
 	const router = useRouter();
 	const { data: statsData } = useGetCourseStats();
+	// Removed unused data, isLoading, isError
 
 	return (
 		<ListPage<Course>

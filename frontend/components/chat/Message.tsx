@@ -1,9 +1,10 @@
 import React from "react";
 import { Message as MessageType } from "@/types/chat";
 import { EnhancedChatItem } from "@/types/chat";
-import { MoreVertical, Trash2, CheckCircle, Circle, Check, CheckCheck, Pause, Play, X } from "lucide-react";
+import { MoreVertical, Trash2, Check, CheckCheck, Pause, Play, X } from "lucide-react";
 import { useState } from "react";
 import { AlertComponent } from "@/components/ui/AlertComponent";
+import Image from 'next/image';
 
 interface MessageProps {
   message: MessageType;
@@ -86,6 +87,7 @@ export function Message({ message, currentUserId, chat, onDelete }: MessageProps
                 audioUrl={message.audioUrl}
                 isMine={isMine}
                 isRead={message.isRead}
+                duration={typeof (message as any).duration === 'number' ? (message as any).duration : undefined}
               />
             </>
           )}
@@ -112,9 +114,11 @@ export function Message({ message, currentUserId, chat, onDelete }: MessageProps
                   </div>
                 )}
                 <div className="relative px-1 pt-1 pb-5 bg-[var(--color-primary-light)]/10 rounded-2xl shadow-md border border-[var(--color-primary-light)]/20 overflow-hidden">
-                  <img
+                  <Image
                     src={message.imageUrl}
                     alt="Sent image"
+                    width={400}
+                    height={300}
                     className={`max-w-xs w-full object-cover transition-opacity duration-300 rounded-xl ${imgLoaded ? 'opacity-100' : 'opacity-0'}`}
                     onLoad={() => setImgLoaded(true)}
                     onError={() => setImgError(true)}
@@ -136,7 +140,13 @@ export function Message({ message, currentUserId, chat, onDelete }: MessageProps
               {showImagePreview && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70" onClick={() => setShowImagePreview(false)}>
                   <div className="relative max-w-2xl w-full" onClick={e => e.stopPropagation()}>
-                    <img src={message.imageUrl} alt="Preview" className="w-full max-h-[80vh] object-contain rounded-lg shadow-lg" />
+                    <Image
+                      src={message.imageUrl}
+                      alt="Preview"
+                      width={800}
+                      height={600}
+                      className="w-full max-h-[80vh] object-contain rounded-lg shadow-lg"
+                    />
                     <button
                       className="absolute top-2 right-2 bg-black/60 hover:bg-black/80 text-white rounded-full p-2"
                       onClick={() => setShowImagePreview(false)}
@@ -232,7 +242,7 @@ export function Message({ message, currentUserId, chat, onDelete }: MessageProps
   );
 }
 
-function AudioMessage({ audioUrl, isMine, isRead }: { audioUrl: string; isMine: boolean; isRead: boolean }) {
+function AudioMessage({ audioUrl, isMine, isRead, duration: messageDuration }: { audioUrl: string; isMine: boolean; isRead: boolean; duration?: number }) {
   const [isPlaying, setIsPlaying] = React.useState(false);
   const [currentTime, setCurrentTime] = React.useState(0);
   const [duration, setDuration] = React.useState(0);
@@ -363,6 +373,13 @@ function AudioMessage({ audioUrl, isMine, isRead }: { audioUrl: string; isMine: 
     };
   }, [audioUrl, isValidAudioUrl]);
 
+  // Use messageDuration as fallback if metadata fails
+  React.useEffect(() => {
+    if (!duration && messageDuration && !isLoading) {
+      setDuration(messageDuration);
+    }
+  }, [duration, messageDuration, isLoading]);
+
   const togglePlayback = () => {
     if (!audioRef.current || audioError || isLoading) return;
     
@@ -421,22 +438,14 @@ function AudioMessage({ audioUrl, isMine, isRead }: { audioUrl: string; isMine: 
 
   return (
     <div
-      className={`flex items-center gap-3 px-4 py-2 whitespace-pre-wrap break-words text-sm rounded-2xl shadow transition-all duration-200 flex-1 ${
+      className={`flex items-center gap-3 px-4 py-5 whitespace-pre-wrap break-words text-sm rounded-2xl shadow transition-all duration-200 flex-1 ${
         isMine
           ? 'bg-[var(--color-primary-light)] text-[var(--color-surface)] rounded-br-md'
           : 'bg-[var(--color-background)] border border-[var(--color-primary-light)]/20 text-[var(--color-primary-dark)] rounded-bl-md'
       }`}
       style={{ minWidth: 220, maxWidth: 360 }}
     >
-      {/* Hidden audio element */}
-      <audio 
-        ref={audioRef} 
-        src={audioUrl} 
-        style={{ display: 'none' }}
-        preload="metadata"
-        crossOrigin="anonymous"
-      />
-      {/* Simple Play/Pause Button */}
+      {/* Play/Pause Button at start */}
       <button
         onClick={togglePlayback}
         disabled={isLoading}
@@ -455,13 +464,19 @@ function AudioMessage({ audioUrl, isMine, isRead }: { audioUrl: string; isMine: 
           <Play className="w-5 h-5" />
         )}
       </button>
-      {/* Time */}
-      <span className="text-xs font-mono min-w-[60px] text-right text-[var(--color-surface)]">
-        {isLoading ? 'Loading...' : `${formatTime(currentTime)} / ${formatTime(duration)}`}
+      {/* Time in center */}
+      <span className="text-xs font-mono min-w-[60px] text-center flex-1">
+        {isLoading || !(duration > 0) ? (
+          <span className="inline-block w-8 text-center">...</span>
+        ) : isPlaying ? (
+          `${formatTime(currentTime)} / ${formatTime(duration)}`
+        ) : (
+          formatTime(duration)
+        )}
       </span>
-      {/* Read/Unread tick for isMine only */}
+      {/* Read/Unread tick at end for isMine only */}
       {isMine && (
-        <span className="ml-2 align-middle">
+        <span className="ml-2 align-middle flex-shrink-0">
           {isRead ? (
             <CheckCheck className="inline w-4 h-4 text-[var(--color-surface)]" />
           ) : (
@@ -469,6 +484,14 @@ function AudioMessage({ audioUrl, isMine, isRead }: { audioUrl: string; isMine: 
           )}
         </span>
       )}
+      {/* Hidden audio element */}
+      <audio 
+        ref={audioRef} 
+        src={audioUrl} 
+        style={{ display: 'none' }}
+        preload="metadata"
+        crossOrigin="anonymous"
+      />
     </div>
   );
 }

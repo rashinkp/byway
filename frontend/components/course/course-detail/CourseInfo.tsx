@@ -1,10 +1,11 @@
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { BookOpen, Clock, Award, Star, DollarSign, User } from "lucide-react";
+import { BookOpen, Clock, Award, Star, DollarSign } from "lucide-react";
 import { Course } from "@/types/course";
 import { User as UserType, PublicUser } from "@/types/user";
 import CourseInfoSkeleton from "./CourseInfoSkeleton";
 import Link from "next/link";
+import Image from 'next/image';
 
 interface CourseInfoProps {
   course: Course | undefined;
@@ -22,7 +23,6 @@ export default function CourseInfo({
   lessonsLength,
   courseLoading,
   instructorLoading,
-  isEnrolled,
   userRole = "USER",
 }: CourseInfoProps) {
 
@@ -64,11 +64,7 @@ export default function CourseInfo({
       {/* Course Thumbnail */}
       <div className="flex justify-center mb-6">
         <div className="w-32 h-32 rounded-lg overflow-hidden border border-[var(--color-primary-light)]/20 bg-[var(--color-background)]">
-          <img
-            src={course?.thumbnail || '/placeholder-course.jpg'}
-            alt={course?.title || 'Course Thumbnail'}
-            className="object-cover w-full h-full"
-          />
+          <Image src={course?.thumbnail || '/placeholder-course.jpg'} alt={course?.title || 'Course Thumbnail'} width={200} height={200} className="object-cover w-full h-full" />
         </div>
       </div>
       {/* Main Course Header */}
@@ -87,11 +83,7 @@ export default function CourseInfo({
           <div className="flex items-center gap-2">
             <div className="w-10 h-10 rounded-full overflow-hidden bg-gray-100">
               {instructor?.avatar ? (
-                <img
-                  src={instructor.avatar}
-                  alt={instructor.name}
-                  className="w-full h-full object-cover"
-                />
+                <Image src={instructor.avatar} alt={instructor.name} width={200} height={200} className="w-full h-full object-cover" />
               ) : (
                 <div className="w-full h-full bg-blue-50 flex items-center justify-center text-blue-600 text-sm font-bold">
                   {instructor?.name?.charAt(0) || "I"}

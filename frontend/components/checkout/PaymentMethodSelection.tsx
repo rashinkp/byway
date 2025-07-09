@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { CreditCard, Wallet, CheckCircle2, Clock, AlertCircle } from "lucide-react";
+import { CreditCard, Wallet, CheckCircle2,  AlertCircle } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 

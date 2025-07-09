@@ -1,4 +1,4 @@
-import { BookOpen, FileText, Star, User, Settings } from "lucide-react";
+import { BookOpen, FileText, Star, User } from "lucide-react";
 import { Course } from "@/types/course";
 
 interface CourseTabsProps {

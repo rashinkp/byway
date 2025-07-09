@@ -123,7 +123,7 @@ export function generateAdminDashboardReport(data: DashboardData) {
   });
 
   // Top Instructors Table
-  let nextY = (doc as any).lastAutoTable.finalY || y + 30;
+  const nextY = (doc as any).lastAutoTable.finalY || y + 30;
   doc.setFontSize(13);
   doc.setTextColor(123, 36, 160);
   doc.text("Top Performing Instructors", 14, nextY + 10);

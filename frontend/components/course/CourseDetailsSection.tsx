@@ -3,7 +3,7 @@
 import { Course } from "@/types/course";
 import { formatDate } from "@/utils/formatDate";
 import { Badge } from "../ui/badge";
-import { BookOpen, Clock, Award, DollarSign, Calendar, User } from "lucide-react";
+import { BookOpen, Clock, Award, DollarSign } from "lucide-react";
 
 export const DetailsSection = ({ course }: { course?: Course }) => {
   return (

@@ -1,5 +1,5 @@
 import { ILesson } from "@/types/lesson";
-import { ChevronLeft, ChevronRight, Lock, CheckCircle } from "lucide-react";
+import { ChevronLeft, ChevronRight, CheckCircle } from "lucide-react";
 import { LessonList } from "./EnrolledCourseLessonList";
 
 interface LessonWithCompletion extends ILesson {

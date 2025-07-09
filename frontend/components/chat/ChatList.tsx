@@ -20,32 +20,6 @@ export function ChatList({ chats, selectedChat, onSelectChat, onSearch }: ChatLi
   const router = useRouter();
   const { user } = useAuth();
 
-  const getRoleColor = (role: string) => {
-    switch (role.toLowerCase()) {
-      case 'admin':
-        return 'bg-red-500';
-      case 'instructor':
-        return 'bg-blue-500';
-      case 'user':
-        return 'bg-green-500';
-      default:
-        return 'bg-gray-500';
-    }
-  };
-
-  const getRoleBadgeColor = (role: string) => {
-    switch (role.toLowerCase()) {
-      case 'admin':
-        return 'bg-red-50 text-red-700';
-      case 'instructor':
-        return 'bg-blue-50 text-blue-700';
-      case 'user':
-        return 'bg-green-50 text-green-700';
-      default:
-        return 'bg-gray-50 text-gray-700';
-    }
-  };
-
   // Separate new chats (type === 'user') and existing chats (type === 'chat')
   const newChats = chats.filter(chat => chat.type === 'user');
   const existingChats = chats.filter(chat => chat.type === 'chat');

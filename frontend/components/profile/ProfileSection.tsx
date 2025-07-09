@@ -17,6 +17,7 @@ import {
   UserCircle,
 } from "lucide-react";
 import { UserProfileType } from "@/types/user";
+import Image from 'next/image';
 
 interface ProfileSectionProps {
   user: UserProfileType;
@@ -27,7 +28,6 @@ interface ProfileSectionProps {
 export default function ProfileSection({
   user,
   setIsModalOpen,
-  isInstructor = false,
 }: ProfileSectionProps) {
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString("en-US", {
@@ -64,11 +64,7 @@ export default function ProfileSection({
         {/* Avatar/Initial */}
         <div className="flex-shrink-0 flex flex-col items-center gap-2">
           {user.avatar ? (
-            <img
-              src={user.avatar}
-              alt={`${user.name}'s avatar`}
-              className="w-24 h-24 rounded-full object-cover border-4 border-[var(--color-primary-light)] shadow-md bg-[var(--color-background)]"
-            />
+            <Image src={user.avatar} alt={`${user.name}'s avatar`} width={200} height={200} className="w-24 h-24 rounded-full object-cover border-4 border-[var(--color-primary-light)] shadow-md bg-[var(--color-background)]" />
           ) : (
             <div className="w-24 h-24 rounded-full flex items-center justify-center text-4xl font-bold bg-[var(--color-primary-light)] text-[var(--color-surface)] border-4 border-[var(--color-primary-light)] shadow-md">
               {user.name ? getInitials(user.name) : "U"}

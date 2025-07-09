@@ -72,6 +72,7 @@ export default function InstructorsPage() {
 		{ label: "Email", value: "user" },
 	];
 
+
 	return (
 		<ListPage<IInstructorWithUserDetails>
 			title="Instructor Management"

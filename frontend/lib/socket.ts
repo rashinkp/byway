@@ -31,4 +31,21 @@ socket.on("connect_error", (err: Error) => {
 	console.error("[Socket] Connection error:", err);
 });
 
+// Enhanced: Helper to safely connect only when token is present
+export const safeSocketConnect = () => {
+	const token = getToken();
+	if (!token) {
+		console.warn("[Socket] Not connecting: No token present");
+		return;
+	}
+	// Set the token before connecting
+	socket.auth = { token };
+	if (!socket.connected) {
+		console.log("[Socket] Attempting to connect with token");
+		socket.connect();
+	} else {
+		console.log("[Socket] Already connected");
+	}
+};
+
 export default socket;

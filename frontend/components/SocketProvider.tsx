@@ -1,10 +1,9 @@
 "use client";
 import { useEffect } from "react";
 import { toast } from "sonner";
-import socket from "../lib/socket";
+import socket, { getToken, safeSocketConnect } from "../lib/socket";
 import { useAuth } from "@/hooks/auth/useAuth";
 import { Bell } from "lucide-react";
-import { getToken } from "@/lib/socket";
 
 interface SocketNotification {
 	message: string;
@@ -33,9 +32,7 @@ export default function SocketProvider() {
 	useEffect(() => {
 		if (user?.id) {
 			socket.auth = { token: getToken() };
-			if (!socket.connected) {
-				socket.connect();
-			}
+			safeSocketConnect();
 		}
 	}, [user?.id]);
 

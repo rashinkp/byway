@@ -2,11 +2,11 @@
 
 import { FileText, CheckCircle, Clock } from "lucide-react";
 import { ILesson } from "@/types/lesson";
-import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
 import { QuizQuestion } from "@/types/content";
 import { useState } from "react";
 import { IQuizAnswer } from "@/types/progress";
 import ErrorDisplay from "@/components/ErrorDisplay";
+import Image from 'next/image';
 
 interface LessonWithCompletion extends ILesson {
   completed: boolean;
@@ -36,7 +36,6 @@ interface LessonContentProps {
 export function LessonContent({
   selectedLesson,
   content,
-  isContentLoading,
   isContentError,
   contentError,
   currentLessonIndex,
@@ -207,11 +206,7 @@ export function LessonContent({
                         </div>
                       )
                     ) : (
-                      <img
-                        src={content.thumbnailUrl || "/api/placeholder/800/600"}
-                        alt="Document preview"
-                        className="w-full object-contain mb-4 rounded"
-                      />
+                      <Image src={content.thumbnailUrl || "/api/placeholder/800/600"} alt="Document preview" width={800} height={600} className="w-full object-contain mb-4 rounded" />
                     )}
                     <p className="text-[var(--color-primary-dark)] leading-relaxed">
                       {content.description || "No description available."}
@@ -246,13 +241,7 @@ export function LessonContent({
                   </div>
                 )}
                 <div className="space-y-6">
-                  {content.quizQuestions.map((question: QuizQuestion, index: number) => {
-                    const submittedAnswer = selectedLesson.answers?.find(
-                      a => a.questionId === question.id
-                    );
-                    const isUserAnswer = submittedAnswer?.selectedAnswer === question.correctAnswer;
-                    const isWrongAnswer = isUserAnswer && !question.correctAnswer;
-                    
+                  {content.quizQuestions.map((question: QuizQuestion, index: number) => { 
                     return (
                       <div key={question.id} className="bg-blue-50 p-6 rounded-xl border border-blue-200">
                         <h3 className="text-lg font-medium text-[var(--color-primary-dark)] mb-4">

@@ -35,7 +35,7 @@ export function ModernChatInput({
     }
   };
 
-  const handleSendAudio = (audioUrl: string, duration: number) => {
+  const handleSendAudio = (audioUrl: string) => {
     if (isNewChat && setPendingAudioUrl) {
       setPendingAudioUrl(audioUrl);
       setInputMode('text');

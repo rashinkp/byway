@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import { Mic, Square, Send, Trash2, Play, Pause } from 'lucide-react';
+import {  Square, Send, Trash2, Play, Pause } from 'lucide-react';
 import { AlertComponent } from '@/components/ui/AlertComponent';
 import { getPresignedUrl, uploadFileToS3 } from '@/api/file';
 
@@ -13,11 +13,11 @@ interface ModernAudioRecorderProps {
 export function ModernAudioRecorder({
   onSend,
   onCancel,
-  maxDuration = 300,
 }: ModernAudioRecorderProps) {
   const [isRecording, setIsRecording] = useState(false);
   const [audioUrl, setAudioUrl] = useState<string | null>(null);
-  const [duration, setDuration] = useState(0); // Total duration
+  const [duration, setDuration] = useState(0); // Total duration in seconds
+  const durationIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [showDiscardAlert, setShowDiscardAlert] = useState(false);
@@ -81,6 +81,11 @@ export function ModernAudioRecorder({
     }
     setDuration(0);
     setIsPlaying(false);
+    // Stop the timer if running
+    if (durationIntervalRef.current) {
+      clearInterval(durationIntervalRef.current);
+      durationIntervalRef.current = null;
+    }
   };
 
   // Start recording immediately on mount
@@ -144,6 +149,11 @@ export function ModernAudioRecorder({
           streamRef.current.getTracks().forEach((track) => track.stop());
           streamRef.current = null;
         }
+        // Stop the timer
+        if (durationIntervalRef.current) {
+          clearInterval(durationIntervalRef.current);
+          durationIntervalRef.current = null;
+        }
       };
       
       mediaRecorder.onerror = (event) => {
@@ -154,6 +164,10 @@ export function ModernAudioRecorder({
       
       mediaRecorder.start();
       setIsRecording(true);
+      // Start the timer
+      durationIntervalRef.current = setInterval(() => {
+        setDuration((prev) => prev + 1);
+      }, 1000);
     } catch (err: any) {
       console.error('Recording error:', err);
       if (err.name === 'NotAllowedError') {
@@ -171,66 +185,16 @@ export function ModernAudioRecorder({
   const stopRecording = () => {
     if (mediaRecorderRef.current && isRecording) {
       mediaRecorderRef.current.stop();
-      setIsRecording(false);
+      // Do not setIsRecording(false) here; let onstop handle it
+    }
+    // Stop the timer if running
+    if (durationIntervalRef.current) {
+      clearInterval(durationIntervalRef.current);
+      durationIntervalRef.current = null;
     }
   };
 
-  // Set accurate duration after recording stops
-  useEffect(() => {
-    if (pendingAudioUrl) {
-      const audio = new window.Audio();
-      
-      const handleLoadedMetadata = () => {
-        if (!isNaN(audio.duration) && audio.duration > 0) {
-          setDuration(Math.round(audio.duration));
-        } else {
-          console.warn('Invalid audio duration:', audio.duration);
-          setDuration(0);
-        }
-        setPendingAudioUrl(null);
-      };
-      
-      const handleError = (e: Event) => {
-        console.error('Error loading audio metadata:', e);
-        setDuration(0);
-        setPendingAudioUrl(null);
-        setError('Failed to process audio. Please try recording again.');
-      };
-      
-      const handleAbort = () => {
-        console.warn('Audio loading aborted');
-        setDuration(0);
-        setPendingAudioUrl(null);
-      };
-      
-      audio.addEventListener('loadedmetadata', handleLoadedMetadata);
-      audio.addEventListener('error', handleError);
-      audio.addEventListener('abort', handleAbort);
-      
-      // Set a timeout to prevent hanging
-      const timeout = setTimeout(() => {
-        if (pendingAudioUrl) {
-          console.warn('Audio metadata loading timeout');
-          audio.removeEventListener('loadedmetadata', handleLoadedMetadata);
-          audio.removeEventListener('error', handleError);
-          audio.removeEventListener('abort', handleAbort);
-          setDuration(0);
-          setPendingAudioUrl(null);
-        }
-      }, 10000); // 10 second timeout
-      
-      audio.src = pendingAudioUrl;
-      
-      return () => {
-        clearTimeout(timeout);
-        audio.removeEventListener('loadedmetadata', handleLoadedMetadata);
-        audio.removeEventListener('error', handleError);
-        audio.removeEventListener('abort', handleAbort);
-        audio.src = '';
-      };
-    }
-    return undefined;
-  }, [pendingAudioUrl]);
+  // Remove the useEffect that sets duration from pendingAudioUrl
 
   const togglePlayback = () => {
     if (!audioRef.current || !audioUrl) {
@@ -298,7 +262,7 @@ export function ModernAudioRecorder({
       
       // Determine the correct file extension based on MIME type
       let fileExtension = 'webm';
-      let mimeType = blob.type;
+      const mimeType = blob.type;
       
       if (mimeType.includes('mp4') || mimeType.includes('m4a')) {
         fileExtension = 'm4a';
@@ -336,13 +300,6 @@ export function ModernAudioRecorder({
       console.error('Error in S3 upload:', error);
       throw new Error('Failed to upload audio to cloud storage');
     }
-  };
-
-  const formatTime = (seconds: number) => {
-    if (!isFinite(seconds) || isNaN(seconds) || seconds < 0) return "0:00";
-    const mins = Math.floor(seconds / 60);
-    const secs = Math.floor(seconds % 60);
-    return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
 
   if (error) {
@@ -391,7 +348,7 @@ export function ModernAudioRecorder({
             <div className="flex-1">
               <div className="flex items-center justify-between text-sm">
                 <span className="text-[var(--color-muted)]">Voice message</span>
-                <span className="text-[var(--color-muted)] font-mono">{formatTime(duration)}</span>
+                {/* Removed duration display here */}
               </div>
             </div>
           </div>

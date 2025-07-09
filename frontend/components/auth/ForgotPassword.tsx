@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import {
 	Form,
 	FormControl,
@@ -27,7 +26,6 @@ const forgotPasswordSchema = z.object({
 type ForgotPasswordFormData = z.infer<typeof forgotPasswordSchema>;
 
 export function ForgotPasswordForm() {
-	const router = useRouter();
 	const [error, setError] = useState<string | null>(null);
 	const { mutate: forgotPassword, isPending } = useForgotPassword();
 

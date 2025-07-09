@@ -1,5 +1,5 @@
 import { ILesson } from "@/types/lesson";
-import {  Lock, CheckCircle } from "lucide-react";
+import {  CheckCircle } from "lucide-react";
 import { LessonListSkeleton } from "./skeletons/LessonListSkeleton";
 import { IQuizAnswer } from "@/types/progress";
 import ErrorDisplay from "@/components/ErrorDisplay";

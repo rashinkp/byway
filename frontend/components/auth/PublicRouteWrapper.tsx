@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import React, { useEffect, useMemo } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import { useAuth } from "@/hooks/auth/useAuth";
 import { ROUTES } from "@/constants/routes";
@@ -16,10 +16,10 @@ export function PublicRouteWrapper({ children }: PublicRouteWrapperProps) {
 	const pathname = usePathname();
 
 	// Routes that should not redirect even if user is authenticated
-	const authRoutes = ["/login", "/signup", "/verify-otp", "/forgot-password", "/reset-password"];
+	const authRoutes = useMemo(() => ["/login", "/signup", "/verify-otp", "/forgot-password", "/reset-password"], []);
 	
 	// User-specific routes that should not redirect (even though they're in public folder)
-	const userRoutes = ["/user/profile", "/user/cart", "/user/checkout", "/user/my-courses"];
+	const userRoutes = useMemo(() => ["/user/profile", "/user/cart", "/user/checkout", "/user/my-courses"], []);
 
 	useEffect(() => {
 		// Only redirect if we're not loading and user is authenticated
@@ -44,7 +44,7 @@ export function PublicRouteWrapper({ children }: PublicRouteWrapperProps) {
 				router.push(route);
 			}
 		}
-	}, [isAuthenticated, isLoading, user, router, pathname]);
+	}, [isAuthenticated, isLoading, user, router, pathname, authRoutes, userRoutes]);
 
 	// Show children while loading or if not authenticated
 	// The redirect will happen automatically when authentication is determined

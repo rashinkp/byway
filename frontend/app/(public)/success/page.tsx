@@ -17,7 +17,7 @@ const SuccessPage = () => {
   const isWalletTopUp = searchParams.get("type") === "wallet-topup";
   const isWalletPayment = searchParams.get("type") === "wallet-payment";
   const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [error] = useState<string | null>(null);
 
   useEffect(() => {
     const verifySession = async () => {

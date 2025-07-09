@@ -77,7 +77,7 @@ export function generateRevenueAnalyticsReport(
 
   // Latest Revenue Transactions (if available)
   if (latestData && latestData.items.length > 0) {
-    let nextY = (doc as any).lastAutoTable?.finalY || y + 30;
+    const nextY = (doc as any).lastAutoTable?.finalY || y + 30;
     doc.setFontSize(13);
     doc.setTextColor(123, 36, 160);
     doc.text("Latest Revenue Transactions", 14, nextY + 10);

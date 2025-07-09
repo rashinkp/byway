@@ -48,7 +48,6 @@ function AlertTitle({ className, ...props }: React.ComponentProps<"div">) {
 }
 
 function AlertDescription({
-	className,
 	...props
 }: React.ComponentProps<"div">) {
 	return (
@@ -56,6 +55,7 @@ function AlertDescription({
 			data-slot="alert-description"
 			className="text-[var(--color-muted)] col-start-2 grid justify-items-start gap-1 text-sm [&_p]:leading-relaxed"
 			{...props}
+			
 		/>
 	);
 }

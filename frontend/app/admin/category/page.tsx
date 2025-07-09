@@ -26,6 +26,8 @@ export default function CategoriesPage() {
 	const { mutate: updateCategory } = useUpdateCategory();
 	const { mutate: toggleDeleteCategory } = useToggleDeleteCategory();
 
+	// Removed unused data, isLoading, isError, and handleRefresh
+
 	const handleAddSubmit = async (data: CategoryFormData) => {
 		createCategory(data, {
 			onSuccess: () => setIsAddOpen(false),

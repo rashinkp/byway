@@ -54,8 +54,7 @@ export default function CourseContent() {
   const { data: progressData, isLoading: isProgressLoading } = useProgress({
     courseId,
   });
-  const { mutate: updateProgress, isLoading: isUpdatingProgress } =
-    useUpdateProgress();
+  const { mutate: updateProgress } = useUpdateProgress();
 
   // Fetch content for the selected lesson
   const {
@@ -66,10 +65,10 @@ export default function CourseContent() {
   } = useGetContentByLessonId(selectedLesson?.id || "");
 
   // Fetch certificate
-  const { certificate, loading: certLoading, error: certError, fetchCertificate, createCertificate } = useCertificate(courseId);
+  const { certificate, fetchCertificate } = useCertificate(courseId);
 
   // Add state for error message
-  const [regenError, setRegenError] = useState<string | null>(null);
+  // Removed unused regenError and setRegenError
 
   // Handle content errors
   useEffect(() => {

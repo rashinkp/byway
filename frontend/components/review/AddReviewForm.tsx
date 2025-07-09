@@ -39,7 +39,7 @@ export default function AddReviewForm({
     try {
       await createReview(reviewData);
       onSuccess();
-    } catch (error) {
+    } catch  {
       // Error is handled by the hook
     }
   };
