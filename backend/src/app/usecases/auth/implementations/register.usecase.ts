@@ -46,7 +46,7 @@ export class RegisterUseCase implements IRegisterUseCase {
         user = await this.authRepository.updateUser(user);
       }
 
-      await this.otpProvider.generateOtp(user.email, user.id, "VERIFICATION");
+      await this.otpProvider.generateOtp(user.email, user.id);
       // TODO: Implement email sending
       // await this.emailProvider.sendOtpEmail(user.email, verification.otp);
 

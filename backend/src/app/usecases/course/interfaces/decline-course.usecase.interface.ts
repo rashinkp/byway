@@ -1,5 +1,5 @@
-import { ICourseOutputDTO, IUpdateCourseApprovalInputDTO } from "../../../../domain/dtos/course/course.dto";
+import { ICourseWithDetailsDTO, IUpdateCourseApprovalInputDTO } from "../../../../domain/dtos/course/course.dto";
 
 export interface IDeclineCourseUseCase {
-  execute(input: IUpdateCourseApprovalInputDTO): Promise<ICourseOutputDTO>;
+  execute(input: IUpdateCourseApprovalInputDTO): Promise<ICourseWithDetailsDTO>;
 }

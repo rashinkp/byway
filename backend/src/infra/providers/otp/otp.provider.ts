@@ -10,7 +10,6 @@ export class OtpProvider implements IOtpProvider {
   async generateOtp(
     email: string,
     userId: string,
-    type: "VERIFICATION" | "RESET"
   ): Promise<UserVerification> {
     // Generate 6-digit numeric OTP
     const otp = Math.floor(100000 + Math.random() * 900000).toString();

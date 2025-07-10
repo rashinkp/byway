@@ -17,7 +17,7 @@ export class ForgotPasswordUseCase implements IForgotPasswordUseCase {
     }
 
     try {
-      await this.otpProvider.generateOtp(user.email, user.id, "RESET");
+      await this.otpProvider.generateOtp(user.email, user.id);
       // TODO: Implement email sending
       // await this.emailProvider.sendResetTokenEmail(user.email, verification.otp);
     } catch (error) {

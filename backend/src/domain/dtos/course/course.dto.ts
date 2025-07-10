@@ -174,3 +174,5 @@ export interface ICourseListResponseDTO {
   total: number;
   totalPage: number;
 }
+
+export type ICourseResponseDTO = ICourseListResponseDTO;
