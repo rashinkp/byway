@@ -44,6 +44,7 @@
     "prisma-client": "^0.0.0",
     "socket.io": "^4.8.1",
     "stripe": "^18.1.0",
+    "tsconfig-paths": "^4.2.0",
     "uuid": "^11.1.0",
     "winston": "^3.17.0",
     "zod": "^3.25.30"

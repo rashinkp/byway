@@ -1,0 +1,47 @@
+
+services:
+  db:
+    image: postgres:15
+    restart: always
+    environment:
+      POSTGRES_USER: bywayuser
+      POSTGRES_PASSWORD: bywaypass
+      POSTGRES_DB: bywaydb
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432" # Optional: expose if you want to connect from host
+
+  backend:
+    build: ./backend
+    depends_on:
+      - db
+    env_file:
+      - ./backend/.env
+    environment:
+      DATABASE_URL: postgres://bywayuser:bywaypass@db:5432/bywaydb
+      NODE_ENV: production
+    ports:
+      - "5001:5001"
+    # Uncomment below to mount code for live reload in dev
+    # volumes:
+    #   - ./backend:/app
+
+  frontend:
+    build: ./frontend
+    depends_on:
+      - backend
+    env_file:
+      - ./frontend/.env
+    environment:
+      NEXT_PUBLIC_API_URL: http://localhost:5001
+      NODE_ENV: production
+      NEXT_PUBLIC_GOOGLE_CLIENT_ID: 212202057591-87b5i5r366ss61n3nkdjmj5kksaudt8r.apps.googleusercontent.com
+    ports:
+      - "3000:3000"
+    # Uncomment below to mount code for live reload in dev
+    # volumes:
+    #   - ./frontend:/app
+
+volumes:
+  db_data: 
