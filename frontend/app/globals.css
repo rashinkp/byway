@@ -59,11 +59,11 @@
 
 /* ──────────────────────────── Midnight ───────────────────────────── */
 [data-theme="midnight"] {
-	--color-primary-dark: #0f172a; /* slate-900 */
+	--color-primary-dark: #020617; /* slate-900 */
 	--color-primary-light: #475569; /* slate-600 */
 
 	--color-background: #020617; /* slate-950 */
-	--color-surface: #1e293b; /* slate-800 */
+	--color-surface: #ffffff; /* slate-800 */
 	--color-muted: #64748b; /* slate-500 */
 
 	--color-accent: #8b5cf6; /* violet-500 */
