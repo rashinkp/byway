@@ -12,7 +12,7 @@ export default function CategoriesPage() {
 	const router = useRouter(); 
 	const [page, setPage] = useState(1);
 	const limit = 9;
-   
+       
 	const { data, isLoading, error } = useCategories({
 		page,
 		limit,
