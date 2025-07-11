@@ -76,7 +76,9 @@ jobs:
           docker compose -f docker-compose.yml up -d
           docker image prune -f
           EOF
-          scp -i key.pem -o StrictHostKeyChecking=no docker-compose.yml .env ${EC2_USER}@${EC2_HOST}:~/app/
+          scp -i key.pem -o StrictHostKeyChecking=no docker-compose.yml ${EC2_USER}@${EC2_HOST}:~/app/
+          scp -i key.pem -o StrictHostKeyChecking=no frontend.env ${EC2_USER}@${EC2_HOST}:~/app/
+          scp -i key.pem -o StrictHostKeyChecking=no backend.env ${EC2_USER}@${EC2_HOST}:~/app/
           scp -i key.pem -o StrictHostKeyChecking=no deploy.sh ${EC2_USER}@${EC2_HOST}:~/app/
           ssh -i key.pem -o StrictHostKeyChecking=no ${EC2_USER}@${EC2_HOST} << 'EOF'
             cd ~/app
