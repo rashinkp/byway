@@ -1,29 +1,21 @@
-# Use official Node.js 20 LTS base image
-FROM node:20
-
-# Set working directory inside the container
+# Build stage
+FROM node:20 AS builder
 WORKDIR /app
-
-# Copy package.json and lock file
 COPY package*.json ./
-
-# Install dependencies
 RUN npm install
-
-# Copy Prisma folder first (to allow caching of dependencies)
 COPY prisma ./prisma/
-
-# Generate Prisma client
 RUN npx prisma generate
-
-# Copy rest of the backend source code (including src/, dist/, etc.)
 COPY . .
-
-# Build TypeScript to JavaScript
 RUN npm run build
 
-# Expose the port your Express app runs on 
+# Production stage
+FROM node:20
+WORKDIR /app
+COPY package*.json ./
+RUN npm install --omit=dev
+COPY --from=builder /app/dist ./dist
+COPY --from=builder /app/prisma ./prisma
+COPY --from=builder /app/package.json ./package.json
+RUN npx prisma generate
 EXPOSE 5001
-
-# Start the application
 CMD ["npm", "start"]
