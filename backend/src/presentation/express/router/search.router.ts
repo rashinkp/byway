@@ -5,7 +5,7 @@ import { expressAdapter } from "../../adapters/express.adapter";
 export function searchRouter(searchController: SearchController): Router {
   const router = Router();
 
-  router.get("/global", (req, res, next) =>
+  router.get("/", (req, res, next) =>
     expressAdapter(req, res, searchController.globalSearch.bind(searchController), next)
   );
 

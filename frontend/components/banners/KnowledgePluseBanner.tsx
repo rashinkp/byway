@@ -20,7 +20,7 @@ export default function Banner({
 			Knowledge Meets <br className="hidden sm:block" /> Innovation
 		</>
 	),
-	subtitle = "KNOWLEDGEPULSE",
+	subtitle = "BYWAY",
 	description = "This platform's simplicity belies its powerful capabilities, offering a seamless and enjoyable educational experience.",
 	imageSrc = "/boyholdingbook.png",
 	imageAlt = "Student",
