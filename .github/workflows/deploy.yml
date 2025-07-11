@@ -1,0 +1,86 @@
+name: Deploy to EC2
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Cache frontend node_modules
+        uses: actions/cache@v4
+        with:
+          path: frontend/node_modules
+          key: ${{ runner.os }}-frontend-node-modules-${{ hashFiles('frontend/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-frontend-node-modules-
+
+      - name: Cache backend node_modules
+        uses: actions/cache@v4
+        with:
+          path: backend/node_modules
+          key: ${{ runner.os }}-backend-node-modules-${{ hashFiles('backend/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-backend-node-modules-
+
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GHCR_TOKEN }}
+
+      - name: Build and push frontend image
+        env:
+          IMAGE_NAME: ghcr.io/${{ github.repository }}/frontend:${{ github.sha }}
+        run: |
+          cd frontend
+          docker build -t $IMAGE_NAME .
+          docker push $IMAGE_NAME
+
+      - name: Build and push backend image
+        env:
+          IMAGE_NAME: ghcr.io/${{ github.repository }}/backend:${{ github.sha }}
+        run: |
+          cd backend
+          docker build -t $IMAGE_NAME .
+          docker push $IMAGE_NAME
+
+      - name: Deploy to EC2
+        env:
+          EC2_HOST: ${{ secrets.EC2_HOST }}
+          EC2_USER: ${{ secrets.EC2_USER }}
+          EC2_SSH_KEY: ${{ secrets.EC2_SSH_KEY }}
+          REPO_NAME: ${{ github.repository }}
+          COMMIT_SHA: ${{ github.sha }}
+        run: |
+          echo "$EC2_SSH_KEY" > key.pem
+          chmod 600 key.pem
+          cat > deploy.sh << 'EOF'
+          #!/bin/bash
+          set -e
+          echo ${{ secrets.GHCR_TOKEN }} | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+          docker compose -f docker-compose.yml pull
+          docker compose -f docker-compose.yml down
+          docker compose -f docker-compose.yml up -d
+          docker image prune -f
+          EOF
+          scp -i key.pem -o StrictHostKeyChecking=no docker-compose.yml .env ${EC2_USER}@${EC2_HOST}:~/app/
+          scp -i key.pem -o StrictHostKeyChecking=no deploy.sh ${EC2_USER}@${EC2_HOST}:~/app/
+          ssh -i key.pem -o StrictHostKeyChecking=no ${EC2_USER}@${EC2_HOST} << 'EOF'
+            cd ~/app
+            chmod +x deploy.sh
+            ./deploy.sh
+          EOF
+          rm key.pem deploy.sh
