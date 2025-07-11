@@ -5,7 +5,7 @@ while approving course not refetching the data (low level);
 while reload without login redirecting to login page without any reason.
 lesson count in (cart)
 too many auth/me and socket io connection
-
+404 PAGE 
 env config
 
 

@@ -1,30 +1,35 @@
-# Build stage
+# =========================
+# 🔧 Build stage
+# =========================
 FROM node:20-alpine AS builder
 WORKDIR /app
 
-# Install dependencies
+# Install all dependencies (including dev)
 COPY package*.json ./
 RUN npm install
 
-# Copy all source code
+# Copy source code and build the app
 COPY . .
-
-# Build the Next.js app
 RUN npm run build
 
-# Production stage
+# =========================
+# 🚀 Production stage
+# =========================
 FROM node:20-alpine
 WORKDIR /app
 
-# Install only production dependencies
+# Copy package files and install only production deps
 COPY package*.json ./
 RUN npm install --omit=dev
 
-# Copy built app from builder
-COPY --from=builder /app ./
+# Copy only the necessary built files from builder
+COPY --from=builder /app/.next ./.next
+COPY --from=builder /app/public ./public
+COPY --from=builder /app/next.config.js ./next.config.js
+COPY --from=builder /app/package.json ./package.json
 
-# Expose the port Next.js runs on
+# If you need others like tsconfig, add as needed
+
 EXPOSE 3000
 
-# Start the Next.js app
 CMD ["npm", "start"]
