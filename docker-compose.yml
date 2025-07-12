@@ -11,7 +11,7 @@ services:
       - db_data:/var/lib/postgresql/data
 
   backend:
-    image: ghcr.io/rashinkp/byway/backend:latest
+    image: ghcr.io/rashinkp/byway/backend:${COMMIT_SHA:-latest}
     depends_on:
       - db
     env_file:
@@ -24,7 +24,7 @@ services:
     restart: always
 
   frontend:
-    image: ghcr.io/rashinkp/byway/frontend:latest
+    image: ghcr.io/rashinkp/byway/frontend:${COMMIT_SHA:-latest}
     depends_on:
       - backend
     env_file:
