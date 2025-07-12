@@ -31,8 +31,25 @@ export default function SocketProvider() {
 
 	useEffect(() => {
 		if (user?.id) {
-			socket.auth = { token: getToken() };
-			safeSocketConnect();
+			console.log("[SocketProvider] User authenticated, attempting socket connection");
+			// Add a small delay to ensure cookies are available
+			const timer = setTimeout(() => {
+				const token = getToken();
+				if (token) {
+					console.log("[SocketProvider] Token available, connecting socket");
+					socket.auth = { token };
+					safeSocketConnect();
+				} else {
+					console.log("[SocketProvider] No token available, will retry on next effect");
+				}
+			}, 100);
+			
+			return () => clearTimeout(timer);
+		} else {
+			console.log("[SocketProvider] No user, disconnecting socket");
+			if (socket.connected) {
+				socket.disconnect();
+			}
 		}
 	}, [user?.id]);
 

@@ -31,6 +31,7 @@ services:
       - ./frontend.env
     environment:
       NEXT_PUBLIC_API_URL: https://byway.ddns.net/api/v1
+      NEXT_PUBLIC_SOCKET_URL: https://byway.ddns.net
       NODE_ENV: production
       NEXT_PUBLIC_GOOGLE_CLIENT_ID: 212202057591-87b5i5r366ss61n3nkdjmj5kksaudt8r.apps.googleusercontent.com
     ports:
