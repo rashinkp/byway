@@ -72,10 +72,19 @@ export default function CommonLayout({
 
 	const handleLogout = async () => {
 		try {
-			logout();
-			router.replace("/login");
+			logout(undefined, {
+				onSuccess: () => {
+					router.replace("/login");
+				},
+				onError: (error) => {
+					console.error("Logout failed:", error);
+					// Even if logout fails, redirect to login page
+					router.replace("/login");
+				},
+			});
 		} catch (error) {
 			console.error("Logout failed:", error);
+			router.replace("/login");
 		}
 	};
 

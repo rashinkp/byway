@@ -142,6 +142,11 @@ const Sidebar: FC<SidebarProps> = ({
 								onSuccess: () => {
 									router.push("/login");
 								},
+								onError: (error) => {
+									console.error("Logout failed:", error);
+									// Even if logout fails, redirect to login page
+									router.push("/login");
+								},
 							});
 						}}
 						disabled={isLoggingOut}

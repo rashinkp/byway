@@ -1,11 +1,12 @@
-import MainCourseDetailsContent from "@/components/course/course-detail/MainCourseDetailContent";
+
+import MainContentSection from "@/components/content/Main";
 import { Suspense } from "react";
 
 
 export default function CourseContent() {
   return (
     <Suspense fallback={<div>Loading...</div>}>
-      <MainCourseDetailsContent />
+      <MainContentSection />
     </Suspense>
   ); 
 }

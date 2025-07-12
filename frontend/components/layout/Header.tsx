@@ -122,8 +122,16 @@ export function Header(
 	// Handle logout with dropdown close
 	const handleLogout = useCallback(() => {
 		setIsDropdownOpen(false);
-		logout();
-		router.push("/login");
+		logout(undefined, {
+			onSuccess: () => {
+				router.push("/login");
+			},
+			onError: (error) => {
+				console.error("Logout failed:", error);
+				// Even if logout fails, redirect to login page
+				router.push("/login");
+			},
+		});
 	}, [logout, router]);
 
 	// Handle scroll effect
@@ -482,8 +490,18 @@ export function Header(
 												<Button
 													variant="outline"
 													onClick={() => {
-														logout();
-														setIsMenuOpen(false);
+														logout(undefined, {
+															onSuccess: () => {
+																setIsMenuOpen(false);
+																router.push("/login");
+															},
+															onError: (error) => {
+																console.error("Logout failed:", error);
+																setIsMenuOpen(false);
+																// Even if logout fails, redirect to login page
+																router.push("/login");
+															},
+														});
 													}}
 													disabled={isLoggingOut}
 													className="w-full border-[var(--color-primary-200)] text-[var(--color-primary-dark)] rounded-lg text-base"
