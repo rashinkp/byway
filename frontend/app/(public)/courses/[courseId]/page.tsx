@@ -5,7 +5,7 @@ export default function CourseDetail() {
 
 	return (
 		 <Suspense fallback={<div>Loading...</div>}>
-					<MainCourseDetailsContent />
+					<MainCourseDetailsContent /> 
 				</Suspense>
 	);
 }

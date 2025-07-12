@@ -156,6 +156,8 @@ export const getAllInstructors = async (params?: {
 				}
 			});
 		}
+		console.log("[Instructor API] Making request to:", `/instructor/instructors?${queryParams.toString()}`);
+		console.log("[Instructor API] API base URL:", process.env.NEXT_PUBLIC_API_URL);
 		const response = await api.get<
 			ApiResponse<{
 				items: IInstructorWithUserDetails[];
