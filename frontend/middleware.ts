@@ -28,7 +28,7 @@ export async function middleware(request: NextRequest) {
 		"/verify-otp",
 		"/forgot-password",
 		"/reset-password",
-		"/", // Home page is public
+		"/", // Home page is public 
 	];
 
 	// Check if current path is a public route
