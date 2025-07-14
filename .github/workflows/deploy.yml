@@ -78,16 +78,18 @@ jobs:
           set -e
           echo ${{ secrets.GHCR_TOKEN }} | docker login ghcr.io -u ${{ github.actor }} --password-stdin
           export COMMIT_SHA=${{ github.sha }}
-          docker compose -f docker-compose.yml pull
-          docker compose -f docker-compose.yml down
-          docker compose -f docker-compose.yml up -d
           # ---
-          # Cleanup: Remove unused Docker images, stopped containers, and networks (safe for DB data)
+          # CLEANUP: Free up disk space before pulling new images
+          # Remove unused Docker images, stopped containers, networks, and builder cache (safe for DB data)
           docker system prune -a -f
+          docker builder prune -a -f
           # Optional: Clean up old Docker/container logs (safe for DB data)
           sudo journalctl --vacuum-time=7d || true
           sudo rm -rf /var/lib/docker/containers/*/*-json.log || true
           # ---
+          docker compose -f docker-compose.yml pull
+          docker compose -f docker-compose.yml down
+          docker compose -f docker-compose.yml up -d
           EOF
           scp -i key.pem -o StrictHostKeyChecking=no docker-compose.yml ${EC2_USER}@${EC2_HOST}:~/app/
           scp -i key.pem -o StrictHostKeyChecking=no deploy.sh ${EC2_USER}@${EC2_HOST}:~/app/
