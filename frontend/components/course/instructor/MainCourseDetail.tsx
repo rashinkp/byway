@@ -3,7 +3,6 @@
 import { useParams } from "next/navigation";
 import { LessonManager } from "@/components/lesson/LessonManager";
 import { useGetCourseById } from "@/hooks/course/useGetCourseById";
-import PlaceHolderImage from "@/public/placeHolder.jpg";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import {
   Users,
@@ -126,7 +125,7 @@ export default function MainCourseDetails() {
           <CourseDetails
             course={course}
             isLoading={isLoading}
-            src={course?.thumbnail || PlaceHolderImage}
+            src={course?.thumbnail || "/placeHolder.jpg"}
             alt={course?.title || "Course Thumbnail"}
           />
         </TabsContent>
