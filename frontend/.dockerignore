@@ -18,4 +18,4 @@ yarn-error.log*
 .pnpm-debug.log*
 .vercel
 *.tsbuildinfo
-next-env.d.ts 
+next-env.d.ts
