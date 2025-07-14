@@ -41,19 +41,36 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GHCR_TOKEN }}
 
+      # Build and push images sequentially to reduce disk usage and avoid 'no space left on device' errors
       - name: Build and push frontend image
         env:
           IMAGE_NAME: ghcr.io/${{ github.repository }}/frontend:${{ github.sha }}
           LATEST_IMAGE: ghcr.io/${{ github.repository }}/frontend:latest
+          NEXT_PUBLIC_API_URL: ${{ secrets.NEXT_PUBLIC_API_URL }}
+          NEXT_PUBLIC_SOCKET_URL: ${{ secrets.NEXT_PUBLIC_SOCKET_URL }}
+          NEXT_PUBLIC_GOOGLE_CLIENT_ID: ${{ secrets.NEXT_PUBLIC_GOOGLE_CLIENT_ID }}
+          NEXT_PUBLIC_GOOGLE_REDIRECT_URI: ${{ secrets.NEXT_PUBLIC_GOOGLE_REDIRECT_URI }}
+          NEXT_PUBLIC_FACEBOOK_APP_ID: ${{ secrets.NEXT_PUBLIC_FACEBOOK_APP_ID }}
+          NEXT_PUBLIC_PAYPAL_CLIENT_ID: ${{ secrets.NEXT_PUBLIC_PAYPAL_CLIENT_ID }}
+          NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: ${{ secrets.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY }}
         run: |
           cd frontend
           npm cache clean --force
           docker builder prune -af || true
-          docker build --no-cache -t $IMAGE_NAME .
+          docker build --no-cache \
+            --build-arg NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL \
+            --build-arg NEXT_PUBLIC_SOCKET_URL=$NEXT_PUBLIC_SOCKET_URL \
+            --build-arg NEXT_PUBLIC_GOOGLE_CLIENT_ID=$NEXT_PUBLIC_GOOGLE_CLIENT_ID \
+            --build-arg NEXT_PUBLIC_GOOGLE_REDIRECT_URI=$NEXT_PUBLIC_GOOGLE_REDIRECT_URI \
+            --build-arg NEXT_PUBLIC_FACEBOOK_APP_ID=$NEXT_PUBLIC_FACEBOOK_APP_ID \
+            --build-arg NEXT_PUBLIC_PAYPAL_CLIENT_ID=$NEXT_PUBLIC_PAYPAL_CLIENT_ID \
+            --build-arg NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=$NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY \
+            -t $IMAGE_NAME .
           docker tag $IMAGE_NAME $LATEST_IMAGE
           docker push $IMAGE_NAME
           docker push $LATEST_IMAGE
 
+      # Wait for frontend build to finish before starting backend
       - name: Build and push backend image
         env:
           IMAGE_NAME: ghcr.io/${{ github.repository }}/backend:${{ github.sha }}
