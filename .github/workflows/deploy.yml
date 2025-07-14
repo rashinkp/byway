@@ -47,7 +47,9 @@ jobs:
           LATEST_IMAGE: ghcr.io/${{ github.repository }}/frontend:latest
         run: |
           cd frontend
-          docker build -t $IMAGE_NAME .
+          npm cache clean --force
+          docker builder prune -af || true
+          docker build --no-cache -t $IMAGE_NAME .
           docker tag $IMAGE_NAME $LATEST_IMAGE
           docker push $IMAGE_NAME
           docker push $LATEST_IMAGE
@@ -58,7 +60,9 @@ jobs:
           LATEST_IMAGE: ghcr.io/${{ github.repository }}/backend:latest
         run: |
           cd backend
-          docker build -t $IMAGE_NAME .
+          npm cache clean --force
+          docker builder prune -af || true
+          docker build --no-cache -t $IMAGE_NAME .
           docker tag $IMAGE_NAME $LATEST_IMAGE
           docker push $IMAGE_NAME
           docker push $LATEST_IMAGE
