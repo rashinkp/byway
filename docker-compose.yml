@@ -40,3 +40,13 @@ services:
 
 volumes:
   db_data:
+
+# ---
+# DB data is persisted in the named volume 'db_data'.
+# To safely clean up unused Docker images, containers, and networks (but NOT volumes/data), run:
+#   docker system prune -a -f
+# This will keep your database data safe.
+# To also clean up old logs, you can run:
+#   sudo journalctl --vacuum-time=7d
+#   sudo rm -rf /var/lib/docker/containers/*/*-json.log
+# ---
