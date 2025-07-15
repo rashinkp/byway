@@ -102,7 +102,9 @@ jobs:
           # ---
           # CLEANUP: Free up disk space before pulling new images
           # Remove unused Docker images, stopped containers, networks, and builder cache (safe for DB data)
-          docker system prune -a -f
+          docker container prune -f
+          docker image prune -a -f
+          docker network prune -f
           docker builder prune -a -f
           # Optional: Clean up old Docker/container logs (safe for DB data)
           sudo journalctl --vacuum-time=7d || true
