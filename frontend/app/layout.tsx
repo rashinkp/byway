@@ -29,7 +29,6 @@ export default function RootLayout({
 }: Readonly<{
 	children: React.ReactNode;
 }>) {
-	console.log("[env] showing", process.env.NEXT_PUBLIC_API_URL);
 	return (
 		<html lang="en" suppressHydrationWarning>
 			<body
