@@ -100,18 +100,22 @@ jobs:
           echo ${{ secrets.GHCR_TOKEN }} | docker login ghcr.io -u ${{ github.actor }} --password-stdin
           export COMMIT_SHA=${{ github.sha }}
           # ---
-          # CLEANUP: Free up disk space before pulling new images
-          # Remove unused Docker images, stopped containers, networks, and builder cache (safe for DB data)
+          # AGGRESSIVE CLEANUP: Free up disk space before pulling new images
+          # 1. Stop and remove all containers
+          docker compose -f docker-compose.yml down
+          # 2. Remove all stopped containers (should be none, but just in case)
           docker container prune -f
+          # 3. Remove all unused images
           docker image prune -a -f
+          # 4. Remove unused networks and builder cache
           docker network prune -f
           docker builder prune -a -f
-          # Optional: Clean up old Docker/container logs (safe for DB data)
+          # 5. Optional: Clean up old Docker/container logs (safe for DB data)
           sudo journalctl --vacuum-time=7d || true
           sudo rm -rf /var/lib/docker/containers/*/*-json.log || true
           # ---
+          # Now pull and start new containers
           docker compose -f docker-compose.yml pull
-          docker compose -f docker-compose.yml down
           docker compose -f docker-compose.yml up -d
           EOF
           scp -i key.pem -o StrictHostKeyChecking=no docker-compose.yml ${EC2_USER}@${EC2_HOST}:~/app/
