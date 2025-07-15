@@ -23,10 +23,6 @@ ENV NEXT_PUBLIC_FACEBOOK_APP_ID=$NEXT_PUBLIC_FACEBOOK_APP_ID
 ENV NEXT_PUBLIC_PAYPAL_CLIENT_ID=$NEXT_PUBLIC_PAYPAL_CLIENT_ID
 ENV NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=$NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY
 
-# Transpile next.config.ts to next.config.js for runtime use
-RUN npm install --no-save tsx
-RUN npx tsx ./next.config.ts > next.config.js
-
 # Build the Next.js app
 RUN npm run build
 
