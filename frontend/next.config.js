@@ -1,6 +1,6 @@
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-var nextConfig = {
+
+const nextConfig = {
     images: {
         remotePatterns: [
             {
@@ -8,7 +8,6 @@ var nextConfig = {
                 hostname: 'res.cloudinary.com',
                 pathname: '/dxogdfuse/image/upload/**',
             },
-            // Add other remote patterns as needed
         ],
         domains: [
             "res.cloudinary.com",
@@ -19,4 +18,5 @@ var nextConfig = {
         ],
     },
 };
-exports.default = nextConfig;
+
+module.exports = nextConfig; 
