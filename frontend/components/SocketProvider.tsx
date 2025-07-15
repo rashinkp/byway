@@ -1,7 +1,7 @@
 "use client";
 import { useEffect } from "react";
 import { toast } from "sonner";
-import socket, { getToken, safeSocketConnect } from "../lib/socket";
+import socket, { safeSocketConnect } from "../lib/socket";
 import { useAuth } from "@/hooks/auth/useAuth";
 import { Bell } from "lucide-react";
 
@@ -34,14 +34,7 @@ export default function SocketProvider() {
 			console.log("[SocketProvider] User authenticated, attempting socket connection");
 			// Add a small delay to ensure cookies are available
 			const timer = setTimeout(() => {
-				const token = getToken();
-				if (token) {
-					console.log("[SocketProvider] Token available, connecting socket");
-					socket.auth = { token };
-					safeSocketConnect();
-				} else {
-					console.log("[SocketProvider] No token available, will retry on next effect");
-				}
+				safeSocketConnect();
 			}, 100);
 			
 			return () => clearTimeout(timer);
