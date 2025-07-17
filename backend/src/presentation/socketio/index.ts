@@ -8,6 +8,7 @@ import { registerNotificationHandlers } from "./handlers/notification.handlers";
 import { ChatController } from "../http/controllers/chat.controller";
 import { NotificationController } from '../http/controllers/notification.controller';
 import { WinstonLogger } from "../../infra/providers/logging/winston.logger";
+import { envConfig } from "../express/configs/env.config";
 let ioInstance: SocketIOServer | null = null;
 
 export function setupSocketIO(
@@ -17,8 +18,11 @@ export function setupSocketIO(
   notificationController: NotificationController,
 ) {
   const io = new SocketIOServer(server, {
-    cors: { origin: "*" },
-});
+    cors: {
+      origin: envConfig.CORS_ORIGIN,
+      credentials: true,
+    },
+  });
   ioInstance = io;
 
   io.use(socketAuthMiddleware);

@@ -15,9 +15,8 @@ services:
     depends_on:
       - db
     env_file:
-      - ./backend.env
+      - ./backend/.env.production
     environment:
-      DATABASE_URL: postgres://bywayuser:bywaypass@db:5432/bywaydb
       NODE_ENV: production
     ports:
       - "5001:5001"
@@ -28,12 +27,9 @@ services:
     depends_on:
       - backend
     env_file:
-      - ./frontend.env
+      - ./frontend/.env.production
     environment:
-      NEXT_PUBLIC_API_URL: https://byway.ddns.net/api/v1
-      NEXT_PUBLIC_SOCKET_URL: https://byway.ddns.net
       NODE_ENV: production
-      NEXT_PUBLIC_GOOGLE_CLIENT_ID: 212202057591-87b5i5r366ss61n3nkdjmj5kksaudt8r.apps.googleusercontent.com
     ports:
       - "3000:3000"
     restart: always

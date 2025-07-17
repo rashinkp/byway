@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   backend:
     volumes:
@@ -7,10 +5,14 @@ services:
     command: npm run dev
     environment:
       NODE_ENV: development
+    env_file:
+      - ./backend/.env.development
 
   frontend:
     volumes:
       - ./frontend:/app
     command: npm run dev
     environment:
-      NODE_ENV: development 
+      NODE_ENV: development
+    env_file:
+      - ./frontend/.env.development 

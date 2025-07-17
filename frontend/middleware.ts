@@ -1,17 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 
 export async function middleware(request: NextRequest) {
-	const { pathname, searchParams } = request.nextUrl;
-	// const cookies = request.headers.get("cookie") || "";
+	const { pathname } = request.nextUrl;
 
-	console.log("Middleware triggered:", {
-		pathname,
-		searchParams: Object.fromEntries(searchParams.entries()),
-		url: request.url,
-		method: request.method,
-	});
-
-	// Skip middleware for static assets and API routes
 	if (
 		pathname.startsWith("/_next") ||
 		pathname.startsWith("/api") ||
@@ -63,13 +54,6 @@ export async function middleware(request: NextRequest) {
 		}
 	}
 
-	console.log("Middleware user check:", {
-		pathname,
-		hasUser: !!currentUser,
-		userRole: currentUser?.role,
-		isPublicRoute,
-		isProtectedRoute,
-	});
 
 	if (isPublicRoute) {
 		// Handle role-based redirection for authenticated users on public routes
