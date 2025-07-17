@@ -18,7 +18,7 @@ export class StripePaymentGateway implements PaymentGateway {
     }
 
     this.stripe = new Stripe(stripeKey, {
-      apiVersion: "2025-04-30.basil",
+      apiVersion: "2025-06-30.basil",
     });
   }
 

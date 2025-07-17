@@ -184,12 +184,11 @@ export function InstructorFormModal({
 	if (instructorData?.data?.status === "PENDING") {
 		return (
 			<Dialog open={open} onOpenChange={onOpenChange}>
-				<DialogContent>
+				<DialogContent className="bg-white text-black">
 					<DialogHeader>
-						<DialogTitle>Application Pending</DialogTitle>
-						<DialogDescription>
-							Your instructor application is currently under review. We will
-							notify you once it has been processed.
+						<DialogTitle className="text-black">Application Pending</DialogTitle>
+						<DialogDescription className="text-[#facc15]">
+							Your instructor application is currently under review. We will notify you once it has been processed.
 						</DialogDescription>
 					</DialogHeader>
 				</DialogContent>
