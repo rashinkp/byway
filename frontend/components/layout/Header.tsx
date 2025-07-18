@@ -358,7 +358,7 @@ export function Header(
 						<Button
 							variant="ghost"
 							size="icon"
-							className="text-black hover:text-[#facc15] bg-transparent border-none"
+							className="text-black  bg-transparent border-none"
 							onClick={() => setIsMenuOpen(!isMenuOpen)}
 						>
 							{isMenuOpen ? (
@@ -483,7 +483,7 @@ export function Header(
 											</Link>
 											<div className="flex justify-between items-center gap-2 mt-4">
 												<Button
-													variant="outline"
+													variant="secondary"
 													onClick={() => {
 														logout(undefined, {
 															onSuccess: () => {

@@ -67,14 +67,10 @@ export const HeaderSearchBar: React.FC<HeaderSearchBarProps> = ({
 						searchQuery && searchResults && setShowSearchResults(true)
 					}
 					placeholder="Search for courses, topics, instructors..."
-					className="w-full py-2.5 px-4 pl-10 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#facc15] focus:border-transparent text-black placeholder-gray-400 transition-all duration-300 shadow-sm bg-white"
-					style={{
-						background: "#fff",
-						color: "#18181b",
-					}}
+					className="w-full py-2.5 px-4 pl-10 border-0 border-b-1 border-black focus:border-b-2 focus:border-[#facc15] bg-white text-black placeholder-gray-400 focus:outline-none transition-all duration-300 shadow-none"
 					ref={inputRef}
 				/>
-				<Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-[#facc15]" />
+				<Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-black/60 " />
 				{isSearching && (
 					<Loader2
 						className="absolute right-3 top-1/2 transform -translate-y-1/2 w-5 h-5 animate-spin"
@@ -84,11 +80,7 @@ export const HeaderSearchBar: React.FC<HeaderSearchBarProps> = ({
 				{/* Enhanced Search Results Dropdown */}
 				{showSearchResults && searchResults && searchQuery && (
 					<div
-						className="absolute top-full left-0 right-0 mt-2 rounded-lg shadow-lg max-h-96 overflow-hidden z-50 bg-white text-black"
-						style={{
-							background: "#fff",
-							color: "#18181b",
-						}}
+						className="absolute top-full left-0 right-0 mt-2 rounded-lg shadow-lg max-h-96 overflow-hidden z-50 bg-white text-black border border-black"
 					>
 						<div className="max-h-96 overflow-y-auto">
 							{/* Instructors Section */}
@@ -98,7 +90,7 @@ export const HeaderSearchBar: React.FC<HeaderSearchBarProps> = ({
 										<h3 className="text-sm font-semibold text-black whitespace-nowrap">
 											Instructors
 										</h3>
-										<div className="flex-1 border-t border-[#facc15] ml-1" />
+										<div className="flex-1 border-t border-black ml-1" />
 									</div>
 									<div className="space-y-2">
 										{searchResults.instructors.items.map((instructor) => (
@@ -106,10 +98,10 @@ export const HeaderSearchBar: React.FC<HeaderSearchBarProps> = ({
 												key={instructor.id}
 												href={`/instructors/${instructor.id}`}
 												onClick={handleSearchItemClick}
-												className="flex items-center gap-3 p-3 hover:bg-[#fde047] rounded-lg transition-colors group"
+												className="flex items-center gap-3 p-3 hover:bg-[#facc15] rounded-lg transition-colors group"
 											>
 												<div
-													className="w-10 h-10 rounded-full flex items-center justify-center text-white font-semibold shadow-md bg-[#facc15]"
+													className="w-10 h-10 rounded-full flex items-center justify-center text-black font-semibold shadow-md bg-[#facc15]"
 												>
 													{instructor.name.charAt(0)}
 												</div>
@@ -117,11 +109,11 @@ export const HeaderSearchBar: React.FC<HeaderSearchBarProps> = ({
 													<p className="text-sm font-medium text-black transition-colors">
 														{instructor.name}
 													</p>
-													<p className="text-xs text-[#facc15] truncate">
+													<p className="text-xs text-black truncate">
 														{instructor.shortBio || "Instructor"}
 													</p>
 												</div>
-												<Users className="w-4 h-4 text-[#facc15]" />
+												<Users className="w-4 h-4 text-black" />
 											</Link>
 										))}
 									</div>
@@ -129,12 +121,12 @@ export const HeaderSearchBar: React.FC<HeaderSearchBarProps> = ({
 							)}
 							{/* Courses Section */}
 							{searchResults.courses.items.length > 0 && (
-								<div className="p-4 border-b border-[#facc15] ">
+								<div className="p-4 ">
 									<div className="flex items-center gap-2 mb-3">
 										<h3 className="text-sm font-semibold text-black whitespace-nowrap">
 											Courses
 										</h3>
-										<div className="flex-1 border-t border-[#facc15] ml-1" />
+										<div className="flex-1 border-t border-black ml-1" />
 									</div>
 									<div className="space-y-2">
 										{searchResults.courses.items.map((course) => (
@@ -142,7 +134,7 @@ export const HeaderSearchBar: React.FC<HeaderSearchBarProps> = ({
 												key={course.id}
 												href={`/courses/${course.id}`}
 												onClick={handleSearchItemClick}
-												className="flex items-center gap-3 p-3 hover:bg-[#fde047] rounded-lg transition-colors group"
+												className="flex items-center gap-3 p-3 hover:bg-[#facc15] rounded-lg transition-colors group"
 											>
 												<div className="w-12 h-8 rounded-md bg-[#facc15]/10 flex items-center justify-center shadow-sm overflow-hidden">
 													{course.thumbnail ? (
@@ -167,18 +159,18 @@ export const HeaderSearchBar: React.FC<HeaderSearchBarProps> = ({
 																<span className="text-sm font-semibold text-black transition-colors">
 																	${course.offer}
 																</span>
-																<span className="text-sm text-[#facc15] line-through">
+																<span className="text-sm text-black line-through">
 																	${course.price}
 																</span>
 															</>
 														) : (
-															<span className="text-sm font-semibold text-[#facc15] transition-colors">
+															<span className="text-sm font-semibold text-black transition-colors">
 																${course.price}
 															</span>
 														)}
 													</div>
 												</div>
-												<Clock className="w-4 h-4 text-[#facc15]" />
+												<Clock className="w-4 h-4 text-black" />
 											</Link>
 										))}
 									</div>
@@ -187,12 +179,12 @@ export const HeaderSearchBar: React.FC<HeaderSearchBarProps> = ({
 							{/* Certificates Section */}
 							{searchResults.certificates &&
 								searchResults.certificates.items.length > 0 && (
-									<div className="p-4 border-b border-[#facc15] ">
+									<div className="p-4">
 										<div className="flex items-center gap-2 mb-3">
 											<h3 className="text-sm font-semibold text-black whitespace-nowrap">
 												Certificates
 											</h3>
-											<div className="flex-1 border-t border-[#facc15] ml-1" />
+											<div className="flex-1 border-t border-black ml-1" />
 										</div>
 										<div className="space-y-2">
 											{searchResults.certificates.items.map((certificate) => (
@@ -200,7 +192,7 @@ export const HeaderSearchBar: React.FC<HeaderSearchBarProps> = ({
 													key={certificate.id}
 													href={`/certificates/${certificate.id}`}
 													onClick={handleSearchItemClick}
-													className="flex items-center gap-3 p-3 hover:bg-[#fde047] rounded-lg transition-colors group"
+													className="flex items-center gap-3 p-3 hover:bg-[#facc15] rounded-lg transition-colors group"
 												>
 												</Link>
 											))}
@@ -214,7 +206,7 @@ export const HeaderSearchBar: React.FC<HeaderSearchBarProps> = ({
 										<h3 className="text-sm font-semibold text-black whitespace-nowrap">
 											Categories
 										</h3>
-										<div className="flex-1 border-t border-[#facc15] ml-1" />
+										<div className="flex-1 border-t border-black ml-1" />
 									</div>
 									<div className="space-y-2">
 										{searchResults.categories.items.map((category) => (
@@ -222,7 +214,7 @@ export const HeaderSearchBar: React.FC<HeaderSearchBarProps> = ({
 												key={category.id}
 												href={`/courses?category=${category.id}`}
 												onClick={handleSearchItemClick}
-												className="block p-3 hover:bg-[#fde047] rounded-lg transition-colors group"
+												className="block p-3 hover:bg-[#facc15] rounded-lg transition-colors group"
 												style={{
 													background: "#facc15/10",
 													color: "#18181b",
@@ -231,7 +223,7 @@ export const HeaderSearchBar: React.FC<HeaderSearchBarProps> = ({
 												<p className="text-sm font-medium text-black transition-colors">
 													{category.title}
 												</p>
-												<p className="text-xs text-[#facc15] mt-1 line-clamp-2">
+												<p className="text-xs text-black mt-1 line-clamp-2">
 													{category.description}
 												</p>
 											</Link>
@@ -255,7 +247,7 @@ export const HeaderSearchBar: React.FC<HeaderSearchBarProps> = ({
 										<p className="text-sm text-black">
 											No results found for &quot;{searchQuery}&quot;
 										</p>
-										<p className="text-xs text-[#facc15] mt-1">
+										<p className="text-xs text-black mt-1">
 											Try different keywords or browse categories
 										</p>
 									</div>

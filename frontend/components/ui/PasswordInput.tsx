@@ -29,14 +29,14 @@ export function PasswordInput({ className, ...props }: PasswordInputProps) {
 				type="button"
 				variant="ghost"
 				size="sm"
-				className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
+				className="absolute right-0 top-0 h-full px-3 py-2 bg-transparent shadow-none hover:bg-transparent focus:bg-transparent active:bg-transparent"
 				onClick={togglePasswordVisibility}
 				aria-label={showPassword ? "Hide password" : "Show password"}
 			>
 				{showPassword ? (
-					<EyeOff className="h-4 w-4 text-[var(--primary-400)] group-hover:text-[var(--primary-700)] transition-colors" />
+					<EyeOff className="h-4 w-4 text-black" />
 				) : (
-					<Eye className="h-4 w-4 text-[var(--primary-400)] group-hover:text-[var(--primary-700)] transition-colors" />
+					<Eye className="h-4 w-4 text-black" />
 				)}
 			</Button>
 		</div>

@@ -3,18 +3,20 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/utils/cn";
 
 const badgeVariants = cva(
-	"inline-flex items-center justify-center rounded-lg border px-2 py-0.5 text-xs font-medium w-fit whitespace-nowrap shrink-0 [&>svg]:size-3 gap-1 [&>svg]:pointer-events-none focus-visible:border-[var(--color-primary-dark)] focus-visible:ring-[var(--color-primary-dark)]/50 focus-visible:ring-[3px] aria-invalid:ring-[var(--color-danger)]/20 dark:aria-invalid:ring-[var(--color-danger)]/40 aria-invalid:border-[var(--color-danger)] transition-[color,box-shadow] overflow-hidden",
+	"inline-flex items-center justify-center rounded-lg px-2 py-0.5 text-xs font-medium w-fit whitespace-nowrap shrink-0 gap-1 transition-colors border-none",
 	{
 		variants: {
 			variant: {
 				default:
-					"border-transparent bg-[var(--color-primary-dark)] text-[var(--color-surface)] [a&]:hover:bg-[var(--color-primary-light)]",
+					"bg-[#18181b] text-white border-none",
+				primary:
+					"bg-[#facc15] text-black border-none",
 				secondary:
-					"border-transparent bg-[var(--color-primary-light)] text-[var(--color-surface)] [a&]:hover:bg-[var(--color-primary-dark)]",
+					"bg-white text-[#18181b] border border-[#18181b]",
 				destructive:
-					"border-transparent bg-[var(--color-danger)] text-[var(--color-surface)] [a&]:hover:bg-[var(--color-danger)]/90 focus-visible:ring-[var(--color-danger)]/20 dark:focus-visible:ring-[var(--color-danger)]/40 dark:bg-[var(--color-danger)]/60",
+					"bg-red-600 text-white border-none",
 				outline:
-					"text-[var(--color-primary-dark)] [a&]:hover:bg-[var(--color-accent)] [a&]:hover:text-[var(--color-surface)]",
+					"bg-transparent text-[#18181b] border border-[#18181b]",
 			},
 		},
 		defaultVariants: {

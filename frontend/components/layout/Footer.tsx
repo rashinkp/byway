@@ -28,31 +28,28 @@ const BywayFooter = () => {
 	];
 
 	return (
-		<footer className="bg-[var(--color-primary-dark)] text-[var(--color-surface)] py-12 px-4 w-full mt-auto ">
+		<footer className="bg-black text-white py-12 px-4 w-full mt-auto">
 			<div className="container mx-auto max-w-6xl">
 				{/* Main Footer Content */}
 				<div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
 					{/* Brand Section */}
 					<div>
-						<h2 className="text-2xl font-bold mb-4">Byway</h2>
-						<p className="text-[var(--color-foreground)]/70 text-sm mb-4">
-							Empowering learners worldwide with accessible, high-quality
-							education.
+						<h2 className="text-2xl font-bold mb-4 text-white">Byway</h2>
+						<p className="text-white/70 text-sm mb-4">
+							Empowering learners worldwide with accessible, high-quality education.
 						</p>
-						<p className="text-[var(--color-foreground)]/50 text-sm">
-							support@byway.com
-						</p>
+						<p className="text-white/50 text-sm">support@byway.com</p>
 					</div>
 
 					{/* Quick Links */}
 					<div>
-						<h3 className="text-lg font-semibold mb-4">Quick Links</h3>
+						<h3 className="text-lg font-semibold mb-4 text-white">Quick Links</h3>
 						<ul className="space-y-2">
 							{quickLinks.map((link, index) => (
 								<li key={index}>
 									<Link
 										href={link.href}
-										className="text-[var(--color-foreground)]/70 hover:text-[var(--color-primary)] transition-colors text-sm"
+										className="text-white/70 hover:text-[#facc15] transition-colors text-sm"
 									>
 										{link.name}
 									</Link>
@@ -63,7 +60,7 @@ const BywayFooter = () => {
 
 					{/* Follow Us */}
 					<div>
-						<h3 className="text-lg font-semibold mb-4">Follow Us</h3>
+						<h3 className="text-lg font-semibold mb-4 text-white">Follow Us</h3>
 						<div className="flex space-x-4">
 							{socialLinks.map((social, index) => (
 								<a
@@ -71,10 +68,10 @@ const BywayFooter = () => {
 									href={social.href}
 									target="_blank"
 									rel="noopener noreferrer"
-									className="w-10 h-10 bg-[var(--color-primary-light)] rounded-lg flex items-center justify-center transition-colors"
+									className="w-10 h-10 bg-white/10 rounded-lg flex items-center justify-center transition-colors hover:bg-[#facc15] group"
 									aria-label={social.label}
 								>
-									<social.icon className="w-5 h-5 text-[var(--color-surface)]" />
+									<social.icon className="w-5 h-5 text-white group-hover:text-black transition-colors" />
 								</a>
 							))}
 						</div>
@@ -82,8 +79,8 @@ const BywayFooter = () => {
 				</div>
 
 				{/* Copyright */}
-				<div className="border-t border-[var(--color-primary-light)] pt-6 text-center">
-					<p className="text-sm text-[var(--color-foreground)]/50">
+				<div className="border-t border-white/20 pt-6 text-center">
+					<p className="text-sm text-white/50">
 						© {currentYear} Byway. All Rights Reserved.
 					</p>
 				</div>

@@ -8,7 +8,7 @@ function Input({ className, type, ...props }: React.ComponentProps<"input">) {
 			type={type}
 			data-slot="input"
 			className={cn(
-				"file:text-[var(--color-primary-dark)] placeholder:text-[var(--color-muted)] selection:bg-[var(--color-primary-dark)] selection:text-[var(--color-surface)] border border-[var(--color-primary-light)] flex h-10 w-full min-w-0 rounded-lg bg-transparent px-4 py-2 text-base transition-all duration-300 outline-none file:inline-flex file:items-center file:justify-center file:rounded-md file:border-0 file:bg-[var(--color-primary-light)] file:px-4 file:py-2 file:text-sm file:font-medium file:text-[var(--color-surface)] focus-visible:border-[var(--color-primary-dark)] focus-visible:ring-2 focus-visible:ring-[var(--color-primary-dark)]/20 disabled:cursor-not-allowed disabled:opacity-50 aria-invalid:border-[var(--color-danger)] aria-invalid:ring-[var(--color-danger)]/20",
+				"file:text-black placeholder:text-neutral-400 selection:bg-[#facc15] selection:text-black border border-[#18181b] flex h-10 w-full min-w-0 rounded-lg bg-white px-4 py-2 text-base text-black transition-all duration-300 outline-none shadow-sm focus-visible:border-[#facc15] focus-visible:ring-2 focus-visible:ring-[#facc15]/20 hover:border-[#facc15] disabled:cursor-not-allowed disabled:opacity-50 aria-invalid:border-red-600 aria-invalid:ring-red-600/20",
 				className,
 			)}
 			{...props}
