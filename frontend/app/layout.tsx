@@ -35,12 +35,6 @@ export default function RootLayout({
 				className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen flex flex-col bg-background text-foreground`}
 				suppressHydrationWarning
 			>
-				<ThemeProvider
-					attribute="data-theme"
-					defaultTheme="nature"
-					enableSystem={false}
-					disableTransitionOnChange
-				>
 					<SocketProvider />
 					<Providers>
 						<GoogleOAuthProvider
@@ -50,7 +44,6 @@ export default function RootLayout({
 						</GoogleOAuthProvider>
 					</Providers>
 					<Toaster richColors position="top-right" />
-				</ThemeProvider>
 			</body>
 		</html>
 	);

@@ -26,15 +26,9 @@ const APP_INFO = {
 };
 
 const THEMES = [
-	{ value: "nature", label: "Nature" },
-	{ value: "sunrise", label: "Sunrise" },
-	{ value: "ocean", label: "Ocean" },
-	{ value: "forest", label: "Forest" },
-	{ value: "midnight", label: "Midnight" },
-	{ value: "rose", label: "Rose" },
-	{ value: "sand", label: "Sand" },
-	{ value: "tech", label: "Tech" },
-	{ value: "lime", label: "Lime" },
+	{ value: "light", label: "Light" },
+	{ value: "dark", label: "Dark" },
+	{ value: "system", label: "System" },
 ];
 
 export default function SettingsPage() {
@@ -48,36 +42,19 @@ export default function SettingsPage() {
 	if (!mounted) return null;
 
 	return (
-		<div className="min-h-screen flex flex-col items-center justify-center px-4 py-12 bg-[var(--color-background)]">
-			<Card className="w-full max-w-xl border-[var(--color-primary-200)] bg-[var(--color-surface)] shadow-lg">
+		<div className="min-h-screen flex flex-col items-center justify-center px-4 py-12 bg-white dark:bg-[#18181b]">
+			<Card className="w-full max-w-xl border-gray-200 bg-white dark:bg-[#232323] shadow-lg">
 				<CardHeader>
-					<CardTitle className="text-2xl text-[var(--color-primary-dark)]">
+					<CardTitle className="text-2xl text-black dark:text-white">
 						Settings
 					</CardTitle>
-					<CardDescription className="text-[var(--color-muted)]">
+					<CardDescription className="text-gray-500 dark:text-gray-300">
 						Manage your Byway experience
 					</CardDescription>
 				</CardHeader>
 				<CardContent className="space-y-8">
 					<section>
-						<h2 className="text-lg font-semibold text-[var(--color-primary-dark)] mb-1">
-							About this Application
-						</h2>
-						<div className="text-[var(--color-primary-dark)] font-medium mb-1">
-							{APP_INFO.name}{" "}
-							<span className="text-xs text-[var(--color-muted)]">
-								v{APP_INFO.version}
-							</span>
-						</div>
-						<div className="text-[var(--color-muted)] mb-2">
-							{APP_INFO.description}
-						</div>
-						<div className="text-sm text-[var(--color-primary-dark)]">
-							{APP_INFO.about}
-						</div>
-					</section>
-					<section>
-						<h2 className="text-lg font-semibold text-[var(--color-primary-dark)] mb-2">
+						<h2 className="text-lg font-semibold text-black dark:text-white mb-1">
 							Theme
 						</h2>
 						<div className="flex items-center gap-4">
@@ -85,24 +62,24 @@ export default function SettingsPage() {
 								value={currentTheme || resolvedTheme}
 								onValueChange={setTheme}
 							>
-								<SelectTrigger className="w-48 border-[var(--color-primary-200)] bg-[var(--color-surface)] text-[var(--color-primary-dark)]">
+								<SelectTrigger className="w-48 border-gray-200 bg-white dark:bg-[#232323] text-black dark:text-white">
 									<SelectValue placeholder="Select theme" />
 								</SelectTrigger>
-								<SelectContent className="bg-[var(--color-surface)] text-[var(--color-primary-dark)] border-[var(--color-primary-200)]">
+								<SelectContent className="bg-white dark:bg-[#232323] text-black dark:text-white border-gray-200">
 									{THEMES.map((theme) => (
 										<SelectItem
 											key={theme.value}
 											value={theme.value}
-											className="hover:bg-[var(--color-primary-50)]"
+											className="hover:bg-gray-100 dark:hover:bg-[#232323]/80"
 										>
 											{theme.label}
 										</SelectItem>
 									))}
 								</SelectContent>
 							</Select>
-							<span className="text-[var(--color-muted)] text-sm">
+							<span className="text-gray-500 dark:text-gray-300 text-sm">
 								Current:{" "}
-								<span className="font-semibold text-[var(--color-primary-dark)]">
+								<span className="font-semibold text-black dark:text-white">
 									{THEMES.find(
 										(t) => t.value === (currentTheme || resolvedTheme),
 									)?.label || ""}

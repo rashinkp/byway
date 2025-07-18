@@ -5,6 +5,7 @@ import { useState, useEffect } from "react";
 import { useAuthStore } from "@/stores/auth.store";
 import { useCurrentUserQuery } from "@/hooks/auth/useCurrentUserQuery";
 import React from "react";
+import { ThemeProvider } from "@/components/Theme-Provider";
 
 function AuthHydrator() {
 	const { data: user } = useCurrentUserQuery();
@@ -38,7 +39,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
 	return (
 		<QueryClientProvider client={queryClient}>
 			<AuthHydrator />
-			{children}
+			<ThemeProvider>{children}</ThemeProvider>
 		</QueryClientProvider>
 	);
 }

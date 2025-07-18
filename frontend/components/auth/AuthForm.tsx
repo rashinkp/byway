@@ -109,7 +109,7 @@ export function AuthForm<T extends FieldValues>({
 					<Button
 						type="submit"
 						disabled={isSubmitting}
-						className="w-full mt-2 bg-[#facc15] text-black hover:bg-black hover:text-[#facc15] border-none"
+						className="w-full mt-2 bg-[#facc15] text-black hover:bg-black hover:text-[#facc15] dark:text-[#facc15] dark:bg-neutral-800 border-none dark:hover:bg-[#facc15] dark:hover:text-black"
 					>
 						{isSubmitting ? (
 							<>

@@ -192,8 +192,8 @@ export function Header(
 				className={cn(
 					"sticky top-0 z-50 w-full transition-all duration-300",
 					scrolled
-						? "bg-white shadow-md"
-						: "bg-white",
+						? "bg-white dark:bg-neutral-900 shadow-md"
+						: "bg-white dark:bg-neutral-900",
 				)}
 			>
 				<div className="container mx-auto px-10 py-3">
@@ -202,7 +202,7 @@ export function Header(
 						<div className="flex items-center gap-10">
 							<Link
 								href="/"
-								className="text-2xl font-bold text-black flex items-center gap-2 transition-colors"
+								className="text-2xl font-bold text-black dark:text-white flex items-center gap-2 transition-colors hover:text-[#facc15] dark:hover:text-[#facc15]"
 							>
 								Byway
 							</Link>
@@ -221,7 +221,7 @@ export function Header(
 						<nav className="flex items-center gap-4">
 							<Link
 								href="/courses"
-								className="text-base font-medium text-black  px-2 py-1 rounded transition-colors"
+								className="text-base font-medium text-black dark:text-white px-2 py-1 rounded transition-colors hover:text-[#facc15] dark:hover:text-[#facc15]"
 							>
 								Courses
 							</Link>
@@ -230,23 +230,23 @@ export function Header(
 								<DropdownMenuTrigger asChild>
 									<Button
 										variant="link"
-										className="flex items-center gap-1 text-base font-medium text-black px-2 py-1 rounded focus:outline-none shadow-none border-none bg-transparent"
+										className="flex items-center gap-1 text-base font-medium text-black dark:text-white px-2 py-1 rounded focus:outline-none shadow-none border-none bg-transparent hover:text-[#facc15] dark:hover:text-[#facc15] group"
 									>
 										Pages
-										<ChevronDown className="w-4 h-4 transition-transform group-data-[state=open]:rotate-90 text-black" />
+										<ChevronDown className="w-4 h-4 transition-colors text-black dark:text-white group-hover:text-[#facc15] dark:group-hover:text-[#facc15]" />
 									</Button>
 								</DropdownMenuTrigger>
 								<DropdownMenuContent
 									align="start"
-									className="w-40 bg-white text-black shadow-lg border-0 p-1"
+									className="w-40 bg-white dark:bg-neutral-800 text-black dark:text-white shadow-lg border-0 p-1"
 								>
-									<DropdownMenuItem asChild className="rounded hover:bg-[#facc15] hover:text-black">
+									<DropdownMenuItem asChild className="rounded hover:bg-[#facc15] hover:text-black dark:hover:bg-[#facc15] dark:hover:text-[#18181b] dark:hover:bg-opacity-80">
 										<Link href="/categories">Categories</Link>
 									</DropdownMenuItem>
-									<DropdownMenuItem asChild className="rounded hover:bg-[#facc15] hover:text-black">
+									<DropdownMenuItem asChild className="rounded hover:bg-[#facc15] hover:text-black dark:hover:bg-[#facc15] dark:hover:text-[#18181b]">
 										<Link href="/instructors">Instructors</Link>
 									</DropdownMenuItem>
-									<DropdownMenuItem asChild className="rounded hover:bg-[#facc15] hover:text-black">
+									<DropdownMenuItem asChild className="rounded hover:bg-[#facc15] hover:text-black dark:hover:bg-[#facc15] dark:hover:text-[#18181b]">
 										<Link href="/theme">Theme</Link>
 									</DropdownMenuItem>
 								</DropdownMenuContent>
@@ -261,9 +261,8 @@ export function Header(
 										<div className="relative group">
 											<Link href="/chat">
 												<MessageSquare
-													className="w-6 h-6 text-black group-hover:text-[#facc15] transition-colors cursor-pointer"
+													className="w-6 h-6 text-black dark:text-white group-hover:text-[#facc15] dark:group-hover:text-[#facc15] transition-colors cursor-pointer"
 													strokeWidth={1.5}
-													style={{ color: "#18181b" }}
 												/>
 												{unreadCount > 0 && (
 													<span className="absolute -top-2 -right-2 w-5 h-5 p-0 flex items-center justify-center text-xs rounded-full bg-[#facc15] text-black font-bold shadow ">
@@ -275,9 +274,8 @@ export function Header(
 										<div className="relative group">
 											<Link href="/user/cart">
 												<ShoppingCart
-													className="w-6 h-6 text-black group-hover:text-[#facc15] transition-colors cursor-pointer"
+													className="w-6 h-6 text-black dark:text-white group-hover:text-[#facc15] dark:group-hover:text-[#facc15] transition-colors cursor-pointer"
 													strokeWidth={1.5}
-													style={{ color: "#18181b" }}
 												/>
 												{cartCount > 0 && (
 													<span className="absolute -top-2 -right-2 w-5 h-5 p-0 flex items-center justify-center text-xs rounded-full bg-[#facc15] text-black font-bold shadow ">
@@ -288,10 +286,9 @@ export function Header(
 										</div>
 										<div className="relative group">
 											<Bell
-												className="w-6 h-6 text-black group-hover:text-[#facc15] transition-colors cursor-pointer"
+												className="w-6 h-6 text-black dark:text-white group-hover:text-[#facc15] dark:group-hover:text-[#facc15] transition-colors cursor-pointer"
 												strokeWidth={1.5}
 												onClick={onNotificationClick}
-												style={{ color: "#18181b" }}
 											/>
 										</div>
 										<DropdownMenu
@@ -300,16 +297,16 @@ export function Header(
 										>
 											<DropdownMenuTrigger asChild>
 												<div className="relative group cursor-pointer">
-													<div className="w-10 h-10 rounded-full bg-[#facc15] flex items-center justify-center text-black font-bold  transition-all">
+													<div className="w-10 h-10 rounded-full bg-[#facc15] dark:bg-[#232323] flex items-center justify-center text-black dark:text-[#facc15] font-bold  transition-all border border-[#facc15] dark:border-[#facc15]">
 														{user.name?.charAt(0) || "U"}
 													</div>
 												</div>
 											</DropdownMenuTrigger>
 											<DropdownMenuContent
 												align="end"
-												className="w-56 bg-white text-black shadow-lg border-0 p-1"
+												className="w-56 bg-white dark:bg-[#232323] text-black dark:text-white shadow-lg border-0 p-1"
 											>
-												<DropdownMenuLabel className="text-black font-semibold">
+												<DropdownMenuLabel className="text-black dark:text-white font-semibold">
 													{user.name || "User"}
 												</DropdownMenuLabel>
 												<DropdownMenuSeparator />
@@ -346,7 +343,7 @@ export function Header(
 							) : (
 								<>
 									<Link href="/login">
-										<Button className="bg-[#facc15] text-black hover:bg-black hover:text-[#facc15] border-none">Sign In</Button>
+										<Button className="bg-[#facc15] text-black hover:bg-black hover:text-[#facc15] border-none dark:bg-neutral-800 dark:text-[#facc15] dark:hover:bg-[#facc15] dark:hover:text-black">Sign In</Button>
 									</Link>
 								</>
 							)}
@@ -369,7 +366,7 @@ export function Header(
 						</Button>
 						<Link
 							href="/"
-							className="text-2xl font-bold text-black flex items-center gap-2 hover:text-[#facc15] transition-colors"
+							className="text-2xl font-bold text-black dark:text-white flex items-center gap-2 hover:text-[#facc15] transition-colors"
 						>
 							Byway
 						</Link>
@@ -379,9 +376,8 @@ export function Header(
 									<div className="relative group">
 										<Link href="/chat">
 											<MessageSquare
-												className="w-6 h-6 text-black group-hover:text-[#facc15] transition-colors cursor-pointer"
+												className="w-6 h-6 text-black dark:text-white group-hover:text-[#facc15] dark:group-hover:text-[#facc15] transition-colors cursor-pointer"
 												strokeWidth={1.5}
-												style={{ color: "#18181b" }}
 											/>
 											{unreadCount > 0 && (
 												<span className="absolute -top-2 -right-2 w-5 h-5 p-0 flex items-center justify-center text-xs rounded-full bg-[#facc15] text-black font-bold shadow ">
@@ -393,9 +389,8 @@ export function Header(
 									<div className="relative group">
 										<Link href="/user/cart">
 											<ShoppingCart
-												className="w-6 h-6 text-black group-hover:text-[#facc15] transition-colors cursor-pointer"
+												className="w-6 h-6 text-black dark:text-white group-hover:text-[#facc15] dark:group-hover:text-[#facc15] transition-colors cursor-pointer"
 												strokeWidth={1.5}
-												style={{ color: "#18181b" }}
 											/>
 											{cartCount > 0 && (
 												<span className="absolute -top-2 -right-2 w-5 h-5 p-0 flex items-center justify-center text-xs rounded-full bg-[#facc15] text-black font-bold shadow ">
@@ -406,10 +401,9 @@ export function Header(
 									</div>
 									<div className="relative group">
 										<Bell
-											className="w-6 h-6 text-black group-hover:text-[#facc15] transition-colors cursor-pointer"
+											className="w-6 h-6 text-black dark:text-white group-hover:text-[#facc15] dark:group-hover:text-[#facc15] transition-colors cursor-pointer"
 											strokeWidth={1.5}
 											onClick={onNotificationClick}
-											style={{ color: "#18181b" }}
 										/>
 									</div>
 									<div className="relative group">
@@ -423,7 +417,7 @@ export function Header(
 							) : (
 								<>
 									<Link href="/login">
-										<Button className="bg-[#facc15] text-black hover:bg-black hover:text-[#facc15] border-none">Sign In</Button>
+										<Button className="bg-[#facc15] text-black hover:bg-black hover:text-[#facc15] border-none dark:bg-neutral-800 dark:text-[#facc15] dark:hover:bg-[#facc15] dark:hover:text-black">Sign In</Button>
 									</Link>
 								</>
 							)}
@@ -432,25 +426,25 @@ export function Header(
 
 					{/* Mobile Menu */}
 					{isMenuOpen && (
-						<div className="md:hidden pt-4 pb-2 space-y-4 border-t mt-3 bg-white">
+						<div className="md:hidden pt-4 pb-2 space-y-4 border-t mt-3 bg-white dark:bg-neutral-900">
 							<div className="space-y-3">
 								<Link
 									href="/courses"
-									className="block px-2 py-1 text-black font-medium text-base rounded hover:bg-[#facc15]/20 transition-colors"
+									className="block px-2 py-1 text-black dark:text-white font-medium text-base rounded transition-colors hover:text-[#facc15] dark:hover:text-[#facc15]"
 									onClick={() => setIsMenuOpen(false)}
 								>
 									Courses
 								</Link>
 								<Link
 									href="/categories"
-									className="block px-2 py-1 text-black font-medium text-base rounded hover:bg-[#facc15]/20 transition-colors"
+									className="block px-2 py-1 text-black dark:text-white font-medium text-base rounded hover:bg-[#facc15]/20 dark:hover:bg-[#facc15]/10 hover:text-black dark:hover:text-[#facc15] transition-colors"
 									onClick={() => setIsMenuOpen(false)}
 								>
 									Categories
 								</Link>
 								<Link
 									href="/instructors"
-									className="block px-2 py-1 text-black font-medium text-base rounded hover:bg-[#facc15]/20 transition-colors"
+									className="block px-2 py-1 text-black dark:text-white font-medium text-base rounded hover:bg-[#facc15]/20 dark:hover:bg-[#facc15]/10 hover:text-black dark:hover:text-[#facc15] transition-colors"
 									onClick={() => setIsMenuOpen(false)}
 								>
 									Instructors
@@ -469,14 +463,14 @@ export function Header(
 										<>
 											<Link
 												href="/user/profile"
-												className="block px-2 py-1 text-black font-medium text-base rounded hover:bg-[#facc15]/20 transition-colors"
+												className="block px-2 py-1 text-black dark:text-white font-medium text-base rounded hover:bg-[#facc15]/20 dark:hover:bg-[#facc15]/10 hover:text-black dark:hover:text-[#facc15] transition-colors"
 												onClick={() => setIsMenuOpen(false)}
 											>
 												Profile
 											</Link>
 											<Link
 												href="/user/profile?section=courses"
-												className="block px-2 py-1 text-black font-medium text-base rounded hover:bg-[#facc15]/20 transition-colors"
+												className="block px-2 py-1 text-black dark:text-white font-medium text-base rounded hover:bg-[#facc15]/20 dark:hover:bg-[#facc15]/10 hover:text-black dark:hover:text-[#facc15] transition-colors"
 												onClick={() => setIsMenuOpen(false)}
 											>
 												My Courses
@@ -509,7 +503,7 @@ export function Header(
 								)}
 								{!user && !isLoading && (
 									<Link href="/login">
-										<Button className="bg-[#facc15] text-black hover:bg-black hover:text-[#facc15] border-none w-full">Sign In</Button>
+										<Button className="bg-[#facc15] text-black hover:bg-black hover:text-[#facc15] border-none w-full dark:bg-neutral-800 dark:text-[#facc15] dark:hover:bg-[#facc15] dark:hover:text-black">Sign In</Button>
 									</Link>
 								)}
 							</div>
