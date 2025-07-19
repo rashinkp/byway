@@ -68,7 +68,7 @@ export default function CourseDetailLayout({
 	}
 
 	return (
-		<div className="min-h-screen bg-gray-50/50 p-6">
+		<div className="min-h-screen p-6">
 			<div className="max-w-7xl mx-auto space-y-6">
 				<div className="flex flex-col lg:flex-row gap-6">
 					<div
@@ -84,7 +84,7 @@ export default function CourseDetailLayout({
 							userRole={userRole}
 						/>
 
-						<div className="bg-white/80 backdrop-blur-sm border border-gray-100 shadow-sm rounded-xl overflow-hidden">
+						<div className="backdrop-blur-sm border border-gray-100 shadow-sm rounded-xl overflow-hidden dark:text-white">
 							<CourseTabs
 								activeTab={activeTab}
 								setActiveTab={setActiveTab}
