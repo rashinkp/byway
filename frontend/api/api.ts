@@ -33,23 +33,34 @@ api.interceptors.response.use(
 			url: error.config?.url,
 		});
 
-		// List of endpoints that should not trigger auth clearing on 401
+		// List of endpoints that should not trigger auth clearing or redirect on 401
 		const guestAccessibleEndpoints = [
 			"/reviews/course/",
 			"/courses/",
 			"/instructors/",
 			"/categories/",
+			"/login",
+			"/signup",
+			"/verify-otp",
+			"/forgot-password",
+			"/reset-password",
+			"/", // Home page
 		];
 
 		const isGuestAccessibleEndpoint = guestAccessibleEndpoints.some(
-			(endpoint) => error.config?.url?.includes(endpoint),
+			(endpoint) => error.config?.url?.includes(endpoint)
+		);
+
+		const isGuestPage = typeof window !== "undefined" && guestAccessibleEndpoints.some(
+			(endpoint) => window.location.pathname.startsWith(endpoint)
 		);
 
 		// Handle 401 errors (unauthorized/disabled user)
 		if (
 			error.response?.status === 401 &&
 			!error.config?.url?.includes("/auth/logout") &&
-			!isGuestAccessibleEndpoint
+			!isGuestAccessibleEndpoint &&
+			!isGuestPage
 		) {
 			console.log("Handling 401 for:", error.config?.url);
 			console.log("[API] Calling clearAuth for 401");

@@ -129,7 +129,7 @@ export default function MainCourseListing() {
   }
 
   return (
-    <div className="container mx-auto px-4 py-2 bg-[var(--color-background)]">
+    <div className="container mx-auto px-4 py-2 mt-16 bg-[var(--color-background)]">
       <div className="flex flex-col lg:flex-row gap-4">
         <div className="lg:w-1/5">
           {isLoading ? (
