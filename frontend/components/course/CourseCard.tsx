@@ -37,7 +37,7 @@ export function CourseCard({ course, className }: CourseCardProps) {
 	return (
 		<div
 			className={cn(
-				"rounded-2xl shadow-lg cursor-pointer overflow-hidden hover:shadow-xl transition-shadow duration-300 bg-white dark:bg-neutral-800 text-black dark:text-white",
+				"rounded-2xl shadow-lg cursor-pointer overflow-hidden  bg-white dark:bg-neutral-800 text-black dark:text-white flex flex-col",
 				className,
 			)}
 			style={{ height: "400px", minHeight: "400px" }}
@@ -56,7 +56,7 @@ export function CourseCard({ course, className }: CourseCardProps) {
 				/>
 				{/* Discount Badge */}
 				{hasDiscount && (
-					<div className="absolute top-3 left-3 bg-red-500 text-white px-2 py-1 rounded-md text-xs font-bold">
+					<div className="absolute top-3 left-3 bg-[#facc15] text-black px-3 py-1 rounded-full text-xs font-bold shadow ring-1 ring-[#facc15]">
 						-{discountPercentage}%
 					</div>
 				)}
@@ -91,21 +91,21 @@ export function CourseCard({ course, className }: CourseCardProps) {
 				</div>
 				{/* Title */}
 				<h2
-					className="text-xl font-bold mb-1 line-clamp-1 text-black dark:text-white"
+					className="text-xl font-bold mb-1 line-clamp-1 text-[#facc15] dark:text-white"
 				>
 					{course.title}
 				</h2>
 				{/* Description */}
-				<p className="text-sm mb-1 leading-relaxed line-clamp-2 text-gray-700 dark:text-gray-300">
+				<p className="text-sm mb-1 leading-relaxed line-clamp-2 text-neutral-600 dark:text-neutral-300">
 					{course.description || "No description available."}
 				</p>
 				{/* Price Section */}
-				<div className="flex items-center gap-2 mb-2">
+				<div className="flex items-center gap-2 mb-2 mt-2">
 					{originalPrice > 0 ? (
 						<>
 							{hasDiscount ? (
 								<>
-									<span className="text-lg font-bold text-black dark:text-white">
+									<span className="text-lg font-bold text-[#facc15] dark:text-[#facc15]">
 										{formatPrice(offerPrice)}
 									</span>
 									<span className="text-sm text-gray-500 dark:text-gray-400 line-through">
@@ -113,13 +113,13 @@ export function CourseCard({ course, className }: CourseCardProps) {
 									</span>
 								</>
 							) : (
-								<span className="text-lg font-bold text-black dark:text-white">
+								<span className="text-lg font-bold text-[#facc15] dark:text-[#facc15]">
 									{formatPrice(originalPrice)}
 								</span>
 							)}
 						</>
 					) : (
-						<span className="text-lg font-bold text-green-600">
+						<span className="text-lg font-bold text-[#facc15] dark:text-[#facc15]">
 							Free
 						</span>
 					)}

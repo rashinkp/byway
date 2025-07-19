@@ -15,7 +15,7 @@ export default function PublicLayout({
 
 	return (
 		<div className="flex flex-col min-h-screen">
-			<Header onNotificationClick={() => setNotificationOpen(true)} />
+			<Header onNotificationClick={() => setNotificationOpen(true)} transparent />
 			<NotificationModal
 				open={notificationOpen}
 				onOpenChange={setNotificationOpen}

@@ -1,56 +1,27 @@
 import React from "react";
 import { Button } from "../ui/button";
 import { useRouter } from "next/navigation";
-import Image from "next/image";
+// Import Lucide icons
+import { User, Search, Users } from "lucide-react";
 
 const steps = [
 	{
 		title: "Create your profile",
 		description:
 			"Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris",
-		illustration: (
-			<div className="w-full h-36 flex items-center justify-center mb-4">
-				<Image
-					src="/maponmobile.webp"
-					alt="Create profile on mobile"
-					width={128}
-					height={128}
-					className="h-32 w-auto rounded-xl object-contain"
-				/>
-			</div>
-		),
+		icon: <User className="w-12 h-12 text-black" />,
 	},
 	{
 		title: "Search Courses",
 		description:
 			"Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris",
-		illustration: (
-			<div className="w-full h-36 flex items-center justify-center mb-4">
-				<Image
-					src="/searching.webp"
-					alt="Searching courses"
-					width={128}
-					height={128}
-					className="h-32 w-auto rounded-xl object-contain"
-				/>
-			</div>
-		),
+		icon: <Search className="w-12 h-12 text-black" />,
 	},
 	{
 		title: "Make a Connection",
 		description:
 			"Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris",
-		illustration: (
-			<div className="w-full h-36 flex items-center justify-center mb-4">
-				<Image
-					src="/peoplemakingconnection.webp"
-					alt="People making connection"
-					width={128}
-					height={128}
-					className="h-32 w-auto rounded-xl object-contain"
-				/>
-			</div>
-		),
+		icon: <Users className="w-12 h-12 text-black" />,
 	},
 ];
 
@@ -91,7 +62,10 @@ export function HowItWorksSection() {
 							key={idx}
 							className="flex flex-col items-center bg-white dark:bg-neutral-800 rounded-2xl shadow-lg hover:shadow-xl transition-shadow duration-300 p-8 border border-transparent dark:border-neutral-700"
 						>
-							{step.illustration}
+							{/* Modern Icon */}
+							<div className="w-20 h-20 flex items-center justify-center mb-4 rounded-full bg-[#facc15] shadow-lg">
+								{step.icon}
+							</div>
 							<h3 className="text-xl font-semibold text-black dark:text-white mb-2 text-center">
 								{step.title}
 							</h3>

@@ -28,7 +28,7 @@ const BywayFooter = () => {
 	];
 
 	return (
-		<footer className="bg-black text-white py-12 px-4 w-full mt-auto">
+		<footer className="relative z-50 bg-black text-white py-12 px-4 w-full mt-auto">
 			<div className="container mx-auto max-w-6xl">
 				{/* Main Footer Content */}
 				<div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">

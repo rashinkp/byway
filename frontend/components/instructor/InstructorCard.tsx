@@ -1,6 +1,7 @@
 import React from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
+import { User } from "lucide-react";
 
 interface InstructorCardProps {
 	instructor: {
@@ -19,7 +20,7 @@ export function InstructorCard({ instructor }: InstructorCardProps) {
 	const router = useRouter();
 	return (
 		<div
-			className="bg-white rounded-2xl shadow-lg cursor-pointer overflow-hidden hover:shadow-xl transition-shadow duration-300 max-w-xs w-full flex flex-col"
+			className="bg-white dark:bg-neutral-800 rounded-2xl shadow-lg cursor-pointer overflow-hidden  max-w-xs w-full flex flex-col"
 			onClick={() => {
 				const id = instructor.user?.id || instructor.id;
 				router.push(`/instructors/${id}`);
@@ -27,23 +28,29 @@ export function InstructorCard({ instructor }: InstructorCardProps) {
 			role="button"
 			tabIndex={0}
 		>
-			<div className="h-40 w-full overflow-hidden">
-				<Image
-					src={instructor.user.avatar}
-					alt={instructor.user.name}
-					className="w-full h-full object-cover p-5"
-					width={160}
-					height={160}
-				/>
+			<div className="flex justify-center mt-6 mb-2">
+				<div className="w-20 h-20 rounded-full ring-2 ring-[#facc15] bg-white dark:bg-neutral-900 shadow flex items-center justify-center overflow-hidden">
+					{instructor.user.avatar ? (
+						<Image
+							src={instructor.user.avatar}
+							alt={instructor.user.name}
+							className="w-full h-full object-cover rounded-full"
+							width={80}
+							height={80}
+						/>
+					) : (
+						<User className="w-10 h-10 text-[#facc15]" />
+					)}
+				</div>
 			</div>
 			<div className="p-6 flex flex-col flex-1">
-				<h3 className="text-lg font-semibold text-[var(--color-primary-dark)] mb-1 line-clamp-1">
+				<h3 className="text-lg font-semibold text-[#facc15] dark:text-[#facc15] mb-1 line-clamp-1 text-center">
 					{instructor.user.name}
 				</h3>
-				<p className="text-sm text-[var(--color-primary-light)] mb-1 line-clamp-1">
+				<p className="text-sm text-neutral-600 dark:text-neutral-300 mb-1 line-clamp-1 text-center">
 					{instructor.areaOfExpertise}
 				</p>
-				<p className="text-sm text-gray-500 line-clamp-2">
+				<p className="text-sm text-gray-500 dark:text-neutral-400 line-clamp-2 text-center">
 					{instructor.professionalExperience}
 				</p>
 			</div>

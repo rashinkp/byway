@@ -79,14 +79,14 @@ export function SectionGrid<T>({
 			{showNavigation && (
 				<div className="flex justify-start gap-3">
 					<Button
-						variant="outline"
+						variant="default"
 						onClick={() => handleSlide("left")}
 						disabled={!canGoLeft || isAnimating}
 					>
 						<ChevronLeft className="w-6 h-6" />
 					</Button>
 					<Button
-						variant="outline"
+						variant="default"
 						onClick={() => handleSlide("right")}
 						disabled={!canGoRight || isAnimating}
 					>

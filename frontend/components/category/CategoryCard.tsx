@@ -34,32 +34,29 @@ export function CategoryCard({
 						key={category.id}
 						onClick={() => onCategoryClick?.(category.id)}
 						className={cn(
-							"group flex flex-col items-center justify-center rounded-2xl shadow-lg hover:shadow-2xl hover:scale-[1.04] transition-all duration-200 cursor-pointer relative overflow-hidden ",
+							"group flex flex-col items-center justify-center rounded-2xl shadow-lg hover:shadow-2xl hover:scale-[1.04] hover:ring-2 hover:ring-[#facc15] transition-all duration-200 cursor-pointer relative overflow-hidden bg-white dark:bg-neutral-800 backdrop-blur-md",
 							wide
-								? "bg-[var(--color-surface)] p-8 min-h-[180px] min-w-[320px] w-full"
-								: "bg-[var(--color-surface)] p-6 min-h-[140px]",
+								? "p-8 min-h-[180px] min-w-[320px] w-full"
+								: "p-6 min-h-[140px]",
 						)}
 					>
 						{/* Category Name */}
 						<h2
-							className="text-xl font-bold mb-1 line-clamp-1"
-							style={{ color: "var(--color-primary-dark)" }}
+							className="text-xl font-bold mb-1 line-clamp-1 text-[#facc15] dark:text-[#facc15]"
 						>
 							{category.name}
 						</h2>
 						{/* Category Description */}
 						{category.description && (
 							<p
-								className="text-sm text-center opacity-90 mt-1 line-clamp-2"
-								style={{ color: "var(--color-muted)" }}
+								className="text-sm text-center opacity-90 mt-1 line-clamp-2 text-neutral-600 dark:text-neutral-300"
 							>
 								{category.description}
 							</p>
 						)}
-						{/* Decorative Blur/Glass Effect */}
+						{/* Decorative Subtle Overlay (no blur) */}
 						<div
-							className="absolute inset-0 pointer-events-none rounded-2xl blur-lg z-0"
-							style={{ background: "rgba(232,246,243,0.3)" }}
+							className="absolute inset-0 pointer-events-none rounded-2xl z-0 bg-white/10 dark:bg-neutral-900/10"
 						/>
 					</div>
 				))}

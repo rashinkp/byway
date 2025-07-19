@@ -40,10 +40,11 @@ import { useUnreadMessageCount } from "@/hooks/chat/useUnreadMessageCount";
 interface HeaderProps {
 	client?: { id: string; name: string };
 	onNotificationClick?: () => void;
+	transparent?: boolean;
 }
 
 export function Header(
-	{ onNotificationClick }: HeaderProps = {} as HeaderProps,
+	{ onNotificationClick, transparent }: HeaderProps = {} as HeaderProps,
 ) {
 	const { user, isLoading } = useAuth();
 	const { mutate: logout, isPending: isLoggingOut } = useLogout();
@@ -191,9 +192,11 @@ export function Header(
 			<header
 				className={cn(
 					"sticky top-0 z-50 w-full transition-all duration-300 ",
-					scrolled
-						? "bg-white dark:bg-neutral-900 shadow-md"
-						: "bg-white dark:bg-neutral-900",
+					transparent
+						? "bg-transparent shadow-none"
+						: scrolled
+							? "bg-white dark:bg-neutral-900 shadow-md"
+							: "bg-white dark:bg-neutral-900",
 				)}
 			>
 				<div className="container mx-auto px-10 py-3">

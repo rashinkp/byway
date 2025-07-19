@@ -71,14 +71,10 @@ export default function UserDashboard() {
 	return (
 		<div className="relative min-h-screen bg-white dark:bg-neutral-900 text-black dark:text-white">
 			{/* Hero Section with banner background */}
-			<div className="relative w-full min-h-[60vh] flex items-center justify-center overflow-hidden">
+			<div className="relative w-full h-[80vh] flex items-center justify-center overflow-hidden mt-16">
 				<LearningBanner />
 				<motion.section
-					initial={{ opacity: 0, y: 40 }}
-					whileInView={{ opacity: 1, y: 0 }}
-					viewport={{ once: true, amount: 0.7 }}
-					transition={{ duration: 0.7, ease: "easeOut" }}
-					className="absolute inset-0 flex flex-col items-center justify-center min-h-[40vh] text-center z-10 mt-50 mb-10 pb-10"
+					className="absolute inset-0 flex flex-col items-center justify-center h-full w-full text-center z-10"
 				>
 					<span className="tracking-[0.3em] text-xs sm:text-sm font-semibold text-[#facc15] mb-2 drop-shadow-[0_2px_8px_rgba(0,0,0,0.7)]">BYWAY</span>
 					<h1 className="text-3xl sm:text-5xl md:text-6xl font-extrabold text-[#facc15] drop-shadow-[0_2px_16px_rgba(0,0,0,0.7)] mb-4">
