@@ -26,7 +26,7 @@ export function CategoriesSection({
 		<section className={`mb-0 ${className || ""}`}>
 			<div className="mb-16">
 				<h2 className="text-3xl sm:text-4xl font-bold mb-4 text-[var(--color-primary-dark)]">
-					Explore & Find the perfect category to guide{" "}
+					<span className="text-[#facc15] dark:text-[#facc15]">Explore & Find</span> the perfect category to guide
 					<br className="hidden sm:block" /> your learning journey.
 				</h2>
 			</div>

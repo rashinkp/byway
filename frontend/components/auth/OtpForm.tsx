@@ -157,7 +157,7 @@ export function VerifyOtpForm() {
 							{resendCooldown > 0 ? (
 								<span>
 									Resend code in{" "}
-									<span className="font-medium text-[var(--color-primary-dark)]">
+									<span className="font-medium text-[#facc15]">
 										{formatTime(resendCooldown)}
 									</span>
 								</span>
@@ -168,10 +168,9 @@ export function VerifyOtpForm() {
 					</div>
 					<Button
 						type="button"
-						variant="outline"
 						onClick={handleResend}
 						disabled={resendCooldown > 0 || isSubmitting || isResending}
-						className="w-full bg-[var(--color-primary-light)] text-[var(--color-surface)] hover:bg-[var(--color-primary-dark)] border-none"
+						className="w-full border-none"
 					>
 						{isResending ? (
 							<>

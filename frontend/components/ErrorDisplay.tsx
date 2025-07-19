@@ -42,18 +42,18 @@ const ErrorDisplay: FC<ErrorDisplayProps> = ({
 				className="w-full flex items-center justify-center mb-6"
 				aria-live="assertive"
 			>
-				<div className="inline-flex items-center gap-3 text-[var(--color-danger)] bg-[var(--color-danger)]/10 border border-[var(--color-danger)] rounded-lg px-4 py-3 text-sm font-medium shadow-sm max-w-md">
-					<AlertCircle className="w-5 h-5 flex-shrink-0" aria-hidden="true" />
+				<div className="inline-flex items-center gap-3 text-red-600 dark:text-red-400 bg-red-50 dark:bg-neutral-900 border border-red-600 dark:border-red-400 rounded-lg px-4 py-3 text-sm font-medium shadow-sm max-w-md">
+					<AlertCircle className="w-5 h-5 flex-shrink-0 text-red-600 dark:text-red-400" aria-hidden="true" />
 					<div className="flex flex-col items-start">
 						<span className="font-semibold">{title}</span>
-						<span className="text-[var(--color-danger)] font-normal">
+						<span className="text-red-600 dark:text-red-400 font-normal">
 							{errorMessage}
 						</span>
 					</div>
 					{onRetry && (
 						<button
 							onClick={onRetry}
-							className="ml-2 underline text-[var(--color-primary-light)] hover:text-[var(--color-primary-dark)] text-xs"
+							className="ml-2 underline text-[#facc15] hover:text-black dark:hover:text-white text-xs"
 							aria-label="Retry the action"
 						>
 							Retry
@@ -73,30 +73,30 @@ const ErrorDisplay: FC<ErrorDisplayProps> = ({
 			aria-live="assertive"
 			className="container mx-auto max-w-2xl px-4 py-8 min-h-screen flex items-center justify-center"
 		>
-			<div className="bg-[var(--color-surface)] rounded-lg shadow-sm p-8 w-full text-center border border-[var(--color-danger)]">
+			<div className="bg-white dark:bg-neutral-900 rounded-lg shadow-sm p-8 w-full text-center border border-red-600 dark:border-red-400">
 				<div className="flex justify-center mb-6">
 					<AlertCircle
 						size={48}
-						className="text-[var(--color-danger)]"
+						className="text-red-600 dark:text-red-400"
 						aria-hidden="true"
 					/>
 				</div>
-				<h1 className="text-2xl font-bold text-[var(--color-primary-dark)] mb-2">
+				<h1 className="text-2xl font-bold text-black dark:text-white mb-2">
 					{title}
 				</h1>
 				{code && (
-					<div className="text-sm text-[var(--color-danger)] mb-2">
+					<div className="text-sm text-red-600 dark:text-red-400 mb-2">
 						Error Code: {code}
 					</div>
 				)}
-				<p className="text-[var(--color-muted)] mb-4">{description}</p>
+				<p className="text-gray-500 dark:text-gray-400 mb-4">{description}</p>
 				<p className="text-[var(--color-danger)] font-medium mb-6" role="alert">
-					Error: {errorMessage}
+					Error: <span className="text-red-600 dark:text-red-400">{errorMessage}</span>
 				</p>
 				{onRetry && (
 					<button
 						onClick={onRetry}
-						className="inline-flex items-center px-6 py-3 bg-[var(--color-primary-light)] text-[var(--color-surface)] rounded-md font-medium hover:bg-[var(--color-primary-dark)] focus:ring-2 focus:ring-[var(--color-primary-light)] focus:outline-none transition-colors"
+						className="inline-flex items-center px-6 py-3 bg-[#facc15] text-black rounded-md font-medium hover:bg-black hover:text-[#facc15] dark:bg-[#18181b] dark:text-[#facc15] dark:hover:bg-[#facc15] dark:hover:text-black focus:ring-2 focus:ring-[#facc15] focus:outline-none transition-colors"
 						aria-label="Retry the action"
 					>
 						Retry

@@ -20,7 +20,7 @@ export default function PublicLayout({
 				open={notificationOpen}
 				onOpenChange={setNotificationOpen}
 			/>
-			<main className="flex-1">
+			<main className="">
 				<PublicRouteWrapper>
 					{children}
 				</PublicRouteWrapper>

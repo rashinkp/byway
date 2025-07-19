@@ -34,7 +34,7 @@ export function OrderCard({ order }: OrderCardProps) {
 						<StatusBadge status={order.paymentStatus} type="payment" />
 						{order.paymentStatus === "FAILED" && (
 							<Button
-								variant="outline"
+								variant="secondary"
 								size="sm"
 								onClick={handleRetry}
 								disabled={isRetrying}

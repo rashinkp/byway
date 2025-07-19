@@ -67,8 +67,8 @@ export function HowItWorksSection() {
 	return (
 		<section className="w-full py-16 bg-transparent">
 			<div className="max-w-7xl mx-auto px-4">
-				<h2 className="text-3xl sm:text-4xl font-bold text-center mb-14 text-[var(--color-primary-dark)]">
-					How Byway{" "}
+				<h2 className="text-3xl sm:text-4xl font-bold text-center mb-14">
+					How <span className="text-[#facc15] dark:text-[#facc15]">Byway</span>{' '}
 					<span className="inline-block relative">
 						works
 						<svg
@@ -78,7 +78,7 @@ export function HowItWorksSection() {
 						>
 							<path
 								d="M0 10 Q60 0 120 10"
-								stroke="var(--color-primary-dark)"
+								stroke="#facc15"
 								strokeWidth="2"
 								fill="none"
 							/>
@@ -89,13 +89,13 @@ export function HowItWorksSection() {
 					{steps.map((step, idx) => (
 						<div
 							key={idx}
-							className="flex flex-col items-center bg-white rounded-2xl border border-[var(--color-primary-light)] shadow-md p-8 transition hover:shadow-xl"
+							className="flex flex-col items-center bg-white dark:bg-neutral-800 rounded-2xl shadow-lg hover:shadow-xl transition-shadow duration-300 p-8 border border-transparent dark:border-neutral-700"
 						>
 							{step.illustration}
-							<h3 className="text-xl font-semibold text-[var(--color-primary-dark)] mb-2 text-center">
+							<h3 className="text-xl font-semibold text-black dark:text-white mb-2 text-center">
 								{step.title}
 							</h3>
-							<p className="text-sm text-center text-[var(--color-primary-light)] mb-6">
+							<p className="text-sm text-center text-gray-700 dark:text-gray-300 mb-6">
 								{step.description}
 							</p>
 							<Button

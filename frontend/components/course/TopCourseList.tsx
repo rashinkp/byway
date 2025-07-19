@@ -44,7 +44,7 @@ export function TopCourses({
 		<section className={cn("mb-12 px-2 sm:px-0", className)}>
 			<div className="mb-16">
 				<h2 className="text-3xl sm:text-4xl font-bold mb-4 text-[var(--color-primary-dark)]">
-					Explore & Find the perfect course to boost <br /> your skills and
+					<span className="text-[#facc15] dark:text-[#facc15]">Explore & Find</span> the perfect course to boost <br /> your skills and
 					career.
 				</h2>
 			</div>
@@ -75,14 +75,14 @@ export function TopCourses({
 			</div>
 			<div className="flex justify-start gap-3 mt-10">
 				<Button
-					variant="outline"
+					variant="default"
 					onClick={() => handleSlide("left")}
 					disabled={!canGoLeft || isAnimating}
 				>
 					<ChevronLeft className="w-6 h-6" />
 				</Button>
 				<Button
-					variant="outline"
+					variant="default"
 					onClick={() => handleSlide("right")}
 					disabled={!canGoRight || isAnimating}
 				>

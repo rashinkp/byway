@@ -86,10 +86,10 @@ export const HeaderSearchBar: React.FC<HeaderSearchBarProps> = ({
 							{searchResults.instructors.items.length > 0 && (
 								<div className="p-4">
 									<div className="flex items-center gap-2 mb-3">
-										<h3 className="text-sm font-semibold text-white whitespace-nowrap">
+										<h3 className="text-sm font-semibold text-black dark:text-white whitespace-nowrap">
 											Instructors
 										</h3>
-										<div className="flex-1 border-t border-white ml-1" />
+										<div className="flex-1 border-t border-black dark:border-white ml-1" />
 									</div>
 									<div className="space-y-2">
 										{searchResults.instructors.items.map((instructor) => (
@@ -97,7 +97,7 @@ export const HeaderSearchBar: React.FC<HeaderSearchBarProps> = ({
 												key={instructor.id}
 												href={`/instructors/${instructor.id}`}
 												onClick={handleSearchItemClick}
-												className="flex items-center gap-3 p-3 rounded-lg transition-colors group text-white hover:text-[#facc15]"
+												className="flex items-center gap-3 p-3 rounded-lg transition-colors group text-black dark:text-white hover:bg-[#facc15] dark:hover:bg-[#facc15] dark:hover:text-black"
 											>
 												<div
 													className="w-10 h-10 rounded-full flex items-center justify-center text-black font-semibold shadow-md bg-[#facc15]"
@@ -105,14 +105,14 @@ export const HeaderSearchBar: React.FC<HeaderSearchBarProps> = ({
 													{instructor.name.charAt(0)}
 												</div>
 												<div className="flex-1 min-w-0">
-													<p className="text-sm font-medium text-white transition-colors">
+													<p className="text-sm font-medium text-black dark:text-white transition-colors group-hover:text-black dark:group-hover:text-black">
 														{instructor.name}
 													</p>
-													<p className="text-xs text-white truncate">
+													<p className="text-xs text-black dark:text-white group-hover:text-black dark:group-hover:text-black truncate">
 														{instructor.shortBio || "Instructor"}
 													</p>
 												</div>
-												<Users className="w-4 h-4 text-black" />
+												<Users className="w-4 h-4 text-black group-hover:text-black dark:text-white dark:group-hover:text-black" />
 											</Link>
 										))}
 									</div>
@@ -122,10 +122,10 @@ export const HeaderSearchBar: React.FC<HeaderSearchBarProps> = ({
 							{searchResults.courses.items.length > 0 && (
 								<div className="p-4 ">
 									<div className="flex items-center gap-2 mb-3">
-										<h3 className="text-sm font-semibold text-white whitespace-nowrap">
+										<h3 className="text-sm font-semibold text-black dark:text-white whitespace-nowrap">
 											Courses
 										</h3>
-										<div className="flex-1 border-t border-white ml-1" />
+										<div className="flex-1 border-t border-black dark:border-white ml-1" />
 									</div>
 									<div className="space-y-2">
 										{searchResults.courses.items.map((course) => (
@@ -133,7 +133,7 @@ export const HeaderSearchBar: React.FC<HeaderSearchBarProps> = ({
 												key={course.id}
 												href={`/courses/${course.id}`}
 												onClick={handleSearchItemClick}
-												className="flex items-center gap-3 p-3 rounded-lg transition-colors group text-white hover:text-[#facc15]"
+												className="flex items-center gap-3 p-3 rounded-lg transition-colors group text-black dark:text-white hover:bg-[#facc15] dark:hover:bg-[#facc15] dark:hover:text-black"
 											>
 												<div className="w-12 h-8 rounded-md bg-[#facc15]/10 flex items-center justify-center shadow-sm overflow-hidden">
 													{course.thumbnail ? (
@@ -149,27 +149,27 @@ export const HeaderSearchBar: React.FC<HeaderSearchBarProps> = ({
 													)}
 												</div>
 												<div className="flex-1 min-w-0">
-													<p className="text-sm font-medium text-white transition-colors truncate">
+													<p className="text-sm font-medium text-black dark:text-white transition-colors group-hover:text-black dark:group-hover:text-black truncate">
 														{course.title}
 													</p>
 													<div className="flex items-center gap-2 mt-1">
 														{course.offer ? (
 															<>
-																<span className="text-sm font-semibold text-white transition-colors">
+																<span className="text-sm font-semibold text-black dark:text-white transition-colors group-hover:text-black dark:group-hover:text-black">
 																	${course.offer}
 																</span>
-																<span className="text-sm text-white line-through">
+																<span className="text-sm text-black dark:text-white line-through group-hover:text-black dark:group-hover:text-black">
 																	${course.price}
 																</span>
 															</>
 														) : (
-															<span className="text-sm font-semibold text-white transition-colors">
+															<span className="text-sm font-semibold text-black dark:text-white transition-colors group-hover:text-black dark:group-hover:text-black">
 																${course.price}
 															</span>
 														)}
 													</div>
 												</div>
-												<Clock className="w-4 h-4 text-black" />
+												<Clock className="w-4 h-4 text-black group-hover:text-black dark:text-white dark:group-hover:text-black" />
 											</Link>
 										))}
 									</div>
@@ -180,10 +180,10 @@ export const HeaderSearchBar: React.FC<HeaderSearchBarProps> = ({
 								searchResults.certificates.items.length > 0 && (
 									<div className="p-4">
 										<div className="flex items-center gap-2 mb-3">
-											<h3 className="text-sm font-semibold text-white whitespace-nowrap">
+											<h3 className="text-sm font-semibold text-black dark:text-white whitespace-nowrap">
 												Certificates
 											</h3>
-											<div className="flex-1 border-t border-white ml-1" />
+											<div className="flex-1 border-t border-black dark:border-white ml-1" />
 										</div>
 										<div className="space-y-2">
 											{searchResults.certificates.items.map((certificate) => (
@@ -191,7 +191,7 @@ export const HeaderSearchBar: React.FC<HeaderSearchBarProps> = ({
 													key={certificate.id}
 													href={`/certificates/${certificate.id}`}
 													onClick={handleSearchItemClick}
-													className="flex items-center gap-3 p-3 rounded-lg transition-colors group text-white hover:text-[#facc15]"
+													className="flex items-center gap-3 p-3 rounded-lg transition-colors group text-black dark:text-white hover:bg-[#facc15] dark:hover:bg-[#facc15] dark:hover:text-black"
 												>
 												</Link>
 											))}
@@ -202,10 +202,10 @@ export const HeaderSearchBar: React.FC<HeaderSearchBarProps> = ({
 							{searchResults.categories.items.length > 0 && (
 								<div className="p-4">
 									<div className="flex items-center gap-2 mb-3">
-										<h3 className="text-sm font-semibold text-white whitespace-nowrap">
+										<h3 className="text-sm font-semibold text-black dark:text-white whitespace-nowrap">
 											Categories
 										</h3>
-										<div className="flex-1 border-t border-white ml-1" />
+										<div className="flex-1 border-t border-black dark:border-white ml-1" />
 									</div>
 									<div className="space-y-2">
 										{searchResults.categories.items.map((category) => (
@@ -213,16 +213,16 @@ export const HeaderSearchBar: React.FC<HeaderSearchBarProps> = ({
 												key={category.id}
 												href={`/courses?category=${category.id}`}
 												onClick={handleSearchItemClick}
-												className="block p-3 rounded-lg transition-colors group text-white hover:text-[#facc15]"
+												className="block p-3 rounded-lg transition-colors group text-black dark:text-white hover:bg-[#facc15] dark:hover:bg-[#facc15] dark:hover:text-black"
 												style={{
 													background: "#facc15/10",
 													color: "#18181b",
 												}}
 											>
-												<p className="text-sm font-medium text-white transition-colors">
+												<p className="text-sm font-medium text-black dark:text-white group-hover:text-black dark:group-hover:text-black transition-colors">
 													{category.title}
 												</p>
-												<p className="text-xs text-white mt-1 line-clamp-2">
+												<p className="text-xs text-black dark:text-white group-hover:text-black dark:group-hover:text-black mt-1 line-clamp-2">
 													{category.description}
 												</p>
 											</Link>
@@ -240,10 +240,10 @@ export const HeaderSearchBar: React.FC<HeaderSearchBarProps> = ({
 										<Search
 											className="w-12 h-12 text-[#facc15] mx-auto mb-3"
 										/>
-										<p className="text-sm text-white">
+										<p className="text-sm text-black dark:text-white">
 											No results found for &quot;{searchQuery}&quot;
 										</p>
-										<p className="text-xs text-white mt-1">
+										<p className="text-xs text-black dark:text-white mt-1">
 											Try different keywords or browse categories
 										</p>
 									</div>

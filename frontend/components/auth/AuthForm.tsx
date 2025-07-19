@@ -64,7 +64,7 @@ export function AuthForm<T extends FieldValues>({
 				<p className="text-sm text-muted-foreground">{subtitle}</p>
 			</div>
 			{error && (
-				<div className="text-center text-sm text-[var(--color-danger)] rounded py-2 px-3 mb-2">
+				<div className="text-center text-sm text-red-600 dark:text-red-400 rounded py-2 px-3 mb-2">
 					{error}
 				</div>
 			)}
@@ -92,7 +92,7 @@ export function AuthForm<T extends FieldValues>({
 											/>
 										)}
 									</FormControl>
-									<FormMessage className="text-[var(--color-danger)]" />
+									<FormMessage className="text-red-600 dark:text-red-400" />
 								</FormItem>
 							)}
 						/>

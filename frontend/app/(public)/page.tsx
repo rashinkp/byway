@@ -4,12 +4,13 @@ import { useCategories } from "@/hooks/category/useCategories";
 import { useRouter } from "next/navigation";
 import { useGetAllCourses } from "@/hooks/course/useGetAllCourse";
 import { useGetAllInstructors } from "@/hooks/instructor/useGetAllInstructor";
-import KnowledgePluseBanner from "@/components/banners/KnowledgePluseBanner";
+import LearningBanner from "@/components/banners/KnowledgePluseBanner";
 import { TopCourses } from "@/components/course/TopCourseList";
 import { CategoriesSection } from "@/components/category/CategorySection";
 import { HowItWorksSection } from "@/components/common/HowItWorksSection";
 import { SectionGrid } from "@/components/common/SectionGrid";
 import { InstructorCard } from "@/components/instructor/InstructorCard";
+import { motion } from "framer-motion";
 
 export default function UserDashboard() {
 	const router = useRouter();
@@ -68,13 +69,34 @@ export default function UserDashboard() {
 		})) || [];
 
 	return (
-		<div
-			className="relative min-h-screen px-10"
-			style={{ background: "var(--color-background)" }}
-		>
-			<div className="container mx-auto px-2 sm:px-4 pt-6 sm:pt-8">
-				<KnowledgePluseBanner />
-				<section className="w-screen relative left-1/2 right-1/2 -mx-[50vw] bg-[var(--color-surface)] rounded-2xl shadow-lg py-10 sm:py-16 my-26">
+		<div className="relative min-h-screen bg-white dark:bg-neutral-900 text-black dark:text-white">
+			{/* Hero Section with banner background */}
+			<div className="relative w-full min-h-[60vh] flex items-center justify-center overflow-hidden">
+				<LearningBanner />
+				<motion.section
+					initial={{ opacity: 0, y: 40 }}
+					whileInView={{ opacity: 1, y: 0 }}
+					viewport={{ once: true, amount: 0.7 }}
+					transition={{ duration: 0.7, ease: "easeOut" }}
+					className="absolute inset-0 flex flex-col items-center justify-center min-h-[40vh] text-center z-10 mt-50 mb-10 pb-10"
+				>
+					<span className="tracking-[0.3em] text-xs sm:text-sm font-semibold text-[#facc15] mb-2 drop-shadow-[0_2px_8px_rgba(0,0,0,0.7)]">BYWAY</span>
+					<h1 className="text-3xl sm:text-5xl md:text-6xl font-extrabold text-[#facc15] drop-shadow-[0_2px_16px_rgba(0,0,0,0.7)] mb-4">
+						Knowledge Meets <span className="block">Innovation</span>
+					</h1>
+					<p className="max-w-2xl mx-auto text-base sm:text-lg md:text-xl text-white/90 font-medium drop-shadow-[0_2px_8px_rgba(0,0,0,0.7)]">
+						This platform's simplicity belies its powerful capabilities, offering a seamless and enjoyable educational experience.
+					</p>
+				</motion.section>
+			</div>
+			<div className="container relative z-10">
+				<motion.section
+					initial={{ opacity: 0, y: 40 }}
+					whileInView={{ opacity: 1, y: 0 }}
+					viewport={{ once: true, amount: 0.3 }}
+					transition={{ duration: 0.7, ease: "easeOut" }}
+					className="w-full relative rounded-2xl shadow-lg py-14 sm:py-20 my-42"
+				>
 					<div className="max-w-7xl mx-auto px-4">
 						<CategoriesSection
 							categories={categories}
@@ -82,26 +104,41 @@ export default function UserDashboard() {
 							onCategoryClick={handleCategoryClick}
 						/>
 					</div>
-				</section>
-				{/* Top Courses Section with matching alignment and spacing */}
-				<section className="my-16">
+				</motion.section>
+				<motion.section
+					initial={{ opacity: 0, y: 40 }}
+					whileInView={{ opacity: 1, y: 0 }}
+					viewport={{ once: true, amount: 0.3 }}
+					transition={{ duration: 0.7, delay: 0.2, ease: "easeOut" }}
+					className="my-32"
+				>
 					<div className="max-w-7xl mx-auto px-4">
 						<TopCourses courses={topCourses} router={router} />
 					</div>
-				</section>
-				{/* How It Works Section */}
-				<section className="w-screen relative left-1/2 right-1/2 -mx-[50vw] bg-[var(--color-surface)] rounded-2xl shadow-lg py-10 sm:py-16 my-16">
+				</motion.section>
+				<motion.section
+					initial={{ opacity: 0, y: 40 }}
+					whileInView={{ opacity: 1, y: 0 }}
+					viewport={{ once: true, amount: 0.3 }}
+					transition={{ duration: 0.7, delay: 0.4, ease: "easeOut" }}
+					className="w-full relative rounded-2xl shadow-lg py-14 sm:py-20 my-32"
+				>
 					<div className="max-w-7xl mx-auto px-4">
 						<HowItWorksSection />
 					</div>
-				</section>
-				{/* Instructors Section */}
-				<section className="my-16">
+				</motion.section>
+				<motion.section
+					initial={{ opacity: 0, y: 40 }}
+					whileInView={{ opacity: 1, y: 0 }}
+					viewport={{ once: true, amount: 0.3 }}
+					transition={{ duration: 0.7, delay: 0.6, ease: "easeOut" }}
+					className="my-32"
+				>
 					<div className="max-w-7xl mx-auto px-4">
 						<SectionGrid
 							title={
 								<span>
-									Meet our professional{" "}
+									<span className="text-[#facc15] dark:text-[#facc15]">Meet</span> our professional{' '}
 									<span className="inline-block relative">
 										mentors.
 										<svg
@@ -111,7 +148,7 @@ export default function UserDashboard() {
 										>
 											<path
 												d="M0 10 Q60 0 120 10"
-												stroke="var(--color-primary-dark)"
+												stroke="#facc15"
 												strokeWidth="2"
 												fill="none"
 											/>
@@ -126,9 +163,14 @@ export default function UserDashboard() {
 							showNavigation={true}
 						/>
 					</div>
-				</section>
-				{/* Testimonial Section */}
-				<section className="w-screen relative left-1/2 right-1/2 -mx-[50vw] bg-[var(--color-surface)] rounded-2xl shadow-lg py-10 sm:py-16">
+				</motion.section>
+				<motion.section
+					initial={{ opacity: 0, y: 40 }}
+					whileInView={{ opacity: 1, y: 0 }}
+					viewport={{ once: true, amount: 0.3 }}
+					transition={{ duration: 0.7, delay: 0.8, ease: "easeOut" }}
+					className="w-full relative rounded-2xl shadow-lg py-14 sm:py-20 my-32 bg-white dark:bg-neutral-800"
+				>
 					<div className="max-w-2xl mx-auto px-4 text-left">
 						<div className="flex justify-start mb-4">
 							<svg
@@ -142,17 +184,17 @@ export default function UserDashboard() {
 									x="0"
 									y="32"
 									fontSize="56"
-									fill="var(--color-background)"
+									fill="#facc15]"
 									fontWeight="bold"
 								>
 									"
 								</text>
 							</svg>
 						</div>
-						<h2 className="text-2xl font-bold mb-4 text-[var(--color-primary-dark)]">
+						<h2 className="text-2xl font-bold mb-4 text-[#facc15]">
 							Testimonial
 						</h2>
-						<p className="text-lg text-[var(--color-primary-dark)] mb-8 font-medium">
+						<p className="text-lg text-white mb-8 font-medium">
 							"Since implementing Byway, our organization has witnessed a
 							remarkable transformation in how we approach learning. The
 							platform&apos;s simplicity belies its powerful capabilities,
@@ -161,12 +203,12 @@ export default function UserDashboard() {
 							and foster collaboration among learners is truly impressive."
 						</p>
 						<div className="flex flex-col items-start gap-2">
-							<span className="font-semibold text-[var(--color-primary-dark)]">
+							<span className="font-semibold text-[#facc15]">
 								Byway
 							</span>
 						</div>
 					</div>
-				</section>
+				</motion.section>
 			</div>
 		</div>
 	);

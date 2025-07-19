@@ -34,9 +34,9 @@ export function PasswordInput({ className, ...props }: PasswordInputProps) {
 				aria-label={showPassword ? "Hide password" : "Show password"}
 			>
 				{showPassword ? (
-					<EyeOff className="h-4 w-4 text-black" />
+					<EyeOff className="h-4 w-4 text-black dark:text-white" />
 				) : (
-					<Eye className="h-4 w-4 text-black" />
+					<Eye className="h-4 w-4 text-black dark:text-white" />
 				)}
 			</Button>
 		</div>

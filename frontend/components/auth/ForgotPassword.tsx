@@ -77,16 +77,15 @@ export function ForgotPasswordForm() {
 											{...field}
 										/>
 									</FormControl>
-									<FormMessage />
+									<FormMessage className="text-red-600 dark:text-red-400" />
 								</FormItem>
 							)}
 						/>
-						<Button type="submit" disabled={isPending}>
+						<Button type="submit" disabled={isPending} className="w-full mt-2">
 							{isPending ? "Sending..." : "Send Reset Code"}
 						</Button>
 						<div className="flex justify-between">
 							<AuthLink text="" linkText="Back to login" href="/login" />
-							<AuthLink text="" linkText="Create account" href="/signup" />
 						</div>
 					</form>
 				</Form>

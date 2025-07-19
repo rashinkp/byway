@@ -37,15 +37,10 @@ export function CourseCard({ course, className }: CourseCardProps) {
 	return (
 		<div
 			className={cn(
-				"rounded-2xl shadow-lg cursor-pointer overflow-hidden hover:shadow-xl transition-shadow duration-300 ",
+				"rounded-2xl shadow-lg cursor-pointer overflow-hidden hover:shadow-xl transition-shadow duration-300 bg-white dark:bg-neutral-800 text-black dark:text-white",
 				className,
 			)}
-			style={{
-				background: "var(--color-surface)",
-				color: "var(--color-primary-dark)",
-				height: "400px",
-				minHeight: "400px",
-			}}
+			style={{ height: "400px", minHeight: "400px" }}
 			onClick={handleCardClick}
 			role="button"
 			tabIndex={0}
@@ -83,10 +78,10 @@ export function CourseCard({ course, className }: CourseCardProps) {
 						height={36}
 					/>
 					<div>
-						<h3 className="font-medium text-sm text-[var(--color-primary-dark)]">
+						<h3 className="font-medium text-sm text-black dark:text-white">
 							{course.instructor?.name || "Unknown"}
 						</h3>
-						<p className="text-xs text-[var(--color-primary-light)]">
+						<p className="text-xs text-gray-500 dark:text-gray-400">
 							{(course.instructor &&
 								"role" in course.instructor &&
 								(course.instructor as any).role) ||
@@ -96,15 +91,12 @@ export function CourseCard({ course, className }: CourseCardProps) {
 				</div>
 				{/* Title */}
 				<h2
-					className="text-xl font-bold mb-1 line-clamp-1"
-					style={{ color: "var(--foreground)" }}
+					className="text-xl font-bold mb-1 line-clamp-1 text-black dark:text-white"
 				>
-					<span className="text-[var(--color-primary-dark)]">
-						{course.title}
-					</span>
+					{course.title}
 				</h2>
 				{/* Description */}
-				<p className="text-sm mb-1 leading-relaxed line-clamp-2 text-[var(--color-primary-light)]">
+				<p className="text-sm mb-1 leading-relaxed line-clamp-2 text-gray-700 dark:text-gray-300">
 					{course.description || "No description available."}
 				</p>
 				{/* Price Section */}
@@ -113,15 +105,15 @@ export function CourseCard({ course, className }: CourseCardProps) {
 						<>
 							{hasDiscount ? (
 								<>
-									<span className="text-lg font-bold text-[var(--color-primary-dark)]">
+									<span className="text-lg font-bold text-black dark:text-white">
 										{formatPrice(offerPrice)}
 									</span>
-									<span className="text-sm text-[var(--color-primary-light)] line-through">
+									<span className="text-sm text-gray-500 dark:text-gray-400 line-through">
 										{formatPrice(originalPrice)}
 									</span>
 								</>
 							) : (
-								<span className="text-lg font-bold text-[var(--color-primary-dark)]">
+								<span className="text-lg font-bold text-black dark:text-white">
 									{formatPrice(originalPrice)}
 								</span>
 							)}
