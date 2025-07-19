@@ -87,11 +87,11 @@ export default function UserDashboard() {
 			</div>
 			<div className="container relative z-10">
 				<motion.section
-					initial={{ opacity: 0, y: 40 }}
+					initial={{ opacity: 0, y: 60 }}
 					whileInView={{ opacity: 1, y: 0 }}
 					viewport={{ once: true, amount: 0.3 }}
-					transition={{ duration: 0.7, ease: "easeOut" }}
-					className="w-full relative rounded-2xl shadow-lg py-14 sm:py-20 my-42"
+					transition={{ duration: 0.3, ease: "easeOut" }}
+					className="w-full relative rounded-2xl shadow-lg py-14 sm:py-20 my-28"
 				>
 					<div className="max-w-7xl mx-auto px-4">
 						<CategoriesSection
@@ -102,33 +102,33 @@ export default function UserDashboard() {
 					</div>
 				</motion.section>
 				<motion.section
-					initial={{ opacity: 0, y: 40 }}
+					initial={{ opacity: 0, y: 60 }}
 					whileInView={{ opacity: 1, y: 0 }}
 					viewport={{ once: true, amount: 0.3 }}
-					transition={{ duration: 0.7, delay: 0.2, ease: "easeOut" }}
-					className="my-32"
+					transition={{ duration: 0.3, ease: "easeOut" }}
+					className="my-50"
 				>
 					<div className="max-w-7xl mx-auto px-4">
 						<TopCourses courses={topCourses} router={router} />
 					</div>
 				</motion.section>
 				<motion.section
-					initial={{ opacity: 0, y: 40 }}
+					initial={{ opacity: 0, y: 60 }}
 					whileInView={{ opacity: 1, y: 0 }}
 					viewport={{ once: true, amount: 0.3 }}
-					transition={{ duration: 0.7, delay: 0.4, ease: "easeOut" }}
-					className="w-full relative rounded-2xl shadow-lg py-14 sm:py-20 my-32"
+					transition={{ duration: 0.3, ease: "easeOut" }}
+					className="w-full relative rounded-2xl shadow-lg py-4 sm:py-20 my-28"
 				>
 					<div className="max-w-7xl mx-auto px-4">
 						<HowItWorksSection />
 					</div>
 				</motion.section>
 				<motion.section
-					initial={{ opacity: 0, y: 40 }}
+					initial={{ opacity: 0, y: 60 }}
 					whileInView={{ opacity: 1, y: 0 }}
 					viewport={{ once: true, amount: 0.3 }}
-					transition={{ duration: 0.7, delay: 0.6, ease: "easeOut" }}
-					className="my-32"
+					transition={{ duration: 0.3, ease: "easeOut" }}
+					className="my-28"
 				>
 					<div className="max-w-7xl mx-auto px-4">
 						<SectionGrid
@@ -161,11 +161,11 @@ export default function UserDashboard() {
 					</div>
 				</motion.section>
 				<motion.section
-					initial={{ opacity: 0, y: 40 }}
+					initial={{ opacity: 0, y: 60 }}
 					whileInView={{ opacity: 1, y: 0 }}
 					viewport={{ once: true, amount: 0.3 }}
-					transition={{ duration: 0.7, delay: 0.8, ease: "easeOut" }}
-					className="w-full relative rounded-2xl shadow-lg py-14 sm:py-20 my-32 bg-white dark:bg-neutral-800"
+					transition={{ duration: 0.3, ease: "easeOut" }}
+					className="w-full relative rounded-2xl shadow-lg py-14 sm:py-20 my-28 bg-white dark:bg-neutral-800"
 				>
 					<div className="max-w-2xl mx-auto px-4 text-left">
 						<div className="flex justify-start mb-4">

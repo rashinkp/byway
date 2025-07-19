@@ -43,7 +43,7 @@ export default function SettingsPage() {
 
 	return (
 		<div className="min-h-screen flex flex-col items-center justify-center px-4 py-12 bg-white dark:bg-[#18181b]">
-			<Card className="w-full max-w-xl border-gray-200 bg-white dark:bg-[#232323] shadow-lg">
+			<Card className="w-full max-w-xl border-gray-200 bg-white dark:bg-[#232323] shadow-lg mb-10">
 				<CardHeader>
 					<CardTitle className="text-2xl text-black dark:text-white">
 						Settings
@@ -81,7 +81,7 @@ export default function SettingsPage() {
 								Current:{" "}
 								<span className="font-semibold text-black dark:text-white">
 									{THEMES.find(
-										(t) => t.value === (currentTheme || resolvedTheme),
+									(t) => t.value === (currentTheme || resolvedTheme),
 									)?.label || ""}
 								</span>
 							</span>
@@ -89,6 +89,20 @@ export default function SettingsPage() {
 					</section>
 				</CardContent>
 			</Card>
+
+      {/* About Byway Section */}
+      <Card className="w-full max-w-xl border-gray-200 bg-white dark:bg-[#232323] shadow-lg">
+        <CardHeader>
+          <CardTitle className="text-xl text-black dark:text-white mb-2">About Byway</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div>
+            <span className="block text-base font-semibold text-[#facc15] mb-1">{APP_INFO.name} v{APP_INFO.version}</span>
+            <p className="text-gray-700 dark:text-gray-200 mb-2">{APP_INFO.description}</p>
+            <p className="text-gray-600 dark:text-gray-300 text-sm leading-relaxed">{APP_INFO.about}</p>
+          </div>
+        </CardContent>
+      </Card>
 		</div>
 	);
 }

@@ -41,14 +41,14 @@ export function TopCourses({
 	};
 
 	return (
-		<section className={cn("mb-12 px-2 sm:px-0", className)}>
-			<div className="mb-16">
+		<section className={cn("mb-0 px-2 sm:px-0", className)}>
+			<div className="mb-4">
 				<h2 className="text-3xl sm:text-4xl font-bold mb-4 text-[var(--color-primary-dark)]">
 					<span className="text-[#facc15] dark:text-[#facc15]">Explore & Find</span> the perfect course to boost <br /> your skills and
 					career.
 				</h2>
 			</div>
-			<div className="overflow-hidden relative" style={{ minHeight: 420 }}>
+			<div className="overflow-hidden relative mt-20" style={{ minHeight: 420 }}>
 				<div
 					ref={containerRef}
 					className={

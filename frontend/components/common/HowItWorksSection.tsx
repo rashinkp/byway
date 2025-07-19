@@ -1,7 +1,6 @@
 import React from "react";
 import { Button } from "../ui/button";
 import { useRouter } from "next/navigation";
-// Import Lucide icons
 import { User, Search, Users } from "lucide-react";
 
 const steps = [
@@ -36,9 +35,9 @@ export function HowItWorksSection() {
 	};
 
 	return (
-		<section className="w-full py-16 bg-transparent">
-			<div className="max-w-7xl mx-auto px-4">
-				<h2 className="text-3xl sm:text-4xl font-bold text-center mb-14">
+		<section className="w-full py-10 bg-transparent">
+			<div className="max-w-7xl mx-auto px-4 ">
+				<h2 className="text-3xl sm:text-4xl font-bold text-center mb-20">
 					How <span className="text-[#facc15] dark:text-[#facc15]">Byway</span>{' '}
 					<span className="inline-block relative">
 						works
