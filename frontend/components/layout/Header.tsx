@@ -13,6 +13,7 @@ import {
 	MessageSquare,
 	ChevronDown,
 	Loader2,
+	Search,
 } from "lucide-react";
 import { useState, useCallback, useEffect, useRef } from "react";
 import {
@@ -60,6 +61,17 @@ export function Header(
 	const debouncedSearchQuery = useDebounce(searchQuery, 500);
 	const { data: searchResults } = useGlobalSearch({
 		query: debouncedSearchQuery,
+		page: 1,
+		limit: 5,
+	});
+
+	const [searchModalOpen, setSearchModalOpen] = useState(false);
+	const [mobileSearchQuery, setMobileSearchQuery] = useState("");
+	const [showMobileSearchResults, setShowMobileSearchResults] = useState(false);
+	const mobileSearchInputRef = useRef<HTMLInputElement>(null);
+	const debouncedMobileSearchQuery = useDebounce(mobileSearchQuery, 500);
+	const { data: mobileSearchResults, isLoading: isMobileSearching } = useGlobalSearch({
+		query: debouncedMobileSearchQuery,
 		page: 1,
 		limit: 5,
 	});
@@ -186,6 +198,28 @@ export function Header(
 		window.addEventListener("focus-header-search-bar", handler);
 		return () => window.removeEventListener("focus-header-search-bar", handler);
 	}, []);
+
+	// Autofocus input when modal opens
+	useEffect(() => {
+		if (searchModalOpen && mobileSearchInputRef.current) {
+			mobileSearchInputRef.current.focus();
+		}
+	}, [searchModalOpen]);
+
+	// Show/hide results
+	useEffect(() => {
+		if (debouncedMobileSearchQuery && mobileSearchResults) {
+			setShowMobileSearchResults(true);
+		} else {
+			setShowMobileSearchResults(false);
+		}
+	}, [debouncedMobileSearchQuery, mobileSearchResults]);
+
+	const handleMobileSearchItemClick = () => {
+		setShowMobileSearchResults(false);
+		setMobileSearchQuery("");
+		setSearchModalOpen(false);
+	};
 
 	return (
     <>
@@ -385,6 +419,15 @@ export function Header(
               Byway
             </Link>
             <div className="flex items-center gap-3">
+              {/* Mobile Search Icon Button */}
+              <Button
+                variant="ghost"
+                size="icon"
+                className="text-black dark:text-white bg-transparent border-none"
+                onClick={() => setSearchModalOpen(true)}
+              >
+                <Search className="h-6 w-6" />
+              </Button>
               {user ? (
                 <>
                   <div className="relative group">
@@ -542,6 +585,144 @@ export function Header(
         onSubmit={handleInstructorSubmit}
         isSubmitting={isCreatingInstructor}
       />
+      {/* Mobile Search Modal */}
+      {searchModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+          <div className="relative w-full max-w-md bg-white dark:bg-black rounded-lg shadow-lg h-[85vh] p-4 flex flex-col mx-2">
+            {/* Top bar: search icon, input, close button */}
+            <div className="flex items-center gap-2 mb-4">
+              <Search className="w-5 h-5 text-black/60 dark:text-white/60" />
+              <input
+                type="text"
+                value={mobileSearchQuery}
+                onChange={e => setMobileSearchQuery(e.target.value)}
+                placeholder="Search for courses, topics, instructors..."
+                className="flex-1 py-2 px-2 border-0 border-b-2 border-black dark:border-white focus:border-b-2 focus:border-[#facc15] dark:focus:border-[#facc15] bg-white dark:bg-black text-black dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none transition-all duration-300 shadow-none"
+                ref={mobileSearchInputRef}
+              />
+              <button
+                className="text-2xl font-bold text-gray-700 dark:text-gray-200 hover:text-black dark:hover:text-white focus:outline-none px-2"
+                onClick={() => setSearchModalOpen(false)}
+                aria-label="Close search"
+                type="button"
+              >
+                ×
+              </button>
+            </div>
+            {/* Results */}
+            {showMobileSearchResults && mobileSearchResults && mobileSearchQuery && (
+              <div className="flex-1 overflow-y-auto mt-2">
+                {/* Instructors */}
+                {mobileSearchResults.instructors.items.length > 0 && (
+                  <div className="mb-4">
+                    <div className="font-semibold mb-2">Instructors</div>
+                    {mobileSearchResults.instructors.items.map((instructor) => (
+                      <Link
+                        key={instructor.id}
+                        href={`/instructors/${instructor.id}`}
+                        onClick={handleMobileSearchItemClick}
+                        className="flex items-center gap-3 px-2 py-2 rounded hover:bg-[#facc15] dark:hover:bg-[#facc15] dark:hover:text-black"
+                      >
+                        <div className="w-9 h-9 rounded-full flex items-center justify-center text-black font-semibold shadow-md bg-[#facc15]">
+                          {instructor.name.charAt(0)}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-medium text-black dark:text-white transition-colors group-hover:text-black dark:group-hover:text-black">
+                            {instructor.name}
+                          </p>
+                          <p className="text-xs text-black dark:text-white truncate">
+                            {instructor.shortBio || "Instructor"}
+                          </p>
+                        </div>
+                      </Link>
+                    ))}
+                  </div>
+                )}
+                {/* Courses */}
+                {mobileSearchResults.courses.items.length > 0 && (
+                  <div className="mb-4">
+                    <div className="font-semibold mb-2">Courses</div>
+                    {mobileSearchResults.courses.items.map((course) => (
+                      <Link
+                        key={course.id}
+                        href={`/courses/${course.id}`}
+                        onClick={handleMobileSearchItemClick}
+                        className="flex items-center gap-3 px-2 py-2 rounded hover:bg-[#facc15] dark:hover:bg-[#facc15] dark:hover:text-black"
+                      >
+                        <div className="w-12 h-8 rounded-md bg-[#facc15]/10 flex items-center justify-center shadow-sm overflow-hidden">
+                          {course.thumbnail ? (
+                            <img
+                              src={course.thumbnail}
+                              alt={course.title}
+                              className="w-full h-full object-cover"
+                            />
+                          ) : (
+                            <svg className="w-5 h-5 text-[#facc15]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 20l9-5-9-5-9 5 9 5z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 12V4m0 0L3 9m9-5l9 5" /></svg>
+                          )}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-medium text-black dark:text-white transition-colors group-hover:text-black dark:group-hover:text-black truncate">
+                            {course.title}
+                          </p>
+                          <div className="flex items-center gap-2 mt-1">
+                            {course.offer ? (
+                              <>
+                                <span className="text-sm font-semibold text-black dark:text-white transition-colors group-hover:text-black dark:group-hover:text-black">
+                                  ${course.offer}
+                                </span>
+                                <span className="text-sm text-black dark:text-white line-through group-hover:text-black dark:group-hover:text-black">
+                                  ${course.price}
+                                </span>
+                              </>
+                            ) : (
+                              <span className="text-sm font-semibold text-black dark:text-white transition-colors group-hover:text-black dark:group-hover:text-black">
+                                ${course.price}
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                      </Link>
+                    ))}
+                  </div>
+                )}
+                {/* Categories */}
+                {mobileSearchResults.categories.items.length > 0 && (
+                  <div className="mb-4">
+                    <div className="font-semibold mb-2">Categories</div>
+                    {mobileSearchResults.categories.items.map((category) => (
+                      <Link
+                        key={category.id}
+                        href={`/courses?category=${category.id}`}
+                        onClick={handleMobileSearchItemClick}
+                        className="block p-3 rounded-lg transition-colors group text-black dark:text-white hover:bg-[#facc15] dark:hover:bg-[#facc15] dark:hover:text-black"
+                        style={{
+                          background: "#facc15/10",
+                          color: "#18181b",
+                        }}
+                      >
+                        <p className="text-sm font-medium text-black dark:text-white group-hover:text-black dark:group-hover:text-black transition-colors">
+                          {category.title}
+                        </p>
+                        <p className="text-xs text-black dark:text-white group-hover:text-black dark:group-hover:text-black mt-1 line-clamp-2">
+                          {category.description}
+                        </p>
+                      </Link>
+                    ))}
+                  </div>
+                )}
+                {/* No Results */}
+                {mobileSearchResults.instructors.items.length === 0 &&
+                  mobileSearchResults.courses.items.length === 0 &&
+                  mobileSearchResults.categories.items.length === 0 && (
+                  <div className="p-4 text-center text-gray-500 dark:text-gray-300">
+                    No results found for "{mobileSearchQuery}"
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        </div>
+      )}
     </>
   );
 }
