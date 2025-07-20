@@ -111,19 +111,19 @@ const NotificationList: React.FC<NotificationListProps> = ({
 	);
 
 	return (
-		<div className="w-full h-full flex flex-col bg-[var(--color-background)]">
+		<div className="w-full h-full flex flex-col bg-white dark:bg-[#18181b]">
 			{/* Header */}
-			<div className="p-6 bg-[var(--color-surface)] border-b border-[var(--color-background)]">
+			<div className="p-6 bg-white dark:bg-black ">
 				<div className="flex items-center justify-between mb-6">
 					<div className="flex items-center gap-3">
-						<div className="w-12 h-12 rounded-xl bg-[var(--color-primary-light)] flex items-center justify-center shadow-sm">
-							<Bell className="w-6 h-6 text-white" />
+						<div className="w-12 h-12 rounded-xl bg-[#facc15] flex items-center justify-center shadow-sm">
+							<Bell className="w-6 h-6 text-black" />
 						</div>
 						<div>
-							<h2 className="text-2xl font-bold text-[var(--color-primary-dark)]">
+							<h2 className="text-2xl font-bold text-black dark:text-[#facc15]">
 								Notifications
 							</h2>
-							<p className="text-sm text-[var(--color-muted)]">
+							<p className="text-sm text-gray-500 dark:text-gray-300">
 								{total ?? uniqueNotifications.length} total notifications
 							</p>
 						</div>
@@ -133,11 +133,11 @@ const NotificationList: React.FC<NotificationListProps> = ({
 				{/* Search and Filters */}
 				<div className="space-y-4">
 					<div className="relative">
-						<Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-[var(--color-muted)]" />
+						<Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400 dark:text-gray-500" />
 						<input
 							type="text"
 							placeholder="Search notifications..."
-							className="w-full pl-10 pr-4 py-3 bg-[var(--color-background)] border border-gray-200 rounded-xl text-sm text-[var(--color-primary-dark)] placeholder-[var(--color-muted)] focus:ring-2 focus:ring-[var(--color-primary-light)]/20 focus:border-[var(--color-primary-light)] focus:outline-none transition-all duration-200"
+							className="w-full pl-10 pr-4 py-3 bg-[#f9fafb] dark:bg-[#232323] border-none rounded-xl text-sm text-black dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:ring-2 focus:ring-[#facc15]/40 focus:border-[#facc15] focus:outline-none transition-all duration-200"
 							value={search || ""}
 							onChange={(e) => setSearch?.(e.target.value)}
 						/>
@@ -148,7 +148,7 @@ const NotificationList: React.FC<NotificationListProps> = ({
 						<DropdownMenu>
 							<DropdownMenuTrigger asChild>
 								<button
-									className="flex-1 px-4 py-3 bg-[var(--color-background)] border border-gray-200 rounded-xl text-sm text-[var(--color-primary-dark)] flex justify-between items-center hover:border-[var(--color-primary-light)] hover:bg-[var(--color-surface)] transition-all duration-200"
+									className="flex-1 px-4 py-3 bg-[#f9fafb] dark:bg-[#232323] border-none rounded-xl text-sm text-black dark:text-[#facc15] flex justify-between items-center hover:border-[#facc15] hover:bg-[#facc15]/10 dark:hover:bg-[#facc15]/10 transition-all duration-200"
 									type="button"
 								>
 									<span className="flex items-center gap-2">
@@ -161,7 +161,7 @@ const NotificationList: React.FC<NotificationListProps> = ({
 							</DropdownMenuTrigger>
 							<DropdownMenuContent
 								align="start"
-								className="w-full min-w-[200px] bg-[var(--color-surface)] border border-gray-200 shadow-lg rounded-xl p-1"
+								className="w-full min-w-[200px] bg-white dark:bg-[#232323] border-none shadow-lg rounded-xl p-1"
 							>
 								{eventTypeOptions.map((opt) => (
 									<DropdownMenuItem
@@ -183,7 +183,7 @@ const NotificationList: React.FC<NotificationListProps> = ({
 						<DropdownMenu>
 							<DropdownMenuTrigger asChild>
 								<button
-									className="px-4 py-3 bg-[var(--color-background)] border border-gray-200 rounded-xl text-sm text-[var(--color-primary-dark)] flex justify-between items-center hover:border-[var(--color-primary-light)] hover:bg-[var(--color-surface)] transition-all duration-200"
+									className="px-4 py-3 bg-[#f9fafb] dark:bg-[#232323] border-none rounded-xl text-sm text-black dark:text-[#facc15] flex justify-between items-center hover:border-[#facc15] hover:bg-[#facc15]/10 dark:hover:bg-[#facc15]/10 transition-all duration-200"
 									type="button"
 								>
 									<span className="flex items-center gap-2">
@@ -196,7 +196,7 @@ const NotificationList: React.FC<NotificationListProps> = ({
 							</DropdownMenuTrigger>
 							<DropdownMenuContent
 								align="start"
-								className="w-full min-w-[140px] bg-[var(--color-surface)] border border-gray-200 shadow-lg rounded-xl p-1"
+								className="w-full min-w-[140px] bg-white dark:bg-[#232323] border-none shadow-lg rounded-xl p-1"
 							>
 								{sortOptions.map((opt) => (
 									<DropdownMenuItem
@@ -218,7 +218,7 @@ const NotificationList: React.FC<NotificationListProps> = ({
 						<DropdownMenu>
 							<DropdownMenuTrigger asChild>
 								<button
-									className="px-4 py-3 bg-[var(--color-background)] border border-gray-200 rounded-xl text-sm text-[var(--color-primary-dark)] flex justify-between items-center hover:border-[var(--color-primary-light)] hover:bg-[var(--color-surface)] transition-all duration-200"
+									className="px-4 py-3 bg-[#f9fafb] dark:bg-[#232323] border-none rounded-xl text-sm text-black dark:text-[#facc15] flex justify-between items-center hover:border-[#facc15] hover:bg-[#facc15]/10 dark:hover:bg-[#facc15]/10 transition-all duration-200"
 									type="button"
 								>
 									{sortOrder === "asc" ? "Oldest" : "Newest"}
@@ -227,7 +227,7 @@ const NotificationList: React.FC<NotificationListProps> = ({
 							</DropdownMenuTrigger>
 							<DropdownMenuContent
 								align="start"
-								className="w-full min-w-[100px] bg-[var(--color-surface)] border border-gray-200 shadow-lg rounded-xl p-1"
+								className="w-full min-w-[100px] bg-white dark:bg-[#232323] border-none shadow-lg rounded-xl p-1"
 							>
 								<DropdownMenuItem
 									onSelect={() => setSortOrder?.("desc")}
@@ -256,62 +256,62 @@ const NotificationList: React.FC<NotificationListProps> = ({
 			</div>
 
 			{/* Content */}
-			<div className="flex-1 min-h-0 bg-[var(--color-background)]">
+			<div className="flex-1 min-h-0 bg-white dark:bg-black">
 				{loading && (!notifications || notifications.length === 0) ? (
 					<div className="flex flex-col items-center justify-center h-full py-12">
-						<div className="w-16 h-16 bg-[var(--color-surface)] rounded-2xl flex items-center justify-center mb-4 shadow-sm">
-							<Bell className="w-8 h-8 text-[var(--color-primary-light)] animate-pulse" />
+						<div className="w-16 h-16 bg-[#facc15]/20 rounded-2xl flex items-center justify-center mb-4 shadow-sm">
+							<Bell className="w-8 h-8 text-[#facc15] animate-pulse" />
 						</div>
-						<h3 className="text-lg font-semibold text-[var(--color-primary-dark)] mb-2">
+						<h3 className="text-lg font-semibold text-black dark:text-[#facc15] mb-2">
 							Loading notifications
 						</h3>
-						<p className="text-[var(--color-muted)] text-sm">
+						<p className="text-gray-500 dark:text-gray-300 text-sm">
 							Please wait while we fetch your updates...
 						</p>
 					</div>
 				) : uniqueNotifications.length === 0 ? (
 					<div className="flex flex-col items-center justify-center h-full py-12">
-						<div className="w-16 h-16 bg-[var(--color-surface)] rounded-2xl flex items-center justify-center mb-4 shadow-sm">
-							<Bell className="w-8 h-8 text-[var(--color-muted)]" />
+						<div className="w-16 h-16 bg-[#232323] rounded-2xl flex items-center justify-center mb-4 shadow-sm">
+							<Bell className="w-8 h-8 text-gray-400 dark:text-gray-500" />
 						</div>
-						<h3 className="text-lg font-semibold text-[var(--color-primary-dark)] mb-2">
+						<h3 className="text-lg font-semibold text-black dark:text-[#facc15] mb-2">
 							No notifications
 						</h3>
-						<p className="text-[var(--color-muted)] text-sm">
+						<p className="text-gray-500 dark:text-gray-300 text-sm">
 							You&#39;re all caught up! Check back later for updates.
 						</p>
 					</div>
 				) : (
-					<div className="h-full overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
+					<div className="h-full overflow-y-auto scrollbar-thin scrollbar-thumb-[#facc15]/40 scrollbar-track-[#f9fafb] dark:scrollbar-thumb-[#facc15]/30 dark:scrollbar-track-[#232323]">
 						<div className="p-4 space-y-3">
 							{uniqueNotifications.map((notification) => (
 								<Card
 									key={notification.id}
-									className="group border border-gray-200 bg-[var(--color-surface)] hover:border-[var(--color-primary-light)] hover:shadow-md transition-all duration-300 cursor-pointer rounded-xl overflow-hidden"
+									className="group bg-white dark:bg-[#232323] border-none hover:border-[#facc15] hover:shadow-md transition-all duration-300 cursor-pointer rounded-xl overflow-hidden"
 									onClick={() => onNotificationClick?.(notification.id)}
 								>
-									<CardContent className="p-5">
-										<div className="flex gap-4">
+									<CardContent className="px-3">
+										<div className="flex gap-1">
 											<div className="flex-1 min-w-0">
 												<div className="flex items-start justify-between gap-3 mb-3">
-													<h4 className="font-semibold text-[var(--color-primary-dark)] text-base group-hover:text-[var(--color-primary-light)] transition-colors duration-200 line-clamp-1">
+													<h4 className="font-semibold text-black dark:text-[#facc15] text-base group-hover:text-[#facc15] transition-colors duration-200 line-clamp-1">
 														{notification.title}
 													</h4>
-													<span className="text-xs text-[var(--color-muted)] whitespace-nowrap font-medium bg-[var(--color-background)] px-2 py-1 rounded-md">
+													<span className="text-xs text-gray-500 dark:text-gray-300 whitespace-nowrap font-medium bg-[#f9fafb] dark:bg-[#232323] px-2 py-1 rounded-md">
 														{notification.date}
 													</span>
 												</div>
 
-												<p className="text-[var(--color-muted)] text-sm leading-relaxed line-clamp-2 mb-3">
+												<p className="text-gray-500 dark:text-gray-300 text-sm leading-relaxed line-clamp-2 mb-3">
 													{notification.message}
 												</p>
 
 												{notification.eventType && (
 													<Badge
 														variant="outline"
-														className={`text-xs font-medium border ${
+														className={`text-xs font-medium border border-[#facc15] bg-[#facc15] text-black dark:text-black ${
 															eventTypeColors[notification.eventType] ||
-															"bg-[var(--color-background)] text-[var(--color-muted)] border-gray-200"
+															"bg-white dark:bg-[#facc15]  text-gray-500 dark:text-gray-300 border-[#facc15]"
 														}`}
 													>
 														{notification.eventType.replace(/_/g, " ")}
@@ -327,7 +327,7 @@ const NotificationList: React.FC<NotificationListProps> = ({
 						{hasMore &&
 							!loading &&
 							uniqueNotifications.length < (total || 0) && (
-								<div className="flex justify-center py-6 bg-[var(--color-background)]">
+								<div className="flex justify-center py-6">
 									<Button
 										onClick={() => {
 											setLoadMoreLoading(true);

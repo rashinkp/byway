@@ -91,7 +91,7 @@ export function CourseCard({ course, className }: CourseCardProps) {
 				</div>
 				{/* Title */}
 				<h2
-					className="text-xl font-bold mb-1 line-clamp-1 dark:text-[#facc15] dark:text-white"
+					className="text-xl font-bold mb-1 line-clamp-1 dark:text-white"
 				>
 					{course.title}
 				</h2>
