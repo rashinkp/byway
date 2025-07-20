@@ -1,5 +1,5 @@
 "use client";
-import { Trash2, ShoppingCart } from "lucide-react";
+import { ShoppingCart } from "lucide-react";
 import { useCart } from "@/hooks/cart/useCart";
 import { useRemoveFromCart } from "@/hooks/cart/useRemoveFromCart";
 import { useClearCart } from "@/hooks/cart/useClearCart";
@@ -15,7 +15,7 @@ import { useSearchParams } from "next/navigation";
 export default function MainCartComponent() {
   const searchParams = useSearchParams();
   const page = Number(searchParams.get("page")) || 1;
-  const limit = 10; // Assuming a default limit
+  const limit = 10; 
   const { data, isLoading, error, refetch } = useCart({ page, limit });
   const removeFromCartMutation = useRemoveFromCart();
   const clearCartMutation = useClearCart();

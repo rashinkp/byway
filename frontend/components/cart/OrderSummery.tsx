@@ -47,13 +47,13 @@ export function OrderSummary({ cart }: OrderSummaryProps) {
 						<span className="font-semibold text-black dark:text-[#facc15]">
 							Total
 						</span>
-						<span className="font-bold text-xl text-[#facc15]">
+						<span className="font-bold text-xl dark:text-[#facc15]">
 							{formatPrice(total)}
 						</span>
 					</div>
 				</div>
 
-				<div className="pt-4 border-t border-[#facc15]">
+				<div className="pt-4 border-t dark:border-[#facc15]">
 					<Link
 						href="/contact"
 						className="flex items-center justify-center gap-2 w-full py-2 text-sm transition-colors"

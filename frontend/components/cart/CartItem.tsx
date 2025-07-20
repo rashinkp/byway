@@ -38,7 +38,7 @@ export function CartItem({ item, isRemoving, onRemove }: CartItemProps) {
 			initial={{ opacity: 0, y: 10 }}
 			animate={{ opacity: 1, y: 0 }}
 			transition={{ duration: 0.3 }}
-			className="flex flex-col sm:flex-row gap-4 p-4  bg-white dark:bg-[#232323]  rounded-lg transition-all duration-300"
+			className="flex flex-col sm:flex-row gap-4 p-4  bg-white dark:bg-[#232323] dark:border-none border-b border-gray-300 rounded-lg transition-all duration-300"
 		>
 			<Image
 				src={course.thumbnail}
@@ -49,7 +49,7 @@ export function CartItem({ item, isRemoving, onRemove }: CartItemProps) {
 			/>
 
 			<div className="flex-1 space-y-4">
-				<div className="flex justify-between items-center justify-center">
+				<div className="flex justify-between items-center ">
 					<div className="flex-1 space-y-1">
 						<h3 className="text-base sm:text-lg font-semibold text-black dark:text-white leading-tight">
 							{course.title}
@@ -76,7 +76,7 @@ export function CartItem({ item, isRemoving, onRemove }: CartItemProps) {
 					)}
 					<button
 						onClick={() => course.id && onRemove(course.id)}
-						className="p-2 text-[#facc15] hover:text-red-700 hover:bg-red-100 dark:hover:bg-red-900/20 rounded-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed ml-4"
+						className="p-2 dark:text-[#facc15] hover:text-red-700 hover:bg-red-100 dark:hover:bg-red-900/20 rounded-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed ml-4"
 						title="Remove from cart"
 						disabled={isRemoving}
 					>
@@ -87,11 +87,11 @@ export function CartItem({ item, isRemoving, onRemove }: CartItemProps) {
 
 				<div className="flex flex-wrap items-center gap-4 text-sm text-gray-500 dark:text-gray-300">
 					<span className="flex items-center gap-1">
-						<Clock size={14} className="text-white" />
+						<Clock size={14} className="dark:text-white" />
 						{course.duration}
 					</span>
 					<span className="flex items-center gap-1">
-						<BookOpen size={14} className="text-white" />
+						<BookOpen size={14} className="dark:text-white" />
 						{course.lectures || 0} lectures
 					</span>
 					<span className="flex items-center gap-1">
