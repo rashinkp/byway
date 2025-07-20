@@ -37,6 +37,7 @@ import { HeaderSearchBar } from "@/components/layout/HeaderSearchBar";
 import { useCartStore } from "@/stores/cart.store";
 import { useChatStore } from "@/stores/chat.store";
 import { useUnreadMessageCount } from "@/hooks/chat/useUnreadMessageCount";
+import Image from 'next/image';
 
 interface HeaderProps {
 	client?: { id: string; name: string };
@@ -70,7 +71,7 @@ export function Header(
 	const [showMobileSearchResults, setShowMobileSearchResults] = useState(false);
 	const mobileSearchInputRef = useRef<HTMLInputElement>(null);
 	const debouncedMobileSearchQuery = useDebounce(mobileSearchQuery, 500);
-	const { data: mobileSearchResults, isLoading: isMobileSearching } = useGlobalSearch({
+	const { data: mobileSearchResults } = useGlobalSearch({
 		query: debouncedMobileSearchQuery,
 		page: 1,
 		limit: 5,
@@ -587,21 +588,21 @@ export function Header(
       />
       {/* Mobile Search Modal */}
       {searchModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-          <div className="relative w-full max-w-md bg-white dark:bg-black rounded-lg shadow-lg h-[85vh] p-4 flex flex-col mx-2">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70">
+          <div className="relative w-full max-w-md  rounded-lg shadow-lg h-[85vh] p-4 flex flex-col mx-2">
             {/* Top bar: search icon, input, close button */}
-            <div className="flex items-center gap-2 mb-4">
+            <div className="flex items-center gap-2 mb-4 bg-white dark:bg-[#18181b] rounded-md px-2 py-1">
               <Search className="w-5 h-5 text-black/60 dark:text-white/60" />
               <input
                 type="text"
                 value={mobileSearchQuery}
                 onChange={e => setMobileSearchQuery(e.target.value)}
                 placeholder="Search for courses, topics, instructors..."
-                className="flex-1 py-2 px-2 border-0 border-b-2 border-black dark:border-white focus:border-b-2 focus:border-[#facc15] dark:focus:border-[#facc15] bg-white dark:bg-black text-black dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none transition-all duration-300 shadow-none"
+                className="flex-1 py-2 px-2  bg-white dark:bg-[#18181b] text-black dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none transition-all duration-300 shadow-none"
                 ref={mobileSearchInputRef}
               />
               <button
-                className="text-2xl font-bold text-gray-700 dark:text-gray-200 hover:text-black dark:hover:text-white focus:outline-none px-2"
+                className="text-2xl font-bold text-gray-700 dark:hover:text-[#facc15] dark:text-gray-200 hover:text-black focus:outline-none px-2"
                 onClick={() => setSearchModalOpen(false)}
                 aria-label="Close search"
                 type="button"
@@ -611,7 +612,7 @@ export function Header(
             </div>
             {/* Results */}
             {showMobileSearchResults && mobileSearchResults && mobileSearchQuery && (
-              <div className="flex-1 overflow-y-auto mt-2">
+              <div className="flex-1 overflow-y-auto mt-2 dark:bg-[#18181b] p-4">
                 {/* Instructors */}
                 {mobileSearchResults.instructors.items.length > 0 && (
                   <div className="mb-4">
@@ -651,10 +652,13 @@ export function Header(
                       >
                         <div className="w-12 h-8 rounded-md bg-[#facc15]/10 flex items-center justify-center shadow-sm overflow-hidden">
                           {course.thumbnail ? (
-                            <img
+                            <Image
                               src={course.thumbnail}
                               alt={course.title}
+                              width={48}
+                              height={32}
                               className="w-full h-full object-cover"
+                              unoptimized
                             />
                           ) : (
                             <svg className="w-5 h-5 text-[#facc15]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 20l9-5-9-5-9 5 9 5z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 12V4m0 0L3 9m9-5l9 5" /></svg>
