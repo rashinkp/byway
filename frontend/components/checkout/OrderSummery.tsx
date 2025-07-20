@@ -60,7 +60,7 @@ export default function OrderSummary({
       <Button
         onClick={onSubmit}
         disabled={isPending}
-        className="w-full bg-[var(--color-primary-light)] hover:bg-[var(--color-primary-dark)] text-[var(--color-surface)] font-medium py-3 px-6 rounded-xl transition-colors flex items-center justify-center"
+        className="w-full font-medium py-3 px-6 rounded-xl transition-colors flex items-center justify-center"
       >
         {isPending && <LoadingSpinner size="sm" className="mr-2" />}
         {isPending ? "Processing..." : "Complete Payment"}

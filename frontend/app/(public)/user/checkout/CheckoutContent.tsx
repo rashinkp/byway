@@ -157,23 +157,22 @@ export default function CheckoutContent() {
   };
 
   return (
-    <div className="min-h-screen bg-[var(--color-surface)] p-4 sm:p-6">
+    <div className="min-h-screen bg-white dark:bg-[#18181b] p-4 sm:p-6">
       <div className="max-w-7xl mx-auto space-y-6">
         {/* Header */}
-        <Card className="bg-[var(--color-primary-dark)] rounded-lg p-6">
+        <Card className="dark:bg-[#18181b]  p-6 shadow-none border-none">
           <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
             <div>
-              <h1 className="text-2xl font-semibold text-[var(--color-surface)]">Checkout</h1>
-              <p className="text-[var(--color-surface)]/70 mt-1">
+              <h1 className="text-2xl font-semibold text-black dark:text-[#facc15]">Checkout</h1>
+              <p className="text-black/70 dark:text-[#facc15]/70 mt-1">
                 Complete your purchase to access your courses
               </p>
             </div>
             <Badge
               variant="outline"
-              className="bg-[var(--color-surface)] text-[var(--color-primary-dark)] border-[var(--color-primary-light)] px-3 py-1 rounded-full text-sm font-medium"
+              className="bg-white dark:bg-[#232323]  text-black dark:text-[#facc15] border border-[#facc15] px-3 py-1 rounded-full text-sm font-medium"
             >
-              {courseDetails.length}{" "}
-              {courseDetails.length === 1 ? "Course" : "Courses"}
+              {courseDetails.length} {courseDetails.length === 1 ? "Course" : "Courses"}
             </Badge>
           </div>
         </Card>
@@ -183,7 +182,7 @@ export default function CheckoutContent() {
           {/* Left Column - Order Details & Payment */}
           <div className="lg:col-span-2 space-y-6">
             {/* Order Details */}
-            <Card className="bg-[var(--color-surface)] rounded-lg border border-[var(--color-primary-light)]/20 shadow-sm p-6">
+            <Card className="bg-white dark:bg-[#232323]  p-6 shadow-none border-none">
               {isLoading ? (
                 <OrderDetailsSkeleton />
               ) : (
@@ -192,7 +191,7 @@ export default function CheckoutContent() {
             </Card>
 
             {/* Payment Method */}
-            <Card className="bg-[var(--color-surface)] rounded-lg border border-[var(--color-primary-light)]/20 shadow-sm p-6">
+            <Card className="bg-white dark:bg-[#232323] shadow-none border-none p-6">
               {isLoading ? (
                 <PaymentMethodSkeleton />
               ) : (
@@ -205,7 +204,7 @@ export default function CheckoutContent() {
 
           {/* Right Column - Order Summary */}
           <div className="lg:col-span-1">
-            <Card className="bg-[var(--color-surface)] rounded-lg border border-[var(--color-primary-light)]/20 shadow-sm p-6 sticky top-6">
+            <Card className="bg-gray-100 dark:bg-[#232323] shadow-none border-none p-6 sticky top-6">
               {isLoading ? (
                 <OrderSummarySkeleton />
               ) : (
