@@ -1,5 +1,5 @@
 import { ICart } from "@/types/cart";
-import { Receipt, HelpCircle } from "lucide-react";
+import { HelpCircle } from "lucide-react";
 import Link from "next/link";
 
 interface OrderSummaryProps {
@@ -25,39 +25,38 @@ export function OrderSummary({ cart }: OrderSummaryProps) {
 	const total = subtotal;
 
 	return (
-		<div className="bg-[var(--color-background)] rounded-lg p-6 border border-[var(--color-primary-light)]/20">
+		<div className="bg-white dark:bg-[#232323] rounded-lg p-6 ">
 			<div className="flex items-center gap-3 mb-6">
-				<Receipt className="h-5 w-5 text-[var(--color-primary-light)]" />
-				<h2 className="text-lg font-semibold text-[var(--color-primary-dark)]">
+				<h2 className="text-lg font-semibold text-black dark:text-[#facc15]">
 					Order Summary
 				</h2>
 			</div>
 
 			<div className="space-y-4">
 				<div className="flex justify-between text-sm">
-					<span className="text-[var(--color-muted)]">
+					<span className="text-gray-500 dark:text-gray-300">
 						Subtotal ({cart.length} {cart.length === 1 ? "course" : "courses"})
 					</span>
-					<span className="font-medium text-[var(--color-primary-dark)]">
+					<span className="font-medium text-gray-500 dark:text-gray-300 ">
 						{formatPrice(subtotal)}
 					</span>
 				</div>
 
-				<div className="border-t border-[var(--color-primary-dark)] pt-4">
+				<div className="pt-4">
 					<div className="flex justify-between items-center">
-						<span className="font-semibold text-[var(--color-primary-dark)]">
+						<span className="font-semibold text-black dark:text-[#facc15]">
 							Total
 						</span>
-						<span className="font-bold text-xl text-[var(--color-primary-light)]">
+						<span className="font-bold text-xl text-[#facc15]">
 							{formatPrice(total)}
 						</span>
 					</div>
 				</div>
 
-				<div className="pt-4 border-t border-[var(--color-background)]">
+				<div className="pt-4 border-t border-[#facc15]">
 					<Link
 						href="/contact"
-						className="flex items-center justify-center gap-2 w-full py-2 text-sm text-[var(--color-primary-dark)] hover:text-[var(--color-primary-light)] transition-colors"
+						className="flex items-center justify-center gap-2 w-full py-2 text-sm transition-colors"
 					>
 						<HelpCircle className="h-4 w-4" />
 						Need help? Contact support

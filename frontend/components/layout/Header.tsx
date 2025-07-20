@@ -530,14 +530,14 @@ export function Header(
                     <>
                       <Link
                         href="/user/profile"
-                        className="block px-2 py-1 text-black dark:text-white font-medium text-base rounded hover:bg-[#facc15]/20 dark:hover:bg-[#facc15]/10 hover:text-black dark:hover:text-[#facc15] transition-colors"
+                        className="block px-2 py-1 text-black dark:text-white font-medium text-base rounded hover:bg-[#facc15]/20 dark:hover:bg-[#facc15] hover:text-black  transition-colors"
                         onClick={() => setIsMenuOpen(false)}
                       >
                         Profile
                       </Link>
                       <Link
                         href="/user/profile?section=courses"
-                        className="block px-2 py-1 text-black dark:text-white font-medium text-base rounded hover:bg-[#facc15]/20 dark:hover:bg-[#facc15]/10 hover:text-black dark:hover:text-[#facc15] transition-colors"
+                        className="block px-2 py-1 text-black dark:text-white font-medium text-base rounded hover:bg-[#facc15]/20 dark:hover:bg-[#facc15] hover:text-black  transition-colors"
                         onClick={() => setIsMenuOpen(false)}
                       >
                         My Courses
