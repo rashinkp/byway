@@ -164,26 +164,25 @@ export function FormModal<T extends z.ZodType<any, any>>({
 
 	return (
 		<Dialog open={open} onOpenChange={onOpenChange}>
-			<DialogContent className="sm:max-w-4xl max-h-[90vh] overflow-y-auto bg-[var(--color-surface)] border border-[var(--color-primary-200)]">
-				<DialogHeader>
-					<DialogTitle className="text-xl font-bold text-[var(--color-primary-dark)]">
+			<DialogContent className="sm:max-w-4xl h-[90vh] flex flex-col p-0 bg-white dark:bg-[#18181b] border-none">
+				<DialogHeader className="px-6 pt-6">
+					<DialogTitle className="text-xl font-bold text-black dark:text-[#facc15]">
 						{title}
 					</DialogTitle>
 					{description && (
-						<DialogDescription className="text-[var(--color-muted)]">
+						<DialogDescription className="text-gray-500 dark:text-gray-300">
 							{description}
 						</DialogDescription>
 					)}
 				</DialogHeader>
-
 				<Form {...form}>
-					<form onSubmit={form.handleSubmit(handleSubmit)} className="py-4">
+					<form onSubmit={form.handleSubmit(handleSubmit)} className="flex-1 overflow-y-auto px-6">
 						{form.formState.errors.root && (
-							<div className="bg-[var(--color-danger)]/10 border border-[var(--color-danger)] rounded-xl p-4 mb-4">
+							<div className="bg-red-100 dark:bg-red-900/30 border border-red-400 dark:border-red-700 rounded-xl p-4 mb-4">
 								<div className="flex">
 									<div className="flex-shrink-0">
 										<svg
-											className="h-5 w-5 text-[var(--color-danger)]"
+											className="h-5 w-5 text-red-600 dark:text-red-400"
 											viewBox="0 0 20 20"
 											fill="currentColor"
 											aria-hidden="true"
@@ -196,7 +195,7 @@ export function FormModal<T extends z.ZodType<any, any>>({
 										</svg>
 									</div>
 									<div className="ml-3">
-										<p className="text-sm text-[var(--color-danger)]">
+										<p className="text-sm text-red-700 dark:text-red-300">
 											{form.formState.errors.root.message}
 										</p>
 									</div>
@@ -217,7 +216,7 @@ export function FormModal<T extends z.ZodType<any, any>>({
 												name={field.name as Path<z.infer<T>>}
 												render={({ field: formField }) => (
 													<FormItem>
-														<FormLabel className="text-sm font-normal text-[var(--color-primary-dark)]">
+														<FormLabel className="text-sm font-normal text-black dark:text-[#facc15]">
 															{field.label}
 														</FormLabel>
 														<FormControl>
@@ -259,7 +258,7 @@ export function FormModal<T extends z.ZodType<any, any>>({
 																						)
 																				: formField.onChange
 																	}
-																	className="h-10 border-[var(--color-primary-200)] bg-[var(--color-surface)] text-[var(--color-primary-dark)] focus:border-[var(--color-primary-light)] focus:ring-1 focus:ring-[var(--color-primary-light)]"
+																	className="h-10 border-none bg-[#f9fafb] dark:bg-[#232323] text-black dark:text-white focus:border-[#facc15] focus:ring-1 focus:ring-[#facc15] rounded-md"
 																	disabled={isSubmitting || field.disabled}
 																/>
 															) : field.type === "select" && field.options ? (
@@ -268,19 +267,19 @@ export function FormModal<T extends z.ZodType<any, any>>({
 																	onValueChange={formField.onChange}
 																	disabled={isSubmitting || field.disabled}
 																>
-																	<SelectTrigger className="border-[var(--color-primary-200)] bg-[var(--color-surface)] text-[var(--color-primary-dark)] focus:border-[var(--color-primary-light)] focus:ring-1 focus:ring-[var(--color-primary-light)]">
+																	<SelectTrigger className="border-[#facc15] dark:border-[#facc15] bg-white dark:bg-[#18181b] text-black dark:text-white focus:border-[#facc15] focus:ring-1 focus:ring-[#facc15] rounded-md">
 																		<SelectValue
 																			placeholder={
 																				field.placeholder || "Select an option"
 																			}
 																		/>
 																	</SelectTrigger>
-																	<SelectContent className="bg-[var(--color-surface)] text-[var(--color-primary-dark)] border-[var(--color-primary-200)]">
+																	<SelectContent className="bg-white dark:bg-[#18181b] text-black dark:text-white border-[#facc15] dark:border-[#facc15]">
 																		{field.options.map((option) => (
 																			<SelectItem
 																				key={option.value}
 																				value={option.value}
-																				className="hover:bg-[var(--color-primary-50)]"
+																				className="hover:bg-[#facc15]/20 dark:hover:bg-[#facc15]/20"
 																			>
 																				{option.label}
 																			</SelectItem>
@@ -290,11 +289,11 @@ export function FormModal<T extends z.ZodType<any, any>>({
 															) : null}
 														</FormControl>
 														{field.description && (
-															<FormDescription className="text-[var(--color-muted)]">
+															<FormDescription className="text-gray-500 dark:text-gray-300">
 																{field.description}
 															</FormDescription>
 														)}
-														<FormMessage />
+														<FormMessage className="text-red-600 dark:text-red-400" />
 													</FormItem>
 												)}
 											/>
@@ -313,23 +312,23 @@ export function FormModal<T extends z.ZodType<any, any>>({
 										name={field.name as Path<z.infer<T>>}
 										render={({ field: formField }) => (
 											<FormItem>
-												<FormLabel className="text-sm font-normal text-[var(--color-primary-dark)]">
+												<FormLabel className="text-sm font-normal text-black dark:text-[#facc15]">
 													{field.label}
 												</FormLabel>
 												<FormControl>
 													<Textarea
 														placeholder={field.placeholder}
 														{...formField}
-														className="min-h-24 resize-y rounded-xl border-[var(--color-primary-200)] bg-[var(--color-surface)] text-[var(--color-primary-dark)] focus:border-[var(--color-primary-light)] focus:ring-1 focus:ring-[var(--color-primary-light)]"
+														className="min-h-24 resize-y rounded-xl border-none bg-[#f9fafb] dark:bg-[#232323] text-black dark:text-white focus:border-[#facc15] focus:ring-1 focus:ring-[#facc15]"
 														disabled={isSubmitting || field.disabled}
 													/>
 												</FormControl>
 												{field.description && (
-													<FormDescription className="text-[var(--color-muted)]">
+													<FormDescription className="text-gray-500 dark:text-gray-300">
 														{field.description}
 													</FormDescription>
 												)}
-												<FormMessage />
+												<FormMessage className="text-red-600 dark:text-red-400" />
 											</FormItem>
 										)}
 									/>
@@ -346,7 +345,7 @@ export function FormModal<T extends z.ZodType<any, any>>({
 										name={field.name as Path<z.infer<T>>}
 										render={({ field: formField }) => (
 											<FormItem>
-												<FormLabel className="text-sm font-normal text-[var(--color-primary-dark)]">
+												<FormLabel className="text-sm font-normal text-black dark:text-[#facc15]">
 													{field.label}
 												</FormLabel>
 												{typeof formField.value === "string" &&
@@ -355,7 +354,7 @@ export function FormModal<T extends z.ZodType<any, any>>({
 															<Image
 																src={formField.value}
 																alt={`${field.label} preview`}
-																className="w-32 h-32 object-cover rounded-md border border-[var(--color-primary-200)]"
+																className="w-32 h-32 object-cover rounded-md border-[#facc15] dark:border-[#facc15]"
 																width={128}
 																height={128}
 															/>
@@ -389,13 +388,13 @@ export function FormModal<T extends z.ZodType<any, any>>({
 													/>
 												</FormControl>
 												{field.description && (
-													<FormDescription className="text-[var(--color-muted)]">
+													<FormDescription className="text-gray-500 dark:text-gray-300">
 														{field.description}
 													</FormDescription>
 												)}
 												{field.type !== "input" ||
 												field.fieldType !== "file" ? (
-													<FormMessage />
+													<FormMessage className="text-red-600 dark:text-red-400" />
 												) : null}
 											</FormItem>
 										)}
@@ -403,12 +402,11 @@ export function FormModal<T extends z.ZodType<any, any>>({
 								))}
 							</div>
 						)}
-						<DialogFooter className="pt-6 bg-[var(--color-surface)] pb-4 border-t border-[var(--color-primary-200)] sticky bottom-0">
+						<DialogFooter className="pt-6 pb-6 bg-white dark:bg-[#18181b] border-t border-[#facc15] dark:border-[#facc15] sticky bottom-0 px-6">
 							<Button
 								type="button"
-								variant="outline"
+								variant="link"
 								onClick={() => onOpenChange(false)}
-								className="mr-2 border-[var(--color-primary-200)] text-[var(--color-primary-dark)]"
 								disabled={isSubmitting}
 							>
 								<X className="mr-2 h-4 w-4" />
@@ -416,7 +414,6 @@ export function FormModal<T extends z.ZodType<any, any>>({
 							</Button>
 							<Button
 								type="submit"
-								className="bg-[var(--color-primary-light)] hover:bg-[var(--color-primary-dark)] text-[var(--color-surface)]"
 								disabled={isSubmitting}
 							>
 								{isSubmitting ? (

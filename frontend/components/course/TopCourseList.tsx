@@ -52,13 +52,15 @@ export function TopCourses({
 				<div
 					ref={containerRef}
 					className={
-						`grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-8 gap-y-10 transition-transform duration-350 ease-in-out ` +
+						`grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-8 gap-y-10 justify-items-center transition-transform duration-350 ease-in-out ` +
 						(isAnimating && direction === "right" ? "animate-slide-left" : "") +
 						(isAnimating && direction === "left" ? "animate-slide-right" : "")
 					}
 				>
 					{visibleCourses.map((course) => (
-						<CourseCard key={course.id} course={course} />
+						<div key={course.id} className="w-full max-w-xs">
+							<CourseCard course={course} />
+						</div>
 					))}
 				</div>
 				{/* Animation keyframes (Tailwind custom) */}

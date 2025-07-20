@@ -490,28 +490,28 @@ export function Header(
               <div className="space-y-3">
                 <Link
                   href="/courses"
-                  className="block px-2 py-1 text-black dark:text-white font-medium text-base rounded transition-colors hover:bg-[#facc15]/50  dark:hover:text-[#facc15]"
+                  className="block px-2 py-1 text-black dark:text-white font-medium text-base rounded transition-colors hover:bg-[#facc15] dark:hover:text-black  "
                   onClick={() => setIsMenuOpen(false)}
                 >
                   Courses
                 </Link>
                 <Link
                   href="/categories"
-                  className="block px-2 py-1 text-black dark:text-white font-medium text-base rounded hover:bg-[#facc15]/50 dark:hover:bg-[#facc15]/10 hover:text-black dark:hover:text-[#facc15] transition-colors"
+                  className="block px-2 py-1 text-black dark:text-white font-medium text-base rounded hover:bg-[#facc15]/50 dark:hover:bg-[#facc15] hover:text-black  transition-colors"
                   onClick={() => setIsMenuOpen(false)}
                 >
                   Categories
                 </Link>
                 <Link
                   href="/instructors"
-                  className="block px-2 py-1 text-black dark:text-white font-medium text-base rounded hover:bg-[#facc15]/50 dark:hover:bg-[#facc15]/10 hover:text-black dark:hover:text-[#facc15] transition-colors"
+                  className="block px-2 py-1 text-black dark:text-white font-medium text-base rounded hover:bg-[#facc15]/50 dark:hover:bg-[#facc15] hover:text-black  transition-colors"
                   onClick={() => setIsMenuOpen(false)}
                 >
                   Instructors
                 </Link>
                 <Link
                   href="/theme"
-                  className="block px-2 py-1 text-black dark:text-white font-medium text-base rounded hover:bg-[#facc15]/50 dark:hover:bg-[#facc15]/10 hover:text-black dark:hover:text-[#facc15] transition-colors"
+                  className="block px-2 py-1 text-black dark:text-white font-medium text-base rounded hover:bg-[#facc15]/50 dark:hover:bg-[#facc15] hover:text-black  transition-colors"
                   onClick={() => setIsMenuOpen(false)}
                 >
                   Theme
