@@ -16,6 +16,7 @@ interface FilterSidebarProps {
   onFilterChange?: (filters: Record<string, any>) => void;
 	currentFilters: Record<string, any>;
 	isLoading?: boolean;
+	onClose?: () => void; // <-- added
 }
 
 export function FilterSidebar({
@@ -23,6 +24,7 @@ export function FilterSidebar({
   onFilterChange,
 	currentFilters,
 	isLoading = false,
+	onClose,
 }: FilterSidebarProps) {
   const { data: categoriesData } = useCategories({
     page: 1,
@@ -46,10 +48,21 @@ export function FilterSidebar({
   return (
     <div
       className={cn(
-        "p-6  duration-200",
+        "p-6 duration-200 relative", // <-- add relative for close button
         className
       )}
     >
+      {/* Close button for modal */}
+      {onClose && (
+        <button
+          className="absolute top-2 right-2 text-2xl font-bold text-gray-700 dark:text-gray-200 hover:text-black dark:hover:text-white focus:outline-none"
+          onClick={onClose}
+          aria-label="Close filter"
+          type="button"
+        >
+          ×
+        </button>
+      )}
       <h2 className="text-lg font-semibold text-black dark:text-white mb-4">
         Filters
       </h2>

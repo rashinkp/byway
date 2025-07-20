@@ -7,6 +7,7 @@ import ErrorDisplay from "@/components/ErrorDisplay";
 import { Course, IGetAllCoursesInput } from "@/types/course";
 import { useGetAllCourses } from "@/hooks/course/useGetAllCourse";
 import { useSearchParams } from "next/navigation";
+import { Button } from "../ui/button";
 
 interface GridCourse extends Course {
   rating: number;
@@ -31,6 +32,8 @@ export default function MainCourseListing() {
     duration: "all",
     sort: "title-asc",
   });
+  // Modal state for mobile filter
+  const [filterModalOpen, setFilterModalOpen] = useState(false);
 
   // Update filters when URL parameters change
   useEffect(() => {
@@ -129,15 +132,49 @@ export default function MainCourseListing() {
 
   return (
     <div className="container mx-auto px-4 py-2 mt-8 ">
-      <div className="flex flex-col lg:flex-row gap-4">
-        <div className="lg:w-1/5">
+      {/* Mobile Filter Button */}
+      <div className="block lg:hidden mb-8 mx-16">
+        <Button
+          className="px-4 py-2 w-full rounded-md"
+          onClick={() => setFilterModalOpen(true)}
+        >
+          Filter and Sort
+        </Button>
+      </div>
+      {/* Mobile Filter Modal */}
+      {filterModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 bg-opacity-50">
+          <div className="relative w-full max-w-xs bg-white dark:bg-black rounded-lg shadow-lg p-0 overflow-y-auto max-h-screen">
+            <button
+              className="absolute top-2 right-2 text-2xl font-bold text-gray-700 dark:text-gray-200 hover:text-black dark:hover:text-white focus:outline-none"
+              onClick={() => setFilterModalOpen(false)}
+              aria-label="Close filter"
+            >
+              ×
+            </button>
             <FilterSidebar
-              onFilterChange={handleFilterChange}
+              onFilterChange={(f) => {
+                setFilters(f);
+                setCurrentPage(1);
+                setFilterModalOpen(false);
+              }}
+              currentFilters={filters}
+              isLoading={isLoading}
+              onClose={() => setFilterModalOpen(false)}
+            />
+          </div>
+        </div>
+      )}
+      <div className="flex flex-col lg:flex-row gap-4">
+        {/* Desktop Sidebar */}
+        <div className="hidden lg:block lg:w-1/5">
+          <FilterSidebar
+            onFilterChange={handleFilterChange}
             currentFilters={filters}
             isLoading={isLoading}
-            />
+          />
         </div>
-        <div className="lg:w-4/5 flex flex-col items-center">
+        <div className="lg:w-4/5 flex flex-col items-center w-full">
           <CourseGrid
             courses={courses}
             isLoading={isLoading}
