@@ -28,7 +28,7 @@ export function CourseGrid({
 
 	// Skeleton Card Component using shadcn/ui Skeleton
 	const SkeletonCard = () => (
-		<div className="flex flex-col bg-white rounded-xl border border-gray-100 shadow-sm w-full h-[320px]">
+		<div className="flex flex-col  rounded-xl  shadow-sm w-full h-[320px]">
 			<div className="relative aspect-video">
 				<Skeleton className="w-full h-full rounded-t-xl" />
 				<Skeleton className="absolute top-4 left-4 w-20 h-6 rounded-md" />
@@ -55,10 +55,6 @@ export function CourseGrid({
 					</div>
 				</div>
 				<Skeleton className="w-20 h-5 rounded mb-3" />
-				<div className="mt-auto flex gap-2">
-					<Skeleton className="flex-1 h-8 rounded-lg" />
-					<Skeleton className="flex-1 h-8 rounded-lg" />
-				</div>
 			</div>
 		</div>
 	);

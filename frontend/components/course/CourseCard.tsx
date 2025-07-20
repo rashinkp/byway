@@ -91,7 +91,7 @@ export function CourseCard({ course, className }: CourseCardProps) {
 				</div>
 				{/* Title */}
 				<h2
-					className="text-xl font-bold mb-1 line-clamp-1 text-[#facc15] dark:text-white"
+					className="text-xl font-bold mb-1 line-clamp-1 dark:text-[#facc15] dark:text-white"
 				>
 					{course.title}
 				</h2>
@@ -105,7 +105,7 @@ export function CourseCard({ course, className }: CourseCardProps) {
 						<>
 							{hasDiscount ? (
 								<>
-									<span className="text-lg font-bold text-[#facc15] dark:text-[#facc15]">
+									<span className="text-lg font-bold  dark:text-[#facc15]">
 										{formatPrice(offerPrice)}
 									</span>
 									<span className="text-sm text-gray-500 dark:text-gray-400 line-through">
@@ -113,13 +113,13 @@ export function CourseCard({ course, className }: CourseCardProps) {
 									</span>
 								</>
 							) : (
-								<span className="text-lg font-bold text-[#facc15] dark:text-[#facc15]">
+								<span className="text-lg font-bold  dark:text-[#facc15]">
 									{formatPrice(originalPrice)}
 								</span>
 							)}
 						</>
 					) : (
-						<span className="text-lg font-bold text-[#facc15] dark:text-[#facc15]">
+						<span className="text-lg font-bold  dark:text-[#facc15]">
 							Free
 						</span>
 					)}

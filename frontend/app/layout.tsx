@@ -5,7 +5,6 @@ import { Toaster } from "sonner";
 import { Providers } from "@/components/providers";
 import { GoogleOAuthProvider } from "@react-oauth/google";
 import SocketProvider from "@/components/SocketProvider";
-import { ThemeProvider } from "@/components/Theme-Provider";
 
 // Load fonts
 const geistSans = Geist({

@@ -2,7 +2,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 
 export function CourseCardSkeleton() {
 	return (
-		<div className="bg-white rounded-lg shadow-sm overflow-hidden">
+		<div className="rounded-lg shadow-sm overflow-hidden">
 			{/* Thumbnail Skeleton */}
 			<Skeleton className="w-full h-48" />
 

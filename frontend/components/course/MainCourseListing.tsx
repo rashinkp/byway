@@ -6,7 +6,6 @@ import { Pagination } from "@/components/ui/Pagination";
 import ErrorDisplay from "@/components/ErrorDisplay";
 import { Course, IGetAllCoursesInput } from "@/types/course";
 import { useGetAllCourses } from "@/hooks/course/useGetAllCourse";
-import { FilterSidebarSkeleton } from "@/components/course/FilterSidebarSkeleton";
 import { useSearchParams } from "next/navigation";
 
 interface GridCourse extends Course {
@@ -129,17 +128,14 @@ export default function MainCourseListing() {
   }
 
   return (
-    <div className="container mx-auto px-4 py-2 mt-16 bg-[var(--color-background)]">
+    <div className="container mx-auto px-4 py-2 mt-8 ">
       <div className="flex flex-col lg:flex-row gap-4">
         <div className="lg:w-1/5">
-          {isLoading ? (
-            <FilterSidebarSkeleton />
-          ) : (
             <FilterSidebar
               onFilterChange={handleFilterChange}
-              currentFilters={filters}
+            currentFilters={filters}
+            isLoading={isLoading}
             />
-          )}
         </div>
         <div className="lg:w-4/5 flex flex-col items-center">
           <CourseGrid
