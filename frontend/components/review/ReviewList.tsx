@@ -165,8 +165,8 @@ export default function ReviewList({
     }
     
     return (
-      <div className="bg-[var(--color-surface)] border border-[var(--color-primary-light)]/20 rounded-xl p-8 text-center">
-        <p className="text-[var(--color-muted)] text-sm">{message}</p>
+      <div className="bg-white dark:bg-[#232323] border border-[#facc15] rounded-xl p-8 text-center">
+        <p className="text-gray-500 dark:text-gray-300 text-sm">{message}</p>
       </div>
     );
   }
@@ -176,7 +176,7 @@ export default function ReviewList({
       {/* Reviews */}
       <div className="space-y-4">
         {filteredReviews.map((review) => (
-          <div key={review.id} className="bg-[var(--color-surface)] border border-[var(--color-primary-light)]/20 rounded-xl p-4 hover:bg-[var(--color-background)] transition-all duration-200">
+          <div key={review.id} className="bg-white dark:bg-[#232323]  rounded-xl p-4 hover:shadow-lg transition-all duration-200">
             {editingReview === review.id ? (
               <EditReviewForm
                 review={review}
@@ -207,7 +207,7 @@ export default function ReviewList({
           <button
             onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
             disabled={currentPage === 1}
-            className="px-3 py-2 text-sm border border-gray-200 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 transition-colors"
+            className="px-3 py-2 text-sm border border-[#facc15] rounded-lg disabled:opacity-50 disabled:cursor-not-allowed bg-white dark:bg-[#232323] hover:bg-[#facc15]/10 transition-colors"
           >
             Previous
           </button>
@@ -217,7 +217,7 @@ export default function ReviewList({
           <button
             onClick={() => setCurrentPage(Math.min(Math.ceil(total / 10), currentPage + 1))}
             disabled={currentPage >= Math.ceil(total / 10)}
-            className="px-3 py-2 text-sm border border-gray-200 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 transition-colors"
+            className="px-3 py-2 text-sm border border-[#facc15] rounded-lg disabled:opacity-50 disabled:cursor-not-allowed bg-white dark:bg-[#232323] hover:bg-[#facc15]/10 transition-colors"
           >
             Next
           </button>

@@ -83,13 +83,11 @@ export default function CourseDescription({
       )}
 
       {course?.details?.longDescription && (
-        <div className="space-y-4">
-          <h3 className="text-lg font-semibold text-[#facc15]">Course Description</h3>
-          <div className="prose max-w-none">
-            <p className=" leading-relaxed whitespace-pre-line">
-              {course.details.longDescription}
-            </p>
-          </div>
+        <div className="bg-white dark:bg-[#232323] border border-[#facc15] shadow-sm rounded-xl p-6">
+          <h2 className="text-xl font-bold text-black dark:text-[#facc15] mb-4">Course Description</h2>
+          <p className="text-gray-500 dark:text-gray-300 text-lg leading-relaxed">
+            {course.details.longDescription}
+          </p>
         </div>
       )}
     </div>

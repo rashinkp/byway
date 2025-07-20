@@ -4,10 +4,10 @@ import { useGetCourseById } from "@/hooks/course/useGetCourseById";
 import { useGetPublicLessons } from "@/hooks/lesson/useGetPublicLessons";
 import { useGetPublicUser } from "@/hooks/user/useGetPublicUser";
 import { useParams, useRouter } from "next/navigation";
-import { CourseDetailLayout } from "@/components/course/course-detail";
 import { useAuth } from "@/hooks/auth/useAuth";
 import { useAddToCart } from "@/hooks/cart/useAddToCart";
 import { User } from "@/types/user";
+import CourseDetailLayout from "./CourseDetailLayout";
 
 export default function MainCourseDetailsContent() {
   const router = useRouter();
@@ -48,24 +48,26 @@ export default function MainCourseDetailsContent() {
   }
 
   return (
-    <CourseDetailLayout
-      course={course}
-      instructor={instructor as User}
-      lessons={lessonsData?.lessons}
-      isLoading={{
-        course: courseLoading,
-        instructor: instructorLoading,
-        lessons: lessonLoading,
-        user: userLoading,
-      }}
-      error={error}
-      sidebarProps={{
-        isCartLoading,
-        handleAddToCart,
-        isEnrolled: course?.isEnrolled || false,
-        userLoading,
-      }}
-      showReviews={true}
-    />
+    <div className="bg-white dark:bg-[#18181b] min-h-screen p-0">
+      <CourseDetailLayout
+        course={course}
+        instructor={instructor as User}
+        lessons={lessonsData?.lessons}
+        isLoading={{
+          course: courseLoading,
+          instructor: instructorLoading,
+          lessons: lessonLoading,
+          user: userLoading,
+        }}
+        error={error}
+        sidebarProps={{
+          isCartLoading,
+          handleAddToCart,
+          isEnrolled: course?.isEnrolled || false,
+          userLoading,
+        }}
+        showReviews={true}
+      />
+    </div>
   );
 }

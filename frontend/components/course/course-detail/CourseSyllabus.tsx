@@ -36,40 +36,24 @@ export default function CourseSyllabus({
   }
 
   return (
-    <div>
-      <h2 className="text-xl font-bold mb-4 text-[var(--color-primary-dark)]">Syllabus</h2>
-      {(!lessons || lessons.length === 0) ? (
-        <div className="bg-[var(--color-background)] border border-[var(--color-primary-light)]/20 rounded-lg p-6 text-center">
-          <p className="text-[var(--color-muted)] text-base font-medium">Syllabus is not available. Please contact the team.</p>
-        </div>
-      ) : (
-        <div className="space-y-4">
-          {lessons.map((lesson, index) => (
-            <div key={index} className="border rounded-lg overflow-hidden border-[var(--color-primary-light)]/20">
-              <button
-                className="w-full flex justify-between items-center p-4 bg-[var(--color-background)]"
-                onClick={() => toggleModule(lesson.title)}
-              >
-                <div className="flex items-center gap-2">
-                  <ChevronDown
-                    size={20}
-                    className={`transform transition-transform ${
-                      expandedModules.includes(lesson.title) ? "rotate-180" : ""
-                    }`}
-                  />
-                  {lesson.contentType === "VIDEO" && <Video className="w-4 h-4 text-blue-500" />}
-                  {lesson.contentType === "DOCUMENT" && <FileText className="w-4 h-4 text-blue-500" />}
-                  {lesson.contentType === "QUIZ" && <HelpCircle className="w-4 h-4 text-blue-500" />}
-                  <span className="font-medium text-[var(--color-primary-dark)]">{lesson.title}</span>
-                </div>
-                <div className="text-[var(--color-muted)] text-sm">{lesson.order}</div>
-              </button>
-              {expandedModules.includes(lesson.title) && (
-                <AdminLessonContent lessonId={lesson.id} />
-              )}
-            </div>
+    <div className="bg-white dark:bg-[#232323] border border-[#facc15] shadow-sm rounded-xl p-6">
+      <h2 className="text-xl font-bold text-black dark:text-[#facc15] mb-4">Course Syllabus</h2>
+      {isLoading ? (
+        <div className="text-gray-500 dark:text-gray-300">Loading lessons...</div>
+      ) : lessons && lessons.length > 0 ? (
+        <ul className="space-y-4">
+          {lessons.map((lesson, idx) => (
+            <li key={lesson.id} className="flex items-start gap-3">
+              <span className="text-[#facc15] font-bold">{idx + 1}.</span>
+              <div>
+                <h3 className="font-semibold text-black dark:text-[#facc15]">{lesson.title}</h3>
+                <p className="text-gray-500 dark:text-gray-300 text-sm">{lesson.description}</p>
+              </div>
+            </li>
           ))}
-        </div>
+        </ul>
+      ) : (
+        <div className="text-gray-500 dark:text-gray-300">No lessons available.</div>
       )}
     </div>
   );

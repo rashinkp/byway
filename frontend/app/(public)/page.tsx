@@ -80,7 +80,7 @@ export default function UserDashboard() {
 					<h1 className="text-3xl sm:text-5xl md:text-6xl font-extrabold text-[#facc15] drop-shadow-[0_2px_16px_rgba(0,0,0,0.7)] mb-4">
 						Knowledge Meets <span className="block">Innovation</span>
 					</h1>
-					<p className="max-w-2xl mx-auto text-base sm:text-lg md:text-xl text-white/90 font-medium drop-shadow-[0_2px_8px_rgba(0,0,0,0.7)]">
+					<p className="max-w-2xl mx-auto text-base sm:text-lg md:text-xl dark:text-white/90 font-medium drop-shadow-[0_2px_8px_rgba(0,0,0,0.7)]">
 						This platform's simplicity belies its powerful capabilities, offering a seamless and enjoyable educational experience.
 					</p>
 				</motion.section>
@@ -190,7 +190,7 @@ export default function UserDashboard() {
 						<h2 className="text-2xl font-bold mb-4 text-[#facc15]">
 							Testimonial
 						</h2>
-						<p className="text-lg text-white mb-8 font-medium">
+						<p className="text-lg dark:text-white mb-8 font-medium">
 							"Since implementing Byway, our organization has witnessed a
 							remarkable transformation in how we approach learning. The
 							platform&apos;s simplicity belies its powerful capabilities,

@@ -48,56 +48,56 @@ export default function MainCourseDetails() {
   return (
     <div className="container mx-auto py-6 px-4 sm:px-6 lg:px-8">
       {/* Course Stats Section */}
-      <div className="bg-white/80 backdrop-blur-sm border border-gray-100 shadow-sm rounded-xl p-6 mb-6">
-        <h3 className="text-sm font-semibold text-gray-900 mb-4">
+      <div className="bg-white dark:bg-[#232323] border border-[#facc15] shadow-sm rounded-xl p-6 mb-6">
+        <h3 className="text-sm font-semibold text-black dark:text-[#facc15] mb-4">
           Course Performance
         </h3>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           <div className="flex items-center gap-3">
-            <div className="p-2 rounded-lg bg-blue-50">
-              <Percent className="h-4 w-4 text-blue-600" />
+            <div className="p-2 rounded-lg bg-[#facc15]/10">
+              <Percent className="h-4 w-4 text-[#facc15]" />
             </div>
             <div>
-              <p className="text-sm font-medium text-gray-900">
+              <p className="text-sm font-medium text-black dark:text-[#facc15]">
                 {course?.instructorSharePercentage || 0}%
               </p>
-              <p className="text-xs text-gray-500">Your Share</p>
+              <p className="text-xs text-gray-500 dark:text-gray-300">Your Share</p>
             </div>
           </div>
 
           <div className="flex items-center gap-3">
-            <div className="p-2 rounded-lg bg-orange-50">
-              <Users className="h-4 w-4 text-orange-600" />
+            <div className="p-2 rounded-lg bg-[#facc15]/10">
+              <Users className="h-4 w-4 text-[#facc15]" />
             </div>
             <div>
-              <p className="text-sm font-medium text-gray-900">
+              <p className="text-sm font-medium text-black dark:text-[#facc15]">
                 {course?.adminSharePercentage || 0}%
               </p>
-              <p className="text-xs text-gray-500">Admin Share</p>
+              <p className="text-xs text-gray-500 dark:text-gray-300">Admin Share</p>
             </div>
           </div>
 
           <div className="flex items-center gap-3">
-            <div className="p-2 rounded-lg bg-green-50">
-              <DollarSign className="h-4 w-4 text-green-600" />
+            <div className="p-2 rounded-lg bg-[#facc15]/10">
+              <DollarSign className="h-4 w-4 text-[#facc15]" />
             </div>
             <div>
-              <p className="text-sm font-medium text-gray-900">
+              <p className="text-sm font-medium text-black dark:text-[#facc15]">
                 ${Number(course?.price)?.toFixed(2) || "0.00"}
               </p>
-              <p className="text-xs text-gray-500">Course Price</p>
+              <p className="text-xs text-gray-500 dark:text-gray-300">Course Price</p>
             </div>
           </div>
 
           <div className="flex items-center gap-3">
-            <div className="p-2 rounded-lg bg-purple-50">
-              <TrendingUp className="h-4 w-4 text-purple-600" />
+            <div className="p-2 rounded-lg bg-[#facc15]/10">
+              <TrendingUp className="h-4 w-4 text-[#facc15]" />
             </div>
             <div>
-              <p className="text-sm font-medium text-gray-900">
+              <p className="text-sm font-medium text-black dark:text-[#facc15]">
                 ${Number(course?.offer)?.toFixed(2) || "0.00"}
               </p>
-              <p className="text-xs text-gray-500">Offer Price</p>
+              <p className="text-xs text-gray-500 dark:text-gray-300">Offer Price</p>
             </div>
           </div>
         </div>
@@ -105,14 +105,14 @@ export default function MainCourseDetails() {
 
       <Tabs defaultValue="overview" className="w-full">
         <div className="relative mb-6">
-          <TabsList className="flex justify-center md:justify-start gap-1 p-1 bg-gray-100 rounded-xl overflow-x-auto no-scrollbar">
+          <TabsList className="flex justify-center md:justify-start gap-1 p-1 bg-[#f9fafb] dark:bg-[#232323] rounded-xl overflow-x-auto no-scrollbar border border-[#facc15]">
             {tabItems.map((tab) => (
               <TabsTrigger
                 key={tab.id}
                 value={tab.id}
-                className="flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-gray-600 rounded-lg transition-all 
-                data-[state=active]:bg-white data-[state=active]:text-primary data-[state=active]:shadow-sm
-                hover:bg-gray-200 hover:text-primary"
+                className="flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-black dark:text-white rounded-lg transition-all \
+                data-[state=active]:bg-[#facc15] data-[state=active]:text-black data-[state=active]:shadow-sm
+                hover:bg-[#facc15]/20 hover:text-black dark:hover:text-[#facc15]"
               >
                 <tab.icon className="h-4 w-4" />
                 {tab.label}
@@ -133,7 +133,7 @@ export default function MainCourseDetails() {
           <LessonManager courseId={courseId as string} />
         </TabsContent>
         <TabsContent value="reviews" className="mt-0">
-          <div className="bg-white/80 backdrop-blur-sm border border-gray-100 shadow-sm rounded-xl p-6">
+          <div className="bg-white dark:bg-[#232323] border border-[#facc15] shadow-sm rounded-xl p-6">
             <CourseReviews
               course={course}
               isLoading={isLoading}

@@ -11,7 +11,7 @@ export default function LearningBanner() {
 				className="object-cover w-full h-full absolute inset-0 z-0 p-0 m-0"
 				priority
 			/>
-			<div className="absolute inset-0 dark:bg-black/80 bg-white/60 z-5" />
+			<div className="absolute inset-0 dark:bg-black/80 bg-white/80 z-5" />
 		</section>
 	);
 }

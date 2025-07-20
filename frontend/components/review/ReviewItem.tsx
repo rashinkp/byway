@@ -55,8 +55,8 @@ export default function ReviewItem({
       <div className="flex items-start space-x-4">
         {/* Avatar */}
         <div className="flex-shrink-0">
-          <div className="w-10 h-10 bg-[var(--color-primary-light)]/10 rounded-full flex items-center justify-center">
-            <span className="text-[var(--color-primary-light)] font-semibold text-sm">
+          <div className="w-10 h-10 bg- rounded-full flex items-center justify-center">
+            <span className=" font-semibold text-sm">
               {review.user?.name?.charAt(0).toUpperCase() || "U"}
             </span>
           </div>
@@ -67,7 +67,7 @@ export default function ReviewItem({
           <div className="flex items-start justify-between">
             <div className="flex-1">
               <div className="flex items-center space-x-2">
-                <h4 className="text-sm font-semibold text-[var(--color-primary-dark)]">
+                <h4 className="text-sm font-semibold ">
                   {review.user?.name || "Anonymous"}
                 </h4>
                 <div className="flex items-center space-x-1">
@@ -86,7 +86,7 @@ export default function ReviewItem({
               </div>
               
               {review.title && (
-                <h5 className="text-sm font-medium text-[var(--color-primary-dark)] mt-1">
+                <h5 className="text-sm font-medium  mt-1">
                   {review.title}
                 </h5>
               )}
