@@ -4,7 +4,6 @@ import { useState } from "react";
 import { Pagination } from "@/components/ui/Pagination";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useGetAllInstructors } from "@/hooks/instructor/useGetAllInstructor";
-import KnowledgePluseBanner from "@/components/banners/KnowledgePluseBanner";
 import { InstructorCard } from "@/components/instructor/InstructorCard";
 
 export default function InstructorsPage() {
@@ -30,13 +29,6 @@ export default function InstructorsPage() {
 
 	return (
 		<div className="bg-[var(--color-background)]">
-			<KnowledgePluseBanner
-				title="Meet Our Instructors"
-				subtitle="BYWAY"
-				description="Learn from industry experts and passionate educators. Browse our instructor profiles to find the perfect mentor for your learning journey."
-				hideImage={true}
-				className="mx-auto max-w-7xl w-full"
-			/>
 			<div className="container mx-auto py-8 max-w-5xl px-4">
 				{isLoading ? (
 					<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -50,7 +42,7 @@ export default function InstructorsPage() {
 									<div className="space-y-2">
 										<Skeleton className="h-4 w-32" />
 										<Skeleton className="h-3 w-24" />
-									</div>
+									</div>	
 								</div>
 								<Skeleton className="h-3 w-full mt-4" />
 								<Skeleton className="h-3 w-2/3 mt-2" />

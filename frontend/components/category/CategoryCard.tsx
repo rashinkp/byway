@@ -36,13 +36,13 @@ export function CategoryCard({
 						className={cn(
 							"group flex flex-col items-center justify-center rounded-2xl shadow-lg hover:shadow-2xl hover:scale-[1.04] hover:ring-2 hover:ring-[#facc15] transition-all duration-200 cursor-pointer relative overflow-hidden bg-white dark:bg-neutral-800 backdrop-blur-md",
 							wide
-								? "p-8 min-h-[180px] min-w-[320px] w-full"
+								? "p-8 min-h-[100px] min-w-[320px] w-full"
 								: "p-6 min-h-[140px]",
 						)}
 					>
 						{/* Category Name */}
 						<h2
-							className="text-xl font-bold mb-1 line-clamp-1 text-[#facc15] dark:text-[#facc15]"
+							className="text-xl font-bold mb-1 line-clamp-1 "
 						>
 							{category.name}
 						</h2>
