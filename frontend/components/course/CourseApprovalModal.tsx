@@ -44,7 +44,7 @@ export function CourseApprovalModal() {
 		<Dialog open={isOpen} onOpenChange={setIsOpen}>
 			<DialogTrigger asChild>
 				<Button
-					variant="outline"
+					variant="default"
 					className="bg-blue-600 text-white hover:bg-blue-700 hover:text-white"
 				>
 					Review Pending Courses
@@ -96,7 +96,6 @@ export function CourseApprovalModal() {
 											)}
 										</Button>
 										<Button
-											variant="destructive"
 											size="sm"
 											className="bg-red-600 hover:bg-red-700 text-white"
 											onClick={() => handleDecline(course.id)}

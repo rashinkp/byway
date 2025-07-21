@@ -42,28 +42,28 @@ export default function AdminActions({
 	onToggleStatus,
 }: AdminActionsProps) {
 	return (
-		<div className="space-y-4">
+		<div className="rounded-xl dark:border-gray-700 bg-white dark:bg-[#18181b] p-6 shadow-sm space-y-6">
 			{/* Course Status Section */}
-			<div className="space-y-3">
-				<div className="flex items-center gap-2 text-gray-900">
-					<Shield className="w-4 h-4 text-blue-600" />
+			<div className="space-y-4">
+				<div className="flex items-center gap-2 text-gray-900 dark:text-[#facc15]">
+					<Shield className="w-4 h-4 text-blue-600 dark:text-blue-400" />
 					<h3 className="text-sm font-medium">Course Status</h3>
 				</div>
 				<div className="space-y-3">
 					{/* Course Status */}
 					<div className="flex items-center justify-between">
-						<span className="text-sm text-gray-600">Status</span>
+						<span className="text-sm text-gray-600 dark:text-gray-300">Status</span>
 						<Badge
-							className={`${
+							className={`rounded-md px-2 py-1 text-xs font-semibold border-0 ${
 								course.deletedAt
-									? "bg-red-50 text-red-700 border-red-200"
+									? "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300"
 									: course.status === "PUBLISHED"
-										? "bg-green-50 text-green-700 border-green-200"
+										? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300"
 										: course.status === "DRAFT"
-											? "bg-yellow-50 text-yellow-700 border-yellow-200"
+											? "bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-300"
 											: course.status === "ARCHIVED"
-												? "bg-gray-50 text-gray-700 border-gray-200"
-												: "bg-gray-50 text-gray-700 border-gray-200"
+												? "bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300"
+												: "bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300"
 							}`}
 						>
 							{course.deletedAt ? "Deleted" : course.status || "Unknown"}
@@ -72,16 +72,16 @@ export default function AdminActions({
 
 					{/* Approval Status */}
 					<div className="flex items-center justify-between">
-						<span className="text-sm text-gray-600">Approval</span>
+						<span className="text-sm text-gray-600 dark:text-gray-300">Approval</span>
 						<Badge
-							className={`${
+							className={`rounded-md px-2 py-1 text-xs font-semibold border-0 ${
 								course.approvalStatus === "APPROVED"
-									? "bg-green-50 text-green-700 border-green-200"
+									? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300"
 									: course.approvalStatus === "PENDING"
-										? "bg-yellow-50 text-yellow-700 border-yellow-200"
+										? "bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-300"
 										: course.approvalStatus === "DECLINED"
-											? "bg-red-50 text-red-700 border-red-200"
-											: "bg-gray-50 text-gray-700 border-gray-200"
+											? "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300"
+											: "bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300"
 							}`}
 						>
 							{course.approvalStatus || "No Status"}
@@ -90,8 +90,8 @@ export default function AdminActions({
 
 					{/* Created Date */}
 					<div className="flex items-center justify-between">
-						<span className="text-sm text-gray-600">Created</span>
-						<span className="text-sm font-medium text-gray-900">
+						<span className="text-sm text-gray-600 dark:text-gray-300">Created</span>
+						<span className="text-sm font-medium text-gray-900 dark:text-white">
 							{new Date(course.createdAt).toLocaleDateString()}
 						</span>
 					</div>
@@ -99,27 +99,25 @@ export default function AdminActions({
 					{/* Deleted Date (if applicable) */}
 					{course.deletedAt && (
 						<div className="flex items-center justify-between">
-							<span className="text-sm text-gray-600">Deleted</span>
-							<span className="text-sm font-medium text-red-600">
+							<span className="text-sm text-gray-600 dark:text-gray-300">Deleted</span>
+							<span className="text-sm font-medium text-red-600 dark:text-red-400">
 								{new Date(course.deletedAt).toLocaleDateString()}
 							</span>
 						</div>
 					)}
 				</div>
 			</div>
-
-			<Separator />
-
+			<Separator className="my-4 dark:bg-gray-700" />
 			{/* Action Buttons */}
 			<div className="space-y-3">
 				{course.approvalStatus === "PENDING" && (
-					<>
+					<div className="flex flex-col gap-3">
 						<AlertDialog>
 							<AlertDialogTrigger asChild>
 								<Button
 									disabled={isApproving}
 									size="lg"
-									className="w-full bg-green-50 text-green-700 border-green-200 hover:bg-green-100"
+									className="w-full bg-green-500/10 text-green-700 dark:bg-green-900/30 dark:text-green-300 border-0 hover:bg-green-500/20 dark:hover:bg-green-900/50"
 								>
 									{isApproving ? (
 										<Loader2 className="w-4 h-4 mr-2 animate-spin" />
@@ -148,13 +146,12 @@ export default function AdminActions({
 								</AlertDialogFooter>
 							</AlertDialogContent>
 						</AlertDialog>
-
 						<AlertDialog>
 							<AlertDialogTrigger asChild>
 								<Button
 									disabled={isDeclining}
 									size="lg"
-									className="w-full bg-red-50 text-red-700 border-red-200 hover:bg-red-100"
+									className="w-full bg-red-500/10 text-red-700 dark:bg-red-900/30 dark:text-red-300 border-0 hover:bg-red-500/20 dark:hover:bg-red-900/50"
 								>
 									{isDeclining ? (
 										<Loader2 className="w-4 h-4 mr-2 animate-spin" />
@@ -183,7 +180,7 @@ export default function AdminActions({
 								</AlertDialogFooter>
 							</AlertDialogContent>
 						</AlertDialog>
-					</>
+					</div>
 				)}
 
 				{course.approvalStatus === "APPROVED" && (
@@ -192,7 +189,11 @@ export default function AdminActions({
 							<Button
 								disabled={isTogglingStatus}
 								size="lg"
-								className="w-full bg-blue-50 text-blue-700 border-blue-200 hover:bg-blue-100"
+								className={`w-full border-0 ${
+									course?.deletedAt
+										? "bg-green-500/10 text-green-700 dark:bg-green-900/30 dark:text-green-300 hover:bg-green-500/20 dark:hover:bg-green-900/50"
+										: "bg-red-500/10 text-red-700 dark:bg-red-900/30 dark:text-red-300 hover:bg-red-500/20 dark:hover:bg-red-900/50"
+								}`}
 							>
 								{isTogglingStatus ? (
 									<Loader2 className="w-4 h-4 mr-2 animate-spin" />
@@ -208,8 +209,7 @@ export default function AdminActions({
 									{course?.deletedAt ? "Enable Course" : "Disable Course"}
 								</AlertDialogTitle>
 								<AlertDialogDescription>
-									Are you sure you want to{" "}
-									{course?.deletedAt ? "enable" : "disable"} &quot;{course.title}"?
+									Are you sure you want to {course?.deletedAt ? "enable" : "disable"} &quot;{course.title}"?
 									{course?.deletedAt
 										? " This will make the course available to students again."
 										: " This will hide the course from students."}

@@ -8,6 +8,7 @@ import ErrorDisplay from "@/components/ErrorDisplay";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import CourseDetailLayoutSkeleton from "./CourseDetailLayoutSkeleton";
+import AdminActions from "./AdminActions";
 
 interface CourseDetailLayoutProps {
 	course: Course | undefined;
@@ -27,6 +28,7 @@ interface CourseDetailLayoutProps {
 		userLoading?: boolean;
 		adminActions?: ReactNode;
 		instructorActions?: ReactNode;
+		adminActionsProps?: any;
 	};
 	tabContent?: {
 		[key: string]: ReactNode;
@@ -102,21 +104,27 @@ export default function CourseDetailLayout({
 							</div>
 						)}
 						<div className="flex flex-wrap gap-3 items-center justify-center sm:justify-start mt-2">
-							{course?.price && (
-								<span className="text-2xl font-bold text-[#facc15]">₹{Number(course?.offer || course?.price).toFixed(2)}</span>
+							{userRole !== 'ADMIN' && course?.price && (
+								<span className="text-2xl font-bold text-[#facc15]">₹{Number(course?.offer ?? course?.price).toFixed(2)}</span>
 							)}
-							{course?.offer && course?.offer !== course?.price && (
-								<span className="text-lg text-gray-500 dark:text-gray-300 line-through">₹{Number(course?.price).toFixed(2)}</span>
+							{userRole !== 'ADMIN' && course?.offer && course?.offer !== course?.price && (
+								<span className="text-lg text-gray-500 dark:text-gray-300 line-through">₹{Number(course?.price ?? 0).toFixed(2)}</span>
 							)}
-							{/* Purchase/Enroll Buttons */}
+							{/* Purchase/Enroll Buttons or Admin Actions */}
 							{sidebarProps && (
 								<>
-									{sidebarProps.isEnrolled ? (
+									{userRole === 'ADMIN' ? (
+										sidebarProps.adminActions ? (
+											sidebarProps.adminActions
+										) : (
+											<AdminActions course={course} {...(sidebarProps.adminActionsProps || {})} />
+										)
+									) : sidebarProps.isEnrolled ? (
 										<Button variant={'primary'} className="px-6 py-2" onClick={() => window.location.href = `/user/my-courses/${course?.id}`}>Learn Now</Button>
 									) : course?.isInCart ? (
 										<>
-											<Button className="px-6 py-2 rounded-full bg-gray-900 text-white font-semibold shadow hover:bg-gray-700 transition-colors border-none" onClick={() => window.location.href = '/user/cart'}>Go to Cart</Button>
-											<Button className="px-6 py-2 rounded-full bg-[#facc15] text-black font-semibold shadow hover:bg-gray-900 hover:text-[#facc15] transition-colors border-none ml-2" onClick={() => window.location.href = `/user/checkout?courseId=${course?.id}`}>Buy Now</Button>
+											<Button variant={'primary'} onClick={() => window.location.href = '/user/cart'}>Go to Cart</Button>
+											<Button variant={'default'}  onClick={() => window.location.href = `/user/checkout?courseId=${course?.id}`}>Buy Now</Button>
 										</>
 									) : (
 										<>
@@ -225,6 +233,18 @@ export default function CourseDetailLayout({
 							<h4 className="font-semibold text-black dark:text-white mb-1">Status</h4>
 							<p className="text-gray-500 dark:text-gray-300">{course?.deletedAt ? 'Inactive' : 'Active'}</p>
 						</div>
+						{userRole !== 'USER' && typeof course?.adminSharePercentage === 'number' && (
+							<div>
+								<h4 className="font-semibold text-black dark:text-white mb-1">Admin Share</h4>
+								<p className="text-gray-500 dark:text-gray-300">{course.adminSharePercentage}%</p>
+							</div>
+						)}
+						{userRole !== 'USER' && typeof course?.instructorSharePercentage === 'number' && (
+							<div>
+								<h4 className="font-semibold text-black dark:text-white mb-1">Instructor Share</h4>
+								<p className="text-gray-500 dark:text-gray-300">{course.instructorSharePercentage}%</p>
+							</div>
+						)}
 					</div>
 				</div>
 
