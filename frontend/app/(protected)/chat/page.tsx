@@ -435,10 +435,10 @@ export default function ChatPage() {
 	}
 
 	return (
-		<div className="h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 overflow-hidden">
+		<div className="h-screen  overflow-hidden">
 			{/* Main Chat Interface */}
 			<div className="w-full h-full flex items-stretch">
-				<div className="w-full h-full bg-white/60 backdrop-blur-xl border border-slate-200/60 shadow-2xl shadow-slate-200/50 rounded-3xl overflow-hidden flex flex-col min-h-0">
+				<div className="w-full h-full overflow-hidden flex flex-col min-h-0">
 					<div className="flex flex-1 min-h-0">
 						{/* Chat List Sidebar (show on mobile only if sidebar is open and no chat selected) */}
 						{((isSidebarOpen && (!selectedChat || !isMobile)) ||
@@ -456,12 +456,12 @@ export default function ChatPage() {
 								/>
 								{/* Load More Button */}
 								{hasMore && (
-									<div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-white via-white to-transparent">
+									<div className="absolute bottom-0 left-0 right-0 p-4">
 										<Button
 											onClick={loadMoreChats}
 											disabled={loading}
-											variant="outline"
-											className="w-full rounded-xl border-slate-200/60 hover:bg-slate-50 transition-all duration-200"
+											variant="default"
+											
 										>
 											{loading ? (
 												<>
@@ -479,7 +479,7 @@ export default function ChatPage() {
 						{/* Mobile Overlay */}
 						{isSidebarOpen && !selectedChat && (
 							<div
-								className="fixed inset-0 bg-black/20 backdrop-blur-sm z-30 md:hidden"
+								className="fixed inset-0 backdrop-blur-sm z-30 md:hidden"
 								onClick={() => setIsSidebarOpen(false)}
 							/>
 						)}
@@ -504,11 +504,11 @@ export default function ChatPage() {
 						)}
 						{/* Fallback UI when no chat is selected */}
 						{!selectedChat && (!isMobile || (isMobile && !isSidebarOpen)) && (
-							<div className="flex-1 flex flex-col items-center justify-center h-full min-h-0 text-center text-slate-500 select-none">
+							<div className="flex-1 flex flex-col items-center justify-center h-full min-h-0  select-none">
 								<div className="mb-4">
-									<svg width="48" height="48" fill="none" viewBox="0 0 24 24" stroke="currentColor" className="mx-auto mb-2 text-slate-300"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M7 8h10M7 12h6m-6 4h8m-2 4.5V21a2 2 0 01-2 2H6a2 2 0 01-2-2V6a2 2 0 012-2h12a2 2 0 012 2v7" /></svg>
+									<svg width="48" height="48" fill="none" viewBox="0 0 24 24" stroke="currentColor" className="mx-auto mb-2 "><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M7 8h10M7 12h6m-6 4h8m-2 4.5V21a2 2 0 01-2 2H6a2 2 0 01-2-2V6a2 2 0 012-2h12a2 2 0 012 2v7" /></svg>
 									<h2 className="text-lg font-semibold">Select any chat to start conversation</h2>
-									<p className="text-sm text-slate-400">Choose a chat from the list or start a new one to begin messaging.</p>
+									<p className="text-sm ">Choose a chat from the list or start a new one to begin messaging.</p>
 								</div>
 							</div>
 						)}
