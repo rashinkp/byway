@@ -11,7 +11,7 @@ export function LessonContentSkeleton() {
         </div>
 
         {/* Content card skeleton */}
-        <div className="bg-[var(--color-surface)] shadow-xl rounded-xl overflow-hidden">
+        <div className="bg-white dark:bg-[#18181b] shadow-xl rounded-xl overflow-hidden">
           <div className="p-6 space-y-4">
             <Skeleton className="h-6 w-2/3" />
             <Skeleton className="h-4 w-full" />
@@ -24,7 +24,7 @@ export function LessonContentSkeleton() {
           </div>
 
           {/* Bottom section skeleton */}
-          <div className="p-6 border-t border-[var(--color-primary-light)]/20 bg-[var(--color-background)] flex justify-between items-center">
+          <div className="p-6 border-t border-gray-200 dark:border-[#232323] bg-gray-50 dark:bg-[#232323] flex justify-between items-center">
             <div className="flex items-center space-x-2">
               <Skeleton className="h-6 w-6 rounded-full" />
               <Skeleton className="h-4 w-24" />

@@ -32,13 +32,13 @@ export function CertificateActions({ courseId }: { courseId: string }) {
     <div className="max-w-3xl mx-auto relative animate-fade-in">
       {/* Celebration Header */}
       <div className="text-center mb-8">
-        <div className="inline-flex items-center justify-center p-4 bg-[var(--color-primary-light)]/20 rounded-full mb-4">
+        <div className="inline-flex items-center justify-center p-4 bg-yellow-100 dark:bg-yellow-900/20 rounded-full mb-4">
           <span className="text-4xl">🎉</span>
         </div>
-        <h1 className="text-4xl lg:text-5xl font-bold text-[var(--color-primary-dark)] mb-2">
+        <h1 className="text-4xl lg:text-5xl font-bold text-black dark:text-white mb-2">
           Congratulations!
         </h1>
-        <p className="text-xl text-[var(--color-muted)]">You've successfully completed the course</p>
+        <p className="text-xl text-gray-500 dark:text-gray-300">You've successfully completed the course</p>
       </div>
 
       {/* Certificate Actions Only */}
@@ -48,7 +48,7 @@ export function CertificateActions({ courseId }: { courseId: string }) {
             href={certificate.pdfUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center justify-center px-8 py-4 bg-[var(--color-primary-light)] text-[var(--color-surface)] font-semibold rounded-xl hover:bg-[var(--color-primary-dark)] transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="inline-flex items-center justify-center px-8 py-4 bg-yellow-400 dark:bg-yellow-500 text-black font-semibold rounded-xl hover:bg-yellow-500 dark:hover:bg-yellow-600 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <span className="mr-2 text-lg">📄</span>
             View & Download Certificate
@@ -65,24 +65,24 @@ export function CertificateActions({ courseId }: { courseId: string }) {
             }
           }}
           disabled={certLoading || !canRegenerate}
-          className={`inline-flex items-center justify-center px-8 py-3 rounded-xl font-semibold transition-colors duration-200 ${certLoading || !canRegenerate ? "bg-gray-400 text-white" : "bg-yellow-500 text-white hover:bg-yellow-600"}`}
+          className={`inline-flex items-center justify-center px-8 py-3 rounded-xl font-semibold transition-colors duration-200 ${certLoading || !canRegenerate ? "bg-gray-400 text-white dark:bg-gray-700 dark:text-gray-300" : "bg-yellow-400 dark:bg-yellow-500 text-black hover:bg-yellow-500 dark:hover:bg-yellow-600"}`}
         >
           {certLoading ? (
             <span className="flex items-center justify-center w-full">
-              <svg className="animate-spin h-5 w-5 mr-2 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+              <svg className="animate-spin h-5 w-5 mr-2 text-white dark:text-black" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                 <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                 <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path>
               </svg>
               Regenerating...
             </span>
           ) : regenError ? (
-            <span className="text-red-600">{regenError}</span>
+            <span className="text-red-600 dark:text-red-400">{regenError}</span>
           ) : (
             "Regenerate Certificate"
           )}
         </button>
         {!canRegenerate && remainingDays > 0 && (
-          <div className="text-sm text-[var(--color-muted)] mt-1">
+          <div className="text-sm text-gray-500 dark:text-gray-300 mt-1">
             You can regenerate your certificate in <b>{remainingDays} day{remainingDays > 1 ? "s" : ""}</b>.
           </div>
         )}

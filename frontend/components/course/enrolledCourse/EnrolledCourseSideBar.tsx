@@ -38,17 +38,17 @@ export function EnrolledCourseSidebar({
   goToNextPage,
 }: CourseSidebarProps) {
   return (
-    <div className="lg:w-80 bg-[var(--color-surface)] shadow-lg lg:min-h-screen p-6 overflow-y-auto transition-all">
+    <div className="lg:w-80 bg-white dark:bg-[#18181b] shadow-lg lg:min-h-screen p-6 overflow-y-auto transition-all">
       <div className="mb-8">
-        <h2 className="text-2xl font-semibold text-[var(--color-primary-dark)]">{courseTitle}</h2>
+        <h2 className="text-2xl font-semibold text-black dark:text-white">{courseTitle}</h2>
         <div className="mt-4">
-          <div className="relative h-2 bg-[var(--color-background)] rounded-full overflow-hidden">
+          <div className="relative h-2 bg-gray-100 dark:bg-[#232323] rounded-full overflow-hidden">
             <div
-              className="absolute h-full bg-gradient-to-r from-[var(--color-primary-light)] to-[var(--color-primary-dark)] transition-all duration-300"
+              className="absolute h-full bg-gradient-to-r from-blue-400 to-indigo-500 dark:from-yellow-400 dark:to-yellow-500 transition-all duration-300"
               style={{ width: `${progressPercentage}%` }}
             ></div>
           </div>
-          <p className="text-sm text-[var(--color-muted)] mt-2">
+          <p className="text-sm text-gray-500 dark:text-gray-300 mt-2">
             {progressPercentage.toFixed(0)}% complete
           </p>
         </div>

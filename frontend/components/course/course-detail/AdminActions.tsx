@@ -42,11 +42,11 @@ export default function AdminActions({
 	onToggleStatus,
 }: AdminActionsProps) {
 	return (
-		<div className="rounded-xl dark:border-gray-700 bg-white dark:bg-[#18181b] p-6 shadow-sm space-y-6">
+		<div className="rounded-xl border border-gray-200 dark:border-[#232323] bg-white dark:bg-[#18181b] p-6 shadow space-y-6">
 			{/* Course Status Section */}
 			<div className="space-y-4">
-				<div className="flex items-center gap-2 text-gray-900 dark:text-[#facc15]">
-					<Shield className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+				<div className="flex items-center gap-2 text-black dark:text-[#facc15]">
+					<Shield className="w-4 h-4 text-[#2563eb] dark:text-[#facc15]" />
 					<h3 className="text-sm font-medium">Course Status</h3>
 				</div>
 				<div className="space-y-3">
@@ -56,11 +56,11 @@ export default function AdminActions({
 						<Badge
 							className={`rounded-md px-2 py-1 text-xs font-semibold border-0 ${
 								course.deletedAt
-									? "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300"
+									? "bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-300"
 									: course.status === "PUBLISHED"
-										? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300"
+										? "bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-300"
 										: course.status === "DRAFT"
-											? "bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-300"
+											? "bg-[#facc15]/20 text-[#facc15] dark:bg-[#facc15]/10 dark:text-[#facc15]"
 											: course.status === "ARCHIVED"
 												? "bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300"
 												: "bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300"
@@ -76,11 +76,11 @@ export default function AdminActions({
 						<Badge
 							className={`rounded-md px-2 py-1 text-xs font-semibold border-0 ${
 								course.approvalStatus === "APPROVED"
-									? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300"
+									? "bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-300"
 									: course.approvalStatus === "PENDING"
-										? "bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-300"
+										? "bg-[#facc15]/20 text-[#facc15] dark:bg-[#facc15]/10 dark:text-[#facc15]"
 										: course.approvalStatus === "DECLINED"
-											? "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300"
+											? "bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-300"
 											: "bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300"
 							}`}
 						>
@@ -107,7 +107,7 @@ export default function AdminActions({
 					)}
 				</div>
 			</div>
-			<Separator className="my-4 dark:bg-gray-700" />
+			<Separator className="my-4 bg-gray-200 dark:bg-[#232323]" />
 			{/* Action Buttons */}
 			<div className="space-y-3">
 				{course.approvalStatus === "PENDING" && (
@@ -117,7 +117,7 @@ export default function AdminActions({
 								<Button
 									disabled={isApproving}
 									size="lg"
-									className="w-full bg-green-500/10 text-green-700 dark:bg-green-900/30 dark:text-green-300 border-0 hover:bg-green-500/20 dark:hover:bg-green-900/50"
+									className="w-full bg-green-500/10 text-green-700 dark:bg-green-900/40 dark:text-green-300 border-0 hover:bg-green-500/20 dark:hover:bg-green-900/60"
 								>
 									{isApproving ? (
 										<Loader2 className="w-4 h-4 mr-2 animate-spin" />
@@ -151,7 +151,7 @@ export default function AdminActions({
 								<Button
 									disabled={isDeclining}
 									size="lg"
-									className="w-full bg-red-500/10 text-red-700 dark:bg-red-900/30 dark:text-red-300 border-0 hover:bg-red-500/20 dark:hover:bg-red-900/50"
+									className="w-full bg-red-500/10 text-red-700 dark:bg-red-900/40 dark:text-red-300 border-0 hover:bg-red-500/20 dark:hover:bg-red-900/60"
 								>
 									{isDeclining ? (
 										<Loader2 className="w-4 h-4 mr-2 animate-spin" />
@@ -191,8 +191,8 @@ export default function AdminActions({
 								size="lg"
 								className={`w-full border-0 ${
 									course?.deletedAt
-										? "bg-green-500/10 text-green-700 dark:bg-green-900/30 dark:text-green-300 hover:bg-green-500/20 dark:hover:bg-green-900/50"
-										: "bg-red-500/10 text-red-700 dark:bg-red-900/30 dark:text-red-300 hover:bg-red-500/20 dark:hover:bg-red-900/50"
+										? "bg-green-500/10 text-green-700 dark:bg-green-900/40 dark:text-green-300 hover:bg-green-500/20 dark:hover:bg-green-900/60"
+										: "bg-red-500/10 text-red-700 dark:bg-red-900/40 dark:text-red-300 hover:bg-red-500/20 dark:hover:bg-red-900/60"
 								}`}
 							>
 								{isTogglingStatus ? (

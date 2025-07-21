@@ -129,13 +129,14 @@ export default function CourseDetailLayout({
 									) : (
 										<>
 											<Button
+												variant={'primary'}
 												onClick={sidebarProps.handleAddToCart}
 												disabled={sidebarProps.isCartLoading}
-												className="px-6 py-2 rounded-full bg-gray-900 text-white font-semibold shadow hover:bg-gray-700 transition-colors border-none disabled:opacity-60"
+												
 											>
 												{sidebarProps.isCartLoading ? 'Processing...' : 'Add to Cart'}
 											</Button>
-											<Button className="px-6 py-2 rounded-full bg-[#facc15] text-black font-semibold shadow hover:bg-gray-900 hover:text-[#facc15] transition-colors border-none ml-2" onClick={() => window.location.href = `/user/checkout?courseId=${course?.id}`}>Buy Now</Button>
+											<Button  onClick={() => window.location.href = `/user/checkout?courseId=${course?.id}`}>Buy Now</Button>
 										</>
 									)}
 								</>

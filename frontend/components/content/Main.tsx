@@ -280,7 +280,7 @@ export default function MainContentSection() {
     totalLessons > 0 ? Math.round((completedLessons / totalLessons) * 100) : 0;
 
   return (
-    <div className="flex flex-col lg:flex-row w-full bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 min-h-screen">
+    <div className="flex flex-col lg:flex-row w-full min-h-screen bg-white dark:bg-[#18181b]">
       <EnrolledCourseSidebar
         courseTitle="Introduction to User Experience Design"
         progressPercentage={progressPercentage}
@@ -295,12 +295,12 @@ export default function MainContentSection() {
         goToPreviousPage={goToPreviousPage}
         goToNextPage={goToNextPage}
       />
-      <div className="flex-1 p-4 lg:p-8 xl:p-12">
+      <div className="flex-1 p-4 lg:p-8 xl:p-12 bg-white dark:bg-[#18181b]">
         {isError ? (
           <div className="flex flex-col items-center justify-center h-full space-y-6 animate-fade-in">
-            <div className="w-24 h-24 rounded-full bg-red-100 flex items-center justify-center mb-4">
+            <div className="w-24 h-24 rounded-full bg-red-100 dark:bg-red-900 flex items-center justify-center mb-4">
               <svg
-                className="w-12 h-12 text-red-500"
+                className="w-12 h-12 text-red-500 dark:text-red-400"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -313,10 +313,10 @@ export default function MainContentSection() {
                 />
               </svg>
             </div>
-            <h3 className="text-2xl font-bold text-gray-800 mb-2">
+            <h3 className="text-2xl font-bold text-gray-800 dark:text-white mb-2">
               Unable to Load Course
             </h3>
-            <p className="text-gray-600 text-center max-w-md">
+            <p className="text-gray-600 dark:text-gray-300 text-center max-w-md">
               We're having trouble loading the course content. Please try again
               or return to your courses.
             </p>
@@ -351,9 +351,9 @@ export default function MainContentSection() {
           </div>
         ) : (
           <div className="flex flex-col items-center justify-center h-full space-y-6 animate-fade-in">
-            <div className="w-32 h-32 rounded-full bg-gradient-to-br from-blue-100 to-indigo-100 flex items-center justify-center mb-4">
+            <div className="w-32 h-32 rounded-full bg-gradient-to-br from-blue-100 to-indigo-100 dark:from-blue-900 dark:to-indigo-900 flex items-center justify-center mb-4">
               <svg
-                className="w-16 h-16 text-blue-500"
+                className="w-16 h-16 text-blue-500 dark:text-blue-400"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -366,10 +366,10 @@ export default function MainContentSection() {
                 />
               </svg>
             </div>
-            <h3 className="text-2xl font-bold text-gray-800 mb-2">
+            <h3 className="text-2xl font-bold text-gray-800 dark:text-white mb-2">
               Ready to Learn?
             </h3>
-            <p className="text-gray-600 text-center max-w-md">
+            <p className="text-gray-600 dark:text-gray-300 text-center max-w-md">
               Select a lesson from the sidebar to begin your learning journey
             </p>
           </div>
