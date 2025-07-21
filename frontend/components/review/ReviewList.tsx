@@ -19,6 +19,9 @@ import ReviewItem from "./ReviewItem";
 import React from "react";
 import ErrorDisplay from "@/components/ErrorDisplay";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
+import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
+import { Button } from "../ui/button";
 
 interface ReviewListProps {
   reviews: CourseReview[];
@@ -165,7 +168,7 @@ export default function ReviewList({
     }
     
     return (
-      <div className="bg-white dark:bg-[#232323] border border-[#facc15] rounded-xl p-8 text-center">
+      <div className="bg-white dark:bg-[#232323] border border-gray-200 rounded-xl p-8 text-center">
         <p className="text-gray-500 dark:text-gray-300 text-sm">{message}</p>
       </div>
     );
@@ -176,27 +179,31 @@ export default function ReviewList({
       {/* Reviews */}
       <div className="space-y-4">
         {filteredReviews.map((review) => (
-          <div key={review.id} className="bg-white dark:bg-[#232323]  rounded-xl p-4 hover:shadow-lg transition-all duration-200">
-            {editingReview === review.id ? (
-              <EditReviewForm
-                review={review}
-                onSave={(data) => handleUpdateReview(review.id, data)}
-                onCancel={() => setEditingReview(null)}
-                isLoading={isUpdating}
-              />
-            ) : (
-              <ReviewItem
-                review={review}
-                isOwner={user?.id === review.userId}
-                onEdit={() => setEditingReview(review.id)}
-                onDelete={() => handleDeleteClick(review.id)}
-                onDisable={userRole === "ADMIN" ? () => handleDisableClick(review.id, review.deletedAt !== null) : undefined}
-                isDeleting={deletingReview === review.id}
-                isDisabling={disablingReview === review.id}
-                userRole={userRole}
-                isDisabled={review.deletedAt !== null}
-              />
-            )}
+          <div key={review.id} className="bg-white dark:bg-[#232323] rounded-xl p-4 hover:shadow-lg transition-all duration-200">
+            <ReviewItem
+              review={review}
+              isOwner={user?.id === review.userId}
+              onEdit={() => setEditingReview(review.id)}
+              onDelete={() => handleDeleteClick(review.id)}
+              onDisable={userRole === "ADMIN" ? () => handleDisableClick(review.id, review.deletedAt !== null) : undefined}
+              isDeleting={deletingReview === review.id}
+              isDisabling={disablingReview === review.id}
+              userRole={userRole}
+              isDisabled={review.deletedAt !== null}
+            />
+            <Dialog open={editingReview === review.id} onOpenChange={(open) => setEditingReview(open ? review.id : null)}>
+              <DialogContent className="max-w-lg p-0 border-none">
+                <VisuallyHidden>
+                  <DialogTitle>Edit Review</DialogTitle>
+                </VisuallyHidden>
+                <EditReviewForm
+                  review={review}
+                  onSave={(data) => handleUpdateReview(review.id, data)}
+                  onCancel={() => setEditingReview(null)}
+                  isLoading={isUpdating}
+                />
+              </DialogContent>
+            </Dialog>
           </div>
         ))}
       </div>
@@ -204,23 +211,23 @@ export default function ReviewList({
       {/* Pagination */}
       {total > 10 && (
         <div className="flex items-center justify-center space-x-2 pt-4">
-          <button
+          <Button
             onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
             disabled={currentPage === 1}
-            className="px-3 py-2 text-sm border border-[#facc15] rounded-lg disabled:opacity-50 disabled:cursor-not-allowed bg-white dark:bg-[#232323] hover:bg-[#facc15]/10 transition-colors"
+            className="px-3 py-2 text-sm border border-gray-200 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed bg-white dark:bg-[#232323] hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
           >
             Previous
-          </button>
+          </Button>
           <span className="px-3 py-2 text-sm text-gray-600">
             Page {currentPage} of {Math.ceil(total / 10)}
           </span>
-          <button
+          <Button
             onClick={() => setCurrentPage(Math.min(Math.ceil(total / 10), currentPage + 1))}
             disabled={currentPage >= Math.ceil(total / 10)}
-            className="px-3 py-2 text-sm border border-[#facc15] rounded-lg disabled:opacity-50 disabled:cursor-not-allowed bg-white dark:bg-[#232323] hover:bg-[#facc15]/10 transition-colors"
+            className="px-3 py-2 text-sm border border-gray-200 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed bg-white dark:bg-[#232323] hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
           >
             Next
-          </button>
+          </Button>
         </div>
       )}
 

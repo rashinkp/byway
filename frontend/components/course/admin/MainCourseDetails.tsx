@@ -11,8 +11,8 @@ import {
 } from "@/hooks/course/useApproveCourse";
 import { useSoftDeleteCourse } from "@/hooks/course/useSoftDeleteCourse";
 import { useParams } from "next/navigation";
-import { CourseDetailLayout } from "@/components/course/course-detail";
 import AdminActions from "@/components/course/course-detail/AdminActions";
+import CourseDetailLayout from "../course-detail/CourseDetailLayout";
 
 // Admin Course Details Component
 const MainAdminCourseDetails: React.FC = () => {

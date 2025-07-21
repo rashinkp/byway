@@ -119,7 +119,6 @@ export default function AdminActions({
 								<Button
 									disabled={isApproving}
 									size="lg"
-									variant="outline"
 									className="w-full bg-green-50 text-green-700 border-green-200 hover:bg-green-100"
 								>
 									{isApproving ? (
@@ -155,7 +154,6 @@ export default function AdminActions({
 								<Button
 									disabled={isDeclining}
 									size="lg"
-									variant="outline"
 									className="w-full bg-red-50 text-red-700 border-red-200 hover:bg-red-100"
 								>
 									{isDeclining ? (
@@ -194,7 +192,6 @@ export default function AdminActions({
 							<Button
 								disabled={isTogglingStatus}
 								size="lg"
-								variant="outline"
 								className="w-full bg-blue-50 text-blue-700 border-blue-200 hover:bg-blue-100"
 							>
 								{isTogglingStatus ? (

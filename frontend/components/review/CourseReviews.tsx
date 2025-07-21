@@ -6,6 +6,9 @@ import AddReviewForm from "./AddReviewForm";
 import ReviewList from "./ReviewList";
 import { Star } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Button } from "../ui/button";
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
+import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 
 interface CourseReviewsProps {
   course: Course | undefined;
@@ -21,7 +24,7 @@ export default function CourseReviews({
   const { user } = useAuth();
   const [showAddReview, setShowAddReview] = useState(false);
   const [activeFilter, setActiveFilter] = useState<'all' | 'my'>('all');
-  const [disabledFilter, setDisabledFilter] = useState<'all' | 'disabled'>('all');
+  const [disabledFilter] = useState<'all' | 'disabled'>('all');
 
   const {
     data: reviewsData,
@@ -50,6 +53,8 @@ export default function CourseReviews({
   // Use review stats from course data if available
   const reviewStats = course?.reviewStats;
 
+  const userHasReview = !!(user && reviewsData?.items?.some(r => r.userId === user.id));
+
   const renderStars = (rating: number) => {
     return Array.from({ length: 5 }, (_, i) => (
       <Star
@@ -68,7 +73,7 @@ export default function CourseReviews({
         {/* Review Stats for Instructor */}
         {reviewStats && reviewStats.totalReviews > 0 && (
           <div className="bg-white dark:bg-[#232323] rounded-lg p-6">
-            <h3 className="text-sm font-semibold text-black dark:text-[#facc15] mb-4">Review Statistics</h3>
+            <h3 className="text-sm font-semibold text-black dark:text-white mb-4">Review Statistics</h3>
             <div className="flex items-start space-x-6">
               {/* Average Rating */}
               <div className="text-center">
@@ -110,7 +115,7 @@ export default function CourseReviews({
         {/* Reviews List */}
         <div className="space-y-4">
           <div className="flex items-center justify-between">
-            <h3 className="text-sm font-semibold text-black dark:text-[#facc15]">
+            <h3 className="text-sm font-semibold text-black dark:text-white">
               Student Reviews
             </h3>
             
@@ -138,26 +143,31 @@ export default function CourseReviews({
 
   return (
     <div className="space-y-8">
-      {/* Add Review Button - Only for users */}
-      {canReview && !showAddReview && (
-        <div className="flex justify-end mb-2">
-          <button
-            onClick={() => setShowAddReview(true)}
-            className="px-4 py-2 bg-[#facc15] text-black rounded-lg hover:bg-[#18181b] hover:text-[#facc15] transition-colors font-medium shadow"
-          >
-            Add Review
-          </button>
-        </div>
-      )}
-      {/* Add Review Form */}
-      {canReview && showAddReview && (
-        <div className="rounded-lg p-6 bg-[#f9fafb] dark:bg-[#18181b] mb-4">
-          <AddReviewForm
-            courseId={course?.id || ""}
-            onSuccess={() => setShowAddReview(false)}
-            onCancel={() => setShowAddReview(false)}
-          />
-        </div>
+      {canReview && (
+        <>
+          <div className="flex justify-end mb-2">
+            <Button
+              onClick={() => setShowAddReview(true)}
+              className=""
+              disabled={userHasReview}
+              title={userHasReview ? 'You have already reviewed this course.' : ''}
+            >
+              Add Review
+            </Button>
+          </div>
+          <Dialog open={showAddReview} onOpenChange={setShowAddReview}>
+            <DialogContent className="max-w-lg p-0 border-none">
+              <VisuallyHidden>
+                <DialogTitle>Add Review</DialogTitle>
+              </VisuallyHidden>
+              <AddReviewForm
+                courseId={course?.id || ""}
+                onSuccess={() => setShowAddReview(false)}
+                onCancel={() => setShowAddReview(false)}
+              />
+            </DialogContent>
+          </Dialog>
+        </>
       )}
 
       {/* Reviews Card */}
@@ -167,10 +177,10 @@ export default function CourseReviews({
           <div className="mb-6">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
               <div className="flex items-center gap-4">
-                <div className="text-3xl font-bold text-black dark:text-[#facc15]">
+                <div className="text-3xl font-bold text-black dark:text-white">
                   {reviewStats.averageRating.toFixed(1)}
                 </div>
-                <div className="flex gap-1">
+                <div className="flex gap-1 text-[#facc15]">
                   {renderStars(Math.round(reviewStats.averageRating))}
                 </div>
                 <div className="text-sm text-gray-500 dark:text-gray-300">
@@ -182,61 +192,25 @@ export default function CourseReviews({
           </div>
         )}
 
-        {/* Filter Buttons */}
-        <div className="flex flex-wrap gap-2 items-center justify-between mb-4">
-          <h3 className="text-lg font-semibold text-black dark:text-[#facc15]">
-            {userRole === "USER" ? "Student Reviews" : "Course Reviews"}
-          </h3>
-          <div className="flex gap-2">
-            {userRole !== "ADMIN" && (
-              <button
-                onClick={() => setActiveFilter('all')}
-                className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                  activeFilter === 'all'
-                    ? 'bg-[#facc15]/10 text-[#facc15]'
-                    : 'bg-[#f9fafb] dark:bg-[#18181b] text-gray-500 dark:text-gray-300 hover:bg-[#facc15]/10'
-                }`}
-              >
-                All Reviews
-              </button>
-            )}
-            {user && userRole === "USER" && (
-              <button
-                onClick={() => setActiveFilter('my')}
-                className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                  activeFilter === 'my'
-                    ? 'bg-[#facc15]/10 text-[#facc15]'
-                    : 'bg-[#f9fafb] dark:bg-[#18181b] text-gray-500 dark:text-gray-300 hover:bg-[#facc15]/10'
-                }`}
-              >
-                My Reviews
-              </button>
-            )}
-            {/* Admin Filter Buttons */}
-            {userRole === "ADMIN" && (
-              <>
-                <button
-                  onClick={() => setDisabledFilter('all')}
-                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                    disabledFilter === 'all'
-                      ? 'bg-[#facc15]/10 text-[#facc15]'
-                      : 'bg-[#f9fafb] dark:bg-[#18181b] text-gray-500 dark:text-gray-300 hover:bg-[#facc15]/10'
-                  }`}
-                >
-                  All
-                </button>
-                <button
-                  onClick={() => setDisabledFilter('disabled')}
-                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                    disabledFilter === 'disabled'
-                      ? 'bg-yellow-400 text-black'
-                      : 'bg-[#f9fafb] dark:bg-[#18181b] text-gray-500 dark:text-gray-300 hover:bg-yellow-400 hover:text-black'
-                  }`}
-                >
-                  Disabled
-                </button>
-              </>
-            )}
+        {/* Filter Toggle - Segmented Control Style */}
+        <div className="flex justify-center mb-4">
+          <div className="inline-flex bg-gray-100 dark:bg-[#232323] rounded-lg p-1 gap-1">
+            <Button
+              variant={activeFilter === 'all' ? 'primary' : 'ghost'}
+              size="sm"
+              className={`rounded-lg px-4 py-1 text-sm font-medium transition-all duration-150 `}
+              onClick={() => setActiveFilter('all')}
+            >
+              All Reviews
+            </Button>
+            <Button
+              variant={activeFilter === 'my' ? 'primary' : 'ghost'}
+              size="sm"
+              className={`rounded-lg px-4 py-1 text-sm font-medium transition-all duration-150 hover:none`}
+              onClick={() => setActiveFilter('my')}
+            >
+              My Reviews
+            </Button>
           </div>
         </div>
 

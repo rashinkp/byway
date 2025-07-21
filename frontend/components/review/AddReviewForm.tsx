@@ -70,7 +70,7 @@ export default function AddReviewForm({
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4 bg-white dark:bg-[#232323] p-6">
+    <form onSubmit={handleSubmit} className="space-y-4 bg-white dark:bg-[#232323] bornder-none p-6">
       {error && (
         <ErrorDisplay error={error} title="Review Error" description="There was a problem submitting your review. Please try again." compact />
       )}
@@ -131,7 +131,7 @@ export default function AddReviewForm({
         <button
           type="button"
           onClick={onCancel}
-          className="px-4 py-2 text-black dark:text-white bg-[#f9fafb] dark:bg-[#18181b] rounded-lg hover:bg-white/10 transition-colors"
+          className="px-4 py-2  rounded-lg hover:bg-white/10 transition-colors"
         >
           Cancel
         </button>

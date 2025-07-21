@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Star } from "lucide-react";
 import { CourseReview } from "@/types/course-review";
+import { Button } from "../ui/button";
 
 interface EditReviewFormProps {
   review: CourseReview;
@@ -50,8 +51,8 @@ export default function EditReviewForm({
         >
           <Star
             className={`w-6 h-6 ${
-              isFilled ? "text-[var(--color-warning)] fill-current" : "text-[var(--color-muted)]"
-            } hover:text-[var(--color-warning)]`}
+              isFilled ? "text-[#facc15] fill-current" : "text-[var(--color-muted)]"
+            } hover:text-[#facc15]`}
           />
         </button>
       );
@@ -59,15 +60,15 @@ export default function EditReviewForm({
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
+    <form onSubmit={handleSubmit} className="space-y-4 bg-white dark:bg-[#232323] p-6">
       {/* Rating */}
       <div className="space-y-2">
-        <label className="block text-sm font-medium text-[var(--color-primary-dark)]">
+        <label className="block text-sm font-medium text-black dark:text-white">
           Rating *
         </label>
         <div className="flex items-center space-x-1">
           {renderStars()}
-          <span className="ml-2 text-sm text-[var(--color-muted)]">
+          <span className="ml-2 text-sm text-gray-500 dark:text-gray-300">
             {rating > 0 && `${rating} star${rating > 1 ? 's' : ''}`}
           </span>
         </div>
@@ -75,7 +76,7 @@ export default function EditReviewForm({
 
       {/* Title */}
       <div className="space-y-2">
-        <label htmlFor="edit-title" className="block text-sm font-medium text-[var(--color-primary-dark)]">
+        <label htmlFor="edit-title" className="block text-sm font-medium text-black dark:text-white">
           Title (optional)
         </label>
         <input
@@ -84,17 +85,17 @@ export default function EditReviewForm({
           value={title}
           onChange={(e) => setTitle(e.target.value)}
           maxLength={100}
-          className="w-full px-3 py-2 border border-[var(--color-primary-light)]/40 rounded-lg focus:ring-2 focus:ring-[var(--color-primary-light)] focus:border-[var(--color-primary-light)] bg-[var(--color-surface)] text-[var(--color-primary-dark)]"
+          className="w-full px-3 py-2 rounded-lg focus:ring-2 focus:ring-white bg-[#f9fafb] dark:bg-[#18181b] text-black dark:text-white"
           placeholder="Brief summary of your experience"
         />
-        <p className="text-xs text-[var(--color-muted)]">
+        <p className="text-xs text-gray-500 dark:text-gray-300">
           {title.length}/100 characters
         </p>
       </div>
 
       {/* Comment */}
       <div className="space-y-2">
-        <label htmlFor="edit-comment" className="block text-sm font-medium text-[var(--color-primary-dark)]">
+        <label htmlFor="edit-comment" className="block text-sm font-medium text-black dark:text-white">
           Review (optional)
         </label>
         <textarea
@@ -103,10 +104,10 @@ export default function EditReviewForm({
           onChange={(e) => setComment(e.target.value)}
           maxLength={1000}
           rows={4}
-          className="w-full px-3 py-2 border border-[var(--color-primary-light)]/40 rounded-lg focus:ring-2 focus:ring-[var(--color-primary-light)] focus:border-[var(--color-primary-light)] bg-[var(--color-surface)] text-[var(--color-primary-dark)] resize-none"
+          className="w-full px-3 py-2 rounded-lg focus:ring-2 focus:ring-white bg-[#f9fafb] dark:bg-[#18181b] text-black dark:text-white resize-none"
           placeholder="Share your detailed thoughts about this course..."
         />
-        <p className="text-xs text-[var(--color-muted)]">
+        <p className="text-xs text-gray-500 dark:text-gray-300">
           {comment.length}/1000 characters
         </p>
       </div>
@@ -117,17 +118,17 @@ export default function EditReviewForm({
           type="button"
           onClick={onCancel}
           disabled={isLoading}
-          className="px-4 py-2 text-[var(--color-primary-dark)] bg-[var(--color-background)] rounded-lg hover:bg-[var(--color-primary-light)]/10 disabled:opacity-50 transition-colors"
+          className="px-4 py-2  rounded-lg hover:bg-white/10 transition-colors"
         >
           Cancel
         </button>
-        <button
+        <Button
           type="submit"
           disabled={rating === 0 || isLoading}
-          className="px-4 py-2 bg-[var(--color-primary-light)] text-[var(--color-surface)] rounded-lg hover:bg-[var(--color-primary-dark)] disabled:bg-[var(--color-muted)] disabled:cursor-not-allowed transition-colors"
+          className="px-4 py-2 rounded-lg disabled:bg-gray-300 disabled:text-white disabled:cursor-not-allowed transition-colors bg-[#facc15] text-black"
         >
           {isLoading ? "Saving..." : "Save Changes"}
-        </button>
+        </Button>
       </div>
     </form>
   );

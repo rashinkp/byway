@@ -2,6 +2,13 @@ import { useState } from "react";
 import { Star, MoreVertical, Edit, Trash2, Eye, EyeOff } from "lucide-react";
 import { CourseReview } from "@/types/course-review";
 import { formatDistanceToNow } from "date-fns";
+import { Button } from "../ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem
+} from "@/components/ui/dropdown-menu";
 
 interface ReviewItemProps {
   review: CourseReview;
@@ -74,12 +81,12 @@ export default function ReviewItem({
                   {renderStars(review.rating)}
                 </div>
                 {isDisabled && (
-                  <span className="text-xs bg-[var(--color-danger)]/10 text-[var(--color-danger)] px-2 py-1 rounded">
+                  <span className="text-xs bg-red-100 text-red-600 px-2 py-1 rounded">
                     Disabled
                   </span>
                 )}
                 {userRole === "ADMIN" && !isDisabled && (
-                  <span className="text-xs bg-[var(--color-primary-light)]/10 text-[var(--color-primary-light)] px-2 py-1 rounded">
+                  <span className="text-xs bg-blue-100 text-blue-600 px-2 py-1 rounded">
                     Enabled
                   </span>
                 )}
@@ -92,78 +99,65 @@ export default function ReviewItem({
               )}
               
               {review.comment && (
-                <p className="text-sm text-[var(--color-muted)] mt-2 leading-relaxed">
+                <p className="text-sm text-gray-700 dark:text-gray-300 mt-2 leading-relaxed">
                   {review.comment}
                 </p>
               )}
               
-              <p className="text-xs text-[var(--color-muted)] mt-2">
+              <p className="text-xs text-gray-500 mt-2 dark:text-gray-300">
                 {formatDate(review.createdAt)}
               </p>
             </div>
 
             {/* Actions Menu */}
             {showActions && (
-              <div className="relative">
-                <button
-                  onClick={() => setShowMenu(!showMenu)}
-                  className="p-1 text-[var(--color-muted)] hover:text-[var(--color-primary-dark)] transition-colors"
-                >
-                  <MoreVertical className="w-4 h-4" />
-                </button>
-
-                {showMenu && (
-                  <div className="absolute right-0 top-8 w-40 bg-[var(--color-surface)] border border-[var(--color-primary-light)]/20 rounded-lg shadow-lg z-10">
-                    {canEdit && (
-                      <button
-                        onClick={() => {
-                          onEdit();
-                          setShowMenu(false);
-                        }}
-                        className="w-full px-3 py-2 text-left text-sm text-[var(--color-primary-dark)] hover:bg-[var(--color-background)] flex items-center space-x-2"
-                      >
-                        <Edit className="w-4 h-4" />
-                        <span>Edit</span>
-                      </button>
-                    )}
-                    {canDisable && (
-                      <button
-                        onClick={() => {
-                          onDisable?.();
-                          setShowMenu(false);
-                        }}
-                        disabled={isDisabling}
-                        className="w-full px-3 py-2 text-left text-sm text-[var(--color-warning)] hover:bg-[var(--color-warning)]/10 flex items-center space-x-2 disabled:opacity-50"
-                      >
-                        {isDisabled ? (
-                          <>
-                            <Eye className="w-4 h-4" />
-                            <span>{isDisabling ? "Enabling..." : "Enable"}</span>
-                          </>
-                        ) : (
-                          <>
-                            <EyeOff className="w-4 h-4" />
-                            <span>{isDisabling ? "Disabling..." : "Disable"}</span>
-                          </>
-                        )}
-                      </button>
-                    )}
-                    {canDelete && (
-                      <button
-                        onClick={() => {
-                          onDelete();
-                          setShowMenu(false);
-                        }}
-                        disabled={isDeleting}
-                        className="w-full px-3 py-2 text-left text-sm text-[var(--color-danger)] hover:bg-[var(--color-danger)]/10 flex items-center space-x-2 disabled:opacity-50"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                        <span>{isDeleting ? "Deleting..." : "Delete"}</span>
-                      </button>
-                    )}
-                  </div>
-                )}
-              </div>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <button className="p-1 text-gray-500 hover:text-blue-700 transition-colors">
+                    <MoreVertical className="w-4 h-4" />
+                  </button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-40 dark:bg-black">
+                  {canEdit && (
+                    <DropdownMenuItem
+                      onClick={() => onEdit()}
+                      className=" flex items-center space-x-2"
+                    >
+                      <Edit className="w-4 h-4 mr-2" />
+                      <span>Edit</span>
+                    </DropdownMenuItem>
+                  )}
+                  {canDisable && (
+                    <DropdownMenuItem
+                      onClick={onDisable}
+                      disabled={isDisabling}
+                      className="text-yellow-600 hover:bg-yellow-100 flex items-center space-x-2 disabled:opacity-50"
+                    >
+                      {isDisabled ? (
+                        <>
+                          <Eye className="w-4 h-4 mr-2" />
+                          <span>{isDisabling ? "Enabling..." : "Enable"}</span>
+                        </>
+                      ) : (
+                        <>
+                          <EyeOff className="w-4 h-4 mr-2" />
+                          <span>{isDisabling ? "Disabling..." : "Disable"}</span>
+                        </>
+                      )}
+                    </DropdownMenuItem>
+                  )}
+                  {canDelete && (
+                    <DropdownMenuItem
+                      onClick={onDelete}
+                      disabled={isDeleting}
+                      className=" flex items-center space-x-2 disabled:opacity-50"
+                    >
+                      <Trash2 className="w-4 h-4 mr-2" />
+                      <span>{isDeleting ? "Deleting..." : "Delete"}</span>
+                    </DropdownMenuItem>
+                  )}
+                </DropdownMenuContent>
+              </DropdownMenu>
             )}
           </div>
         </div>
