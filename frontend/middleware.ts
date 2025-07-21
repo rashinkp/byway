@@ -42,13 +42,7 @@ export async function middleware(request: NextRequest) {
 	const token = request.cookies.get("access_token")?.value;
 	if (token) {
 		try {
-			// If using JWT, verify and decode here:
-			// currentUser = await verifyToken(token);
-			// For session-based, look up session here.
-			// For now, just treat as authenticated if token exists:
-			currentUser = { token };
-		} catch (err) {
-			// Invalid token, treat as unauthenticated
+		} catch  {
 			currentUser = null;
 		}
 	}

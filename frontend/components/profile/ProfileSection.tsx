@@ -58,218 +58,145 @@ export default function ProfileSection({
   const skillsArray = getSkillsArray(user.skills);
 
   return (
-    <div className="w-full">
-      {/* Header Card */}
-      <div className="bg-[var(--color-surface)]/95 rounded-2xl shadow-lg border border-[var(--color-primary-light)]/20 p-8 mb-8 flex flex-col md:flex-row items-center md:items-start gap-8">
+    <div className="w-full space-y-8">
+      {/* Header Section */}
+      <div className="flex flex-col md:flex-row items-center md:items-start gap-8">
         {/* Avatar/Initial */}
-        <div className="flex-shrink-0 flex flex-col items-center gap-2">
+        <div className="flex-shrink-0 flex flex-col items-center gap-2 relative">
           {user.avatar ? (
-            <Image src={user.avatar} alt={`${user.name}'s avatar`} width={200} height={200} className="w-24 h-24 rounded-full object-cover border-4 border-[var(--color-primary-light)] shadow-md bg-[var(--color-background)]" />
+            <Image src={user.avatar} alt={`${user.name}'s avatar`} width={200} height={200} className="w-24 h-24 rounded-full object-cover border-4 border-gray-200 dark:border-gray-700 shadow-md bg-white dark:bg-[#232326]" />
           ) : (
-            <div className="w-24 h-24 rounded-full flex items-center justify-center text-4xl font-bold bg-[var(--color-primary-light)] text-[var(--color-surface)] border-4 border-[var(--color-primary-light)] shadow-md">
+            <div className="w-24 h-24 rounded-full flex items-center justify-center text-4xl font-bold bg-gray-200 dark:bg-gray-700 text-white border-4 border-gray-200 dark:border-gray-700 shadow-md">
               {user.name ? getInitials(user.name) : "U"}
-            </div>
-          )}
-          {user.isVerified && (
-            <div className="absolute -bottom-2 -right-2 bg-[var(--color-primary-dark)] rounded-full p-1.5">
-              <CheckCircle2 className="w-4 h-4 text-[var(--color-surface)]" />
             </div>
           )}
         </div>
         {/* Main Info */}
-        <div className="flex-1 flex flex-col items-center md:items-start gap-2">
-          <h1 className="text-2xl font-bold text-[var(--color-primary-dark)] mb-1 text-center md:text-left">
-            {user.name || "Anonymous User"}
-          </h1>
-          <p className="text-[var(--color-muted)] mb-2 text-center md:text-left">{user.email}</p>
-          <div className="flex flex-wrap items-center gap-3 justify-center md:justify-start">
-            <Badge variant="outline" className="capitalize bg-[var(--color-primary-light)]/10 text-[var(--color-primary-light)] border-[var(--color-primary-light)]/40">
-              <Shield className="w-3 h-3 mr-1" />
-              {user.role.toLowerCase()}
-            </Badge>
-            <Badge variant="outline" className="bg-[var(--color-primary-light)]/10 text-[var(--color-primary-light)] border-[var(--color-primary-light)]/40">
-              {user.isVerified ? (
-                <>
-                  <CheckCircle2 className="w-3 h-3 mr-1" />
-                  Verified
-                </>
-              ) : (
-                <>
-                  <AlertCircle className="w-3 h-3 mr-1" />
-                  Pending
-                </>
-              )}
-            </Badge>
-            <Badge variant="outline" className="bg-[var(--color-primary-light)]/10 text-[var(--color-primary-light)] border-[var(--color-primary-light)]/40">
-              <UserCircle className="w-3 h-3 mr-1" />
-              {user.gender ? user.gender.toLowerCase() : "Not specified"}
-            </Badge>
+        <div className="flex-1 flex flex-col items-center md:items-start gap-2 w-full">
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2 w-full">
+            <h1 className="text-3xl font-bold text-black dark:text-white mb-1 text-center md:text-left">
+              {user.name || "Anonymous User"}
+            </h1>
+            <Button
+              onClick={() => setIsModalOpen(true)}
+              size="lg"
+              variant="default"
+              className="mt-2 md:mt-0"
+            >
+              <Edit2 className="w-4 h-4 mr-2" />
+              Edit Profile
+            </Button>
           </div>
-          <Button
-            onClick={() => setIsModalOpen(true)}
-            size="lg"
-            variant="outline"
-            className="bg-[var(--color-primary-light)]/10 text-[var(--color-primary-light)] border-[var(--color-primary-light)] hover:bg-[var(--color-primary-light)]/20 mt-4"
-          >
-            <Edit2 className="w-4 h-4 mr-2" />
-            Edit Profile
-          </Button>
+          <div className="flex items-center gap-2 justify-center md:justify-start w-full">
+            <p className="text-gray-500 dark:text-gray-300 mb-2 text-center md:text-left flex items-center">
+              {user.email}
+              {user.isVerified && (
+                <span className="ml-2" title="Verified">
+                  <CheckCircle2 className="w-5 h-5 text-green-500 inline" />
+                </span>
+              )}
+            </p>
+          </div>
         </div>
       </div>
 
-      {/* Main Content Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* Personal Information */}
-        <div className="lg:col-span-2 space-y-8">
-          {/* About Section */}
-          <div className="bg-[var(--color-surface)]/95 rounded-2xl shadow-lg border border-[var(--color-primary-light)]/20 p-8">
-            <div className="flex items-center gap-2 text-[var(--color-primary-dark)] mb-4">
-              <User className="w-5 h-5" />
-              <h2 className="text-lg font-semibold">About Me</h2>
-            </div>
-            <div>
-              <h3 className="text-sm font-medium text-[var(--color-muted)] uppercase tracking-wide mb-2">
-                Biography
-              </h3>
-              <p className="text-[var(--color-primary-dark)] leading-relaxed">
-                {user.bio || (
-                  <span className="italic text-[var(--color-muted)]">
-                    No biography provided yet
-                  </span>
-                )}
-              </p>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mt-6">
-              <div className="flex items-start gap-3">
-                <div className="bg-[var(--color-primary-light)]/10 p-2 rounded-lg">
-                  <GraduationCap className="w-5 h-5 text-[var(--color-primary)]" />
-                </div>
-                <div className="flex-1">
-                  <h3 className="text-sm font-medium text-[var(--color-muted)] uppercase tracking-wide mb-1">
-                    Education
-                  </h3>
-                  <p className="text-[var(--color-primary-dark)]">
-                    {user.education || (
-                      <span className="italic text-[var(--color-muted)]">
-                        Not specified
-                      </span>
-                    )}
-                  </p>
-                </div>
-              </div>
-
-              <div className="flex items-start gap-3">
-                <div className="bg-[var(--color-primary-light)]/10 p-2 rounded-lg">
-                  <Calendar className="w-5 h-5 text-[var(--color-primary)]" />
-                </div>
-                <div className="flex-1">
-                  <h3 className="text-sm font-medium text-[var(--color-muted)] uppercase tracking-wide mb-1">
-                    Date of Birth
-                  </h3>
-                  <p className="text-[var(--color-primary-dark)]">
-                    {user.dateOfBirth ? (
-                      formatDate(user.dateOfBirth)
-                    ) : (
-                      <span className="italic text-[var(--color-muted)]">
-                        Not specified
-                      </span>
-                    )}
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            <div className="flex items-start gap-3">
-              <div className="bg-[var(--color-primary-light)]/10 p-2 rounded-lg">
-                <Briefcase className="w-5 h-5 text-[var(--color-primary)]" />
-              </div>
-              <div className="flex-1">
-                <h3 className="text-sm font-medium text-[var(--color-muted)] uppercase tracking-wide mb-3">
-                  Skills & Expertise
-                </h3>
-                {skillsArray.length > 0 ? (
-                  <div className="flex flex-wrap gap-2">
-                    {skillsArray.map((skill, index) => (
-                      <Badge
-                        key={index}
-                        variant="outline"
-                        className="bg-[var(--color-primary-light)]/10 text-[var(--color-primary)] border-[var(--color-primary-light)]"
-                      >
-                        {skill}
-                      </Badge>
-                    ))}
-                  </div>
-                ) : (
-                  <span className="italic text-gray-400">
-                    No skills listed yet
-                  </span>
-                )}
-              </div>
-            </div>
+      {/* Main Content Grid: 2 columns per row */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+        {/* About Me */}
+        <div>
+          <div className="flex items-center gap-2 mb-2">
+            <User className="w-5 h-5 dark:text-[#facc15]" />
+            <h3 className="text-sm font-medium text-gray-500 dark:text-[#facc15] uppercase tracking-wide">About Me</h3>
           </div>
+          <p className="text-gray-900 dark:text-gray-100 leading-relaxed">
+            {user.bio || (
+              <span className="italic text-gray-400">No biography provided yet</span>
+            )}
+          </p>
         </div>
-
-        {/* Contact Info Sidebar */}
-        <div className="space-y-8">
-          {/* Contact Information */}
-          <div className="bg-[var(--color-surface)]/95 rounded-2xl shadow-lg border border-[var(--color-primary-light)]/20 p-8">
-            <div className="flex items-center gap-2 text-[var(--color-primary-dark)] mb-4">
-              <Mail className="w-5 h-5" />
-              <h2 className="text-lg font-semibold">Contact Info</h2>
+        {/* Education */}
+        <div>
+          <div className="flex items-center gap-2 mb-2">
+            <GraduationCap className="w-5 h-5 dark:text-[#facc15]" />
+            <h3 className="text-sm font-medium text-gray-500 dark:text-[#facc15] uppercase tracking-wide">Education</h3>
+          </div>
+          <p className="text-gray-900 dark:text-gray-100">
+            {user.education || (
+              <span className="italic text-gray-400">Not specified</span>
+            )}
+          </p>
+        </div>
+        {/* Skills */}
+        <div>
+          <div className="flex items-center gap-2 mb-2">
+            <Briefcase className="w-5 h-5 dark:text-[#facc15]" />
+            <h3 className="text-sm font-medium text-gray-500 dark:text-[#facc15] uppercase tracking-wide">Skills & Expertise</h3>
+          </div>
+          {skillsArray.length > 0 ? (
+            <div className="flex flex-wrap gap-2">
+              {skillsArray.map((skill, index) => (
+                <Badge variant={'secondary'} key={index} className="">
+                  {skill}
+                </Badge>
+              ))}
             </div>
-            <div className="space-y-4">
-              <div className="flex items-start gap-3">
-                <div className="bg-[var(--color-primary-light)]/10 p-2 rounded-lg">
-                  <Mail className="w-4 h-4 text-[var(--color-primary)]" />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-[var(--color-muted)] mb-1">
-                    Email Address
-                  </p>
-                  <p className="text-[var(--color-primary-dark)] break-all">{user.email}</p>
-                </div>
+          ) : (
+            <span className="italic text-gray-400">No skills listed yet</span>
+          )}
+        </div>
+        {/* Date of Birth */}
+        <div>
+          <div className="flex items-center gap-2 mb-2">
+            <Calendar className="w-5 h-5 dark:text-[#facc15]" />
+            <h3 className="text-sm font-medium text-gray-500 dark:text-[#facc15] uppercase tracking-wide">Date of Birth</h3>
+          </div>
+          <p className="text-gray-900 dark:text-gray-100">
+            {user.dateOfBirth ? (
+              formatDate(user.dateOfBirth)
+            ) : (
+              <span className="italic text-gray-400">Not specified</span>
+            )}
+          </p>
+        </div>
+        {/* Gender */}
+        <div>
+          <div className="flex items-center gap-2 mb-2">
+            <UserCircle className="w-5 h-5 dark:text-[#facc15]" />
+            <h3 className="text-sm font-medium text-gray-500 dark:text-[#facc15] uppercase tracking-wide">Gender</h3>
+          </div>
+          <p className="text-gray-900 dark:text-gray-100">
+            {user.gender ? user.gender.toUpperCase() : <span className="italic text-gray-400">Not specified</span>}
+          </p>
+        </div>
+        {/* Contact Info */}
+        <div>
+          <div className="flex items-center gap-2 mb-2">
+            <Mail className="w-5 h-5 dark:text-[#facc15]" />
+            <h3 className="text-sm font-medium text-gray-500 dark:text-[#facc15] uppercase tracking-wide">Contact Info</h3>
+          </div>
+          <div className="space-y-4">
+            <div className="flex items-start gap-3">
+              <Phone className="w-4 h-4 text-gray-400 mt-1" />
+              <div className="flex-1">
+                <p className="text-sm font-medium text-gray-500 dark:text-gray-300 mb-1">Phone Number</p>
+                <p className="text-gray-900 dark:text-gray-100">
+                  {user.phoneNumber || (
+                    <span className="italic text-gray-400">Not provided</span>
+                  )}
+                </p>
               </div>
-
-              <div className="flex items-start gap-3">
-                <div className="bg-[var(--color-primary-light)]/10 p-2 rounded-lg">
-                  <Phone className="w-4 h-4 text-[var(--color-primary)]" />
-                </div>
-                <div className="flex-1">
-                  <p className="text-sm font-medium text-[var(--color-muted)] mb-1">
-                    Phone Number
-                  </p>
-                  <p className="text-[var(--color-primary-dark)]">
-                    {user.phoneNumber || (
-                      <span className="italic text-[var(--color-muted)]">
-                        Not provided
-                      </span>
-                    )}
-                  </p>
-                </div>
-              </div>
-
-              <div className="flex items-start gap-3">
-                <div className="bg-[var(--color-primary-light)]/10 p-2 rounded-lg">
-                  <MapPin className="w-4 h-4 text-[var(--color-primary)]" />
-                </div>
-                <div className="flex-1">
-                  <p className="text-sm font-medium text-[var(--color-muted)] mb-1">
-                    Location
-                  </p>
-                  <p className="text-[var(--color-primary-dark)]">
-                    {[user.address, user.city, user.country].filter(Boolean)
-                      .length > 0 ? (
-                      [user.address, user.city, user.country]
-                        .filter(Boolean)
-                        .join(", ")
-                    ) : (
-                      <span className="italic text-[var(--color-muted)]">
-                        Not specified
-                      </span>
-                    )}
-                  </p>
-                </div>
+            </div>
+            <div className="flex items-start gap-3">
+              <MapPin className="w-4 h-4 text-gray-400 mt-1" />
+              <div className="flex-1">
+                <p className="text-sm font-medium text-gray-500 dark:text-gray-300 mb-1">Location</p>
+                <p className="text-gray-900 dark:text-gray-100">
+                  {[user.address, user.city, user.country].filter(Boolean).length > 0 ? (
+                    [user.address, user.city, user.country].filter(Boolean).join(", ")
+                  ) : (
+                    <span className="italic text-gray-400">Not specified</span>
+                  )}
+                </p>
               </div>
             </div>
           </div>

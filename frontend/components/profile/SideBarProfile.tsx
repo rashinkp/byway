@@ -59,29 +59,27 @@ const Sidebar: FC<SidebarProps> = ({
 	return (
 		<div
 			className={cn(
-				"w-full h-full bg-[var(--color-surface)]  flex flex-col relative transition-all duration-300",
-				"shadow-lg",
-				"z-[60]",
+				"w-full h-full bg-white dark:bg-[#232326] border-l-4 border-yellow-400 flex flex-col relative transition-all duration-300 shadow-md z-[60]",
 			)}
 		>
 			{/* Collapse/Expand Chevron - always visible on mobile, at the very top when collapsed or expanded */}
 			{collapsed ? (
 				<button
-					className="md:hidden w-full h-14 flex items-center justify-center border-b border-[var(--color-muted)] bg-[var(--color-surface)] focus:outline-none z-20"
+					className="md:hidden w-full h-14 flex items-center justify-center border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-[#232326] focus:outline-none z-20"
 					onClick={toggleCollapse}
 					aria-label="Expand sidebar"
 					type="button"
 				>
-					<ChevronRight className="w-6 h-6 text-gray-500" />
+					<ChevronRight className="w-6 h-6 text-yellow-500" />
 				</button>
 			) : (
 				<button
-					className="md:hidden w-full h-14 flex items-center justify-center border-b border-[var(--color-muted)] bg-[var(--color-surface)] focus:outline-none z-20"
+					className="md:hidden w-full h-14 flex items-center justify-center border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-[#232326] focus:outline-none z-20"
 					onClick={toggleCollapse}
 					aria-label="Collapse sidebar"
 					type="button"
 				>
-					<ChevronLeft className="w-6 h-6 text-gray-500" />
+					<ChevronLeft className="w-6 h-6 text-yellow-500" />
 				</button>
 			)}
 			{/* Navigation */}
@@ -103,18 +101,18 @@ const Sidebar: FC<SidebarProps> = ({
 								collapsed
 									? "justify-center p-0 w-12 h-12"
 									: "px-4 py-3 text-sm font-medium",
-								"hover:bg-[var(--color-background)] active:bg-[var(--color-primary-light)]",
+								"hover:bg-yellow-50 dark:hover:bg-yellow-900/20",
 								activeSection === item.id
-									? "bg-[var(--color-primary-light)]/20 text-[var(--color-primary-light)]"
-									: "text-[var(--color-muted)]",
+									? "bg-yellow-100 dark:bg-yellow-900/30 text-yellow-600 dark:text-yellow-400 font-semibold"
+									: "text-gray-600 dark:text-gray-300",
 							)}
 							title={item.label}
 							disabled={isLoading}
 						>
 							{isLoading ? (
-								<Loader2 className="w-5 h-5 animate-spin text-[var(--color-primary-light)]" />
+								<Loader2 className="w-5 h-5 animate-spin text-yellow-500" />
 							) : (
-								<Icon className="w-5 h-5 flex-shrink-0" />
+								<Icon className={cn("w-5 h-5 flex-shrink-0", activeSection === item.id ? "text-yellow-500" : "")} />
 							)}
 							{/* Only show text if not collapsed or on desktop */}
 							<span
@@ -132,7 +130,7 @@ const Sidebar: FC<SidebarProps> = ({
 				{/* Logout Button - now directly after menu */}
 				<div
 					className={cn(
-						"mt-4 border-t border-[var(--color-muted)] pt-3 w-full",
+						"mt-4 border-t border-gray-200 dark:border-gray-700 pt-3 w-full",
 						collapsed ? "flex flex-col items-center" : "",
 					)}
 				>
@@ -154,8 +152,8 @@ const Sidebar: FC<SidebarProps> = ({
 							"flex items-center gap-3 w-full rounded-lg transition-all duration-200",
 							collapsed
 								? "justify-center p-0 w-12 h-12 mt-2"
-								: "px-4 py-3 text-[var(--color-danger)] hover:bg-[var(--color-danger)]/10 mt-2",
-							"hover:bg-[var(--color-danger)]/10 disabled:opacity-50",
+								: "px-4 py-3 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 mt-2",
+							"hover:bg-red-50 dark:hover:bg-red-900/20 disabled:opacity-50",
 						)}
 						title="Logout"
 					>

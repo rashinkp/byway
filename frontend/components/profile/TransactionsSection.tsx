@@ -26,18 +26,11 @@ export default function TransactionsSection() {
 
 	return (
 		<div className="w-full space-y-6">
-			{/* Header Section */}
-			<div className="bg-[var(--color-background)] rounded-xl  p-4 sm:p-6">
-				<div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-					<div>
-						<h1 className="text-xl sm:text-2xl font-bold text-[var(--color-primary-dark)] mb-2">
-							Transaction History
-						</h1>
-						<p className="text-sm sm:text-base text-[var(--color-muted)]">
-							View all your transaction history and payment records
-						</p>
-					</div>
-				</div>
+			<div className="bg-white dark:bg-[#232326] rounded-xl p-8 mb-8 text-center">
+				<h1 className="text-3xl md:text-4xl font-bold mb-4 text-gray-900 dark:text-gray-100">Transaction History</h1>
+				<p className="text-lg md:text-xl text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
+					View all your transaction history and payment records.
+				</p>
 			</div>
 
 			{/* Transactions List */}

@@ -25,12 +25,10 @@ export default function CertificatesSection() {
 
 	return (
 		<div className="w-full">
-			<div className="bg-[var(--color-background)] rounded-xl  p-6 mb-8">
-				<h1 className="text-2xl font-bold text-[var(--color-primary-dark)] mb-2">
-					My Certificates
-				</h1>
-				<p className="text-[var(--color-muted)]">
-					View and download your course completion certificates
+			<div className="bg-white dark:bg-[#232326] rounded-xl p-8 mb-8 text-center">
+				<h1 className="text-3xl md:text-4xl font-bold mb-4 text-gray-900 dark:text-gray-100">My Certificates</h1>
+				<p className="text-lg md:text-xl text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
+					View and download your course completion certificates.
 				</p>
 			</div>
 
@@ -56,16 +54,16 @@ export default function CertificatesSection() {
 						{certificates.map((cert) => (
 							<div
 								key={cert.id}
-								className="flex flex-col md:flex-row md:items-center justify-between bg-[var(--color-background)] rounded-lg p-4 mb-4"
+								className="flex flex-col md:flex-row md:items-center justify-between bg-white dark:bg-[#232326] rounded-lg p-4 mb-4"
 							>
-								<div>
+								<div className="space-y-2">
 									<div className="font-semibold text-[var(--color-primary-dark)]">
 										{cert.courseTitle || cert.courseId}
 									</div>
 									<div className="text-sm text-[var(--color-muted)]">
 										Issued:{" "}
-										{cert.issuedAt
-											? new Date(cert.issuedAt).toLocaleDateString()
+										{cert.metadata.generatedAt
+											? new Date(cert.metadata.generatedAt).toLocaleDateString()
 											: "-"}
 									</div>
 									<div className="text-xs text-[var(--color-muted)]">
@@ -78,7 +76,7 @@ export default function CertificatesSection() {
 											href={cert.pdfUrl}
 											target="_blank"
 											rel="noopener noreferrer"
-											className="inline-block px-4 py-2 bg-[var(--color-primary-dark)] text-[var(--color-surface)] rounded hover:bg-[var(--color-primary-light)] transition"
+											className="inline-block px-4 py-2 text-[#facc15] rounded transition"
 										>
 											Download
 										</a>

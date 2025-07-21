@@ -80,9 +80,9 @@ export default function MainProfileComponent() {
   // Show loading skeleton until auth is initialized and not loading
   if (isLoading || authLoading || !isInitialized) {
     return (
-      <div className="min-h-screen bg-[var(--color-surface)] flex flex-row">
+      <div className="min-h-screen bg-white dark:bg-[#18181b] flex flex-row">
         {/* Sidebar skeleton */}
-        <aside className="transition-all duration-300 w-14 md:w-64 bg-[var(--color-surface)]/95 border border-[var(--color-primary-light)]/20 shadow-lg rounded-2xl m-4 flex flex-col">
+        <aside className="transition-all duration-300 w-14 md:w-64 dark:border-gray-700 shadow-lg rounded-2xl m-4 flex flex-col">
           <div className="p-4 space-y-4">
             {[1, 2, 3, 4, 5].map((i) => (
               <Skeleton key={i} className="h-10 w-full rounded-lg" />
@@ -107,7 +107,7 @@ export default function MainProfileComponent() {
 
   if (error) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-[var(--color-surface)]">
+      <div className="flex items-center justify-center min-h-screen bg-white dark:bg-[#18181b]">
         <ErrorDisplay
           error={error}
           title="Something went wrong"
@@ -119,7 +119,7 @@ export default function MainProfileComponent() {
 
   if (!user) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-[var(--color-surface)]">
+      <div className="flex items-center justify-center min-h-screen bg-white dark:bg-[#18181b]">
         <ErrorDisplay
           error={"No user data found"}
           title="No user data found"
@@ -131,12 +131,12 @@ export default function MainProfileComponent() {
 
   return (
     <>
-      <div className="min-h-screen bg-[var(--color-surface)] flex flex-row relative">
+      <div className="min-h-screen bg-white dark:bg-[#18181b] flex flex-row relative">
         {/* Sidebar for desktop */}
         <aside
           className={`hidden md:flex transition-all duration-300 ${
             sidebarCollapsed ? "w-14" : "w-64"
-          } bg-[var(--color-surface)]/95 border border-[var(--color-primary-light)]/20 shadow-lg rounded-2xl m-4 flex-col z-30`}
+          }  shadow-lg rounded-2xl m-4 flex-col z-30`}
         >
           <Sidebar
             activeSection={activeSection}
@@ -149,7 +149,7 @@ export default function MainProfileComponent() {
 
         {/* Sidebar for mobile: always show thin bar, overlay when expanded */}
         <aside
-          className={`w-14 bg-[var(--color-surface)]/95 border border-[var(--color-primary-light)]/20 shadow-lg rounded-2xl m-2 z-20 flex flex-col md:hidden transition-all duration-300 ${
+          className={`w-14 bg-white dark:bg-[#232326] border border-gray-200 dark:border-gray-700 shadow-lg rounded-2xl m-2 z-20 flex flex-col md:hidden transition-all duration-300 ${
             !sidebarCollapsed ? "pointer-events-none opacity-0" : ""
           }`}
         >
@@ -168,7 +168,7 @@ export default function MainProfileComponent() {
               className="fixed left-0 right-0 top-[64px] bottom-0 bg-black/30 z-30 md:hidden"
               onClick={() => setSidebarCollapsed(true)}
             />
-            <aside className="fixed left-0 top-[64px] h-[calc(100vh-64px)] w-64 bg-[var(--color-surface)]/95 border border-[var(--color-primary-light)]/20 shadow-lg rounded-2xl m-2 z-40 flex flex-col md:hidden transition-transform duration-300">
+            <aside className="fixed left-0 top-[64px] h-[calc(100vh-64px)] w-64 bg-white dark:bg-[#232326] border border-gray-200 dark:border-gray-700 shadow-lg rounded-2xl m-2 z-40 flex flex-col md:hidden transition-transform duration-300">
               <Sidebar
                 activeSection={activeSection}
                 setActiveSection={handleSectionChange}
@@ -182,7 +182,7 @@ export default function MainProfileComponent() {
 
         {/* Main Content */}
         <main className="flex-1 transition-all duration-300 p-4 md:p-8 min-w-0 ">
-          <div className="max-w-5xl mx-auto space-y-8">
+          <div className="max-w-5xl space-y-8">
             {activeSection === "profile" && (
               <ProfileSection user={user} setIsModalOpen={setIsModalOpen} />
             )}
@@ -192,12 +192,12 @@ export default function MainProfileComponent() {
             {activeSection === "orders" && <OrdersSection />}
             {activeSection === "certificates" && <CertificatesSection />}
             {activeSection === "settings" && (
-              <div className="bg-[var(--color-surface)] rounded-2xl border border-[var(--color-primary-light)]/20 p-8 shadow-lg">
-                <h2 className="text-2xl font-bold text-[var(--color-primary-dark)] capitalize mb-2">
+              <div className="bg-white dark:bg-[#232326] rounded-2xl border border-gray-200 dark:border-gray-700 p-8 shadow-lg">
+                <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 capitalize mb-2">
                   Settings
                 </h2>
-                <div className="h-px bg-[var(--color-primary-light)]/20 my-4" />
-                <p className="text-[var(--color-muted)]">
+                <div className="h-px bg-gray-200 dark:bg-gray-700 my-4" />
+                <p className="text-gray-600 dark:text-gray-300">
                   Content for settings section coming soon...
                 </p>
               </div>

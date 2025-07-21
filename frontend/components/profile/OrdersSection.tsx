@@ -46,12 +46,10 @@ export default function OrdersSection() {
 
 	return (
 		<div className="w-full">
-			<div className="bg-[var(--color-background)] rounded-xl  p-6 mb-8">
-				<h1 className="text-2xl font-bold text-[var(--color-primary-dark)] mb-2">
-					My Orders
-				</h1>
-				<p className="text-[var(--color-muted)]">
-					Track your course purchases and enrollments
+			<div className="bg-white dark:bg-[#232326] rounded-xl p-8 mb-8 text-center">
+				<h1 className="text-3xl md:text-4xl font-bold mb-4 text-gray-900 dark:text-gray-100">My Orders</h1>
+				<p className="text-lg md:text-xl text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
+					Track your course purchases and enrollments.
 				</p>
 			</div>
 

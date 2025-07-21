@@ -24,40 +24,40 @@ export const TransactionList: React.FC<TransactionListProps> = ({
 				case "COMPLETED":
 					return {
 						icon: (
-							<ArrowUp className="h-5 w-5 text-[var(--color-primary-dark)]" />
+							<ArrowUp className="h-5 w-5 text-yellow-500" />
 						),
-						bgColor: "bg-green-100",
-						textColor: "text-green-600",
+						bgColor: "bg-green-100 dark:bg-green-900/30",
+						textColor: "text-green-600 dark:text-green-400",
 						label: "Wallet Top-up",
 						amountPrefix: "+",
 					};
 				case "FAILED":
 					return {
 						icon: (
-							<AlertCircle className="h-5 w-5 text-[var(--color-primary-dark)]" />
+							<AlertCircle className="h-5 w-5 text-yellow-500" />
 						),
-						bgColor: "bg-red-100",
-						textColor: "text-red-600",
+						bgColor: "bg-red-100 dark:bg-red-900/30",
+						textColor: "text-red-600 dark:text-red-400",
 						label: transaction.failureReason || "Top-up Failed",
 						amountPrefix: "",
 					};
 				case "PENDING":
 					return {
 						icon: (
-							<AlertCircle className="h-5 w-5 text-[var(--color-primary-dark)]" />
+							<AlertCircle className="h-5 w-5 text-yellow-500" />
 						),
-						bgColor: "bg-yellow-100",
-						textColor: "text-yellow-600",
+						bgColor: "bg-yellow-100 dark:bg-yellow-900/30",
+						textColor: "text-yellow-600 dark:text-yellow-400",
 						label: "Top-up Pending",
 						amountPrefix: "",
 					};
 				default:
 					return {
 						icon: (
-							<AlertCircle className="h-5 w-5 text-[var(--color-primary-dark)]" />
+							<AlertCircle className="h-5 w-5 text-yellow-500" />
 						),
-						bgColor: "bg-gray-100",
-						textColor: "text-gray-600",
+						bgColor: "bg-gray-100 dark:bg-gray-800",
+						textColor: "text-gray-600 dark:text-gray-300",
 						label: "Unknown Status",
 						amountPrefix: "",
 					};
@@ -69,40 +69,40 @@ export const TransactionList: React.FC<TransactionListProps> = ({
 				case "COMPLETED":
 					return {
 						icon: (
-							<ArrowUp className="h-5 w-5 text-[var(--color-primary-dark)]" />
+							<ArrowUp className="h-5 w-5 text-yellow-500" />
 						),
-						bgColor: "bg-red-100",
-						textColor: "text-red-600",
+						bgColor: "bg-red-100 dark:bg-red-900/30",
+						textColor: "text-red-600 dark:text-red-400",
 						label: "Purchase Completed",
 						amountPrefix: "-",
 					};
 				case "FAILED":
 					return {
 						icon: (
-							<AlertCircle className="h-5 w-5 text-[var(--color-primary-dark)]" />
+							<AlertCircle className="h-5 w-5 text-yellow-500" />
 						),
-						bgColor: "bg-red-100",
-						textColor: "text-red-600",
+						bgColor: "bg-red-100 dark:bg-red-900/30",
+						textColor: "text-red-600 dark:text-red-400",
 						label: transaction.failureReason || "Payment Failed",
 						amountPrefix: "",
 					};
 				case "PENDING":
 					return {
 						icon: (
-							<AlertCircle className="h-5 w-5 text-[var(--color-primary-dark)]" />
+							<AlertCircle className="h-5 w-5 text-yellow-500" />
 						),
-						bgColor: "bg-yellow-100",
-						textColor: "text-yellow-600",
+						bgColor: "bg-yellow-100 dark:bg-yellow-900/30",
+						textColor: "text-yellow-600 dark:text-yellow-400",
 						label: "Purchase Pending",
 						amountPrefix: "",
 					};
 				default:
 					return {
 						icon: (
-							<AlertCircle className="h-5 w-5 text-[var(--color-primary-dark)]" />
+							<AlertCircle className="h-5 w-5 text-yellow-500" />
 						),
-						bgColor: "bg-gray-100",
-						textColor: "text-gray-600",
+						bgColor: "bg-gray-100 dark:bg-gray-800",
+						textColor: "text-gray-600 dark:text-gray-300",
 						label: "Unknown Status",
 						amountPrefix: "",
 					};
@@ -113,40 +113,40 @@ export const TransactionList: React.FC<TransactionListProps> = ({
 			case "COMPLETED":
 				return {
 					icon: (
-						<ArrowDown className="h-5 w-5 text-[var(--color-primary-dark)]" />
+						<ArrowDown className="h-5 w-5 text-yellow-500" />
 					),
-					bgColor: "bg-green-100",
-					textColor: "text-green-600",
+					bgColor: "bg-green-100 dark:bg-green-900/30",
+					textColor: "text-green-600 dark:text-green-400",
 					label: "Payment Received",
 					amountPrefix: "+",
 				};
 			case "FAILED":
 				return {
 					icon: (
-						<AlertCircle className="h-5 w-5 text-[var(--color-primary-dark)]" />
+						<AlertCircle className="h-5 w-5 text-yellow-500" />
 					),
-					bgColor: "bg-red-100",
-					textColor: "text-red-600",
+					bgColor: "bg-red-100 dark:bg-red-900/30",
+					textColor: "text-red-600 dark:text-red-400",
 					label: transaction.failureReason || "Payment Failed",
 					amountPrefix: "",
 				};
 			case "PENDING":
 				return {
 					icon: (
-						<AlertCircle className="h-5 w-5 text-[var(--color-primary-dark)]" />
+						<AlertCircle className="h-5 w-5 text-yellow-500" />
 					),
-					bgColor: "bg-yellow-100",
-					textColor: "text-yellow-600",
+					bgColor: "bg-yellow-100 dark:bg-yellow-900/30",
+					textColor: "text-yellow-600 dark:text-yellow-400",
 					label: "Payment Pending",
 					amountPrefix: "",
 				};
 			default:
 				return {
 					icon: (
-						<AlertCircle className="h-5 w-5 text-[var(--color-primary-dark)]" />
+						<AlertCircle className="h-5 w-5 text-yellow-500" />
 					),
-					bgColor: "bg-gray-100",
-					textColor: "text-gray-600",
+					bgColor: "bg-gray-100 dark:bg-gray-800",
+					textColor: "text-gray-600 dark:text-gray-300",
 					label: "Unknown Status",
 					amountPrefix: "",
 				};
@@ -182,7 +182,7 @@ export const TransactionList: React.FC<TransactionListProps> = ({
 				return (
 					<div
 						key={transaction.id}
-						className="flex items-center p-4 bg-[var(--color-background)] rounded-lg transition-colors"
+						className="flex items-center p-4 bg-white dark:bg-[#232326] rounded-lg transition-colors"
 					>
 						<div
 							className={`h-10 w-10 rounded-full flex items-center justify-center mr-4 ${statusInfo.bgColor}`}
@@ -191,15 +191,15 @@ export const TransactionList: React.FC<TransactionListProps> = ({
 						</div>
 
 						<div className="flex-1">
-							<p className="text-sm font-medium text-[var(--color-primary-dark)]">
+							<p className="text-sm font-medium text-yellow-500">
 								{statusInfo.label}
 								{transaction.courseId && (
-									<span className="text-xs text-[var(--color-muted)] ml-2">
+									<span className="text-xs text-gray-500 dark:text-gray-300 ml-2">
 										(Course: {transaction.courseId})
 									</span>
 								)}
 							</p>
-							<p className="text-sm text-[var(--color-muted)]">
+							<p className="text-sm text-gray-500 dark:text-gray-300">
 								{formatDate(transaction.createdAt)}
 							</p>
 						</div>
@@ -209,7 +209,7 @@ export const TransactionList: React.FC<TransactionListProps> = ({
 								{statusInfo.amountPrefix}
 								{formatPrice(transaction.amount)}
 							</p>
-							<p className="text-sm text-[var(--color-muted)]">
+							<p className="text-sm text-gray-500 dark:text-gray-300">
 								{transaction.paymentGateway || "Unknown Gateway"}
 							</p>
 						</div>

@@ -30,6 +30,12 @@ export default function InstructorsPage() {
 	return (
 		<div className="bg-[var(--color-background)]">
 			<div className="container mx-auto py-8 max-w-5xl px-4">
+				<div className="mb-20 text-center">
+					<h1 className="text-3xl md:text-4xl font-bold mb-6">Browse Instructors</h1>
+					<p className="text-lg md:text-xl text-gray-600 max-w-2xl mx-auto dark:text-[#facc15]">
+						Meet our expert instructors on Byway. Explore profiles, discover their expertise, and find the perfect mentor to guide your learning journey!
+					</p>
+				</div>
 				{isLoading ? (
 					<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
 						{Array.from({ length: 6 }).map((_, index) => (
