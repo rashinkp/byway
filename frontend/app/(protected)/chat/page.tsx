@@ -435,86 +435,106 @@ export default function ChatPage() {
 	}
 
 	return (
-		<div className="overflow-hidden">
-			{/* Main Chat Interface */}
-			<div className="w-full  flex items-stretch">
-				<div className="w-full overflow-hidden flex flex-col min-h-0">
-					<div className="flex flex-1 min-h-0">
-						{/* Chat List Sidebar (show on mobile only if sidebar is open and no chat selected) */}
-						{((isSidebarOpen && (!selectedChat || !isMobile)) ||
-							(!selectedChat && isMobile)) && (
-							<div
-								className={`$${
-									isSidebarOpen ? "translate-x-0" : "-translate-x-full"
-								} md:relative md:translate-x-0 z-40 ${isMobile && !selectedChat ? "w-full" : "w-80 md:w-96"} h-full transition-transform duration-300 ease-in-out md:transition-none`}
-							>
-								<ChatList
-									chats={chatItems}
-									selectedChat={selectedChat}
-									onSelectChat={handleSelectChat}
-									onSearch={setSearchQuery}
-								/>
-								{/* Load More Button */}
-								{hasMore && (
-									<div className="absolute bottom-0 left-0 right-0 p-4">
-										<Button
-											onClick={loadMoreChats}
-											disabled={loading}
-											variant="default"
-											
-										>
-											{loading ? (
-												<>
-													<Loader2 className="w-4 h-4 mr-2 animate-spin" />
-													Loading...
-												</>
-											) : (
-												"Load more conversations"
-											)}
-										</Button>
-									</div>
-								)}
-							</div>
-						)}
-						{/* Mobile Overlay */}
-						{isSidebarOpen && !selectedChat && (
-							<div
-								className="fixed inset-0 backdrop-blur-sm z-30 md:hidden"
-								onClick={() => setIsSidebarOpen(false)}
-							/>
-						)}
-						{/* Chat Window (show on mobile only if a chat is selected) */}
-						{selectedChat && (!isMobile || (isMobile && !isSidebarOpen)) && (
-							<div className="flex-1 flex flex-col h-full min-h-0">
-								<ChatWindow
-									chat={selectedChat}
-									messages={messages}
-									onSendMessage={handleSendMessage}
-									currentUserId={user?.id || ""}
-									onDeleteMessage={handleDeleteMessage}
-									showBackButton={isMobile}
-									onBack={() => {
-										setIsSidebarOpen(true);
-										setSelectedChat(null);
-									}}
-									setPendingImageUrl={debugSetPendingImageUrl}
-									setPendingAudioUrl={debugSetPendingAudioUrl}
-								/>
-							</div>
-						)}
-						{/* Fallback UI when no chat is selected */}
-						{!selectedChat && (!isMobile || (isMobile && !isSidebarOpen)) && (
-							<div className="flex-1 flex flex-col items-center justify-center h-full min-h-0  select-none">
-								<div className="mb-4">
-									<svg width="48" height="48" fill="none" viewBox="0 0 24 24" stroke="currentColor" className="mx-auto mb-2 "><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M7 8h10M7 12h6m-6 4h8m-2 4.5V21a2 2 0 01-2 2H6a2 2 0 01-2-2V6a2 2 0 012-2h12a2 2 0 012 2v7" /></svg>
-									<h2 className="text-lg font-semibold">Select any chat to start conversation</h2>
-									<p className="text-sm ">Choose a chat from the list or start a new one to begin messaging.</p>
-								</div>
-							</div>
-						)}
-					</div>
-				</div>
-			</div>
-		</div>
-	);
+    <div className="overflow-hidden">
+      {/* Main Chat Interface */}
+      <div className="w-full h-[calc(100vh-4rem)]  flex items-stretch">
+        <div className="w-full overflow-hidden flex flex-col min-h-0">
+          <div className="flex flex-1 min-h-0">
+            {/* Chat List Sidebar (show on mobile only if sidebar is open and no chat selected) */}
+            {((isSidebarOpen && (!selectedChat || !isMobile)) ||
+              (!selectedChat && isMobile)) && (
+              <div
+                className={`$${
+                  isSidebarOpen ? "translate-x-0" : "-translate-x-full"
+                } md:relative md:translate-x-0 z-40 ${
+                  isMobile && !selectedChat ? "w-full" : "w-80 md:w-96"
+                } h-full transition-transform duration-300 ease-in-out md:transition-none`}
+              >
+                <ChatList
+                  chats={chatItems}
+                  selectedChat={selectedChat}
+                  onSelectChat={handleSelectChat}
+                  onSearch={setSearchQuery}
+                />
+                {/* Load More Button */}
+                {hasMore && (
+                  <div className="absolute bottom-0 left-0 right-0 p-4">
+                    <Button
+                      onClick={loadMoreChats}
+                      disabled={loading}
+                      variant="default"
+                    >
+                      {loading ? (
+                        <>
+                          <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                          Loading...
+                        </>
+                      ) : (
+                        "Load more conversations"
+                      )}
+                    </Button>
+                  </div>
+                )}
+              </div>
+            )}
+            {/* Mobile Overlay */}
+            {isSidebarOpen && !selectedChat && (
+              <div
+                className="fixed inset-0 backdrop-blur-sm z-30 md:hidden"
+                onClick={() => setIsSidebarOpen(false)}
+              />
+            )}
+            {/* Chat Window (show on mobile only if a chat is selected) */}
+            {selectedChat && (!isMobile || (isMobile && !isSidebarOpen)) && (
+              <div className="flex-1 flex flex-col h-full min-h-0">
+                <ChatWindow
+                  chat={selectedChat}
+                  messages={messages}
+                  onSendMessage={handleSendMessage}
+                  currentUserId={user?.id || ""}
+                  onDeleteMessage={handleDeleteMessage}
+                  showBackButton={isMobile}
+                  onBack={() => {
+                    setIsSidebarOpen(true);
+                    setSelectedChat(null);
+                  }}
+                  setPendingImageUrl={debugSetPendingImageUrl}
+                  setPendingAudioUrl={debugSetPendingAudioUrl}
+                />
+              </div>
+            )}
+            {/* Fallback UI when no chat is selected */}
+            {!selectedChat && (!isMobile || (isMobile && !isSidebarOpen)) && (
+              <div className="flex-1 flex flex-col items-center justify-center h-full min-h-0  select-none">
+                <div className="mb-4">
+                  <svg
+                    width="48"
+                    height="48"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                    className="mx-auto mb-2 "
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={1.5}
+                      d="M7 8h10M7 12h6m-6 4h8m-2 4.5V21a2 2 0 01-2 2H6a2 2 0 01-2-2V6a2 2 0 012-2h12a2 2 0 012 2v7"
+                    />
+                  </svg>
+                  <h2 className="text-lg font-semibold">
+                    Select any chat to start conversation
+                  </h2>
+                  <p className="text-sm ">
+                    Choose a chat from the list or start a new one to begin
+                    messaging.
+                  </p>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
 }
