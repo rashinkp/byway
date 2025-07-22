@@ -125,29 +125,29 @@ export default function ChatPage() {
   }, [selectedChat]);
 
   // Listen for new incoming messages
-  useEffect(() => {
-    const handleMessage = (msg: Message) => {
-      if (msg.chatId === selectedChat?.chatId) {
-        setMessages((prev) =>
-          prev.some((m) => m.id === msg.id) ? prev : [...prev, msg]
-        );
-        // Mark as read if the message is for the currently open chat and not sent by the current user
-        if (user && msg.senderId !== user.id) {
-          markMessagesAsRead(msg.chatId, user.id);
-        }
-      }
-    };
-    import("@/lib/socket").then(({ default: socket }) => {
-      socket.on("message", handleMessage);
-      socket.on("connect", () => setIsSidebarOpen(true));
-      socket.on("disconnect", () => setIsSidebarOpen(false));
-      return () => {
-        socket.off("message", handleMessage);
-        socket.off("connect");
-        socket.off("disconnect");
-      };
-    });
-  }, [selectedChat, user]);
+		useEffect(() => {
+			const handleMessage = (msg: Message) => {
+				console.log("[SocketIO] New message received:", msg);
+				if (msg.chatId === selectedChat?.chatId) {
+					setMessages((prev) =>
+						prev.some((m) => m.id === msg.id) ? prev : [...prev, msg]
+					);
+					if (user && msg.senderId !== user.id) {
+						markMessagesAsRead(msg.chatId, user.id);
+					}
+				}
+			};
+			import("@/lib/socket").then(({ default: socket }) => {
+				socket.on("message", handleMessage);
+				socket.on("connect", () => setIsSidebarOpen(true));
+				socket.on("disconnect", () => setIsSidebarOpen(false));
+				return () => {
+					socket.off("message", handleMessage);
+					socket.off("connect");
+					socket.off("disconnect");
+				};
+			});
+		}, [selectedChat, user]);
 
   // Debug wrappers for pending media setters
   const debugSetPendingImageUrl = (url: string) => {
@@ -157,7 +157,9 @@ export default function ChatPage() {
   const debugSetPendingAudioUrl = (url: string) => {
     console.log("[Debug] setPendingAudioUrl called with:", url);
     setPendingAudioUrl(url);
-  };
+	};
+	
+
 
   // useEffect to send pending message after new chat is selected
   useEffect(() => {

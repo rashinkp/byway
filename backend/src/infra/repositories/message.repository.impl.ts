@@ -54,11 +54,14 @@ export class MessageRepository implements IMessageRepository {
           },
         },
       },
-      orderBy: { createdAt: "asc" },
+      orderBy: { createdAt: "desc" },
       take: limit,
     });
 
-    return messages.map((msg) => ({
+    // Reverse the messages to get chronological order (oldest first)
+    const chronologicalMessages = [...messages].reverse();
+
+    return chronologicalMessages.map((msg) => ({
       id: msg.id,
       chatId: msg.chatId,
       senderId: msg.senderId,
@@ -163,12 +166,9 @@ export class MessageRepository implements IMessageRepository {
         isRead: false,
         senderId: { not: userId.value },
         chat: {
-          OR: [
-            { user1Id: userId.value },
-            { user2Id: userId.value }
-          ]
-        }
-      }
+          OR: [{ user1Id: userId.value }, { user2Id: userId.value }],
+        },
+      },
     });
     return count;
   }
@@ -181,9 +181,9 @@ export class MessageRepository implements IMessageRepository {
       prismaMessage.content ? new MessageContent(prismaMessage.content) : null,
       prismaMessage.imageUrl ? prismaMessage.imageUrl : null,
       prismaMessage.audioUrl ? prismaMessage.audioUrl : null,
-      prismaMessage.type, 
+      prismaMessage.type,
       prismaMessage.isRead,
-      new Timestamp(prismaMessage.createdAt) 
+      new Timestamp(prismaMessage.createdAt)
     );
   }
 }

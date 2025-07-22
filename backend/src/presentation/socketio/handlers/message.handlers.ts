@@ -135,6 +135,38 @@ export function registerMessageHandlers(
     }
   });
 
+  // Handle marking messages as read
+  socket.on("markMessagesAsRead", async ({ chatId, userId }) => {
+    try {
+      const authenticatedUserId = socket.data.user?.id;
+      if (!authenticatedUserId || authenticatedUserId !== userId) {
+        socket.emit("error", {
+          message: "Not authorized to mark messages as read",
+        });
+        return;
+      }
+
+      await chatController.markMessagesAsRead({ chatId, userId });
+
+      // Emit updated unread count to the user
+      const unreadCount = await chatController.getTotalUnreadCount(userId);
+      io.to(userId).emit("unreadMessageCount", { count: unreadCount });
+
+      // Emit chatListUpdated to update the chat list UI
+      io.to(userId).emit("chatListUpdated");
+
+      // Emit messagesRead event to all participants in the chat
+      io.to(chatId).emit("messagesRead", { chatId, userId });
+
+      console.log(
+        `[SocketIO] Messages marked as read for user ${userId} in chat ${chatId}`
+      );
+    } catch (err) {
+      console.error("[SocketIO] Error marking messages as read:", err);
+      socket.emit("error", { message: "Failed to mark messages as read" });
+    }
+  });
+
   socket.on(
     "sendMessage",
     async ({ chatId, userId, content, imageUrl, audioUrl }) => {
