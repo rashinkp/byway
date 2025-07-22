@@ -3,15 +3,12 @@ import { EnhancedChatItem, Message } from "@/types/chat";
 import { Message as MessageComponent } from "./Message";
 import { Badge } from "@/components/ui/badge";
 import { ModernChatInput } from "./ChatInput";
+import { ArrowLeft } from "lucide-react";
 
 interface ChatWindowProps {
   chat: EnhancedChatItem;
   messages: Message[];
-  onSendMessage: (
-    content: string,
-    imageUrl?: string,
-    audioUrl?: string
-  ) => void;
+  onSendMessage: (content: string, imageUrl?: string, audioUrl?: string) => void;
   currentUserId: string;
   onDeleteMessage?: (messageId: string) => void;
   loadingMoreMessages?: boolean;
@@ -26,6 +23,8 @@ export function ChatWindow({
   currentUserId,
   onDeleteMessage,
   loadingMoreMessages,
+  showBackButton,
+  onBack,
   ...props
 }: ChatWindowProps & {
   setPendingImageUrl?: (url: string) => void;
@@ -126,21 +125,31 @@ export function ChatWindow({
   };
 
   return (
-    <div className="flex flex-col h-full bg-[var(--color-surface)]">
+    <div className="flex flex-col max-h-[calc(100vh-4rem)] bg-gray-100 dark:bg-[#18181b] transition-colors duration-300">
       {/* Header */}
-      <div className="flex items-center justify-between px-6 py-4 border-b border-[var(--color-primary-light)]/20 ">
+      <div className="flex items-center justify-between px-4 py-3 border-b border-gray-200 dark:border-white/10 bg-white dark:bg-[#18181b] shadow-sm">
         <div className="flex items-center gap-3">
-          <div
-            className={`w-10 h-10 bg-[var(--color-primary-light)] rounded-full flex items-center justify-center text-[var(--color-surface)] font-medium text-lg`}
-          >
-            {(chat.displayName?.charAt(0) || "?").toUpperCase()}
+          {showBackButton && (
+            <button
+              onClick={onBack}
+              className="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-[#facc15]/10 text-gray-600 dark:text-gray-300 transition-colors duration-200"
+              title="Back to chat list"
+            >
+              <ArrowLeft className="w-5 h-5" />
+            </button>
+          )}
+          <div className="relative">
+            <div className="w-10 h-10 bg-[#facc15] rounded-full flex items-center justify-center text-black font-medium text-lg shadow-sm">
+              {(chat.displayName?.charAt(0) || "?").toUpperCase()}
+            </div>
+            <div className={`absolute bottom-0 right-0 w-3 h-3 rounded-full border-2 border-white dark:border-[#18181b] ${chat.isOnline ? 'bg-green-400' : 'bg-gray-400'}`} />
           </div>
           <div className="flex flex-col">
-            <span className="font-semibold text-[var(--color-primary-dark)] text-base">
+            <span className="font-semibold text-gray-900 dark:text-white text-base">
               {chat.displayName}
             </span>
             {chat.role !== "USER" && (
-              <Badge className="text-xs px-2 py-0.5 bg-[var(--color-primary-light)]/10 text-[var(--color-primary-light)] rounded-md w-fit">
+              <Badge className="text-xs px-2 py-0.5 bg-[#facc15]/10 text-[#facc15] rounded-md w-fit mt-1">
                 {chat.role.charAt(0).toUpperCase() +
                   chat.role.slice(1).toLowerCase()}
               </Badge>
@@ -152,12 +161,12 @@ export function ChatWindow({
       {/* Messages Area */}
       <div
         ref={messagesContainerRef}
-        className="flex-1 overflow-y-auto px-6 py-4 space-y-6 bg-[var(--color-surface)]"
+        className="flex-1 overflow-y-auto px-4 py-6 space-y-6 bg-gray-100 dark:bg-[#18181b]"
         onDrop={handleDrop}
         onDragOver={handleDragOver}
       >
         {messages.length === 0 ? (
-          <div className="flex flex-col items-center justify-center h-full py-16 text-center text-[var(--color-muted)]">
+          <div className="flex flex-col items-center justify-center h-full py-16 text-center text-gray-500 dark:text-gray-400">
             <svg
               width="80"
               height="80"
@@ -165,29 +174,29 @@ export function ChatWindow({
               viewBox="0 0 80 80"
               className="mx-auto mb-6"
             >
-              <rect width="80" height="80" rx="16" fill="#EEF2FF" />
+              <rect width="80" height="80" rx="16" fill="#facc15/10" />
               <path
                 d="M24 56V32a8 8 0 0 1 8-8h16a8 8 0 0 1 8 8v24l-8-4-8 4-8-4-8 4Z"
-                fill="#6366F1"
+                fill="#facc15"
               />
               <circle cx="32" cy="40" r="2" fill="#fff" />
               <circle cx="40" cy="40" r="2" fill="#fff" />
               <circle cx="48" cy="40" r="2" fill="#fff" />
             </svg>
-            <h3 className="text-lg font-semibold mb-2 text-[var(--color-primary-dark)]">
+            <h3 className="text-lg font-semibold mb-2 text-gray-900 dark:text-[#facc15]">
               No messages yet
             </h3>
             <p className="mb-4 text-sm">
               Start the conversation! Say hello and break the ice.
             </p>
-            <span className="inline-block px-4 py-2 bg-[var(--color-primary-light)]/10 text-[var(--color-primary-light)] rounded-full text-xs font-medium">
+            <span className="inline-block px-4 py-2 bg-[#facc15]/10 text-[#facc15] rounded-full text-xs font-medium">
               Type your first message below
             </span>
           </div>
         ) : (
           groupedMessages.map((group, idx) => (
             <div key={idx} className="space-y-4">
-              <div className="text-center text-xs text-[var(--color-muted)] mb-2">
+              <div className="text-center text-xs text-gray-500 dark:text-gray-400 bg-gray-200 dark:bg-gray-800 rounded-full px-3 py-1 mx-auto w-fit">
                 {group.date}
               </div>
               {group.messages.map((msg) => (

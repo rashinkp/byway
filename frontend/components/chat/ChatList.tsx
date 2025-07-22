@@ -2,11 +2,7 @@ import React, { useState } from 'react';
 import { EnhancedChatItem } from '@/types/chat';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
-import { MessageSquare, Search, ChevronLeft, Image as ImageIcon, Mic } from 'lucide-react';
-import { useRouter } from 'next/navigation';
-import Link from 'next/link';
-import { useAuth } from '@/hooks/auth/useAuth';
+import { MessageSquare, Search, Image as ImageIcon, Mic } from 'lucide-react';
 
 interface ChatListProps {
   chats: EnhancedChatItem[];
@@ -17,52 +13,17 @@ interface ChatListProps {
 
 export function ChatList({ chats, selectedChat, onSelectChat, onSearch }: ChatListProps) {
   const [searchQuery, setSearchQuery] = useState('');
-  const router = useRouter();
-  const { user } = useAuth();
 
   // Separate new chats (type === 'user') and existing chats (type === 'chat')
   const newChats = chats.filter(chat => chat.type === 'user');
   const existingChats = chats.filter(chat => chat.type === 'chat');
 
-  // Determine home path based on user role
-  const getHomePath = () => {
-    if (!user) return '/';
-    if (user.role === 'ADMIN') return '/admin';
-    if (user.role === 'INSTRUCTOR') return '/instructor';
-    return '/';
-  };
-
   return (
-    <div className="flex flex-col h-full min-h-0 bg-[var(--color-surface)] border-r border-[var(--color-primary-light)]/20">
+    <div className="flex max-h-[calc(100vh-4rem)] flex-col h-full min-h-0 border-r border-gray-200 dark:border-white/10 bg-white dark:bg-[#18181b] transition-colors duration-300">
       {/* Header */}
-      <div className="p-4 border-b border-[var(--color-primary-light)]/20">
-        <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center space-x-2">
-            <Button
-              variant="ghost"
-              size="sm"
-              className="h-8 w-8 p-0 mr-1 rounded-full hover:bg-[var(--color-primary-light)]/10"
-              onClick={() => router.back()}
-              aria-label="Go back"
-            >
-              <ChevronLeft className="h-5 w-5 text-[var(--color-muted)]" />
-            </Button>
-            <h2 className="text-lg font-semibold text-[var(--color-primary-dark)] flex items-center gap-2">
-              Messages
-              <Link
-                href={getHomePath()}
-                className="text-[var(--color-primary-light)] font-bold text-base ml-2 px-2 py-0.5 hover:text-[var(--color-primary-dark)] transition-colors"
-                style={{ letterSpacing: '0.5px' }}
-              >
-                Byway
-              </Link>
-            </h2>
-          </div>
-        </div>
-        
-        {/* Search */}
+      <div className="p-4 border-b border-gray-200 dark:border-white/10">
         <div className="relative">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[var(--color-muted)] h-4 w-4" />
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-500 dark:text-gray-400" />
           <Input
             placeholder="Search conversations..."
             value={searchQuery}
@@ -70,7 +31,7 @@ export function ChatList({ chats, selectedChat, onSelectChat, onSearch }: ChatLi
               setSearchQuery(e.target.value);
               if (onSearch) onSearch(e.target.value);
             }}
-            className="pl-10 border-[var(--color-primary-light)]/30 focus:border-[var(--color-primary-light)] focus:ring-[var(--color-primary-light)]"
+            className="pl-10 bg-gray-100 dark:bg-gray-800 border-gray-300 dark:border-[#facc15]/20 text-gray-900 dark:text-white focus:ring-2 focus:ring-[#facc15] focus:border-[#facc15] rounded-lg transition-all duration-200"
           />
         </div>
       </div>
@@ -79,84 +40,98 @@ export function ChatList({ chats, selectedChat, onSelectChat, onSearch }: ChatLi
       <div className="flex-1 overflow-y-auto">
         {chats.length === 0 ? (
           <div className="flex-1 flex items-center justify-center p-8">
-            <div className="text-center space-y-3">
-              <div className="w-12 h-12 bg-[var(--color-background)] rounded-full flex items-center justify-center mx-auto">
-                <MessageSquare className="w-6 h-6 text-[var(--color-muted)]" />
+            <div className="text-center space-y-4">
+              <div className="w-12 h-12 bg-[#facc15]/10 rounded-full flex items-center justify-center mx-auto">
+                <MessageSquare className="w-6 h-6 text-[#facc15]" />
               </div>
               <div>
-                <h3 className="font-medium text-[var(--color-primary-dark)] mb-1">No conversations</h3>
-                <p className="text-sm text-[var(--color-muted)]">
-                  {searchQuery ? 'No conversations match your search.' : 'Your conversations will appear here.'}
+                <h3 className="font-medium text-gray-900 dark:text-[#facc15] mb-1">
+                  No conversations
+                </h3>
+                <p className="text-sm text-gray-500 dark:text-gray-400">
+                  {searchQuery
+                    ? "No conversations match your search."
+                    : "Your conversations will appear here."}
                 </p>
               </div>
             </div>
           </div>
         ) : (
-          <div className="p-2 space-y-6">
+          <div className="p-3 space-y-6">
             {/* Existing Chats Section */}
             {existingChats.length > 0 && (
               <div>
-                <div className="text-xs font-semibold text-[var(--color-muted)] uppercase mb-2 pl-1">Conversations</div>
+                <div className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase mb-3 pl-2 tracking-wide">
+                  Conversations
+                </div>
                 <div className="space-y-1">
                   {existingChats.map((chat) => (
                     <div
                       key={chat.id}
                       onClick={() => onSelectChat(chat)}
-                      className={`group relative p-3 cursor-pointer transition-colors duration-200 rounded-lg mb-1 ${
-                        selectedChat?.id === chat.id 
-                          ? 'bg-[var(--color-primary-light)]/10 border border-[var(--color-primary-light)]/40' 
-                          : 'hover:bg-[var(--color-background)]'
+                      className={`group relative p-3 cursor-pointer transition-all duration-200 rounded-xl hover:bg-gray-100 dark:hover:bg-[#facc15]/5 ${
+                        selectedChat?.id === chat.id
+                          ? "bg-[#facc15]/10 dark:bg-[#facc15]/10 border-l-4 border-[#facc15]"
+                          : "border-l-4 border-transparent"
                       }`}
                     >
-                      <div className="flex items-center space-x-3">
+                      <div className="flex items-center space-x-4">
                         {/* Avatar */}
                         <div className="relative flex-shrink-0">
-                          <div className={`w-10 h-10 bg-[var(--color-primary-light)] rounded-full flex items-center justify-center text-[var(--color-surface)] font-medium text-sm`}>
-                            {(chat.displayName?.charAt(0) || '?').toUpperCase()}
+                          <div className="w-10 h-10 bg-gray-200 dark:bg-gray-700 rounded-full flex items-center justify-center font-medium text-sm text-gray-700 dark:text-gray-200 shadow-sm">
+                            {(chat.displayName?.charAt(0) || "?").toUpperCase()}
                           </div>
+                          <div
+                            className={`absolute bottom-0 right-0 w-3 h-3 rounded-full border-2 border-white dark:border-[#18181b] ${
+                              chat.isOnline ? "bg-green-400" : "bg-gray-400"
+                            }`}
+                          />
                         </div>
                         {/* Content */}
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center justify-between mb-1">
-                            <h3 className="font-medium text-[var(--color-primary-dark)] truncate text-sm">
-                              {chat.displayName || 'Unknown User'}
+                            <h3 className="font-semibold text-gray-900 dark:text-white text-sm truncate">
+                              {chat.displayName || "Unknown User"}
                             </h3>
                             {chat.lastMessageTime && (
-                              <span className="text-xs text-[var(--color-muted)] ml-2 flex-shrink-0">
+                              <span className="text-xs text-gray-500 dark:text-gray-400 ml-2 flex-shrink-0">
                                 {chat.lastMessageTime}
                               </span>
                             )}
                           </div>
                           <div className="flex items-center justify-between">
-                            <p className="text-sm text-[var(--color-muted)] truncate flex-1 mr-2">
+                            <p className="text-sm text-gray-600 dark:text-gray-300 truncate flex-1 mr-2">
                               {chat.lastMessage?.imageUrl ? (
-                                <span className="flex items-center gap-1 text-[var(--color-primary-light)]">
-                                  <ImageIcon className="w-4 h-4 inline" /> Photo
+                                <span className="flex items-center gap-1">
+                                  <ImageIcon className="w-4 h-4 inline text-[#facc15]" />{" "}
+                                  Photo
                                 </span>
                               ) : chat.lastMessage?.audioUrl ? (
-                                <span className="flex items-center gap-1 text-[var(--color-primary-dark)]">
-                                  <Mic className="w-4 h-4 inline" /> Audio
+                                <span className="flex items-center gap-1">
+                                  <Mic className="w-4 h-4 inline text-[#facc15]" />{" "}
+                                  Audio
                                 </span>
                               ) : chat.lastMessage?.content ? (
                                 chat.lastMessage.content
                               ) : (
-                                'No messages yet'
+                                "No messages yet"
                               )}
                             </p>
                             {(chat.unreadCount ?? 0) > 0 && (
-                              <span className="ml-2 bg-[var(--color-primary-light)] text-[var(--color-surface)] rounded-full px-2 py-0.5 text-xs">
+                              <span className="ml-2 bg-[#facc15] text-black rounded-full px-2 py-0.5 text-xs font-medium">
                                 {chat.unreadCount}
                               </span>
                             )}
                           </div>
-                            {/* Role Badge (hide for 'user') */}
-                            {chat.role !== 'USER' && (
-                              <div className="mt-2">
-                                <Badge className={`text-xs px-2 py-0.5 bg-[var(--color-primary-light)]/10 text-[var(--color-primary-light)] rounded-md`}>
-                                  {chat.role.charAt(0).toUpperCase() + chat.role.slice(1).toLowerCase()}
-                                </Badge>
-                              </div>
-                            )}
+                          {/* Role Badge (hide for 'user') */}
+                          {chat.role !== "USER" && (
+                            <div className="mt-2">
+                              <Badge className="text-xs px-2 py-0.5 bg-[#facc15]/10 text-[#facc15] rounded-md">
+                                {chat.role.charAt(0).toUpperCase() +
+                                  chat.role.slice(1).toLowerCase()}
+                              </Badge>
+                            </div>
+                          )}
                         </div>
                       </div>
                     </div>
@@ -167,34 +142,44 @@ export function ChatList({ chats, selectedChat, onSelectChat, onSearch }: ChatLi
             {/* New Chats Section */}
             {newChats.length > 0 && (
               <div>
-                <div className="text-xs font-semibold text-[var(--color-muted)] uppercase mb-2 pl-1">Start New Chat</div>
+                <div className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase mb-3 pl-2 tracking-wide">
+                  Start New Chat
+                </div>
                 <div className="space-y-1">
                   {newChats.map((chat) => (
                     <div
                       key={chat.id}
                       onClick={() => onSelectChat(chat)}
-                      className={`group relative p-3 cursor-pointer transition-colors duration-200 rounded-lg mb-1  hover:bg-[var(--color-background)]`}
+                      className="group relative p-3 cursor-pointer transition-all duration-200 rounded-xl hover:bg-gray-100 dark:hover:bg-[#facc15]/5 border-l-4 border-transparent"
                     >
-                      <div className="flex items-center space-x-3">
+                      <div className="flex items-center space-x-4">
                         {/* Avatar */}
                         <div className="relative flex-shrink-0">
-                          <div className={`w-10 h-10 bg-[var(--color-primary-light)] rounded-full flex items-center justify-center text-[var(--color-surface)] font-medium text-sm`}>
-                            {(chat.displayName?.charAt(0) || '?').toUpperCase()}  
+                          <div className="w-10 h-10 bg-gray-200 dark:bg-gray-700 rounded-full flex items-center justify-center font-medium text-sm text-gray-700 dark:text-gray-200 shadow-sm">
+                            {(chat.displayName?.charAt(0) || "?").toUpperCase()}
                           </div>
+                          <div
+                            className={`absolute bottom-0 right-0 w-3 h-3 rounded-full border-2 border-white dark:border-[#18181b] ${
+                              chat.isOnline ? "bg-green-400" : "bg-gray-400"
+                            }`}
+                          />
                         </div>
                         {/* Content */}
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center justify-between mb-1">
-                            <h3 className="font-medium text-[var(--color-primary-dark)] truncate text-sm">
-                              {chat.displayName || 'Unknown User'}
+                            <h3 className="font-semibold text-gray-900 dark:text-white text-sm truncate">
+                              {chat.displayName || "Unknown User"}
                             </h3>
                           </div>
-                          <p className="text-sm text-[var(--color-muted)] truncate flex-1 mr-2">Start a new conversation</p>
+                          <p className="text-sm text-gray-600 dark:text-gray-300 truncate flex-1 mr-2">
+                            Start a new conversation
+                          </p>
                           {/* Role Badge (hide for 'user') */}
-                          {chat.role !== 'USER' && (
+                          {chat.role !== "USER" && (
                             <div className="mt-2">
-                              <Badge className={`text-xs px-2 py-0.5 bg-[var(--color-primary-light)]/10 text-[var(--color-primary-light)] rounded-md`}>
-                                {chat.role.charAt(0).toUpperCase() + chat.role.slice(1).toLowerCase()}
+                              <Badge className="text-xs px-2 py-0.5 bg-[#facc15]/10 text-[#facc15] rounded-md">
+                                {chat.role.charAt(0).toUpperCase() +
+                                  chat.role.slice(1).toLowerCase()}
                               </Badge>
                             </div>
                           )}

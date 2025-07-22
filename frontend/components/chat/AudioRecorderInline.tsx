@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import {  Square, Send, Trash2, Play, Pause } from 'lucide-react';
+import { Square, Send, Trash2, Play, Pause } from 'lucide-react';
 import { AlertComponent } from '@/components/ui/AlertComponent';
 import { getPresignedUrl, uploadFileToS3 } from '@/api/file';
 
@@ -13,59 +13,45 @@ interface ModernAudioRecorderProps {
 export function ModernAudioRecorder({
   onSend,
   onCancel,
+  maxDuration = 300,
 }: ModernAudioRecorderProps) {
   const [isRecording, setIsRecording] = useState(false);
   const [audioUrl, setAudioUrl] = useState<string | null>(null);
-  const [duration, setDuration] = useState(0); // Total duration in seconds
-  const durationIntervalRef = useRef<NodeJS.Timeout | null>(null);
+  const [duration, setDuration] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [showDiscardAlert, setShowDiscardAlert] = useState(false);
-  const [pendingAudioUrl, setPendingAudioUrl] = useState<string | null>(null); // For duration fix
-  const [isUploading, setIsUploading] = useState(false); // Upload state
-
+  const [isUploading, setIsUploading] = useState(false);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
+  const durationIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Get supported MIME type
   const getSupportedMimeType = () => {
-    const types = [
-      'audio/webm;codecs=opus',
-      'audio/webm',
-      'audio/mp4',
-      'audio/ogg;codecs=opus',
-      'audio/wav'
-    ];
-    
+    const types = ['audio/webm;codecs=opus', 'audio/webm', 'audio/mp4', 'audio/ogg;codecs=opus', 'audio/wav'];
     for (const type of types) {
       if (MediaRecorder.isTypeSupported(type)) {
         return type;
       }
     }
-    return 'audio/webm'; // fallback
+    return 'audio/webm';
   };
 
-  // Check browser support
   const checkBrowserSupport = () => {
     if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
       throw new Error('Media devices not supported in this browser');
     }
-    
     if (!window.MediaRecorder) {
       throw new Error('MediaRecorder not supported in this browser');
     }
-    
     const mimeType = getSupportedMimeType();
     if (!MediaRecorder.isTypeSupported(mimeType)) {
       throw new Error(`Audio format ${mimeType} not supported in this browser`);
     }
-    
     return mimeType;
   };
 
-  // Clean up all resources
   const cleanup = () => {
     if (streamRef.current) {
       streamRef.current.getTracks().forEach((track) => track.stop());
@@ -75,20 +61,14 @@ export function ModernAudioRecorder({
       URL.revokeObjectURL(audioUrl);
       setAudioUrl(null);
     }
-    if (pendingAudioUrl) {
-      URL.revokeObjectURL(pendingAudioUrl);
-      setPendingAudioUrl(null);
-    }
     setDuration(0);
     setIsPlaying(false);
-    // Stop the timer if running
     if (durationIntervalRef.current) {
       clearInterval(durationIntervalRef.current);
       durationIntervalRef.current = null;
     }
   };
 
-  // Start recording immediately on mount
   useEffect(() => {
     startRecording();
     return () => {
@@ -101,127 +81,82 @@ export function ModernAudioRecorder({
     setError(null);
     setDuration(0);
     try {
-      // Check browser support first
       const mimeType = checkBrowserSupport();
-      
       const stream = await navigator.mediaDevices.getUserMedia({
-        audio: {
-          echoCancellation: true,
-          noiseSuppression: true,
-          sampleRate: 44100,
-        },
+        audio: { echoCancellation: true, noiseSuppression: true, sampleRate: 44100 },
       });
       streamRef.current = stream;
-      
-      const mediaRecorder = new MediaRecorder(stream, {
-        mimeType: mimeType,
-      });
+      const mediaRecorder = new MediaRecorder(stream, { mimeType });
       mediaRecorderRef.current = mediaRecorder;
       audioChunksRef.current = [];
-      
+
       mediaRecorder.ondataavailable = (event) => {
         if (event.data.size > 0) {
           audioChunksRef.current.push(event.data);
         }
       };
-      
+
       mediaRecorder.onstop = () => {
         if (audioChunksRef.current.length === 0) {
           setError('No audio data recorded. Please try again.');
           return;
         }
-        
-        const audioBlob = new Blob(audioChunksRef.current, {
-          type: mimeType,
-        });
-        
-        // Validate blob
+        const audioBlob = new Blob(audioChunksRef.current, { type: mimeType });
         if (audioBlob.size === 0) {
           setError('Recording failed. Please try again.');
           return;
         }
-        
         const url = URL.createObjectURL(audioBlob);
-        setPendingAudioUrl(url);
         setAudioUrl(url);
         setIsRecording(false);
         if (streamRef.current) {
           streamRef.current.getTracks().forEach((track) => track.stop());
           streamRef.current = null;
         }
-        // Stop the timer
         if (durationIntervalRef.current) {
           clearInterval(durationIntervalRef.current);
           durationIntervalRef.current = null;
         }
       };
-      
-      mediaRecorder.onerror = (event) => {
-        console.error('MediaRecorder error:', event);
+
+      mediaRecorder.onerror = () => {
         setError('Recording failed. Please try again.');
         setIsRecording(false);
       };
-      
+
       mediaRecorder.start();
       setIsRecording(true);
-      // Start the timer
       durationIntervalRef.current = setInterval(() => {
         setDuration((prev) => prev + 1);
       }, 1000);
     } catch (err: any) {
-      console.error('Recording error:', err);
-      if (err.name === 'NotAllowedError') {
-        setError('Microphone access denied. Please allow microphone permissions and try again.');
-      } else if (err.name === 'NotFoundError') {
-        setError('No microphone found. Please connect a microphone and try again.');
-      } else if (err.name === 'NotSupportedError') {
-        setError('Audio recording is not supported in this browser. Please use a modern browser.');
-      } else {
-        setError(err.message || 'Could not access microphone. Please check permissions.');
-      }
+      setError(err.message || 'Could not access microphone. Please check permissions.');
     }
   };
 
   const stopRecording = () => {
     if (mediaRecorderRef.current && isRecording) {
       mediaRecorderRef.current.stop();
-      // Do not setIsRecording(false) here; let onstop handle it
     }
-    // Stop the timer if running
     if (durationIntervalRef.current) {
       clearInterval(durationIntervalRef.current);
       durationIntervalRef.current = null;
     }
   };
 
-  // Remove the useEffect that sets duration from pendingAudioUrl
-
   const togglePlayback = () => {
-    if (!audioRef.current || !audioUrl) {
-      console.warn('Audio element or URL not available');
-      return;
-    }
-    
-    // Check if audio is ready to play
-    if (audioRef.current.readyState < 2) { // HAVE_CURRENT_DATA
-      console.warn('Audio not ready to play');
+    if (!audioRef.current || !audioUrl) return;
+    if (audioRef.current.readyState < 2) {
       setError('Audio not ready to play. Please try again.');
       return;
     }
-    
     if (isPlaying) {
       audioRef.current.pause();
       setIsPlaying(false);
     } else {
       audioRef.current.currentTime = 0;
       audioRef.current.play().catch((err) => {
-        console.error('Playback error:', err);
-        setIsPlaying(false);
-        if (err.name === 'NotAllowedError') {
-          setError('Audio playback blocked. Please allow autoplay and try again.');
-        } else {
-          setError('Failed to play audio. Please try again.');
-        }
+        setError('Failed to play audio. Please try again.');
       });
       setIsPlaying(true);
     }
@@ -234,8 +169,7 @@ export function ModernAudioRecorder({
         setError(null);
         const s3AudioUrl = await uploadToS3(audioUrl);
         onSend(s3AudioUrl, duration);
-      } catch (error) {
-        console.error('Error uploading audio:', error);
+      } catch {
         setError('Failed to upload audio. Please try again.');
       } finally {
         setIsUploading(false);
@@ -253,61 +187,38 @@ export function ModernAudioRecorder({
     onCancel();
   };
 
-  // S3 upload function for audio files
   const uploadToS3 = async (audioUrl: string): Promise<string> => {
-    try {
-      // Convert blob URL to File object
-      const response = await fetch(audioUrl);
-      const blob = await response.blob();
-      
-      // Determine the correct file extension based on MIME type
-      let fileExtension = 'webm';
-      const mimeType = blob.type;
-      
-      if (mimeType.includes('mp4') || mimeType.includes('m4a')) {
-        fileExtension = 'm4a';
-      } else if (mimeType.includes('ogg')) {
-        fileExtension = 'ogg';
-      } else if (mimeType.includes('wav')) {
-        fileExtension = 'wav';
-      } else if (mimeType.includes('mp3')) {
-        fileExtension = 'mp3';
-      }
-      
-      // Create a File object from the blob with proper extension
-      const audioFile = new File([blob], `audio-${Date.now()}.${fileExtension}`, {
-        type: mimeType
-      });
-      
-      console.log('[AudioRecorder] Uploading audio file:', {
-        name: audioFile.name,
-        type: audioFile.type,
-        size: audioFile.size
-      });
-      
-      // Get presigned URL for S3 upload
-      const { uploadUrl, fileUrl } = await getPresignedUrl(
-        audioFile.name,
-        audioFile.type
-      );
-      
-      // Upload to S3
-      await uploadFileToS3(audioFile, uploadUrl);
-      
-      console.log('[AudioRecorder] Audio uploaded successfully:', fileUrl);
-      return fileUrl;
-    } catch (error) {
-      console.error('Error in S3 upload:', error);
-      throw new Error('Failed to upload audio to cloud storage');
+    const response = await fetch(audioUrl);
+    const blob = await response.blob();
+    let fileExtension = 'webm';
+    const mimeType = blob.type;
+    if (mimeType.includes('mp4') || mimeType.includes('m4a')) {
+      fileExtension = 'm4a';
+    } else if (mimeType.includes('ogg')) {
+      fileExtension = 'ogg';
+    } else if (mimeType.includes('wav')) {
+      fileExtension = 'wav';
+    } else if (mimeType.includes('mp3')) {
+      fileExtension = 'mp3';
     }
+    const audioFile = new File([blob], `audio-${Date.now()}.${fileExtension}`, { type: mimeType });
+    const { uploadUrl, fileUrl } = await getPresignedUrl(audioFile.name, audioFile.type);
+    await uploadFileToS3(audioFile, uploadUrl);
+    return fileUrl;
+  };
+
+  const formatTime = (s: number) => {
+    const mins = Math.floor(s / 60);
+    const secs = Math.floor(s % 60);
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
 
   if (error) {
     return (
-      <div className="flex items-center justify-center p-4 bg-[var(--color-danger-bg,#fef2f2)] border border-[var(--color-danger,#ef4444)]/20 rounded-lg">
+      <div className="flex items-center justify-center p-4 bg-red-100 dark:bg-red-900/30 border border-red-200 dark:border-red-700 rounded-lg">
         <div className="text-center">
-          <p className="text-[var(--color-danger,#ef4444)] text-sm mb-2">{error}</p>
-          <Button variant="outline" size="sm" onClick={onCancel}>
+          <p className="text-red-600 dark:text-red-300 text-sm mb-2">{error}</p>
+          <Button variant="ghost" size="sm" onClick={onCancel} className="text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-[#facc15]/10">
             Close
           </Button>
         </div>
@@ -316,22 +227,20 @@ export function ModernAudioRecorder({
   }
 
   return (
-    <div className="flex flex-col gap-3 p-4 bg-[var(--color-surface)] border border-[var(--color-primary-light)]/20 rounded-lg shadow-sm">
+    <div className="flex flex-col gap-3 p-4 bg-white dark:bg-[#18181b] border border-gray-200 dark:border-[#facc15]/20 rounded-lg shadow-sm transition-colors duration-300">
       {/* Recording State */}
       {isRecording && (
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="flex items-center gap-2">
-              <div className="w-3 h-3 bg-[var(--color-danger,#ef4444)] rounded-full animate-pulse" />
-              <span className="text-sm font-medium text-[var(--color-primary-dark)]">Recording...</span>
-            </div>
+            <div className="w-3 h-3 bg-[#facc15] rounded-full animate-pulse" />
+            <span className="text-sm font-medium text-gray-900 dark:text-white">Recording... {formatTime(duration)}</span>
           </div>
           <div className="flex items-center gap-2">
-            <Button onClick={stopRecording} size="sm" className="bg-[var(--color-danger,#ef4444)] hover:bg-[var(--color-danger,#ef4444)]/80 text-[var(--color-surface)]">
+            <Button onClick={stopRecording} size="sm" className="bg-[#facc15] hover:bg-[#facc15]/80 text-black">
               <Square className="w-4 h-4 mr-1" />
               Stop
             </Button>
-            <Button onClick={handleRequestDiscard} variant="outline" size="sm">
+            <Button onClick={handleRequestDiscard} variant="ghost" size="sm" className="text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-[#facc15]/10">
               <Trash2 className="w-4 h-4" />
             </Button>
           </div>
@@ -342,13 +251,12 @@ export function ModernAudioRecorder({
       {audioUrl && !isRecording && (
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3 flex-1">
-            <Button onClick={togglePlayback} size="sm" variant="outline" className="p-2 text-[var(--color-primary-light)]">
+            <Button onClick={togglePlayback} size="sm" variant="ghost" className="p-2 text-[#facc15]">
               {isPlaying ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
             </Button>
             <div className="flex-1">
               <div className="flex items-center justify-between text-sm">
-                <span className="text-[var(--color-muted)]">Voice message</span>
-                {/* Removed duration display here */}
+                <span className="text-gray-600 dark:text-gray-300">Voice message ({formatTime(duration)})</span>
               </div>
             </div>
           </div>
@@ -356,12 +264,12 @@ export function ModernAudioRecorder({
             <Button 
               onClick={handleSend} 
               size="sm" 
-              className="bg-[var(--color-primary-light)] hover:bg-[var(--color-primary-dark)] text-[var(--color-surface)]"
+              className="bg-[#facc15] hover:bg-[#facc15]/80 text-black"
               disabled={isUploading}
             >
               {isUploading ? (
                 <>
-                  <div className="w-4 h-4 border-2 border-[var(--color-surface)] border-t-transparent rounded-full animate-spin mr-1" />
+                  <div className="w-4 h-4 border-2 border-black border-t-transparent rounded-full animate-spin mr-1" />
                   Uploading...
                 </>
               ) : (
@@ -371,14 +279,14 @@ export function ModernAudioRecorder({
                 </>
               )}
             </Button>
-            <Button onClick={handleRequestDiscard} variant="outline" size="sm" disabled={isUploading}>
+            <Button onClick={handleRequestDiscard} variant="ghost" size="sm" disabled={isUploading} className="text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-[#facc15]/10">
               <Trash2 className="w-4 h-4" />
             </Button>
           </div>
         </div>
       )}
       
-      {/* Hidden audio element for playback */}
+      {/* Hidden audio element */}
       {audioUrl && (
         <audio
           ref={audioRef}
@@ -386,16 +294,7 @@ export function ModernAudioRecorder({
           onEnded={() => setIsPlaying(false)}
           onPlay={() => setIsPlaying(true)}
           onPause={() => setIsPlaying(false)}
-          onError={(e) => {
-            console.error('Audio playback error:', e);
-            setError('Failed to play audio. Please try recording again.');
-          }}
-          onLoadStart={() => {
-            console.log('Audio loading started');
-          }}
-          onCanPlay={() => {
-            console.log('Audio can play');
-          }}
+          onError={() => setError('Failed to play audio. Please try recording again.')}
           preload="metadata"
           style={{ display: 'none' }}
         />

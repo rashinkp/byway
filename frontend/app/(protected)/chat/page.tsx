@@ -435,10 +435,10 @@ export default function ChatPage() {
 	}
 
 	return (
-		<div className="h-screen  overflow-hidden">
+		<div className="overflow-hidden">
 			{/* Main Chat Interface */}
-			<div className="w-full h-full flex items-stretch">
-				<div className="w-full h-full overflow-hidden flex flex-col min-h-0">
+			<div className="w-full  flex items-stretch">
+				<div className="w-full overflow-hidden flex flex-col min-h-0">
 					<div className="flex flex-1 min-h-0">
 						{/* Chat List Sidebar (show on mobile only if sidebar is open and no chat selected) */}
 						{((isSidebarOpen && (!selectedChat || !isMobile)) ||

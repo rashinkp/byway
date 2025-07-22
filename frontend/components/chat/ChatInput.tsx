@@ -16,8 +16,8 @@ interface ModernChatInputProps {
 
 type InputMode = 'text' | 'audio' | 'image';
 
-export function ModernChatInput({ 
-  onSendMessage, 
+export function ModernChatInput({
+  onSendMessage,
   placeholder = "Type a message...",
   disabled = false,
   isNewChat = false,
@@ -71,7 +71,7 @@ export function ModernChatInput({
             />
           </div>
         );
-      
+
       case 'image':
         return (
           <div className="w-full">
@@ -82,7 +82,7 @@ export function ModernChatInput({
             />
           </div>
         );
-      
+
       default:
         return (
           <form onSubmit={handleSendText} className="flex items-center gap-2 w-full">
@@ -93,10 +93,10 @@ export function ModernChatInput({
               value={message}
               onChange={(e) => setMessage(e.target.value)}
               disabled={disabled}
-              className="flex-1 border-[var(--color-primary-light)]/30 focus:border-[var(--color-primary-light)] focus:ring-1 focus:ring-[var(--color-primary-light)]"
+              className="flex-1 bg-white dark:bg-gray-800 border-gray-300 dark:border-[#facc15]/20 text-gray-900 dark:text-white focus:ring-2 focus:ring-[#facc15] focus:border-[#facc15] rounded-lg transition-all duration-200"
             />
 
-            {/* Media Buttons (moved to right) */}
+            {/* Media Buttons */}
             <div className="flex items-center gap-1">
               <Button
                 type="button"
@@ -104,10 +104,10 @@ export function ModernChatInput({
                 size="sm"
                 onClick={() => setInputMode('image')}
                 disabled={disabled}
-                className="p-2 h-9 w-9 hover:bg-[var(--color-primary-light)]/10"
+                className="p-2 h-9 w-9 hover:bg-gray-200 dark:hover:bg-[#facc15]/10 text-gray-600 dark:text-gray-300"
                 title="Add image"
               >
-                <ImageIcon className="w-4 h-4 text-[var(--color-muted)]" />
+                <ImageIcon className="w-4 h-4" />
               </Button>
               <Button
                 type="button"
@@ -115,10 +115,10 @@ export function ModernChatInput({
                 size="sm"
                 onClick={() => setInputMode('audio')}
                 disabled={disabled}
-                className="p-2 h-9 w-9 hover:bg-[var(--color-primary-light)]/10"
+                className="p-2 h-9 w-9 hover:bg-gray-200 dark:hover:bg-[#facc15]/10 text-gray-600 dark:text-gray-300"
                 title="Record audio"
               >
-                <Mic className="w-4 h-4 text-[var(--color-muted)]" />
+                <Mic className="w-4 h-4" />
               </Button>
             </div>
 
@@ -126,7 +126,7 @@ export function ModernChatInput({
             <Button
               type="submit"
               disabled={!message.trim() || disabled}
-              className="bg-[var(--color-primary-light)] hover:bg-[var(--color-primary-dark)] disabled:bg-[var(--color-muted)] px-4 py-2 h-9 text-[var(--color-surface)]"
+              className="bg-[#facc15] hover:bg-[#facc15]/80 disabled:bg-gray-400 text-black px-4 py-2 h-9 rounded-lg transition-colors duration-200"
             >
               <Send className="w-4 h-4" />
             </Button>
@@ -136,7 +136,7 @@ export function ModernChatInput({
   };
 
   return (
-    <div className="flex-shrink-0 px-4 py-3 bg-[var(--color-surface)] border-t border-[var(--color-primary-light)]/20">
+    <div className="flex-shrink-0 px-4 py-3 bg-white dark:bg-[#18181b] border-t border-gray-200 dark:border-white/10 transition-colors duration-300">
       {renderInputContent()}
     </div>
   );

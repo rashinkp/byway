@@ -1,8 +1,6 @@
-import React from "react";
-import { Message as MessageType } from "@/types/chat";
-import { EnhancedChatItem } from "@/types/chat";
+import React, { useState } from "react";
+import { Message as MessageType, EnhancedChatItem } from "@/types/chat";
 import { MoreVertical, Trash2, Check, CheckCheck, Pause, Play, X } from "lucide-react";
-import { useState } from "react";
 import { AlertComponent } from "@/components/ui/AlertComponent";
 import Image from 'next/image';
 
@@ -24,13 +22,13 @@ export function Message({ message, currentUserId, chat, onDelete }: MessageProps
   const getRoleColor = (role: string) => {
     switch (role.toLowerCase()) {
       case "admin":
-        return "bg-[var(--color-primary-dark)]";
+        return "bg-[#facc15] text-black";
       case "instructor":
-        return "bg-[var(--color-primary-light)]";
+        return "bg-green-500 text-white";
       case "user":
-        return "bg-[var(--color-primary-light)]/60";
+        return "bg-gray-400 text-white";
       default:
-        return "bg-[var(--color-muted)]";
+        return "bg-gray-300 text-gray-900";
     }
   };
 
@@ -45,18 +43,14 @@ export function Message({ message, currentUserId, chat, onDelete }: MessageProps
 
   return (
     <div
-      className={`group flex items-start space-x-2 ${
-        isMine ? "flex-row-reverse space-x-reverse" : "flex-row"
-      }`}
+      className={`group flex items-start space-x-3 ${isMine ? "flex-row-reverse space-x-reverse" : "flex-row"}`}
       onMouseLeave={() => setMenuOpen(false)}
     >
       {/* Avatar - only show for other users */}
       {!isMine && (
         <div className="flex-shrink-0">
           <div
-            className={`w-8 h-8 ${getRoleColor(
-              chat.role
-            )} rounded-full flex items-center justify-center text-[var(--color-surface)] font-medium text-xs`}
+            className={`w-8 h-8 ${getRoleColor(chat.role)} rounded-full flex items-center justify-center font-medium text-xs shadow-sm`}
           >
             {(chat.displayName?.charAt(0) || "?").toUpperCase()}
           </div>
@@ -64,73 +58,67 @@ export function Message({ message, currentUserId, chat, onDelete }: MessageProps
       )}
 
       {/* Message Content */}
-      <div
-        className={`max-w-[70%] ${
-          isMine ? "items-end" : "items-start"
-        } flex flex-col`}
-      >
+      <div className={`max-w-[70%] ${isMine ? "items-end" : "items-start"} flex flex-col`}>
         {/* Sender Name - only show for other users */}
         {!isMine && (
           <div className="mb-1 px-1">
-            <span className="text-xs font-medium text-[var(--color-muted)]">
+            <span className="text-xs font-medium text-gray-600 dark:text-gray-400">
               {chat.displayName || "Unknown User"}
             </span>
           </div>
         )}
 
-        {/* Message Bubble Row (bubble + menu button for mine) */}
-        <div className="flex items-center">
+        {/* Message Bubble Row */}
+        <div className="flex items-center gap-2">
           {/* Audio message */}
           {message.audioUrl && (
-            <>
-              <AudioMessage
-                audioUrl={message.audioUrl}
-                isMine={isMine}
-                isRead={message.isRead}
-                duration={typeof (message as any).duration === 'number' ? (message as any).duration : undefined}
-              />
-            </>
+            <AudioMessage
+              audioUrl={message.audioUrl}
+              isMine={isMine}
+              isRead={message.isRead}
+              duration={typeof (message as any).duration === 'number' ? (message as any).duration : undefined}
+            />
           )}
           {/* Image message */}
           {message.imageUrl && (
             <>
               <div
-                className={`relative max-w-xs rounded-2xl overflow-hidden shadow transition-all duration-200 cursor-pointer ${
+                className={`relative max-w-xs rounded-xl overflow-hidden shadow-sm transition-all duration-200 cursor-pointer ${
                   isMine
-                    ? 'bg-[var(--color-primary-light)] text-[var(--color-surface)] rounded-br-md'
-                    : 'bg-[var(--color-background)] border border-[var(--color-primary-light)]/20 text-[var(--color-primary-dark)] rounded-bl-md'
+                    ? 'bg-[#facc15]/10 text-gray-900 dark:text-white border border-[#facc15]/30'
+                    : 'bg-gray-200 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 text-gray-900 dark:text-white'
                 }`}
                 style={{ minWidth: '2.5rem' }}
                 onClick={() => setShowImagePreview(true)}
               >
                 {!imgLoaded && !imgError && (
-                  <div className="flex items-center justify-center w-full h-40 bg-gray-100">
-                    <span className="animate-spin w-6 h-6 border-4 border-blue-400 border-t-transparent rounded-full"></span>
+                  <div className="flex items-center justify-center w-full h-40 bg-gray-100 dark:bg-gray-700">
+                    <span className="animate-spin w-6 h-6 border-4 border-[#facc15] border-t-transparent rounded-full"></span>
                   </div>
                 )}
                 {imgError && (
-                  <div className="flex items-center justify-center w-full h-40 bg-red-100 text-red-500">
+                  <div className="flex items-center justify-center w-full h-40 bg-red-100 dark:bg-red-900 text-red-500 dark:text-red-300">
                     Failed to load image
                   </div>
                 )}
-                <div className="relative px-1 pt-1 pb-5 bg-[var(--color-primary-light)]/10 rounded-2xl shadow-md border border-[var(--color-primary-light)]/20 overflow-hidden">
+                <div className="relative p-1 bg-transparent rounded-xl">
                   <Image
                     src={message.imageUrl}
                     alt="Sent image"
                     width={400}
                     height={300}
-                    className={`max-w-xs w-full object-cover transition-opacity duration-300 rounded-xl ${imgLoaded ? 'opacity-100' : 'opacity-0'}`}
+                    className={`max-w-xs w-full object-cover rounded-lg transition-opacity duration-300 ${imgLoaded ? 'opacity-100' : 'opacity-0'}`}
                     onLoad={() => setImgLoaded(true)}
                     onError={() => setImgError(true)}
                     style={{ display: imgError ? 'none' : undefined }}
                   />
                   {/* Read/Unread tick for image messages (isMine only) */}
                   {isMine && imgLoaded && (
-                    <span className="absolute bottom-0 right-4">
+                    <span className="absolute bottom-2 right-2">
                       {message.isRead ? (
-                        <CheckCheck className="inline w-4 h-4 text-[var(--color-surface)]" />
+                        <CheckCheck className="inline w-4 h-4 text-[#facc15]" />
                       ) : (
-                        <Check className="inline w-4 h-4 text-[var(--color-surface)]" />
+                        <Check className="inline w-4 h-4 text-[#facc15]" />
                       )}
                     </span>
                   )}
@@ -138,8 +126,8 @@ export function Message({ message, currentUserId, chat, onDelete }: MessageProps
               </div>
               {/* Image Preview Modal */}
               {showImagePreview && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70" onClick={() => setShowImagePreview(false)}>
-                  <div className="relative max-w-2xl w-full" onClick={e => e.stopPropagation()}>
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80" onClick={() => setShowImagePreview(false)}>
+                  <div className="relative max-w-3xl w-full" onClick={e => e.stopPropagation()}>
                     <Image
                       src={message.imageUrl}
                       alt="Preview"
@@ -148,7 +136,7 @@ export function Message({ message, currentUserId, chat, onDelete }: MessageProps
                       className="w-full max-h-[80vh] object-contain rounded-lg shadow-lg"
                     />
                     <button
-                      className="absolute top-2 right-2 bg-black/60 hover:bg-black/80 text-white rounded-full p-2"
+                      className="absolute top-4 right-4 bg-black/60 hover:bg-black/80 text-white rounded-full p-2 transition-colors duration-200"
                       onClick={() => setShowImagePreview(false)}
                     >
                       <X className="w-6 h-6" />
@@ -161,21 +149,20 @@ export function Message({ message, currentUserId, chat, onDelete }: MessageProps
           {/* Text message */}
           {message.content && (
             <div
-              className={`px-4 py-2 rounded-2xl max-w-full whitespace-pre-wrap break-words text-sm ${
+              className={`px-4 py-2 rounded-xl max-w-full whitespace-pre-wrap break-words text-sm shadow-sm ${
                 isMine
-                  ? "bg-[var(--color-primary-light)] text-[var(--color-surface)] rounded-br-md"
-                  : "bg-[var(--color-background)] border border-[var(--color-primary-light)]/20 text-[var(--color-primary-dark)] rounded-bl-md"
+                  ? "bg-[#facc15]/10 text-gray-900 dark:text-white border border-[#facc15]/30 rounded-br-sm"
+                  : "bg-gray-200 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 text-gray-900 dark:text-white rounded-bl-sm"
               }`}
               style={{ minWidth: "2.5rem" }}
             >
               {message.content}
-              {/* WhatsApp-like ticks for isMine only */}
               {isMine && (
                 <span className="ml-2 align-middle">
                   {message.isRead ? (
-                    <CheckCheck className="inline w-4 h-4 text-[var(--color-surface)]" />
+                    <CheckCheck className="inline w-4 h-4 text-[#facc15]" />
                   ) : (
-                    <Check className="inline w-4 h-4 text-[var(--color-surface)]" />
+                    <Check className="inline w-4 h-4 text-[#facc15]" />
                   )}
                 </span>
               )}
@@ -184,19 +171,18 @@ export function Message({ message, currentUserId, chat, onDelete }: MessageProps
           {isMine && (
             <div className="relative">
               <button
-                className="p-1 rounded-full hover:bg-[var(--color-primary-light)]/20 opacity-0 group-hover:opacity-100 transition-opacity"
+                className="p-1 rounded-full hover:bg-[#facc15]/10 text-gray-600 dark:text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity duration-200"
                 onClick={() => setMenuOpen((open) => !open)}
                 tabIndex={-1}
                 aria-label="Message options"
                 type="button"
               >
-                <MoreVertical className="w-4 h-4 text-[var(--color-muted)]" />
+                <MoreVertical className="w-4 h-4" />
               </button>
-              {/* Menu dropdown */}
               {menuOpen && (
-                <div className="absolute right-0 top-full mt-1 bg-[var(--color-surface)] border border-[var(--color-primary-light)]/20 rounded shadow-lg min-w-[120px] z-20">
+                <div className="absolute right-0 top-full mt-1 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg min-w-[120px] z-20">
                   <button
-                    className="flex items-center w-full px-4 py-2 text-sm text-red-600 hover:bg-red-50 gap-2"
+                    className="flex items-center w-full px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/50 gap-2"
                     onClick={() => {
                       setShowDeleteConfirm(true);
                       setMenuOpen(false);
@@ -210,15 +196,9 @@ export function Message({ message, currentUserId, chat, onDelete }: MessageProps
             </div>
           )}
         </div>
-        {/* Timestamp and delete confirmation */}
-        <div
-          className={`flex items-center gap-1 mt-1 ${
-            isMine ? "justify-end" : "justify-start"
-          } w-full`}
-        >
-          <span
-            className={`text-xs ${isMine ? "text-gray-500" : "text-gray-700"}`}
-          >
+        {/* Timestamp */}
+        <div className={`flex items-center gap-1 mt-1 ${isMine ? "justify-end" : "justify-start"} w-full`}>
+          <span className="text-xs text-gray-500 dark:text-gray-400">
             {formatTime(message.timestamp)}
           </span>
         </div>
@@ -256,30 +236,8 @@ function AudioMessage({ audioUrl, isMine, isRead, duration: messageDuration }: {
     if (!audioUrl) return false;
     try {
       const url = new URL(audioUrl);
-      const isValid = url.protocol === 'http:' || url.protocol === 'https:' || url.protocol === 'blob:';
-      
-      // Debug logging
-      if (process.env.NODE_ENV === 'development') {
-        console.log('Audio URL validation:', {
-          audioUrl,
-          protocol: url.protocol,
-          isValid,
-          hostname: url.hostname,
-          pathname: url.pathname,
-          isBlobUrl: url.protocol === 'blob:'
-        });
-        
-        // Warn if using blob URL (temporary)
-        if (url.protocol === 'blob:') {
-          console.warn('Audio message using blob URL (temporary):', audioUrl);
-        }
-      }
-      
-      return isValid;
-    } catch (error) {
-      if (process.env.NODE_ENV === 'development') {
-        console.error('Audio URL validation error:', error, audioUrl);
-      }
+      return url.protocol === 'http:' || url.protocol === 'https:' || url.protocol === 'blob:';
+    } catch {
       return false;
     }
   }, [audioUrl]);
@@ -302,8 +260,6 @@ function AudioMessage({ audioUrl, isMine, isRead, duration: messageDuration }: {
     const handleError = (e: Event) => {
       const target = e.target as HTMLAudioElement;
       const error = target.error;
-      
-      // Get specific error message based on error code
       let errorMessage = 'Audio playback failed';
       if (error) {
         switch (error.code) {
@@ -323,16 +279,6 @@ function AudioMessage({ audioUrl, isMine, isRead, duration: messageDuration }: {
             errorMessage = `Audio error: ${error.message || 'Unknown error'}`;
         }
       }
-      
-      console.error('Audio playback error:', {
-        error: error?.code,
-        message: error?.message,
-        errorMessage,
-        audioUrl,
-        readyState: target.readyState,
-        networkState: target.networkState
-      });
-      
       setAudioError(true);
       setIsPlaying(false);
       setIsLoading(false);
@@ -348,20 +294,14 @@ function AudioMessage({ audioUrl, isMine, isRead, duration: messageDuration }: {
       setAudioError(false);
       setErrorMessage('');
     };
-    const handleLoadError = () => {
-      setIsLoading(false);
-      setAudioError(true);
-      setErrorMessage('Failed to load audio');
-    };
-    
+
     audio.addEventListener('timeupdate', update);
     audio.addEventListener('loadedmetadata', setDur);
     audio.addEventListener('ended', handleEnded);
     audio.addEventListener('error', handleError);
     audio.addEventListener('loadstart', handleLoadStart);
     audio.addEventListener('canplay', handleCanPlay);
-    audio.addEventListener('loaderror', handleLoadError);
-    
+
     return () => {
       audio.removeEventListener('timeupdate', update);
       audio.removeEventListener('loadedmetadata', setDur);
@@ -369,11 +309,10 @@ function AudioMessage({ audioUrl, isMine, isRead, duration: messageDuration }: {
       audio.removeEventListener('error', handleError);
       audio.removeEventListener('loadstart', handleLoadStart);
       audio.removeEventListener('canplay', handleCanPlay);
-      audio.removeEventListener('loaderror', handleLoadError);
     };
   }, [audioUrl, isValidAudioUrl]);
 
-  // Use messageDuration as fallback if metadata fails
+  // Use messageDuration as fallback
   React.useEffect(() => {
     if (!duration && messageDuration && !isLoading) {
       setDuration(messageDuration);
@@ -389,7 +328,6 @@ function AudioMessage({ audioUrl, isMine, isRead, duration: messageDuration }: {
     } else {
       audioRef.current.currentTime = 0;
       audioRef.current.play().catch((err) => {
-        console.error('Playback error:', err);
         setAudioError(true);
         setIsPlaying(false);
       });
@@ -404,7 +342,6 @@ function AudioMessage({ audioUrl, isMine, isRead, duration: messageDuration }: {
     return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
 
-  // If there's an audio error, show error state
   if (audioError) {
     const isBlobUrl = audioUrl?.startsWith('blob:');
     const errorText = isBlobUrl 
@@ -413,22 +350,20 @@ function AudioMessage({ audioUrl, isMine, isRead, duration: messageDuration }: {
     
     return (
       <div
-        className={`flex items-center gap-3 px-4 py-2 whitespace-pre-wrap break-words text-sm rounded-2xl shadow transition-all duration-200 flex-1 ${
+        className={`flex items-center gap-3 px-4 py-3 rounded-xl shadow-sm text-sm ${
           isMine
-            ? 'bg-[var(--color-danger, #ef4444)] text-[var(--color-surface)] rounded-br-md'
-            : 'bg-[var(--color-danger-bg, #fef2f2)] border border-[var(--color-danger, #ef4444)]/20 text-[var(--color-danger, #ef4444)] rounded-bl-md'
+            ? 'bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-300 border border-red-300 dark:border-red-700'
+            : 'bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-300 border border-red-300 dark:border-red-700'
         }`}
         style={{ minWidth: 220, maxWidth: 360 }}
       >
-        <span className="text-xs">
-          {!isValidAudioUrl ? 'Invalid audio URL' : errorText}
-        </span>
+        <span className="text-xs">{!isValidAudioUrl ? 'Invalid audio URL' : errorText}</span>
         {isMine && (
           <span className="ml-2 align-middle">
             {isRead ? (
-              <CheckCheck className="inline w-4 h-4 text-[var(--color-surface)]" />
+              <CheckCheck className="inline w-4 h-4 text-red-600 dark:text-red-300" />
             ) : (
-              <Check className="inline w-4 h-4 text-[var(--color-surface)]" />
+              <Check className="inline w-4 h-4 text-red-600 dark:text-red-300" />
             )}
           </span>
         )}
@@ -438,34 +373,31 @@ function AudioMessage({ audioUrl, isMine, isRead, duration: messageDuration }: {
 
   return (
     <div
-      className={`flex items-center gap-3 px-4 py-5 whitespace-pre-wrap break-words text-sm rounded-2xl shadow transition-all duration-200 flex-1 ${
+      className={`flex items-center gap-3 px-4 py-3 rounded-xl shadow-sm text-sm ${
         isMine
-          ? 'bg-[var(--color-primary-light)] text-[var(--color-surface)] rounded-br-md'
-          : 'bg-[var(--color-background)] border border-[var(--color-primary-light)]/20 text-[var(--color-primary-dark)] rounded-bl-md'
+          ? 'bg-[#facc15]/10 text-gray-900 dark:text-white border border-[#facc15]/30'
+          : 'bg-gray-200 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 text-gray-900 dark:text-white'
       }`}
       style={{ minWidth: 220, maxWidth: 360 }}
     >
-      {/* Play/Pause Button at start */}
       <button
         onClick={togglePlayback}
         disabled={isLoading}
         className={`focus:outline-none flex-shrink-0 hover:scale-110 transition-transform duration-150 ${
-          isMine ? 'text-[var(--color-surface)]' : 'text-[var(--color-primary-light)]'
+          isMine ? 'text-[#facc15]' : 'text-gray-600 dark:text-gray-300'
         } ${isLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
         aria-label={isPlaying ? 'Pause' : 'Play'}
         type="button"
-        style={{ fontSize: 22, lineHeight: 1 }}
       >
         {isLoading ? (
-          <div className="w-5 h-5 border-2 border-current border-t-transparent rounded-full animate-spin" />
+          <div className="w-5 h-5 border-2 border-[#facc15] border-t-transparent rounded-full animate-spin" />
         ) : isPlaying ? (
           <Pause className="w-5 h-5" />
         ) : (
           <Play className="w-5 h-5" />
         )}
       </button>
-      {/* Time in center */}
-      <span className="text-xs font-mono min-w-[60px] text-center flex-1">
+      <span className="text-xs font-mono min-w-[60px] text-center flex-1 text-gray-600 dark:text-gray-300">
         {isLoading || !(duration > 0) ? (
           <span className="inline-block w-8 text-center">...</span>
         ) : isPlaying ? (
@@ -474,17 +406,15 @@ function AudioMessage({ audioUrl, isMine, isRead, duration: messageDuration }: {
           formatTime(duration)
         )}
       </span>
-      {/* Read/Unread tick at end for isMine only */}
       {isMine && (
         <span className="ml-2 align-middle flex-shrink-0">
           {isRead ? (
-            <CheckCheck className="inline w-4 h-4 text-[var(--color-surface)]" />
+            <CheckCheck className="inline w-4 h-4 text-[#facc15]" />
           ) : (
-            <Check className="inline w-4 h-4 text-[var(--color-surface)]" />
+            <Check className="inline w-4 h-4 text-[#facc15]" />
           )}
         </span>
       )}
-      {/* Hidden audio element */}
       <audio 
         ref={audioRef} 
         src={audioUrl} 
