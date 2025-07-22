@@ -336,10 +336,6 @@ export function ModernAudioRecorder({
     }
   }, [audioUrl]);
 
-  // Cleanup on unmount
-  useEffect(() => {
-    return cleanup;
-  }, []);
 
   if (error) {
     return (
