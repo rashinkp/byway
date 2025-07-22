@@ -380,7 +380,7 @@ export function ModernAudioRecorder({
   }
 
   return (
-    <div className="flex flex-col gap-6 p-6 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl shadow-lg transition-all duration-300">
+    <div className="flex flex-col gap-6 p-6  rounded-xl shadow-lg transition-all duration-300">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
@@ -450,14 +450,7 @@ export function ModernAudioRecorder({
             </span>
           </div>
 
-          <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-4">
-            <canvas
-              ref={canvasRef}
-              className="w-full h-16 rounded-lg"
-              width="400"
-              height="64"
-            />
-          </div>
+
 
           <div className="flex justify-center">
             <Button

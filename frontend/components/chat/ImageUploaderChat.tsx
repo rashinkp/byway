@@ -113,19 +113,9 @@ export function ModernImageUploader({
   };
 
   return (
-    <div className="flex flex-col gap-4 p-4 bg-white dark:bg-[#18181b] border border-gray-200 dark:border-[#facc15]/20 rounded-lg shadow-sm max-w-md mx-auto transition-colors duration-300">
+    <div className="flex flex-col gap-4 p-4  rounded-lg shadow-sm mt-10 transition-colors duration-300">
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Add Image</h3>
-        <Button
-          onClick={onCancel}
-          variant="ghost"
-          size="sm"
-          className="p-1 h-auto text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-[#facc15]/10"
-        >
-          <X className="w-5 h-5" />
-        </Button>
-      </div>
+    
 
       {/* Upload Area */}
       {!selectedImage ? (

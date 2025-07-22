@@ -1,21 +1,23 @@
-import React, { useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Send, Image as ImageIcon, Mic } from 'lucide-react';
-import { ModernAudioRecorder } from './AudioRecorderInline';
-import { ModernImageUploader } from './ImageUploaderChat';
-import { Dialog, DialogContent } from '@/components/ui/dialog';
+import React, { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Send, Image as ImageIcon, Mic } from "lucide-react";
+import { ModernAudioRecorder } from "./AudioRecorderInline";
+import { ModernImageUploader } from "./ImageUploaderChat";
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 
 interface ModernChatInputProps {
-  onSendMessage: (content: string, imageUrl?: string, audioUrl?: string) => void;
+  onSendMessage: (
+    content: string,
+    imageUrl?: string,
+    audioUrl?: string
+  ) => void;
   placeholder?: string;
   disabled?: boolean;
   isNewChat?: boolean;
   setPendingImageUrl?: (url: string) => void;
   setPendingAudioUrl?: (url: string) => void;
 }
-
-type InputMode = 'text' | 'audio' | 'image';
 
 export function ModernChatInput({
   onSendMessage,
@@ -25,8 +27,7 @@ export function ModernChatInput({
   setPendingImageUrl,
   setPendingAudioUrl,
 }: ModernChatInputProps) {
-  const [message, setMessage] = useState('');
-  const [inputMode, setInputMode] = useState<InputMode>('text');
+  const [message, setMessage] = useState("");
   const [audioModalOpen, setAudioModalOpen] = useState(false);
   const [imageModalOpen, setImageModalOpen] = useState(false);
 
@@ -34,7 +35,7 @@ export function ModernChatInput({
     e.preventDefault();
     if (message.trim() && !disabled) {
       onSendMessage(message.trim());
-      setMessage('');
+      setMessage("");
     }
   };
 
@@ -42,34 +43,33 @@ export function ModernChatInput({
     if (isNewChat && setPendingAudioUrl) {
       setPendingAudioUrl(audioUrl);
     } else {
-      onSendMessage('', undefined, audioUrl);
+      onSendMessage("", undefined, audioUrl);
     }
     setAudioModalOpen(false);
-    setInputMode('text');
   };
 
   const handleSendImage = (imageFile: File, imageUrl: string) => {
     if (isNewChat && setPendingImageUrl) {
       setPendingImageUrl(imageUrl);
     } else {
-      onSendMessage('', imageUrl);
+      onSendMessage("", imageUrl);
     }
     setImageModalOpen(false);
-    setInputMode('text');
   };
 
   const handleCancelAudio = () => {
     setAudioModalOpen(false);
-    setInputMode('text');
   };
   const handleCancelImage = () => {
     setImageModalOpen(false);
-    setInputMode('text');
   };
 
   const renderInputContent = () => {
     return (
-      <form onSubmit={handleSendText} className="flex items-center gap-2 w-full">
+      <form
+        onSubmit={handleSendText}
+        className="flex items-center gap-2 w-full"
+      >
         {/* Text Input */}
         <Input
           type="text"
@@ -115,10 +115,11 @@ export function ModernChatInput({
   };
 
   return (
-    <div className="flex-shrink-0 px-4 py-3 bg-white dark:bg-[#18181b] border-t border-gray-200 dark:border-white/10 transition-colors duration-300">
+    <div className="flex-shrink-0 px-4 py-3 bg-white dark:bg-[#18181b] dark:border-white/10 transition-colors duration-300">
       {renderInputContent()}
       <Dialog open={audioModalOpen} onOpenChange={setAudioModalOpen}>
-        <DialogContent>
+        <DialogContent className="border-none bg-white dark:bg-[#18181b] ">
+          <DialogTitle>Record Audio</DialogTitle>
           <ModernAudioRecorder
             onSend={handleSendAudio}
             onCancel={handleCancelAudio}
@@ -127,7 +128,8 @@ export function ModernChatInput({
         </DialogContent>
       </Dialog>
       <Dialog open={imageModalOpen} onOpenChange={setImageModalOpen}>
-        <DialogContent>
+        <DialogContent className="border-none bg-white dark:bg-[#18181b] ">
+          <DialogTitle>Upload Image</DialogTitle>
           <ModernImageUploader
             onSend={handleSendImage}
             onCancel={handleCancelImage}
