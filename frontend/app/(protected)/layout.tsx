@@ -3,7 +3,6 @@
 import { Header } from "@/components/layout/Header";
 import NotificationModal from "@/components/notifications/NotificationModal";
 import { useState } from "react";
-import BywayFooter from "@/components/layout/Footer";
 import { PublicRouteWrapper } from "@/components/auth/PublicRouteWrapper";
 
 export default function PublicLayout({
@@ -20,12 +19,11 @@ export default function PublicLayout({
 				open={notificationOpen}
 				onOpenChange={setNotificationOpen}
 			/>
-			<main className="">
+			<main className="flex-1 flex flex-col overflow-hidden">
 				<PublicRouteWrapper>
 					{children}
 				</PublicRouteWrapper>
 			</main>
-			<BywayFooter />
 		</div>
 	);
 }

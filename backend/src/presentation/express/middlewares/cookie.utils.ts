@@ -20,7 +20,6 @@ export class CookieUtils {
    * Clear authentication cookies (access_token and refresh_token)
    */
   static clearAuthCookies(res: Response): void {
-    console.log("[CookieUtils] Clearing auth cookies");
     res.cookie("access_token", "", {
       ...COOKIE_CONFIG,
       maxAge: 0,

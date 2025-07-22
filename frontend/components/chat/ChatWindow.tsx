@@ -50,22 +50,16 @@ export function ChatWindow({
     }
   }, [loadingMoreMessages, messages.length]);
 
+  // Only scroll to bottom when chat is opened or a new message is added
   useEffect(() => {
-    if (!loadingMoreMessages && prevMessagesLength.current < messages.length) {
-      if (messagesContainerRef.current && prevScrollHeight.current !== null) {
-        const container = messagesContainerRef.current;
-        const newScrollHeight = container.scrollHeight;
-        container.scrollTop =
-          newScrollHeight - (prevScrollHeight.current - container.scrollTop);
-      }
-      prevMessagesLength.current = messages.length;
-      prevScrollHeight.current = null;
-      return;
-    }
-    if (!loadingMoreMessages) {
+    // If the number of messages increases, scroll to bottom
+    if (prevMessagesLength.current < messages.length) {
       scrollToBottom();
     }
-  }, [messages, loadingMoreMessages]);
+    prevMessagesLength.current = messages.length;
+    // Do not scroll on every update, only when new messages arrive
+    // eslint-disable-next-line
+  }, [messages.length]);
 
   // Group messages by date
   const groupedMessages: { date: string; messages: Message[] }[] = [];
@@ -125,7 +119,7 @@ export function ChatWindow({
   };
 
   return (
-    <div className="flex flex-col max-h-[calc(100vh-4rem)] bg-gray-100 dark:bg-[#18181b] transition-colors duration-300">
+    <div className="flex flex-col h-[calc(100vh-4rem)] bg-gray-100 dark:bg-[#18181b] transition-colors duration-300">
       {/* Header */}
       <div className="flex items-center justify-between px-4 py-3 border-b border-gray-200 dark:border-white/10 bg-white dark:bg-[#18181b] shadow-sm">
         <div className="flex items-center gap-3">

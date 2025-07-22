@@ -360,8 +360,10 @@ function AudioMessage({
     };
 
     const handleLoadedMetadata = () => {
-      if (!isNaN(audio.duration) && audio.duration > 0) {
+      if (!isNaN(audio.duration) && isFinite(audio.duration)) {
         setDuration(audio.duration);
+      } else if (messageDuration && messageDuration > 0) {
+        setDuration(messageDuration);
       }
       setIsLoading(false);
       setAudioLoaded(true);
@@ -369,6 +371,9 @@ function AudioMessage({
     };
 
     const handleCanPlay = () => {
+      if (!isNaN(audio.duration) && isFinite(audio.duration)) {
+        setDuration(audio.duration);
+      }
       setIsLoading(false);
       setAudioLoaded(true);
       setAudioError(false);
@@ -419,7 +424,6 @@ function AudioMessage({
       setErrorMessage("");
     };
 
-    // Add event listeners
     audio.addEventListener("timeupdate", handleTimeUpdate);
     audio.addEventListener("loadedmetadata", handleLoadedMetadata);
     audio.addEventListener("canplay", handleCanPlay);
@@ -429,8 +433,10 @@ function AudioMessage({
     audio.addEventListener("error", handleError);
     audio.addEventListener("loadstart", handleLoadStart);
 
-    // Load the audio
-    audio.load();
+    // Only call load() if not already loaded
+    if (audio.readyState < 1) {
+      audio.load();
+    }
 
     return () => {
       audio.removeEventListener("timeupdate", handleTimeUpdate);
@@ -442,9 +448,8 @@ function AudioMessage({
       audio.removeEventListener("error", handleError);
       audio.removeEventListener("loadstart", handleLoadStart);
     };
-  }, [audioUrl, isValidAudioUrl]);
+  }, [audioUrl, isValidAudioUrl, messageDuration]);
 
-  // Use messageDuration if audio duration is not available
   React.useEffect(() => {
     if (
       messageDuration &&
@@ -461,7 +466,6 @@ function AudioMessage({
     if (isPlaying) {
       audioRef.current.pause();
     } else {
-      // If audio ended, restart from beginning
       if (currentTime >= duration) {
         audioRef.current.currentTime = 0;
       }
@@ -492,6 +496,23 @@ function AudioMessage({
     return `${mins}:${secs.toString().padStart(2, "0")}`;
   };
 
+  const showDuration = duration > 0 || (messageDuration && messageDuration > 0);
+  const displayDuration = duration > 0 ? duration : messageDuration || 0;
+
+  // Fallback: try to force load duration after a short delay if not available
+  React.useEffect(() => {
+    if (!showDuration && audioRef.current) {
+      const timeout = setTimeout(() => {
+        if (audioRef.current && (!audioRef.current.duration || isNaN(audioRef.current.duration))) {
+          audioRef.current.load();
+        }
+      }, 1000);
+      return () => clearTimeout(timeout);
+    }
+  }, [showDuration, audioUrl]);
+
+  const progress = duration > 0 ? (currentTime / duration) * 100 : 0;
+
   if (audioError) {
     const isBlobUrl = audioUrl?.startsWith("blob:");
     const errorText = isBlobUrl
@@ -505,7 +526,7 @@ function AudioMessage({
             ? "bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-300 border border-red-300 dark:border-red-700"
             : "bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-300 border border-red-300 dark:border-red-700"
         }`}
-        style={{ minWidth: 240, maxWidth: 380 }}
+        style={{ minWidth: 320, maxWidth: 520 }}
       >
         <div className="w-8 h-8 rounded-full bg-red-200 dark:bg-red-800 flex items-center justify-center flex-shrink-0">
           <X className="w-4 h-4" />
@@ -528,21 +549,16 @@ function AudioMessage({
     );
   }
 
-  const progress = duration > 0 ? (currentTime / duration) * 100 : 0;
-  const showDuration = duration > 0 || (messageDuration && messageDuration > 0);
-  const displayDuration = duration > 0 ? duration : messageDuration || 0;
-
   return (
     <div
-      className={`flex flex-col gap-2 px-4 py-3 rounded-xl shadow-sm text-sm ${
+      className={`flex flex-col gap-1 px-3 py-2 rounded-xl shadow-sm text-sm ${
         isMine
           ? "bg-[#facc15]/10 text-gray-900 dark:text-white border border-[#facc15]/30"
           : "bg-gray-200 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 text-gray-900 dark:text-white"
       }`}
-      style={{ minWidth: 240, maxWidth: 380 }}
+      style={{ minWidth: 300, maxWidth: 480 }}
     >
-      {/* Top row with play button and time */}
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-2">
         <button
           onClick={togglePlayback}
           disabled={isLoading || !audioLoaded}
@@ -558,30 +574,37 @@ function AudioMessage({
           aria-label={isPlaying ? "Pause" : "Play"}
           type="button"
         >
-          {isLoading ? (
-            <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
-          ) : isPlaying ? (
+          {isPlaying ? (
             <Pause className="w-4 h-4" />
           ) : (
             <Play className="w-4 h-4 ml-0.5" />
           )}
         </button>
-
-        <div className="flex-1 flex items-center justify-between">
-          <span className="text-xs font-medium">Voice message</span>
-          <span className="text-xs font-mono text-gray-500 dark:text-gray-400">
-            {isLoading
-              ? "..."
-              : showDuration
-              ? isPlaying
-                ? `${formatTime(currentTime)} / ${formatTime(displayDuration)}`
-                : formatTime(displayDuration)
-              : "Loading..."}
-          </span>
+        <div className="flex-1">
+          <div
+            className="relative w-full h-2 bg-gray-200 dark:bg-gray-600 rounded-full cursor-pointer overflow-hidden"
+            onClick={handleProgressClick}
+          >
+            <div
+              className={`absolute h-full rounded-full transition-all duration-300 ${
+                isMine ? "bg-[#facc15]" : "bg-gray-500 dark:bg-gray-400"
+              }`}
+              style={{ width: `${progress}%` }}
+            />
+            <div className="absolute inset-0 bg-black/5 opacity-0 hover:opacity-100 transition-opacity duration-200 rounded-full" />
+          </div>
         </div>
-
+        <span className="text-xs font-mono text-gray-500 dark:text-gray-400 min-w-[48px] text-right">
+          {showDuration && isPlaying
+            ? formatTime(currentTime)
+            : showDuration
+            ? formatTime(displayDuration)
+            : isLoading
+            ? 'Loading...'
+            : <span className="animate-spin inline-block w-4 h-4 border-2 border-gray-400 border-t-transparent rounded-full align-middle" />}
+        </span>
         {isMine && (
-          <span className="ml-2 align-middle flex-shrink-0">
+          <span className="ml-1 align-middle flex-shrink-0">
             {isRead ? (
               <CheckCheck className="inline w-4 h-4 text-[#facc15]" />
             ) : (
@@ -590,27 +613,10 @@ function AudioMessage({
           </span>
         )}
       </div>
-
-      {/* Progress bar */}
-      <div
-        className="relative w-full h-1.5 bg-gray-200 dark:bg-gray-600 rounded-full cursor-pointer overflow-hidden"
-        onClick={handleProgressClick}
-      >
-        <div
-          className={`absolute h-full rounded-full transition-all duration-300 ${
-            isMine ? "bg-[#facc15]" : "bg-gray-500 dark:bg-gray-400"
-          }`}
-          style={{ width: `${progress}%` }}
-        />
-        {/* Hover effect */}
-        <div className="absolute inset-0 bg-black/5 opacity-0 hover:opacity-100 transition-opacity duration-200 rounded-full" />
-      </div>
-
-      {/* Hidden audio element */}
       <audio
         ref={audioRef}
         src={audioUrl}
-        preload="metadata"
+        preload="auto"
         crossOrigin="anonymous"
         style={{ display: "none" }}
       />

@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Square, Send, Trash2, Play, Pause, Mic, MicOff } from "lucide-react";
+import { useFileUpload } from '@/hooks/file/useFileUpload';
 
 interface ModernAudioRecorderProps {
   onSend: (audioUrl: string, duration: number) => void;
@@ -31,6 +32,8 @@ export function ModernAudioRecorder({
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const analyserRef = useRef<AnalyserNode | null>(null);
   const animationFrameRef = useRef<number | null>(null);
+
+  const { uploadFile } = useFileUpload();
 
   const getSupportedMimeType = () => {
     const types = [
@@ -280,8 +283,12 @@ export function ModernAudioRecorder({
       try {
         setIsUploading(true);
         setError(null);
-        // Simulate upload - replace with your actual upload logic
-        const s3AudioUrl = await uploadToS3(audioUrl);
+        // Convert blob URL to File
+        const response = await fetch(audioUrl);
+        const blob = await response.blob();
+        const file = new File([blob], `audio-${Date.now()}.webm`, { type: blob.type });
+        // Upload to S3 or backend
+        const s3AudioUrl = await uploadFile(file);
         onSend(s3AudioUrl, duration);
       } catch {
         setError("Failed to upload audio. Please try again.");
@@ -294,13 +301,6 @@ export function ModernAudioRecorder({
   const handleDiscard = () => {
     cleanup();
     onCancel();
-  };
-
-  // Simulated upload function - replace with your actual implementation
-  const uploadToS3 = async (audioUrl: string): Promise<string> => {
-    // Simulate upload delay
-    await new Promise((resolve) => setTimeout(resolve, 2000));
-    return audioUrl; // In reality, return the S3 URL
   };
 
   const formatTime = (s: number) => {
