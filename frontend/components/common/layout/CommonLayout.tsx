@@ -101,52 +101,52 @@ export default function CommonLayout({
 	}
 
 	return (
-		<div className="flex min-h-screen bg-gray-100">
-			<CommonSidebar
-				collapsed={collapsed}
-				toggleCollapse={
-					isCollapsible ? () => setCollapsed(!collapsed) : undefined
-				}
-				mobileMenuOpen={mobileMenuOpen}
-				setMobileMenuOpen={setMobileMenuOpen}
-				pathname={pathname}
-				handleLogout={handleLogout}
-				headerTitle={sidebarHeaderTitle}
-				headerSubtitle={sidebarHeaderSubtitle}
-				navItems={navItems}
-				isCollapsible={isCollapsible}
-				onNotificationClick={() => setNotificationOpen(true)}
-			/>
-			<NotificationModal
-				open={notificationOpen}
-				onOpenChange={setNotificationOpen}
-			/>
-			<div className="flex-1 flex flex-col min-h-screen">
-				<main
-					className={`flex-1 transition-all duration-300 ease-in-out ${
-						isCollapsible
-							? collapsed
-								? "lg:ml-20"
-								: "lg:ml-64"
-							: "lg:ml-64 lg:[&@media(min-width:1024px)]:ml-[80px] xl:ml-64"
-					}`}
-				>
-					<div className="p-4 lg:p-6">
-						<div className="max-w-7xl mx-auto">{children}</div>
-					</div>
-				</main>
-				<div
-					className={`${
-						isCollapsible
-							? collapsed
-								? "lg:ml-20"
-								: "lg:ml-64"
-							: "lg:ml-64 lg:[&@media(min-width:1024px)]:ml-[80px] xl:ml-64"
-					}`}
-				>
-					<BywayFooter />
-				</div>
-			</div>
-		</div>
-	);
+    <div className="flex min-h-screen bg-gray-50">
+      <CommonSidebar
+        collapsed={collapsed}
+        toggleCollapse={
+          isCollapsible ? () => setCollapsed(!collapsed) : undefined
+        }
+        mobileMenuOpen={mobileMenuOpen}
+        setMobileMenuOpen={setMobileMenuOpen}
+        pathname={pathname}
+        handleLogout={handleLogout}
+        headerTitle={sidebarHeaderTitle}
+        headerSubtitle={sidebarHeaderSubtitle}
+        navItems={navItems}
+        isCollapsible={isCollapsible}
+        onNotificationClick={() => setNotificationOpen(true)}
+      />
+      <NotificationModal
+        open={notificationOpen}
+        onOpenChange={setNotificationOpen}
+      />
+      <div className="flex-1 flex flex-col min-h-screen">
+        <main
+          className={`flex-1 transition-all duration-300 ease-in-out ${
+            isCollapsible
+              ? collapsed
+                ? "lg:ml-20"
+                : "lg:ml-64"
+              : "lg:ml-64 lg:[&@media(min-width:1024px)]:ml-[80px] xl:ml-64"
+          }`}
+        >
+          <div className="p-4 lg:p-6">
+            <div className="max-w-7xl mx-auto text-gray-900 dark:text-gray-100">{children}</div>
+          </div>
+        </main>
+        <div
+          className={`${
+            isCollapsible
+              ? collapsed
+                ? "lg:ml-20"
+                : "lg:ml-64"
+              : "lg:ml-64 lg:[&@media(min-width:1024px)]:ml-[80px] xl:ml-64"
+          }`}
+        >
+          <BywayFooter />
+        </div>
+      </div>
+    </div>
+  );
 }

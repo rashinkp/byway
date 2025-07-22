@@ -23,13 +23,13 @@ export function DashboardSection({
 		<div className={`space-y-6 ${className}`}>
 			<div className="flex items-center gap-3">
 				<div
-					className={`w-10 h-10 ${iconBgColor} rounded-lg flex items-center justify-center`}
+					className={`w-10 h-10 bg-[#facc15] rounded-lg flex items-center justify-center`}
 				>
-					<Icon className={`w-6 h-6 ${iconColor}`} />
+					<Icon className={`w-6 h-6 text-black`} />
 				</div>
 				<div>
-					<h2 className="text-xl font-semibold text-gray-900">{title}</h2>
-					<p className="text-gray-600">{subtitle}</p>
+					<h2 className="text-xl font-semibold text-black">{title}</h2>
+					<p className="text-gray-500">{subtitle}</p>
 				</div>
 			</div>
 			{children}

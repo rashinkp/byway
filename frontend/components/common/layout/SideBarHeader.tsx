@@ -15,16 +15,16 @@ export function SidebarHeader({
 }) {
 	return (
 		<div
-			className={`p-6 border-b border-[var(--color-primary-light)]/20 flex ${
+			className={`p-6 border-b border-gray-800 flex ${
 				collapsed ? "justify-center" : "justify-between"
-			} items-center`}
+			} items-center bg-[#18181b]`}
 		>
 			{!collapsed && (
 				<div>
-					<h1 className="text-xl font-bold text-[var(--color-surface)] tracking-tight">
+					<h1 className="text-xl font-bold text-white tracking-tight">
 						{title}
 					</h1>
-					<p className="text-sm text-[var(--color-muted/80)] mt-1">{subtitle}</p>
+					<p className="text-sm text-[#facc15] mt-1">{subtitle}</p>
 				</div>
 			)}
 
@@ -33,7 +33,7 @@ export function SidebarHeader({
 					variant="ghost"
 					size="icon"
 					onClick={toggleCollapse}
-					className="hidden lg:flex text-[var(--color-surface)] hover:text-[var(--color-surface)] hover:bg-[var(--color-primary-light)]/10"
+					className="hidden lg:flex text-white hover:text-[#facc15] hover:bg-[#facc15]/10"
 				>
 					{collapsed ? (
 						<ChevronRight className="h-5 w-5" />

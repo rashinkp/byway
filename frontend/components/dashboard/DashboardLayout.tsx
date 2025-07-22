@@ -77,15 +77,15 @@ export function DashboardLayout({
 			<div className="max-w-7xl mx-auto space-y-8">
 				{/* Header Section */}
 				<div className="flex items-center gap-3">
-					<div className="w-10 h-10 bg-blue-50 rounded-lg flex items-center justify-center">
-						<BarChart3 className="w-6 h-6 text-blue-600" />
+					<div className="w-10 h-10 bg-[#facc15] rounded-lg flex items-center justify-center">
+						<BarChart3 className="w-6 h-6 text-black" />
 					</div>
 					<div>
-						<h1 className="text-2xl font-bold text-gray-900">{title}</h1>
-						<p className="text-gray-600">{subtitle}</p>
+						<h1 className="text-2xl font-bold text-black">{title}</h1>
+						<p className="text-gray-500">{subtitle}</p>
 					</div>
 					<div className="ml-auto">
-						<span className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-sm font-medium bg-green-50 text-green-700 border border-green-200">
+						<span className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-sm font-medium bg-[#facc15] text-black border border-[#facc15]">
 							<Activity className="w-4 h-4" />
 							Live Data
 						</span>

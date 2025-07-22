@@ -32,8 +32,8 @@ export function NavItemLink({
 						} 
             ${
 							isActive
-								? "bg-[var(--color-primary-light)] text-[var(--color-surface)] hover:bg-[var(--color-primary-light)]/80 hover:text-[var(--color-surface)]"
-								: "text-[var(--color-surface)] hover:bg-[var(--color-primary-light)]/10 hover:text-[var(--color-surface)]"
+								? "bg-[#facc15] text-black hover:bg-[#facc15]/90 hover:text-black"
+								: "text-white hover:bg-[#facc15]/10 hover:text-[#facc15]"
 						}
             transition-all duration-200 py-3 h-auto my-1 rounded-lg`}
 					>
@@ -47,7 +47,7 @@ export function NavItemLink({
 			{collapsed && (
 				<TooltipContent
 					side="right"
-					className="bg-[var(--color-primary-dark)] text-[var(--color-surface)] border-[var(--color-primary-light)] px-3 py-1.5 rounded-md"
+					className="bg-[#18181b] text-white border-[#facc15] px-3 py-1.5 rounded-md"
 				>
 					{item.label}
 				</TooltipContent>

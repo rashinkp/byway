@@ -3,7 +3,6 @@ import { DialogTitle } from "@radix-ui/react-dialog";
 import NotificationList from "./NotificationList";
 import { useNotificationSocket } from "@/hooks/notification/useNotificationSocket";
 import React, { useRef, useEffect } from "react";
-import { X } from "lucide-react";
 
 interface NotificationModalProps {
 	open: boolean;
