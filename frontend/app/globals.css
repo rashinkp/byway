@@ -10,3 +10,46 @@ body {
   width: 100vw;
   overflow-x: hidden;
 }
+
+.loader {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  display: block;
+  margin: 35px auto;
+  position: relative;
+  color: #FFF;
+  left: -100px;
+  box-sizing: border-box;
+  animation: shadowRolling 2s linear infinite;
+}
+
+@keyframes shadowRolling {
+  0% {
+    box-shadow: 0px 0 rgba(255, 255, 255, 0), 0px 0 rgba(255, 255, 255, 0), 0px 0 rgba(255, 255, 255, 0), 0px 0 rgba(255, 255, 255, 0);
+  }
+  12% {
+    box-shadow: 100px 0 #facc15, 0px 0 rgba(255, 255, 255, 0), 0px 0 rgba(255, 255, 255, 0), 0px 0 rgba(255, 255, 255, 0);
+  }
+  25% {
+    box-shadow: 130px 0 #facc15, 100px 0 #facc15, 0px 0 rgba(255, 255, 255, 0), 0px 0 rgba(255, 255, 255, 0);
+  }
+  36% {
+    box-shadow: 160px 0 #facc15, 130px 0 #facc15, 100px 0 #facc15, 0px 0 rgba(255, 255, 255, 0);
+  }
+  50% {
+    box-shadow: 190px 0 #facc15, 160px 0 #facc15, 130px 0 #facc15, 100px 0 #facc15;
+  }
+  62% {
+    box-shadow: 200px 0 rgba(255, 255, 255, 0), 190px 0 #facc15, 160px 0 #facc15, 130px 0 #facc15;
+  }
+  75% {
+    box-shadow: 200px 0 rgba(255, 255, 255, 0), 200px 0 rgba(255, 255, 255, 0), 190px 0 #facc15, 160px 0 #facc15;
+  }
+  87% {
+    box-shadow: 200px 0 rgba(255, 255, 255, 0), 200px 0 rgba(255, 255, 255, 0), 200px 0 rgba(255, 255, 255, 0), 190px 0 #facc15;
+  }
+  100% {
+    box-shadow: 200px 0 rgba(255, 255, 255, 0), 200px 0 rgba(255, 255, 255, 0), 200px 0 rgba(255, 255, 255, 0), 200px 0 rgba(255, 255, 255, 0);
+  }
+}
