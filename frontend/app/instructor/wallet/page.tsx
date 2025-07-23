@@ -42,18 +42,18 @@ export default function InstructorWalletPage() {
 	return (
 		<div className="container mx-auto px-4 py-8">
 			<div className="max-w-2xl mx-auto space-y-6">
-				<Card className="p-6">
+				<Card className="p-6 bg-white/80 dark:bg-[#232323] border border-gray-200 dark:border-gray-700">
 					<div className="flex items-center gap-4 mb-6">
-						<Wallet className="h-8 w-8 text-blue-600" />
+						<Wallet className="h-8 w-8 text-[#facc15] dark:text-[#facc15]" />
 						<div>
-							<h1 className="text-2xl font-bold">Instructor Wallet</h1>
-							<p className="text-gray-600">Manage your wallet balance</p>
+							<h1 className="text-2xl font-bold text-gray-900 dark:text-white">Instructor Wallet</h1>
+							<p className="text-gray-600 dark:text-gray-300">Manage your wallet balance</p>
 						</div>
 					</div>
 
-					<div className="bg-gray-50 p-4 rounded-lg mb-6">
-						<p className="text-sm text-gray-600 mb-1">Current Balance</p>
-						<p className="text-3xl font-bold">
+					<div className="bg-gray-50 p-4 rounded-lg mb-6 dark:bg-[#18181b]">
+						<p className="text-sm text-gray-600 dark:text-gray-300 mb-1">Current Balance</p>
+						<p className="text-3xl font-bold text-black dark:text-[#facc15]">
 							${wallet?.balance.toFixed(2) || "0.00"}
 						</p>
 					</div>
@@ -62,12 +62,12 @@ export default function InstructorWalletPage() {
 						<div>
 							<label
 								htmlFor="amount"
-								className="block text-sm font-medium text-gray-700 mb-1"
+								className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
 							>
 								Top Up Amount
 							</label>
 							<div className="relative">
-								<span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">
+								<span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 dark:text-gray-300">
 									$
 								</span>
 								<Input
@@ -86,7 +86,7 @@ export default function InstructorWalletPage() {
 						<Button
 							onClick={handleTopUp}
 							disabled={isToppingUp || !amount}
-							className="w-full"
+							className="w-full bg-[#facc15] hover:bg-yellow-600 text-black font-semibold dark:bg-[#facc15] dark:hover:bg-yellow-400 dark:text-[#18181b]"
 						>
 							{isToppingUp ? (
 								<div className="flex items-center gap-2">
@@ -102,10 +102,9 @@ export default function InstructorWalletPage() {
 						</Button>
 
 						<div className="bg-blue-50 p-4 rounded-lg flex items-start gap-3">
-							<AlertCircle className="h-5 w-5 text-blue-600 flex-shrink-0 mt-0.5" />
-							<p className="text-sm text-blue-700">
-								Your wallet balance can be used to purchase courses or other
-								services on our platform.
+							<AlertCircle className="h-5 w-5 text-[#facc15] flex-shrink-0 mt-0.5" />
+							<p className="text-sm text-[#facc15]">
+								Your wallet balance can be used to purchase courses or other services on our platform.
 							</p>
 						</div>
 					</div>

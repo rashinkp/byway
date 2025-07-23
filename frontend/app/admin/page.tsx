@@ -156,11 +156,11 @@ export default function AdminDashboard() {
 							{data.topEnrolledCourses.map((course, index) => (
 								<div
 									key={course.courseId}
-									className="bg-white/60 backdrop-blur-sm border border-gray-200/50 rounded-xl p-4"
+									className="bg-white/80 backdrop-blur-sm border border-gray-200 rounded-xl p-4 dark:bg-[#232323] dark:border-gray-700"
 								>
 									<div className="flex items-center space-x-4">
-										<div className="w-10 h-10 bg-blue-50 rounded-lg flex items-center justify-center">
-											<span className="text-sm font-semibold text-blue-600">
+										<div className="w-10 h-10 rounded-lg flex items-center justify-center">
+											<span className="text-sm font-semibold text-blue-600 dark:text-[#facc15]">
 												#{index + 1}
 											</span>
 										</div>
@@ -171,11 +171,11 @@ export default function AdminDashboard() {
 												</span>
 												<button
 													onClick={() => handleCourseClick(course.courseId)}
-													className="text-lg font-semibold text-gray-900 hover:text-blue-600 hover:underline transition-colors cursor-pointer"
+													className="text-lg font-semibold text-gray-900 dark:text-white hover:text-blue-600 hover:underline transition-colors cursor-pointer"
 												>
 													{course.courseTitle}
 												</button>
-												<span className="text-sm text-gray-500">
+												<span className="text-sm text-gray-500 dark:text-gray-300">
 													by {course.instructorName}
 												</span>
 											</div>
@@ -183,8 +183,8 @@ export default function AdminDashboard() {
 												<div className="flex items-center space-x-2">
 													<Users className="w-4 h-4 text-gray-400" />
 													<div>
-														<p className="text-xs text-gray-500">Enrollments</p>
-														<p className="text-sm font-medium">
+														<p className="text-xs text-gray-500 dark:text-gray-300">Enrollments</p>
+														<p className="text-sm font-medium dark:text-white">
 															{course.enrollmentCount}
 														</p>
 													</div>
@@ -192,8 +192,8 @@ export default function AdminDashboard() {
 												<div className="flex items-center space-x-2">
 													<DollarSign className="w-4 h-4 text-gray-400" />
 													<div>
-														<p className="text-xs text-gray-500">Revenue</p>
-														<p className="text-sm font-medium">
+														<p className="text-xs text-gray-500 dark:text-gray-300">Revenue</p>
+														<p className="text-sm font-medium dark:text-white">
 															${truncateToTwoDecimals(course.revenue)}
 														</p>
 													</div>
@@ -201,8 +201,8 @@ export default function AdminDashboard() {
 												<div className="flex items-center space-x-2">
 													<BarChart3 className="w-4 h-4 text-gray-400" />
 													<div>
-														<p className="text-xs text-gray-500">Rating</p>
-														<p className="text-sm font-medium">
+														<p className="text-xs text-gray-500 dark:text-gray-300">Rating</p>
+														<p className="text-sm font-medium dark:text-white">
 															{course.rating}/5
 														</p>
 													</div>
@@ -210,8 +210,8 @@ export default function AdminDashboard() {
 												<div className="flex items-center space-x-2">
 													<MessageSquare className="w-4 h-4 text-gray-400" />
 													<div>
-														<p className="text-xs text-gray-500">Reviews</p>
-														<p className="text-sm font-medium">
+														<p className="text-xs text-gray-500 dark:text-gray-300">Reviews</p>
+														<p className="text-sm font-medium dark:text-white">
 															{course.reviewCount}
 														</p>
 													</div>
@@ -236,16 +236,16 @@ export default function AdminDashboard() {
 							{data.topInstructors.map((instructor, index) => (
 								<div
 									key={instructor.instructorId}
-									className="bg-white/60 backdrop-blur-sm border border-gray-200/50 rounded-xl p-4"
+									className="bg-white/80 backdrop-blur-sm border border-gray-200 rounded-xl p-4 dark:bg-[#232323] dark:border-gray-700"
 								>
 									<div className="flex items-center space-x-4">
-										<div className="w-10 h-10 bg-purple-50 rounded-lg flex items-center justify-center">
-											<span className="text-sm font-semibold text-purple-600">
+										<div className="w-10 h-10 rounded-lg flex items-center justify-center">
+											<span className="text-sm font-semibold text-purple-600 dark:text-[#facc15]">
 												#{index + 1}
 											</span>
 										</div>
-										<div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center">
-											<span className="text-sm font-semibold text-gray-600">
+										<div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center dark:bg-[#18181b]">
+											<span className="text-sm font-semibold text-gray-600 dark:text-[#facc15]">
 												{instructor.instructorName
 													.split(" ")
 													.map((n) => n[0])
@@ -257,17 +257,17 @@ export default function AdminDashboard() {
 												<span className="text-sm font-medium text-gray-500">
 													#{index + 1}
 												</span>
-												<h3 className="text-lg font-semibold text-gray-900">
+												<h3 className="text-lg font-semibold text-gray-900 dark:text-white">
 													{instructor.instructorName}
 												</h3>
-												<span className="text-sm text-gray-500">
+												<span className="text-sm text-gray-500 dark:text-gray-300">
 													{instructor.email}
 												</span>
 												<span
 													className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${
 														instructor.isActive
-															? "bg-green-50 text-green-700 border border-green-200"
-															: "bg-red-50 text-red-700 border border-red-200"
+															? "bg-green-50 text-green-700 border border-green-200 dark:bg-green-900 dark:text-green-300 dark:border-green-700"
+															: "bg-red-50 text-red-700 border border-red-200 dark:bg-red-900 dark:text-red-300 dark:border-red-700"
 													}`}
 												>
 													{instructor.isActive ? "Active" : "Inactive"}
@@ -277,8 +277,8 @@ export default function AdminDashboard() {
 												<div className="flex items-center space-x-2">
 													<BookOpen className="w-4 h-4 text-gray-400" />
 													<div>
-														<p className="text-xs text-gray-500">Courses</p>
-														<p className="text-sm font-medium">
+														<p className="text-xs text-gray-500 dark:text-gray-300">Courses</p>
+														<p className="text-sm font-medium dark:text-white">
 															{instructor.courseCount}
 														</p>
 													</div>
@@ -286,8 +286,8 @@ export default function AdminDashboard() {
 												<div className="flex items-center space-x-2">
 													<Users className="w-4 h-4 text-gray-400" />
 													<div>
-														<p className="text-xs text-gray-500">Enrollments</p>
-														<p className="text-sm font-medium">
+														<p className="text-xs text-gray-500 dark:text-gray-300">Enrollments</p>
+														<p className="text-sm font-medium dark:text-white">
 															{instructor.totalEnrollments}
 														</p>
 													</div>
@@ -295,8 +295,8 @@ export default function AdminDashboard() {
 												<div className="flex items-center space-x-2">
 													<DollarSign className="w-4 h-4 text-gray-400" />
 													<div>
-														<p className="text-xs text-gray-500">Revenue</p>
-														<p className="text-sm font-medium">
+														<p className="text-xs text-gray-500 dark:text-gray-300">Revenue</p>
+														<p className="text-sm font-medium dark:text-white">
 															${truncateToTwoDecimals(instructor.totalRevenue)}
 														</p>
 													</div>
@@ -304,10 +304,9 @@ export default function AdminDashboard() {
 												<div className="flex items-center space-x-2">
 													<BarChart3 className="w-4 h-4 text-gray-400" />
 													<div>
-														<p className="text-xs text-gray-500">Rating</p>
-														<p className="text-sm font-medium">
-															{truncateToTwoDecimals(instructor.averageRating)}
-															/5
+														<p className="text-xs text-gray-500 dark:text-gray-300">Rating</p>
+														<p className="text-sm font-medium dark:text-white">
+															{truncateToTwoDecimals(instructor.averageRating)}/5
 														</p>
 													</div>
 												</div>

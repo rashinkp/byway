@@ -1,5 +1,6 @@
 import React from "react";
 import { generateAdminDashboardReport } from "@/lib/generateAdminDashboardReport";
+import { Button } from "../ui/button";
 
 interface PDFExportButtonProps {
   dashboardData?: any; // Use the DashboardData type if available
@@ -7,7 +8,7 @@ interface PDFExportButtonProps {
   className?: string;
 }
 
-const PDFExportButton: React.FC<PDFExportButtonProps> = ({ dashboardData, onExport, className }) => {
+const PDFExportButton: React.FC<PDFExportButtonProps> = ({ dashboardData, onExport }) => {
   const handleExportPDF = () => {
     if (onExport) {
       onExport();
@@ -17,12 +18,12 @@ const PDFExportButton: React.FC<PDFExportButtonProps> = ({ dashboardData, onExpo
   };
 
   return (
-    <button
+    <Button
+      variant={'primary'}
       onClick={handleExportPDF}
-      className={className || "px-4 py-2 bg-blue-600 text-white rounded-lg shadow hover:bg-blue-700 transition-colors font-semibold"}
     >
       Export as PDF
-    </button>
+    </Button>
   );
 };
 

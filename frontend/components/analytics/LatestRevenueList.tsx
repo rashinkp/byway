@@ -156,14 +156,14 @@ export default function LatestRevenueList({
 		<div className="space-y-6">
 			<div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
 				<div className="flex items-center gap-3">
-					<div className="bg-blue-50 p-2 rounded-lg">
-						<Clock className="w-5 h-5 text-blue-600" />
+					<div className="bg-[#facc15] p-2 rounded-lg dark:bg-[#232323]">
+						<Clock className="w-5 h-5 text-black dark:text-[#facc15]" />
 					</div>
 					<div>
-						<h2 className="text-lg font-semibold text-gray-900">
+						<h2 className="text-lg font-semibold text-black dark:text-white">
 							Latest Revenue Transactions
 						</h2>
-						<p className="text-sm text-gray-600">
+						<p className="text-sm text-gray-500 dark:text-gray-300">
 							Recent financial activities and revenue streams
 						</p>
 					</div>
@@ -175,14 +175,13 @@ export default function LatestRevenueList({
 
 					<div className="flex gap-2">
 						<Button
-							variant={currentSort === "latest" ? "default" : "outline"}
+							
 							size="sm"
 							onClick={() => onSortChange("latest")}
 						>
 							Latest
 						</Button>
 						<Button
-							variant={currentSort === "oldest" ? "default" : "outline"}
 							size="sm"
 							onClick={() => onSortChange("oldest")}
 						>
@@ -199,23 +198,23 @@ export default function LatestRevenueList({
 				{latestItems.map((item: any) => (
 					<div
 						key={item.orderId}
-						className="bg-white/60 backdrop-blur-sm border border-gray-200/50 rounded-xl p-4 hover:bg-white/80 hover:shadow-sm transition-all duration-200"
+						className="bg-white/60 backdrop-blur-sm border border-gray-200/50 rounded-xl p-4 hover:bg-white/80 hover:shadow-sm transition-all duration-200 dark:bg-[#232323] dark:border-gray-700 dark:hover:bg-[#18181b]"
 					>
 						<div className="flex items-center justify-between">
 							{/* Left side - Essential Info */}
 							<div className="flex items-center space-x-4 flex-1">
-								<div className="bg-green-100 p-2 rounded-lg">
-									<DollarSign className="w-5 h-5 text-green-600" />
+								<div className="bg-[#facc15] p-2 rounded-lg dark:bg-[#232323]">
+									<DollarSign className="w-5 h-5 text-black dark:text-[#facc15]" />
 								</div>
 
 								<div className="flex-1">
 									<div className="flex items-center space-x-2 mb-2">
-										<h4 className="font-semibold text-gray-900">
+										<h4 className="font-semibold text-black dark:text-white">
 											{item.courseTitle}
 										</h4>
 										<button
 											onClick={() => handleTransactionClick(item)}
-											className="text-blue-500 hover:text-blue-700 transition-colors p-1 rounded-full hover:bg-blue-50"
+											className="text-[#facc15] hover:text-black transition-colors p-1 rounded-full hover:bg-[#facc15]/20 dark:hover:text-[#facc15] dark:hover:bg-[#232323]"
 										>
 											<Info className="w-4 h-4" />
 										</button>
@@ -223,32 +222,32 @@ export default function LatestRevenueList({
 
 									<div className="grid grid-cols-1 md:grid-cols-4 gap-4 text-sm">
 										<div className="flex items-center space-x-2">
-											<User className="w-4 h-4 text-blue-500" />
+											<User className="w-4 h-4 text-[#facc15] dark:text-[#facc15]" />
 											<div>
-												<span className="text-gray-600">Instructor:</span>
-												<span className="ml-1 font-medium text-gray-900">
+												<span className="text-gray-600 dark:text-gray-300">Instructor:</span>
+												<span className="ml-1 font-medium text-black dark:text-white">
 													{item.creatorName}
 												</span>
 											</div>
 										</div>
 										<div className="flex items-center space-x-2">
-											<Users className="w-4 h-4 text-purple-500" />
+											<Users className="w-4 h-4 text-[#facc15] dark:text-[#facc15]" />
 											<div>
-												<span className="text-gray-600">Customer:</span>
-												<span className="ml-1 font-medium text-gray-900">
+												<span className="text-gray-600 dark:text-gray-300">Customer:</span>
+												<span className="ml-1 font-medium text-black  dark:text-white">
 													{item.customerName}
 												</span>
 											</div>
 										</div>
 										<div>
-											<span className="text-gray-600">Offer Price:</span>
-											<span className="ml-1 font-medium text-gray-900">
+											<span className="text-gray-600 dark:text-gray-300">Offer Price:</span>
+											<span className="ml-1 font-medium text-black  dark:text-white">
 												{formatCurrency(item.offerPrice)}
 											</span>
 										</div>
 										<div>
-											<span className="text-gray-600">Admin Share:</span>
-											<span className="ml-1 font-medium text-gray-900">
+											<span className="text-gray-600 dark:text-gray-300">Admin Share:</span>
+											<span className="ml-1 font-medium text-black  dark:text-white">
 												{item.adminSharePercentage}%
 											</span>
 										</div>
@@ -258,10 +257,10 @@ export default function LatestRevenueList({
 
 							{/* Right side - Revenue */}
 							<div className="text-right">
-								<div className="text-xl font-bold text-green-600">
+								<div className="text-xl font-bold text-black dark:text-[#facc15]">
 									{formatCurrency(item.transactionAmount)}
 								</div>
-								<div className="text-sm text-gray-500">
+								<div className="text-sm text-gray-500 dark:text-gray-300">
 									{formatDate(item.createdAt)}
 								</div>
 							</div>
@@ -280,7 +279,6 @@ export default function LatestRevenueList({
 
 					<div className="flex items-center gap-2">
 						<Button
-							variant="outline"
 							size="sm"
 							onClick={() => onPageChange(currentPage - 1)}
 							disabled={currentPage <= 1}
@@ -295,7 +293,6 @@ export default function LatestRevenueList({
 								return (
 									<Button
 										key={pageNum}
-										variant={pageNum === currentPage ? "default" : "outline"}
 										size="sm"
 										onClick={() => onPageChange(pageNum)}
 										className="w-8 h-8 p-0"
@@ -307,7 +304,6 @@ export default function LatestRevenueList({
 						</div>
 
 						<Button
-							variant="outline"
 							size="sm"
 							onClick={() => onPageChange(currentPage + 1)}
 							disabled={currentPage >= totalPages}
@@ -321,11 +317,11 @@ export default function LatestRevenueList({
 
 			{/* Detailed Transaction Modal */}
 			<Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
-				<DialogContent className="max-w-2xl">
+				<DialogContent className="max-w-2xl dark:bg-[#18181b] dark:text-white">
 					<DialogHeader>
 						<DialogTitle className="flex items-center space-x-2">
-							<div className="bg-blue-50 p-2 rounded-lg">
-								<Info className="w-5 h-5 text-blue-500" />
+							<div className="bg-[#facc15] p-2 rounded-lg dark:bg-[#232323]">
+								<Info className="w-5 h-5 text-black dark:text-[#facc15]" />
 							</div>
 							<span>Transaction Details</span>
 						</DialogTitle>
@@ -335,7 +331,7 @@ export default function LatestRevenueList({
 						<div className="space-y-6">
 							{/* Header */}
 							<div className="text-center space-y-2">
-								<h3 className="text-xl font-semibold text-gray-900">
+								<h3 className="text-xl font-semibold text-black dark:text-white">
 									{selectedTransaction.courseTitle}
 								</h3>
 								<p className="text-sm text-gray-500">
@@ -348,45 +344,45 @@ export default function LatestRevenueList({
 							{/* Course Information */}
 							<div className="space-y-3">
 								<div className="flex items-center gap-2">
-									<Target className="w-4 h-4 text-blue-500" />
-									<h4 className="text-sm font-semibold text-gray-700 uppercase tracking-wide">
+									<Target className="w-4 h-4 text-[#facc15]" />
+									<h4 className="text-sm font-semibold text-black uppercase tracking-wide dark:text-white">
 										Course Information
 									</h4>
 								</div>
 								<div className="space-y-2 ml-6">
 									<div className="flex justify-between">
 										<span className="text-gray-600">Course Price:</span>
-										<span className="font-medium">
+										<span className="font-medium text-black dark:text-white">
 											{formatCurrency(selectedTransaction.coursePrice)}
 										</span>
 									</div>
 									<div className="flex justify-between">
 										<span className="text-gray-600">Offer Price:</span>
-										<span className="font-medium">
+										<span className="font-medium text-black dark:text-white">
 											{formatCurrency(selectedTransaction.offerPrice)}
 										</span>
 									</div>
 									<div className="flex justify-between">
 										<span className="text-gray-600">Admin Share:</span>
-										<span className="font-medium">
+										<span className="font-medium text-black dark:text-white">
 											{selectedTransaction.adminSharePercentage}%
 										</span>
 									</div>
 									<div className="flex justify-between">
 										<span className="text-gray-600">Admin Share:</span>
-										<span className="font-medium">
+										<span className="font-medium text-black dark:text-white">
 											{formatCurrency(selectedTransaction.transactionAmount)}
 										</span>
 									</div>
 									<div className="flex justify-between">
 										<span className="text-gray-600">Instructor Share:</span>
-										<span className="font-medium">
+										<span className="font-medium text-black dark:text-white">
 											{100 - selectedTransaction.adminSharePercentage}%
 										</span>
 									</div>
 									<div className="flex justify-between">
 										<span className="text-gray-600">Instructor Revenue:</span>
-										<span className="font-medium">
+										<span className="font-medium text-black dark:text-white">
 											{formatCurrency(
 												selectedTransaction.offerPrice *
 													((100 - selectedTransaction.adminSharePercentage) /
@@ -402,26 +398,26 @@ export default function LatestRevenueList({
 							{/* Participants */}
 							<div className="space-y-3">
 								<div className="flex items-center gap-2">
-									<Users className="w-4 h-4 text-purple-500" />
-									<h4 className="text-sm font-semibold text-gray-700 uppercase tracking-wide">
+									<Users className="w-4 h-4 text-[#facc15]" />
+									<h4 className="text-sm font-semibold text-black uppercase tracking-wide dark:text-white">
 										Participants
 									</h4>
 								</div>
 								<div className="space-y-3 ml-6">
 									<div className="flex items-center space-x-3">
-										<User className="w-4 h-4 text-blue-500" />
+										<User className="w-4 h-4 text-[#facc15] dark:text-[#facc15]" />
 										<div>
 											<div className="text-sm text-gray-600">Instructor</div>
-											<div className="font-medium text-gray-900">
+											<div className="font-medium text-black dark:text-white">
 												{selectedTransaction.creatorName}
 											</div>
 										</div>
 									</div>
 									<div className="flex items-center space-x-3">
-										<Users className="w-4 h-4 text-purple-500" />
+										<Users className="w-4 h-4 text-[#facc15]" />
 										<div>
 											<div className="text-sm text-gray-600">Customer</div>
-											<div className="font-medium text-gray-900">
+											<div className="font-medium text-black">
 												{selectedTransaction.customerName}
 											</div>
 											<div className="text-sm text-gray-500">
@@ -438,26 +434,26 @@ export default function LatestRevenueList({
 							<div className="space-y-3">
 								<div className="flex items-center gap-2">
 									<Calendar className="w-4 h-4 text-gray-500" />
-									<h4 className="text-sm font-semibold text-gray-700 uppercase tracking-wide">
+									<h4 className="text-sm font-semibold text-black uppercase tracking-wide dark:text-white">
 										Transaction Details
 									</h4>
 								</div>
 								<div className="space-y-2 ml-6">
 									<div className="flex justify-between">
 										<span className="text-gray-600">Date:</span>
-										<span className="font-medium">
+										<span className="font-medium text-black dark:text-white">
 											{formatDate(selectedTransaction.createdAt)}
 										</span>
 									</div>
 									<div className="flex justify-between">
 										<span className="text-gray-600">Course ID:</span>
-										<span className="text-sm text-gray-900">
+										<span className="text-sm text-black dark:text-white">
 											{selectedTransaction.courseId}
 										</span>
 									</div>
 									<div className="flex justify-between">
 										<span className="text-gray-600">Transaction Amount:</span>
-										<span className="font-medium text-green-600">
+										<span className="font-medium text-black dark:text-white">
 											{formatCurrency(selectedTransaction.transactionAmount)}
 										</span>
 									</div>

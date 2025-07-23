@@ -12,8 +12,6 @@ interface DashboardSectionProps {
 
 export function DashboardSection({
 	icon: Icon,
-	iconColor,
-	iconBgColor,
 	title,
 	subtitle,
 	children,
@@ -28,8 +26,8 @@ export function DashboardSection({
 					<Icon className={`w-6 h-6 text-black`} />
 				</div>
 				<div>
-					<h2 className="text-xl font-semibold text-black">{title}</h2>
-					<p className="text-gray-500">{subtitle}</p>
+					<h2 className="text-xl font-semibold text-black dark:text-white">{title}</h2>
+					<p className="text-gray-500 dark:text-gray-300">{subtitle}</p>
 				</div>
 			</div>
 			{children}

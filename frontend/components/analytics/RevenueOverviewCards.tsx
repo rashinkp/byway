@@ -34,65 +34,62 @@ export default function RevenueOverviewCards({
 
 	return (
 		<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-			<div className="bg-white/60 backdrop-blur-sm border border-gray-200/50 rounded-xl p-6 hover:bg-white/80 transition-all duration-200">
+			<div className="bg-white/80 backdrop-blur-sm border border-gray-200 rounded-xl p-6 hover:bg-white transition-all duration-200 dark:bg-[#232323] dark:border-gray-700 dark:hover:bg-[#232323]">
 				<div className="flex items-center justify-between">
 					<div className="space-y-2">
-						<p className="text-sm font-medium text-gray-500 uppercase tracking-wide">
+						<p className="text-sm font-medium text-gray-500 uppercase tracking-wide dark:text-gray-300">
 							Total Revenue
 						</p>
-						<h3 className="text-2xl font-semibold text-gray-900">
+						<h3 className="text-2xl font-semibold text-black dark:text-white">
 							{formatCurrency(overallData?.data?.totalRevenue || 0)}
 						</h3>
-						<div className="flex items-center text-green-600">
+						<div className="flex items-center text-[#facc15] dark:text-[#facc15]">
 							<ArrowUpRight className="w-4 h-4 mr-1" />
 							<span className="text-sm">
 								Net: {formatCurrency(overallData?.data?.netRevenue || 0)}
 							</span>
 						</div>
 					</div>
-					<div className="bg-blue-50 p-3 rounded-lg">
-						<DollarSign className="w-6 h-6 text-blue-600" />
+					<div className="bg-[#facc15] p-3 rounded-lg dark:bg-[#18181b]">
+						<DollarSign className="w-6 h-6 text-black dark:text-[#facc15]" />
 					</div>
 				</div>
 			</div>
 
-			<div className="bg-white/60 backdrop-blur-sm border border-gray-200/50 rounded-xl p-6 hover:bg-white/80 transition-all duration-200">
+			<div className="bg-white/80 backdrop-blur-sm border border-gray-200 rounded-xl p-6 hover:bg-white transition-all duration-200 dark:bg-[#232323] dark:border-gray-700 dark:hover:bg-[#232323]">
 				<div className="flex items-center justify-between">
 					<div className="space-y-2">
-						<p className="text-sm font-medium text-gray-500 uppercase tracking-wide">
+						<p className="text-sm font-medium text-gray-500 uppercase tracking-wide dark:text-gray-300">
 							Courses Sold
 						</p>
-						<h3 className="text-2xl font-semibold text-gray-900">
+						<h3 className="text-2xl font-semibold text-black dark:text-white">
 							{overallData?.data?.coursesSold ?? 0}
 						</h3>
-						<div className="text-sm text-gray-500">In selected period</div>
+						<div className="text-sm text-gray-500 dark:text-gray-300">In selected period</div>
 					</div>
-					<div className="bg-purple-50 p-3 rounded-lg">
-						<Activity className="w-6 h-6 text-purple-600" />
+					<div className="bg-[#facc15] p-3 rounded-lg dark:bg-[#18181b]">
+						<Activity className="w-6 h-6 text-black dark:text-[#facc15]" />
 					</div>
 				</div>
 			</div>
 
-			<div className="bg-white/60 backdrop-blur-sm border border-gray-200/50 rounded-xl p-6 hover:bg-white/80 transition-all duration-200">
+			<div className="bg-white/80 backdrop-blur-sm border border-gray-200 rounded-xl p-6 hover:bg-white transition-all duration-200 dark:bg-[#232323] dark:border-gray-700 dark:hover:bg-[#232323]">
 				<div className="flex items-center justify-between">
 					<div className="space-y-2">
-						<p className="text-sm font-medium text-gray-500 uppercase tracking-wide">
+						<p className="text-sm font-medium text-gray-500 uppercase tracking-wide dark:text-gray-300">
 							Selected Period
 						</p>
-						<h3 className="text-2xl font-semibold text-gray-900">
+						<h3 className="text-2xl font-semibold text-black dark:text-white">
 							{dateRange.from
 								? format(dateRange.from, "MMM d, yyyy")
 								: "Select date"}
 						</h3>
-						<div className="text-sm text-gray-500">
-							To:{" "}
-							{dateRange.to
-								? format(dateRange.to, "MMM d, yyyy")
-								: "Select date"}
+						<div className="text-sm text-gray-500 dark:text-gray-300">
+							To: {dateRange.to ? format(dateRange.to, "MMM d, yyyy") : "Select date"}
 						</div>
 					</div>
-					<div className="bg-green-50 p-3 rounded-lg">
-						<Calendar className="w-6 h-6 text-green-600" />
+					<div className="bg-[#facc15] p-3 rounded-lg dark:bg-[#18181b]">
+						<Calendar className="w-6 h-6 text-black dark:text-[#facc15]" />
 					</div>
 				</div>
 			</div>

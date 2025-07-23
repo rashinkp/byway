@@ -19,7 +19,7 @@ export function DashboardLayout({
 }: DashboardLayoutProps) {
 	if (isLoading) {
 		return (
-			<div className="min-h-screen bg-gray-50/50 p-6">
+			<div className="min-h-screen p-6">
 				<div className="max-w-7xl mx-auto space-y-8">
 					<div className="animate-pulse">
 						<div className="h-8 bg-gray-200 rounded w-64 mb-4"></div>
@@ -73,19 +73,19 @@ export function DashboardLayout({
 	}
 
 	return (
-		<div className="min-h-screen bg-gray-50/50 p-6">
+		<div className="min-h-screen bg-gray-50/50 p-6 dark:bg-[#18181b]">
 			<div className="max-w-7xl mx-auto space-y-8">
 				{/* Header Section */}
 				<div className="flex items-center gap-3">
-					<div className="w-10 h-10 bg-[#facc15] rounded-lg flex items-center justify-center">
-						<BarChart3 className="w-6 h-6 text-black" />
+					<div className="w-10 h-10 bg-[#facc15] rounded-lg flex items-center justify-center dark:bg-[#232323]">
+						<BarChart3 className="w-6 h-6 text-black dark:text-[#facc15]" />
 					</div>
 					<div>
-						<h1 className="text-2xl font-bold text-black">{title}</h1>
-						<p className="text-gray-500">{subtitle}</p>
+						<h1 className="text-2xl font-bold text-black dark:text-white">{title}</h1>
+						<p className="text-gray-500 dark:text-gray-300">{subtitle}</p>
 					</div>
 					<div className="ml-auto">
-						<span className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-sm font-medium bg-[#facc15] text-black border border-[#facc15]">
+						<span className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-sm font-medium bg-[#facc15] text-black border border-[#facc15] dark:bg-[#232323] dark:text-[#facc15] dark:border-[#facc15]">
 							<Activity className="w-4 h-4" />
 							Live Data
 						</span>

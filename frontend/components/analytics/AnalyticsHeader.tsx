@@ -21,21 +21,21 @@ export default function AnalyticsHeader({
 	return (
 		<div className="space-y-4">
 			<div className="flex items-center gap-3">
-				<div className="bg-blue-50 p-2 rounded-lg">
-					<BarChart3 className="w-6 h-6 text-blue-600" />
+				<div className="bg-[#facc15] p-2 rounded-lg dark:bg-[#232323]">
+					<BarChart3 className="w-6 h-6 text-black dark:text-[#facc15]" />
 				</div>
 				<div>
-					<h1 className="text-2xl font-semibold text-gray-900">{title}</h1>
-					<p className="text-gray-600">{subtitle}</p>
+					<h1 className="text-2xl font-semibold text-black dark:text-white">{title}</h1>
+					<p className="text-gray-500 dark:text-gray-300">{subtitle}</p>
 				</div>
 			</div>
 			<div className="flex items-center gap-4">
 				<DatePickerWithRange date={dateRange} onDateChange={onDateChange} />
 				<Badge
 					variant="outline"
-					className="bg-green-50 text-green-700 border-green-200"
+					className="bg-white text-black border-[#facc15] dark:bg-[#232323] dark:text-[#facc15] dark:border-[#facc15]"
 				>
-					<Activity className="w-3 h-3 mr-1" />
+					<Activity className="w-3 h-3 mr-1 text-[#facc15] dark:text-[#facc15]" />
 					Live Data
 				</Badge>
 			</div>
