@@ -7,6 +7,7 @@ import { Message, EnhancedChatItem } from "@/types/chat";
 import { useAuthStore } from "@/stores/auth.store";
 import { Button } from "@/components/ui/button";
 import { Loader2 } from "lucide-react";
+import { ChevronLeft } from "lucide-react";
 import {
   listUserChats,
   getMessagesByChat,
@@ -15,12 +16,14 @@ import {
   markMessagesAsRead,
 } from "@/services/socketChat";
 import socket from "@/lib/socket";
+import { useRouter } from "next/navigation";
 
 export default function ChatPage() {
   const user = useAuthStore((state) => state.user);
   const isInitialized = useAuthStore((state) => state.isInitialized);
   const isLoading = useAuthStore((state) => state.isLoading);
   const initializeAuth = useAuthStore((state) => state.initializeAuth);
+  const router = useRouter();
 
   const [chatItems, setChatItems] = useState<EnhancedChatItem[]>([]);
   const [selectedChat, setSelectedChat] = useState<EnhancedChatItem | null>(
@@ -459,6 +462,9 @@ export default function ChatPage() {
     };
   }, [selectedChat]);
 
+  // Helper to determine if header should be shown
+  const showHeader = user?.role === "USER";
+
   if (!isInitialized || isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-white dark:bg-[#18181b] transition-colors duration-300">
@@ -495,6 +501,20 @@ export default function ChatPage() {
                   isMobile && !selectedChat ? "w-full" : "w-80 md:w-96"
                 } h-full transition-transform duration-300 ease-in-out md:transition-none`}
               >
+                {/* Back button for non-USER roles */}
+                {user?.role !== "USER" && (
+                  <div className="flex items-center gap-2 p-3 pt-5 border-b border-gray-200 dark:border-gray-700 dark:bg-[#18181b]">
+                    <button
+                      onClick={() => router.back()}
+                      className="flex items-center gap-1 text-black dark:text-[#facc15] hover:text-[#facc15] dark:hover:text-white px-2 py-1 rounded-md"
+                      aria-label="Back"
+                    >
+                      <ChevronLeft className="w-5 h-5" />
+                      <span className="text-sm font-medium">Back</span>
+                    </button>
+                    <span className="ml-2 font-bold text-[#facc15] dark:text-[#facc15] text-lg">Byway</span>
+                  </div>
+                )}
                 <ChatList
                   chats={chatItems}
                   selectedChat={selectedChat}
