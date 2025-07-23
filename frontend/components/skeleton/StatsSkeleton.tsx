@@ -10,7 +10,7 @@ export function StatsSkeleton({ count = 3 }: StatsSkeletonProps) {
 			{[...Array(count)].map((_, i) => (
 				<div
 					key={i}
-					className="bg-white/60 backdrop-blur-sm border border-gray-200/50 rounded-xl p-6"
+					className=" backdrop-blur-sm border rounded-xl p-6"
 				>
 					<div className="flex items-center justify-between">
 						<div className="space-y-2 flex-1">

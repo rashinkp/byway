@@ -87,13 +87,13 @@ function ListPage<T>({
 	}
 
 	return (
-		<div className="min-h-screen bg-[var(--color-surface)]/50 p-6">
+		<div className="min-h-screen bg-white/80 p-6 dark:bg-[#18181b]">
 			<div className="max-w-7xl mx-auto space-y-8">
 				{/* Header Section */}
 				<div className="space-y-4">
 					<div className="flex items-center gap-3">
-						<div className="bg-[var(--color-primary-light)]/10 p-2 rounded-lg">
-							<BarChart3 className="w-6 h-6 text-[var(--color-primary-light)]" />
+						<div className="bg-[#facc15]/10 p-2 rounded-lg dark:bg-[#232323]">
+							<BarChart3 className="w-6 h-6 text-[#facc15] dark:text-[#facc15]" />
 						</div>
 						<div>
 							<h1 className="text-2xl font-semibold text-black dark:text-white">{title}</h1>
@@ -113,8 +113,8 @@ function ListPage<T>({
 							)}
 							{extraButtons && extraButtons.length > 0 && extraButtons}
 						</div>
-						<div className="bg-[var(--color-accent)]/10 px-3 py-1 rounded-full border border-[var(--color-accent)]/20">
-							<div className="flex items-center text-yellow-700 dark:text-yellow-300 text-sm">
+						<div className="bg-[#facc15]/10 px-3 py-1 rounded-full border border-[#facc15]/20 dark:bg-[#232323] dark:border-[#facc15]/20">
+							<div className="flex items-center text-yellow-700 dark:text-[#facc15] text-sm">
 								<Activity className="w-3 h-3 mr-1" />
 								Live Data
 							</div>
@@ -167,7 +167,7 @@ function ListPage<T>({
 				{isLoading ? (
 					<PaginationSkeleton />
 				) : totalPages > 1 ? (
-					<div className="flex items-center justify-between pt-6 border-t border-[var(--color-muted)]">
+					<div className="flex items-center justify-between pt-6 border-t border-gray-200 dark:border-gray-700">
 						<div className="text-sm text-gray-700 dark:text-gray-300">
 							Showing {(page - 1) * itemsPerPage + 1} to{" "}
 							{Math.min(page * itemsPerPage, total)} of {total} results

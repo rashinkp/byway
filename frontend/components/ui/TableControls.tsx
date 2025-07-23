@@ -87,117 +87,122 @@ export function TableControls({
 	};
 
 	return (
-		<div className="space-y-6">
-			{/* Header with Icon */}
-			<div className="flex items-center gap-3">
-				<div className="bg-[var(--color-primary-light)]/10 p-2 rounded-lg">
-					<Clock className="w-5 h-5 text-[var(--color-primary-light)]" />
-				</div>
-				<div>
-					<h2 className="text-lg font-semibold text-[var(--color-primary-dark)]">
-						Data Management
-					</h2>
-					<p className="text-sm text-[var(--color-muted)]">
-						Filter, search, and organize your data
-					</p>
-				</div>
-			</div>
+    <div className="space-y-6">
+      {/* Header with Icon */}
+      <div className="flex items-center gap-3">
+        <div className="bg-[#facc15]/10 p-2 rounded-lg dark:bg-[#232323]">
+          <Clock className="w-5 h-5 text-[#facc15] dark:text-[#facc15]" />
+        </div>
+        <div>
+          <h2 className="text-lg font-semibold text-black dark:text-white">
+            Data Management
+          </h2>
+          <p className="text-sm text-gray-700 dark:text-gray-300">
+            Filter, search, and organize your data
+          </p>
+        </div>
+      </div>
 
-			<Separator />
+      <Separator />
 
-			{/* Filter Tabs */}
-			<div className="space-y-4">
-				<Tabs
-					value={filterStatus}
-					onValueChange={setFilterStatus}
-					className="w-full"
-				>
-					<TabsList
-						className={`grid w-full max-w-4xl ${getGridCols(filterTabs.length)}`}
-					>
-						{filterTabs.map((tab) => (
-							<TabsTrigger
-								key={tab.value}
-								value={tab.value}
-								className="text-xs"
-							>
-								{tab.label}
-							</TabsTrigger>
-						))}
-					</TabsList>
-				</Tabs>
+      {/* Filter Tabs */}
+      <div className="space-y-4">
+        <Tabs
+          value={filterStatus}
+          onValueChange={setFilterStatus}
+          className="w-full"
+        >
+          <TabsList
+            className={`grid w-full max-w-4xl ${getGridCols(
+              filterTabs.length
+            )} bg-white/80 dark:bg-[#232323]`}
+          >
+            {filterTabs.map((tab) => (
+              <TabsTrigger
+                key={tab.value}
+                value={tab.value}
+                className="text-xs"
+              >
+                {tab.label}
+              </TabsTrigger>
+            ))}
+          </TabsList>
+        </Tabs>
 
-				{/* Search and Controls */}
-				<div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
-					<div className="relative w-full lg:w-64">
-						<Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-						<Input
-							placeholder="Search..."
-							className="pl-10 w-full"
-							value={inputSearchTerm}
-							onChange={(e) => setInputSearchTerm(e.target.value)}
-						/>
-					</div>
+        {/* Search and Controls */}
+        <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
+          <div className="relative w-full lg:w-64">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+            <Input
+              placeholder="Search..."
+              value={inputSearchTerm}
+              className="pl-10 w-full bg-white/80 dark:bg-[#232323] text-black dark:text-white border border-gray-200 dark:border-gray-700"
+              onChange={(e) => setInputSearchTerm(e.target.value)}
+            />
+          </div>
 
-					<div className="flex items-center gap-2">
-						<Button
-							variant="outline"
-							size="sm"
-							onClick={onRefresh}
-							className="flex items-center gap-1 text-[var(--color-primary-dark)] border-[var(--color-primary-light)]"
-						>
-							<RefreshCcw className="h-4 w-4" />
-							Refresh
-						</Button>
+          <div className="flex items-center gap-2">
+            <Button
+              size="sm"
+              onClick={onRefresh}
+              variant={"ghost"}
+              className="flex items-center gap-1 text-[var(--color-primary-dark)] border-[var(--color-primary-light)]"
+            >
+              <RefreshCcw className="h-4 w-4" />
+              Refresh
+            </Button>
 
-						<DropdownMenu>
-							<DropdownMenuTrigger asChild>
-								<Button
-									variant="outline"
-									size="sm"
-									className="flex items-center gap-1 text-[var(--color-primary-dark)] border-[var(--color-primary-light)]"
-								>
-									<Filter className="h-4 w-4" />
-									Sort:{" "}
-									{sortOptions.find((opt) => opt.value === sortBy)?.label ||
-										"Select"}
-								</Button>
-							</DropdownMenuTrigger>
-							<DropdownMenuContent align="end" className="w-48 bg-[var(--color-surface)] text-[var(--color-primary-dark)] border-[var(--color-primary-light)]">
-								<DropdownMenuLabel>Sort by</DropdownMenuLabel>
-								<DropdownMenuSeparator />
-								<DropdownMenuRadioGroup
-									value={sortBy}
-									onValueChange={setSortBy}
-								>
-									{sortOptions.map((option) => (
-										<DropdownMenuRadioItem
-											key={option.value}
-											value={option.value}
-										>
-											{option.label}
-										</DropdownMenuRadioItem>
-									))}
-								</DropdownMenuRadioGroup>
-							</DropdownMenuContent>
-						</DropdownMenu>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  size="sm"
+                  variant={"ghost"}
+                  className="flex items-center gap-1 text-[var(--color-primary-dark)] border-[var(--color-primary-light)]"
+                >
+                  <Filter className="h-4 w-4" />
+                  Sort:{" "}
+                  {sortOptions.find((opt) => opt.value === sortBy)?.label ||
+                    "Select"}
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent
+                align="end"
+                className="w-48 bg-white/80 dark:bg-[#232323] text-black dark:text-white border-[#facc15] dark:border-[#facc15]"
+              >
+                <DropdownMenuLabel>Sort by</DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuRadioGroup
+                  value={sortBy}
+                  onValueChange={setSortBy}
+                >
+                  {sortOptions.map((option) => (
+                    <DropdownMenuRadioItem
+                      key={option.value}
+                      value={option.value}
+                    >
+                      {option.label}
+                    </DropdownMenuRadioItem>
+                  ))}
+                </DropdownMenuRadioGroup>
+              </DropdownMenuContent>
+            </DropdownMenu>
 
-						<Button
-							variant="outline"
-							size="sm"
-							onClick={() => setSortOrder(sortOrder === "asc" ? "desc" : "asc")}
-							className="flex items-center gap-1 text-[var(--color-primary-dark)] border-[var(--color-primary-light)]"
-						>
-							{sortOrder === "asc" ? (
-								<ArrowUp className="h-4 w-4" />
-							) : (
-								<ArrowDown className="h-4 w-4" />
-							)}
-							{getOrderLabel()}
-						</Button>
-					</div>
-				</div>
-			</div>
-		</div>
-	);
+            <Button
+              size="sm"
+              variant={"ghost"}
+              onClick={() => setSortOrder(sortOrder === "asc" ? "desc" : "asc")}
+              className="flex items-center gap-1 text-[var(--color-primary-dark)] border-[var(--color-primary-light)]"
+            >
+              {sortOrder === "asc" ? (
+                <ArrowUp className="h-4 w-4" />
+              ) : (
+                <ArrowDown className="h-4 w-4" />
+              )}
+              {getOrderLabel()}
+            </Button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
 }

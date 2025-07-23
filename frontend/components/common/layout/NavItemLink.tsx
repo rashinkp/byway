@@ -32,7 +32,7 @@ export function NavItemLink({
 						} 
             ${
 							isActive
-								? "bg-[#facc15] text-black hover:bg-[#facc15]/90 hover:text-black"
+								? "bg-[#facc15] dark:text-black text-black hover:text-black dark:hover:text-black"
 								: "text-white hover:bg-[#facc15]/10 hover:text-[#facc15]"
 						}
             transition-all duration-200 py-3 h-auto my-1 rounded-lg`}

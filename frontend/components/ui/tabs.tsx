@@ -25,7 +25,7 @@ function TabsList({
 		<TabsPrimitive.List
 			data-slot="tabs-list"
 			className={cn(
-				"inline-flex h-9 w-fit items-center justify-center rounded-lg p-[3px]",
+				"inline-flex h-9 w-fit items-center justify-center rounded-lg p-[3px] bg-white/80 dark:bg-[#232323] border border-gray-200 dark:border-gray-700",
 				className,
 			)}
 			{...props}
@@ -41,7 +41,7 @@ function TabsTrigger({
 		<TabsPrimitive.Trigger
 			data-slot="tabs-trigger"
 			className={cn(
-				"data-[state=active]:bg-[var(--color-background)] dark:data-[state=active]:text-[var(--color-primary-dark)] focus-visible:border-[var(--color-primary-dark)] focus-visible:ring-[var(--color-primary-dark)]/50 focus-visible:outline-[var(--color-primary-dark)] dark:data-[state=active]:border-[var(--color-primary-light)] dark:data-[state=active]:bg-[var(--color-primary-light)]/30 text-[var(--color-primary-dark)] dark:text-[var(--color-muted)] inline-flex h-[calc(100%-1px)] flex-1 items-center justify-center gap-1.5 rounded-md border border-transparent px-2 py-1 text-sm font-medium whitespace-nowrap transition-[color,bg]",
+				`data-[state=active]:bg-[#facc15] data-[state=active]:text-black dark:data-[state=active]:bg-[#facc15] dark:data-[state=active]:text-[#18181b] focus-visible:border-[#facc15] focus-visible:ring-[#facc15]/50 focus-visible:outline-[#facc15] text-black dark:text-white inline-flex h-[calc(100%-1px)] flex-1 items-center justify-center gap-1.5 rounded-md border border-transparent px-2 py-1 text-sm font-medium whitespace-nowrap transition-[color,bg]`,
 				className,
 			)}
 			{...props}

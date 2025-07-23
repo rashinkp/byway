@@ -85,7 +85,7 @@ export function DataTable<T>({
 
 	return (
 		<div className="space-y-4">
-			<div className="backdrop-blur-sm rounded-xl shadow-sm overflow-hidden">
+			<div className="backdrop-blur-sm rounded-xl shadow-sm overflow-hidden bg-white/80 dark:bg-[#232323] border border-gray-200 dark:border-gray-700">
 				{isLoading ? (
 					<TableSkeleton
 						columns={columns.length}
@@ -94,17 +94,17 @@ export function DataTable<T>({
 				) : (
 					<Table>
 						<TableHeader>
-							<TableRow className="bg-[var(--color-surface)]/50 hover:bg-[var(--color-surface)]/70 transition-colors">
+							<TableRow className="bg-white/80 dark:bg-[#232323] hover:bg-white/90 dark:hover:bg-[#232323] transition-colors">
 								{columns.map((column, index) => (
 									<TableHead
 										key={index}
-										className="text-[var(--color-primary-dark)] font-semibold text-sm tracking-tight py-4 px-6"
+										className="text-black dark:text-[#facc15] font-semibold text-sm tracking-tight py-4 px-6"
 									>
 										{column.header}
 									</TableHead>
 								))}
 								{actions.length > 0 && (
-									<TableHead className="text-[var(--color-primary-dark)] font-semibold text-sm tracking-tight py-4 px-6">
+									<TableHead className="text-black dark:text-[#facc15] font-semibold text-sm tracking-tight py-4 px-6">
 										Actions
 									</TableHead>
 								)}
@@ -146,7 +146,7 @@ export function DataTable<T>({
 											{columns.map((column, colIndex) => (
 												<TableCell
 													key={colIndex}
-													className="text-[var(--color-primary-dark)] text-sm py-4 px-6 max-w-xs truncate"
+													className="text-black dark:text-white text-sm py-4 px-6 max-w-xs truncate"
 													title={
 														column.render
 															? undefined
@@ -182,7 +182,7 @@ export function DataTable<T>({
 															return (
 																<Button
 																	key={actionIndex}
-																	variant={variant}
+																	variant={variant === "default" ? "default" : "secondary"}
 																	size="sm"
 																	className={`
                                     relative
@@ -191,10 +191,10 @@ export function DataTable<T>({
                                     transition-all duration-200
                                     hover:scale-105 hover:shadow-md
                                     ${variant === "destructive"
-																			? "bg-[var(--color-danger)]/10 text-[var(--color-danger)] hover:bg-[var(--color-danger)]/20 border-[var(--color-danger)]/30"
+																			? "bg-red-100 dark:bg-red-900 text-red-700 dark:text-red-300 hover:bg-red-200 dark:hover:bg-red-800 border-red-200 dark:border-red-700"
 																			: variant === "default"
-																				? "bg-[var(--color-accent)]/10 text-[var(--color-accent)] hover:bg-[var(--color-accent)]/20 border-[var(--color-accent)]/30"
-																				: "bg-[var(--color-primary-light)]/10 text-[var(--color-primary-light)] hover:bg-[var(--color-primary-light)]/20 border-[var(--color-primary-light)]/30"
+																				? "bg-[#facc15]/10 text-[#facc15] hover:bg-[#facc15]/20 border-[#facc15]/30 dark:bg-[#232323] dark:text-[#facc15] dark:hover:bg-[#18181b] dark:border-[#facc15]"
+																				: "bg-white/80 text-black dark:bg-[#232323] dark:text-white border-gray-200 dark:border-gray-700"
 																		}
                                   `}
 																	onClick={(e) => {

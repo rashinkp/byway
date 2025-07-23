@@ -41,7 +41,7 @@ export function CommonSidebar({
 }: CommonSidebarProps) {
 	return (
 		<aside
-			className={`fixed top-0 left-0 z-40 h-screen bg-[#18181b] text-white shadow-xl transition-all duration-300 ease-in-out
+			className={`fixed top-0 left-0 z-40 h-screen bg-[#18181b] shadow-xl transition-all duration-300 ease-in-out
         ${mobileMenuOpen ? "translate-x-0" : "-translate-x-full"}
         lg:translate-x-0 ${
 				isCollapsible

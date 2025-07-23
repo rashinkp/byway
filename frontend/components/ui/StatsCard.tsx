@@ -120,24 +120,22 @@ export function StatsCards({ stats }: StatsCardsProps) {
 					custom={index}
 				>
 					<div
-						className={`${getBgColor(stat.title)} backdrop-blur-sm border border-gray-200/50 rounded-lg p-4 hover:bg-white/80 transition-all duration-200 hover:shadow-sm`}
+						className={`bg-white/80 dark:bg-[#232323] backdrop-blur-sm border border-gray-200/50 dark:border-gray-700 rounded-lg p-4 hover:bg-white/80 dark:hover:bg-[#232323] transition-all duration-200 hover:shadow-sm`}
 					>
 						<div className="flex items-center justify-between mb-2">
-							<div className={`${getTextColor(stat.title)} opacity-75`}>
+							<div className="text-[#facc15] dark:text-[#facc15] opacity-75">
 								{getIcon(stat.title, stat.icon)}
 							</div>
 						</div>
 						<div className="space-y-1">
-							<h3 className="text-lg font-semibold text-gray-900">
+							<h3 className="text-lg font-semibold text-gray-900 dark:text-white">
 								{stat.value}
 							</h3>
-							<p
-								className={`text-xs font-medium ${getTextColor(stat.title)} uppercase tracking-wide`}
-							>
+							<p className="text-xs font-medium text-gray-700 dark:text-[#facc15] uppercase tracking-wide">
 								{stat.title}
 							</p>
 							{stat.description && (
-								<p className="text-xs text-gray-500">{stat.description}</p>
+								<p className="text-xs text-gray-500 dark:text-gray-300">{stat.description}</p>
 							)}
 						</div>
 					</div>
