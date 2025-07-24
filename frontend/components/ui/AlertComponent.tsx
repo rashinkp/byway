@@ -61,31 +61,31 @@ export function AlertComponent({
   return (
     <AlertDialog open={open} onOpenChange={onOpenChange}>
       <AlertDialogOverlay className="fixed inset-0 bg-black/50 z-50" />
-      <AlertDialogContent className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 rounded-lg bg-[var(--color-surface)] p-6 shadow-lg max-w-md w-full z-50">
+      <AlertDialogContent className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 rounded-lg bg-white/80 dark:bg-[#232323] border border-gray-200 dark:border-gray-700 p-6 shadow-lg max-w-md w-full z-50">
         <AlertDialogHeader>
-          <AlertDialogTitle className="text-lg font-semibold text-[var(--color-primary-dark)]">
+          <AlertDialogTitle className="text-lg font-semibold text-black dark:text-[#facc15]">
             {title}
           </AlertDialogTitle>
 
           {typeof getDynamicDescription() === "string" ? (
-            <AlertDialogDescription className="mt-2 text-sm text-[var(--color-muted)]">
+            <AlertDialogDescription className="mt-2 text-sm text-gray-700 dark:text-gray-300">
               {getDynamicDescription() as string}
             </AlertDialogDescription>
           ) : (
-            <div className="mt-2 text-sm text-[var(--color-muted)]">
+            <div className="mt-2 text-sm text-gray-700 dark:text-gray-300">
               {getDynamicDescription() as string}
             </div>
           )}
         </AlertDialogHeader>
         <AlertDialogFooter className="mt-4 flex justify-end gap-2">
           {cancelText && (
-            <AlertDialogCancel className="px-4 py-2 text-sm font-medium text-[var(--color-surface)] bg-[var(--color-muted)] hover:bg-[var(--color-muted)]/80 rounded-md">
+            <AlertDialogCancel className="px-4 py-2 text-sm font-medium text-black dark:text-white bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 rounded-md">
               {cancelText}
             </AlertDialogCancel>
           )}
           <AlertDialogAction
             onClick={handleConfirm}
-            className="px-4 py-2 text-sm font-medium text-[var(--color-surface)] bg-[var(--color-primary-dark)] hover:bg-[var(--color-primary-dark)] rounded-md"
+            className="px-4 py-2 text-sm font-medium text-black dark:text-[#18181b] bg-[#facc15] hover:bg-yellow-400 dark:bg-[#facc15] dark:hover:bg-yellow-400 rounded-md"
           >
             {confirmText}
           </AlertDialogAction>

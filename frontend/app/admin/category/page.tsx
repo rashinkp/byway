@@ -69,26 +69,26 @@ export default function CategoriesPage() {
 	const renderCategoryDetails = (category: Category) => (
 		<div className="space-y-4">
 			<div>
-				<h3 className="text-sm font-semibold text-gray-700">Name</h3>
-				<p className="text-sm text-gray-600">{category.name}</p>
+				<h3 className="text-sm font-semibold text-gray-700 dark:text-white">Name</h3>
+				<p className="text-sm text-gray-600 dark:text-gray-300">{category.name}</p>
 			</div>
 			<div>
-				<h3 className="text-sm font-semibold text-gray-700">Description</h3>
-				<p className="text-sm text-gray-600">{category.description || "N/A"}</p>
+				<h3 className="text-sm font-semibold text-gray-700 dark:text-white">Description</h3>
+				<p className="text-sm text-gray-600 dark:text-gray-300">{category.description || "N/A"}</p>
 			</div>
 			<div>
-				<h3 className="text-sm font-semibold text-gray-700">Status</h3>
+				<h3 className="text-sm font-semibold text-gray-700 dark:text-white">Status</h3>
 				<StatusBadge isActive={!category.deletedAt} />
 			</div>
 			<div>
-				<h3 className="text-sm font-semibold text-gray-700">Created At</h3>
-				<p className="text-sm text-gray-600">
+				<h3 className="text-sm font-semibold text-gray-700 dark:text-white">Created At</h3>
+				<p className="text-sm text-gray-600 dark:text-gray-300">
 					{new Date(category.createdAt).toLocaleString()}
 				</p>
 			</div>
 			<div>
-				<h3 className="text-sm font-semibold text-gray-700">Updated At</h3>
-				<p className="text-sm text-gray-600">
+				<h3 className="text-sm font-semibold text-gray-700 dark:text-white">Updated At</h3>
+				<p className="text-sm text-gray-600 dark:text-gray-300">
 					{new Date(category.updatedAt).toLocaleString()}
 				</p>
 			</div>

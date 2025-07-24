@@ -82,10 +82,10 @@ export default function CategoryFormModal({
 
 	return (
 		<Dialog open={open} onOpenChange={onOpenChange}>
-			<DialogContent className="sm:max-w-[425px]">
+			<DialogContent className="sm:max-w-[425px] bg-white/80 dark:bg-[#232323] border border-gray-200 dark:border-gray-700">
 				<DialogHeader>
-					<DialogTitle>{title}</DialogTitle>
-					<DialogDescription>
+					<DialogTitle className="text-lg font-semibold text-black dark:text-white">{title}</DialogTitle>
+					<DialogDescription className="text-gray-700 dark:text-gray-300">
 						{initialData
 							? "Update the category information below."
 							: "Add a new category by filling out the form below."}
@@ -101,9 +101,9 @@ export default function CategoryFormModal({
 							name="name"
 							render={({ field }) => (
 								<FormItem>
-									<FormLabel>Name</FormLabel>
+									<FormLabel className="text-gray-700 dark:text-gray-300">Name</FormLabel>
 									<FormControl>
-										<Input placeholder="Enter category name" {...field} />
+										<Input placeholder="Enter category name" {...field} className="bg-white/80 dark:bg-[#18181b] text-black dark:text-white border border-gray-200 dark:border-gray-700" />
 									</FormControl>
 									<FormMessage />
 								</FormItem>
@@ -114,11 +114,11 @@ export default function CategoryFormModal({
 							name="description"
 							render={({ field }) => (
 								<FormItem>
-									<FormLabel>Description</FormLabel>
+									<FormLabel className="text-gray-700 dark:text-gray-300">Description</FormLabel>
 									<FormControl>
 										<Textarea
 											placeholder="Enter category description (optional)"
-											className="resize-none"
+											className="resize-none bg-white/80 dark:bg-[#18181b] text-black dark:text-white border border-gray-200 dark:border-gray-700"
 											rows={3}
 											{...field}
 										/>
@@ -130,12 +130,14 @@ export default function CategoryFormModal({
 						<DialogFooter>
 							<Button
 								type="button"
-								variant="outline"
 								onClick={() => onOpenChange(false)}
+								className="bg-gray-200 dark:bg-gray-700 text-black dark:text-white hover:bg-gray-300 dark:hover:bg-gray-600"
 							>
 								Cancel
 							</Button>
-							<Button type="submit">{submitText}</Button>
+							<Button type="submit" className="bg-[#facc15] hover:bg-yellow-400 text-black dark:bg-[#facc15] dark:hover:bg-yellow-400 dark:text-[#18181b] font-semibold">
+								{submitText}
+							</Button>
 						</DialogFooter>
 					</form>
 				</Form>

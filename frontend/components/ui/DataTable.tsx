@@ -85,7 +85,7 @@ export function DataTable<T>({
 
 	return (
 		<div className="space-y-4">
-			<div className="backdrop-blur-sm rounded-xl shadow-sm overflow-hidden bg-white/80 dark:bg-[#232323] border border-gray-200 dark:border-gray-700">
+			<div className="backdrop-blur-sm rounded-xl shadow-sm overflow-hidden">
 				{isLoading ? (
 					<TableSkeleton
 						columns={columns.length}
@@ -94,7 +94,7 @@ export function DataTable<T>({
 				) : (
 					<Table>
 						<TableHeader>
-							<TableRow className="bg-white/80 dark:bg-[#232323] hover:bg-white/90 dark:hover:bg-[#232323] transition-colors">
+							<TableRow className="">
 								{columns.map((column, index) => (
 									<TableHead
 										key={index}
