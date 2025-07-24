@@ -191,11 +191,11 @@ export function DataTable<T>({
                                     transition-all duration-200
                                     hover:scale-105 hover:shadow-md
                                     ${variant === "destructive"
-																			? "bg-red-100 dark:bg-red-900 text-red-700 dark:text-red-300 hover:bg-red-200 dark:hover:bg-red-800 border-red-200 dark:border-red-700"
-																			: variant === "default"
-																				? "bg-[#facc15]/10 text-[#facc15] hover:bg-[#facc15]/20 border-[#facc15]/30 dark:bg-[#232323] dark:text-[#facc15] dark:hover:bg-[#18181b] dark:border-[#facc15]"
-																				: "bg-white/80 text-black dark:bg-[#232323] dark:text-white border-gray-200 dark:border-gray-700"
-																		}
+                                        ? "bg-red-100 dark:bg-red-900 text-red-700 dark:text-red-300 hover:bg-red-200 dark:hover:bg-red-800 border-red-200 dark:border-red-700"
+                                        : variant === "default"
+                                            ? "bg-[#facc15]/10 text-[#facc15] dark:hover:text-white hover:bg-[#facc15]/20 border-[#facc15]/30 dark:bg-[#232323] dark:text-[#facc15] dark:hover:bg-[#facc15]/20 dark:border-[#facc15]"
+                                            : "bg-white/80 text-black dark:bg-[#232323] dark:text-white hover:dark:text-white border-gray-200 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-[#232323]"
+                                    }
                                   `}
 																	onClick={(e) => {
 																		e.stopPropagation();

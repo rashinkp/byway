@@ -127,15 +127,15 @@ export function LessonDetailSection({
 	}
 
 	return (
-		<div className=" overflow-hidden">
+		<div className="overflow-hidden bg-white dark:bg-[#232323] border border-gray-200 dark:border-gray-700 rounded-xl">
 			{/* Header section */}
-			<div className="border-b border-gray-100 p-2">
+			<div className="border-b border-gray-200 dark:border-gray-700 p-4">
 				<div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
-					<h1 className="text-2xl font-bold text-gray-800">{lesson.title}</h1>
+					<h1 className="text-2xl font-bold text-black dark:text-white">{lesson.title}</h1>
 					<div className="flex flex-wrap gap-6">
 						<span
 							onClick={() => setIsLessonModalOpen(true)}
-							className={`flex items-center text-blue-700 hover:text-blue-600 transition-colors duration-200 cursor-pointer ${
+							className={`flex items-center text-[#facc15] hover:text-black dark:hover:text-white transition-colors duration-200 cursor-pointer ${
 								isLoading || isSubmitting ? "opacity-50 cursor-not-allowed" : ""
 							}`}
 						>
@@ -147,8 +147,8 @@ export function LessonDetailSection({
 							onClick={handleTogglePublish}
 							className={`flex items-center ${
 								lesson.status === "PUBLISHED"
-									? "text-yellow-700 hover:text-yellow-500"
-									: "text-green-800 hover:text-green-600"
+									? "text-[#facc15] hover:text-black dark:hover:text-white"
+									: "text-[#facc15] hover:text-black dark:hover:text-white"
 							} transition-colors duration-200 cursor-pointer ${
 								isLoading || isSubmitting ? "opacity-50 cursor-not-allowed" : ""
 							}`}
@@ -168,7 +168,7 @@ export function LessonDetailSection({
 
 						<span
 							onClick={handleOpenConfirm}
-							className={`flex items-center text-red-700 hover:text-red-900 transition-colors duration-200 cursor-pointer ${
+							className={`flex items-center text-red-600 hover:text-red-400 transition-colors duration-200 cursor-pointer ${
 								isLoading || isSubmitting ? "opacity-50 cursor-not-allowed" : ""
 							}`}
 						>
@@ -186,10 +186,10 @@ export function LessonDetailSection({
 						<div className="flex items-start gap-3">
 							<StickyNote className="h-5 w-5 text-gray-400 mt-1" />
 							<div>
-								<h3 className="text-gray-500 font-medium text-sm">
+								<h3 className="text-gray-700 dark:text-gray-300 font-medium text-sm">
 									Description
 								</h3>
-								<p className="text-gray-800">
+								<p className="text-black dark:text-white">
 									{lesson.description || "No description provided"}
 								</p>
 							</div>
@@ -198,8 +198,8 @@ export function LessonDetailSection({
 						<div className="flex items-center gap-3">
 							<Hash className="h-5 w-5 text-gray-400" />
 							<div>
-								<h3 className="text-gray-500 font-medium text-sm">Order</h3>
-								<p className="text-gray-800">{lesson.order}</p>
+								<h3 className="text-gray-700 dark:text-gray-300 font-medium text-sm">Order</h3>
+								<p className="text-black dark:text-white">{lesson.order}</p>
 							</div>
 						</div>
 					</div>
@@ -208,32 +208,32 @@ export function LessonDetailSection({
 						<div className="flex items-center gap-3">
 							<CalendarClock className="h-5 w-5 text-gray-400" />
 							<div>
-								<h3 className="text-gray-500 font-medium text-sm">Created</h3>
-								<p className="text-gray-800">{formatDate(lesson.createdAt)}</p>
+								<h3 className="text-gray-700 dark:text-gray-300 font-medium text-sm">Created</h3>
+								<p className="text-black dark:text-white">{formatDate(lesson.createdAt)}</p>
 							</div>
 						</div>
 
 						<div className="flex items-center gap-3">
 							<CalendarClock className="h-5 w-5 text-gray-400" />
 							<div>
-								<h3 className="text-gray-500 font-medium text-sm">
+								<h3 className="text-gray-700 dark:text-gray-300 font-medium text-sm">
 									Last Updated
 								</h3>
-								<p className="text-gray-800">{formatDate(lesson.updatedAt)}</p>
+								<p className="text-black dark:text-white">{formatDate(lesson.updatedAt)}</p>
 							</div>
 						</div>
 
 						<div className="flex items-center gap-3">
 							<ArrowUpRight className="h-5 w-5 text-gray-400" />
 							<div>
-								<h3 className="text-gray-500 font-medium text-sm">Status</h3>
+								<h3 className="text-gray-700 dark:text-gray-300 font-medium text-sm">Status</h3>
 								<div className="flex items-center gap-3 mt-1">
 									<StatusBadge isActive={!lesson.deletedAt} />
 									<span
 										className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
 											lesson.status === "PUBLISHED"
-												? "bg-green-100 text-green-800"
-												: "bg-amber-100 text-amber-800"
+												? "bg-[#facc15] text-black dark:bg-[#facc15] dark:text-[#18181b]"
+												: "bg-gray-200 text-gray-700 dark:bg-gray-700 dark:text-white"
 										}`}
 									>
 										{lesson.status === "PUBLISHED" ? "Published" : "Draft"}

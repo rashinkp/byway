@@ -56,11 +56,11 @@ export const ContentSection = ({ lessonId }: ContentSectionProps) => {
 	const getContentTypeIcon = (type: ContentType) => {
 		switch (type) {
 			case ContentType.VIDEO:
-				return <Video className="w-5 h-5 text-blue-500" />;
+				return <Video className="w-5 h-5 text-yellow-500" />;
 			case ContentType.DOCUMENT:
-				return <FileText className="w-5 h-5 text-blue-500" />;
+				return <FileText className="w-5 h-5 text-yellow-500" />;
 			case ContentType.QUIZ:
-				return <HelpCircle className="w-5 h-5 text-blue-500" />;
+				return <HelpCircle className="w-5 h-5 text-yellow-500" />;
 			default:
 				return null;
 		}
@@ -72,8 +72,8 @@ export const ContentSection = ({ lessonId }: ContentSectionProps) => {
 
 	if (isEditing) {
 		return (
-			<div className="bg-white rounded-2xl p-8 shadow-lg border border-gray-100 backdrop-blur-sm">
-				<h2 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-indigo-700 bg-clip-text text-transparent mb-6">
+			<div className="bg-white dark:bg-[#232323] rounded-2xl p-8 shadow-lg border border-gray-200 dark:border-gray-700">
+				<h2 className="text-2xl font-bold text-black dark:text-white mb-6">
 					{content ? "Edit Content" : "Add New Content"}
 				</h2>
 				<ContentInputForm
@@ -87,21 +87,21 @@ export const ContentSection = ({ lessonId }: ContentSectionProps) => {
 
 	if (!content) {
 		return (
-			<div className="bg-white rounded-2xl p-8 shadow-lg border border-gray-100 backdrop-blur-sm">
+			<div className="bg-white dark:bg-[#232323] rounded-2xl p-8 shadow-lg border border-gray-200 dark:border-gray-700">
 				<div className="text-center py-12">
-					<div className="bg-blue-50 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-						<Plus className="w-8 h-8 text-blue-600" />
+					<div className="bg-[#facc15]/20 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+						<Plus className="w-8 h-8 text-[#facc15]" />
 					</div>
-					<h2 className="text-2xl font-bold text-gray-800 mb-3">
+					<h2 className="text-2xl font-bold text-black dark:text-white mb-3">
 						No Content Yet
 					</h2>
-					<p className="text-gray-500 mb-6 max-w-md mx-auto">
+					<p className="text-gray-700 dark:text-gray-300 mb-6 max-w-md mx-auto">
 						This lesson doesn't have any content yet. Add videos, documents, or
 						quizzes to get started.
 					</p>
 					<Button
 						onClick={() => setIsEditing(true)}
-						className="bg-gradient-to-r from-blue-600 to-indigo-700 hover:from-blue-700 hover:to-indigo-800 text-white px-6 py-2 rounded-xl shadow-md hover:shadow-lg transform hover:-translate-y-1 transition-all"
+						className="bg-[#facc15] text-black dark:bg-[#facc15] dark:text-[#18181b] hover:bg-yellow-400 dark:hover:bg-yellow-400 px-6 py-2 rounded-xl shadow-md hover:shadow-lg transform hover:-translate-y-1 transition-all"
 					>
 						<Plus className="mr-2 h-4 w-4" />
 						Add Content
@@ -112,18 +112,18 @@ export const ContentSection = ({ lessonId }: ContentSectionProps) => {
 	}
 
 	return (
-		<div className="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
+		<div className="bg-white dark:bg-[#232323] rounded-2xl shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
 			{/* Content header */}
-			<div className="border-b border-gray-100 p-6">
+			<div className="border-b border-gray-200 dark:border-gray-700 p-6">
 				<div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
 					<div className="flex items-center gap-3">
 						{getContentTypeIcon(content.type)}
-						<h2 className="text-xl font-bold text-gray-800">{content.title}</h2>
+						<h2 className="text-xl font-bold text-black dark:text-white">{content.title}</h2>
 					</div>
 					<div className="flex gap-3">
 						<Button
 							onClick={() => setIsEditing(true)}
-							className="text-blue-600 hover:text-blue-700  bg-inherit hover:bg-inherit"
+							className="bg-[#facc15] text-black dark:bg-[#facc15] dark:text-[#18181b] hover:bg-yellow-400 dark:hover:bg-yellow-400 px-4 py-2 rounded shadow-sm"
 							disabled={isDeleting}
 							size="sm"
 						>
@@ -133,7 +133,7 @@ export const ContentSection = ({ lessonId }: ContentSectionProps) => {
 						<Button
 							onClick={() => handleDelete(content.id)}
 							disabled={isDeleting}
-							className="text-red-600 hover:text-red-700 bg-inherit hover:bg-inherit"
+							className="bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300 hover:bg-red-200 dark:hover:bg-red-800 px-4 py-2 rounded shadow-sm"
 							size="sm"
 						>
 							<Trash2 className="mr-2 h-4 w-4" />
@@ -142,7 +142,7 @@ export const ContentSection = ({ lessonId }: ContentSectionProps) => {
 					</div>
 				</div>
 				{content.description && (
-					<p className="mt-3 text-gray-600 leading-relaxed">
+					<p className="mt-3 text-gray-700 dark:text-gray-300 leading-relaxed">
 						{content.description}
 					</p>
 				)}
@@ -151,7 +151,7 @@ export const ContentSection = ({ lessonId }: ContentSectionProps) => {
 			{/* Content body */}
 			<div className="p-6">
 				{content.type === ContentType.VIDEO && content.fileUrl && (
-					<div className="rounded-xl overflow-hidden border border-gray-200 shadow-sm">
+					<div className="rounded-xl overflow-hidden border border-gray-200 dark:border-gray-700 shadow-sm">
 						<div
 							className="relative w-full"
 							style={{ paddingTop: "56.25%" /* 16:9 aspect ratio */ }}
@@ -167,15 +167,15 @@ export const ContentSection = ({ lessonId }: ContentSectionProps) => {
 				)}
 
 				{content.type === ContentType.DOCUMENT && content.fileUrl && (
-					<div className="flex items-center p-4 bg-blue-50 rounded-xl border border-blue-200">
-						<FileText className="w-10 h-10 text-blue-500 mr-4" />
+					<div className="flex items-center rounded-xl bg-[#facc15]/10 dark:bg-[#232323] border border-gray-200 dark:border-gray-700 p-4">
+						<FileText className="w-10 h-10 text-yellow-500 mr-4" />
 						<div>
-							<h3 className="text-gray-800 font-medium">Document</h3>
+							<h3 className="text-black dark:text-white font-medium">Document</h3>
 							<a
 								href={content.fileUrl}
 								target="_blank"
 								rel="noopener noreferrer"
-								className="text-blue-600 hover:text-blue-800 flex items-center mt-1 group"
+								className="text-[#facc15] hover:text-black dark:hover:text-white flex items-center mt-1 group"
 							>
 								View Document
 								<ChevronRight className="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform" />
@@ -189,9 +189,9 @@ export const ContentSection = ({ lessonId }: ContentSectionProps) => {
 						{content.quizQuestions.map((q, index) => (
 							<div
 								key={index}
-								className="bg-blue-50 p-6 rounded-xl border border-blue-200"
+								className="bg-[#facc15]/10 dark:bg-[#232323] p-6 rounded-xl border border-[#facc15] dark:border-[#facc15]"
 							>
-								<h3 className="text-lg font-medium text-gray-800 mb-4">
+								<h3 className="text-lg font-medium text-black dark:text-white mb-4">
 									Question {index + 1}: {q.question}
 								</h3>
 								<ul className="space-y-3 mb-4">
@@ -200,26 +200,26 @@ export const ContentSection = ({ lessonId }: ContentSectionProps) => {
 											key={i}
 											className={`flex items-center p-3 rounded-lg ${
 												opt === q.correctAnswer
-													? "bg-green-100 border border-green-200"
-													: "bg-white border border-gray-200"
+													? "bg-[#facc15] text-black dark:bg-[#facc15] dark:text-[#18181b] border border-[#facc15] dark:border-[#facc15]"
+													: "bg-white dark:bg-[#232323] text-black dark:text-white border border-gray-200 dark:border-gray-700"
 											}`}
 										>
 											{opt === q.correctAnswer ? (
-												<Check className="w-5 h-5 text-green-600 mr-3 flex-shrink-0" />
+												<Check className="w-5 h-5 text-[#facc15] mr-3 flex-shrink-0" />
 											) : (
 												<X className="w-5 h-5 text-gray-400 mr-3 flex-shrink-0" />
 											)}
 											<span
 												className={`${
 													opt === q.correctAnswer
-														? "text-gray-800 font-medium"
-														: "text-gray-600"
+														? "text-black dark:text-[#18181b] font-medium"
+														: "text-black dark:text-white"
 												}`}
 											>
 												{opt}
 											</span>
 											{opt === q.correctAnswer && (
-												<span className="ml-auto text-xs bg-green-100 text-green-800 px-2 py-1 rounded">
+												<span className="ml-auto text-xs bg-[#facc15] text-black dark:bg-[#facc15] dark:text-[#18181b] px-2 py-1 rounded">
 													Correct Answer
 												</span>
 											)}

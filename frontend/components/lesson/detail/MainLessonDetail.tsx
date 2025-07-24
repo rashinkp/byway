@@ -8,8 +8,6 @@ import { useUpdateLesson } from "@/hooks/lesson/useUpdateLesson";
 import { z } from "zod";
 import { LessonFormData, lessonSchema } from "@/lib/validations/lesson";
 import ErrorDisplay from "@/components/ErrorDisplay";
-
-// Component imports
 import { LessonDetailSection } from "@/components/lesson/LessonDetailSection";
 import { ContentSection } from "@/components/content/ContentSection";
 import { ContentSectionSkeleton } from "@/components/skeleton/LessonContentSectionSkeleton";
@@ -83,8 +81,8 @@ export default function MainLessonDetail() {
     return (
       <div className=" min-h-screen py-8">
         <div className="max-w-6xl mx-auto px-4">
-          <div className="bg-white rounded-lg p-8 shadow-md border border-gray-100">
-            <p className="text-gray-700 text-xl font-medium">No lesson found</p>
+          <div className="bg-white dark:bg-[#232323] rounded-lg p-8 shadow-md border border-gray-200 dark:border-gray-700">
+            <p className="text-black dark:text-white text-xl font-medium">No lesson found</p>
           </div>
         </div>
       </div>

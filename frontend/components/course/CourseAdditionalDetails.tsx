@@ -18,13 +18,12 @@ export function AdditionalDetailsSection({
 			<div className="space-y-6">
 				{/* Status Indicator */}
 				<div>
-					<h3 className="text-lg font-semibold text-gray-900">Status</h3>
+					<h3 className="text-lg font-semibold text-black dark:text-white">Status</h3>
 					<Badge
-						variant={status === "Active" ? "default" : "destructive"}
 						className={
 							status === "Active"
-								? "bg-green-100 text-green-800"
-								: "bg-red-100 text-red-800"
+								? "bg-[#facc15] text-black dark:bg-[#facc15] dark:text-[#18181b]"
+								: "bg-red-100 text-red-800 dark:bg-red-800 dark:text-white"
 						}
 					>
 						{status}
@@ -33,18 +32,18 @@ export function AdditionalDetailsSection({
 
 				{/* Prerequisites */}
 				<div>
-					<h3 className="text-lg font-semibold text-gray-900">Prerequisites</h3>
-					<p className="text-gray-600">
+					<h3 className="text-lg font-semibold text-black dark:text-white">Prerequisites</h3>
+					<p className="text-gray-700 dark:text-gray-300">
 						{course?.details?.prerequisites || "No prerequisites specified."}
 					</p>
 				</div>
 
 				{/* Long Description */}
 				<div>
-					<h3 className="text-lg font-semibold text-gray-900">
+					<h3 className="text-lg font-semibold text-black dark:text-white">
 						Detailed Description
 					</h3>
-					<p className="text-gray-600">
+					<p className="text-gray-700 dark:text-gray-300">
 						{course?.details?.longDescription ||
 							"No detailed description available."}
 					</p>
@@ -52,20 +51,20 @@ export function AdditionalDetailsSection({
 
 				{/* Learning Objectives */}
 				<div>
-					<h3 className="text-lg font-semibold text-gray-900">
+					<h3 className="text-lg font-semibold text-black dark:text-white">
 						Learning Objectives
 					</h3>
-					<p className="text-gray-600">
+					<p className="text-gray-700 dark:text-gray-300">
 						{course?.details?.objectives || "No learning objectives specified."}
 					</p>
 				</div>
 
 				{/* Target Audience */}
 				<div>
-					<h3 className="text-lg font-semibold text-gray-900">
+					<h3 className="text-lg font-semibold text-black dark:text-white">
 						Target Audience
 					</h3>
-					<p className="text-gray-600">
+					<p className="text-gray-700 dark:text-gray-300">
 						{course?.details?.targetAudience || "No target audience specified."}
 					</p>
 				</div>

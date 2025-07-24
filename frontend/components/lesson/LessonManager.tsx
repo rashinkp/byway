@@ -97,13 +97,13 @@ export function LessonManager({ courseId }: { courseId: string }) {
 	return (
 		<div className="space-y-6">
 			<div className="flex items-center justify-between">
-				<h2 className="text-xl font-bold text-gray-800">Lessons</h2>
+				<h2 className="text-xl font-bold text-black dark:text-white">Lessons</h2>
 				<Button
 					onClick={() => {
 						setEditingLesson(null);
 						setIsLessonModalOpen(true);
 					}}
-					className="bg-blue-600 hover:bg-blue-700 text-white"
+					className="bg-[#facc15] text-black dark:bg-[#facc15] dark:text-[#18181b] hover:bg-yellow-400 dark:hover:bg-yellow-400"
 				>
 					<Video className="mr-2 h-4 w-4" />
 					Add Lesson

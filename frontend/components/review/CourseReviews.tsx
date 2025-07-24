@@ -72,18 +72,18 @@ export default function CourseReviews({
       <div className="space-y-6">
         {/* Review Stats for Instructor/Admin */}
         {reviewStats && reviewStats.totalReviews > 0 && (
-          <div className="bg-white dark:bg-[#232323] rounded-lg p-6">
+          <div className=" rounded-lg p-6">
             <h3 className="text-sm font-semibold text-black dark:text-white mb-4">Review Statistics</h3>
             <div className="flex items-start space-x-6">
               {/* Average Rating */}
               <div className="text-center">
-                <div className="text-3xl font-bold ">
+                <div className="text-3xl font-bold text-black dark:text-white ">
                   {reviewStats.averageRating.toFixed(1)}
                 </div>
-                <div className="flex justify-center mt-1">
+                <div className="flex justify-center mt-1 text-[#facc15]">
                   {renderStars(Math.round(reviewStats.averageRating))}
                 </div>
-                <div className="text-sm text-gray-500 dark:text-gray-300 mt-1">
+                <div className="text-sm text-gray-700 dark:text-gray-300 mt-1">
                   {reviewStats.totalReviews} {reviewStats.totalReviews === 1 ? 'review' : 'reviews'}
                 </div>
               </div>
@@ -93,16 +93,16 @@ export default function CourseReviews({
                 {[5, 4, 3, 2, 1].map((rating) => (
                   <div key={rating} className="flex items-center space-x-2">
                     <div className="flex items-center space-x-1 w-8">
-                      <span className="text-sm text-gray-500 dark:text-gray-300">{rating}</span>
+                      <span className="text-sm text-gray-700 dark:text-gray-300">{rating}</span>
                       <Star className="w-3 h-3 text-yellow-400 fill-current" />
                     </div>
-                    <div className="flex-1 bg-[#f9fafb] dark:bg-[#18181b] rounded-full h-2">
+                    <div className="flex-1 bg-gray-200 dark:bg-[#18181b] rounded-full h-2">
                       <div
-                        className="bg-yellow-400 h-2 rounded-full transition-all duration-300"
+                        className="bg-[#facc15] h-2 rounded-full transition-all duration-300"
                         style={{ width: `${reviewStats.ratingPercentages?.[rating] ?? 0}%` }}
                       />
                     </div>
-                    <div className="w-8 text-sm text-gray-500 dark:text-gray-300 text-right">
+                    <div className="w-8 text-sm text-gray-700 dark:text-gray-300 text-right">
                       {reviewStats.ratingDistribution?.[rating] ?? 0}
                     </div>
                   </div>
@@ -119,7 +119,7 @@ export default function CourseReviews({
               Student Reviews
             </h3>
             {reviewsData?.total && (
-              <span className="text-xs text-gray-500 dark:text-gray-300">
+              <span className="text-xs text-gray-700 dark:text-gray-300">
                 {reviewsData.total} {reviewsData.total === 1 ? 'review' : 'reviews'}
               </span>
             )}
@@ -170,7 +170,7 @@ export default function CourseReviews({
       )}
 
       {/* Reviews Card */}
-      <div className="rounded-xl  space-y-6">
+      <div className="rounded-xl bg-white dark:bg-[#232323] space-y-6">
         {/* Review Stats for Instructor or User */}
         {reviewStats && reviewStats.totalReviews > 0 && (
           <div className="mb-6">
@@ -182,7 +182,7 @@ export default function CourseReviews({
                 <div className="flex gap-1 text-[#facc15]">
                   {renderStars(Math.round(reviewStats.averageRating))}
                 </div>
-                <div className="text-sm text-gray-500 dark:text-gray-300">
+                <div className="text-sm text-gray-700 dark:text-gray-300">
                   ({reviewStats.totalReviews} {reviewStats.totalReviews === 1 ? 'review' : 'reviews'})
                 </div>
               </div>

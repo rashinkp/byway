@@ -86,17 +86,17 @@ export const FileUploadInput = ({
 
 	return (
 		<div className="space-y-3">
-			<label className="block text-sm font-semibold text-gray-700">
+			<label className="block text-sm font-semibold text-black dark:text-white">
 				{type === ContentType.VIDEO ? "Video File" : "Document File"}
 			</label>
 
 			<div
 				className={`relative p-6 border-2 border-dashed rounded-xl transition-all duration-300 ${
 					isDragging
-						? "border-blue-500 bg-blue-50"
+						? "border-[#facc15] bg-[#facc15]/20"
 						: errors.file
 							? "border-red-300 bg-red-50"
-							: "border-gray-300 bg-gray-50 hover:border-blue-400 hover:bg-blue-50"
+							: "border-gray-200 dark:border-gray-700 bg-white dark:bg-[#232323] hover:border-[#facc15] hover:bg-[#facc15]/10"
 				}`}
 				onDragOver={handleDragOver}
 				onDragLeave={handleDragLeave}
@@ -104,9 +104,9 @@ export const FileUploadInput = ({
 			>
 				<div className="flex flex-col items-center justify-center py-4 space-y-4">
 					{file ? (
-						<div className="flex items-center space-x-3 bg-blue-100 px-4 py-2 rounded-lg">
-							<File className="h-6 w-6 text-blue-600" />
-							<span className="text-sm font-medium text-gray-800 max-w-xs truncate">
+						<div className="flex items-center space-x-3 bg-[#facc15]/20 px-4 py-2 rounded-lg">
+							<File className="h-6 w-6 text-[#facc15]" />
+							<span className="text-sm font-medium text-black dark:text-white max-w-xs truncate">
 								{file.name}
 							</span>
 							<button
@@ -119,12 +119,12 @@ export const FileUploadInput = ({
 						</div>
 					) : (
 						<>
-							<Upload className="h-12 w-12 text-blue-500" />
+							<Upload className="h-12 w-12 text-[#facc15]" />
 							<div className="text-center">
-								<p className="text-gray-700 font-medium">
+								<p className="text-black dark:text-white font-medium">
 									Drag & drop your {getFileTypeLabel()} here
 								</p>
-								<p className="text-gray-500 text-sm mt-1">
+								<p className="text-gray-700 dark:text-gray-300 text-sm mt-1">
 									or click to browse files
 								</p>
 							</div>
@@ -149,8 +149,8 @@ export const FileUploadInput = ({
 					type="text"
 					value={fileUrl}
 					onChange={(e) => setFileUrl(e.target.value)}
-					className={`w-full p-3 pr-10 border rounded-xl bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300 ${
-						errors.file ? "border-red-300" : "border-gray-300"
+					className={`w-full p-3 pr-10 border rounded-xl bg-white dark:bg-[#232323] text-black dark:text-white focus:ring-2 focus:ring-[#facc15] focus:border-[#facc15] transition-all duration-300 ${
+						errors.file ? "border-red-300" : "border-gray-200 dark:border-gray-700"
 					}`}
 					placeholder="Or enter file URL"
 				/>
@@ -175,16 +175,16 @@ export const FileUploadInput = ({
 			{uploadStatus === "uploading" && (
 				<div className="mt-2">
 					<div className="flex justify-between text-sm mb-1">
-						<span className="text-blue-600 font-medium">Uploading...</span>
+						<span className="text-[#facc15] font-medium">Uploading...</span>
 						<span className="text-gray-600">{Math.round(uploadProgress)}%</span>
 					</div>
 					<div className="w-full bg-gray-200 rounded-full h-2">
 						<div
-							className="bg-gradient-to-r from-blue-500 to-indigo-600 h-2 rounded-full transition-all duration-300"
+							className="bg-[#facc15] h-2 rounded-full transition-all duration-300"
 							style={{ width: `${uploadProgress}%` }}
 						></div>
 					</div>
-					<p className="text-xs text-gray-500 mt-1">
+					<p className="text-xs text-gray-700 dark:text-gray-300 mt-1">
 						Please do not refresh the page
 					</p>
 				</div>

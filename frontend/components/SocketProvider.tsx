@@ -66,22 +66,22 @@ export default function SocketProvider() {
 			const toastContent = (
 				<div className="flex gap-4 p-4">
 					{/* Avatar */}
-					<div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center flex-shrink-0">
-						<Bell className="w-4 h-4 text-white" />
+					<div className="w-10 h-10 bg-[#facc15] rounded-lg flex items-center justify-center flex-shrink-0">
+						<Bell className="w-4 h-4 text-black" />
 					</div>
 
 					{/* Content */}
 					<div className="flex-1 min-w-0">
 						<div className="flex items-start justify-between gap-3 mb-2">
-							<h4 className="font-semibold text-gray-900 text-sm line-clamp-1">
+							<h4 className="font-semibold text-black dark:text-white text-sm line-clamp-1">
 								{getNotificationTitle(notificationType)}
 							</h4>
-							<span className="text-xs text-gray-500 whitespace-nowrap font-medium">
+							<span className="text-xs text-gray-500 dark:text-gray-300 whitespace-nowrap font-medium">
 								Just now
 							</span>
 						</div>
 
-						<p className="text-gray-600 text-xs leading-relaxed line-clamp-2 mb-2">
+						<p className="text-gray-700 dark:text-gray-300 text-xs leading-relaxed line-clamp-2 mb-2">
 							{notification.message}
 						</p>
 
@@ -94,7 +94,7 @@ export default function SocketProvider() {
 			toast.custom(
 				() => (
 					<div
-						className="bg-white border border-gray-200 rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300 cursor-pointer max-w-sm"
+						className="bg-white dark:bg-[#232323] border border-[#facc15] rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300 cursor-pointer max-w-sm"
 						onClick={() => {
 							// Navigate based on notification type and user role
 							handleNotificationClick(notification, user.role);

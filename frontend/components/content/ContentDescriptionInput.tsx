@@ -9,13 +9,13 @@ export const DescriptionInput = ({
 }: DescriptionInputProps) => {
 	return (
 		<div>
-			<label className="block text-sm font-semibold text-gray-700 mb-1">
+			<label className="block text-sm font-semibold text-black dark:text-white mb-1">
 				Description
 			</label>
 			<textarea
 				value={description}
 				onChange={(e) => setDescription(e.target.value)}
-				className="w-full p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300"
+				className="w-full p-3 border rounded-xl bg-white dark:bg-[#232323] text-black dark:text-white border-gray-200 dark:border-gray-700 focus:ring-2 focus:ring-[#facc15] focus:border-[#facc15] transition-all duration-300"
 				placeholder="Enter content description"
 				rows={4}
 			/>

@@ -19,6 +19,7 @@ import { ThumbnailUploadInput } from "./ContentThumbnailInputSection";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { AlertTriangle } from "lucide-react";
 import { FileUploadInput } from "./ContentFileUploadInput";
+import { Button } from "../ui/button";
 
 //todo: when editing content and all make sure the status update
 
@@ -186,17 +187,11 @@ export const ContentInputForm = ({
 
 	return (
 		<form onSubmit={handleSubmit} className="space-y-8 p-8">
-			<div className="text-center mb-6">
-				<h2 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-indigo-700 bg-clip-text text-transparent">
-					{isEditing ? "Edit Content" : "Create Content"}
-				</h2>
-				<div className="h-1 w-16 bg-gradient-to-r from-blue-600 to-indigo-700 mx-auto mt-2 rounded-full"></div>
-			</div>
 
 			<div className="grid grid-cols-1 md:grid-cols-2 gap-6">
 				{isEditing ? (
 					<div className="flex flex-col">
-						<label className="block text-sm font-semibold text-gray-700 mb-2">
+						<label className="block text-sm font-semibold mb-2">
 							Content Type
 						</label>
 						<div className="p-3 border border-gray-300 rounded-xl bg-gray-100 text-gray-700">
@@ -274,7 +269,7 @@ export const ContentInputForm = ({
 			)}
 
 			<div className="flex space-x-6 pt-4">
-				<button
+				<Button
 					type="submit"
 					disabled={isSubmitting}
 					className="flex-1 px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-700 text-white rounded-xl hover:from-blue-700 hover:to-indigo-800 disabled:opacity-70 disabled:cursor-not-allowed transition-all duration-300 shadow-md hover:shadow-lg transform hover:-translate-y-1 font-medium"
@@ -306,15 +301,14 @@ export const ContentInputForm = ({
 					) : (
 						"Submit"
 					)}
-				</button>
-				<button
-					type="button"
+				</Button>
+				<Button
 					onClick={handleCancel}
 					disabled={isSubmitting}
 					className="flex-1 px-6 py-3 bg-gray-200 text-gray-700 rounded-xl hover:bg-gray-300 disabled:opacity-70 disabled:cursor-not-allowed transition-all duration-300 shadow-md hover:shadow-lg transform hover:-translate-y-1 font-medium"
 				>
 					Cancel
-				</button>
+				</Button>
 			</div>
 		</form>
 	);

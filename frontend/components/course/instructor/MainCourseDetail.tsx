@@ -48,7 +48,7 @@ export default function MainCourseDetails() {
   return (
     <div className="container mx-auto py-6 px-4 sm:px-6 lg:px-8">
       {/* Course Stats Section */}
-      <div className="bg-white dark:bg-[#232323] border border-[#facc15] shadow-sm rounded-xl p-6 mb-6">
+      <div className="shadow-sm rounded-xl p-6 mb-6">
         <h3 className="text-sm font-semibold text-black dark:text-[#facc15] mb-4">
           Course Performance
         </h3>
@@ -133,7 +133,7 @@ export default function MainCourseDetails() {
           <LessonManager courseId={courseId as string} />
         </TabsContent>
         <TabsContent value="reviews" className="mt-0">
-          <div className="bg-white dark:bg-[#232323] border border-[#facc15] shadow-sm rounded-xl p-6">
+          <div className="shadow-sm rounded-xl p-6">
             <CourseReviews
               course={course}
               isLoading={isLoading}

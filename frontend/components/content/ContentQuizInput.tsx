@@ -103,7 +103,7 @@ export const QuizInput = ({
 
 	return (
 		<div className="space-y-4">
-			<label className="block text-sm font-semibold text-gray-700">
+			<label className="block text-sm font-semibold text-black dark:text-white">
 				Questions
 			</label>
 			{questions.length === 0 && errors.questions && (
@@ -112,7 +112,7 @@ export const QuizInput = ({
 			{questions.map((q, index) => (
 				<div
 					key={index}
-					className="p-4 border border-blue-200 rounded-xl bg-blue-50"
+					className="p-4 border border-[#facc15] dark:border-[#facc15] rounded-xl bg-[#facc15]/10 dark:bg-[#232323]"
 				>
 					{editingIndex === index ? (
 						<div className="space-y-3">
@@ -121,8 +121,8 @@ export const QuizInput = ({
 									type="text"
 									value={editQuestion}
 									onChange={(e) => setEditQuestion(e.target.value)}
-									className={`w-full p-3 border rounded-xl focus:ring-2 focus:ring-blue-500 transition-all duration-300 ${
-										errors.editQuestion ? "border-red-500" : "border-gray-300"
+									className={`w-full p-3 border rounded-xl focus:ring-2 focus:ring-[#facc15] transition-all duration-300 ${
+										errors.editQuestion ? "border-red-500" : "border-gray-200 dark:border-gray-700"
 									}`}
 									placeholder="Enter question"
 								/>
@@ -142,8 +142,8 @@ export const QuizInput = ({
 											updated[i] = e.target.value;
 											setEditOptions(updated);
 										}}
-										className={`w-full p-3 border rounded-xl focus:ring-2 focus:ring-blue-500 transition-all duration-300 ${
-											errors.editOptions ? "border-red-500" : "border-gray-300"
+										className={`w-full p-3 border rounded-xl focus:ring-2 focus:ring-[#facc15] transition-all duration-300 ${
+											errors.editOptions ? "border-red-500" : "border-gray-200 dark:border-gray-700"
 										}`}
 										placeholder={`Option ${i + 1}`}
 									/>
@@ -159,8 +159,8 @@ export const QuizInput = ({
 									type="text"
 									value={editAnswer}
 									onChange={(e) => setEditAnswer(e.target.value)}
-									className={`w-full p-3 border rounded-xl focus:ring-2 focus:ring-blue-500 transition-all duration-300 ${
-										errors.editAnswer ? "border-red-500" : "border-gray-300"
+									className={`w-full p-3 border rounded-xl focus:ring-2 focus:ring-[#facc15] transition-all duration-300 ${
+										errors.editAnswer ? "border-red-500" : "border-gray-200 dark:border-gray-700"
 									}`}
 									placeholder="Enter correct answer"
 								/>
@@ -174,14 +174,14 @@ export const QuizInput = ({
 								<button
 									type="button"
 									onClick={handleSaveEdit}
-									className="px-4 py-2 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-all duration-300 shadow-md"
+									className="px-4 py-2 bg-[#facc15] text-black dark:bg-[#facc15] dark:text-[#18181b] rounded-xl hover:bg-yellow-400 dark:hover:bg-yellow-400 transition-all duration-300 shadow-md"
 								>
 									Save
 								</button>
 								<button
 									type="button"
 									onClick={handleCancelEdit}
-									className="px-4 py-2 bg-gray-600 text-white rounded-xl hover:bg-gray-700 transition-all duration-300 shadow-md"
+									className="px-4 py-2 bg-gray-200 text-gray-700 dark:bg-gray-700 dark:text-gray-300 rounded-xl hover:bg-gray-300 dark:hover:bg-gray-600 transition-all duration-300 shadow-md"
 								>
 									Cancel
 								</button>
@@ -189,7 +189,7 @@ export const QuizInput = ({
 						</div>
 					) : (
 						<div className="space-y-4">
-							<h3 className="text-lg font-medium text-gray-800">
+							<h3 className="text-lg font-medium text-black dark:text-white">
 								Question {index + 1}: {q.question}
 							</h3>
 							<ul className="space-y-3">
@@ -198,26 +198,26 @@ export const QuizInput = ({
 										key={i}
 										className={`flex items-center p-3 rounded-lg ${
 											opt === q.correctAnswer
-												? "bg-green-100 border border-green-200"
-												: "bg-white border border-gray-200"
+												? "bg-[#facc15] text-black dark:bg-[#facc15] dark:text-[#18181b] border border-[#facc15] dark:border-[#facc15]"
+												: "bg-white dark:bg-[#232323] text-black dark:text-white border border-gray-200 dark:border-gray-700"
 										}`}
 									>
 										{opt === q.correctAnswer ? (
-											<Check className="w-5 h-5 text-green-600 mr-3 flex-shrink-0" />
+											<Check className="w-5 h-5 text-[#facc15] mr-3 flex-shrink-0" />
 										) : (
 											<X className="w-5 h-5 text-gray-400 mr-3 flex-shrink-0" />
 										)}
 										<span
 											className={`${
 												opt === q.correctAnswer
-													? "text-gray-800 font-medium"
-													: "text-gray-600"
+													? "text-black dark:text-[#18181b] font-medium"
+													: "text-black dark:text-white"
 											}`}
 										>
 											{opt}
 										</span>
 										{opt === q.correctAnswer && (
-											<span className="ml-auto text-xs bg-green-100 text-green-800 px-2 py-1 rounded">
+											<span className="ml-auto text-xs bg-[#facc15] text-black dark:bg-[#facc15] dark:text-[#18181b] px-2 py-1 rounded">
 												Correct Answer
 											</span>
 										)}
@@ -227,14 +227,14 @@ export const QuizInput = ({
 							<div className="flex flex-wrap gap-3">
 								<span
 									onClick={() => handleEditQuestion(index)}
-									className="flex items-center text-blue-600 hover:text-blue-700 transition-colors duration-200 cursor-pointer"
+									className="flex items-center bg-[#facc15] text-black dark:bg-[#facc15] dark:text-[#18181b] hover:bg-yellow-400 dark:hover:bg-yellow-400 px-3 py-1 rounded cursor-pointer transition-colors duration-200"
 								>
 									<Pencil className="mr-2 h-4 w-4" />
 									Edit
 								</span>
 								<span
 									onClick={() => handleDeleteQuestion(index)}
-									className="flex items-center text-red-600 hover:text-red-700 transition-colors duration-200 cursor-pointer"
+									className="flex items-center bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300 hover:bg-red-200 dark:hover:bg-red-800 px-3 py-1 rounded cursor-pointer transition-colors duration-200"
 								>
 									<Trash2 className="mr-2 h-4 w-4" />
 									Delete
@@ -250,8 +250,8 @@ export const QuizInput = ({
 						type="text"
 						value={newQuestion}
 						onChange={(e) => setNewQuestion(e.target.value)}
-						className={`w-full p-3 border rounded-xl focus:ring-2 focus:ring-blue-500 transition-all duration-300 ${
-							errors.newQuestion ? "border-red-500" : "border-gray-300"
+						className={`w-full p-3 border rounded-xl focus:ring-2 focus:ring-[#facc15] transition-all duration-300 ${
+							errors.newQuestion ? "border-red-500" : "border-gray-200 dark:border-gray-700"
 						}`}
 						placeholder="Enter question"
 					/>
@@ -269,8 +269,8 @@ export const QuizInput = ({
 								updated[i] = e.target.value;
 								setNewOptions(updated);
 							}}
-							className={`w-full p-3 border rounded-xl focus:ring-2 focus:ring-blue-500 transition-all duration-300 ${
-								errors.newOptions ? "border-red-500" : "border-gray-300"
+							className={`w-full p-3 border rounded-xl focus:ring-2 focus:ring-[#facc15] transition-all duration-300 ${
+								errors.newOptions ? "border-red-500" : "border-gray-200 dark:border-gray-700"
 							}`}
 							placeholder={`Option ${i + 1}`}
 						/>
@@ -284,8 +284,8 @@ export const QuizInput = ({
 						type="text"
 						value={newAnswer}
 						onChange={(e) => setNewAnswer(e.target.value)}
-						className={`w-full p-3 border rounded-xl focus:ring-2 focus:ring-blue-500 transition-all duration-300 ${
-							errors.newAnswer ? "border-red-500" : "border-gray-300"
+						className={`w-full p-3 border rounded-xl focus:ring-2 focus:ring-[#facc15] transition-all duration-300 ${
+							errors.newAnswer ? "border-red-500" : "border-gray-200 dark:border-gray-700"
 						}`}
 						placeholder="Enter correct answer"
 					/>
@@ -296,7 +296,7 @@ export const QuizInput = ({
 				<button
 					type="button"
 					onClick={handleAddQuestion}
-					className="px-4 py-2 text-blue-600 bg-transparent hover:text-blue-700 transition-all duration-300 "
+					className="px-4 py-2 bg-[#facc15] text-black dark:bg-[#facc15] dark:text-[#18181b] rounded-xl hover:bg-yellow-400 dark:hover:bg-yellow-400 transition-all duration-300 "
 				>
 					Add Question
 				</button>
