@@ -1,9 +1,8 @@
 "use client";
-
-import { SkeletonLayout } from "@/components/admin/LoadingSpinner";
 import CommonLayout from "@/components/common/layout/CommonLayout";
 import { INSTRUCTOR_NAV_ITEMS } from "@/types/nav";
 import { ReactNode } from "react";
+import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
 
 interface InstructorLayoutProps {
   children: ReactNode;
@@ -17,7 +16,7 @@ export default function InstructorLayout({ children }: InstructorLayoutProps) {
       navItems={INSTRUCTOR_NAV_ITEMS}
       role="INSTRUCTOR"
       isCollapsible={true}
-      skeleton={<SkeletonLayout />}
+      skeleton={<LoadingSpinner />}
     >
       {children}
     </CommonLayout>

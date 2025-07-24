@@ -161,11 +161,11 @@ export default function InstructorDashboard() {
 							{data.topCourses.map((course, index) => (
 								<div
 									key={course.courseId}
-									className="bg-white/60 backdrop-blur-sm border border-gray-200/50 rounded-xl p-4"
+									className="bg-white/80 dark:bg-[#232326] border border-gray-200 dark:border-gray-700 rounded-xl p-4"
 								>
 									<div className="flex items-center space-x-4">
-										<div className="w-10 h-10 bg-blue-50 rounded-lg flex items-center justify-center">
-											<span className="text-sm font-semibold text-blue-600">
+										<div className="w-10 h-10 bg-[#facc15]/20 dark:bg-[#232326] rounded-lg flex items-center justify-center">
+											<span className="text-sm font-semibold text-[#facc15] dark:text-[#facc15]">
 												#{index + 1}
 											</span>
 										</div>
@@ -176,17 +176,17 @@ export default function InstructorDashboard() {
 												</span>
 												<button
 													onClick={() => handleCourseClick(course.courseId)}
-													className="text-lg font-semibold text-gray-900 hover:text-blue-600 hover:underline transition-colors cursor-pointer"
+													className="text-lg font-semibold text-black dark:text-white hover:text-[#facc15] dark:hover:text-[#facc15] hover:underline transition-colors cursor-pointer"
 												>
 													{course.courseTitle}
 												</button>
 												<span
 													className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${
 														course.status === "PUBLISHED"
-															? "bg-green-50 text-green-700 border border-green-200"
+															? "bg-[#facc15]/20 text-[#facc15] border border-[#facc15] dark:bg-[#232326] dark:text-[#facc15] dark:border-[#facc15]"
 															: course.status === "PENDING"
-																? "bg-yellow-50 text-yellow-700 border border-yellow-200"
-																: "bg-gray-50 text-gray-700 border border-gray-200"
+																? "bg-gray-100 text-gray-700 border border-gray-200 dark:bg-[#232326] dark:text-gray-300 dark:border-gray-700"
+																: "bg-gray-50 text-gray-700 border border-gray-200 dark:bg-[#232326] dark:text-gray-300 dark:border-gray-700"
 													}`}
 												>
 													{course.status}
@@ -194,10 +194,10 @@ export default function InstructorDashboard() {
 											</div>
 											<div className="grid grid-cols-1 md:grid-cols-5 gap-4">
 												<div className="flex items-center space-x-2">
-													<Users className="w-4 h-4 text-gray-400" />
+													<Users className="w-4 h-4 text-[#facc15] dark:text-[#facc15]" />
 													<div>
-														<p className="text-xs text-gray-500">Enrollments</p>
-														<p className="text-sm font-medium">
+														<p className="text-xs text-gray-500 dark:text-gray-300">Enrollments</p>
+														<p className="text-sm font-medium text-black dark:text-white">
 															{course.enrollmentCount}
 														</p>
 													</div>
@@ -258,11 +258,11 @@ export default function InstructorDashboard() {
 							{data.recentStudents.map((student) => (
 								<div
 									key={student.studentId}
-									className="bg-white/60 backdrop-blur-sm border border-gray-200/50 rounded-xl p-4"
+									className="bg-white/80 dark:bg-[#232326] border border-gray-200 dark:border-gray-700 rounded-xl p-4"
 								>
 									<div className="flex items-center space-x-4">
-										<div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center">
-											<span className="text-sm font-semibold text-gray-600">
+										<div className="w-12 h-12 bg-[#facc15]/20 dark:bg-[#232326] rounded-full flex items-center justify-center">
+											<span className="text-sm font-semibold text-[#facc15] dark:text-[#facc15]">
 												{student.studentName
 													.split(" ")
 													.map((n) => n[0])
@@ -271,17 +271,17 @@ export default function InstructorDashboard() {
 										</div>
 										<div className="flex-1 space-y-2">
 											<div className="flex items-center gap-2">
-												<h3 className="text-lg font-semibold text-gray-900">
+												<h3 className="text-lg font-semibold text-black dark:text-white">
 													{student.studentName}
 												</h3>
-												<span className="text-sm text-gray-500">
+												<span className="text-sm text-gray-500 dark:text-gray-300">
 													{student.email}
 												</span>
 												<span
 													className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${
 														student.isActive
-															? "bg-green-50 text-green-700 border border-green-200"
-															: "bg-red-50 text-red-700 border border-red-200"
+															? "bg-[#facc15]/20 text-[#facc15] border border-[#facc15] dark:bg-[#232326] dark:text-[#facc15] dark:border-[#facc15]"
+															: "bg-gray-100 text-gray-700 border border-gray-200 dark:bg-[#232326] dark:text-gray-300 dark:border-gray-700"
 													}`}
 												>
 													{student.isActive ? "Active" : "Inactive"}
@@ -332,29 +332,29 @@ export default function InstructorDashboard() {
 							{data.recentEnrollments.map((enrollment, index) => (
 								<div
 									key={`${enrollment.courseId}-${enrollment.studentName}-${index}`}
-									className="bg-white/60 backdrop-blur-sm border border-gray-200/50 rounded-xl p-4"
+									className="bg-white/80 dark:bg-[#232326] border border-gray-200 dark:border-gray-700 rounded-xl p-4"
 								>
 									<div className="flex items-center space-x-4">
-										<div className="w-10 h-10 bg-purple-50 rounded-lg flex items-center justify-center">
-											<span className="text-sm font-semibold text-purple-600">
+										<div className="w-10 h-10 bg-[#facc15]/20 dark:bg-[#232326] rounded-lg flex items-center justify-center">
+											<span className="text-sm font-semibold text-[#facc15] dark:text-[#facc15]">
 												#{index + 1}
 											</span>
 										</div>
 										<div className="flex-1 space-y-2">
 											<div className="flex items-center gap-2">
-												<h3 className="text-lg font-semibold text-gray-900">
+												<h3 className="text-lg font-semibold text-black dark:text-white">
 													{enrollment.courseTitle}
 												</h3>
-												<span className="text-sm text-gray-500">
+												<span className="text-sm text-gray-500 dark:text-gray-300">
 													by {enrollment.studentName}
 												</span>
 											</div>
 											<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 												<div className="flex items-center space-x-2">
-													<Clock className="w-4 h-4 text-gray-400" />
+													<Clock className="w-4 h-4 text-[#facc15] dark:text-[#facc15]" />
 													<div>
-														<p className="text-xs text-gray-500">Enrolled At</p>
-														<p className="text-sm font-medium">
+														<p className="text-xs text-gray-500 dark:text-gray-300">Enrolled At</p>
+														<p className="text-sm font-medium text-black dark:text-white">
 															{new Date(
 																enrollment.enrolledAt,
 															).toLocaleDateString()}

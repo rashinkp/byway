@@ -67,10 +67,10 @@ export default function CourseReviews({
   };
 
   // For instructors, show a simplified view
-  if (userRole === 'INSTRUCTOR') {
+  if (userRole === 'INSTRUCTOR' || userRole === 'ADMIN') {
     return (
       <div className="space-y-6">
-        {/* Review Stats for Instructor */}
+        {/* Review Stats for Instructor/Admin */}
         {reviewStats && reviewStats.totalReviews > 0 && (
           <div className="bg-white dark:bg-[#232323] rounded-lg p-6">
             <h3 className="text-sm font-semibold text-black dark:text-white mb-4">Review Statistics</h3>
@@ -118,7 +118,6 @@ export default function CourseReviews({
             <h3 className="text-sm font-semibold text-black dark:text-white">
               Student Reviews
             </h3>
-            
             {reviewsData?.total && (
               <span className="text-xs text-gray-500 dark:text-gray-300">
                 {reviewsData.total} {reviewsData.total === 1 ? 'review' : 'reviews'}

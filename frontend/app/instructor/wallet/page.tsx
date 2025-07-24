@@ -101,7 +101,7 @@ export default function InstructorWalletPage() {
 							)}
 						</Button>
 
-						<div className="bg-blue-50 p-4 rounded-lg flex items-start gap-3">
+						<div className="bg-gray-500 p-4 rounded-lg flex items-start gap-3">
 							<AlertCircle className="h-5 w-5 text-[#facc15] flex-shrink-0 mt-0.5" />
 							<p className="text-sm text-[#facc15]">
 								Your wallet balance can be used to purchase courses or other services on our platform.

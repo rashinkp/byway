@@ -9,6 +9,10 @@ import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import CourseDetailLayoutSkeleton from "./CourseDetailLayoutSkeleton";
 import AdminActions from "./AdminActions";
+import { AlertCircle } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { useGetContentByLessonId } from "@/hooks/content/useGetContentByLessonId";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface CourseDetailLayoutProps {
 	course: Course | undefined;
@@ -52,6 +56,9 @@ export default function CourseDetailLayout({
 }: CourseDetailLayoutProps) {
 	const { user } = useAuthStore();
 	const userRole = user?.role || "USER";
+	const [openLessonContentId, setOpenLessonContentId] = React.useState<string | null>(null);
+	const isAdmin = userRole === 'ADMIN';
+	const { data: lessonContent, isLoading: isContentLoading, error: contentError } = useGetContentByLessonId(openLessonContentId || "");
 
 	if (error) {
 		return (
@@ -183,16 +190,30 @@ export default function CourseDetailLayout({
 
 				{/* Syllabus */}
 				<div>
-					<h2 className="text-xl font-bold text-black dark:text-white mb-2">Syllabus</h2>
+					<h2 className="text-xl font-bold text-black dark:text-white mb-2 flex items-center gap-2">
+						Syllabus
+					</h2>
 					{isLoading.lessons ? (
 						<div className="text-gray-500 dark:text-gray-300">Loading lessons...</div>
 					) : lessons && lessons.length > 0 ? (
 						<ul className="space-y-3">
 							{lessons.map((lesson, idx) => (
 								<li key={lesson.id} className="flex items-start gap-3">
-									<span className="text-gray-700 font-bold">{idx + 1}.</span>
+									<span className="text-gray-700 dark:text-gray-300 font-bold">{idx + 1}.</span>
 									<div>
-										<h3 className="font-semibold text-black dark:text-white">{lesson.title}</h3>
+										<div className="flex items-center gap-2">
+											<h3 className="font-semibold text-black dark:text-white">{lesson.title}</h3>
+											{isAdmin && (
+												<button
+													type="button"
+													aria-label="View lesson content"
+													onClick={() => setOpenLessonContentId(lesson.id)}
+													className="ml-1 p-1 rounded-full bg-[#facc15]/20 hover:bg-[#facc15]/40 text-[#facc15] dark:bg-[#232323] dark:hover:bg-[#facc15]/20 dark:text-[#facc15] focus:outline-none focus:ring-2 focus:ring-[#facc15]"
+												>
+													<AlertCircle className="w-4 h-4" />
+												</button>
+											)}
+										</div>
 										<p className="text-gray-500 dark:text-gray-300 text-sm">{lesson.description}</p>
 									</div>
 								</li>
@@ -201,6 +222,84 @@ export default function CourseDetailLayout({
 					) : (
 						<div className="text-gray-500 dark:text-gray-300">No lessons available.</div>
 					)}
+					{/* Lesson Content Modal */}
+					<Dialog open={!!openLessonContentId} onOpenChange={() => setOpenLessonContentId(null)}>
+						<DialogContent className="max-w-2xl bg-white/80 dark:bg-[#232323] border border-gray-200 dark:border-gray-700">
+							<DialogHeader>
+								<DialogTitle className="text-lg font-bold text-black dark:text-white flex items-center gap-2">
+									<AlertCircle className="w-5 h-5 text-[#facc15]" /> Lesson Content
+								</DialogTitle>
+							</DialogHeader>
+							{isContentLoading ? (
+								<div className="flex flex-col gap-4 py-6 items-center">
+									<Skeleton className="h-6 w-2/3 rounded bg-gray-200 dark:bg-gray-700 animate-pulse" />
+									<Skeleton className="h-4 w-full rounded bg-gray-200 dark:bg-gray-700 animate-pulse" />
+									<Skeleton className="h-4 w-5/6 rounded bg-gray-200 dark:bg-gray-700 animate-pulse" />
+									<Skeleton className="h-64 w-full rounded bg-gray-200 dark:bg-gray-700 animate-pulse" />
+								</div>
+							) : contentError ? (
+								<div className="text-red-600 dark:text-red-400 py-6 text-center">Failed to load content.</div>
+							) : lessonContent ? (
+								<div className="py-2 text-gray-900 dark:text-white text-sm space-y-4">
+									<h3 className="text-xl font-bold text-black dark:text-white mb-2 flex items-center gap-2">
+										{lessonContent.title}
+									</h3>
+									{lessonContent.description && (
+										<p className="text-gray-700 dark:text-gray-300 mb-4 whitespace-pre-line">{lessonContent.description}</p>
+									)}
+									{lessonContent.type === 'VIDEO' && lessonContent.fileUrl && (
+										<video
+											controls
+											poster={lessonContent.thumbnailUrl || "/api/placeholder/800/450"}
+											className="w-full max-w-2xl rounded-lg object-cover mb-4"
+											style={{ maxHeight: 400 }}
+										>
+											<source src={lessonContent.fileUrl} type="video/mp4" />
+											Your browser does not support the video tag.
+										</video>
+									)}
+									{lessonContent.type === 'DOCUMENT' && lessonContent.fileUrl && (
+										<div className="space-y-2">
+											<a
+												href={lessonContent.fileUrl}
+												download
+												className="inline-block px-4 py-2 bg-[#facc15] text-black dark:bg-[#facc15] dark:text-[#18181b] rounded font-semibold hover:bg-yellow-400 dark:hover:bg-yellow-400 transition-colors mb-2"
+											>
+												Download Document
+											</a>
+											{lessonContent.fileUrl.endsWith('.pdf') ? (
+												<iframe
+													src={lessonContent.fileUrl}
+													className="w-full h-[400px] rounded border border-gray-200 dark:border-gray-700"
+													title="Document preview"
+												/>
+											) : (
+												<div className="text-gray-500 dark:text-gray-300">Preview not available for this document type.</div>
+											)}
+										</div>
+									)}
+									{lessonContent.type === 'QUIZ' && lessonContent.quizQuestions && lessonContent.quizQuestions.length > 0 && (
+										<div className="space-y-4">
+											<h4 className="text-lg font-semibold text-black dark:text-[#facc15] mb-2">Quiz Questions</h4>
+											{lessonContent.quizQuestions.map((q, i) => (
+												<div key={q.id} className="mb-4 p-4 rounded-lg bg-gray-100 dark:bg-[#232323] border border-gray-200 dark:border-gray-700">
+													<div className="font-medium text-black dark:text-white mb-2">Q{i + 1}: {q.question}</div>
+													<ul className="space-y-1">
+														{q.options.map((opt, idx) => (
+															<li key={idx} className="text-gray-700 dark:text-gray-300 pl-2">- {opt}</li>
+														))}
+													</ul>
+													<div className="mt-2 text-xs text-green-700 dark:text-green-300">Correct: {q.correctAnswer}</div>
+												</div>
+											))}
+										</div>
+									)}
+								</div>
+							) : (
+								<div className="text-gray-500 dark:text-gray-300 py-6 text-center">No content found.</div>
+							)}
+						</DialogContent>
+					</Dialog>
 				</div>
 
 				{/* Course Features */}

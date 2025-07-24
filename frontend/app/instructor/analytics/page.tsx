@@ -85,7 +85,7 @@ export default function InstructorAnalytics() {
 	}
 
 	return (
-		<div className="min-h-screen bg-gray-50/50 p-6">
+		<div className="min-h-screen bg-gray-50 dark:bg-[#18181b] p-6">
 			<div className="max-w-7xl mx-auto space-y-8">
 				{/* PDF Export Button */}
 				<PDFExportButton

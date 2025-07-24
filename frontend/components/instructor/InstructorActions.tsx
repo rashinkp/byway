@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import {
 	Check,
@@ -43,33 +42,33 @@ export default function InstructorActions({
 	const getStatusBadge = (status: string) => {
 		const statusConfig = {
 			PENDING: {
-				bg: "bg-yellow-50",
-				text: "text-yellow-700",
-				border: "border-yellow-200",
+				bg: "bg-[#facc15]/20 dark:bg-[#facc15]/10",
+				text: "text-[#facc15] dark:text-[#facc15]",
+				border: "border-[#facc15] dark:border-[#facc15]",
 				icon: Clock,
 			},
 			APPROVED: {
-				bg: "bg-green-50",
-				text: "text-green-700",
-				border: "border-green-200",
+				bg: "bg-white/80 dark:bg-[#232323]",
+				text: "text-black dark:text-white",
+				border: "border-gray-200 dark:border-gray-700",
 				icon: Check,
 			},
 			REJECTED: {
-				bg: "bg-red-50",
-				text: "text-red-700",
-				border: "border-red-200",
+				bg: "bg-red-100 dark:bg-red-900/40",
+				text: "text-red-700 dark:text-red-300",
+				border: "border-red-200 dark:border-red-700",
 				icon: X,
 			},
 			ENABLED: {
-				bg: "bg-green-50",
-				text: "text-green-700",
-				border: "border-green-200",
+				bg: "bg-white/80 dark:bg-[#232323]",
+				text: "text-black dark:text-white",
+				border: "border-gray-200 dark:border-gray-700",
 				icon: Check,
 			},
 			DISABLED: {
-				bg: "bg-red-50",
-				text: "text-red-700",
-				border: "border-red-200",
+				bg: "bg-gray-100 dark:bg-gray-700",
+				text: "text-gray-700 dark:text-gray-300",
+				border: "border-gray-200 dark:border-gray-700",
 				icon: X,
 			},
 		};
@@ -83,38 +82,38 @@ export default function InstructorActions({
 		const Icon = config.icon;
 
 		return (
-			<Badge className={`${config.bg} ${config.text} ${config.border}`}>
+			<div className={`rounded-xl border ${config.bg} ${config.text} ${config.border} px-2 py-1 text-xs font-semibold flex items-center gap-1`}>
 				<Icon className="w-3 h-3 mr-1" />
 				{status}
-			</Badge>
+			</div>
 		);
 	};
 
 	return (
-		<div className="space-y-4">
+		<div className="rounded-2xl  bg-white/80 dark:bg-[#232326] shadow-xl p-8 space-y-6">
 			{/* Instructor Status Section */}
-			<div className="space-y-3">
-				<div className="flex items-center gap-2 text-gray-900">
-					<Shield className="w-4 h-4 text-blue-600" />
-					<h3 className="text-sm font-medium">Instructor Status</h3>
+			<div className="space-y-4">
+				<div className="flex items-center gap-2 text-black dark:text-[#facc15] text-lg font-semibold">
+					<Shield className="w-5 h-5 text-[#facc15] dark:text-[#facc15]" />
+					<span>Instructor Status</span>
 				</div>
 				<div className="space-y-3">
 					{/* Approval Status */}
 					<div className="flex items-center justify-between">
-						<span className="text-sm text-gray-600">Approval</span>
+						<span className="text-sm text-gray-700 dark:text-gray-300 font-medium">Approval</span>
 						{getStatusBadge(instructor.status)}
 					</div>
 
 					{/* Account Status */}
 					<div className="flex items-center justify-between">
-						<span className="text-sm text-gray-600">Account</span>
+						<span className="text-sm text-gray-700 dark:text-gray-300 font-medium">Account</span>
 						{getStatusBadge(instructor.deletedAt ? "DISABLED" : "ENABLED")}
 					</div>
 
 					{/* Joined Date */}
 					<div className="flex items-center justify-between">
-						<span className="text-sm text-gray-600">Joined</span>
-						<span className="text-sm font-medium text-gray-900">
+						<span className="text-sm text-gray-700 dark:text-gray-300 font-medium">Joined</span>
+						<span className="text-sm font-semibold text-black dark:text-white">
 							{new Date(instructor.createdAt).toLocaleDateString()}
 						</span>
 					</div>
@@ -122,8 +121,8 @@ export default function InstructorActions({
 					{/* Deleted Date (if applicable) */}
 					{instructor.deletedAt && (
 						<div className="flex items-center justify-between">
-							<span className="text-sm text-gray-600">Disabled</span>
-							<span className="text-sm font-medium text-red-600">
+							<span className="text-sm text-gray-700 dark:text-gray-300 font-medium">Disabled</span>
+							<span className="text-sm font-semibold text-red-600 dark:text-red-400">
 								{new Date(instructor.deletedAt).toLocaleDateString()}
 							</span>
 						</div>
@@ -131,28 +130,28 @@ export default function InstructorActions({
 				</div>
 			</div>
 
-			<Separator />
+			<Separator className="my-4 bg-gray-200 dark:bg-[#232323]" />
 
 			{/* Action Buttons */}
-			<div className="space-y-3">
+			<div className="space-y-4">
 				{instructor.status === "PENDING" && (
 					<>
 						<Button
 							onClick={onApprove}
 							size="lg"
-							variant="outline"
-							className="w-full bg-green-50 text-green-700 border-green-200 hover:bg-green-100"
+							variant="default"
+							className="w-full bg-[#facc15] text-black dark:bg-[#facc15] dark:text-[#18181b] border-0 hover:bg-yellow-400 dark:hover:bg-yellow-400 font-semibold text-base py-3"
 						>
-							<Check className="w-4 h-4 mr-2" />
+							<Check className="w-5 h-5 mr-2" />
 							Approve Instructor
 						</Button>
 						<Button
 							onClick={onDecline}
 							size="lg"
-							variant="outline"
-							className="w-full bg-red-50 text-red-700 border-red-200 hover:bg-red-100"
+							variant="secondary"
+							className="w-full bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-300 border-0 hover:bg-red-200 dark:hover:bg-red-900/60 font-semibold text-base py-3"
 						>
-							<X className="w-4 h-4 mr-2" />
+							<X className="w-5 h-5 mr-2" />
 							Decline Instructor
 						</Button>
 					</>
@@ -162,10 +161,10 @@ export default function InstructorActions({
 					<Button
 						onClick={onApprove}
 						size="lg"
-						variant="outline"
-						className="w-full bg-green-50 text-green-700 border-green-200 hover:bg-green-100"
+						variant="default"
+						className="w-full bg-[#facc15] text-black dark:bg-[#facc15] dark:text-[#18181b] border-0 hover:bg-yellow-400 dark:hover:bg-yellow-400 font-semibold text-base py-3"
 					>
-						<Check className="w-4 h-4 mr-2" />
+						<Check className="w-5 h-5 mr-2" />
 						Approve Instructor
 					</Button>
 				)}
@@ -173,15 +172,15 @@ export default function InstructorActions({
 				<Button
 					onClick={onDownloadCV}
 					size="lg"
-					variant="outline"
+					variant="default"
 					className={`w-full ${
 						instructor.cv && instructor.cv !== "No CV provided"
-							? "bg-blue-50 text-blue-700 border-blue-200 hover:bg-blue-100"
-							: "bg-gray-50 text-gray-400 border-gray-200 cursor-not-allowed"
+							? "bg-[#facc15]/10 text-[#facc15] dark:bg-[#232323] dark:text-[#facc15] border-0 hover:bg-[#facc15]/20 dark:hover:bg-[#facc15]/20 font-semibold text-base py-3"
+							: "bg-gray-100 text-gray-400 dark:bg-gray-700 dark:text-gray-400 border-0 cursor-not-allowed text-base py-3"
 					}`}
 					disabled={!instructor.cv || instructor.cv === "No CV provided"}
 				>
-					<Download className="w-4 h-4 mr-2" />
+					<Download className="w-5 h-5 mr-2" />
 					{instructor.cv && instructor.cv !== "No CV provided"
 						? "Download CV"
 						: "No CV Available"}
@@ -191,38 +190,39 @@ export default function InstructorActions({
 					<AlertDialogTrigger asChild>
 						<Button
 							size="lg"
-							variant="outline"
+							variant={instructor.deletedAt ? "default" : "secondary"}
 							className={`w-full ${
 								instructor.deletedAt
-									? "bg-green-50 text-green-700 border-green-200 hover:bg-green-100"
-									: "bg-red-50 text-red-700 border-red-200 hover:bg-red-100"
+									? "bg-[#facc15]/10 text-[#facc15] dark:bg-[#232323] dark:text-[#facc15] border-0 hover:bg-[#facc15]/20 dark:hover:bg-[#facc15]/20 font-semibold text-base py-3"
+									: "bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-300 border-0 hover:bg-red-200 dark:hover:bg-red-900/60 font-semibold text-base py-3"
 							}`}
 						>
 							{instructor.deletedAt ? (
-								<Check className="w-4 h-4 mr-2" />
+								<Check className="w-5 h-5 mr-2" />
 							) : (
-								<X className="w-4 h-4 mr-2" />
+								<X className="w-5 h-5 mr-2" />
 							)}
 							{instructor.deletedAt
 								? "Enable Instructor"
 								: "Disable Instructor"}
 						</Button>
 					</AlertDialogTrigger>
-					<AlertDialogContent>
+					<AlertDialogContent className="bg-white/80 dark:bg-[#232326] border border-gray-200 dark:border-gray-700 rounded-2xl p-8">
 						<AlertDialogHeader>
-							<AlertDialogTitle>
+							<AlertDialogTitle className="text-black dark:text-[#facc15] text-lg font-bold">
 								{instructor.deletedAt
 									? "Enable Instructor"
 									: "Disable Instructor"}
 							</AlertDialogTitle>
-							<AlertDialogDescription>
-								Are you sure you want to{" "}
-								{instructor.deletedAt ? "enable" : "disable"} the instructor &quot;
+							<AlertDialogDescription className="text-gray-700 dark:text-gray-300 text-base">
+								Are you sure you want to {instructor.deletedAt ? "enable" : "disable"} the instructor &quot;
 								{instructor.name || instructor.email}"?
 							</AlertDialogDescription>
 						</AlertDialogHeader>
 						<AlertDialogFooter>
-							<AlertDialogCancel>Cancel</AlertDialogCancel>
+							<AlertDialogCancel className="bg-gray-200 dark:bg-gray-700 text-black dark:text-white hover:bg-gray-300 dark:hover:bg-gray-600 text-base font-semibold">
+								Cancel
+							</AlertDialogCancel>
 							<AlertDialogAction
 								onClick={() => {
 									onToggleDelete();
@@ -230,8 +230,8 @@ export default function InstructorActions({
 								}}
 								className={
 									instructor.deletedAt
-										? "bg-green-600 hover:bg-green-700"
-										: "bg-red-600 hover:bg-red-700"
+										? "bg-[#facc15] hover:bg-yellow-400 text-black dark:bg-[#facc15] dark:hover:bg-yellow-400 dark:text-[#18181b] font-semibold text-base py-3"
+										: "bg-red-600 hover:bg-red-700 text-white font-semibold text-base py-3"
 								}
 							>
 								{instructor.deletedAt ? "Enable" : "Disable"}

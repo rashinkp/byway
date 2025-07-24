@@ -1,5 +1,4 @@
 "use client";
-
 import { FC } from "react";
 import {
 	User,
@@ -17,7 +16,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/utils/cn";
 import { useLogout } from "@/hooks/auth/useLogout";
-import { useRouter } from "next/navigation";
+import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
 
 interface SidebarProps {
 	activeSection: string;
@@ -36,8 +35,7 @@ const Sidebar: FC<SidebarProps> = ({
 	toggleCollapse,
 	loadingSection,
 }) => {
-	const { mutate: logout, isPending: isLoggingOut } = useLogout();
-	const router = useRouter();
+	const { logout, isLoading: isLoggingOut, error, resetError } = useLogout();
 
 	const navigationItems = isInstructor
 		? [
@@ -55,6 +53,10 @@ const Sidebar: FC<SidebarProps> = ({
 				{ id: "transactions", label: "Transactions", icon: History },
 				{ id: "orders", label: "Orders", icon: ShoppingBag },
 			];
+
+	if (isLoggingOut) {
+		return <LoadingSpinner />;
+	}
 
 	return (
 		<div
@@ -117,7 +119,7 @@ const Sidebar: FC<SidebarProps> = ({
 							{/* Only show text if not collapsed or on desktop */}
 							<span
 								className={cn(
-									"truncate",
+									"text-sm font-medium truncate",
 									collapsed ? "hidden" : "inline",
 									"md:inline",
 								)}
@@ -136,16 +138,8 @@ const Sidebar: FC<SidebarProps> = ({
 				>
 					<button
 						onClick={() => {
-							logout(undefined, {
-								onSuccess: () => {
-									router.push("/login");
-								},
-								onError: (error) => {
-									console.error("Logout failed:", error);
-									// Even if logout fails, redirect to login page
-									router.push("/login");
-								},
-							});
+							resetError();
+							logout();
 						}}
 						disabled={isLoggingOut}
 						className={cn(
@@ -168,6 +162,9 @@ const Sidebar: FC<SidebarProps> = ({
 							{isLoggingOut ? "Logging out..." : "Logout"}
 						</span>
 					</button>
+					{error && (
+						<div className="text-red-500 text-xs mt-2">{error}</div>
+					)}
 				</div>
 			</nav>
 		</div>

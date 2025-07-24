@@ -7,6 +7,7 @@ import { useLogout } from "@/hooks/auth/useLogout";
 import { CommonSidebar } from "@/components/common/layout/CommonSidebar";
 import NotificationModal from "@/components/notifications/NotificationModal";
 import BywayFooter from "@/components/layout/Footer";
+import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
 
 interface CommonLayoutProps {
 	children: React.ReactNode;
@@ -28,12 +29,13 @@ export default function CommonLayout({
 	skeleton,
 }: CommonLayoutProps) {
 	const { user, isInitialized, initializeAuth } = useAuthStore();
-	const { mutate: logout } = useLogout();
+	const { logout } = useLogout();
 	const router = useRouter();
 	const pathname = usePathname();
 	const [collapsed, setCollapsed] = useState(isCollapsible);
 	const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 	const [notificationOpen, setNotificationOpen] = useState(false);
+	const [isLoggingOut, setIsLoggingOut] = useState(false);
 
 	// Initialize auth on mount
 	useEffect(() => {
@@ -71,18 +73,22 @@ export default function CommonLayout({
 	}, [user, role, isInitialized, router]);
 
 	const handleLogout = async () => {
+		setIsLoggingOut(true);
 		try {
 			logout(undefined, {
 				onSuccess: () => {
+					setIsLoggingOut(false);
 					router.replace("/login");
 				},
 				onError: (error) => {
+					setIsLoggingOut(false);
 					console.error("Logout failed:", error);
 					// Even if logout fails, redirect to login page
 					router.replace("/login");
 				},
 			});
 		} catch (error) {
+			setIsLoggingOut(false);
 			console.error("Logout failed:", error);
 			router.replace("/login");
 		}
@@ -92,7 +98,11 @@ export default function CommonLayout({
 
 	// Show skeleton while loading
 	if (!isInitialized) {
-		return skeleton || null;
+		return <LoadingSpinner />;
+	}
+
+	if (isLoggingOut) {
+		return <LoadingSpinner />;
 	}
 
 	// Show nothing if not authorized

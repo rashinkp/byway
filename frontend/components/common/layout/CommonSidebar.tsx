@@ -62,15 +62,21 @@ export function CommonSidebar({
 				<div className="flex-1 px-4 py-6 overflow-y-auto">
 					<TooltipProvider delayDuration={0}>
 						<nav className="space-y-1">
-							{navItems.map((item) => (
-								<NavItemLink
-									key={item.href}
-									item={item}
-									collapsed={collapsed}
-									isActive={pathname === item.href}
-									onClick={() => setMobileMenuOpen(false)}
-								/>
-							))}
+							{navItems.map((item) => {
+								const isDashboard = item.href === "/admin" || item.href === "/instructor";
+								const isActive = isDashboard
+									? pathname === item.href || pathname === item.href + "/"
+									: pathname === item.href || pathname.startsWith(item.href + "/");
+								return (
+									<NavItemLink
+										key={item.href}
+										item={item}
+										collapsed={collapsed}
+										isActive={isActive}
+										onClick={() => setMobileMenuOpen(false)}
+									/>
+								);
+							})}
 						</nav>
 					</TooltipProvider>
 				</div>

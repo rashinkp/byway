@@ -117,7 +117,7 @@ export default function AdminActions({
 								<Button
 									disabled={isApproving}
 									size="lg"
-									className="w-full bg-green-500/10 text-green-700 dark:bg-green-900/40 dark:text-green-300 border-0 hover:bg-green-500/20 dark:hover:bg-green-900/60"
+									className="w-full bg-[#facc15] text-black dark:bg-[#facc15] dark:text-[#18181b] border-0 hover:bg-yellow-400 dark:hover:bg-yellow-400 font-semibold"
 								>
 									{isApproving ? (
 										<Loader2 className="w-4 h-4 mr-2 animate-spin" />
@@ -136,10 +136,12 @@ export default function AdminActions({
 									</AlertDialogDescription>
 								</AlertDialogHeader>
 								<AlertDialogFooter>
-									<AlertDialogCancel>Cancel</AlertDialogCancel>
+									<AlertDialogCancel className="bg-gray-200 dark:bg-gray-700 text-black dark:text-white hover:bg-gray-300 dark:hover:bg-gray-600 font-semibold">
+										Cancel
+									</AlertDialogCancel>
 									<AlertDialogAction
 										onClick={onApprove}
-										className="bg-green-600 hover:bg-green-700"
+										className="bg-[#facc15] hover:bg-yellow-400 text-black dark:bg-[#facc15] dark:hover:bg-yellow-400 dark:text-[#18181b] font-semibold"
 									>
 										Approve
 									</AlertDialogAction>
@@ -151,7 +153,7 @@ export default function AdminActions({
 								<Button
 									disabled={isDeclining}
 									size="lg"
-									className="w-full bg-red-500/10 text-red-700 dark:bg-red-900/40 dark:text-red-300 border-0 hover:bg-red-500/20 dark:hover:bg-red-900/60"
+									className="w-full bg-red-500/10 text-red-700 dark:bg-red-900/40 dark:text-red-300 border-0 hover:bg-red-500/20 dark:hover:bg-red-900/60 font-semibold"
 								>
 									{isDeclining ? (
 										<Loader2 className="w-4 h-4 mr-2 animate-spin" />
@@ -170,10 +172,12 @@ export default function AdminActions({
 									</AlertDialogDescription>
 								</AlertDialogHeader>
 								<AlertDialogFooter>
-									<AlertDialogCancel>Cancel</AlertDialogCancel>
+									<AlertDialogCancel className="bg-gray-200 dark:bg-gray-700 text-black dark:text-white hover:bg-gray-300 dark:hover:bg-gray-600 font-semibold">
+										Cancel
+									</AlertDialogCancel>
 									<AlertDialogAction
 										onClick={onDecline}
-										className="bg-red-600 hover:bg-red-700"
+										className="bg-red-600 hover:bg-red-700 text-white font-semibold"
 									>
 										Decline
 									</AlertDialogAction>
@@ -189,7 +193,7 @@ export default function AdminActions({
 							<Button
 								disabled={isTogglingStatus}
 								size="lg"
-								className={`w-full border-0 ${
+								className={`w-full border-0 font-semibold ${
 									course?.deletedAt
 										? "bg-green-500/10 text-green-700 dark:bg-green-900/40 dark:text-green-300 hover:bg-green-500/20 dark:hover:bg-green-900/60"
 										: "bg-red-500/10 text-red-700 dark:bg-red-900/40 dark:text-red-300 hover:bg-red-500/20 dark:hover:bg-red-900/60"
@@ -216,13 +220,15 @@ export default function AdminActions({
 								</AlertDialogDescription>
 							</AlertDialogHeader>
 							<AlertDialogFooter>
-								<AlertDialogCancel>Cancel</AlertDialogCancel>
+								<AlertDialogCancel className="bg-gray-200 dark:bg-gray-700 text-black dark:text-white hover:bg-gray-300 dark:hover:bg-gray-600 font-semibold">
+									Cancel
+								</AlertDialogCancel>
 								<AlertDialogAction
 									onClick={onToggleStatus}
 									className={
 										course?.deletedAt
-											? "bg-green-600 hover:bg-green-700"
-											: "bg-red-600 hover:bg-red-700"
+											? "bg-green-600 hover:bg-green-700 text-white font-semibold"
+											: "bg-red-600 hover:bg-red-700 text-white font-semibold"
 									}
 								>
 									{course?.deletedAt ? "Enable" : "Disable"}

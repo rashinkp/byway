@@ -49,7 +49,7 @@ export function Header(
 	{ onNotificationClick, transparent }: HeaderProps = {} as HeaderProps,
 ) {
 	const { user, isLoading } = useAuth();
-	const { mutate: logout, isPending: isLoggingOut } = useLogout();
+	const { logout, isLoading: isLoggingOut, error, resetError } = useLogout();
 	const { mutate: createInstructor, isPending: isCreatingInstructor } =
 		useCreateInstructor();
 	const [isInstructorModalOpen, setIsInstructorModalOpen] = useState(false);
@@ -134,19 +134,10 @@ export function Header(
 	);
 
 	// Handle logout with dropdown close
-	const handleLogout = useCallback(() => {
+	const handleLogout = () => {
 		setIsDropdownOpen(false);
-		logout(undefined, {
-			onSuccess: () => {
-				router.push("/login");
-			},
-			onError: (error) => {
-				console.error("Logout failed:", error);
-				// Even if logout fails, redirect to login page
-				router.push("/login");
-			},
-		});
-	}, [logout, router]);
+		logout();
+	}
 
 	// Handle scroll effect
 	useEffect(() => {
@@ -545,20 +536,7 @@ export function Header(
                       <div className="flex justify-between items-center gap-2 mt-4">
                         <Button
                           variant="secondary"
-                          onClick={() => {
-                            logout(undefined, {
-                              onSuccess: () => {
-                                setIsMenuOpen(false);
-                                router.push("/login");
-                              },
-                              onError: (error) => {
-                                console.error("Logout failed:", error);
-                                setIsMenuOpen(false);
-                                // Even if logout fails, redirect to login page
-                                router.push("/login");
-                              },
-                            });
-                          }}
+                          onClick={() => logout()}
                           disabled={isLoggingOut}
                           className="w-full border-[#facc15] text-black rounded-lg text-base hover:bg-[#facc15]/20 transition-colors"
                         >

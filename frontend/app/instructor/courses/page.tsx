@@ -109,7 +109,7 @@ export default function InstructorCoursesPage() {
 						header: "Created",
 						accessor: "createdAt",
 						render: (course: Course) => (
-							<span className="text-sm text-gray-600">
+							<span className="">
 								{new Date(course.createdAt).toLocaleDateString()}
 							</span>
 						),
