@@ -50,15 +50,12 @@ export function ChatWindow({
     }
   }, [loadingMoreMessages, messages.length]);
 
-  // Only scroll to bottom when chat is opened or a new message is added
   useEffect(() => {
-    // If the number of messages increases, scroll to bottom
     if (prevMessagesLength.current < messages.length) {
       scrollToBottom();
     }
     prevMessagesLength.current = messages.length;
-    // Do not scroll on every update, only when new messages arrive
-    // eslint-disable-next-line
+
   }, [messages.length]);
 
   // Group messages by date

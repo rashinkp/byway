@@ -462,9 +462,6 @@ export default function ChatPage() {
     };
   }, [selectedChat]);
 
-  // Helper to determine if header should be shown
-  const showHeader = user?.role === "USER";
-
   if (!isInitialized || isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-white dark:bg-[#18181b] transition-colors duration-300">

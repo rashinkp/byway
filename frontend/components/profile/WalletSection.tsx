@@ -7,10 +7,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
 	Wallet,
-	CreditCard,
-	Plus,
-	DollarSign,
-	Shield,
 	ArrowUpRight,
 	ArrowDownRight,
 } from "lucide-react";

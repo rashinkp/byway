@@ -11,9 +11,7 @@ import {
   GraduationCap,
   Briefcase,
   User,
-  Shield,
   CheckCircle2,
-  AlertCircle,
   UserCircle,
 } from "lucide-react";
 import { UserProfileType } from "@/types/user";

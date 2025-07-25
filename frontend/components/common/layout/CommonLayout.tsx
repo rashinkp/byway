@@ -16,7 +16,6 @@ interface CommonLayoutProps {
 	navItems: any[];
 	role: string;
 	isCollapsible?: boolean;
-	skeleton?: React.ReactNode;
 }
 
 export default function CommonLayout({
@@ -26,7 +25,6 @@ export default function CommonLayout({
 	navItems,
 	role,
 	isCollapsible = false,
-	skeleton,
 }: CommonLayoutProps) {
 	const { user, isInitialized, initializeAuth } = useAuthStore();
 	const { logout } = useLogout();

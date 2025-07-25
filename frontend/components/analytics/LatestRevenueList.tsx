@@ -77,7 +77,6 @@ interface LatestRevenueListProps {
 	onSearchChange: (search: string) => void;
 	onSortChange: (sortBy: "latest" | "oldest") => void;
 	onPageChange: (page: number) => void;
-	currentSort: "latest" | "oldest";
 	currentPage: number;
 	searchValue: string;
 }
@@ -88,7 +87,6 @@ export default function LatestRevenueList({
 	onSearchChange,
 	onSortChange,
 	onPageChange,
-	currentSort,
 	currentPage,
 	searchValue,
 }: LatestRevenueListProps) {

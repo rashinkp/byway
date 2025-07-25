@@ -2,7 +2,6 @@ import { LucideIcon } from "lucide-react";
 
 interface StatCardProps {
 	icon: LucideIcon;
-	iconColor: string;
 	title: string;
 	value: string | number;
 	badges?: Array<{
@@ -16,7 +15,6 @@ interface StatCardProps {
 
 export function StatCard({
 	icon: Icon,
-	iconColor,
 	title,
 	value,
 	badges,

@@ -49,7 +49,7 @@ export function Header(
 	{ onNotificationClick, transparent }: HeaderProps = {} as HeaderProps,
 ) {
 	const { user, isLoading } = useAuth();
-	const { logout, isLoading: isLoggingOut, error, resetError } = useLogout();
+	const { logout, isLoading: isLoggingOut } = useLogout();
 	const { mutate: createInstructor, isPending: isCreatingInstructor } =
 		useCreateInstructor();
 	const [isInstructorModalOpen, setIsInstructorModalOpen] = useState(false);

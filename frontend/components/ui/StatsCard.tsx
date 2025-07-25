@@ -63,41 +63,7 @@ export function StatsCards({ stats }: StatsCardsProps) {
 		return <Activity className="h-4 w-4" />;
 	};
 
-	// Get background color based on title
-	const getBgColor = (title: string) => {
-		const lowerTitle = title.toLowerCase();
-		if (lowerTitle.includes("total")) return "bg-blue-50";
-		if (lowerTitle.includes("active")) return "bg-emerald-50";
-		if (lowerTitle.includes("inactive")) return "bg-rose-50";
-		if (lowerTitle.includes("pending")) return "bg-amber-50";
-		if (lowerTitle.includes("declined")) return "bg-orange-50";
-		if (lowerTitle.includes("approved")) return "bg-green-50";
-		if (lowerTitle.includes("published")) return "bg-indigo-50";
-		if (lowerTitle.includes("draft")) return "bg-gray-50";
-		if (lowerTitle.includes("archived")) return "bg-slate-50";
-		if (lowerTitle.includes("revenue")) return "bg-blue-50";
-		if (lowerTitle.includes("courses")) return "bg-purple-50";
-		if (lowerTitle.includes("users")) return "bg-indigo-50";
-		return "bg-gray-50";
-	};
 
-	// Get text color based on title
-	const getTextColor = (title: string) => {
-		const lowerTitle = title.toLowerCase();
-		if (lowerTitle.includes("total")) return "text-blue-600";
-		if (lowerTitle.includes("active")) return "text-emerald-600";
-		if (lowerTitle.includes("inactive")) return "text-rose-600";
-		if (lowerTitle.includes("pending")) return "text-amber-600";
-		if (lowerTitle.includes("declined")) return "text-orange-600";
-		if (lowerTitle.includes("approved")) return "text-green-600";
-		if (lowerTitle.includes("published")) return "text-indigo-600";
-		if (lowerTitle.includes("draft")) return "text-gray-600";
-		if (lowerTitle.includes("archived")) return "text-slate-600";
-		if (lowerTitle.includes("revenue")) return "text-blue-600";
-		if (lowerTitle.includes("courses")) return "text-purple-600";
-		if (lowerTitle.includes("users")) return "text-indigo-600";
-		return "text-gray-600";
-	};
 
 	// Animation variants for fade-in
 	const cardVariants = {

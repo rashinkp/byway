@@ -2,7 +2,6 @@ import { useState } from "react";
 import { Star, MoreVertical, Edit, Trash2, Eye, EyeOff } from "lucide-react";
 import { CourseReview } from "@/types/course-review";
 import { formatDistanceToNow } from "date-fns";
-import { Button } from "../ui/button";
 import {
   DropdownMenu,
   DropdownMenuTrigger,
