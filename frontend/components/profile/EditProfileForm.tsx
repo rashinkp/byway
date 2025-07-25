@@ -230,7 +230,7 @@ export default function EditProfileForm({
 	return (
 		<FormModal
 			open={open}
-			onOpenChange={onOpenChange}
+			onOpenChange={isUpdating ? () => {} : onOpenChange}
 			onSubmit={handleSubmit}
 			schema={profileSchema}
 			initialData={initialData}

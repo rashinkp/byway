@@ -225,7 +225,7 @@ export function Header(
             : "bg-white dark:bg-neutral-900"
         )}
       >
-        <div className="container mx-auto px-10 py-3">
+        <div className="container mx-auto px-4 sm:px-10 py-3">
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center justify-between">
             <div className="flex items-center gap-10">
@@ -391,7 +391,7 @@ export function Header(
           </div>
 
           {/* Mobile Navigation */}
-          <div className="flex md:hidden items-center justify-between">
+          <div className="flex md:hidden items-center justify-between min-h-[56px] gap-2">
             <Button
               variant="ghost"
               size="icon"
@@ -410,7 +410,7 @@ export function Header(
             >
               Byway
             </Link>
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-3 pr-2 flex-nowrap overflow-x-auto">
               {/* Mobile Search Icon Button */}
               <Button
                 variant="ghost"
@@ -418,7 +418,7 @@ export function Header(
                 className="text-black dark:text-white bg-transparent border-none"
                 onClick={() => setSearchModalOpen(true)}
               >
-                <Search className="h-6 w-6" />
+                <Search className="w-6 h-6" />
               </Button>
               {user ? (
                 <>

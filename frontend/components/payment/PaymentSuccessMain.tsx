@@ -65,10 +65,10 @@ export default function SuccessContent() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-[var(--color-surface)] flex items-center justify-center">
+      <div className="min-h-screen bg-white/80 dark:bg-[#18181b] flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[var(--color-primary-light)] mx-auto"></div>
-          <p className="mt-4 text-[var(--color-muted)]">Verifying your payment...</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#facc15] mx-auto"></div>
+          <p className="mt-4 text-[#facc15]">Verifying your payment...</p>
         </div>
       </div>
     );
@@ -81,12 +81,12 @@ export default function SuccessContent() {
   }
 
   return (
-    <div className="min-h-screen bg-[var(--color-surface)] flex items-center justify-center p-4">
+    <div className="min-h-screen bg-white/80 dark:bg-[#18181b] flex items-center justify-center p-4">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
-        className="max-w-md w-full bg-[var(--color-surface)] rounded-xl shadow-lg p-8 text-center border border-[var(--color-primary-light)]/20"
+        className="max-w-md w-full bg-white/80 dark:bg-[#232323] rounded-xl shadow-lg p-8 text-center border border-[#facc15]"
       >
         <div className="flex justify-center mb-6">
           <motion.div
@@ -95,14 +95,14 @@ export default function SuccessContent() {
             transition={{ delay: 0.2, type: 'spring' }}
           >
             {isWalletTopUp ? (
-              <WalletIcon className="h-16 w-16 text-[var(--color-primary-light)]" />
+              <WalletIcon className="h-16 w-16 text-[#facc15]" />
             ) : (
-              <CheckCircleIcon className="h-16 w-16 text-[var(--color-primary-light)]" />
+              <CheckCircleIcon className="h-16 w-16 text-[#facc15]" />
             )}
           </motion.div>
         </div>
 
-        <h1 className="text-2xl font-bold text-[var(--color-primary-dark)] mb-4">
+        <h1 className="text-2xl font-bold text-[#facc15] mb-4">
           {isWalletTopUp
             ? "Wallet Top-up Successful!"
             : isWalletPayment
@@ -110,7 +110,7 @@ export default function SuccessContent() {
             : "Payment Successful!"}
         </h1>
 
-        <p className="text-[var(--color-muted)] mb-8">
+        <p className="text-[#facc15] mb-8">
           {isWalletTopUp
             ? "Your wallet has been topped up successfully."
             : isWalletPayment
@@ -122,14 +122,14 @@ export default function SuccessContent() {
           {!isWalletTopUp && (
             <button
               onClick={handleGoToCourses}
-              className="w-full bg-[var(--color-primary-light)] text-[var(--color-surface)] py-2 px-4 rounded-lg hover:bg-[var(--color-primary-dark)] transition-colors"
+              className="w-full bg-[#facc15] text-black py-2 px-4 rounded-lg hover:bg-black hover:text-[#facc15] dark:bg-[#facc15] dark:text-black dark:hover:bg-black dark:hover:text-[#facc15] transition-colors border border-[#facc15]"
             >
               Go to My Courses
             </button>
           )}
           <button
             onClick={handleGoToWallet}
-            className="w-full bg-[var(--color-background)] text-[var(--color-primary-dark)] py-2 px-4 rounded-lg hover:bg-[var(--color-primary-light)]/10 transition-colors"
+            className="w-full bg-white/80 dark:bg-[#232323] text-black dark:text-white py-2 px-4 rounded-lg hover:bg-[#facc15]/10 dark:hover:bg-[#facc15]/10 transition-colors border border-[#facc15]"
           >
             Go to Wallet
           </button>

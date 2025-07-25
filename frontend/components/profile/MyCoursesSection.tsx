@@ -103,7 +103,7 @@ export default function MyCoursesSection() {
 					{courses.map((course) => (
 						<motion.div
 							key={course.id}
-							className="w-full"
+							className="w-full max-w-xs mx-auto"
 							variants={{
 								hidden: { opacity: 0, y: 20 },
 								show: {

@@ -69,9 +69,9 @@ export default function UserDashboard() {
 		})) || [];
 
 	return (
-		<div className="relative min-h-screen bg-white dark:bg-neutral-900 text-black dark:text-white">
+		<div className="relative min-h-screen bg-white dark:bg-neutral-900 text-black dark:text-white gap-y-8 flex flex-col">
 			{/* Hero Section with banner background */}
-			<div className="relative w-full h-[80vh] flex items-center justify-center overflow-hidden mt-16">
+			<div className="relative w-full h-[60vh] sm:h-[80vh] flex items-center justify-center overflow-hidden mt-16">
 				<LearningBanner />
 				<motion.section
 					className="absolute inset-0 flex flex-col items-center justify-center h-full w-full text-center z-10"
@@ -85,7 +85,7 @@ export default function UserDashboard() {
 					</p>
 				</motion.section>
 			</div>
-			<div className="container relative z-10">
+			<div className="container relative z-10 w-full px-4 sm:px-6 md:px-8 mx-auto">
 				<motion.section
 					initial={{ opacity: 0, y: 60 }}
 					whileInView={{ opacity: 1, y: 0 }}
@@ -93,7 +93,7 @@ export default function UserDashboard() {
 					transition={{ duration: 0.3, ease: "easeOut" }}
 					className="w-full relative rounded-2xl shadow-lg py-14 sm:py-20 my-28"
 				>
-					<div className="max-w-7xl mx-auto px-4">
+					<div className="max-w-7xl mx-auto w-full px-0 sm:px-4 md:px-8">
 						<CategoriesSection
 							categories={categories}
 							isLoading={isCategoriesLoading}
@@ -108,7 +108,7 @@ export default function UserDashboard() {
 					transition={{ duration: 0.3, ease: "easeOut" }}
 					className="my-50"
 				>
-					<div className="max-w-7xl mx-auto px-4">
+					<div className="max-w-7xl mx-auto w-full px-0 sm:px-4 md:px-8">
 						<TopCourses courses={topCourses} router={router} />
 					</div>
 				</motion.section>
@@ -119,7 +119,7 @@ export default function UserDashboard() {
 					transition={{ duration: 0.3, ease: "easeOut" }}
 					className="w-full relative rounded-2xl shadow-lg py-4 sm:py-20 my-28"
 				>
-					<div className="max-w-7xl mx-auto px-4">
+					<div className="max-w-7xl mx-auto w-full px-0 sm:px-4 md:px-8">
 						<HowItWorksSection />
 					</div>
 				</motion.section>
@@ -130,7 +130,7 @@ export default function UserDashboard() {
 					transition={{ duration: 0.3, ease: "easeOut" }}
 					className="my-28"
 				>
-					<div className="max-w-7xl mx-auto px-4">
+					<div className="max-w-7xl mx-auto w-full px-0 sm:px-4 md:px-8">
 						<SectionGrid
 							title={
 								<span>
@@ -167,8 +167,8 @@ export default function UserDashboard() {
 					transition={{ duration: 0.3, ease: "easeOut" }}
 					className="w-full relative rounded-2xl shadow-lg py-14 sm:py-20 my-28 bg-white dark:bg-neutral-800"
 				>
-					<div className="max-w-2xl mx-auto px-4 text-left">
-						<div className="flex justify-start mb-4">
+					<div className="max-w-2xl mx-auto w-full px-0 sm:px-4 md:px-8 text-left sm:text-left text-center">
+						<div className="flex justify-center sm:justify-start mb-4 w-full">
 							<svg
 								width="56"
 								height="40"

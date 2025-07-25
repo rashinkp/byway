@@ -22,7 +22,6 @@ export class EmailProviderImpl implements EmailProvider {
       <div style="font-family: 'Segoe UI', Arial, sans-serif; background: #f7f7fa; padding: 32px;">
         <div style="max-width: 480px; margin: 0 auto; background: #fff; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); padding: 32px 24px;">
           <div style="text-align: center; margin-bottom: 24px;">
-            <img src="https://by-way-uploads.s3.ap-south-1.amazonaws.com/logo/byway-logo.png" alt="Byway Logo" style="height: 48px; margin-bottom: 8px;" />
             <h2 style="color: #2d3748; margin: 0; font-size: 2rem;">Welcome to Byway!</h2>
             <p style="color: #4a5568; font-size: 1.1rem; margin: 8px 0 0;">Your eLearning journey starts here 🚀</p>
           </div>
@@ -57,7 +56,6 @@ export class EmailProviderImpl implements EmailProvider {
       <div style="font-family: 'Segoe UI', Arial, sans-serif; background: #f7f7fa; padding: 32px;">
         <div style="max-width: 480px; margin: 0 auto; background: #fff; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); padding: 32px 24px;">
           <div style="text-align: center; margin-bottom: 24px;">
-            <img src="https://by-way-uploads.s3.ap-south-1.amazonaws.com/logo/byway-logo.png" alt="Byway Logo" style="height: 48px; margin-bottom: 8px;" />
             <h2 style="color: #2d3748; margin: 0; font-size: 2rem;">Reset Your Byway Password</h2>
           </div>
           <p style="color: #4a5568; font-size: 1rem; text-align: center; margin-bottom: 24px;">
