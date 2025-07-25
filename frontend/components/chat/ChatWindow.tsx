@@ -1,11 +1,11 @@
-import React, { useRef, useEffect } from "react";
+import React, { useRef, useEffect, forwardRef, useImperativeHandle } from "react";
 import { EnhancedChatItem, Message } from "@/types/chat";
 import { Message as MessageComponent } from "./Message";
 import { Badge } from "@/components/ui/badge";
 import { ModernChatInput } from "./ChatInput";
 import { ArrowLeft } from "lucide-react";
 
-interface ChatWindowProps {
+export interface ChatWindowProps {
   chat: EnhancedChatItem;
   messages: Message[];
   onSendMessage: (content: string, imageUrl?: string, audioUrl?: string) => void;
@@ -16,7 +16,11 @@ interface ChatWindowProps {
   onBack?: () => void;
 }
 
-export function ChatWindow({
+export const ChatWindow = forwardRef<any, ChatWindowProps & {
+  setPendingImageUrl?: (url: string) => void;
+  setPendingAudioUrl?: (url: string) => void;
+  isNewChat?: boolean;
+}>(({
   chat,
   messages,
   onSendMessage,
@@ -26,11 +30,7 @@ export function ChatWindow({
   showBackButton,
   onBack,
   ...props
-}: ChatWindowProps & {
-  setPendingImageUrl?: (url: string) => void;
-  setPendingAudioUrl?: (url: string) => void;
-  isNewChat?: boolean;
-}) {
+}, ref) => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const messagesContainerRef = useRef<HTMLDivElement>(null);
   const prevMessagesLength = useRef(messages.length);
@@ -40,6 +40,10 @@ export function ChatWindow({
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
+
+  useImperativeHandle(ref, () => ({
+    scrollToBottom,
+  }));
 
   useEffect(() => {
     if (loadingMoreMessages) {
@@ -216,4 +220,4 @@ export function ChatWindow({
       />
     </div>
   );
-}
+});

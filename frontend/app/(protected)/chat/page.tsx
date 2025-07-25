@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState, useCallback, useRef } from "react";
 import { ChatList } from "@/components/chat/ChatList";
 import { ChatWindow } from "@/components/chat/ChatWindow";
 import { Message, EnhancedChatItem } from "@/types/chat";
@@ -40,6 +40,7 @@ export default function ChatPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [isMobile, setIsMobile] = useState(false);
   const [isSocketConnected, setIsSocketConnected] = useState(socket.connected);
+  const chatWindowRef = useRef<any>(null);
 
   // Track previous chatId for leave logic
   const previousChatIdRef = React.useRef<string | null>(null);
@@ -418,6 +419,15 @@ export default function ChatPage() {
     return () => window.removeEventListener("resize", checkMobile);
   }, []);
 
+  // Scroll to bottom on chat open (mobile only)
+  useEffect(() => {
+    if (isMobile && selectedChat && chatWindowRef.current && chatWindowRef.current.scrollToBottom) {
+      setTimeout(() => {
+        chatWindowRef.current.scrollToBottom();
+      }, 100); // slight delay to ensure messages are rendered
+    }
+  }, [selectedChat, isMobile]);
+
   useEffect(() => {
     function handleMessagesRead({ chatId }: { chatId: string }) {
       console.log("[SocketIO] messagesRead event received:", chatId);
@@ -550,6 +560,7 @@ export default function ChatPage() {
             {selectedChat && (!isMobile || (isMobile && !isSidebarOpen)) && (
               <div className="flex-1 flex flex-col h-full min-h-0">
                 <ChatWindow
+                  ref={chatWindowRef}
                   chat={selectedChat}
                   messages={messages}
                   onSendMessage={handleSendMessage}
