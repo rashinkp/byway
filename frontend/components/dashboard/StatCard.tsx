@@ -11,6 +11,7 @@ interface StatCardProps {
 		icon?: LucideIcon;
 	}>;
 	className?: string;
+	iconColor?: string;
 }
 
 export function StatCard({
@@ -19,6 +20,7 @@ export function StatCard({
 	value,
 	badges,
 	className = "",
+	iconColor,
 }: StatCardProps) {
 	return (
 		<div
@@ -27,7 +29,7 @@ export function StatCard({
 			<div className="flex items-center justify-between">
 				<div className="space-y-2 flex-1">
 					<div className="flex items-center gap-2">
-						<Icon className={`w-5 h-5 text-[#facc15] dark:text-[#facc15]`} />
+						<Icon className={`w-5 h-5 ${iconColor || "text-[#facc15] dark:text-[#facc15]"}`} />
 						<span className="text-sm font-medium text-gray-700 dark:text-gray-300">{title}</span>
 					</div>
 					<div className="text-2xl font-bold text-black dark:text-white">{value}</div>
