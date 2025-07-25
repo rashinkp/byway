@@ -539,41 +539,66 @@ export function Header(
                     </div>
                   </div>
                 ) : (
-                  user && (
-                    <>
-                      <Link
-                        href="/user/profile"
-                        className="block px-2 py-1 text-black dark:text-white font-medium text-base rounded hover:bg-[#facc15]/20 dark:hover:bg-[#facc15] hover:text-black  transition-colors"
-                        onClick={() => setIsMenuOpen(false)}
-                      >
-                        Profile
-                      </Link>
-                      <Link
-                        href="/user/profile?section=courses"
-                        className="block px-2 py-1 text-black dark:text-white font-medium text-base rounded hover:bg-[#facc15]/20 dark:hover:bg-[#facc15] hover:text-black  transition-colors"
-                        onClick={() => setIsMenuOpen(false)}
-                      >
-                        My Courses
-                      </Link>
-                      <div className="flex justify-between items-center gap-2 mt-4">
-                        <Button
-                          variant="secondary"
-                          onClick={() => logout()}
-                          disabled={isLoggingOut}
-                          className="w-full border-[#facc15] text-black rounded-lg text-base hover:bg-[#facc15]/20 transition-colors"
+                  <>
+                    {user ? (
+                      <>
+                        <Link
+                          href="/user/profile"
+                          className="block px-2 py-1 text-black dark:text-white font-medium text-base rounded hover:bg-[#facc15]/20 dark:hover:bg-[#facc15] hover:text-black  transition-colors"
+                          onClick={() => setIsMenuOpen(false)}
                         >
-                          {isLoggingOut ? "Logging out..." : "Logout"}
-                        </Button>
-                      </div>
-                    </>
-                  )
-                )}
-                {!user && !isLoading && (
-                  <Link href="/login">
-                    <Button className="bg-[#facc15] text-black hover:bg-black hover:text-[#facc15] border-none w-full dark:bg-neutral-800 dark:text-[#facc15] dark:hover:bg-[#facc15] dark:hover:text-black">
-                      Sign In
-                    </Button>
-                  </Link>
+                          Profile
+                        </Link>
+                        <Link
+                          href="/user/profile?section=courses"
+                          className="block px-2 py-1 text-black dark:text-white font-medium text-base rounded hover:bg-[#facc15]/20 dark:hover:bg-[#facc15] hover:text-black  transition-colors"
+                          onClick={() => setIsMenuOpen(false)}
+                        >
+                          My Courses
+                        </Link>
+                        <button
+                          className="block w-full text-left px-2 py-1 text-black dark:text-white font-medium text-base rounded hover:bg-[#facc15]/20 dark:hover:bg-[#facc15] hover:text-black transition-colors"
+                          onClick={() => {
+                            setIsMenuOpen(false);
+                            setIsInstructorModalOpen(true);
+                          }}
+                        >
+                          Teach on Byway
+                        </button>
+                        <div className="flex justify-between items-center gap-2 mt-4">
+                          <Button
+                            variant="secondary"
+                            onClick={() => {
+                              setIsMenuOpen(false);
+                              logout();
+                            }}
+                            disabled={isLoggingOut}
+                            className="w-full border-[#facc15] text-black rounded-lg text-base hover:bg-[#facc15]/20 transition-colors"
+                          >
+                            {isLoggingOut ? "Logging out..." : "Logout"}
+                          </Button>
+                        </div>
+                      </>
+                    ) : (
+                      <>
+                        <Link
+                          href="/login"
+                          className="block px-2 py-1 text-black dark:text-white font-medium text-base rounded hover:bg-[#facc15]/20 dark:hover:bg-[#facc15] hover:text-black  transition-colors"
+                          onClick={() => setIsMenuOpen(false)}
+                        >
+                          Teach on Byway
+                        </Link>
+                        <div className="flex justify-between items-center gap-2 mt-4">
+                          <Button
+                            className="bg-[#facc15] text-black hover:bg-black hover:text-[#facc15] border-none w-full dark:bg-neutral-800 dark:text-[#facc15] dark:hover:bg-[#facc15] dark:hover:text-black"
+                            onClick={() => setIsMenuOpen(false)}
+                          >
+                            Sign In
+                          </Button>
+                        </div>
+                      </>
+                    )}
+                  </>
                 )}
               </div>
             </div>
