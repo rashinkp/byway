@@ -34,10 +34,20 @@ const THEMES = [
 export default function SettingsPage() {
 	const { setTheme, theme: currentTheme, resolvedTheme } = useTheme();
 	const [mounted, setMounted] = useState(false);
+	const [showLightWarning, setShowLightWarning] = useState(false);
 
 	useEffect(() => {
 		setMounted(true);
 	}, []);
+
+	const handleThemeChange = (value: string) => {
+		setTheme(value);
+		if (value === "light" || (value === "system" && resolvedTheme === "light")) {
+			setShowLightWarning(true);
+		} else {
+			setShowLightWarning(false);
+		}
+	};
 
 	if (!mounted) return null;
 
@@ -57,34 +67,41 @@ export default function SettingsPage() {
 						<h2 className="text-lg font-semibold text-black dark:text-white mb-1">
 							Theme
 						</h2>
-						<div className="flex items-center gap-4">
-							<Select
-								value={currentTheme || resolvedTheme}
-								onValueChange={setTheme}
-							>
-								<SelectTrigger className="w-48 border-gray-200 bg-white dark:bg-[#232323] text-black dark:text-white">
-									<SelectValue placeholder="Select theme" />
-								</SelectTrigger>
-								<SelectContent className="bg-white dark:bg-[#232323] text-black dark:text-white border-gray-200">
-									{THEMES.map((theme) => (
-										<SelectItem
-											key={theme.value}
-											value={theme.value}
-											className="hover:bg-gray-100 dark:hover:bg-[#232323]/80"
-										>
-											{theme.label}
-										</SelectItem>
-									))}
-								</SelectContent>
-							</Select>
-							<span className="text-gray-500 dark:text-gray-300 text-sm">
-								Current:{" "}
-								<span className="font-semibold text-black dark:text-white">
-									{THEMES.find(
-									(t) => t.value === (currentTheme || resolvedTheme),
-									)?.label || ""}
+						<div className="flex flex-col gap-2">
+							<div className="flex items-center gap-4">
+								<Select
+									value={currentTheme || resolvedTheme}
+									onValueChange={handleThemeChange}
+								>
+									<SelectTrigger className="w-48 border-gray-200 bg-white dark:bg-[#232323] text-black dark:text-white">
+										<SelectValue placeholder="Select theme" />
+									</SelectTrigger>
+									<SelectContent className="bg-white dark:bg-[#232323] text-black dark:text-white border-gray-200">
+										{THEMES.map((theme) => (
+											<SelectItem
+												key={theme.value}
+												value={theme.value}
+												className="hover:bg-gray-100 dark:hover:bg-[#232323]/80"
+											>
+												{theme.label}
+											</SelectItem>
+										))}
+									</SelectContent>
+								</Select>
+								<span className="text-gray-500 dark:text-gray-300 text-sm">
+									Current:{" "}
+									<span className="font-semibold text-black dark:text-white">
+										{THEMES.find(
+											(t) => t.value === (currentTheme || resolvedTheme),
+										)?.label || ""}
+									</span>
 								</span>
-							</span>
+							</div>
+							{showLightWarning && (
+								<div className="mt-2 p-3 rounded bg-yellow-100 border border-yellow-300 text-yellow-800 text-sm">
+									⚠️ Light theme is still under development. For the best experience, please use Dark mode.
+								</div>
+							)}
 						</div>
 					</section>
 				</CardContent>

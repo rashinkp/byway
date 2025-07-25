@@ -477,7 +477,7 @@ export function Header(
 
           {/* Mobile Menu */}
           {isMenuOpen && (
-            <div className="md:hidden pt-4 pb-2 space-y-4 border-t mt-3 bg-white dark:bg-neutral-900">
+            <div className="md:hidden pt-4 p-10 pb-2 space-y-4 border-t mt-3 bg-white dark:bg-neutral-900">
               <div className="space-y-3">
                 <Link
                   href="/courses"

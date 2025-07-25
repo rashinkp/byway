@@ -79,7 +79,7 @@ export const HeaderSearchBar: React.FC<HeaderSearchBarProps> = ({
 				{/* Enhanced Search Results Dropdown */}
 				{showSearchResults && searchResults && searchQuery && (
 					<div
-						className="absolute top-full left-0 right-0 mt-2 rounded-lg shadow-lg max-h-96 overflow-hidden z-50 bg-white dark:bg-neutral-900 text-black dark:text-white border border-black dark:border-white"
+						className="absolute top-full left-0 right-0 mt-2 rounded-lg shadow-lg max-h-96 overflow-hidden z-50 bg-white dark:bg-neutral-900 text-black dark:text-white  dark:border-white"
 					>
 						<div className="max-h-96 overflow-y-auto">
 							{/* Instructors Section */}
