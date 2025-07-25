@@ -60,13 +60,7 @@ const eventTypeColors: Record<string, string> = {
 
 const eventTypeOptions = [
 	{ value: "", label: "All Types" },
-	{ value: "COURSE_CREATION", label: "Course Creation" },
-	{ value: "COURSE_APPROVED", label: "Course Approved" },
-	{ value: "COURSE_DECLINED", label: "Course Declined" },
-	{ value: "COURSE_ENABLED", label: "Course Enabled" },
-	{ value: "COURSE_DISABLED", label: "Course Disabled" },
 	{ value: "COURSE_PURCHASED", label: "Course Purchased" },
-	{ value: "REVENUE_EARNED", label: "Revenue Earned" },
 	{ value: "ENROLLMENT", label: "Enrollment" },
 	{ value: "PAYMENT", label: "Payment" },
 	{ value: "SYSTEM", label: "System" },
@@ -74,8 +68,6 @@ const eventTypeOptions = [
 	{ value: "FEEDBACK", label: "Feedback" },
 	{ value: "CHAT_UPDATE", label: "Chat Update" },
 	{ value: "ASSIGNMENT", label: "Assignment" },
-	{ value: "INSTRUCTOR_APPROVED", label: "Instructor Approved" },
-	{ value: "INSTRUCTOR_DECLINED", label: "Instructor Declined" },
 	{ value: "USER_DISABLED", label: "Account Disabled" },
 	{ value: "USER_ENABLED", label: "Account Enabled" },
 ];

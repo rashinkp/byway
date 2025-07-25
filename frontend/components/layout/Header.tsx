@@ -213,6 +213,27 @@ export function Header(
 		setSearchModalOpen(false);
 	};
 
+	// Ref for mobile menu
+	const mobileMenuRef = useRef<HTMLDivElement>(null);
+	const mobileMenuButtonRef = useRef<HTMLButtonElement>(null);
+
+	// Close mobile menu on click outside
+	useEffect(() => {
+		if (!isMenuOpen) return;
+		function handleClickOutside(event: MouseEvent) {
+			if (
+				mobileMenuRef.current &&
+				!mobileMenuRef.current.contains(event.target as Node) &&
+				mobileMenuButtonRef.current &&
+				!mobileMenuButtonRef.current.contains(event.target as Node)
+			) {
+				setIsMenuOpen(false);
+			}
+		}
+		document.addEventListener("mousedown", handleClickOutside);
+		return () => document.removeEventListener("mousedown", handleClickOutside);
+	}, [isMenuOpen]);
+
 	return (
     <>
       <header
@@ -393,6 +414,7 @@ export function Header(
           {/* Mobile Navigation */}
           <div className="flex md:hidden items-center justify-between min-h-[56px] gap-2">
             <Button
+              ref={mobileMenuButtonRef}
               variant="ghost"
               size="icon"
               className="text-black  bg-transparent border-none"
@@ -477,7 +499,7 @@ export function Header(
 
           {/* Mobile Menu */}
           {isMenuOpen && (
-            <div className="md:hidden pt-4 p-10 pb-2 space-y-4 border-t mt-3 bg-white dark:bg-neutral-900">
+            <div ref={mobileMenuRef} className="md:hidden pt-4 p-10 pb-2 space-y-4 border-t mt-3 bg-white dark:bg-neutral-900">
               <div className="space-y-3">
                 <Link
                   href="/courses"
