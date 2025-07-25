@@ -32,7 +32,6 @@ export function LessonNavigation({
 		<div className="flex justify-end items-center mt-8 pt-4 border-t">
 			{!isFirstLesson ? (
 				<Button
-					variant="outline"
 					onClick={goToPrevLesson}
 					className="flex items-center gap-2"
 				>

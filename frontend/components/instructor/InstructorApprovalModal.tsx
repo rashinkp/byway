@@ -53,7 +53,7 @@ export function InstructorApprovalModal() {
 	return (
 		<Dialog open={isOpen} onOpenChange={setIsOpen}>
 			<DialogTrigger asChild>
-				<Button variant="outline" className="text-[#facc15] border-[#facc15] bg-white dark:bg-[#232326] hover:bg-[#facc15]/10">
+				<Button  className="text-[#facc15] border-[#facc15] bg-white dark:bg-[#232326] hover:bg-[#facc15]/10">
 					<Clock className="w-4 h-4 mr-2 text-[#facc15]" />
 					Pending Instructors
 				</Button>
@@ -98,7 +98,6 @@ export function InstructorApprovalModal() {
 										</div>
 										<div className="flex flex-col space-y-2 ml-4">
 											<Button
-												variant="outline"
 												size="sm"
 												className="w-full border-[#facc15] text-[#facc15] bg-white dark:bg-[#232326] hover:bg-[#facc15]/10"
 												onClick={() => handleViewDetails(instructor.user.id)}

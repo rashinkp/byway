@@ -62,7 +62,7 @@ export default function OrderSummary({
         disabled={isPending}
         className="w-full font-medium py-3 px-6 rounded-xl transition-colors flex items-center justify-center"
       >
-        {isPending && <LoadingSpinner size="sm" className="mr-2" />}
+        {isPending && <LoadingSpinner/>}
         {isPending ? "Processing..." : "Complete Payment"}
         {!isPending && <ArrowRight className="w-4 h-4 ml-2" />}
       </Button>

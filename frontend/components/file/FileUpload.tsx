@@ -56,13 +56,13 @@ export function FileUpload({
 	return (
 		<div className={cn("space-y-2", className)}>
 			{label && (
-				<label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 text-[var(--color-primary-dark)]">
+				<label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 text-black dark:text-white">
 					{label}
 				</label>
 			)}
 
 			{description && (
-				<p className="text-sm text-[var(--color-muted)]">{description}</p>
+				<p className="text-sm text-[#facc15]">{description}</p>
 			)}
 
 			<div className="flex items-center gap-4">
@@ -72,17 +72,16 @@ export function FileUpload({
 					onChange={handleFileChange}
 					accept={accept}
 					disabled={disabled || isUploading}
-					className="flex-1 cursor-pointer file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-[var(--color-primary-light)]/10 file:text-[var(--color-primary-light)] hover:file:bg-[var(--color-primary-light)]/20 border border-[var(--color-primary-200)] bg-[var(--color-surface)] text-[var(--color-primary-dark)]"
+					className="flex-1 cursor-pointer file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-[#facc15]/10 file:text-[#facc15] hover:file:bg-[#facc15]/20 border border-[#facc15] bg-white/80 dark:bg-[#232323] text-black dark:text-white"
 				/>
 				<Button
 					type="button"
 					onClick={() => fileInputRef.current?.click()}
 					disabled={disabled || isUploading}
-					variant="outline"
 					size="sm"
-					className="border-[var(--color-primary-200)] text-[var(--color-primary-dark)]"
+					className="border-[#facc15] text-black dark:text-white bg-[#facc15] hover:bg-black hover:text-[#facc15] dark:bg-[#facc15] dark:text-black dark:hover:bg-black dark:hover:text-[#facc15]"
 				>
-					<Upload className="w-4 h-4 mr-2" />
+					<Upload className="w-4 h-4 mr-2 text-black dark:text-[#18181b]" />
 					{isUploading ? "Uploading..." : "Browse"}
 				</Button>
 			</div>
@@ -91,9 +90,9 @@ export function FileUpload({
 				<div className="space-y-2">
 					<Progress
 						value={progress}
-						className="w-full h-2 bg-[var(--color-primary-50)] [&_.bg-primary]:bg-[var(--color-primary-light)]"
+						className="w-full h-2 bg-[#facc15]/20 [&_.bg-primary]:bg-[#facc15]"
 					/>
-					<p className="text-sm text-[var(--color-muted)]">
+					<p className="text-sm text-[#facc15]">
 						Uploading... {Math.round(progress)}%
 					</p>
 				</div>

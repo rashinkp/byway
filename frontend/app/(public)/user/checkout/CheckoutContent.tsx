@@ -169,7 +169,6 @@ export default function CheckoutContent() {
               </p>
             </div>
             <Badge
-              variant="outline"
               className="bg-white dark:bg-[#232323]  text-black dark:text-[#facc15] border border-[#facc15] px-3 py-1 rounded-full text-sm font-medium"
             >
               {courseDetails.length} {courseDetails.length === 1 ? "Course" : "Courses"}

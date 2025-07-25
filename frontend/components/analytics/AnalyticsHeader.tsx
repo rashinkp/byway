@@ -32,7 +32,6 @@ export default function AnalyticsHeader({
 			<div className="flex items-center gap-4">
 				<DatePickerWithRange date={dateRange} onDateChange={onDateChange} />
 				<Badge
-					variant="outline"
 					className="bg-white text-black border-[#facc15] dark:bg-[#232323] dark:text-[#facc15] dark:border-[#facc15]"
 				>
 					<Activity className="w-3 h-3 mr-1 text-[#facc15] dark:text-[#facc15]" />

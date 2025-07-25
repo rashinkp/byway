@@ -1,1 +1,1 @@
-export { SkeletonLayout } from "./LoadingSpinner";
+export { LoadingSpinner } from "../ui/LoadingSpinner";
