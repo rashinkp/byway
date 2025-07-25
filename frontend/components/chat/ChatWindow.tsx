@@ -221,3 +221,5 @@ export const ChatWindow = forwardRef<any, ChatWindowProps & {
     </div>
   );
 });
+
+ChatWindow.displayName = "ChatWindow";
