@@ -79,6 +79,7 @@ interface LatestRevenueListProps {
 	onPageChange: (page: number) => void;
 	currentPage: number;
 	searchValue: string;
+	currentSort: "latest" | "oldest";
 }
 
 export default function LatestRevenueList({
