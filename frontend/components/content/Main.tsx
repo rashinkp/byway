@@ -34,6 +34,8 @@ export default function MainContentSection() {
   >([]);
   const [page, setPage] = useState(1);
   const limit = 10;
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const isMobile = typeof window !== 'undefined' && window.innerWidth < 1024;
 
   const params = useParams();
   const courseId = params.courseId as string;
@@ -281,20 +283,75 @@ export default function MainContentSection() {
 
   return (
     <div className="flex flex-col lg:flex-row w-full min-h-screen bg-white dark:bg-[#18181b]">
-      <EnrolledCourseSidebar
-        courseTitle="Introduction to User Experience Design"
-        progressPercentage={progressPercentage}
-        isLoading={isLoading || isProgressLoading}
-        isError={isError}
-        error={error}
-        allLessons={allItems}
-        selectedLesson={selectedLesson}
-        handleLessonSelect={handleLessonSelect}
-        data={data}
-        page={page}
-        goToPreviousPage={goToPreviousPage}
-        goToNextPage={goToNextPage}
-      />
+      {/* Mobile Lessons Button */}
+      <div className="lg:hidden w-full p-4 flex items-center justify-between sticky top-0 z-40 bg-white dark:bg-[#18181b]">
+        <button
+          className="px-4 py-2 bg-[#facc15] text-black rounded-lg font-semibold shadow hover:bg-[#facc15]/90 transition"
+          onClick={() => setSidebarOpen(true)}
+        >
+          Lessons
+        </button>
+        <div className="flex-1 ml-4">
+          <div className="relative h-2 bg-gray-100 dark:bg-[#232323] rounded-full overflow-hidden">
+            <div
+              className="absolute h-full bg-gradient-to-r from-blue-400 to-indigo-500 dark:from-yellow-400 dark:to-yellow-500 transition-all duration-300"
+              style={{ width: `${progressPercentage}%` }}
+            ></div>
+          </div>
+          <p className="text-xs text-gray-500 dark:text-gray-300 mt-1">
+            {progressPercentage.toFixed(0)}% complete
+          </p>
+        </div>
+      </div>
+      {/* Sidebar as modal on mobile */}
+      {sidebarOpen && (
+        <div className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center lg:hidden">
+          <div className="relative w-full max-w-xs bg-white dark:bg-[#18181b] shadow-xl rounded-xl p-4 flex flex-col mt-20 mx-2 overflow-y-auto max-h-[80vh]">
+            <button
+              className="absolute top-2 right-2 text-black dark:text-white text-2xl font-bold"
+              onClick={() => setSidebarOpen(false)}
+              aria-label="Close lessons sidebar"
+            >
+              ×
+            </button>
+            <EnrolledCourseSidebar
+              courseTitle="Introduction to User Experience Design"
+              progressPercentage={progressPercentage}
+              isLoading={isLoading || isProgressLoading}
+              isError={isError}
+              error={error}
+              allLessons={allItems}
+              selectedLesson={selectedLesson}
+              handleLessonSelect={(lesson) => {
+                handleLessonSelect(lesson);
+                setSidebarOpen(false);
+              }}
+              data={data}
+              page={page}
+              goToPreviousPage={goToPreviousPage}
+              goToNextPage={goToNextPage}
+            />
+          </div>
+          <div className="fixed inset-0" onClick={() => setSidebarOpen(false)} />
+        </div>
+      )}
+      {/* Sidebar on desktop */}
+      <div className="hidden lg:block">
+        <EnrolledCourseSidebar
+          courseTitle="Introduction to User Experience Design"
+          progressPercentage={progressPercentage}
+          isLoading={isLoading || isProgressLoading}
+          isError={isError}
+          error={error}
+          allLessons={allItems}
+          selectedLesson={selectedLesson}
+          handleLessonSelect={handleLessonSelect}
+          data={data}
+          page={page}
+          goToPreviousPage={goToPreviousPage}
+          goToNextPage={goToNextPage}
+        />
+      </div>
       <div className="flex-1 p-4 lg:p-8 xl:p-12 bg-white dark:bg-[#18181b]">
         {isError ? (
           <div className="flex flex-col items-center justify-center h-full space-y-6 animate-fade-in">

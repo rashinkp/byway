@@ -34,7 +34,6 @@ const THEMES = [
 export default function SettingsPage() {
 	const { setTheme, theme: currentTheme, resolvedTheme } = useTheme();
 	const [mounted, setMounted] = useState(false);
-	const [showLightWarning, setShowLightWarning] = useState(false);
 
 	useEffect(() => {
 		setMounted(true);
@@ -42,11 +41,6 @@ export default function SettingsPage() {
 
 	const handleThemeChange = (value: string) => {
 		setTheme(value);
-		if (value === "light" || (value === "system" && resolvedTheme === "light")) {
-			setShowLightWarning(true);
-		} else {
-			setShowLightWarning(false);
-		}
 	};
 
 	if (!mounted) return null;
@@ -97,7 +91,7 @@ export default function SettingsPage() {
 									</span>
 								</span>
 							</div>
-							{showLightWarning && (
+							{(currentTheme === 'light' || (currentTheme === 'system' && resolvedTheme === 'light')) && (
 								<div className="mt-2 p-3 rounded bg-yellow-100 border border-yellow-300 text-yellow-800 text-sm">
 									⚠️ Light theme is still under development. For the best experience, please use Dark mode.
 								</div>
