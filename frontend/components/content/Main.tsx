@@ -35,7 +35,6 @@ export default function MainContentSection() {
   const [page, setPage] = useState(1);
   const limit = 10;
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const isMobile = typeof window !== 'undefined' && window.innerWidth < 1024;
 
   const params = useParams();
   const courseId = params.courseId as string;
