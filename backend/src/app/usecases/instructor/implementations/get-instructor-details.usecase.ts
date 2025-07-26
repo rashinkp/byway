@@ -15,9 +15,7 @@ export class GetInstructorDetailsUseCaseImpl implements GetInstructorDetailsUseC
       throw new HttpError("User not found for instructor", 404);
     }
 
-    if (user.role !== "INSTRUCTOR") {
-      throw new HttpError("User is not an instructor", 403);
-    }
+ 
 
     const instructor = await this.instructorRepository.findInstructorByUserId(
       userId
