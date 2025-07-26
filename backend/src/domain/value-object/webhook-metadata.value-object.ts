@@ -2,6 +2,7 @@ export class WebhookMetadata {
   private constructor(
     public readonly userId?: string,
     public readonly orderId?: string,
+    public readonly courseIds?: string[],
     public readonly courses?: any[],
     public readonly paymentIntentId?: string,
     public readonly status?: string,
@@ -16,13 +17,24 @@ export class WebhookMetadata {
         undefined,
         undefined,
         undefined,
+        undefined,
         metadata.paymentIntentId,
         metadata.status,
         metadata.failureReason
       );
     }
 
-    // Parse courses if they exist
+    // Parse course IDs if they exist
+    let courseIds: string[] | undefined;
+    if (metadata.courseIds) {
+      try {
+        courseIds = JSON.parse(metadata.courseIds);
+      } catch (error) {
+        console.error('Error parsing course IDs from metadata:', error);
+      }
+    }
+
+    // Parse courses if they exist (for backward compatibility)
     let courses: any[] | undefined;
     if (metadata.courses) {
       try {
@@ -35,6 +47,7 @@ export class WebhookMetadata {
     return new WebhookMetadata(
       metadata.userId,
       metadata.orderId,
+      courseIds,
       courses,
       metadata.paymentIntentId,
       metadata.status,
@@ -44,6 +57,10 @@ export class WebhookMetadata {
   }
 
   getCourseIds(): string[] {
+    // Prefer courseIds over courses for backward compatibility
+    if (this.courseIds) {
+      return this.courseIds;
+    }
     return this.courses?.map(course => course.id) || [];
   }
 } 

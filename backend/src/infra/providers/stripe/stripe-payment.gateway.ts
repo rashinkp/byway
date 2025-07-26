@@ -114,7 +114,7 @@ export class StripePaymentGateway implements PaymentGateway {
         metadata: {
           userId: input.userId,
           orderId,
-          ...(courses && { courses: JSON.stringify(courses) }),
+          ...(courses && { courseIds: JSON.stringify(courses.map(course => course.id)) }),
           ...(isWalletTopUp && { isWalletTopUp: "true" }),
         },
         discounts: couponCode ? [{ coupon: couponCode }] : undefined,
