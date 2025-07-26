@@ -61,7 +61,7 @@ const Sidebar: FC<SidebarProps> = ({
 	return (
 		<div
 			className={cn(
-				"w-full h-full bg-white dark:bg-[#232326] border-l-4 border-yellow-400 flex flex-col relative transition-all duration-300 shadow-md z-[60]",
+				"w-full h-full  flex flex-col relative transition-all duration-300 shadow-md z-[60]",
 			)}
 		>
 			{/* Collapse/Expand Chevron - always visible on mobile, at the very top when collapsed or expanded */}

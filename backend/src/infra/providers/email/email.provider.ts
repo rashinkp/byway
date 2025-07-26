@@ -80,4 +80,68 @@ export class EmailProviderImpl implements EmailProvider {
       html,
     });
   }
+
+  async sendContactFormEmail(data: { name: string; email: string; subject: string; message: string }): Promise<void> {
+    const html = `
+      <div style="font-family: 'Segoe UI', Arial, sans-serif; background: #f7f7fa; padding: 32px;">
+        <div style="max-width: 600px; margin: 0 auto; background: #fff; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); padding: 32px 24px;">
+          <div style="text-align: center; margin-bottom: 24px;">
+            <h2 style="color: #2d3748; margin: 0; font-size: 2rem;">New Contact Form Submission</h2>
+            <p style="color: #4a5568; font-size: 1.1rem; margin: 8px 0 0;">Someone has contacted us through the website</p>
+          </div>
+          <div style="background: #f6e05e; color: #2d3748; border-radius: 8px; padding: 20px; margin-bottom: 24px;">
+            <h3 style="margin: 0 0 16px 0; font-size: 1.2rem;">Contact Details</h3>
+            <p style="margin: 8px 0;"><strong>Name:</strong> ${data.name}</p>
+            <p style="margin: 8px 0;"><strong>Email:</strong> ${data.email}</p>
+            <p style="margin: 8px 0;"><strong>Subject:</strong> ${data.subject}</p>
+          </div>
+          <div style="background: #f8f9fa; border-radius: 8px; padding: 20px; margin-bottom: 24px;">
+            <h3 style="margin: 0 0 16px 0; font-size: 1.2rem; color: #2d3748;">Message</h3>
+            <p style="color: #4a5568; font-size: 1rem; line-height: 1.6; margin: 0; white-space: pre-wrap;">${data.message}</p>
+          </div>
+          <div style="text-align: center; color: #a0aec0; font-size: 0.95rem;">
+            This message was sent from the Byway contact form.<br />
+            &copy; ${new Date().getFullYear()} Byway eLearning Platform
+          </div>
+        </div>
+      </div>
+    `;
+    await this.transporter.sendMail({
+      from: `Byway Contact Form <${envConfig.EMAIL_USER}>`,
+      to: envConfig.EMAIL_USER, // Send to admin/support email
+      subject: `Contact Form: ${data.subject}`,
+      text: `Name: ${data.name}\nEmail: ${data.email}\nSubject: ${data.subject}\n\nMessage:\n${data.message}`,
+      html,
+    });
+  }
+
+  async sendContactConfirmationEmail(data: { name: string; email: string; subject: string }): Promise<void> {
+    const html = `
+      <div style="font-family: 'Segoe UI', Arial, sans-serif; background: #f7f7fa; padding: 32px;">
+        <div style="max-width: 480px; margin: 0 auto; background: #fff; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); padding: 32px 24px;">
+          <div style="text-align: center; margin-bottom: 24px;">
+            <h2 style="color: #2d3748; margin: 0; font-size: 2rem;">Thank You for Contacting Us!</h2>
+            <p style="color: #4a5568; font-size: 1.1rem; margin: 8px 0 0;">We've received your message</p>
+          </div>
+          <div style="background: #f6e05e; color: #2d3748; border-radius: 8px; padding: 20px; margin-bottom: 24px;">
+            <p style="margin: 8px 0; font-size: 1.1rem;">Hi ${data.name},</p>
+            <p style="margin: 8px 0; font-size: 1rem;">Thank you for reaching out to us. We've received your message about "<strong>${data.subject}</strong>" and will get back to you within 24 hours.</p>
+          </div>
+          <p style="color: #4a5568; font-size: 1rem; text-align: center; margin-bottom: 24px;">
+            In the meantime, you can check out our <a href="${envConfig.FRONTEND_URL}/courses" style="color: #f6e05e;">course catalog</a> or visit our <a href="${envConfig.FRONTEND_URL}/contact" style="color: #f6e05e;">FAQ section</a> for quick answers.
+          </p>
+          <div style="text-align: center; color: #a0aec0; font-size: 0.95rem;">
+            &copy; ${new Date().getFullYear()} Byway eLearning Platform
+          </div>
+        </div>
+      </div>
+    `;
+    await this.transporter.sendMail({
+      from: `Byway Support <${envConfig.EMAIL_USER}>`,
+      to: data.email,
+      subject: "We've received your message - Byway",
+      text: `Hi ${data.name},\n\nThank you for contacting us. We've received your message about "${data.subject}" and will get back to you within 24 hours.\n\nBest regards,\nThe Byway Team`,
+      html,
+    });
+  }
 }

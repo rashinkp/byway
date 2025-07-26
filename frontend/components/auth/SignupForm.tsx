@@ -95,7 +95,7 @@ export function SignupForm() {
 						name: "password",
 						label: "Password",
 						type: "password",
-						placeholder: "••••••",
+						placeholder: "enter your password",
 					},
 				]}
 				title="Create account"

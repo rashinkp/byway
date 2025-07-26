@@ -55,7 +55,7 @@ export function CourseCard({ course, className }: CourseCardProps) {
           height={192}
         />
         {/* Discount Badge */}
-        {hasDiscount && (
+        {hasDiscount && discountPercentage > 0 && (
           <div className="absolute top-3 left-3 bg-[#facc15] text-black px-3 py-1 rounded-full text-xs font-bold shadow ring-1 ring-[#facc15]">
             -{discountPercentage}%
           </div>

@@ -308,6 +308,12 @@ export function Header(
                   >
                     <Link href="/theme">Theme</Link>
                   </DropdownMenuItem>
+                  <DropdownMenuItem
+                    asChild
+                    className="rounded hover:bg-[#facc15] hover:text-black dark:hover:bg-[#facc15] dark:hover:text-[#18181b]"
+                  >
+                    <Link href="/contact">Contact</Link>
+                  </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
               {isLoading ? (
@@ -528,6 +534,13 @@ export function Header(
                   onClick={() => setIsMenuOpen(false)}
                 >
                   Theme
+                </Link>
+                <Link
+                  href="/contact"
+                  className="block px-2 py-1 text-black dark:text-white font-medium text-base rounded hover:bg-[#facc15]/50 dark:hover:bg-[#facc15] hover:text-black  transition-colors"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  Contact
                 </Link>
                 {isLoading ? (
                   <div className="space-y-3">

@@ -19,24 +19,40 @@ export const instructorSchema = z.object({
 	// Professional Information
 	areaOfExpertise: z
 		.string()
-		.min(1, "Area of expertise is required")
-		.max(100, "Area of expertise is too long"),
+		.min(2, "Area of expertise must be at least 2 characters")
+		.max(100, "Area of expertise must be less than 100 characters")
+		.regex(/^[a-zA-Z\s\-,&]+$/, "Area of expertise can only contain letters, spaces, hyphens, commas, and ampersands")
+		.refine((val) => !/\s{2,}/.test(val), "Area of expertise cannot contain consecutive spaces")
+		.refine((val) => !/^[^a-zA-Z]*$/.test(val), "Area of expertise must contain at least one letter"),
 	professionalExperience: z
 		.string()
-		.min(1, "Professional experience is required")
-		.max(500, "Professional experience is too long"),
-	about: z.string().max(1000, "About section is too long").optional(),
+		.min(10, "Professional experience must be at least 10 characters")
+		.max(500, "Professional experience must be less than 500 characters")
+		.refine((val) => !val || /^[\w\s\.,!?;:'"()-]+$/.test(val), "Professional experience contains invalid characters")
+		.refine((val) => !/\s{2,}/.test(val), "Professional experience cannot contain consecutive spaces"),
+	about: z.string()
+		.max(1000, "About section must be less than 1000 characters")
+		.refine((val) => !val || /^[\w\s\.,!?;:'"()-]+$/.test(val), "About section contains invalid characters")
+		.refine((val) => !val || !/\s{2,}/.test(val), "About section cannot contain consecutive spaces")
+		.optional(),
 	website: z
 		.string()
 		.url("Invalid URL format")
-		.max(200, "Website URL is too long")
+		.max(200, "Website URL must be less than 200 characters")
+		.refine((val) => !val || /^https?:\/\/.+/.test(val), "Website must start with http:// or https://")
 		.optional(),
 
-	// Education
-	education: z.string().min(1, "Education details are required"),
+	education: z.string()
+		.min(10, "Education details must be at least 10 characters")
+		.max(300, "Education details must be less than 300 characters")
+		.refine((val) => /^[a-zA-Z\s\.,\-'()]+$/.test(val), "Education contains invalid characters")
+		.refine((val) => !/\s{2,}/.test(val), "Education cannot contain consecutive spaces"),
 
-	// Certifications
-	certifications: z.string().min(1, "Certifications are required"),
+	certifications: z.string()
+		.min(5, "Certifications must be at least 5 characters")
+		.max(300, "Certifications must be less than 300 characters")
+		.refine((val) => /^[a-zA-Z\s\.,\-'()]+$/.test(val), "Certifications contain invalid characters")
+		.refine((val) => !/\s{2,}/.test(val), "Certifications cannot contain consecutive spaces"),
 
 	// Documents
 	cv: z
@@ -45,7 +61,9 @@ export const instructorSchema = z.object({
 			(file) => file.size <= 5 * 1024 * 1024,
 			"File size must be less than 5MB",
 		)
-		.refine((file) => file.type === "application/pdf", "File must be a PDF"),
+		.refine((file) => file.type === "application/pdf", "File must be a PDF")
+		.refine((file) => file.name.length <= 100, "File name must be less than 100 characters")
+		.refine((file) => /^[a-zA-Z0-9\s\-_\.]+$/.test(file.name), "File name contains invalid characters"),
 });
 
 export type InstructorFormData = z.infer<typeof instructorSchema>;
@@ -61,21 +79,21 @@ const fields: FormFieldConfig<InstructorFormData>[] = [
 		type: "input",
 		fieldType: "text",
 		placeholder: "e.g., Web Development, Data Science",
-		description: "Your primary area of expertise",
+		description: "Your primary area of expertise (letters, spaces, hyphens, commas, and ampersands only)",
 	},
 	{
 		name: "professionalExperience",
 		label: "Professional Experience",
 		type: "textarea",
 		placeholder: "Describe your professional experience",
-		description: "Your work experience and achievements",
+		description: "Your work experience and achievements (minimum 10 characters, no consecutive spaces)",
 	},
 	{
 		name: "about",
 		label: "About",
 		type: "textarea",
 		placeholder: "Tell us about yourself",
-		description: "A brief introduction about yourself",
+		description: "A brief introduction about yourself (optional, maximum 1000 characters)",
 	},
 	{
 		name: "website",
@@ -83,28 +101,28 @@ const fields: FormFieldConfig<InstructorFormData>[] = [
 		type: "input",
 		fieldType: "text",
 		placeholder: "https://your-website.com",
-		description: "Your personal or professional website (optional)",
+		description: "Your personal or professional website (optional, must start with http:// or https://)",
 	},
 	{
 		name: "education",
 		label: "Education",
 		type: "textarea",
 		placeholder: "List your educational qualifications",
-		description: "Include your degrees, institutions, and graduation years",
+		description: "Include your degrees, institutions, and graduation years (minimum 10 characters)",
 	},
 	{
 		name: "certifications",
 		label: "Certifications",
 		type: "textarea",
 		placeholder: "List your professional certifications",
-		description: "Enter your certifications (one per line)",
+		description: "Enter your certifications (minimum 5 characters, one per line)",
 	},
 	{
 		name: "cv",
 		label: "CV/Resume",
 		type: "input",
 		fieldType: "file",
-		description: "Upload your CV/Resume (PDF, max 5MB)",
+		description: "Upload your CV/Resume (PDF only, max 5MB, valid filename)",
 		accept: "application/pdf",
 		maxSize: 5 * 1024 * 1024,
 		fileTypeLabel: "PDF",
