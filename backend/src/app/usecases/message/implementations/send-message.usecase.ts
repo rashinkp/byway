@@ -1,15 +1,18 @@
-import { ISendMessageUseCase, SendMessageInput } from '../interfaces/send-message.usecase.interface';
-import { IChatRepository } from '../../../repositories/chat.repository.interface';
-import { IMessageRepository } from '../../../repositories/message.repository.interface';
-import { ChatId } from '../../../../domain/value-object/ChatId';
-import { UserId } from '../../../../domain/value-object/UserId';
-import { MessageContent } from '../../../../domain/value-object/MessageContent';
-import { Message } from '../../../../domain/entities/Message';
-import { MessageId } from '../../../../domain/value-object/MessageId';
-import { Timestamp } from '../../../../domain/value-object/Timestamp';
-import { MessageResponseDTO } from '@/domain/dtos/chat.dto';
-import { Chat } from '../../../../domain/entities/Chat';
-import { MessageType } from '../../../../domain/enum/Message-type.enum';
+import {
+  ISendMessageUseCase,
+  SendMessageInput,
+} from "../interfaces/send-message.usecase.interface";
+import { IChatRepository } from "../../../repositories/chat.repository.interface";
+import { IMessageRepository } from "../../../repositories/message.repository.interface";
+import { ChatId } from "../../../../domain/value-object/ChatId";
+import { UserId } from "../../../../domain/value-object/UserId";
+import { MessageContent } from "../../../../domain/value-object/MessageContent";
+import { Message } from "../../../../domain/entities/message.entity";
+import { MessageId } from "../../../../domain/value-object/MessageId";
+import { Timestamp } from "../../../../domain/value-object/Timestamp";
+import { MessageResponseDTO } from "@/domain/dtos/chat.dto";
+import { Chat } from "../../../../domain/entities/chat.entity";
+import { MessageType } from "../../../../domain/enum/Message-type.enum";
 
 export class SendMessageUseCase implements ISendMessageUseCase {
   constructor(
@@ -24,7 +27,10 @@ export class SendMessageUseCase implements ISendMessageUseCase {
     } else if (input.userId) {
       const senderId = new UserId(input.senderId);
       const recipientId = new UserId(input.userId);
-      let chat = await this.chatRepository.getChatBetweenUsers(senderId, recipientId);
+      let chat = await this.chatRepository.getChatBetweenUsers(
+        senderId,
+        recipientId
+      );
       if (!chat) {
         chat = await this.chatRepository.create(
           new Chat(
@@ -37,12 +43,12 @@ export class SendMessageUseCase implements ISendMessageUseCase {
           )
         );
         if (!chat) {
-          throw new Error('Failed to create chat');
+          throw new Error("Failed to create chat");
         }
       }
       chatId = chat.id;
     } else {
-      throw new Error('Either chatId or userId must be provided');
+      throw new Error("Either chatId or userId must be provided");
     }
     // Determine message type
     let messageType: MessageType;
@@ -67,12 +73,17 @@ export class SendMessageUseCase implements ISendMessageUseCase {
     try {
       await this.messageRepository.create(message);
     } catch {
-      throw new Error('Failed to create message');
+      throw new Error("Failed to create message");
     }
     if (chatId && (input.chatId || input.userId)) {
-      let chat = input.chatId ? await this.chatRepository.findById(chatId) : null;
+      let chat = input.chatId
+        ? await this.chatRepository.findById(chatId)
+        : null;
       if (!chat) {
-        chat = await this.chatRepository.getChatBetweenUsers(new UserId(input.senderId), new UserId(input.userId!));
+        chat = await this.chatRepository.getChatBetweenUsers(
+          new UserId(input.senderId),
+          new UserId(input.userId!)
+        );
       }
       if (chat) {
         const updatedChat = new Chat(
@@ -88,7 +99,9 @@ export class SendMessageUseCase implements ISendMessageUseCase {
     }
     let enrichedMessage: any = null;
     try {
-      enrichedMessage = await this.messageRepository.findByIdWithUserData(message.id);
+      enrichedMessage = await this.messageRepository.findByIdWithUserData(
+        message.id
+      );
     } catch {
       // Optionally handle error, but no log needed
     }
@@ -97,12 +110,14 @@ export class SendMessageUseCase implements ISendMessageUseCase {
         id: message.id.value,
         chatId: message.chatId.value,
         senderId: message.senderId.value,
-        receiverId: input.userId || '',
-        content: message.content?.value || '',
+        receiverId: input.userId || "",
+        content: message.content?.value || "",
         imageUrl: message.imageUrl ? String(message.imageUrl) : undefined,
         audioUrl: message.audioUrl ? String(message.audioUrl) : undefined,
         isRead: false,
-        timestamp: message.createdAt.value ? new Date(message.createdAt.value).toISOString() : '',
+        timestamp: message.createdAt.value
+          ? new Date(message.createdAt.value).toISOString()
+          : "",
       };
     }
     const chat = await this.chatRepository.findById(chatId);
@@ -111,26 +126,33 @@ export class SendMessageUseCase implements ISendMessageUseCase {
         id: enrichedMessage.id,
         chatId: enrichedMessage.chatId,
         senderId: enrichedMessage.senderId,
-        receiverId: input.userId || '',
-        content: enrichedMessage.content || '',
+        receiverId: input.userId || "",
+        content: enrichedMessage.content || "",
         imageUrl: enrichedMessage.imageUrl || undefined,
         audioUrl: enrichedMessage.audioUrl || undefined,
         isRead: false,
-        timestamp: enrichedMessage.createdAt ? new Date(enrichedMessage.createdAt).toISOString() : '',
+        timestamp: enrichedMessage.createdAt
+          ? new Date(enrichedMessage.createdAt).toISOString()
+          : "",
       };
     }
-    const receiverId = chat.user1Id.value === enrichedMessage.senderId ? chat.user2Id.value : chat.user1Id.value;
-    
+    const receiverId =
+      chat.user1Id.value === enrichedMessage.senderId
+        ? chat.user2Id.value
+        : chat.user1Id.value;
+
     return {
       id: enrichedMessage.id,
       chatId: enrichedMessage.chatId,
       senderId: enrichedMessage.senderId,
       receiverId,
-      content: enrichedMessage.content || '',
+      content: enrichedMessage.content || "",
       imageUrl: enrichedMessage.imageUrl || undefined,
       audioUrl: enrichedMessage.audioUrl || undefined,
       isRead: false,
-      timestamp: enrichedMessage.createdAt ? new Date(enrichedMessage.createdAt).toISOString() : '',
+      timestamp: enrichedMessage.createdAt
+        ? new Date(enrichedMessage.createdAt).toISOString()
+        : "",
     };
   }
-} 
+}

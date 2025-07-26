@@ -1,5 +1,5 @@
 import { IMessageRepository } from "../../app/repositories/message.repository.interface";
-import { Message } from "../../domain/entities/Message";
+import { Message } from "../../domain/entities/message.entity";
 import { MessageId } from "../../domain/value-object/MessageId";
 import { ChatId } from "../../domain/value-object/ChatId";
 import { UserId } from "../../domain/value-object/UserId";

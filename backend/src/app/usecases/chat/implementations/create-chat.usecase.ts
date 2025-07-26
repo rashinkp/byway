@@ -1,9 +1,9 @@
-import { ICreateChatUseCase } from '../interfaces/create-chat.usecase.interface';
-import { IChatRepository } from '../../../repositories/chat.repository.interface';
-import { Chat } from '../../../../domain/entities/Chat';
-import { UserId } from '../../../../domain/value-object/UserId';
-import { ChatId } from '../../../../domain/value-object/ChatId';
-import { Timestamp } from '../../../../domain/value-object/Timestamp';
+import { ICreateChatUseCase } from "../interfaces/create-chat.usecase.interface";
+import { IChatRepository } from "../../../repositories/chat.repository.interface";
+import { Chat } from "../../../../domain/entities/chat.entity";
+import { UserId } from "../../../../domain/value-object/UserId";
+import { ChatId } from "../../../../domain/value-object/ChatId";
+import { Timestamp } from "../../../../domain/value-object/Timestamp";
 
 export class CreateChatUseCase implements ICreateChatUseCase {
   constructor(private readonly chatRepository: IChatRepository) {}
@@ -20,4 +20,4 @@ export class CreateChatUseCase implements ICreateChatUseCase {
     await this.chatRepository.create(chat);
     return chat;
   }
-} 
+}

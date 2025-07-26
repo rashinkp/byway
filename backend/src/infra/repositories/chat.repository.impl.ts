@@ -1,10 +1,13 @@
-import { IChatRepository } from '../../app/repositories/chat.repository.interface';
-import { Chat } from '../../domain/entities/Chat';
-import { ChatId } from '../../domain/value-object/ChatId';
-import { UserId } from '../../domain/value-object/UserId';
-import { PaginatedChatListDTO, EnhancedChatListItemDTO } from '../../domain/dtos/chat.dto';
-import { PrismaClient } from '@prisma/client';
-import { Role } from '../../domain/enum/role.enum';
+import { IChatRepository } from "../../app/repositories/chat.repository.interface";
+import { Chat } from "../../domain/entities/chat.entity";
+import { ChatId } from "../../domain/value-object/ChatId";
+import { UserId } from "../../domain/value-object/UserId";
+import {
+  PaginatedChatListDTO,
+  EnhancedChatListItemDTO,
+} from "../../domain/dtos/chat.dto";
+import { PrismaClient } from "@prisma/client";
+import { Role } from "../../domain/enum/role.enum";
 
 const prisma = new PrismaClient();
 
@@ -21,26 +24,29 @@ export class ChatRepository implements IChatRepository {
   async findByUser(userId: UserId): Promise<Chat[]> {
     const chats = await prisma.chat.findMany({
       where: {
-        OR: [
-          { user1Id: userId.value },
-          { user2Id: userId.value },
-        ],
+        OR: [{ user1Id: userId.value }, { user2Id: userId.value }],
       },
       include: { messages: true },
     });
     return chats.map(this.toDomain);
   }
 
-  async findEnhancedChatList(userId: UserId, page: number = 1, limit: number = 10, search?: string, sort?: string): Promise<PaginatedChatListDTO> {
+  async findEnhancedChatList(
+    userId: UserId,
+    page: number = 1,
+    limit: number = 10,
+    search?: string,
+    sort?: string
+  ): Promise<PaginatedChatListDTO> {
     const offset = (page - 1) * limit;
-    
+
     let chatItems: EnhancedChatListItemDTO[] = [];
     if (search) {
       const normalizedSearch = search.trim().toLowerCase();
       const roleMap: Record<string, Role> = {
-        'admin': Role.ADMIN,
-        'instructor': Role.INSTRUCTOR,
-        'user': Role.USER,
+        admin: Role.ADMIN,
+        instructor: Role.INSTRUCTOR,
+        user: Role.USER,
       };
       const roleSearch = roleMap[normalizedSearch] || undefined;
 
@@ -53,8 +59,14 @@ export class ChatRepository implements IChatRepository {
                 { user1Id: userId.value },
                 {
                   OR: [
-                    { user2: { name: { contains: search, mode: 'insensitive' } } },
-                    ...(roleSearch ? [{ user2: { role: roleSearch as Role } }] : []),
+                    {
+                      user2: {
+                        name: { contains: search, mode: "insensitive" },
+                      },
+                    },
+                    ...(roleSearch
+                      ? [{ user2: { role: roleSearch as Role } }]
+                      : []),
                   ],
                 },
               ],
@@ -64,8 +76,14 @@ export class ChatRepository implements IChatRepository {
                 { user2Id: userId.value },
                 {
                   OR: [
-                    { user1: { name: { contains: search, mode: 'insensitive' } } },
-                    ...(roleSearch ? [{ user1: { role: roleSearch as Role } }] : []),
+                    {
+                      user1: {
+                        name: { contains: search, mode: "insensitive" },
+                      },
+                    },
+                    ...(roleSearch
+                      ? [{ user1: { role: roleSearch as Role } }]
+                      : []),
                   ],
                 },
               ],
@@ -76,27 +94,26 @@ export class ChatRepository implements IChatRepository {
           user1: { select: { id: true, name: true, role: true, avatar: true } },
           user2: { select: { id: true, name: true, role: true, avatar: true } },
           messages: {
-            orderBy: { createdAt: 'desc' },
+            orderBy: { createdAt: "desc" },
             take: 1,
             include: { sender: { select: { name: true } } },
           },
         },
-        orderBy: { updatedAt: 'desc' },
+        orderBy: { updatedAt: "desc" },
         skip: offset,
         take: limit,
       });
 
       // Find chats where the last message matches (but not already in nameOrRoleMatchChats)
-      const nameOrRoleMatchIds = new Set(nameOrRoleMatchChats.map(chat => chat.id));
+      const nameOrRoleMatchIds = new Set(
+        nameOrRoleMatchChats.map((chat) => chat.id)
+      );
       const messageMatchChats = await prisma.chat.findMany({
         where: {
-          OR: [
-            { user1Id: userId.value },
-            { user2Id: userId.value },
-          ],
+          OR: [{ user1Id: userId.value }, { user2Id: userId.value }],
           messages: {
             some: {
-              content: { contains: search, mode: 'insensitive' },
+              content: { contains: search, mode: "insensitive" },
             },
           },
           NOT: {
@@ -107,12 +124,12 @@ export class ChatRepository implements IChatRepository {
           user1: { select: { id: true, name: true, role: true, avatar: true } },
           user2: { select: { id: true, name: true, role: true, avatar: true } },
           messages: {
-            orderBy: { createdAt: 'desc' },
+            orderBy: { createdAt: "desc" },
             take: 1,
             include: { sender: { select: { name: true } } },
           },
         },
-        orderBy: { updatedAt: 'desc' },
+        orderBy: { updatedAt: "desc" },
         skip: 0,
         take: limit,
       });
@@ -121,46 +138,54 @@ export class ChatRepository implements IChatRepository {
       const allChats = [...nameOrRoleMatchChats, ...messageMatchChats];
 
       // Convert to enhanced format as before
-      chatItems = await Promise.all(allChats.map(async chat => {
-        const otherUser = chat.user1 ? (chat.user1Id === userId.value ? chat.user2 : chat.user1) : undefined;
-        const lastMessage = chat.messages && chat.messages[0];
-        // Count unread messages for this user in this chat
-        const unreadCount = await prisma.message.count({
-          where: {
+      chatItems = await Promise.all(
+        allChats.map(async (chat) => {
+          const otherUser = chat.user1
+            ? chat.user1Id === userId.value
+              ? chat.user2
+              : chat.user1
+            : undefined;
+          const lastMessage = chat.messages && chat.messages[0];
+          // Count unread messages for this user in this chat
+          const unreadCount = await prisma.message.count({
+            where: {
+              chatId: chat.id,
+              senderId: { not: userId.value },
+              isRead: false,
+            },
+          });
+          return {
+            id: chat.id,
+            type: "chat",
+            displayName: otherUser?.name || "",
+            avatar: otherUser?.avatar || undefined,
+            role: otherUser?.role || "",
+            lastMessage: lastMessage
+              ? {
+                  content: lastMessage.content || undefined,
+                  imageUrl: lastMessage.imageUrl || undefined,
+                  audioUrl: lastMessage.audioUrl || undefined,
+                  type: lastMessage.type?.toLowerCase() as
+                    | "text"
+                    | "image"
+                    | "audio",
+                }
+              : undefined,
+            lastMessageTime: lastMessage?.createdAt
+              ? this.formatTime(lastMessage.createdAt)
+              : undefined,
+            unreadCount,
             chatId: chat.id,
-            senderId: { not: userId.value },
-            isRead: false,
-          },
-        });
-        return {
-          id: chat.id,
-          type: 'chat',
-          displayName: otherUser?.name || '',
-          avatar: otherUser?.avatar || undefined,
-          role: otherUser?.role || '',
-          lastMessage: lastMessage
-            ? {
-                content: lastMessage.content || undefined,
-                imageUrl: lastMessage.imageUrl || undefined,
-                audioUrl: lastMessage.audioUrl || undefined,
-                type: lastMessage.type?.toLowerCase() as "text" | "image" | "audio",
-              }
-            : undefined,
-          lastMessageTime: lastMessage?.createdAt ? this.formatTime(lastMessage.createdAt) : undefined,
-          unreadCount,
-          chatId: chat.id,
-          userId: otherUser?.id,
-          isOnline: false,
-        };
-      }));
+            userId: otherUser?.id,
+            isOnline: false,
+          };
+        })
+      );
     } else {
       // Default: get user's existing chats with latest messages
       const existingChats = await prisma.chat.findMany({
         where: {
-          OR: [
-            { user1Id: userId.value },
-            { user2Id: userId.value },
-          ],
+          OR: [{ user1Id: userId.value }, { user2Id: userId.value }],
         },
         include: {
           user1: {
@@ -180,7 +205,7 @@ export class ChatRepository implements IChatRepository {
             },
           },
           messages: {
-            orderBy: { createdAt: 'desc' },
+            orderBy: { createdAt: "desc" },
             take: 1,
             include: {
               sender: {
@@ -191,42 +216,53 @@ export class ChatRepository implements IChatRepository {
             },
           },
         },
-        orderBy: { updatedAt: 'desc' },
+        orderBy: { updatedAt: "desc" },
         skip: offset,
         take: limit,
       });
-      chatItems = await Promise.all(existingChats.map(async chat => {
-        const otherUser = chat.user1 ? (chat.user1Id === userId.value ? chat.user2 : chat.user1) : undefined;
-        const lastMessage = chat.messages && chat.messages[0];
-        // Count unread messages for this user in this chat
-        const unreadCount = await prisma.message.count({
-          where: {
+      chatItems = await Promise.all(
+        existingChats.map(async (chat) => {
+          const otherUser = chat.user1
+            ? chat.user1Id === userId.value
+              ? chat.user2
+              : chat.user1
+            : undefined;
+          const lastMessage = chat.messages && chat.messages[0];
+          // Count unread messages for this user in this chat
+          const unreadCount = await prisma.message.count({
+            where: {
+              chatId: chat.id,
+              senderId: { not: userId.value },
+              isRead: false,
+            },
+          });
+          return {
+            id: chat.id,
+            type: "chat",
+            displayName: otherUser?.name || "",
+            avatar: otherUser?.avatar || undefined,
+            role: otherUser?.role || "",
+            lastMessage: lastMessage
+              ? {
+                  content: lastMessage.content || undefined,
+                  imageUrl: lastMessage.imageUrl || undefined,
+                  audioUrl: lastMessage.audioUrl || undefined,
+                  type: lastMessage.type?.toLowerCase() as
+                    | "text"
+                    | "image"
+                    | "audio",
+                }
+              : undefined,
+            lastMessageTime: lastMessage?.createdAt
+              ? this.formatTime(lastMessage.createdAt)
+              : undefined,
+            unreadCount,
             chatId: chat.id,
-            senderId: { not: userId.value },
-            isRead: false,
-          },
-        });
-        return {
-          id: chat.id,
-          type: 'chat',
-          displayName: otherUser?.name || '',
-          avatar: otherUser?.avatar || undefined,
-          role: otherUser?.role || '',
-          lastMessage: lastMessage
-            ? {
-                content: lastMessage.content || undefined,
-                imageUrl: lastMessage.imageUrl || undefined,
-                audioUrl: lastMessage.audioUrl || undefined,
-                type: lastMessage.type?.toLowerCase() as "text" | "image" | "audio",
-              }
-            : undefined,
-          lastMessageTime: lastMessage?.createdAt ? this.formatTime(lastMessage.createdAt) : undefined,
-          unreadCount,
-          chatId: chat.id,
-          userId: otherUser?.id,
-          isOnline: false,
-        };
-      }));
+            userId: otherUser?.id,
+            isOnline: false,
+          };
+        })
+      );
     }
 
     // If we have fewer chats than the limit, fill with other users
@@ -235,25 +271,23 @@ export class ChatRepository implements IChatRepository {
       const remainingSlots = limit - chatItems.length;
       const existingUserIds = new Set([
         userId.value,
-        ...chatItems.map((chat: any) =>
-          chat.userId
-        ),
+        ...chatItems.map((chat: any) => chat.userId),
       ]);
       // Build user where clause for search
       const userWhere: any = {
         id: { notIn: Array.from(existingUserIds) },
         deletedAt: null,
       };
-      const normalizedSearch = search ? search.trim().toLowerCase() : '';
+      const normalizedSearch = search ? search.trim().toLowerCase() : "";
       const roleMap: Record<string, Role> = {
-        'admin': Role.ADMIN,
-        'instructor': Role.INSTRUCTOR,
-        'user': Role.USER,
+        admin: Role.ADMIN,
+        instructor: Role.INSTRUCTOR,
+        user: Role.USER,
       };
       const roleSearch = roleMap[normalizedSearch] || undefined;
       if (search) {
         userWhere.OR = [
-          { name: { contains: search, mode: 'insensitive' } },
+          { name: { contains: search, mode: "insensitive" } },
           ...(roleSearch ? [{ role: roleSearch as Role }] : []),
         ];
       }
@@ -266,15 +300,15 @@ export class ChatRepository implements IChatRepository {
           avatar: true,
         },
         orderBy: [
-          sort === 'name' ? { name: 'asc' } : { role: 'asc' },
-          { name: 'asc' },
+          sort === "name" ? { name: "asc" } : { role: "asc" },
+          { name: "asc" },
         ],
         take: remainingSlots,
         skip: offset,
       });
-      userItems = otherUsers.map(user => ({
+      userItems = otherUsers.map((user) => ({
         id: `user-${user.id}`,
-        type: 'user',
+        type: "user",
         displayName: user.name,
         avatar: user.avatar || undefined,
         role: user.role,
@@ -287,10 +321,7 @@ export class ChatRepository implements IChatRepository {
     // Get total count for pagination
     const totalChats = await prisma.chat.count({
       where: {
-        OR: [
-          { user1Id: userId.value },
-          { user2Id: userId.value },
-        ],
+        OR: [{ user1Id: userId.value }, { user2Id: userId.value }],
       },
     });
 
@@ -313,7 +344,11 @@ export class ChatRepository implements IChatRepository {
   }
 
   async create(chat: Chat): Promise<Chat> {
-    console.log('[ChatRepository] Creating chat:', chat.user1Id.value, chat.user2Id.value);
+    console.log(
+      "[ChatRepository] Creating chat:",
+      chat.user1Id.value,
+      chat.user2Id.value
+    );
     const created = await prisma.chat.create({
       data: {
         user1Id: chat.user1Id.value,
@@ -322,7 +357,7 @@ export class ChatRepository implements IChatRepository {
         updatedAt: chat.updatedAt.value,
       },
     });
-    console.log('[ChatRepository] Chat created in DB:', created.id);
+    console.log("[ChatRepository] Chat created in DB:", created.id);
     return this.toDomain(created);
   }
 
@@ -335,8 +370,15 @@ export class ChatRepository implements IChatRepository {
     });
   }
 
-  async getChatBetweenUsers(user1Id: UserId, user2Id: UserId): Promise<Chat | null> {
-    console.log('[ChatRepository] getChatBetweenUsers:', user1Id.value, user2Id.value);
+  async getChatBetweenUsers(
+    user1Id: UserId,
+    user2Id: UserId
+  ): Promise<Chat | null> {
+    console.log(
+      "[ChatRepository] getChatBetweenUsers:",
+      user1Id.value,
+      user2Id.value
+    );
     const chat = await prisma.chat.findFirst({
       where: {
         OR: [
@@ -347,10 +389,10 @@ export class ChatRepository implements IChatRepository {
       include: { messages: true },
     });
     if (!chat) {
-      console.log('[ChatRepository] No chat found between users');
+      console.log("[ChatRepository] No chat found between users");
       return null;
     }
-    console.log('[ChatRepository] Found chat:', chat.id);
+    console.log("[ChatRepository] Found chat:", chat.id);
     return this.toDomain(chat);
   }
 
@@ -368,15 +410,16 @@ export class ChatRepository implements IChatRepository {
   private formatTime(date: Date): string {
     const now = new Date();
     const diffInHours = (now.getTime() - date.getTime()) / (1000 * 60 * 60);
-    
+
     if (diffInHours < 1) {
-      return 'Just now';
+      return "Just now";
     } else if (diffInHours < 24) {
       return `${Math.floor(diffInHours)}h ago`;
-    } else if (diffInHours < 168) { // 7 days
+    } else if (diffInHours < 168) {
+      // 7 days
       return `${Math.floor(diffInHours / 24)}d ago`;
     } else {
       return date.toLocaleDateString();
     }
   }
-} 
+}
