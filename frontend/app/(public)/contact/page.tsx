@@ -12,7 +12,6 @@ import {
   FormControl,
   FormField,
   FormItem,
-  FormLabel,
   FormMessage,
 } from "@/components/ui/form";
 import { Mail, Phone, MapPin, Clock, Send, CheckCircle } from "lucide-react";
@@ -63,7 +62,7 @@ export default function ContactPage() {
     },
   });
 
-  const handleSubmit = async (data: ContactFormData) => {
+  const handleSubmit = async () => {
     setIsSubmitting(true);
 
     try {
@@ -73,7 +72,7 @@ export default function ContactPage() {
       toast.success("Message sent successfully! We'll get back to you soon.");
       setIsSubmitted(true);
       form.reset();
-    } catch (error) {
+    } catch  {
       toast.error("Failed to send message. Please try again.");
     } finally {
       setIsSubmitting(false);
