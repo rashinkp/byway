@@ -112,7 +112,8 @@ export function createSharedDependencies(): SharedDependencies {
     paymentGateway,
     webhookGateway,
     userRepository,
-    mockRevenueDistributionService
+    mockRevenueDistributionService,
+    cartRepository
   );
 
   const httpErrors = new HttpErrors();

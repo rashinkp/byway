@@ -17,6 +17,7 @@ import { IUserRepository } from "../../../repositories/user.repository";
 import Stripe from "stripe";
 import { OrderStatus } from "../../../../domain/enum/order-status.enum";
 import { IRevenueDistributionService } from "../../revenue-distribution/interfaces/revenue-distribution.service.interface";
+import { ICartRepository } from "../../../repositories/cart.repository";
 import { getSocketIOInstance } from "../../../../presentation/socketio";
 
 interface ServiceResponse<T> {
@@ -33,7 +34,8 @@ export class PaymentService implements IPaymentService {
     private readonly paymentGateway: PaymentGateway,
     private readonly webhookGateway: StripeWebhookGateway,
     private readonly userRepository: IUserRepository,
-    private readonly revenueDistributionService: IRevenueDistributionService
+    private readonly revenueDistributionService: IRevenueDistributionService,
+    private readonly cartRepository: ICartRepository
   ) {}
 
   async handleWalletPayment(
@@ -84,11 +86,24 @@ export class PaymentService implements IPaymentService {
 
     for (const item of orderItems) {
       try {
+        // Check if user is already enrolled in this course
+        const existingEnrollment = await this.enrollmentRepository.findByUserAndCourse(
+          userId,
+          item.courseId
+        );
+
+        if (existingEnrollment) {
+          console.log(`User ${userId} is already enrolled in course ${item.courseId}, skipping enrollment creation`);
+          continue; // Skip creating duplicate enrollment
+        }
+
+        // Create new enrollment
         await this.enrollmentRepository.create({
           userId,
           courseIds: [item.courseId],
           orderItemId: item.id,
         });
+        console.log(`Successfully created enrollment for course ${item.courseId}`);
       } catch (error) {
         console.error(
           "Error creating enrollment for course:",
@@ -111,6 +126,19 @@ export class PaymentService implements IPaymentService {
         "Failed to distribute revenue",
         StatusCodes.INTERNAL_SERVER_ERROR
       );
+    }
+
+    // Clear cart items for purchased courses
+    try {
+      console.log("Clearing cart items for purchased courses");
+      for (const item of orderItems) {
+        await this.cartRepository.deleteByUserAndCourse(userId, item.courseId);
+      }
+      console.log("Cart items cleared successfully");
+    } catch (error) {
+      console.error("Error clearing cart items:", error);
+      // Don't throw error here as the purchase was successful
+      // Cart clearing is a cleanup operation
     }
 
     // Send real-time notifications via Socket.IO
@@ -267,6 +295,18 @@ export class PaymentService implements IPaymentService {
             for (const item of orderItems) {
               console.log("Creating enrollment for course:", item.courseId);
               try {
+                // Check if user is already enrolled in this course
+                const existingEnrollment = await this.enrollmentRepository.findByUserAndCourse(
+                  order.userId,
+                  item.courseId
+                );
+
+                if (existingEnrollment) {
+                  console.log(`User ${order.userId} is already enrolled in course ${item.courseId}, skipping enrollment creation`);
+                  continue; // Skip creating duplicate enrollment
+                }
+
+                // Create new enrollment
                 await this.enrollmentRepository.create({
                   userId: order.userId,
                   courseIds: [item.courseId],
@@ -294,6 +334,19 @@ export class PaymentService implements IPaymentService {
             } catch (error) {
               console.error("Error during revenue distribution:", error);
               throw error;
+            }
+
+            // Clear cart items for purchased courses
+            try {
+              console.log("Clearing cart items for purchased courses");
+              for (const item of orderItems) {
+                await this.cartRepository.deleteByUserAndCourse(order.userId, item.courseId);
+              }
+              console.log("Cart items cleared successfully");
+            } catch (error) {
+              console.error("Error clearing cart items:", error);
+              // Don't throw error here as the purchase was successful
+              // Cart clearing is a cleanup operation
             }
 
             // Send real-time notifications via Socket.IO

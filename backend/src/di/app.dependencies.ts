@@ -129,7 +129,8 @@ export function createAppDependencies(): AppDependencies {
     shared.paymentGateway,
     shared.webhookGateway,
     shared.userRepository,
-    revenueDistributionService
+    revenueDistributionService,
+    shared.cartRepository
   );
 
   // Override the paymentService in shared

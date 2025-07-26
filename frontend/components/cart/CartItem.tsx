@@ -27,11 +27,10 @@ export function CartItem({ item, isRemoving, onRemove }: CartItemProps) {
 				? course.price
 				: 0;
 
-	const discountPercentage = Math.round(
-		(((originalPrice || 0) - (Number(offerPrice) || 0)) /
-			(originalPrice || 1)) *
-			100,
-	);
+	const hasDiscount = offerPrice > 0 && offerPrice < originalPrice;
+	const discountPercentage = hasDiscount
+		? Math.round(((originalPrice - offerPrice) / originalPrice) * 100)
+		: 0;
 
 	return (
 		<motion.div
