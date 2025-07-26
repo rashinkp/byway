@@ -9,12 +9,12 @@ interface OrderSummaryProps {
 export function OrderSummary({ cart }: OrderSummaryProps) {
 	const formatPrice = (price: number | string | undefined): string => {
 		if (typeof price === "string") {
-			return `₹${parseFloat(price).toFixed(2)}`;
+			return `$${parseFloat(price).toFixed(2)}`;
 		}
 		if (typeof price === "number") {
-			return `₹${price.toFixed(2)}`;
+			return `$${price.toFixed(2)}`;
 		}
-		return "₹0.00";
+		return "$0.00";
 	};
 
 	const subtotal = cart.reduce(

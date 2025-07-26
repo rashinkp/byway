@@ -112,10 +112,10 @@ export default function CourseDetailLayout({
 						)}
 						<div className="flex flex-wrap gap-3 items-center justify-center sm:justify-start mt-2">
 							{userRole !== 'ADMIN' && course?.price && (
-								<span className="text-2xl font-bold text-[#facc15]">₹{Number(course?.offer ?? course?.price).toFixed(2)}</span>
+								<span className="text-2xl font-bold text-[#facc15]">${Number(course?.offer ?? course?.price).toFixed(2)}</span>
 							)}
 							{userRole !== 'ADMIN' && course?.offer && course?.offer !== course?.price && (
-								<span className="text-lg text-gray-500 dark:text-gray-300 line-through">₹{Number(course?.price ?? 0).toFixed(2)}</span>
+								<span className="text-lg text-gray-500 dark:text-gray-300 line-through">${Number(course?.price ?? 0).toFixed(2)}</span>
 							)}
 							{/* Purchase/Enroll Buttons or Admin Actions */}
 							{sidebarProps && (

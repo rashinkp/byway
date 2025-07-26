@@ -40,10 +40,10 @@ export const DetailsSection = ({ course }: { course?: Course }) => {
         {course?.price && (
           <Badge variant="outline" className="bg-[var(--color-warning)]/10 text-[var(--color-warning)] border-[var(--color-warning)]/40">
             <DollarSign className="w-3 h-3 mr-1" />
-            ${Number(course.price).toFixed(2)}
+            ${Number(course.offer || course.price).toFixed(2)}
             {course.offer && course.offer !== course.price && (
               <span className="ml-1 line-through text-[var(--color-muted)]">
-                ${Number(course.offer).toFixed(2)}
+                ${Number(course.price).toFixed(2)}
               </span>
             )}
           </Badge>

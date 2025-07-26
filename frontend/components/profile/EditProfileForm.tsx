@@ -7,13 +7,14 @@ import {  UserProfileType } from "@/types/user";
 
 // Zod schema for profile validation (unchanged)
 const profileSchema = z.object({
-	name: z
-		.string()
+	name: z.string()
 		.min(2, "Name must be at least 2 characters")
 		.max(50, "Name must be less than 50 characters")
-		.refine((val) => val.trim().length > 0, {
-			message: "Name cannot be only white spaces",
-		}),
+		.regex(/^[a-zA-Z\s\-'\.]+$/, "Name can only contain letters, spaces, hyphens, apostrophes, and periods")
+		.regex(/^[a-zA-Z]/, "Name must start with a letter")
+		.regex(/[a-zA-Z]$/, "Name must end with a letter")
+		.refine((name) => !/\s{2,}/.test(name), "Name cannot contain consecutive spaces")
+		.refine((name) => !/^[^a-zA-Z]*$/.test(name), "Name must contain at least one letter"),
 	avatar: z
 		.union([
 			z.instanceof(File), // Allow File objects
@@ -24,27 +25,38 @@ const profileSchema = z.object({
 			z.literal(""), // Allow empty string
 		])
 		.optional(),
-	bio: z.string().max(500, "Bio must be less than 500 characters").optional(),
+	bio: z.string()
+		.max(500, "Bio must be less than 500 characters")
+		.refine((val) => !val || /^[\w\s\.,!?;:'"()-]+$/.test(val), "Bio contains invalid characters")
+		.optional(),
 	education: z
 		.string()
 		.max(200, "Education must be less than 200 characters")
+		.refine((val) => !val || /^[a-zA-Z\s\.,\-'()]+$/.test(val), "Education contains invalid characters")
 		.optional(),
 	skills: z
 		.string()
 		.max(200, "Skills must be less than 200 characters")
+		.refine((val) => !val || /^[a-zA-Z\s,]+$/.test(val), "Skills can only contain letters, spaces, and commas")
 		.optional(),
 	phoneNumber: z
 		.string()
-		.regex(/^\+?[\d\s-]{10,15}$/, "Invalid phone number")
+		.regex(/^\+?[\d\s-()]{10,15}$/, "Invalid phone number format")
+		.refine((val) => !val || /^\d{10,15}$/.test(val.replace(/[\s\-()]/g, '')), "Phone number must contain 10-15 digits")
 		.optional(),
 	country: z
 		.string()
 		.max(100, "Country must be less than 100 characters")
+		.refine((val) => !val || /^[a-zA-Z\s\-']+$/.test(val), "Country can only contain letters, spaces, hyphens, and apostrophes")
 		.optional(),
-	city: z.string().max(100, "City must be less than 100 characters").optional(),
+	city: z.string()
+		.max(100, "City must be less than 100 characters")
+		.refine((val) => !val || /^[a-zA-Z\s\-']+$/.test(val), "City can only contain letters, spaces, hyphens, and apostrophes")
+		.optional(),
 	address: z
 		.string()
 		.max(200, "Address must be less than 200 characters")
+		.refine((val) => !val || /^[\w\s\.,\-'#]+$/.test(val), "Address contains invalid characters")
 		.optional(),
 	dateOfBirth: z.coerce
 		.date()
