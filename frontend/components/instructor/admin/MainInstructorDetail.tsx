@@ -47,7 +47,7 @@ const MainInstructorDetail: React.FC = () => {
 
   const handleApprove = async () => {
     try {
-      await approveInstructor(instructor.userId);
+      await approveInstructor(instructor.instructorId);
       await refetch();
       toast.success("Instructor approved successfully!");
     } catch (error) {
@@ -58,7 +58,7 @@ const MainInstructorDetail: React.FC = () => {
 
   const handleDecline = async () => {
     try {
-      await declineInstructor(instructor.userId);
+      await declineInstructor(instructor.instructorId);
       await refetch();
       toast.success("Instructor declined successfully!");
     } catch (error) {

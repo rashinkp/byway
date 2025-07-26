@@ -8,6 +8,7 @@ import {
 	Clock,
 	AlertCircle,
 	Shield,
+	Loader2,
 } from "lucide-react";
 import { IInstructorDetails } from "@/types/instructor";
 import {
@@ -38,6 +39,26 @@ export default function InstructorActions({
 	onDownloadCV,
 }: InstructorActionsProps) {
 	const [showDeleteModal, setShowDeleteModal] = useState(false);
+	const [isApproving, setIsApproving] = useState(false);
+	const [isDeclining, setIsDeclining] = useState(false);
+
+	const handleApprove = async () => {
+		setIsApproving(true);
+		try {
+			await onApprove();
+		} finally {
+			setIsApproving(false);
+		}
+	};
+
+	const handleDecline = async () => {
+		setIsDeclining(true);
+		try {
+			await onDecline();
+		} finally {
+			setIsDeclining(false);
+		}
+	};
 
 	const getStatusBadge = (status: string) => {
 		const statusConfig = {
@@ -48,21 +69,21 @@ export default function InstructorActions({
 				icon: Clock,
 			},
 			APPROVED: {
-				bg: "bg-white/80 dark:bg-[#232323]",
-				text: "text-black dark:text-white",
-				border: "border-gray-200 dark:border-gray-700",
+				bg: "bg-green-100 dark:bg-green-900/40",
+				text: "text-green-700 dark:text-green-300",
+				border: "border-green-200 dark:border-green-700",
 				icon: Check,
 			},
-			REJECTED: {
+			DECLINED: {
 				bg: "bg-red-100 dark:bg-red-900/40",
 				text: "text-red-700 dark:text-red-300",
 				border: "border-red-200 dark:border-red-700",
 				icon: X,
 			},
 			ENABLED: {
-				bg: "bg-white/80 dark:bg-[#232323]",
-				text: "text-black dark:text-white",
-				border: "border-gray-200 dark:border-gray-700",
+				bg: "bg-green-100 dark:bg-green-900/40",
+				text: "text-green-700 dark:text-green-300",
+				border: "border-green-200 dark:border-green-700",
 				icon: Check,
 			},
 			DISABLED: {
@@ -82,22 +103,22 @@ export default function InstructorActions({
 		const Icon = config.icon;
 
 		return (
-			<div className={`rounded-xl border ${config.bg} ${config.text} ${config.border} px-2 py-1 text-xs font-semibold flex items-center gap-1`}>
-				<Icon className="w-3 h-3 mr-1" />
+			<div className={`rounded-md px-3 py-1 text-xs font-semibold flex items-center gap-1 ${config.bg} ${config.text} ${config.border}`}>
+				<Icon className="w-3 h-3" />
 				{status}
 			</div>
 		);
 	};
 
 	return (
-		<div className="rounded-2xl  bg-white/80 dark:bg-[#232326] shadow-xl p-8 space-y-6">
+		<div className="rounded-2xl bg-white/80 dark:bg-[#232326] shadow-xl p-8 space-y-6">
 			{/* Instructor Status Section */}
 			<div className="space-y-4">
 				<div className="flex items-center gap-2 text-black dark:text-[#facc15] text-lg font-semibold">
 					<Shield className="w-5 h-5 text-[#facc15] dark:text-[#facc15]" />
 					<span>Instructor Status</span>
 				</div>
-				<div className="space-y-3">
+				<div className="space-y-4">
 					{/* Approval Status */}
 					<div className="flex items-center justify-between">
 						<span className="text-sm text-gray-700 dark:text-gray-300 font-medium">Approval</span>
@@ -130,81 +151,70 @@ export default function InstructorActions({
 				</div>
 			</div>
 
-			<Separator className="my-4 bg-gray-200 dark:bg-[#232323]" />
+			<Separator className="my-6 bg-gray-200 dark:bg-[#232323]" />
 
 			{/* Action Buttons */}
 			<div className="space-y-4">
 				{instructor.status === "PENDING" && (
 					<>
 						<Button
-							onClick={onApprove}
-							size="lg"
-							variant="default"
-							className="w-full bg-[#facc15] text-black dark:bg-[#facc15] dark:text-[#18181b] border-0 hover:bg-yellow-400 dark:hover:bg-yellow-400 font-semibold text-base py-3"
+							onClick={handleApprove}
+							disabled={isApproving}
 						>
-							<Check className="w-5 h-5 mr-2" />
-							Approve Instructor
+							{isApproving ? (
+								<Loader2 className="w-5 h-5 mr-2 animate-spin flex-shrink-0" />
+							) : (
+								<Check className="w-5 h-5 mr-2 flex-shrink-0" />
+							)}
+							<span className="whitespace-nowrap">Approve Instructor</span>
 						</Button>
+						
 						<Button
-							onClick={onDecline}
-							size="lg"
-							variant="secondary"
-							className="w-full bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-300 border-0 hover:bg-red-200 dark:hover:bg-red-900/60 font-semibold text-base py-3"
+							onClick={handleDecline}
+							disabled={isDeclining}
 						>
-							<X className="w-5 h-5 mr-2" />
-							Decline Instructor
+							{isDeclining ? (
+								<Loader2 className="w-5 h-5 mr-2 animate-spin flex-shrink-0" />
+							) : (
+								<X className="w-5 h-5 mr-2 flex-shrink-0" />
+							)}
+							<span className="whitespace-nowrap">Decline Instructor</span>
 						</Button>
 					</>
 				)}
 
-				{instructor.status === "REJECTED" && (
+				{instructor.status === "DECLINED" && (
 					<Button
-						onClick={onApprove}
-						size="lg"
-						variant="default"
-						className="w-full bg-[#facc15] text-black dark:bg-[#facc15] dark:text-[#18181b] border-0 hover:bg-yellow-400 dark:hover:bg-yellow-400 font-semibold text-base py-3"
+						onClick={handleApprove}
+						disabled={isApproving}
 					>
-						<Check className="w-5 h-5 mr-2" />
-						Approve Instructor
+						
+						<span className="whitespace-nowrap">Approve Instructor</span>
 					</Button>
 				)}
 
 				<Button
 					onClick={onDownloadCV}
-					size="lg"
-					variant="default"
-					className={`w-full ${
-						instructor.cv && instructor.cv !== "No CV provided"
-							? "bg-[#facc15]/10 text-[#facc15] dark:bg-[#232323] dark:text-[#facc15] border-0 hover:bg-[#facc15]/20 dark:hover:bg-[#facc15]/20 font-semibold text-base py-3"
-							: "bg-gray-100 text-gray-400 dark:bg-gray-700 dark:text-gray-400 border-0 cursor-not-allowed text-base py-3"
-					}`}
-					disabled={!instructor.cv || instructor.cv === "No CV provided"}
+					
 				>
-					<Download className="w-5 h-5 mr-2" />
-					{instructor.cv && instructor.cv !== "No CV provided"
-						? "Download CV"
-						: "No CV Available"}
+					<Download className="w-5 h-5 mr-2 flex-shrink-0" />
+					<span className="whitespace-nowrap">
+						{instructor.cv && instructor.cv !== "No CV provided"
+							? "Download CV"
+							: "No CV Available"}
+					</span>
 				</Button>
 
 				<AlertDialog open={showDeleteModal} onOpenChange={setShowDeleteModal}>
 					<AlertDialogTrigger asChild>
 						<Button
-							size="lg"
-							variant={instructor.deletedAt ? "default" : "secondary"}
-							className={`w-full ${
-								instructor.deletedAt
-									? "bg-[#facc15]/10 text-[#facc15] dark:bg-[#232323] dark:text-[#facc15] border-0 hover:bg-[#facc15]/20 dark:hover:bg-[#facc15]/20 font-semibold text-base py-3"
-									: "bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-300 border-0 hover:bg-red-200 dark:hover:bg-red-900/60 font-semibold text-base py-3"
-							}`}
 						>
-							{instructor.deletedAt ? (
-								<Check className="w-5 h-5 mr-2" />
-							) : (
-								<X className="w-5 h-5 mr-2" />
-							)}
-							{instructor.deletedAt
-								? "Enable Instructor"
-								: "Disable Instructor"}
+						
+							<span className="whitespace-nowrap">
+								{instructor.deletedAt
+									? "Enable Instructor"
+									: "Disable Instructor"}
+							</span>
 						</Button>
 					</AlertDialogTrigger>
 					<AlertDialogContent className="bg-white/80 dark:bg-[#232326] border border-gray-200 dark:border-gray-700 rounded-2xl p-8">

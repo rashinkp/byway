@@ -44,7 +44,7 @@ export class DeclineInstructorUseCase implements IDeclineInstructorUseCase {
         entityType: NotificationEntityType.INSTRUCTOR,
         entityId: instructor.id,
         entityName: user.name || user.email,
-        message: `Your instructor application has been declined. You can reapply after 5 minutes with updated information.`,
+        message: `Your instructor application has been declined. You can reapply after 24 hours with updated information.`,
         link: `/instructor/apply`,
       });
     }

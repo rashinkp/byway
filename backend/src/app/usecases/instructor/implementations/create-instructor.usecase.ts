@@ -39,11 +39,11 @@ export class CreateInstructorUseCase implements ICreateInstructorUseCase {
     ) {
       const now = new Date();
       const updatedAt = new Date(existingInstructor.updatedAt);
-      const fiveMinutesInMs = 5 * 60 * 1000;
+      const twentyFourHoursInMs = 24 * 60 * 60 * 1000;
 
-      if (now.getTime() - updatedAt.getTime() < fiveMinutesInMs) {
+      if (now.getTime() - updatedAt.getTime() < twentyFourHoursInMs) {
         throw new HttpError(
-          "Your application is declined. Please wait 5 minutes before retrying.",
+          "Your application is declined. Please wait 24 hours before retrying.",
           400
         );
       }

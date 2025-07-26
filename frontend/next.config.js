@@ -14,7 +14,8 @@ const nextConfig = {
             "platform-lookaside.fbsbx.com",
             "by-way-uploads.s3.ap-south-1.amazonaws.com",
             "byway-uploads.s3.amazonaws.com",
-            "byway.ddns.net"
+            "byway.ddns.net",
+            "ui-avatars.com"
         ],
     },
 };

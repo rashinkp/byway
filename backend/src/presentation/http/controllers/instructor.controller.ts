@@ -182,7 +182,7 @@ export class InstructorController extends BaseController {
       const io = getSocketIOInstance();
       if (io && user) {
         io.to(instructor.userId).emit('newNotification', {
-          message: `Your instructor application has been declined. You can reapply after 5 minutes with updated information.`,
+          message: `Your instructor application has been declined. You can reapply after 24 hours with updated information.`,
           type: 'INSTRUCTOR_DECLINED',
           instructorId: instructor.id,
           instructorName: user.name || user.email,

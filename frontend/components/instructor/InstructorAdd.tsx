@@ -152,33 +152,52 @@ export function InstructorFormModal({
 	const { uploadFile, isUploading } = useFileUpload();
 
 	useEffect(() => {
-		if (
-			instructorData?.data?.status === "DECLINED" &&
-			instructorData.data.updatedAt
-		) {
-			const updatedAt = new Date(instructorData.data.updatedAt);
-			const now = new Date();
-			const fiveMinutesInMs = 5 * 60 * 1000;
-			const timeSinceUpdate = now.getTime() - updatedAt.getTime();
-			const remainingTime = fiveMinutesInMs - timeSinceUpdate;
+		let interval: NodeJS.Timeout | null = null;
 
-			if (remainingTime > 0) {
-				setTimeLeft(Math.ceil(remainingTime / 1000));
-				const interval = setInterval(() => {
-					setTimeLeft((prev) => {
-						if (prev === null || prev <= 1) {
-							clearInterval(interval);
-							return null;
-						}
-						return prev - 1;
-					});
-				}, 1000);
+		const calculateTimeLeft = () => {
+			if (
+				instructorData?.data?.status === "DECLINED" &&
+				instructorData.data.updatedAt
+			) {
+				const updatedAt = new Date(instructorData.data.updatedAt);
+				const now = new Date();
+				const twentyFourHoursInMs = 24 * 60 * 60 * 1000;
+				const timeSinceUpdate = now.getTime() - updatedAt.getTime();
+				const remainingTime = twentyFourHoursInMs - timeSinceUpdate;
+
+				if (remainingTime > 0) {
+					const remainingSeconds = Math.ceil(remainingTime / 1000);
+					setTimeLeft(remainingSeconds);
+					return remainingSeconds;
+				} else {
+					setTimeLeft(null);
+					return 0;
+				}
 			} else {
 				setTimeLeft(null);
+				return 0;
 			}
-		} else {
-			setTimeLeft(null);
+		};
+
+		// Calculate initial time
+		const initialTimeLeft = calculateTimeLeft();
+
+		// Set up interval only if there's time remaining
+		if (initialTimeLeft > 0) {
+			interval = setInterval(() => {
+				const newTimeLeft = calculateTimeLeft();
+				if (newTimeLeft <= 0 && interval) {
+					clearInterval(interval);
+				}
+			}, 1000);
 		}
+
+		// Cleanup function
+		return () => {
+			if (interval) {
+				clearInterval(interval);
+			}
+		};
 	}, [instructorData]);
 
 	const handleSubmit = async (data: InstructorFormData) => {
@@ -234,8 +253,7 @@ export function InstructorFormModal({
 							Application Approved
 						</DialogTitle>
 						<DialogDescription className="text-gray-600 dark:text-gray-300 mt-2">
-							Your instructor application has been approved. You can now start
-							creating courses.
+							Your instructor application has been approved! Please log in again to be redirected to your instructor panel.
 						</DialogDescription>
 					</DialogHeader>
 					<div className="flex justify-end mt-6">
@@ -261,12 +279,12 @@ export function InstructorFormModal({
 						</DialogTitle>
 						<DialogDescription className="text-gray-600 dark:text-gray-300 mt-2">
 							{timeLeft ? (
-								<div className="flex items-center gap-2">
+								<span className="flex items-center gap-2">
 									<Clock className="h-4 w-4 text-[#facc15]" />
 									<span>
-										You can submit a new application in {timeLeft} seconds.
+										You can submit a new application in {Math.floor(timeLeft / 3600)} hours and {Math.floor((timeLeft % 3600) / 60)} minutes.
 									</span>
-								</div>
+								</span>
 							) : (
 								"You can now submit a new application."
 							)}
