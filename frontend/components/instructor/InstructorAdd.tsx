@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/dialog";
 import { Clock } from "lucide-react";
 import { useFileUpload } from "@/hooks/file/useFileUpload";
+import { Button } from "../ui/button";
 
 export const instructorSchema = z.object({
 	// Professional Information
@@ -202,13 +203,23 @@ export function InstructorFormModal({
 	if (instructorData?.data?.status === "PENDING") {
 		return (
 			<Dialog open={open} onOpenChange={onOpenChange}>
-				<DialogContent className="bg-white text-black">
+				<DialogContent className="bg-white dark:bg-[#18181b] border-[#facc15]">
 					<DialogHeader>
-						<DialogTitle className="text-black">Application Pending</DialogTitle>
-						<DialogDescription className="text-[#facc15]">
+						<DialogTitle className="text-black dark:text-white text-xl font-semibold">
+							Application Pending
+						</DialogTitle>
+						<DialogDescription className="text-gray-600 dark:text-gray-300 mt-2">
 							Your instructor application is currently under review. We will notify you once it has been processed.
 						</DialogDescription>
 					</DialogHeader>
+					<div className="flex justify-end mt-6">
+						<Button
+							onClick={() => onOpenChange(false)}
+							className="bg-[#facc15] text-black hover:bg-black hover:text-[#facc15] border-[#facc15] transition-colors"
+						>
+							Close
+						</Button>
+					</div>
 				</DialogContent>
 			</Dialog>
 		);
@@ -217,14 +228,24 @@ export function InstructorFormModal({
 	if (instructorData?.data?.status === "APPROVED") {
 		return (
 			<Dialog open={open} onOpenChange={onOpenChange}>
-				<DialogContent>
+				<DialogContent className="bg-white dark:bg-[#18181b] border-[#facc15]">
 					<DialogHeader>
-						<DialogTitle>Application Approved</DialogTitle>
-						<DialogDescription>
+						<DialogTitle className="text-black dark:text-white text-xl font-semibold">
+							Application Approved
+						</DialogTitle>
+						<DialogDescription className="text-gray-600 dark:text-gray-300 mt-2">
 							Your instructor application has been approved. You can now start
 							creating courses.
 						</DialogDescription>
 					</DialogHeader>
+					<div className="flex justify-end mt-6">
+						<Button
+							onClick={() => onOpenChange(false)}
+							className="bg-[#facc15] text-black hover:bg-black hover:text-[#facc15] border-[#facc15] transition-colors"
+						>
+							Close
+						</Button>
+					</div>
 				</DialogContent>
 			</Dialog>
 		);
@@ -233,13 +254,15 @@ export function InstructorFormModal({
 	if (instructorData?.data?.status === "DECLINED") {
 		return (
 			<Dialog open={open} onOpenChange={onOpenChange}>
-				<DialogContent>
+				<DialogContent className="bg-white dark:bg-[#18181b] border-[#facc15]">
 					<DialogHeader>
-						<DialogTitle>Application Declined</DialogTitle>
-						<DialogDescription>
+						<DialogTitle className="text-black dark:text-white text-xl font-semibold">
+							Application Declined
+						</DialogTitle>
+						<DialogDescription className="text-gray-600 dark:text-gray-300 mt-2">
 							{timeLeft ? (
 								<div className="flex items-center gap-2">
-									<Clock className="h-4 w-4" />
+									<Clock className="h-4 w-4 text-[#facc15]" />
 									<span>
 										You can submit a new application in {timeLeft} seconds.
 									</span>
@@ -249,6 +272,14 @@ export function InstructorFormModal({
 							)}
 						</DialogDescription>
 					</DialogHeader>
+					<div className="flex justify-end mt-6">
+						<Button
+							onClick={() => onOpenChange(false)}
+							className="bg-[#facc15] text-black hover:bg-black hover:text-[#facc15] border-[#facc15] transition-colors"
+						>
+							Close
+						</Button>
+					</div>
 				</DialogContent>
 			</Dialog>
 		);
