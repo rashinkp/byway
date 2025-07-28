@@ -20,7 +20,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
 	// Create a client
 	const [queryClient] = useState(
 		() =>
-			new QueryClient({
+			new QueryClient({ 
 				defaultOptions: {
 					queries: {
 						retry: 1,

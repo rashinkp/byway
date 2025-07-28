@@ -30,6 +30,13 @@ export const generatePresignedUrlSchema = z.object({
     (type) => ALLOWED_FILE_TYPES.includes(type),
     'Invalid file type. Please provide a valid image, video, audio, or document file type.'
   ),
+  uploadType: z.enum(['course', 'profile', 'certificate']),
+  metadata: z.object({
+    courseId: z.string().optional(),
+    userId: z.string().optional(),
+    certificateId: z.string().optional(),
+    contentType: z.enum(['thumbnail', 'video', 'document', 'avatar', 'cv']).optional(),
+  }).optional(),
 });
 
 export type GeneratePresignedUrlRequest = z.infer<typeof generatePresignedUrlSchema>; 

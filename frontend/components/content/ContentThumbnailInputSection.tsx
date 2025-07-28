@@ -1,6 +1,6 @@
 import { useState, useCallback } from "react";
 import { Upload, File, CheckCircle, XCircle } from "lucide-react";
-import { getPresignedUrl, uploadFileToS3 } from "@/api/file";
+import { getPresignedUrl, getCoursePresignedUrl, uploadFileToS3 } from "@/api/file";
 
 interface ThumbnailUploadInputProps {
 	file: File | null;
@@ -12,6 +12,7 @@ interface ThumbnailUploadInputProps {
 	setUploadStatus: (status: "idle" | "uploading" | "success" | "error") => void;
 	setUploadProgress: (progress: number) => void;
 	errors: { thumbnail?: string };
+	courseId?: string;
 }
 
 export const ThumbnailUploadInput = ({
@@ -24,6 +25,7 @@ export const ThumbnailUploadInput = ({
 	setUploadStatus,
 	setUploadProgress,
 	errors,
+	courseId,
 }: ThumbnailUploadInputProps) => {
 	const [isDragging, setIsDragging] = useState(false);
 
@@ -56,10 +58,33 @@ export const ThumbnailUploadInput = ({
 			setUploadStatus("uploading");
 			setUploadProgress(0);
 			try {
-				const { uploadUrl, fileUrl } = await getPresignedUrl(
-					file.name,
-					file.type,
-				);
+				let uploadUrl: string;
+				let fileUrl: string;
+				
+				if (courseId) {
+					// Use course-specific upload for thumbnail
+					const response = await getCoursePresignedUrl(
+						file.name,
+						file.type,
+						courseId,
+						'thumbnail'
+					);
+					uploadUrl = response.uploadUrl;
+					fileUrl = response.fileUrl;
+				} else {
+					// Fallback to generic upload (for backward compatibility)
+					const response = await getPresignedUrl({
+						fileName: file.name,
+						fileType: file.type,
+						uploadType: 'course',
+						metadata: {
+							contentType: 'thumbnail',
+						},
+					});
+					uploadUrl = response.uploadUrl;
+					fileUrl = response.fileUrl;
+				}
+				
 				await uploadFileToS3(file, uploadUrl, setUploadProgress);
 				setUploadStatus("success");
 				return fileUrl;
@@ -68,7 +93,7 @@ export const ThumbnailUploadInput = ({
 				throw error;
 			}
 		},
-		[setUploadStatus, setUploadProgress],
+		[setUploadStatus, setUploadProgress, courseId],
 	);
 
 	// Expose uploadToS3 as a static method for ContentInputForm

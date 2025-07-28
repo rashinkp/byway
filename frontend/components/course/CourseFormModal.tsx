@@ -229,9 +229,15 @@ export function CourseFormModal({
 			// Handle thumbnail upload to S3
 			if (data.thumbnail instanceof File) {
 				setThumbnailUploadStatus(FileUploadStatus.UPLOADING);
-				const { uploadUrl, fileUrl } = await getPresignedUrl(
+				
+				// For new courses, we'll use a temporary courseId that will be updated after creation
+				const tempCourseId = isEditing && initialData?.id ? initialData.id : `temp-${Date.now()}`;
+				
+				const { uploadUrl, fileUrl } = await getCoursePresignedUrl(
 					data.thumbnail.name,
 					data.thumbnail.type,
+					tempCourseId,
+					'thumbnail'
 				);
 				await uploadFileToS3(data.thumbnail, uploadUrl, (progress) => {
 					setThumbnailUploadProgress(progress);

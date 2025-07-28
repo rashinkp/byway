@@ -202,8 +202,15 @@ export function InstructorFormModal({
 
 	const handleSubmit = async (data: InstructorFormData) => {
 		try {
-			// Upload the file first
-			const fileUrl = await uploadFile(data.cv);
+			// Upload the CV file first using the new CV upload functionality
+			const fileUrl = await uploadFile(
+				data.cv,
+				'profile',
+				{
+					userId: user?.id || '',
+					contentType: 'cv'
+				}
+			);
 
 			// Submit the form with the file URL
 			await onSubmit({

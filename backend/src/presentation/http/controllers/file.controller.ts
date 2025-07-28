@@ -19,11 +19,13 @@ export class FileController extends BaseController {
   generatePresignedUrl = async (httpRequest: IHttpRequest): Promise<IHttpResponse> => {
     return this.handleRequest(httpRequest, async (request) => {
       const validatedData = generatePresignedUrlSchema.parse(request.body);
-      const { fileName, fileType } = validatedData;
+      const { fileName, fileType, uploadType, metadata } = validatedData;
 
       const { uploadUrl, fileUrl } = await this.s3Service.generatePresignedUrl(
         fileName,
-        fileType
+        fileType,
+        uploadType,
+        metadata
       );
 
       return this.success_200(

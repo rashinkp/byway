@@ -10,6 +10,7 @@ import {
 } from "@/types/content";
 import { useCreateContent } from "@/hooks/content/useCreateContent";
 import { useUpdateContent } from "@/hooks/content/useUpdateContent";
+import { useGetLessonById } from "@/hooks/lesson/useGetLessonById";
 import { validateForm } from "./ContentValidation";
 import { ContentTypeSelector } from "./ContentTypeSelector";
 import { TitleInput } from "./ContentTitleInput";
@@ -34,6 +35,7 @@ export const ContentInputForm = ({
 	initialData,
 	onSuccess,
 }: ContentInputFormProps) => {
+	const { data: lesson } = useGetLessonById(lessonId);
 	const [type, setType] = useState<ContentType>(
 		initialData?.type || ContentType.VIDEO,
 	);
@@ -221,6 +223,7 @@ export const ContentInputForm = ({
 					uploadStatus={uploadStatus}
 					uploadProgress={uploadProgress}
 					errors={errors}
+					courseId={lesson?.courseId}
 				/>
 			)}
 
@@ -235,6 +238,7 @@ export const ContentInputForm = ({
 					errors={errors}
 					setUploadProgress={setThumbnailUploadProgress}
 					setUploadStatus={setThumbnailUploadStatus}
+					courseId={lesson?.courseId}
 				/>
 			)}
 

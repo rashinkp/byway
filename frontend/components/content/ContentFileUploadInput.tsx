@@ -1,7 +1,7 @@
 import { useState, useCallback } from "react";
 import { ContentType } from "@/types/content";
 import { Upload, File, CheckCircle, XCircle } from "lucide-react";
-import { getPresignedUrl, uploadFileToS3 } from "@/api/file";
+import { getPresignedUrl, getCoursePresignedUrl, uploadFileToS3 } from "@/api/file";
 
 interface FileUploadInputProps {
 	type: ContentType;
@@ -14,6 +14,7 @@ interface FileUploadInputProps {
 	setUploadStatus: (status: "idle" | "uploading" | "success" | "error") => void;
 	setUploadProgress: (progress: number) => void;
 	errors: { file?: string };
+	courseId?: string;
 }
 
 export const FileUploadInput = ({
@@ -27,6 +28,7 @@ export const FileUploadInput = ({
 	setUploadStatus,
 	setUploadProgress,
 	errors,
+	courseId,
 }: FileUploadInputProps) => {
 	const [isDragging, setIsDragging] = useState(false);
 
@@ -66,10 +68,34 @@ export const FileUploadInput = ({
 			setUploadStatus("uploading");
 			setUploadProgress(0);
 			try {
-				const { uploadUrl, fileUrl } = await getPresignedUrl(
-					file.name,
-					file.type,
-				);
+				let uploadUrl: string;
+				let fileUrl: string;
+				
+				if (courseId) {
+					// Use course-specific upload
+					const contentType = type === ContentType.VIDEO ? 'video' : 'document';
+					const response = await getCoursePresignedUrl(
+						file.name,
+						file.type,
+						courseId,
+						contentType
+					);
+					uploadUrl = response.uploadUrl;
+					fileUrl = response.fileUrl;
+				} else {
+					// Fallback to generic upload (for backward compatibility)
+					const response = await getPresignedUrl({
+						fileName: file.name,
+						fileType: file.type,
+						uploadType: 'course',
+						metadata: {
+							contentType: type === ContentType.VIDEO ? 'video' : 'document',
+						},
+					});
+					uploadUrl = response.uploadUrl;
+					fileUrl = response.fileUrl;
+				}
+				
 				await uploadFileToS3(file, uploadUrl, setUploadProgress);
 				setUploadStatus("success");
 				return fileUrl;
@@ -78,7 +104,7 @@ export const FileUploadInput = ({
 				throw error;
 			}
 		},
-		[setUploadStatus, setUploadProgress],
+		[setUploadStatus, setUploadProgress, courseId, type],
 	);
 
 	// Expose uploadToS3 as a static method for ContentInputForm

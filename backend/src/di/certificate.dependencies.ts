@@ -1,6 +1,5 @@
 import { SharedDependencies } from "./shared.dependencies";
 import { CertificatePdfService } from "../infra/providers/certificate/certificate-pdf.service";
-import { CertificateStorageService } from "../infra/providers/certificate/certificate-storage.service";
 import { GenerateCertificateUseCase } from "../app/usecases/certificate/implementations/generate-certificate.usecase";
 import { CertificateRepositoryInterface } from "../app/repositories/certificate-repository.interface";
 import { IEnrollmentRepository } from "../app/repositories/enrollment.repository.interface";
@@ -24,7 +23,6 @@ export function createCertificateDependencies(
 ): CertificateDependencies {
   // Create infrastructure services
   const certificatePdfService = new CertificatePdfService();
-  const certificateStorageService = new CertificateStorageService();
   
   // Create use case
   const generateCertificateUseCase = new GenerateCertificateUseCase(
@@ -34,7 +32,7 @@ export function createCertificateDependencies(
     userRepository,
     lessonProgressRepository,
     certificatePdfService,
-    certificateStorageService
+    sharedDeps.s3Service
   );
 
   // Create controller

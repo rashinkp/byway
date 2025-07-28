@@ -2,7 +2,7 @@
 import { z } from "zod";
 import { FormFieldConfig, FormModal } from "@/components/ui/FormModal";
 import { useUpdateUser } from "@/hooks/user/useUpdateUser";
-import { getPresignedUrl, uploadFileToS3 } from "@/api/file";
+import {  getProfilePresignedUrl, uploadFileToS3 } from "@/api/file";
 import {  UserProfileType } from "@/types/user";
 
 // Zod schema for profile validation (unchanged)
@@ -128,9 +128,20 @@ const formFields: FormFieldConfig<z.infer<typeof profileSchema>>[] = [
 	{
 		name: "country",
 		label: "Country",
-		type: "input",
-		fieldType: "text",
-		placeholder: "Your country",
+		type: "select",
+		options: [
+			{ value: "India", label: "India" },
+			{ value: "United States", label: "United States" },
+			{ value: "United Kingdom", label: "United Kingdom" },
+			{ value: "Canada", label: "Canada" },
+			{ value: "Australia", label: "Australia" },
+			{ value: "Germany", label: "Germany" },
+			{ value: "France", label: "France" },
+			{ value: "China", label: "China" },
+			{ value: "Japan", label: "Japan" },
+			{ value: "Brazil", label: "Brazil" },
+		],
+		placeholder: "Select your country",
 	},
 	{
 		name: "city",
@@ -179,17 +190,19 @@ export default function EditProfileForm({
 	onOpenChange,
 	user,
 }: EditProfileFormProps) {
-	const { mutate: updateUser, isLoading: isUpdating } = useUpdateUser();
+	const { mutateAsync: updateUserAsync, isLoading: isUpdating } = useUpdateUser();
 
 	const handleSubmit = async (data: z.infer<typeof profileSchema>) => {
+		if (isUpdating) return; // Prevent double submission
 		let avatarUrl: string | undefined;
 
 		// If avatar is a File, upload to S3
 		if (data.avatar instanceof File) {
 			try {
-				const { uploadUrl, fileUrl } = await getPresignedUrl(
+				const { uploadUrl, fileUrl } = await getProfilePresignedUrl(
 					data.avatar.name,
 					data.avatar.type,
+					user?.id || '',
 				);
 				await uploadFileToS3(data.avatar, uploadUrl);
 				avatarUrl = fileUrl; // Set the S3 URL
@@ -214,8 +227,15 @@ export default function EditProfileForm({
 					: undefined,
 		};
 
-		updateUser(transformedData);
-		onOpenChange(false);
+		try {
+			// Wait for the update to complete
+			await updateUserAsync(transformedData);
+			// Close the modal only after successful update
+			onOpenChange(false);
+		} catch (error) {
+			// Error is already handled in the mutation's onError callback
+			console.error("Profile update failed:", error);
+		}
 	};
 
 	// Prepare initial form data from user object

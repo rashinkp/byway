@@ -19,11 +19,21 @@ export class S3Service implements S3ServiceInterface {
     });
   }
 
-  async generatePresignedUrl(fileName: string, fileType: string): Promise<{
+  async generatePresignedUrl(
+    fileName: string, 
+    fileType: string, 
+    uploadType: 'course' | 'profile' | 'certificate',
+    metadata?: {
+      courseId?: string;
+      userId?: string;
+      certificateId?: string;
+      contentType?: 'thumbnail' | 'video' | 'document' | 'avatar' | 'cv';
+    }
+  ): Promise<{
     uploadUrl: string;
     fileUrl: string;
   }> {
-    const key = `uploads/${Date.now()}-${fileName}`;
+    const key = this.generateS3Key(fileName, uploadType, metadata);
     
     const command = new PutObjectCommand({
       Bucket: this.bucketName,
@@ -41,6 +51,98 @@ export class S3Service implements S3ServiceInterface {
       uploadUrl,
       fileUrl,
     };
+  }
+
+  // New method for direct server-side uploads (like certificate generation)
+  async uploadFile(
+    fileBuffer: Buffer,
+    fileName: string,
+    fileType: string,
+    uploadType: 'course' | 'profile' | 'certificate',
+    metadata?: {
+      courseId?: string;
+      userId?: string;
+      certificateId?: string;
+      contentType?: 'thumbnail' | 'video' | 'document' | 'avatar' | 'cv';
+    }
+  ): Promise<string> {
+    try {
+      const key = this.generateS3Key(fileName, uploadType, metadata);
+      
+      const command = new PutObjectCommand({
+        Bucket: this.bucketName,
+        Key: key,
+        Body: fileBuffer,
+        ContentType: fileType,
+        ContentDisposition: 'inline',
+        CacheControl: 'public, max-age=31536000', // 1 year cache
+      });
+
+      await this.s3Client.send(command);
+
+      // Return the public URL
+      const fileUrl = `https://${this.bucketName}.s3.${awsConfig.region}.amazonaws.com/${key}`;
+      return fileUrl;
+    } catch (error) {
+      console.error('Error uploading file to S3:', error);
+      throw new Error('Failed to upload file to cloud storage');
+    }
+  }
+
+  private generateS3Key(
+    fileName: string, 
+    uploadType: 'course' | 'profile' | 'certificate',
+    metadata?: {
+      courseId?: string;
+      userId?: string;
+      certificateId?: string;
+      contentType?: 'thumbnail' | 'video' | 'document' | 'avatar' | 'cv';
+    }
+  ): string {
+    const timestamp = Date.now();
+    const sanitizedFileName = fileName.replace(/[^a-zA-Z0-9.-]/g, '_');
+
+    switch (uploadType) {
+      case 'certificate':
+        if (!metadata?.courseId || !metadata?.certificateId) {
+          throw new Error('Course ID and Certificate ID are required for certificate uploads');
+        }
+        return `certificates/${metadata.courseId}/${metadata.certificateId}.pdf`;
+
+      case 'course':
+        if (!metadata?.courseId) {
+          throw new Error('Course ID is required for course uploads');
+        }
+        
+        if (metadata.contentType === 'thumbnail') {
+          return `courses/${metadata.courseId}/thumbnail/${timestamp}-${sanitizedFileName}`;
+        } else if (metadata.contentType === 'video') {
+          return `courses/${metadata.courseId}/videos/${timestamp}-${sanitizedFileName}`;
+        } else if (metadata.contentType === 'document') {
+          return `courses/${metadata.courseId}/documents/${timestamp}-${sanitizedFileName}`;
+        } else {
+          // Default course content
+          return `courses/${metadata.courseId}/content/${timestamp}-${sanitizedFileName}`;
+        }
+
+      case 'profile':
+        if (!metadata?.userId) {
+          throw new Error('User ID is required for profile uploads');
+        }
+        
+        // Simplified profile structure - no subfolders
+        if (metadata.contentType === 'avatar') {
+          return `profile/${metadata.userId}/avatar.jpg`;
+        } else if (metadata.contentType === 'cv') {
+          return `profile/${metadata.userId}/cv.pdf`;
+        } else {
+          // Generic profile files
+          return `profile/${metadata.userId}/${timestamp}-${sanitizedFileName}`;
+        }
+
+      default:
+        throw new Error(`Invalid upload type: ${uploadType}`);
+    }
   }
 
   async deleteFile(fileUrl: string): Promise<void> {
