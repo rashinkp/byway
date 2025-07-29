@@ -1,14 +1,7 @@
 import { api } from "@/api/api";
 import { User } from "@/types/user";
 import { useAuthStore } from "@/stores/auth.store";
-
-interface ApiResponse<T> {
-	statusCode: number;
-	success: boolean;
-	message: string;
-	data: T;
-	error?: string;
-}
+import { ApiResponse } from "@/types/general";
 
 interface SignupData {
 	email: string;

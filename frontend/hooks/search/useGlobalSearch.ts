@@ -1,15 +1,10 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import { globalSearch, ISearchResult, SearchParams } from "@/api/search";
+import { globalSearch } from "@/api/search";
 import { useAuth } from "@/hooks/auth/useAuth";
+import { ISearchResult, SearchParams, UseGlobalSearchReturn } from "@/types/search";
 
-interface UseGlobalSearchReturn {
-	data: ISearchResult | undefined;
-	isLoading: boolean;
-	error: { message: string } | null;
-	refetch: () => void;
-}
 
 export function useGlobalSearch({
 	query,

@@ -1,8 +1,8 @@
 import { api } from "@/api/api";
-import { ApiResponse, IPaginatedResponse } from "@/types/apiResponse";
 import { PublicUser, User, UserProfileType } from "@/types/user";
 import { IInstructorWithUserDetails } from "@/types/instructor";
 import { useAuthStore } from "@/stores/auth.store";
+import { ApiResponse, IPaginatedResponse } from "@/types/general";
 
 export const getAllUsers = async ({
 	page = 1,

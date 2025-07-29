@@ -1,6 +1,8 @@
-import { InstructorDashboardResponse } from "@/types/instructorDashboard";
+
+import { InstructorDashboardResponse } from "@/types/instructor";
 import { api } from "./api";
-import { DashboardResponse, ApiResponse } from "@/types/dashboard";
+import { DashboardResponse } from "@/types/dashboard";
+import { ApiResponse } from "@/types/general";
 
 export async function getAdminDashboard(): Promise<DashboardResponse> {
 	try {

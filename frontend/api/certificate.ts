@@ -1,6 +1,6 @@
 import { CertificateDTO } from "@/types/certificate";
 import { api } from "./api";
-import { ApiResponse } from "@/types/apiResponse";
+import { ApiResponse } from "@/types/general";
 
 export async function getCertificate(
 	courseId: string,

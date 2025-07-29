@@ -1,5 +1,5 @@
 import { api } from "@/api/api";
-import { ApiResponse } from "@/types/apiResponse";
+import { ApiResponse } from "@/types/general";
 import { Order, OrdersResponse, GetOrdersParams } from "@/types/order";
 
 export interface CreateOrderRequest {

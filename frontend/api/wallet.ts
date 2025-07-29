@@ -1,5 +1,5 @@
 import { api } from "@/api/api";
-import { ApiResponse } from "@/types/apiResponse";
+import { ApiResponse } from "@/types/general";
 
 export interface CreateWalletTopUpRequest {
 	amount: number;
