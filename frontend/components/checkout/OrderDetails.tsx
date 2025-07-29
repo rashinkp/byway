@@ -1,11 +1,8 @@
 import { BookOpen, Clock, Users, Award } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
-import { Course } from "@/types/cart";
 import Image from 'next/image';
+import { OrderDetailsProps } from "@/types/checkout";
 
-interface OrderDetailsProps {
-  courseDetails: Course[];
-}
 
 export default function OrderDetails({ courseDetails }: OrderDetailsProps) {
   const formatPrice = (price: number | string | undefined) => {

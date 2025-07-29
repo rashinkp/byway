@@ -1,3 +1,5 @@
+import { Course } from "./course";
+
 // Education details
 export interface Education {
 	degree: string;
@@ -23,15 +25,9 @@ export interface InstructorFormData {
 	professionalExperience: string;
 	about?: string;
 	website?: string;
-
-	// Education
 	education: string;
-
-	// Certifications
 	certifications?: string;
-
-	// Documents
-	cv: string; // URL to CV file
+	cv: string; 
 }
 
 // User details from the API response
@@ -176,3 +172,32 @@ export interface InstructorDashboardResponse {
   recentEnrollments: RecentEnrollment[];
 }
 
+export interface InstructorCardData {
+  id: string;
+  areaOfExpertise: string;
+  professionalExperience: string;
+  about: string;
+  website: string;
+  education: string;
+  certifications: string;
+  totalStudents: number;
+  user: {
+    id: string;
+    name: string;
+    avatar: string;
+  };
+}
+
+
+
+export interface InstructorDetailBaseProps {
+  instructor: IInstructorDetails;
+  courses?: Course[];
+  isCoursesLoading?: boolean;
+  renderHeaderActions?: () => React.ReactNode;
+  renderStatusBadges?: () => React.ReactNode;
+  sidebarProps?: {
+    adminActions?: React.ReactNode;
+    userRole?: "USER" | "ADMIN" | "INSTRUCTOR";
+  };
+}

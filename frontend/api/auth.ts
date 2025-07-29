@@ -2,20 +2,8 @@ import { api } from "@/api/api";
 import { User } from "@/types/user";
 import { useAuthStore } from "@/stores/auth.store";
 import { ApiResponse } from "@/types/general";
+import { FacebookAuthRequest, SignupData } from "@/types/auth";
 
-interface SignupData {
-	email: string;
-	password: string;
-	name: string;
-}
-
-interface FacebookAuthRequest {
-	accessToken: string;
-	userId: string;
-	name: string;
-	email?: string;
-	picture?: string;
-}
 
 export async function signup(data: SignupData): Promise<ApiResponse<User>> {
 	try {

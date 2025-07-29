@@ -10,11 +10,9 @@ import { useLogin } from "@/hooks/auth/useLogin";
 import { useRoleRedirect } from "@/hooks/useRoleRedirects";
 import { useGoogleAuth } from "@/hooks/auth/useGoogleAuth";
 import { useFacebookAuth } from "@/hooks/auth/useFacebookAuth";
+import { loginSchema } from "@/lib/validations/auth";
 
-const loginSchema = z.object({
-	email: z.string().email("Invalid email address"),
-	password: z.string().min(6, "Password must be at least 6 characters"),
-});
+
 
 type LoginFormData = z.infer<typeof loginSchema>;
 

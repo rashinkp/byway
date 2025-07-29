@@ -56,3 +56,31 @@ export interface GetOrdersParams {
 	minAmount?: number;
 	maxAmount?: number;
 }
+export interface CreateOrderRequest {
+	courses: {
+		id: string;
+		title: string;
+		description: string;
+		thumbnail: string;
+		price: number;
+		offer: number;
+		duration: string;
+		lectures: number;
+		level: string;
+		creator: {
+			name: string;
+		};
+	}[];
+	paymentMethod: "WALLET" | "STRIPE" | "PAYPAL" | "RAZORPAY";
+	couponCode?: string;
+}
+
+export interface OrderResponse {
+	order: Order;
+	session?: {
+		id: string;
+		url: string;
+		payment_status: string;
+		amount_total: number;
+	};
+}

@@ -1,10 +1,8 @@
-import { ICart } from "@/types/cart";
+
+import { OrderSummaryProps } from "@/types/cart";
 import { HelpCircle } from "lucide-react";
 import Link from "next/link";
 
-interface OrderSummaryProps {
-	cart: ICart[];
-}
 
 export function OrderSummary({ cart }: OrderSummaryProps) {
 	const formatPrice = (price: number | string | undefined): string => {

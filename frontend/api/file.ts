@@ -1,34 +1,14 @@
+import { GeneratePresignedUrlParams, PresignedUrlResponse } from "@/types/file";
 import { api } from "./api";
+import { ApiResponse } from "@/types/general";
 
-interface PresignedUrlResponse {
-	uploadUrl: string;
-	fileUrl: string;
-}
 
-interface ApiResponse<T> {
-	statusCode: number;
-	success: boolean;
-	message: string;
-	data: T;
-}
-
-interface GeneratePresignedUrlParams {
-	fileName: string;
-	fileType: string;
-	uploadType: 'course' | 'profile' | 'certificate';
-	metadata?: {
-		courseId?: string;
-		userId?: string;
-		certificateId?: string;
-		contentType?: 'thumbnail' | 'video' | 'document' | 'avatar' | 'cv';
-	};
-}
 
 export async function getPresignedUrl(
 	params: GeneratePresignedUrlParams
 ): Promise<PresignedUrlResponse> {
 	try {
-		const response = await api.post<ApiResponse<PresignedUrlResponse>>(
+		const response = await api.post<ApiResponse <PresignedUrlResponse>>(
 			"/files/generate-presigned-url",
 			params,
 		);

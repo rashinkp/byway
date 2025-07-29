@@ -4,20 +4,12 @@ import { FilterSidebar } from "@/components/FilterSidebar";
 import { CourseGrid } from "@/components/course/CourseGrid";
 import { Pagination } from "@/components/ui/Pagination";
 import ErrorDisplay from "@/components/ErrorDisplay";
-import { Course, IGetAllCoursesInput } from "@/types/course";
+import { Course, GridCourse, IGetAllCoursesInput } from "@/types/course";
 import { useGetAllCourses } from "@/hooks/course/useGetAllCourse";
 import { useSearchParams } from "next/navigation";
 import { Button } from "../ui/button";
 
-interface GridCourse extends Course {
-  rating: number;
-  reviewCount: number;
-  formattedDuration: string;
-  lessons: number;
-  bestSeller: boolean;
-  thumbnail: string;
-  price: number;
-}
+
 
 export default function MainCourseListing() {
   const searchParams = useSearchParams();

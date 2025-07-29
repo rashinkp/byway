@@ -11,30 +11,9 @@ import { AuthLink } from "@/components/auth/parts/AuthLink";
 import { AuthFormWrapper } from "./parts/AuthFormWrapper";
 import { Loader2 } from "lucide-react";
 import { useResetPassword } from "@/hooks/auth/useResetPassword";
+import { resetPasswordSchema } from "@/lib/validations/auth";
 
-const resetPasswordSchema = z
-	.object({
-		newPassword: z.string()
-			.min(8, "Password must be at least 8 characters")
-			.regex(/^(?=.*[a-z])/, "Password must contain at least one lowercase letter")
-			.regex(/^(?=.*[A-Z])/, "Password must contain at least one uppercase letter")
-			.regex(/^(?=.*\d)/, "Password must contain at least one number")
-			.regex(/^(?=.*[@$!%*?&])/, "Password must contain at least one special character (@$!%*?&)")
-			.regex(/^\S*$/, "Password cannot contain whitespace")
-			.max(128, "Password must be less than 128 characters"),
-		confirmPassword: z.string()
-			.min(8, "Password must be at least 8 characters")
-			.regex(/^(?=.*[a-z])/, "Password must contain at least one lowercase letter")
-			.regex(/^(?=.*[A-Z])/, "Password must contain at least one uppercase letter")
-			.regex(/^(?=.*\d)/, "Password must contain at least one number")
-			.regex(/^(?=.*[@$!%*?&])/, "Password must contain at least one special character (@$!%*?&)")
-			.regex(/^\S*$/, "Password cannot contain whitespace")
-			.max(128, "Password must be less than 128 characters"),
-	})
-	.refine((data) => data.newPassword === data.confirmPassword, {
-		message: "Passwords do not match",
-		path: ["confirmPassword"],
-	});
+
 
 type ResetPasswordFormData = z.infer<typeof resetPasswordSchema>;
 

@@ -17,8 +17,9 @@ import OrderDetailsSkeleton from "@/components/checkout/OrderDetailsSkeleton";
 import PaymentMethodSkeleton from "@/components/checkout/PaymentMethodSkeleton";
 import OrderSummarySkeleton from "@/components/checkout/OrderSummerySkeleton";
 import { Course as CartCourse } from "@/types/cart";
+import { PaymentMethodType } from "@/types/checkout";
 
-type PaymentMethodType = "WALLET" | "STRIPE" | "PAYPAL";
+
 
 export default function CheckoutContent() {
   const router = useRouter();

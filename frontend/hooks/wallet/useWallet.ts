@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { IWallet, WalletApiResponse } from "@/types/wallet.types";
-import { getWallet } from "@/api/wallet.api";
+import { getWallet } from "@/api/wallet";
 
 export function useWallet() {
 	const {

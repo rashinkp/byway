@@ -11,24 +11,14 @@ import {
   Mail,
   FileText,
 } from "lucide-react";
-import { IInstructorDetails } from "@/types/instructor";
+import { InstructorDetailBaseProps } from "@/types/instructor";
 import { Course } from "@/types/course";
 import { CourseCard } from "@/components/course/CourseCard";
 import Link from "next/link";
 import InstructorSidebar from "./InstructorSidebar";
 import Image from 'next/image';
 
-interface InstructorDetailBaseProps {
-  instructor: IInstructorDetails;
-  courses?: Course[];
-  isCoursesLoading?: boolean;
-  renderHeaderActions?: () => React.ReactNode;
-  renderStatusBadges?: () => React.ReactNode;
-  sidebarProps?: {
-    adminActions?: React.ReactNode;
-    userRole?: "USER" | "ADMIN" | "INSTRUCTOR";
-  };
-}
+
 
 export const InstructorDetailBase: React.FC<InstructorDetailBaseProps> = ({
   instructor,
