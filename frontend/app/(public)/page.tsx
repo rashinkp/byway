@@ -23,13 +23,13 @@ export default function UserDashboard() {
 			filterBy: "Active",
 		});
 
-	const { data: coursesData } = useGetAllCourses({
+	const { data: coursesData, isLoading: isCoursesLoading } = useGetAllCourses({
 		page: 1,
 		limit: 10,
 		role: "USER",
 	});
 
-	const { data: instructorsData } =
+	const { data: instructorsData, isLoading: isInstructorsLoading } =
 		useGetAllInstructors({
 			page: 1,
 			limit: 4,
@@ -111,7 +111,11 @@ export default function UserDashboard() {
 					className="my-50"
 				>
 					<div className="max-w-7xl mx-auto w-full px-0 sm:px-4 md:px-8">
-						<TopCourses courses={topCourses} router={router} />
+						<TopCourses 
+							courses={topCourses} 
+							router={router} 
+							isLoading={isCoursesLoading}
+						/>
 					</div>
 				</motion.section>
 				<motion.section
@@ -159,6 +163,9 @@ export default function UserDashboard() {
 								<InstructorCard instructor={instructor} />
 							)}
 							showNavigation={true}
+							fallbackType="instructors"
+							onFallbackAction={() => router.push("/instructors")}
+							isLoading={isInstructorsLoading}
 						/>
 					</div>
 				</motion.section>

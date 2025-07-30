@@ -236,7 +236,7 @@ export const HeaderSearchBar: React.FC<HeaderSearchBarProps> = ({
 								searchResults.categories.items.length === 0 &&
 								(!searchResults.certificates ||
 									searchResults.certificates.items.length === 0) && (
-									<div className="p-8 text-center bg-[#facc15]/10 dark:bg-[#facc15]/10">
+									<div className="p-8 text-center">
 										<Search
 											className="w-12 h-12 text-[#facc15] mx-auto mb-3"
 										/>

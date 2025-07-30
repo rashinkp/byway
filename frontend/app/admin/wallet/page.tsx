@@ -10,6 +10,7 @@ import { Wallet, CreditCard, AlertCircle } from "lucide-react";
 import { toast } from "sonner";
 import { TransactionList } from "@/components/transactions/TransactionList";
 import { useGetTransactionsByUser } from "@/hooks/transaction/useGetTransactionByUser";
+import { LoadingSpinner } from "@/components/admin";
 
 export default function AdminWalletPage() {
 	const { wallet, isLoading: walletLoading } = useWallet();
@@ -36,7 +37,7 @@ export default function AdminWalletPage() {
 	};
 
 	if (walletLoading) {
-		return <div>Loading...</div>;
+		return <LoadingSpinner />
 	}
 
 	return (
