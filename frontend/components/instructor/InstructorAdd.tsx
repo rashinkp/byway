@@ -15,7 +15,7 @@ import { useFileUpload } from "@/hooks/file/useFileUpload";
 import { Button } from "../ui/button";
 import { InstructorFormModalProps } from "@/types/instructor";
 import { fields, InstructorFormData, instructorSchema } from "@/lib/validations/instructor";
-
+import { Loader2 } from "lucide-react";
 
 
 export function InstructorFormModal({
@@ -104,6 +104,27 @@ export function InstructorFormModal({
 
 	if (user?.role === "ADMIN") {
 		return null;
+	}
+
+	// Show loading state while fetching instructor data
+	if (isInstructorLoading) {
+		return (
+			<Dialog open={open} onOpenChange={onOpenChange}>
+				<DialogContent className="bg-white dark:bg-[#18181b] border-[#facc15]">
+					<DialogHeader>
+						<DialogTitle className="text-black dark:text-white text-xl font-semibold">
+							Loading...
+						</DialogTitle>
+						<DialogDescription className="text-gray-600 dark:text-gray-300 mt-2">
+							Checking your instructor application status...
+						</DialogDescription>
+					</DialogHeader>
+					<div className="flex items-center justify-center py-8">
+						<Loader2 className="h-8 w-8 animate-spin text-[#facc15]" />
+					</div>
+				</DialogContent>
+			</Dialog>
+		);
 	}
 
 	if (instructorData?.data?.status === "PENDING") {
