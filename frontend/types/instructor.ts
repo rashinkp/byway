@@ -1,3 +1,4 @@
+import { InstructorSubmitData } from "@/lib/validations/instructor";
 import { Course } from "./course";
 
 // Education details
@@ -200,4 +201,13 @@ export interface InstructorDetailBaseProps {
     adminActions?: React.ReactNode;
     userRole?: "USER" | "ADMIN" | "INSTRUCTOR";
   };
+}
+
+
+export interface InstructorFormModalProps {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  onSubmit: (data: InstructorSubmitData) => Promise<void>;
+  initialData?: Partial<InstructorFormData>;
+  isSubmitting?: boolean;
 }

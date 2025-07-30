@@ -3,12 +3,8 @@ import { User } from "../../../../domain/entities/user.entity";
 import { UserProfile } from "../../../../domain/entities/user-profile.entity";
 import { HttpError } from "../../../../presentation/http/errors/http-error";
 import { IUserRepository } from "../../../repositories/user.repository";
+import { IGetUserByIdUseCase } from "../interfaces/get-user-by-id.usecase.interface";
 
-export interface IGetUserByIdUseCase {
-  execute(
-    dto: GetUserDto
-  ): Promise<{ user: User; profile: UserProfile | null }>;
-}
 
 export class GetUserByIdUseCase implements IGetUserByIdUseCase {
   constructor(private userRepository: IUserRepository) {}

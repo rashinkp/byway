@@ -18,7 +18,6 @@ import {
 import { useState, useCallback, useEffect, useRef } from "react";
 import {
 	InstructorFormModal,
-	InstructorSubmitData,
 } from "@/components/instructor/InstructorAdd";
 import {
 	DropdownMenu,
@@ -38,6 +37,7 @@ import { useCartStore } from "@/stores/cart.store";
 import { useChatStore } from "@/stores/chat.store";
 import { useUnreadMessageCount } from "@/hooks/chat/useUnreadMessageCount";
 import Image from 'next/image';
+import { InstructorSubmitData } from "@/lib/validations/instructor";
 
 interface HeaderProps {
 	client?: { id: string; name: string };
