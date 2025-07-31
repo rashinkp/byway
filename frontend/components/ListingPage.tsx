@@ -140,7 +140,6 @@ function ListPage<T>({
 					sortOrder={sortOrder}
 					setSortOrder={setSortOrder}
 					sortOptions={sortOptions}
-					onRefresh={refetch}
 					filterTabs={filterOptions}
 				/>
 

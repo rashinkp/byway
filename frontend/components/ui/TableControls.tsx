@@ -15,7 +15,6 @@ import {
 } from "@/components/ui/dropdown-menu";
 import {
 	Search,
-	RefreshCcw,
 	Filter,
 	ArrowUp,
 	ArrowDown,
@@ -35,7 +34,6 @@ interface TableControlsProps {
 	sortOrder: "asc" | "desc";
 	setSortOrder: (order: "asc" | "desc") => void;
 	sortOptions: SortOption<any>[];
-	onRefresh: () => void;
 	filterTabs?: { value: string; label: string }[];
 }
 
@@ -49,7 +47,6 @@ export function TableControls({
 	sortOrder,
 	setSortOrder,
 	sortOptions,
-	onRefresh,
 	filterTabs = [
 		{ value: "All", label: "All" },
 		{ value: "Active", label: "Active" },
@@ -142,22 +139,10 @@ export function TableControls({
           </div>
 
           <div className="flex items-center gap-2">
-            <Button
-              size="sm"
-              onClick={onRefresh}
-              variant={"ghost"}
-              className="flex items-center gap-1 text-[var(--color-primary-dark)] border-[var(--color-primary-light)]"
-            >
-              <RefreshCcw className="h-4 w-4" />
-              Refresh
-            </Button>
-
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button
-                  size="sm"
-                  variant={"ghost"}
-                  className="flex items-center gap-1 text-[var(--color-primary-dark)] border-[var(--color-primary-light)]"
+              
                 >
                   <Filter className="h-4 w-4" />
                   Sort:{" "}
@@ -179,6 +164,7 @@ export function TableControls({
                     <DropdownMenuRadioItem
                       key={option.value}
                       value={option.value}
+                      className=" dark:hover:bg-[#facc15] dark:hover:text-black"
                     >
                       {option.label}
                     </DropdownMenuRadioItem>
@@ -188,10 +174,8 @@ export function TableControls({
             </DropdownMenu>
 
             <Button
-              size="sm"
-              variant={"ghost"}
               onClick={() => setSortOrder(sortOrder === "asc" ? "desc" : "asc")}
-              className="flex items-center gap-1 text-[var(--color-primary-dark)] border-[var(--color-primary-light)]"
+             
             >
               {sortOrder === "asc" ? (
                 <ArrowUp className="h-4 w-4" />
