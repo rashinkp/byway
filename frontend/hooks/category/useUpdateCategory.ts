@@ -12,80 +12,44 @@ export function useUpdateCategory() {
 	return useMutation({
 		mutationFn: ({ id, data }: { id: string; data: CategoryFormData }) =>
 			updateCategory(id, data),
-		onMutate: async ({ id, data }) => {
-			// Cancel any ongoing queries to avoid conflicts
-			await queryClient.cancelQueries({ queryKey: ["categories"] });
-
-			// Get previous categories from cache
-			const previousCategories = queryClient.getQueryData<{
-				data: Category[];
-				total: number;
-				page: number;
-				limit: number;
-			}>(["categories", 1, 10, ""]);
-
-			// Optimistically update the cache
-			queryClient.setQueryData(["categories", 1, 10, ""], (old: any) => {
-				// If cache is empty, create a new entry with the updated category
-				if (!old || !old.data) {
-					return {
-						data: [
-							{ id, ...data, updatedAt: new Date().toISOString() } as Category,
-						],
-						total: 1,
-						page: 1,
-						limit: 10,
-					};
+		onSuccess: (updatedCategory, variables) => {
+			// Update all category queries in cache
+			queryClient.setQueriesData(
+				{ queryKey: ["categories"] },
+				(oldData: any) => {
+					if (!oldData) return oldData;
+					
+					// Handle different possible data structures
+					if (oldData.data && Array.isArray(oldData.data)) {
+						// Structure: { data: Category[], total: number, page: number, limit: number }
+						return {
+							...oldData,
+							data: oldData.data.map((cat: Category) =>
+								cat.id === variables.id ? updatedCategory : cat
+							),
+						};
+					} else if (oldData.items && Array.isArray(oldData.items)) {
+						// Structure: { items: Category[], total: number, totalPages: number }
+						return {
+							...oldData,
+							items: oldData.items.map((cat: Category) =>
+								cat.id === variables.id ? updatedCategory : cat
+							),
+						};
+					}
+					
+					return oldData;
 				}
+			);
 
-				// Update existing category in the list
-				return {
-					...old,
-					data: old.data.map((cat: Category) =>
-						cat.id === id
-							? { ...cat, ...data, updatedAt: new Date().toISOString() }
-							: cat,
-					),
-				};
-			});
-
-			return { previousCategories };
-		},
-		onSuccess: (updatedCategory) => {
-			// Update cache with server response
-			queryClient.setQueryData(["categories", 1, 10, ""], (old: any) => {
-				if (!old || !old.data) {
-					return {
-						data: [updatedCategory],
-						total: 1,
-						page: 1,
-						limit: 10,
-					};
-				}
-				return {
-					...old,
-					data: old.data.map((cat: Category) =>
-						cat.id === updatedCategory.id ? updatedCategory : cat,
-					),
-				};
-			});
 			toast.success("Category Updated", {
 				description: "The category has been updated successfully.",
 			});
 		},
-		onError: (error: any, variables, context) => {
-			// Roll back to previous categories on error
-			queryClient.setQueryData(
-				["categories", 1, 10, ""],
-				context?.previousCategories,
-			);
+		onError: (error: any) => {
 			toast.error("Failed to update category", {
 				description: error.message || "Please try again",
 			});
-		},
-		onSettled: () => {
-			// Invalidate queries to refetch fresh data
-			queryClient.invalidateQueries({ queryKey: ["categories"] });
 		},
 	});
 }

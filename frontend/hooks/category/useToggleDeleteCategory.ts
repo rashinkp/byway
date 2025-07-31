@@ -47,9 +47,6 @@ export function useToggleDeleteCategory() {
 				}
 			);
 
-			toast.success(
-				category.deletedAt ? "Category restored" : "Category deleted"
-			);
 		},
 		onError: (error: any, category) => {
 			toast.error(

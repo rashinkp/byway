@@ -73,8 +73,8 @@ export async function updateCategory(
 	payload: CategoryFormData,
 ): Promise<Category> {
 	try {
-		const response = await api.put<Category>(`/category/${id}`, payload);
-		return response.data;
+		const response = await api.put<ApiResponse>(`/category/${id}`, payload);
+		return response.data.data;
 	} catch (error: unknown) {
 		throw new Error(error instanceof Error ? error.message : "Update category failed");
 	}
