@@ -34,13 +34,14 @@ export default function CategoriesPage() {
 		search: searchTerm,
 		sortBy: (["name", "createdAt"] as const).includes(sortBy as any) ? (sortBy as "name" | "createdAt") : "name",
 		sortOrder,
-		includeDeleted: filterStatus === "Inactive",
+		includeDeleted: filterStatus === "Inactive" || filterStatus === "All",
 		filterBy: (["All", "Active", "Inactive"] as const).includes(filterStatus as any) ? (filterStatus as "All" | "Active" | "Inactive") : "All",
+
 	});
 
 	const { mutate: createCategory , isPending: isCreating } = useCreateCategory();
 	const { mutate: updateCategory , isPending: isUpdating } = useUpdateCategory();
-	const { mutate: toggleDeleteCategory  } = useToggleDeleteCategory();
+	const { mutate: toggleDeleteCategory , isPending: isDeleting } = useToggleDeleteCategory();
 
 	const handleAddSubmit = async (data: CategoryFormData) => {
 		createCategory(data, {
@@ -159,7 +160,20 @@ export default function CategoriesPage() {
 					},
 					{
 						label: (category) => (category.deletedAt ? "Enable" : "Disable"),
-						onClick: (category) => toggleDeleteCategory(category),
+						onClick: (category) => toggleDeleteCategory(category, {
+							onSuccess: () => {
+								// Close any open modals after successful toggle
+								if (isAddOpen) setIsAddOpen(false);
+								if (isEditOpen) {
+									setIsEditOpen(false);
+									setEditCategory(undefined);
+								}
+								if (isViewOpen) {
+									setIsViewOpen(false);
+									setViewCategory(undefined);
+								}
+							},
+						}),
 						variant: (category) =>
 							category.deletedAt ? "default" : "destructive",
 						confirmationMessage: (category) =>
@@ -189,6 +203,7 @@ export default function CategoriesPage() {
 					label: "Add Category",
 					onClick: () => setIsAddOpen(true),
 				}}
+				actionLoading={isDeleting}
 			/>
 
 			<CategoryFormModal

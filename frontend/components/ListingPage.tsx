@@ -42,6 +42,7 @@ interface ListPageProps<T> {
 	setSortBy: (sortBy: string) => void;
 	sortOrder: "asc" | "desc";
 	setSortOrder: (order: "asc" | "desc") => void;
+	actionLoading?: boolean;
 }
 
 function ListPage<T>({
@@ -70,6 +71,7 @@ function ListPage<T>({
 	setSortBy,
 	sortOrder,
 	setSortOrder,
+	actionLoading = false,
 }: ListPageProps<T>) {
 	const items = data?.items || [];
 	const total = data?.total || 0;
@@ -159,6 +161,7 @@ function ListPage<T>({
 						totalItems={total}
 						currentPage={page}
 						setCurrentPage={setPage}
+						actionLoading={actionLoading}
 					/>
 				)}
 

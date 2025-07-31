@@ -1,8 +1,9 @@
 import React from "react";
 import { Transaction } from "@/types/transaction";
 import { ArrowUp, ArrowDown, AlertCircle } from "lucide-react";
-import { formatDate, formatPrice } from "@/utils/formatPrice";
+import {  formatPrice } from "@/utils/formatPrice";
 import { Skeleton } from "@/components/ui/skeleton";
+import { formatDate } from "@/lib/utils";
 
 interface TransactionListProps {
   transactions: Transaction[];

@@ -12,89 +12,49 @@ export function useToggleDeleteCategory() {
 	return useMutation({
 		mutationFn: async (category: Category) => {
 			if (category.deletedAt) {
-				const result = await recoverCategory(category.id);
-				return result;
+				return await recoverCategory(category.id);
 			} else {
-				await deleteCategory(category.id);
-				return { ...category, deletedAt: new Date().toISOString() }; // Simulate deleted state
+				return await deleteCategory(category.id);
 			}
 		},
-		onMutate: async (category) => {
-			// Cancel queries for all category pages
-			await queryClient.cancelQueries({ queryKey: ["categories"] });
-
-			// Snapshot previous state for all matching queries
-			const previousQueries = new Map();
-			const queries = queryClient.getQueriesData<{
-				data: Category[];
-				total: number;
-				page: number;
-				limit: number;
-			}>({ queryKey: ["categories"] });
-
-			queries.forEach(([queryKey, data]) => {
-				if (data) {
-					previousQueries.set(queryKey, data);
-					queryClient.setQueryData(queryKey, {
-						...data,
-						data: data.data.map((cat: Category) =>
-							cat.id === category.id
-								? {
-										...cat,
-										deletedAt: category.deletedAt
-											? null
-											: new Date().toISOString(),
-										updatedAt: new Date().toISOString(),
-									}
-								: cat,
-						),
-					});
-				}
-			});
-
-			return { previousQueries };
-		},
 		onSuccess: (updatedCategory, category) => {
-			// Update all matching queries
-			queryClient
-				.getQueriesData<{
-					data: Category[];
-					total: number;
-					page: number;
-					limit: number;
-				}>({ queryKey: ["categories"] })
-				.forEach(([queryKey, data]) => {
-					if (data) {
-						queryClient.setQueryData(queryKey, {
-							...data,
-							data: data.data.map((cat: Category) =>
-								cat.id === category.id ? updatedCategory : cat,
+			// Update all category queries in cache
+			queryClient.setQueriesData(
+				{ queryKey: ["categories"] },
+				(oldData: any) => {
+					if (!oldData) return oldData;
+					
+					// Handle different possible data structures
+					if (oldData.data && Array.isArray(oldData.data)) {
+						// Structure: { data: Category[], total: number, page: number, limit: number }
+						return {
+							...oldData,
+							data: oldData.data.map((cat: Category) =>
+								cat.id === category.id ? updatedCategory : cat
 							),
-						});
+						};
+					} else if (oldData.items && Array.isArray(oldData.items)) {
+						// Structure: { items: Category[], total: number, totalPages: number }
+						return {
+							...oldData,
+							items: oldData.items.map((cat: Category) =>
+								cat.id === category.id ? updatedCategory : cat
+							),
+						};
 					}
-				});
+					
+					return oldData;
+				}
+			);
 
 			toast.success(
-				category.deletedAt ? "Category restored" : "Category deleted",
-				{ description: "Category soft deleted successfully." },
+				category.deletedAt ? "Category restored" : "Category deleted"
 			);
 		},
-		onError: (error: any, category, context: any) => {
-			// Revert all queries to previous state
-			context?.previousQueries?.forEach((data: any, queryKey: any) => {
-				queryClient.setQueryData(queryKey, data);
-			});
-
+		onError: (error: any, category) => {
 			toast.error(
-				`Failed to ${category.deletedAt ? "restore" : "delete"} category`,
-				{
-					description: error.message || "Please try again",
-				},
+				`Failed to ${category.deletedAt ? "restore" : "delete"} category`
 			);
-		},
-		onSettled: () => {
-			// Invalidate all category queries
-			queryClient.invalidateQueries({ queryKey: ["categories"] });
 		},
 	});
 }

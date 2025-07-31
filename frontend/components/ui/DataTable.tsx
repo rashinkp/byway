@@ -34,6 +34,7 @@ interface DataTableProps<T> {
 	totalItems?: number;
 	currentPage?: number;
 	setCurrentPage?: (page: number) => void;
+	actionLoading?: boolean;
 }
 
 export function DataTable<T>({
@@ -42,6 +43,7 @@ export function DataTable<T>({
 	isLoading = false,
 	onRowClick,
 	actions = [],
+	actionLoading = false,
 }: DataTableProps<T>) {
 	const [confirmOpen, setConfirmOpen] = useState(false);
 	const [confirmItem, setConfirmItem] = useState<T | null>(null);
@@ -71,10 +73,7 @@ export function DataTable<T>({
 		if (confirmAction) {
 			confirmAction();
 		}
-		setConfirmOpen(false);
-		setConfirmItem(null);
-		setConfirmAction(null);
-		setConfirmActionIndex(null);
+	
 	};
 
 	const rowVariants = {
@@ -238,9 +237,20 @@ export function DataTable<T>({
 						</AlertDialogDescription>
 					</AlertDialogHeader>
 					<AlertDialogFooter>
-						<AlertDialogCancel>Cancel</AlertDialogCancel>
-						<AlertDialogAction onClick={handleConfirm}>
-							Confirm
+						<AlertDialogCancel disabled={actionLoading}>Cancel</AlertDialogCancel>
+						<AlertDialogAction 
+							onClick={handleConfirm}
+							disabled={actionLoading}
+							className="relative"
+						>
+							{actionLoading ? (
+								<>
+									<div className="animate-spin rounded-full h-4 w-4 border-b-2 border-current mr-2" />
+									Processing...
+								</>
+							) : (
+								"Confirm"
+							)}
 						</AlertDialogAction>
 					</AlertDialogFooter>
 				</AlertDialogContent>
