@@ -54,7 +54,7 @@ export function TableControls({
 	],
 }: TableControlsProps) {
 	const [inputSearchTerm, setInputSearchTerm] = useState(searchTerm);
-	const [debouncedSearchTerm] = useDebounce(inputSearchTerm, 300);
+	const [debouncedSearchTerm] = useDebounce(inputSearchTerm, 600);
 
 	useEffect(() => {
 		setSearchTerm(debouncedSearchTerm);
