@@ -3,7 +3,8 @@ import React from "react";
 import { useParams } from "next/navigation";
 import { useGetInstructorDetails } from "@/hooks/instructor/useGetInstructorDetails";
 import { useToggleDeleteUser } from "@/hooks/user/useToggleDeleteUser";
-import { approveInstructor, declineInstructor } from "@/api/instructor";
+import { useApproveInstructor } from "@/hooks/instructor/useApproveInstructor";
+import { useDeclineInstructor } from "@/hooks/instructor/useDeclineInstructor";
 import { toast } from "sonner";
 import { AdminInstructorDetail } from "@/components/instructor/AdminInstructorDetail";
 import InstructorDetailSkeleton from "@/components/skeleton/InstructorDetailSkeleton";
@@ -13,16 +14,15 @@ import ErrorDisplay from "@/components/ErrorDisplay";
 const MainInstructorDetail: React.FC = () => {
   const params = useParams();
   const instructorId = params.instructorId as string;
-  const { mutate: toggleDeleteUser , isPending: isDeleting } = useToggleDeleteUser();
+  const { mutate: toggleDeleteUser, isPending: isDeleting } = useToggleDeleteUser();
+  const { mutate: approveInstructor, isPending: isApproving } = useApproveInstructor();
+  const { mutate: declineInstructor, isPending: isDeclining } = useDeclineInstructor();
 
   const {
     data: instructorData,
     isLoading: isInstructorLoading,
     error,
-    refetch,
   } = useGetInstructorDetails(instructorId);
-
-  console.log(instructorData);
 
   const { data: coursesData, isLoading: isCoursesLoading } = useGetAllCourses({
     includeDeleted: false,
@@ -46,25 +46,11 @@ const MainInstructorDetail: React.FC = () => {
   }
 
   const handleApprove = async () => {
-    try {
-      await approveInstructor(instructor.instructorId);
-      await refetch();
-      toast.success("Instructor approved successfully!");
-    } catch (error) {
-      console.error("Error approving instructor:", error);
-      toast.error("Failed to approve instructor");
-    }
+    approveInstructor(instructor.instructorId);
   };
 
   const handleDecline = async () => {
-    try {
-      await declineInstructor(instructor.instructorId);
-      await refetch();
-      toast.success("Instructor declined successfully!");
-    } catch (error) {
-      console.error("Error declining instructor:", error);
-      toast.error("Failed to decline instructor");
-    }
+    declineInstructor(instructor.instructorId);
   };
 
   const handleDelete = () => {

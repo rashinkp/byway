@@ -24,7 +24,7 @@ export default function InstructorsPage() {
 		search: searchTerm,
 		sortBy: (["createdAt", "status", "areaOfExpertise", "user"] as const).includes(sortBy as any) ? (sortBy as "createdAt" | "status" | "areaOfExpertise" | "user") : "createdAt",
 		sortOrder,
-		includeDeleted: filterStatus === "Inactive",
+		includeDeleted: filterStatus === "Inactive" || filterStatus === "All",
 		filterBy: (["All", "Pending", "Approved", "Declined"] as const).includes(filterStatus as any) ? (filterStatus as "All" | "Pending" | "Approved" | "Declined") : "All",
 	});
 
