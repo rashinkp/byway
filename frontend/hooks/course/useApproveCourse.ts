@@ -2,6 +2,8 @@ import { approveCourse, declineCourse } from "@/api/course";
 import { Course } from "@/types/course";
 import { IUpdateCourseApprovalInput } from "@/types/course";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
+import { ApiResponse, IPaginatedResponse } from "@/types/general";
 
 interface UseCourseApprovalReturn {
 	mutate: (input: IUpdateCourseApprovalInput) => void;
@@ -18,12 +20,76 @@ export function useApproveCourse(): UseCourseApprovalReturn {
 		IUpdateCourseApprovalInput
 	>({
 		mutationFn: approveCourse,
-		onSuccess: () => {
-			// Invalidate courses query to refetch updated course list
-			queryClient.invalidateQueries({ queryKey: ["courses"] });
+		onSuccess: (response, input) => {
+			// Update courses listing cache
+			queryClient.setQueriesData(
+				{ queryKey: ["courses"] },
+				(oldData: ApiResponse<IPaginatedResponse<Course>> | undefined) => {
+					if (!oldData?.data?.items) return oldData;
+					
+					return {
+						...oldData,
+						data: {
+							...oldData.data,
+							items: oldData.data.items.map((course: Course) =>
+								course.id === input.courseId
+									? {
+											...course,
+											approvalStatus: "APPROVED",
+										}
+									: course
+							),
+						},
+					};
+				}
+			);
+
+			// Update individual course cache
+			queryClient.setQueriesData(
+				{ queryKey: ["course", input.courseId] },
+				(oldData: ApiResponse<Course> | undefined) => {
+					if (!oldData?.data) return oldData;
+					
+					return {
+						...oldData,
+						data: {
+							...oldData.data,
+							approvalStatus: "APPROVED",
+						},
+					};
+				}
+			);
+
+			// Update instructor courses cache
+			queryClient.setQueriesData(
+				{ queryKey: ["instructor-courses"] },
+				(oldData: any) => {
+					if (!oldData?.data?.items) return oldData;
+					
+					return {
+						...oldData,
+						data: {
+							...oldData.data,
+							items: oldData.data.items.map((course: Course) =>
+								course.id === input.courseId
+									? {
+											...course,
+											approvalStatus: "APPROVED",
+										}
+									: course
+							),
+						},
+					};
+				}
+			);
+
+			toast.success("Course approved successfully!");
 		},
 		onError: (err) => {
 			console.error("Course approval failed:", err);
+			toast.error("Failed to approve course", {
+				description: err.message || "Please try again",
+			});
 		},
 	});
 
@@ -43,12 +109,76 @@ export function useDeclineCourse(): UseCourseApprovalReturn {
 		IUpdateCourseApprovalInput
 	>({
 		mutationFn: declineCourse,
-		onSuccess: () => {
-			// Invalidate courses query to refetch updated course list
-			queryClient.invalidateQueries({ queryKey: ["courses"] });
+		onSuccess: (response, input) => {
+			// Update courses listing cache
+			queryClient.setQueriesData(
+				{ queryKey: ["courses"] },
+				(oldData: ApiResponse<IPaginatedResponse<Course>> | undefined) => {
+					if (!oldData?.data?.items) return oldData;
+					
+					return {
+						...oldData,
+						data: {
+							...oldData.data,
+							items: oldData.data.items.map((course: Course) =>
+								course.id === input.courseId
+									? {
+											...course,
+											approvalStatus: "DECLINED",
+										}
+									: course
+							),
+						},
+					};
+				}
+			);
+
+			// Update individual course cache
+			queryClient.setQueriesData(
+				{ queryKey: ["course", input.courseId] },
+				(oldData: ApiResponse<Course> | undefined) => {
+					if (!oldData?.data) return oldData;
+					
+					return {
+						...oldData,
+						data: {
+							...oldData.data,
+							approvalStatus: "DECLINED",
+						},
+					};
+				}
+			);
+
+			// Update instructor courses cache
+			queryClient.setQueriesData(
+				{ queryKey: ["instructor-courses"] },
+				(oldData: any) => {
+					if (!oldData?.data?.items) return oldData;
+					
+					return {
+						...oldData,
+						data: {
+							...oldData.data,
+							items: oldData.data.items.map((course: Course) =>
+								course.id === input.courseId
+									? {
+											...course,
+											approvalStatus: "DECLINED",
+										}
+									: course
+							),
+						},
+					};
+				}
+			);
+
+			toast.success("Course declined successfully!");
 		},
 		onError: (err) => {
 			console.error("Course decline failed:", err);
+			toast.error("Failed to decline course", {
+				description: err.message || "Please try again",
+			});
 		},
 	});
 

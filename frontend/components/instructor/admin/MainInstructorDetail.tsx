@@ -15,8 +15,8 @@ const MainInstructorDetail: React.FC = () => {
   const params = useParams();
   const instructorId = params.instructorId as string;
   const { mutate: toggleDeleteUser, isPending: isDeleting } = useToggleDeleteUser();
-  const { mutate: approveInstructor, isPending: isApproving } = useApproveInstructor();
-  const { mutate: declineInstructor, isPending: isDeclining } = useDeclineInstructor();
+  const { mutate: approveInstructor } = useApproveInstructor();
+  const { mutate: declineInstructor } = useDeclineInstructor();
 
   const {
     data: instructorData,

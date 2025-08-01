@@ -19,15 +19,37 @@ export default function CoursesPage() {
 	const [sortBy, setSortBy] = useState<string>("title");
 	const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
 
+	const validSortBy = ["title", "price", "createdAt"] as const;
+	const validFilterStatus = [
+		"All",
+		"Active",
+		"Inactive",
+		"Approved",
+		"Declined",
+		"Pending",
+		"Published",
+		"Draft",
+		"Archived",
+	] as const;
+
+	type SortBy = typeof validSortBy[number];
+	type FilterStatus = typeof validFilterStatus[number];
+
+	const isValidSortBy = (value: string): value is SortBy =>
+		validSortBy.includes(value as SortBy);
+
+	const isValidFilterStatus = (value: string): value is FilterStatus =>
+		validFilterStatus.includes(value as FilterStatus);
+
 	const coursesQuery = useGetAllCourses({
 		page,
 		limit: 10,
 		search: searchTerm,
-		sortBy: (["title", "price", "createdAt"] as const).includes(sortBy as any) ? (sortBy as "title" | "price" | "createdAt") : "title",
+		sortBy: isValidSortBy(sortBy) ? sortBy : "title",
 		sortOrder,
 		role: user?.role || "ADMIN",
-		includeDeleted: filterStatus === "Inactive",
-		filterBy: (["All", "Active", "Inactive", "Approved", "Declined", "Pending", "Published", "Draft", "Archived"] as const).includes(filterStatus as any) ? (filterStatus as "All" | "Active" | "Inactive" | "Approved" | "Declined" | "Pending" | "Published" | "Draft" | "Archived") : "All",
+		includeDeleted: filterStatus === "Inactive" || filterStatus === "All",
+		filterBy: isValidFilterStatus(filterStatus) ? filterStatus : "All",
 	});
 
 	return (

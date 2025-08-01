@@ -42,19 +42,16 @@ const MainAdminCourseDetails: React.FC = () => {
   const handleApprove = () => {
     if (!courseData) return;
     approveCourse({ courseId: courseData.id });
-    refetchCourse();
   };
 
   const handleDecline = () => {
     if (!courseData) return;
     declineCourse({ courseId: courseData.id });
-    refetchCourse();
   };
 
   const handleToggleStatus = () => {
     if (!courseData) return;
     toggleCourseStatus(courseData);
-    refetchCourse();
   };
 
   if (isCourseLoading) {
