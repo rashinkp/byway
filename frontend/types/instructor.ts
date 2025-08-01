@@ -211,3 +211,15 @@ export interface InstructorFormModalProps {
   initialData?: Partial<InstructorFormData>;
   isSubmitting?: boolean;
 }
+
+
+export interface InstructorActionsProps {
+	instructor: IInstructorDetails;
+	onApprove: () => Promise<void>;
+	onDecline: () => Promise<void>;
+	onToggleDelete: () => void;
+	onDownloadCV: () => void;
+	isDeleting: boolean;
+}
+
+

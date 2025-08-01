@@ -14,6 +14,7 @@ interface AdminInstructorDetailProps {
 	onDecline: () => Promise<void>;
 	onToggleDelete: () => void;
 	onDownloadCV: () => void;
+	isDeleting: boolean;
 }
 
 export const AdminInstructorDetail: React.FC<AdminInstructorDetailProps> = ({
@@ -24,6 +25,7 @@ export const AdminInstructorDetail: React.FC<AdminInstructorDetailProps> = ({
 	onDecline,
 	onToggleDelete,
 	onDownloadCV,
+	isDeleting
 }) => {
 	const getStatusBadge = (status: string) => {
 		const statusConfig = {
@@ -67,6 +69,7 @@ export const AdminInstructorDetail: React.FC<AdminInstructorDetailProps> = ({
 			onDecline={onDecline}
 			onToggleDelete={onToggleDelete}
 			onDownloadCV={onDownloadCV}
+			isDeleting={isDeleting}
 		/>
 	);
 

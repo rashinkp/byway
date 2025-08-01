@@ -13,7 +13,7 @@ import ErrorDisplay from "@/components/ErrorDisplay";
 const MainInstructorDetail: React.FC = () => {
   const params = useParams();
   const instructorId = params.instructorId as string;
-  const { mutate: toggleDeleteUser } = useToggleDeleteUser();
+  const { mutate: toggleDeleteUser , isPending: isDeleting } = useToggleDeleteUser();
 
   const {
     data: instructorData,
@@ -68,11 +68,7 @@ const MainInstructorDetail: React.FC = () => {
   };
 
   const handleDelete = () => {
-    toggleDeleteUser(instructor.userId, {
-      onSuccess: () => {
-        refetch();
-      },
-    });
+    toggleDeleteUser(instructor.userId);
   };
 
   const handleDownloadCV = () => {
@@ -92,6 +88,7 @@ const MainInstructorDetail: React.FC = () => {
       onDecline={handleDecline}
       onToggleDelete={handleDelete}
       onDownloadCV={handleDownloadCV}
+      isDeleting={isDeleting}
     />
   );
 };

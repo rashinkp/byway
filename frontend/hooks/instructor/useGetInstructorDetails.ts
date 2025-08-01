@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { getInstructorDetails } from "@/api/instructor";
 import { IInstructorDetails } from "@/types/instructor";
-import { ApiResponse } from "@/types/apiResponse";
+import { ApiResponse } from "@/types/general";
 
 export function useGetInstructorDetails(
 	userId: string,

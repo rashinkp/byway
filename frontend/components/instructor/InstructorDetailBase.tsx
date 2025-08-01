@@ -165,7 +165,7 @@ export const InstructorDetailBase: React.FC<InstructorDetailBaseProps> = ({
 
   return (
     <div className="min-h-screen bg-white dark:bg-[#18181b] p-0 md:p-8 flex flex-col items-center">
-      <div className="w-full max-w-5xl mx-auto space-y-8">
+      <div className="w-full mx-auto space-y-8">
         {/* Header Section */}
         <Card className="bg-white dark:bg-[#232326] shadow-xl border border-gray-200 dark:border-gray-700 rounded-2xl p-8 mt-8">
           <div className="flex flex-col md:flex-row justify-between items-center gap-8">
