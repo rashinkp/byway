@@ -112,6 +112,7 @@ export default function CategoriesPage() {
 				setSearchTerm={setSearchTerm}
 				filterStatus={filterStatus}
 				setFilterStatus={setFilterStatus}
+				actionLoading={isDeleting}
 				sortBy={sortBy}
 				setSortBy={setSortBy}
 				sortOrder={sortOrder}
@@ -160,20 +161,7 @@ export default function CategoriesPage() {
 					},
 					{
 						label: (category) => (category.deletedAt ? "Enable" : "Disable"),
-						onClick: (category) => toggleDeleteCategory(category, {
-							onSuccess: () => {
-								// Close any open modals after successful toggle
-								if (isAddOpen) setIsAddOpen(false);
-								if (isEditOpen) {
-									setIsEditOpen(false);
-									setEditCategory(undefined);
-								}
-								if (isViewOpen) {
-									setIsViewOpen(false);
-									setViewCategory(undefined);
-								}
-							},
-						}),
+						onClick: (category) => toggleDeleteCategory(category),
 						variant: (category) =>
 							category.deletedAt ? "default" : "destructive",
 						confirmationMessage: (category) =>
@@ -203,7 +191,6 @@ export default function CategoriesPage() {
 					label: "Add Category",
 					onClick: () => setIsAddOpen(true),
 				}}
-				actionLoading={isDeleting}
 			/>
 
 			<CategoryFormModal

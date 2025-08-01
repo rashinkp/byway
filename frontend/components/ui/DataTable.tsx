@@ -246,7 +246,6 @@ export function DataTable<T>({
 							{actionLoading ? (
 								<>
 									<div className="animate-spin rounded-full h-4 w-4 border-b-2 border-current mr-2" />
-									Processing...
 								</>
 							) : (
 								"Confirm"
