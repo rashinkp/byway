@@ -94,7 +94,8 @@ export default function MainLessonDetail() {
       <div className="max-w-6xl mx-auto px-2 space-y-8">
         <LessonDetailSection
           lesson={lesson}
-          isLoading={isLoading || isUpdating}
+          isLoading={isLoading}
+          isUpdating={isUpdating}
           error={error}
           courseId={courseId as string}
           onUpdateLesson={handleEditLesson}

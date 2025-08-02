@@ -11,6 +11,7 @@ import {
 	CalendarClock,
 	Hash,
 	StickyNote,
+	Loader2,
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -26,12 +27,14 @@ import { formatDate } from "@/utils/formatDate";
 import { deleteLesson } from "@/api/lesson";
 import { ILesson } from "@/types/lesson";
 import { LessonFormData, lessonSchema } from "@/lib/validations/lesson";
+import { Button } from "../ui/button";
 
 interface LessonDetailSectionProps {
 	lesson: ILesson;
 	courseId: string;
 	onUpdateLesson: (data: LessonFormData) => void;
 	isLoading: boolean;
+	isUpdating?: boolean;
 	error: Error | null;
 	onRetry?: () => void;
 }
@@ -41,11 +44,13 @@ export function LessonDetailSection({
 	courseId,
 	onUpdateLesson,
 	isLoading,
+	isUpdating = false,
 	error,
 	onRetry,
 }: LessonDetailSectionProps) {
 	const [isLessonModalOpen, setIsLessonModalOpen] = useState(false);
 	const [isSubmitting, setIsSubmitting] = useState(false);
+	const [isPublishing, setIsPublishing] = useState(false);
 	const [confirmOpen, setConfirmOpen] = useState(false);
 	const router = useRouter();
 
@@ -64,7 +69,7 @@ export function LessonDetailSection({
 	};
 
 	const handleTogglePublish = async () => {
-		setIsSubmitting(true);
+		setIsPublishing(true);
 		try {
 			const updatedStatus =
 				lesson.status === "PUBLISHED" ? "DRAFT" : "PUBLISHED";
@@ -79,7 +84,7 @@ export function LessonDetailSection({
 		} catch (err) {
 			console.error("Error updating lesson status:", err);
 		} finally {
-			setIsSubmitting(false);
+			setIsPublishing(false);
 		}
 	};
 
@@ -133,27 +138,34 @@ export function LessonDetailSection({
 				<div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
 					<h1 className="text-2xl font-bold text-black dark:text-white">{lesson.title}</h1>
 					<div className="flex flex-wrap gap-6">
-						<span
+						<Button
 							onClick={() => setIsLessonModalOpen(true)}
-							className={`flex items-center text-[#facc15] hover:text-black dark:hover:text-white transition-colors duration-200 cursor-pointer ${
-								isLoading || isSubmitting ? "opacity-50 cursor-not-allowed" : ""
-							}`}
-						>
-							<Edit className="mr-2 h-4 w-4" />
-							Edit
-						</span>
+							disabled={isLoading || isUpdating || isSubmitting || isPublishing}
 
-						<span
-							onClick={handleTogglePublish}
-							className={`flex items-center ${
-								lesson.status === "PUBLISHED"
-									? "text-[#facc15] hover:text-black dark:hover:text-white"
-									: "text-[#facc15] hover:text-black dark:hover:text-white"
-							} transition-colors duration-200 cursor-pointer ${
-								isLoading || isSubmitting ? "opacity-50 cursor-not-allowed" : ""
-							}`}
 						>
-							{lesson.status === "PUBLISHED" ? (
+							{isPublishing || isUpdating || isSubmitting || isLoading ? (
+								<>
+									<Loader2 className="mr-2 h-4 w-4 animate-spin" />
+									Loading...
+								</>
+							) : (
+								<>
+									<Edit className="mr-2 h-4 w-4" />
+									Edit
+								</>
+							)}
+						</Button>
+
+						<Button	
+							onClick={handleTogglePublish}
+							disabled={isLoading || isUpdating || isSubmitting || isPublishing}
+						>
+							{isPublishing || isUpdating || isSubmitting || isLoading ? (
+								<>
+									<Loader2 className="mr-2 h-4 w-4 animate-spin" />
+									{lesson.status === "PUBLISHED" ? "Making Draft..." : "Publishing..."}
+								</>
+							) : lesson.status === "PUBLISHED" ? (
 								<>
 									<EyeOff className="mr-2 h-4 w-4" />
 									Make Draft
@@ -162,19 +174,17 @@ export function LessonDetailSection({
 								<>
 									<Eye className="mr-2 h-4 w-4" />
 									Publish
-								</>
-							)}
-						</span>
+									</>
+								)}
+						</Button>
 
-						<span
+						<Button
 							onClick={handleOpenConfirm}
-							className={`flex items-center text-red-600 hover:text-red-400 transition-colors duration-200 cursor-pointer ${
-								isLoading || isSubmitting ? "opacity-50 cursor-not-allowed" : ""
-							}`}
+							disabled={isLoading || isUpdating || isSubmitting || isPublishing}
 						>
 							<Trash2 className="mr-2 h-4 w-4" />
 							Delete
-						</span>
+						</Button>
 					</div>
 				</div>
 			</div>
