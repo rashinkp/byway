@@ -117,8 +117,9 @@ export default function AdminActions({
 					<AlertDialog>
 						<AlertDialogTrigger asChild>
 							<Button
+								variant={'primary'}
 								disabled={isApproving}
-								className="w-full bg-green-600 hover:bg-green-700 text-white"
+								className="w-full"
 							>
 								{isApproving ? (
 									<Loader2 className="w-5 h-5 mr-2 animate-spin" />
@@ -160,8 +161,9 @@ export default function AdminActions({
 					<AlertDialog>
 						<AlertDialogTrigger asChild>
 							<Button
+							variant={'primary'}
 								disabled={isDeclining}
-								className="w-full bg-red-600 hover:bg-red-700 text-white"
+								className="w-full"
 							>
 								{isDeclining ? (
 									<Loader2 className="w-5 h-5 mr-2 animate-spin" />
@@ -204,12 +206,8 @@ export default function AdminActions({
 						<AlertDialogTrigger asChild>
 							<Button
 								disabled={isTogglingStatus}
-								size="lg"
-								className={`w-full border-0 font-semibold text-base py-3 ${
-									course?.deletedAt
-										? "bg-[#facc15]/10 text-[#facc15] dark:bg-[#232323] dark:text-[#facc15] hover:bg-[#facc15]/20 dark:hover:bg-[#facc15]/20"
-										: "bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-300 hover:bg-red-200 dark:hover:bg-red-900/60"
-								}`}
+								variant={'primary'}
+								className="w-full"
 							>
 								{isTogglingStatus ? (
 									<Loader2 className="w-5 h-5 mr-2 animate-spin" />

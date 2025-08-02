@@ -4,6 +4,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { Course } from "@/types/course";
 import { deleteCourse } from "@/api/course";
+import { ApiResponse, IPaginatedResponse } from "@/types/general";
 
 export function useSoftDeleteCourse() {
 	const queryClient = useQueryClient();
@@ -53,6 +54,45 @@ export function useSoftDeleteCourse() {
 			return { previousCourses, previousCourse };
 		},
 		onSuccess: (deletedCourse: Course) => {
+			// Update all courses queries in the cache
+			queryClient.setQueriesData(
+				{ queryKey: ["courses"] },
+				(oldData: ApiResponse<IPaginatedResponse<Course>> | undefined) => {
+					if (!oldData?.data?.items) return oldData;
+					
+					return {
+						...oldData,
+						data: {
+							...oldData.data,
+							items: oldData.data.items.map((course: Course) =>
+								course.id === deletedCourse.id
+									? {
+											...course,
+											deletedAt: course.deletedAt ? null : new Date().toISOString(),
+										}
+									: course
+							),
+						},
+					};
+				}
+			);
+
+			// Update single course query if it exists
+			queryClient.setQueriesData(
+				{ queryKey: ["course", deletedCourse.id] },
+				(oldData: ApiResponse<Course> | undefined) => {
+					if (!oldData?.data) return oldData;
+					
+					return {
+						...oldData,
+						data: {
+							...oldData.data,
+							deletedAt: oldData.data.deletedAt ? null : new Date().toISOString(),
+						},
+					};
+				}
+			);
+
 			toast.success(
 				`Successfully ${!deletedCourse.deletedAt ? "Disabled" : "Enabled"} course`,
 				{
@@ -73,11 +113,6 @@ export function useSoftDeleteCourse() {
 			toast.error(`Failed to delete course "${course.title}"`, {
 				description: error.message || "Please try again",
 			});
-		},
-		onSettled: (data, error, course: Course) => {
-			// Invalidate both the course list and the specific course query
-			queryClient.invalidateQueries({ queryKey: ["courses"] });
-			queryClient.invalidateQueries({ queryKey: ["course", course.id] });
 		},
 	});
 }

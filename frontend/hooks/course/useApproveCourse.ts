@@ -21,25 +21,22 @@ export function useApproveCourse(): UseCourseApprovalReturn {
 	>({
 		mutationFn: approveCourse,
 		onSuccess: (response, input) => {
-			// Update courses listing cache
+			// Update all courses queries in the cache
 			queryClient.setQueriesData(
 				{ queryKey: ["courses"] },
-				(oldData: ApiResponse<IPaginatedResponse<Course>> | undefined) => {
-					if (!oldData?.data?.items) return oldData;
+				(oldData: any) => {
+					if (!oldData?.courses) return oldData;
 					
 					return {
 						...oldData,
-						data: {
-							...oldData.data,
-							items: oldData.data.items.map((course: Course) =>
-								course.id === input.courseId
-									? {
-											...course,
-											approvalStatus: "APPROVED",
-										}
-									: course
-							),
-						},
+						courses: oldData.courses.map((course: Course) =>
+							course.id === input.courseId
+								? {
+										...course,
+										approvalStatus: "APPROVED",
+									}
+								: course
+						),
 					};
 				}
 			);
@@ -47,15 +44,12 @@ export function useApproveCourse(): UseCourseApprovalReturn {
 			// Update individual course cache
 			queryClient.setQueriesData(
 				{ queryKey: ["course", input.courseId] },
-				(oldData: ApiResponse<Course> | undefined) => {
-					if (!oldData?.data) return oldData;
+				(oldData: Course | undefined) => {
+					if (!oldData) return oldData;
 					
 					return {
 						...oldData,
-						data: {
-							...oldData.data,
-							approvalStatus: "APPROVED",
-						},
+						approvalStatus: "APPROVED",
 					};
 				}
 			);
@@ -110,25 +104,22 @@ export function useDeclineCourse(): UseCourseApprovalReturn {
 	>({
 		mutationFn: declineCourse,
 		onSuccess: (response, input) => {
-			// Update courses listing cache
+			// Update all courses queries in the cache
 			queryClient.setQueriesData(
 				{ queryKey: ["courses"] },
-				(oldData: ApiResponse<IPaginatedResponse<Course>> | undefined) => {
-					if (!oldData?.data?.items) return oldData;
+				(oldData: any) => {
+					if (!oldData?.courses) return oldData;
 					
 					return {
 						...oldData,
-						data: {
-							...oldData.data,
-							items: oldData.data.items.map((course: Course) =>
-								course.id === input.courseId
-									? {
-											...course,
-											approvalStatus: "DECLINED",
-										}
-									: course
-							),
-						},
+						courses: oldData.courses.map((course: Course) =>
+							course.id === input.courseId
+								? {
+										...course,
+										approvalStatus: "DECLINED",
+									}
+								: course
+						),
 					};
 				}
 			);
@@ -136,15 +127,12 @@ export function useDeclineCourse(): UseCourseApprovalReturn {
 			// Update individual course cache
 			queryClient.setQueriesData(
 				{ queryKey: ["course", input.courseId] },
-				(oldData: ApiResponse<Course> | undefined) => {
-					if (!oldData?.data) return oldData;
+				(oldData: Course | undefined) => {
+					if (!oldData) return oldData;
 					
 					return {
 						...oldData,
-						data: {
-							...oldData.data,
-							approvalStatus: "DECLINED",
-						},
+						approvalStatus: "DECLINED",
 					};
 				}
 			);

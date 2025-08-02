@@ -22,7 +22,6 @@ const MainAdminCourseDetails: React.FC = () => {
   const {
     data: courseData,
     isLoading: isCourseLoading,
-    refetch: refetchCourse,
   } = useGetCourseById(courseId);
   const { data: lessonsData, isLoading: isLessonsLoading } =
     useGetAllLessonsInCourse({
