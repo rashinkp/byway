@@ -51,10 +51,12 @@ const courseFieldsSchema = z.object({
     .min(0.01, "Admin share must be at least 0.01%")
     .max(100, "Admin share cannot exceed 100%")
     .default(20),
-  prerequisites: z.string().optional().nullable(),
-  longDescription: z.string().optional().nullable(),
-  objectives: z.string().optional().nullable(),
-  targetAudience: z.string().optional().nullable()
+  details: z.object({
+    prerequisites: z.string().optional().nullable(),
+    longDescription: z.string().optional().nullable(),
+    objectives: z.string().optional().nullable(),
+    targetAudience: z.string().optional().nullable()
+  }).optional().nullable()
 });
 
 // Schemas
