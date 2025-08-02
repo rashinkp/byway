@@ -25,23 +25,18 @@ export const useUpdateCourse = () => {
 			data: CourseEditFormData;
 		}) => {
 			// Cancel any ongoing queries for the course list
-			await queryClient.cancelQueries({ queryKey: ["courses", 1, 10, ""] });
+			await queryClient.cancelQueries({ queryKey: ["courses"] });
 			// Cancel the specific course query
 			await queryClient.cancelQueries({ queryKey: ["course", id] });
 
 			// Optimistically update the course list
-			const previousCourses = queryClient.getQueryData<{
-				data: Course[];
-				total: number;
-				page: number;
-				limit: number;
-			}>(["courses", 1, 10, ""]);
+			const previousCourses = queryClient.getQueryData<any>(["courses"]);
 
-			queryClient.setQueryData(["courses", 1, 10, ""], (old: any) => {
-				if (!old) return old;
+			queryClient.setQueryData(["courses"], (old: any) => {
+				if (!old?.courses) return old;
 				return {
 					...old,
-					data: old.data.map((c: Course) =>
+					courses: old.courses.map((c: Course) =>
 						c.id === id ? { ...c, ...data } : c,
 					),
 				};
@@ -56,6 +51,27 @@ export const useUpdateCourse = () => {
 			return { previousCourses, previousCourse };
 		},
 		onSuccess: (data: Course) => {
+			// Update all courses queries in the cache
+			queryClient.setQueriesData(
+				{ queryKey: ["courses"] },
+				(oldData: any) => {
+					if (!oldData?.courses) return oldData;
+					
+					return {
+						...oldData,
+						courses: oldData.courses.map((course: Course) =>
+							course.id === data.id ? data : course
+						),
+					};
+				}
+			);
+
+			// Update individual course cache
+			queryClient.setQueriesData(
+				{ queryKey: ["course", data.id] },
+				data
+			);
+
 			toast.success("Course updated!", {
 				description: "The course has been updated successfully.",
 			});
@@ -68,7 +84,7 @@ export const useUpdateCourse = () => {
 		) => {
 			// Rollback course list
 			queryClient.setQueryData(
-				["courses", 1, 10, ""],
+				["courses"],
 				context?.previousCourses,
 			);
 			// Rollback single course
@@ -82,15 +98,6 @@ export const useUpdateCourse = () => {
 				description:
 					error.message || "The course updation failed try again later.",
 			});
-		},
-		onSettled: (
-			data: Course | undefined,
-			error: any,
-			variables: { id: string; data: CourseEditFormData },
-		) => {
-			// Invalidate both the course list and the specific course query
-			queryClient.invalidateQueries({ queryKey: ["courses"] });
-			queryClient.invalidateQueries({ queryKey: ["course", variables.id] });
 		},
 	});
 };

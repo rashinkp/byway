@@ -256,11 +256,13 @@ export function CourseFormModal({
 				duration: data.duration,
 				offer: data.offer,
 				categoryId: data.categoryId,
-				prerequisites: data.prerequisites,
-				longDescription: data.longDescription,
-				objectives: data.objectives,
-				targetAudience: data.targetAudience,
 				adminSharePercentage: data.adminSharePercentage || 20,
+				details: {
+					prerequisites: data.prerequisites || null,
+					longDescription: data.longDescription || null,
+					objectives: data.objectives || null,
+					targetAudience: data.targetAudience || null,
+				},
 			};
 
 			if (isEditing && initialData?.id) {
