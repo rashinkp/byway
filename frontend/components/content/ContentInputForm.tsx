@@ -196,7 +196,7 @@ export const ContentInputForm = ({
 						<label className="block text-sm font-semibold mb-2">
 							Content Type
 						</label>
-						<div className="p-3 border border-gray-300 rounded-xl bg-gray-100 text-gray-700">
+						<div className="p-3 border">
 							{type}
 						</div>
 					</div>

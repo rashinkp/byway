@@ -30,7 +30,8 @@ export function createLessonContentDependencies(
       courseRepository
     );
   const deleteLessonContentUseCase = new DeleteLessonContentUseCase(
-    lessonContentRepository
+    lessonContentRepository,
+    deps.s3Service
   );
 
   const lessonContentController = new LessonContentController(
