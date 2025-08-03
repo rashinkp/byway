@@ -1,7 +1,5 @@
-import React, { ReactNode } from "react";
-import { Course } from "@/types/course";
-import { User, PublicUser } from "@/types/user";
-import { ILesson, PublicLesson } from "@/types/lesson";
+import React from "react";
+import { CourseDetailLayoutProps } from "@/types/course";
 import { useAuthStore } from "@/stores/auth.store";
 import CourseReviews from "@/components/review/CourseReviews";
 import ErrorDisplay from "@/components/ErrorDisplay";
@@ -14,36 +12,6 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { useGetContentByLessonId } from "@/hooks/content/useGetContentByLessonId";
 import { Skeleton } from "@/components/ui/skeleton";
 
-interface CourseDetailLayoutProps {
-	course: Course | undefined;
-	instructor: (User | PublicUser) | undefined;
-	lessons: (ILesson | PublicLesson)[] | undefined;
-	isLoading: {
-		course: boolean;
-		instructor: boolean;
-		lessons: boolean;
-		user: boolean;
-	};
-	error: any;
-	sidebarProps: {
-		isCartLoading?: boolean;
-		handleAddToCart?: () => void;
-		isEnrolled?: boolean;
-		userLoading?: boolean;
-		adminActions?: ReactNode;
-		instructorActions?: ReactNode;
-		adminActionsProps?: any;
-	};
-	tabContent?: {
-		[key: string]: ReactNode;
-	};
-	showReviews?: boolean;
-	customTabs?: Array<{
-		id: string;
-		label: string;
-		icon: React.ReactNode;
-	}>;
-}
 
 export default function CourseDetailLayout({
 	course,

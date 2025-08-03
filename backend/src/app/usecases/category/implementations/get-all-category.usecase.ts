@@ -4,7 +4,7 @@ import { IGetAllCategoriesUseCase } from "../interfaces/get-all-categories.useca
 import {
   ICategoryListOutputDTO,
   IGetAllCategoriesInputDTO,
-} from "../../../../domain/dtos/category/category.dto";
+} from "../../../dtos/category/category.dto";
 
 export class GetAllCategoriesUseCase implements IGetAllCategoriesUseCase {
   constructor(private categoryRepository: ICategoryRepository) {}

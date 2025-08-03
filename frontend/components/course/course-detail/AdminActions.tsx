@@ -112,99 +112,102 @@ export default function AdminActions({
 			
 			{/* Action Buttons */}
 			<div className="space-y-4">
-				{course.approvalStatus === "PENDING" && (
-					<div className="space-y-4">
-						<AlertDialog>
-							<AlertDialogTrigger asChild>
-								<Button
-									disabled={isApproving}
-									size="lg"
-									className="w-full bg-[#facc15] text-black dark:bg-[#facc15] dark:text-[#18181b] border-0 hover:bg-yellow-400 dark:hover:bg-yellow-400 font-semibold text-base py-3"
+				{/* Show Approve button for PENDING or DECLINED courses */}
+				{(course.approvalStatus === "PENDING" || course.approvalStatus === "DECLINED") && (
+					<AlertDialog>
+						<AlertDialogTrigger asChild>
+							<Button
+								variant={'primary'}
+								disabled={isApproving}
+								className="w-full"
+							>
+								{isApproving ? (
+									<Loader2 className="w-5 h-5 mr-2 animate-spin" />
+								) : (
+									<CheckCircle2 className="w-5 h-5 mr-2" />
+								)}
+								{course.approvalStatus === "DECLINED" ? "Re-approve Course" : "Approve Course"}
+							</Button>
+						</AlertDialogTrigger>
+						<AlertDialogContent className="bg-white/80 dark:bg-[#232326] border border-gray-200 dark:border-gray-700 rounded-2xl p-8">
+							<AlertDialogHeader>
+								<AlertDialogTitle className="text-black dark:text-[#facc15] text-lg font-bold">
+									{course.approvalStatus === "DECLINED" ? "Re-approve Course" : "Approve Course"}
+								</AlertDialogTitle>
+								<AlertDialogDescription className="text-gray-700 dark:text-gray-300 text-base">
+									{course.approvalStatus === "DECLINED" 
+										? `Are you sure you want to re-approve "${course.title}"? This will make the course available to students again.`
+										: `Are you sure you want to approve "${course.title}"? This will make the course available to students.`
+									}
+								</AlertDialogDescription>
+							</AlertDialogHeader>
+							<AlertDialogFooter>
+								<AlertDialogCancel className="bg-gray-200 dark:bg-gray-700 text-black dark:text-white hover:bg-gray-300 dark:hover:bg-gray-600 font-semibold text-base">
+									Cancel
+								</AlertDialogCancel>
+								<AlertDialogAction
+									onClick={onApprove}
+									className="bg-[#facc15] hover:bg-yellow-400 text-black dark:bg-[#facc15] dark:hover:bg-yellow-400 dark:text-[#18181b] font-semibold text-base py-3"
 								>
-									{isApproving ? (
-										<Loader2 className="w-5 h-5 mr-2 animate-spin" />
-									) : (
-										<CheckCircle2 className="w-5 h-5 mr-2" />
-									)}
-									Approve Course
-								</Button>
-							</AlertDialogTrigger>
-							<AlertDialogContent className="bg-white/80 dark:bg-[#232326] border border-gray-200 dark:border-gray-700 rounded-2xl p-8">
-								<AlertDialogHeader>
-									<AlertDialogTitle className="text-black dark:text-[#facc15] text-lg font-bold">
-										Approve Course
-									</AlertDialogTitle>
-									<AlertDialogDescription className="text-gray-700 dark:text-gray-300 text-base">
-										Are you sure you want to approve &quot;{course.title}"? This will
-										make the course available to students.
-									</AlertDialogDescription>
-								</AlertDialogHeader>
-								<AlertDialogFooter>
-									<AlertDialogCancel className="bg-gray-200 dark:bg-gray-700 text-black dark:text-white hover:bg-gray-300 dark:hover:bg-gray-600 font-semibold text-base">
-										Cancel
-									</AlertDialogCancel>
-									<AlertDialogAction
-										onClick={onApprove}
-										className="bg-[#facc15] hover:bg-yellow-400 text-black dark:bg-[#facc15] dark:hover:bg-yellow-400 dark:text-[#18181b] font-semibold text-base py-3"
-									>
-										Approve
-									</AlertDialogAction>
-								</AlertDialogFooter>
-							</AlertDialogContent>
-						</AlertDialog>
-						
-						<AlertDialog>
-							<AlertDialogTrigger asChild>
-								<Button
-									disabled={isDeclining}
-									size="lg"
-									className="w-full bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-300 border-0 hover:bg-red-200 dark:hover:bg-red-900/60 font-semibold text-base py-3"
-								>
-									{isDeclining ? (
-										<Loader2 className="w-5 h-5 mr-2 animate-spin" />
-									) : (
-										<AlertCircle className="w-5 h-5 mr-2" />
-									)}
-									Decline Course
-								</Button>
-							</AlertDialogTrigger>
-							<AlertDialogContent className="bg-white/80 dark:bg-[#232326] border border-gray-200 dark:border-gray-700 rounded-2xl p-8">
-								<AlertDialogHeader>
-									<AlertDialogTitle className="text-black dark:text-[#facc15] text-lg font-bold">
-										Decline Course
-									</AlertDialogTitle>
-									<AlertDialogDescription className="text-gray-700 dark:text-gray-300 text-base">
-										Are you sure you want to decline &quot;{course.title}"? This will
-										reject the course submission.
-									</AlertDialogDescription>
-								</AlertDialogHeader>
-								<AlertDialogFooter>
-									<AlertDialogCancel className="bg-gray-200 dark:bg-gray-700 text-black dark:text-white hover:bg-gray-300 dark:hover:bg-gray-600 font-semibold text-base">
-										Cancel
-									</AlertDialogCancel>
-									<AlertDialogAction
-										onClick={onDecline}
-										className="bg-red-600 hover:bg-red-700 text-white font-semibold text-base py-3"
-									>
-										Decline
-									</AlertDialogAction>
-								</AlertDialogFooter>
-							</AlertDialogContent>
-						</AlertDialog>
-					</div>
+									{course.approvalStatus === "DECLINED" ? "Re-approve" : "Approve"}
+								</AlertDialogAction>
+							</AlertDialogFooter>
+						</AlertDialogContent>
+					</AlertDialog>
 				)}
 
+				{/* Show Decline button for PENDING or APPROVED courses */}
+				{(course.approvalStatus === "PENDING" || course.approvalStatus === "APPROVED") && (
+					<AlertDialog>
+						<AlertDialogTrigger asChild>
+							<Button
+							variant={'primary'}
+								disabled={isDeclining}
+								className="w-full"
+							>
+								{isDeclining ? (
+									<Loader2 className="w-5 h-5 mr-2 animate-spin" />
+								) : (
+									<AlertCircle className="w-5 h-5 mr-2" />
+								)}
+								{course.approvalStatus === "APPROVED" ? "Re-decline Course" : "Decline Course"}
+							</Button>
+						</AlertDialogTrigger>
+						<AlertDialogContent className="bg-white/80 dark:bg-[#232326] border border-gray-200 dark:border-gray-700 rounded-2xl p-8">
+							<AlertDialogHeader>
+								<AlertDialogTitle className="text-black dark:text-[#facc15] text-lg font-bold">
+									{course.approvalStatus === "APPROVED" ? "Re-decline Course" : "Decline Course"}
+								</AlertDialogTitle>
+								<AlertDialogDescription className="text-gray-700 dark:text-gray-300 text-base">
+									{course.approvalStatus === "APPROVED"
+										? `Are you sure you want to re-decline "${course.title}"? This will reject the course again.`
+										: `Are you sure you want to decline "${course.title}"? This will reject the course submission.`
+									}
+								</AlertDialogDescription>
+							</AlertDialogHeader>
+							<AlertDialogFooter>
+								<AlertDialogCancel className="bg-gray-200 dark:bg-gray-700 text-black dark:text-white hover:bg-gray-300 dark:hover:bg-gray-600 font-semibold text-base">
+									Cancel
+								</AlertDialogCancel>
+								<AlertDialogAction
+									onClick={onDecline}
+									className="bg-red-600 hover:bg-red-700 text-white font-semibold text-base py-3"
+								>
+									{course.approvalStatus === "APPROVED" ? "Re-decline" : "Decline"}
+								</AlertDialogAction>
+							</AlertDialogFooter>
+						</AlertDialogContent>
+					</AlertDialog>
+				)}
+
+				{/* Show Enable/Disable button for APPROVED courses */}
 				{course.approvalStatus === "APPROVED" && (
 					<AlertDialog>
 						<AlertDialogTrigger asChild>
 							<Button
 								disabled={isTogglingStatus}
-								size="lg"
-								className={`w-full border-0 font-semibold text-base py-3 ${
-									course?.deletedAt
-										? "bg-[#facc15]/10 text-[#facc15] dark:bg-[#232323] dark:text-[#facc15] hover:bg-[#facc15]/20 dark:hover:bg-[#facc15]/20"
-										: "bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-300 hover:bg-red-200 dark:hover:bg-red-900/60"
-								}`}
+								variant={'primary'}
+								className="w-full"
 							>
 								{isTogglingStatus ? (
 									<Loader2 className="w-5 h-5 mr-2 animate-spin" />

@@ -1,35 +1,8 @@
 import { api } from "@/api/api";
-import { ApiResponse } from "@/types/apiResponse";
-import { Order, OrdersResponse, GetOrdersParams } from "@/types/order";
+import { ApiResponse } from "@/types/general";
+import { Order, OrdersResponse, GetOrdersParams, CreateOrderRequest, OrderResponse } from "@/types/order";
 
-export interface CreateOrderRequest {
-	courses: {
-		id: string;
-		title: string;
-		description: string;
-		thumbnail: string;
-		price: number;
-		offer: number;
-		duration: string;
-		lectures: number;
-		level: string;
-		creator: {
-			name: string;
-		};
-	}[];
-	paymentMethod: "WALLET" | "STRIPE" | "PAYPAL" | "RAZORPAY";
-	couponCode?: string;
-}
 
-interface OrderResponse {
-	order: Order;
-	session?: {
-		id: string;
-		url: string;
-		payment_status: string;
-		amount_total: number;
-	};
-}
 
 export const createOrder = async (
 	data: CreateOrderRequest,

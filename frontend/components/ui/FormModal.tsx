@@ -3,7 +3,7 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
 	Dialog,
 	DialogContent,
@@ -83,6 +83,8 @@ export function FormModal<T extends z.ZodType<any, any>>({
 	description,
 	isSubmitting: externalSubmitting,
 }: FormModalProps<T>) {
+	const [internalSubmitting, setInternalSubmitting] = useState(false);
+	const isSubmitting = externalSubmitting || internalSubmitting;
 	const defaultValues = useMemo(
 		() =>
 			({
@@ -111,8 +113,6 @@ export function FormModal<T extends z.ZodType<any, any>>({
 			: defaultValues,
 	});
 
-	const isSubmitting = externalSubmitting ?? form.formState.isSubmitting;
-
 	useEffect(() => {
 		if (open) {
 			form.reset(
@@ -123,6 +123,7 @@ export function FormModal<T extends z.ZodType<any, any>>({
 
 	const handleSubmit = async (data: z.infer<T>) => {
 		try {
+			setInternalSubmitting(true);
 			await onSubmit(data);
 			form.reset();
 		} catch (error: any) {
@@ -130,6 +131,8 @@ export function FormModal<T extends z.ZodType<any, any>>({
 			form.setError("root", {
 				message: error.message || "Failed to submit the form",
 			});
+		} finally {
+			setInternalSubmitting(false);
 		}
 	};
 

@@ -7,10 +7,8 @@ import {
 	Download,
 	Clock,
 	AlertCircle,
-	Shield,
 	Loader2,
 } from "lucide-react";
-import { IInstructorDetails } from "@/types/instructor";
 import {
 	AlertDialog,
 	AlertDialogAction,
@@ -22,14 +20,8 @@ import {
 	AlertDialogTitle,
 	AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import { InstructorActionsProps } from "@/types/instructor";
 
-interface InstructorActionsProps {
-	instructor: IInstructorDetails;
-	onApprove: () => Promise<void>;
-	onDecline: () => Promise<void>;
-	onToggleDelete: () => void;
-	onDownloadCV: () => void;
-}
 
 export default function InstructorActions({
 	instructor,
@@ -37,6 +29,7 @@ export default function InstructorActions({
 	onDecline,
 	onToggleDelete,
 	onDownloadCV,
+	isDeleting
 }: InstructorActionsProps) {
 	const [showDeleteModal, setShowDeleteModal] = useState(false);
 	const [isApproving, setIsApproving] = useState(false);
@@ -111,13 +104,10 @@ export default function InstructorActions({
 	};
 
 	return (
-		<div className="rounded-2xl bg-white/80 dark:bg-[#232326] shadow-xl p-8 space-y-6">
+		<div className="rounded-2xl bg-white/80 dark:bg-[#232326] ">
 			{/* Instructor Status Section */}
 			<div className="space-y-4">
-				<div className="flex items-center gap-2 text-black dark:text-[#facc15] text-lg font-semibold">
-					<Shield className="w-5 h-5 text-[#facc15] dark:text-[#facc15]" />
-					<span>Instructor Status</span>
-				</div>
+			
 				<div className="space-y-4">
 					{/* Approval Status */}
 					<div className="flex items-center justify-between">
@@ -207,9 +197,7 @@ export default function InstructorActions({
 
 				<AlertDialog open={showDeleteModal} onOpenChange={setShowDeleteModal}>
 					<AlertDialogTrigger asChild>
-						<Button
-						>
-						
+						<Button disabled={isDeleting}>
 							<span className="whitespace-nowrap">
 								{instructor.deletedAt
 									? "Enable Instructor"
@@ -244,7 +232,7 @@ export default function InstructorActions({
 										: "bg-red-600 hover:bg-red-700 text-white font-semibold text-base py-3"
 								}
 							>
-								{instructor.deletedAt ? "Enable" : "Disable"}
+								{isDeleting ? 'Deleting....' : ( instructor.deletedAt ? "Enable" : "Disable" )}
 							</AlertDialogAction>
 						</AlertDialogFooter>
 					</AlertDialogContent>

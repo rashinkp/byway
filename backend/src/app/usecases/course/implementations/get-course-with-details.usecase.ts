@@ -1,4 +1,4 @@
-import { ICourseWithEnrollmentDTO } from "../../../../domain/dtos/course/course.dto";
+import { ICourseWithEnrollmentDTO } from "../../../dtos/course/course.dto";
 import { HttpError } from "../../../../presentation/http/errors/http-error";
 import { ICourseRepository } from "../../../repositories/course.repository.interface";
 import { IEnrollmentRepository } from "../../../repositories/enrollment.repository.interface";

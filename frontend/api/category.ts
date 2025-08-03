@@ -5,6 +5,7 @@ import {
 	ICategoryListOutput,
 	IGetAllCategoryResponse,
 } from "@/types/category";
+import { ApiResponse } from "@/types/general";
 
 export async function createCategory(
 	payload: CategoryFormData,
@@ -72,16 +73,17 @@ export async function updateCategory(
 	payload: CategoryFormData,
 ): Promise<Category> {
 	try {
-		const response = await api.put<Category>(`/category/${id}`, payload);
-		return response.data;
+		const response = await api.put<ApiResponse>(`/category/${id}`, payload);
+		return response.data.data;
 	} catch (error: unknown) {
 		throw new Error(error instanceof Error ? error.message : "Update category failed");
 	}
 }
 
-export async function deleteCategory(id: string): Promise<void> {
+export async function deleteCategory(id: string): Promise<Category> {
 	try {
-		await api.delete(`/category/${id}`);
+		const response = await api.delete<ApiResponse>(`/category/${id}`);
+		return response.data.data;
 	} catch (error: unknown) {
 		throw new Error(error instanceof Error ? error.message : "Delete category failed");
 	}
@@ -89,8 +91,8 @@ export async function deleteCategory(id: string): Promise<void> {
 
 export async function recoverCategory(id: string): Promise<Category> {
 	try {
-		const response = await api.patch<Category>(`/category/${id}/recover`);
-		return response.data;
+		const response = await api.patch<ApiResponse>(`/category/${id}/recover`);
+		return response.data.data;
 	} catch (error: unknown) {
 		throw new Error(error instanceof Error ? error.message : "Recover category failed");
 	}

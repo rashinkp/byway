@@ -11,12 +11,15 @@ import {
   ICourseListResponseDTO,
   IGetAllCoursesInputDTO,
   IGetEnrolledCoursesInputDTO,
-} from "../../domain/dtos/course/course.dto";
+} from "../../app/dtos/course/course.dto";
 import { ICourseRepository } from "../../app/repositories/course.repository.interface";
 import { HttpError } from "../../presentation/http/errors/http-error";
-import { ICourseStats, IGetCourseStatsInput } from "@/app/usecases/course/interfaces/get-course-stats.usecase.interface";
+import {
+  ICourseStats,
+  IGetCourseStatsInput,
+} from "@/app/usecases/course/interfaces/get-course-stats.usecase.interface";
 import { IGetTopEnrolledCoursesInput } from "@/app/usecases/course/interfaces/get-top-enrolled-courses.usecase.interface";
-import { ITopEnrolledCourse } from "@/domain/dtos/admin/admin-dashboard.dto";
+import { ITopEnrolledCourse } from "@/app/dtos/admin/admin-dashboard.dto";
 
 export class CourseRepository implements ICourseRepository {
   constructor(private prisma: PrismaClient) {}
@@ -103,9 +106,9 @@ export class CourseRepository implements ICourseRepository {
     try {
       const course = await this.prisma.course.findUnique({
         where: { id },
-        include: { 
-          details: true
-        }
+        include: {
+          details: true,
+        },
       });
 
       if (!course) return null;
@@ -188,7 +191,9 @@ export class CourseRepository implements ICourseRepository {
     }
   }
 
-  async findAll(input: IGetAllCoursesInputDTO): Promise<ICourseListResponseDTO> {
+  async findAll(
+    input: IGetAllCoursesInputDTO
+  ): Promise<ICourseListResponseDTO> {
     const {
       page = 1,
       limit = 10,
@@ -222,21 +227,27 @@ export class CourseRepository implements ICourseRepository {
             status: CourseStatus.PUBLISHED,
             approvalStatus: APPROVALSTATUS.APPROVED,
           }),
-      
+
       // Filter by active/inactive status
       ...(filterBy === "Active" ? { deletedAt: null } : {}),
       ...(filterBy === "Inactive" ? { deletedAt: { not: null } } : {}),
-      
+
       // Filter by approval status
-      ...(filterBy === "Approved" ? { approvalStatus: APPROVALSTATUS.APPROVED } : {}),
-      ...(filterBy === "Declined" ? { approvalStatus: APPROVALSTATUS.DECLINED } : {}),
-      ...(filterBy === "Pending" ? { approvalStatus: APPROVALSTATUS.PENDING } : {}),
-      
+      ...(filterBy === "Approved"
+        ? { approvalStatus: APPROVALSTATUS.APPROVED }
+        : {}),
+      ...(filterBy === "Declined"
+        ? { approvalStatus: APPROVALSTATUS.DECLINED }
+        : {}),
+      ...(filterBy === "Pending"
+        ? { approvalStatus: APPROVALSTATUS.PENDING }
+        : {}),
+
       // Filter by publish status
       ...(filterBy === "Published" ? { status: CourseStatus.PUBLISHED } : {}),
       ...(filterBy === "Draft" ? { status: CourseStatus.DRAFT } : {}),
       ...(filterBy === "Archived" ? { status: CourseStatus.ARCHIVED } : {}),
-      
+
       ...(myCourses && userId ? { createdBy: userId } : {}),
       ...(level !== "All" ? { level } : {}),
       ...(duration === "Under5" ? { duration: { lte: 5 } } : {}),
@@ -598,48 +609,49 @@ export class CourseRepository implements ICourseRepository {
 
   async getCourseStats(input: IGetCourseStatsInput): Promise<ICourseStats> {
     const { userId, includeDeleted = false, isAdmin = false } = input;
-    
+
     // Build where clause for filtering
     const whereClause: Prisma.CourseWhereInput = {};
-    
+
     // Filter by instructor if userId is provided
     if (userId) {
       whereClause.createdBy = userId;
     }
-    
+
     // Handle deleted courses
     if (!includeDeleted) {
       whereClause.deletedAt = null;
     }
-    
+
     // Build where clause for active courses (non-deleted)
     const activeWhereClause: Prisma.CourseWhereInput = {
       ...whereClause,
-      deletedAt: null
+      deletedAt: null,
     };
-    
+
     // Build where clause for inactive courses (deleted)
     const inactiveWhereClause: Prisma.CourseWhereInput = {
       ...whereClause,
-      deletedAt: { not: null }
+      deletedAt: { not: null },
     };
-    
+
     // Build where clause for pending courses (non-deleted)
     const pendingWhereClause: Prisma.CourseWhereInput = {
       ...whereClause,
       approvalStatus: APPROVALSTATUS.PENDING,
-      deletedAt: null
+      deletedAt: null,
     };
 
     if (!isAdmin) {
       // Original behavior for non-admin users
-      const [totalCourses, activeCourses, inactiveCourses, pendingCourses] = await Promise.all([
-        this.prisma.course.count({ where: whereClause }),
-        this.prisma.course.count({ where: activeWhereClause }),
-        this.prisma.course.count({ where: inactiveWhereClause }),
-        this.prisma.course.count({ where: pendingWhereClause }),
-      ]);
-      
+      const [totalCourses, activeCourses, inactiveCourses, pendingCourses] =
+        await Promise.all([
+          this.prisma.course.count({ where: whereClause }),
+          this.prisma.course.count({ where: activeWhereClause }),
+          this.prisma.course.count({ where: inactiveWhereClause }),
+          this.prisma.course.count({ where: pendingWhereClause }),
+        ]);
+
       return {
         totalCourses,
         activeCourses,
@@ -662,36 +674,42 @@ export class CourseRepository implements ICourseRepository {
         declinedCourses,
         publishedCourses,
         draftCourses,
-        archivedCourses
+        archivedCourses,
       ] = await Promise.all([
         // Total courses (including deleted)
         this.prisma.course.count({}),
-        
+
         // Active courses (not deleted)
         this.prisma.course.count({ where: { deletedAt: null } }),
-        
+
         // Inactive courses (deleted)
         this.prisma.course.count({ where: { deletedAt: { not: null } } }),
-        
+
         // Pending courses
-        this.prisma.course.count({ where: { approvalStatus: APPROVALSTATUS.PENDING } }),
-        
+        this.prisma.course.count({
+          where: { approvalStatus: APPROVALSTATUS.PENDING },
+        }),
+
         // Approved courses
-        this.prisma.course.count({ where: { approvalStatus: APPROVALSTATUS.APPROVED } }),
-        
+        this.prisma.course.count({
+          where: { approvalStatus: APPROVALSTATUS.APPROVED },
+        }),
+
         // Declined courses
-        this.prisma.course.count({ where: { approvalStatus: APPROVALSTATUS.DECLINED } }),
-        
+        this.prisma.course.count({
+          where: { approvalStatus: APPROVALSTATUS.DECLINED },
+        }),
+
         // Published courses
         this.prisma.course.count({ where: { status: CourseStatus.PUBLISHED } }),
-        
+
         // Draft courses
         this.prisma.course.count({ where: { status: CourseStatus.DRAFT } }),
-        
+
         // Archived courses
-        this.prisma.course.count({ where: { status: CourseStatus.ARCHIVED } })
+        this.prisma.course.count({ where: { status: CourseStatus.ARCHIVED } }),
       ]);
-      
+
       return {
         totalCourses,
         activeCourses,
@@ -706,29 +724,29 @@ export class CourseRepository implements ICourseRepository {
     }
   }
 
-  async getTopEnrolledCourses(input: IGetTopEnrolledCoursesInput): Promise<ITopEnrolledCourse[]> {
-    
+  async getTopEnrolledCourses(
+    input: IGetTopEnrolledCoursesInput
+  ): Promise<ITopEnrolledCourse[]> {
     let allCourses;
     if (input.role === "INSTRUCTOR") {
       allCourses = await this.prisma.course.findMany({
         where: {
-          createdBy: input.userId
+          createdBy: input.userId,
         },
         include: {
           creator: true,
-          enrollments: true
-        }
+          enrollments: true,
+        },
       });
     } else {
       allCourses = await this.prisma.course.findMany({
         include: {
           creator: true,
-          enrollments: true
-        }
+          enrollments: true,
+        },
       });
     }
-    
-    
+
     if (allCourses.length === 0) {
       return [];
     }
@@ -736,7 +754,6 @@ export class CourseRepository implements ICourseRepository {
     const topEnrolledCourses = allCourses
       .sort((a, b) => b.enrollments.length - a.enrollments.length)
       .slice(0, input.limit || 5);
-
 
     // Step 3: For each course, get revenue through completed order items
     const coursesWithRevenue = await Promise.all(
@@ -746,13 +763,13 @@ export class CourseRepository implements ICourseRepository {
           where: {
             courseId: course.id,
             order: {
-              paymentStatus: 'COMPLETED',
-              orderStatus: 'COMPLETED'
-            }
+              paymentStatus: "COMPLETED",
+              orderStatus: "COMPLETED",
+            },
           },
           include: {
-            order: true
-          }
+            order: true,
+          },
         });
 
         // Calculate revenue based on role
@@ -776,27 +793,30 @@ export class CourseRepository implements ICourseRepository {
           }, 0);
         }
 
-
         // Get review stats for this course
         const reviews = await this.prisma.courseReview.findMany({
           where: {
             courseId: course.id,
-            deletedAt: null // Only include active reviews
+            deletedAt: null, // Only include active reviews
           },
           select: {
-            rating: true
-          }
+            rating: true,
+          },
         });
 
-        const rating = reviews.length > 0 
-          ? reviews.reduce((sum: number, review: any) => sum + review.rating, 0) / reviews.length
-          : 0;
+        const rating =
+          reviews.length > 0
+            ? reviews.reduce(
+                (sum: number, review: any) => sum + review.rating,
+                0
+              ) / reviews.length
+            : 0;
         const reviewCount = reviews.length;
 
         return {
           courseId: course.id,
           courseTitle: course.title,
-          instructorName: course.creator?.name || 'Unknown',
+          instructorName: course.creator?.name || "Unknown",
           enrollmentCount: course.enrollments.length,
           revenue: totalRevenue,
           rating,
@@ -805,7 +825,6 @@ export class CourseRepository implements ICourseRepository {
       })
     );
 
-    
     // Sort by revenue in descending order
     return coursesWithRevenue.sort((a, b) => b.revenue - a.revenue);
   }

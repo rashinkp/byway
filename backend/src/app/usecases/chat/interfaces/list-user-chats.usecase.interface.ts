@@ -1,5 +1,5 @@
-import { UserId } from '../../../../domain/value-object/UserId';
-import { PaginatedChatListDTO } from '../../../../domain/dtos/chat.dto';
+import { UserId } from "../../../../domain/value-object/UserId";
+import { PaginatedChatListDTO } from "../../../dtos/chat.dto";
 
 export interface IListUserChatsUseCase {
   execute(
@@ -11,5 +11,7 @@ export interface IListUserChatsUseCase {
     filter?: string
   ): Promise<PaginatedChatListDTO>;
 
-  getChatParticipantsById(chatId: string): Promise<{ user1Id: string, user2Id: string } | null>;
-} 
+  getChatParticipantsById(
+    chatId: string
+  ): Promise<{ user1Id: string; user2Id: string } | null>;
+}

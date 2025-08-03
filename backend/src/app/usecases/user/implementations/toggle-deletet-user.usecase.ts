@@ -1,4 +1,4 @@
-import { ToggleDeleteUserDto } from "../../../../domain/dtos/user/user.dto";
+import { ToggleDeleteUserDto } from "../../../dtos/user/user.dto";
 import { User } from "../../../../domain/entities/user.entity";
 import { HttpError } from "../../../../presentation/http/errors/http-error";
 import { IUserRepository } from "../../../repositories/user.repository";
@@ -31,11 +31,13 @@ export class ToggleDeleteUserUseCase implements IToggleDeleteUserUseCase {
     if (!user.deletedAt) {
       user.softDelete();
       eventType = NotificationEventType.USER_DISABLED;
-      message = "Your account has been disabled by an administrator. If you believe this is a mistake, please contact support.";
+      message =
+        "Your account has been disabled by an administrator. If you believe this is a mistake, please contact support.";
     } else {
       user.restore();
       eventType = NotificationEventType.USER_ENABLED;
-      message = "Your account has been re-enabled. You can now access the platform again.";
+      message =
+        "Your account has been re-enabled. You can now access the platform again.";
     }
 
     const updatedUser = await this.userRepository.updateUser(user);

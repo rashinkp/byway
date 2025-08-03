@@ -1,10 +1,10 @@
 import { HttpError } from "../../../../presentation/http/errors/http-error";
 import { ICourseRepository } from "../../../repositories/course.repository.interface";
 import { IDeleteCourseUseCase } from "../interfaces/delete-course.usecase.interface";
-import { ICourseWithDetailsDTO } from "../../../../domain/dtos/course/course.dto";
-import { CreateNotificationsForUsersUseCase } from '../../notification/implementations/create-notifications-for-users.usecase';
-import { NotificationEventType } from '../../../../domain/enum/notification-event-type.enum';
-import { NotificationEntityType } from '../../../../domain/enum/notification-entity-type.enum';
+import { ICourseWithDetailsDTO } from "../../../dtos/course/course.dto";
+import { CreateNotificationsForUsersUseCase } from "../../notification/implementations/create-notifications-for-users.usecase";
+import { NotificationEventType } from "../../../../domain/enum/notification-event-type.enum";
+import { NotificationEntityType } from "../../../../domain/enum/notification-entity-type.enum";
 
 export class DeleteCourseUseCase implements IDeleteCourseUseCase {
   constructor(
@@ -31,13 +31,15 @@ export class DeleteCourseUseCase implements IDeleteCourseUseCase {
 
     // Check if course is currently deleted (disabled) or not
     const isCurrentlyDeleted = course.isDeleted();
-    
+
     course.softDelete();
     const updatedCourse = await this.courseRepository.softDelete(course);
 
     // Determine the action and notify the instructor
-    const eventType = isCurrentlyDeleted ? NotificationEventType.COURSE_ENABLED : NotificationEventType.COURSE_DISABLED;
-    const message = isCurrentlyDeleted 
+    const eventType = isCurrentlyDeleted
+      ? NotificationEventType.COURSE_ENABLED
+      : NotificationEventType.COURSE_DISABLED;
+    const message = isCurrentlyDeleted
       ? `Your course "${course.title}" has been enabled and is now available to students.`
       : `Your course "${course.title}" has been disabled and is no longer available to students.`;
 

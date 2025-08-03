@@ -70,8 +70,8 @@ export class CategoryController extends BaseController {
   async deleteCategory(httpRequest: IHttpRequest): Promise<IHttpResponse> {
     return this.handleRequest(httpRequest, async (request) => {
       const validated = validateCategoryId({ id: request.params.categoryId });
-      await this.deleteCategoryUseCase.execute(validated);
-      return this.success_200(null, "Category deleted successfully");
+      const category = await this.deleteCategoryUseCase.execute(validated);
+      return this.success_200(category, "Category deleted successfully");
     });
   }
 

@@ -1,13 +1,8 @@
-import { ICart } from "@/types/cart";
+import { CartItemsProps } from "@/types/cart";
 import { CartItem } from "./CartItem";
 import { CartItemSkeleton } from "./CartSkeleton";
 
-interface CartItemsProps {
-	cart: ICart[];
-	isRemoving: boolean;
-	removingCourseId?: string;
-	onRemoveCourse: (courseId: string) => void;
-}
+
 
 // Cart Items List Component
 export function CartItems({

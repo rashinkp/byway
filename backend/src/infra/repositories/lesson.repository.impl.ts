@@ -9,7 +9,7 @@ import {
   IGetPublicLessonsInputDTO,
   IPublicLessonListOutputDTO,
   ILessonOutputDTO,
-} from "../../domain/dtos/lesson/lesson.dto";
+} from "../../app/dtos/lesson/lesson.dto";
 import { LessonStatus } from "../../domain/enum/lesson.enum";
 import { ContentStatus, ContentType } from "../../domain/enum/content.enum";
 import { ILessonRepository } from "../../app/repositories/lesson.repository";
@@ -407,8 +407,8 @@ export class LessonRepository implements ILessonRepository {
       where: {
         courseId,
         status: LessonStatus.PUBLISHED,
-        deletedAt: null
-      }
+        deletedAt: null,
+      },
     });
     return count > 0;
   }
@@ -418,10 +418,10 @@ export class LessonRepository implements ILessonRepository {
       where: {
         courseId,
         deletedAt: null,
-        status: LessonStatus.PUBLISHED
+        status: LessonStatus.PUBLISHED,
       },
       include: { content: { include: { quizQuestions: true } } },
-      orderBy: { order: 'asc' }
+      orderBy: { order: "asc" },
     });
 
     return lessons.map(this.mapToLessonEntity);

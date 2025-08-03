@@ -1,7 +1,7 @@
 import {
   IUpdateCourseInputDTO,
-  ICourseWithDetailsDTO
-} from "../../../../domain/dtos/course/course.dto";
+  ICourseWithDetailsDTO,
+} from "../../../dtos/course/course.dto";
 import { HttpError } from "../../../../presentation/http/errors/http-error";
 import { ICourseRepository } from "../../../repositories/course.repository.interface";
 import { IUpdateCourseUseCase } from "../interfaces/update-course.usecase.interface";
@@ -10,22 +10,16 @@ import { Duration } from "../../../../domain/value-object/duration";
 import { Offer } from "../../../../domain/value-object/offer";
 
 export class UpdateCourseUseCase implements IUpdateCourseUseCase {
-  constructor(
-    private courseRepository: ICourseRepository,
-  ) {}
+  constructor(private courseRepository: ICourseRepository) {}
 
   async execute(input: IUpdateCourseInputDTO): Promise<ICourseWithDetailsDTO> {
     try {
       const course = await this.courseRepository.findById(input.id);
       if (!course) {
         throw new HttpError("Course not found", 404);
-
-        
       }
 
-
       console.log("Updating course with input:", input);
-
 
       // Update course with input data
       course.updateBasicInfo({
@@ -38,20 +32,23 @@ export class UpdateCourseUseCase implements IUpdateCourseUseCase {
         thumbnail: input.thumbnail,
         offer: input.offer ? Offer.create(input.offer) : null,
         status: input.status,
-        adminSharePercentage: input.adminSharePercentage
+        adminSharePercentage: input.adminSharePercentage,
       });
-
 
       console.log("Course updated with basic info:", course.toJSON());
 
-
       // Update course details if provided
-      if (input.longDescription || input.prerequisites || input.objectives || input.targetAudience) {
+      if (
+        input.longDescription ||
+        input.prerequisites ||
+        input.objectives ||
+        input.targetAudience
+      ) {
         course.updateDetails({
           longDescription: input.longDescription,
           prerequisites: input.prerequisites,
           objectives: input.objectives,
-          targetAudience: input.targetAudience
+          targetAudience: input.targetAudience,
         });
       }
 

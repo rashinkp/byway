@@ -33,3 +33,18 @@ export interface IGetAllCategoriesInput {
 	sortBy?: SortByField | NegativeSortByField | undefined;
 	filterBy?: "All" | "Active" | "Inactive";
 }
+
+
+
+export interface CategoryFormModalProps {
+	open: boolean;
+	onOpenChange: (open: boolean) => void;
+	onSubmit: (data: CategoryFormData) => void;
+	initialData?: {
+		name: string;
+		description?: string;
+	};
+	title: string;
+	submitText: string;
+	isLoading?: boolean;
+}

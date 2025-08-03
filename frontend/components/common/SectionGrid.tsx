@@ -2,6 +2,8 @@ import React, { useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { cn } from "@/utils/cn";
+import { EmptyStateFallback } from "@/components/common/EmptyStateFallback";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface SectionGridProps<T> {
 	title: React.ReactNode;
@@ -9,6 +11,9 @@ interface SectionGridProps<T> {
 	renderCard: (item: T) => React.ReactNode;
 	className?: string;
 	showNavigation?: boolean;
+	fallbackType?: "courses" | "categories" | "instructors";
+	onFallbackAction?: () => void;
+	isLoading?: boolean;
 }
 
 export function SectionGrid<T>({
@@ -17,11 +22,53 @@ export function SectionGrid<T>({
 	renderCard,
 	className,
 	showNavigation = true,
+	fallbackType,
+	onFallbackAction,
+	isLoading = false,
 }: SectionGridProps<T>) {
 	const [currentIndex, setCurrentIndex] = useState(0);
 	const [direction, setDirection] = useState<"left" | "right" | null>(null);
 	const [isAnimating, setIsAnimating] = useState(false);
 	const containerRef = useRef<HTMLDivElement>(null);
+
+	// Show loading skeleton if loading
+	if (isLoading) {
+		return (
+			<section className={cn("mb-12 px-2 sm:px-0", className)}>
+				<div className="mb-16">
+					<h2 className="text-3xl sm:text-4xl font-bold mb-4 ">
+						{title}
+					</h2>
+				</div>
+				<div className="overflow-hidden relative mb-16">
+					<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-8 gap-y-8 md:gap-y-10 xl:gap-y-12">
+						{Array.from({ length: 4 }).map((_, index) => (
+							<div key={index} className="flex justify-center">
+								<Skeleton className="w-64 h-80 rounded-lg" />
+							</div>
+						))}
+					</div>
+				</div>
+			</section>
+		);
+	}
+
+	// Show fallback if no items and fallback type is provided
+	if ((!items || items.length === 0) && fallbackType) {
+		return (
+			<section className={cn("mb-12 px-2 sm:px-0", className)}>
+				<div className="mb-16">
+					<h2 className="text-3xl sm:text-4xl font-bold mb-4 ">
+						{title}
+					</h2>
+				</div>
+				<EmptyStateFallback
+					type={fallbackType}
+					onAction={onFallbackAction}
+				/>
+			</section>
+		);
+	}
 
 	const visibleItems = items.slice(currentIndex, currentIndex + 4);
 	const isNavDisabled = items.length <= 4;

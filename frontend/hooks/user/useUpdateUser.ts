@@ -1,9 +1,10 @@
 "use client";
 
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { User } from "@/types/user";
+import { User, transformUserData } from "@/types/user";
 import { updateUser } from "@/api/users";
 import { toast } from "sonner";
+import { useAuthStore } from "@/stores/auth.store";
 
 interface UseUpdateUserReturn {
 	mutate: (data: {
@@ -19,14 +20,28 @@ interface UseUpdateUserReturn {
 		dateOfBirth?: string;
 		gender?: "MALE" | "FEMALE" | "OTHER";
 	}) => void;
+	mutateAsync: (data: {
+		name?: string;
+		avatar?: string;
+		bio?: string;
+		education?: string;
+		skills?: string;
+		phoneNumber?: string;
+		country?: string;
+		city?: string;
+		address?: string;
+		dateOfBirth?: string;
+		gender?: "MALE" | "FEMALE" | "OTHER";
+	}) => Promise<User>;
 	isLoading: boolean;
 	error: { message: string; code?: string } | null;
 }
 
 export function useUpdateUser(): UseUpdateUserReturn {
 	const queryClient = useQueryClient();
+	const { user, setUser } = useAuthStore();
 
-	const { mutate, isPending, error } = useMutation<
+	const { mutate, mutateAsync, isPending, error } = useMutation<
 		User,
 		Error,
 		{
@@ -44,10 +59,26 @@ export function useUpdateUser(): UseUpdateUserReturn {
 		}
 	>({
 		mutationFn: updateUser,
-		onSuccess: () => {
-			// Invalidate the userData query to refetch the updated user data
-			queryClient.invalidateQueries({ queryKey: ["userData"] });
-			queryClient.invalidateQueries({ queryKey: ["detailedUserData"] });
+		onSuccess: (updatedUser) => {
+			// Safety check: ensure updatedUser exists
+			if (!updatedUser) {
+				console.error("Update user response is undefined");
+				toast.error("Error", {
+					description: "Failed to update profile. Please try again.",
+				});
+				return;
+			}
+
+			// Update the auth store with the new user data
+			setUser(updatedUser);
+			
+			// Update React Query cache directly instead of invalidating
+			queryClient.setQueryData(["userData", user?.id], updatedUser);
+			
+			// Transform User to UserProfileType for detailedUserData cache
+			const transformedUserData = transformUserData(updatedUser);
+			queryClient.setQueryData(["detailedUserData", user?.id], transformedUserData);
+			
 			toast.success("Success", {
 				description: "Your profile has been updated successfully.",
 			});
@@ -77,6 +108,7 @@ export function useUpdateUser(): UseUpdateUserReturn {
 
 	return {
 		mutate,
+		mutateAsync,
 		isLoading: isPending,
 		error: mappedError,
 	};

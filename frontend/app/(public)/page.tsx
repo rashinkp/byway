@@ -11,6 +11,8 @@ import { HowItWorksSection } from "@/components/common/HowItWorksSection";
 import { SectionGrid } from "@/components/common/SectionGrid";
 import { InstructorCard } from "@/components/instructor/InstructorCard";
 import { motion } from "framer-motion";
+import { IInstructorWithUserDetails, InstructorCardData } from "@/types/instructor";
+
 
 export default function UserDashboard() {
 	const router = useRouter();
@@ -21,13 +23,13 @@ export default function UserDashboard() {
 			filterBy: "Active",
 		});
 
-	const { data: coursesData } = useGetAllCourses({
+	const { data: coursesData, isLoading: isCoursesLoading } = useGetAllCourses({
 		page: 1,
 		limit: 10,
 		role: "USER",
 	});
 
-	const { data: instructorsData } =
+	const { data: instructorsData, isLoading: isInstructorsLoading } =
 		useGetAllInstructors({
 			page: 1,
 			limit: 4,
@@ -50,8 +52,8 @@ export default function UserDashboard() {
 
 	const topCourses = coursesData?.items || [];
 
-	const topInstructors =
-		instructorsData?.data.items.map((instructor) => ({
+	const topInstructors: InstructorCardData[] =
+		instructorsData?.data.items.map((instructor: IInstructorWithUserDetails) => ({
 			id: instructor.id,
 			areaOfExpertise: instructor.areaOfExpertise,
 			professionalExperience: instructor.professionalExperience,
@@ -109,7 +111,11 @@ export default function UserDashboard() {
 					className="my-50"
 				>
 					<div className="max-w-7xl mx-auto w-full px-0 sm:px-4 md:px-8">
-						<TopCourses courses={topCourses} router={router} />
+						<TopCourses 
+							courses={topCourses} 
+							router={router} 
+							isLoading={isCoursesLoading}
+						/>
 					</div>
 				</motion.section>
 				<motion.section
@@ -131,7 +137,7 @@ export default function UserDashboard() {
 					className="my-28"
 				>
 					<div className="max-w-7xl mx-auto w-full px-0 sm:px-4 md:px-8">
-						<SectionGrid
+						<SectionGrid<InstructorCardData>
 							title={
 								<span>
 									<span className="text-[#facc15] dark:text-[#facc15]">Meet</span> our professional{' '}
@@ -157,6 +163,9 @@ export default function UserDashboard() {
 								<InstructorCard instructor={instructor} />
 							)}
 							showNavigation={true}
+							fallbackType="instructors"
+							onFallbackAction={() => router.push("/instructors")}
+							isLoading={isInstructorsLoading}
 						/>
 					</div>
 				</motion.section>
@@ -167,7 +176,7 @@ export default function UserDashboard() {
 					transition={{ duration: 0.3, ease: "easeOut" }}
 					className="w-full relative rounded-2xl shadow-lg py-14 sm:py-20 my-28 bg-white dark:bg-neutral-800"
 				>
-					<div className="max-w-2xl mx-auto w-full px-0 sm:px-4 md:px-8 text-left sm:text-left text-center">
+					<div className="max-w-2xl mx-auto w-full px-0 sm:px-4 md:px-8  sm:text-left text-center">
 						<div className="flex justify-center sm:justify-start mb-4 w-full">
 							<svg
 								width="56"

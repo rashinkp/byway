@@ -5,7 +5,7 @@ import { IRetryOrderUseCase } from "../../../app/usecases/order/interfaces/retry
 import { IHttpErrors } from "../interfaces/http-errors.interface";
 import { IHttpSuccess } from "../interfaces/http-success.interface";
 import { validateGetAllOrders } from "../../validators/order.validators";
-import { CreateOrderDtoSchema } from "../../../domain/dtos/order/create-order.dto";
+import { CreateOrderDtoSchema } from "../../../app/dtos/order/create-order.dto";
 import { IHttpRequest } from "../interfaces/http-request.interface";
 import { IHttpResponse } from "../interfaces/http-response.interface";
 import { BadRequestError } from "../errors/bad-request-error";
@@ -42,7 +42,10 @@ export class OrderController extends BaseController {
       }
 
       const validatedData = await CreateOrderDtoSchema.parseAsync(request.body);
-      const result = await this.createOrderUseCase.execute(userId, validatedData);
+      const result = await this.createOrderUseCase.execute(
+        userId,
+        validatedData
+      );
       return this.success_201(result, "Order created successfully");
     });
   }
@@ -63,4 +66,4 @@ export class OrderController extends BaseController {
       return this.success_200(result, "Order retry initiated successfully");
     });
   }
-} 
+}

@@ -1,9 +1,10 @@
 import { Suspense } from "react";
-import CheckoutContent from "./CheckoutContent";
+import CheckoutContent from "../../../../components/checkout/CheckoutContent";
+import { LoadingSpinner } from "@/components/admin";
 
 export default function CheckoutPage() {
   return (
-    <Suspense fallback={<div>Loading...</div>}>
+    <Suspense fallback={<LoadingSpinner />}>
       <CheckoutContent />
     </Suspense>
   );

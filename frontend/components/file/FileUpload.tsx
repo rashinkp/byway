@@ -79,7 +79,7 @@ export function FileUpload({
 					onClick={() => fileInputRef.current?.click()}
 					disabled={disabled || isUploading}
 					size="sm"
-					className="border-[#facc15] text-black dark:text-white bg-[#facc15] hover:bg-black hover:text-[#facc15] dark:bg-[#facc15] dark:text-black dark:hover:bg-black dark:hover:text-[#facc15]"
+					className="border-[#facc15] text-black  bg-[#facc15] hover:bg-black hover:text-[#facc15] dark:bg-[#facc15] dark:text-black dark:hover:bg-black dark:hover:text-[#facc15]"
 				>
 					<Upload className="w-4 h-4 mr-2 text-black dark:text-[#18181b]" />
 					{isUploading ? "Uploading..." : "Browse"}

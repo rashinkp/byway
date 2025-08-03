@@ -30,4 +30,5 @@ export type Action<T> = {
 	confirmationMessage?: (item: T) => string;
 	Icon?: React.ComponentType<{ className?: string }>;
 	hidden?: (item: T) => boolean; // Add optional hidden property
+	loading?: boolean; // Add optional loading property
 };

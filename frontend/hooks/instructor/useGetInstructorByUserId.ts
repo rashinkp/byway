@@ -1,8 +1,8 @@
 import { useQuery } from "@tanstack/react-query";
 import { getInstructorByUserId } from "@/api/instructor";
 import { IInstructorWithUserDetails } from "@/types/instructor";
-import { ApiResponse } from "@/types/apiResponse";
 import { useAuthStore } from "@/stores/auth.store";
+import { ApiResponse } from "@/types/general";
 
 export function useGetInstructorByUserId(enabled: boolean = true) {
 	const { user } = useAuthStore();

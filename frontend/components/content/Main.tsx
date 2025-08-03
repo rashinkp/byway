@@ -3,7 +3,7 @@
 
 import { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { ILesson, LessonStatus } from "@/types/lesson";
+import { LessonStatus } from "@/types/lesson";
 import { useGetAllLessonsInCourse } from "@/hooks/lesson/useGetAllLesson";
 import { useGetContentByLessonId } from "@/hooks/content/useGetContentByLessonId";
 import { useProgress } from "@/hooks/progress/useProgress";
@@ -17,14 +17,8 @@ import { LockOverlay } from "@/components/ui/LockOverlay";
 import { IQuizAnswer } from "@/types/progress";
 import { useCertificate } from "@/hooks/certificate/useCertificate";
 import { CertificateActions } from "@/components/course/enrolledCourse/CertificateActions";
+import { LessonWithCompletion } from "@/types/course";
 
-interface LessonWithCompletion extends ILesson {
-  completed: boolean;
-  isLocked?: boolean;
-  score?: number;
-  totalQuestions?: number;
-  answers?: IQuizAnswer[];
-}
 
 export default function MainContentSection() {
   const [selectedLesson, setSelectedLesson] =

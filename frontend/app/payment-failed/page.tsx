@@ -2,10 +2,11 @@
 
 import { Suspense } from "react";
 import PaymentFailedContent from "@/components/payment/PaymentFailedContent";
+import { LoadingSpinner } from "@/components/admin";
 
 export default function PaymentFailedPage() {
   return (
-    <Suspense fallback={<div>Loading...</div>}>
+    <Suspense fallback={<LoadingSpinner />}>
       <PaymentFailedContent />
     </Suspense>
   );

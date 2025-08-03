@@ -1,5 +1,5 @@
 import { JwtPayload } from "jsonwebtoken";
-import { ApproveInstructorRequestDTO } from "../../../../domain/dtos/instructor/instructor.dto";
+import { ApproveInstructorRequestDTO } from "../../../dtos/instructor/instructor.dto";
 import { Instructor } from "../../../../domain/entities/instructor.entity";
 
 export interface IApproveInstructorUseCase {

@@ -12,7 +12,7 @@ import {
   IGenerateCertificateResponse 
 } from '../interfaces/generate-certificate.usecase.interface';
 import { CertificatePdfServiceInterface } from '../../../providers/generate-certificate.interface';
-import { CertificateStorageServiceInterface } from '../../../providers/certificate-storage.interface';
+import { S3ServiceInterface } from '../../../providers/s3.service.interface';
 
 export class GenerateCertificateUseCase implements IGenerateCertificateUseCase {
   constructor(
@@ -22,7 +22,7 @@ export class GenerateCertificateUseCase implements IGenerateCertificateUseCase {
     private readonly userRepository: IUserRepository,
     private readonly lessonProgressRepository: ILessonProgressRepository,
     private readonly pdfService: CertificatePdfServiceInterface,
-    private readonly cloudStorageService: CertificateStorageServiceInterface
+    private readonly s3Service: S3ServiceInterface
   ) {}
 
   async execute(request: IGenerateCertificateRequest): Promise<IGenerateCertificateResponse> {
@@ -60,7 +60,7 @@ export class GenerateCertificateUseCase implements IGenerateCertificateUseCase {
         // Delete from S3 if pdfUrl exists
         if (existingCertificate.pdfUrl) {
           try {
-            await this.cloudStorageService.deleteCertificate(existingCertificate.pdfUrl);
+            await this.s3Service.deleteFile(existingCertificate.pdfUrl);
             console.log(`[Certificate] Deleted old certificate PDF from S3: ${existingCertificate.pdfUrl}`);
           } catch (err) {
             console.error(`[Certificate] Failed to delete old certificate PDF from S3:`, err);
@@ -140,7 +140,13 @@ export class GenerateCertificateUseCase implements IGenerateCertificateUseCase {
       console.log(`[Certificate] Uploading PDF to cloud for certificateNumber=${certificateNumber}`);
       let pdfUrl = '';
       try {
-        pdfUrl = await this.cloudStorageService.uploadCertificate(pdfBuffer, certificateNumber);
+        pdfUrl = await this.s3Service.uploadFile(
+          pdfBuffer, 
+          `${certificateNumber}.pdf`, 
+          'application/pdf', 
+          'certificate', 
+          { courseId, certificateId: certificateNumber }
+        );
         console.log(`[Certificate] PDF uploaded successfully: url=${pdfUrl}`);
       } catch (err) {
         console.error(`[Certificate] PDF upload failed for certificateNumber=${certificateNumber}:`, err);

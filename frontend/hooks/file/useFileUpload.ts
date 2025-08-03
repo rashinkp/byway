@@ -2,7 +2,16 @@ import { useState } from "react";
 import { getPresignedUrl, uploadFileToS3 } from "@/api/file";
 
 interface UseFileUploadReturn {
-	uploadFile: (file: File) => Promise<string>;
+	uploadFile: (
+		file: File,
+		uploadType?: 'course' | 'profile' | 'certificate',
+		metadata?: {
+			courseId?: string;
+			userId?: string;
+			certificateId?: string;
+			contentType?: 'thumbnail' | 'video' | 'document' | 'avatar' | 'cv';
+		}
+	) => Promise<string>;
 	progress: number;
 	isUploading: boolean;
 	error: string | null;
@@ -20,16 +29,27 @@ export function useFileUpload(): UseFileUploadReturn {
 		setError(null);
 	};
 
-	const uploadFile = async (file: File): Promise<string> => {
+	const uploadFile = async (
+		file: File,
+		uploadType: 'course' | 'profile' | 'certificate' = 'course',
+		metadata?: {
+			courseId?: string;
+			userId?: string;
+			certificateId?: string;
+			contentType?: 'thumbnail' | 'video' | 'document' | 'avatar' | 'cv';
+		}
+	): Promise<string> => {
 		try {
 			setIsUploading(true);
 			setError(null);
 
 			// Get presigned URL
-			const { uploadUrl, fileUrl } = await getPresignedUrl(
-				file.name,
-				file.type,
-			);
+			const { uploadUrl, fileUrl } = await getPresignedUrl({
+				fileName: file.name,
+				fileType: file.type,
+				uploadType,
+				metadata,
+			});
 
 			// Upload file to S3
 			await uploadFileToS3(file, uploadUrl, (progress) => {

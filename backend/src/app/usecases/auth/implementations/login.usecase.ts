@@ -3,7 +3,7 @@ import { IAuthRepository } from "../../../repositories/auth.repository";
 import { HttpError } from "../../../../presentation/http/errors/http-error";
 import * as bcrypt from "bcrypt";
 import { AuthProvider } from "../../../../domain/enum/auth-provider.enum";
-import { LoginDto } from "../../../../domain/dtos/auth/login.dto";
+import { LoginDto } from "../../../dtos/auth/login.dto";
 import { ILoginUseCase } from "../interfaces/login.usecase.interface";
 import { ICartRepository } from "../../../repositories/cart.repository";
 

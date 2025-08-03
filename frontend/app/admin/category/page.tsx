@@ -34,13 +34,14 @@ export default function CategoriesPage() {
 		search: searchTerm,
 		sortBy: (["name", "createdAt"] as const).includes(sortBy as any) ? (sortBy as "name" | "createdAt") : "name",
 		sortOrder,
-		includeDeleted: filterStatus === "Inactive",
+		includeDeleted: filterStatus === "Inactive" || filterStatus === "All",
 		filterBy: (["All", "Active", "Inactive"] as const).includes(filterStatus as any) ? (filterStatus as "All" | "Active" | "Inactive") : "All",
+
 	});
 
-	const { mutate: createCategory } = useCreateCategory();
-	const { mutate: updateCategory } = useUpdateCategory();
-	const { mutate: toggleDeleteCategory } = useToggleDeleteCategory();
+	const { mutate: createCategory , isPending: isCreating } = useCreateCategory();
+	const { mutate: updateCategory , isPending: isUpdating } = useUpdateCategory();
+	const { mutate: toggleDeleteCategory , isPending: isDeleting } = useToggleDeleteCategory();
 
 	const handleAddSubmit = async (data: CategoryFormData) => {
 		createCategory(data, {
@@ -61,7 +62,7 @@ export default function CategoriesPage() {
 		);
 	};
 
-	const handleViewCategory = (category: Category) => {
+	const handleViewCategory = (category: Category) => {		
 		setViewCategory(category);
 		setIsViewOpen(true);
 	};
@@ -111,6 +112,7 @@ export default function CategoriesPage() {
 				setSearchTerm={setSearchTerm}
 				filterStatus={filterStatus}
 				setFilterStatus={setFilterStatus}
+				actionLoading={isDeleting}
 				sortBy={sortBy}
 				setSortBy={setSortBy}
 				sortOrder={sortOrder}
@@ -197,6 +199,7 @@ export default function CategoriesPage() {
 				onSubmit={handleAddSubmit}
 				title="Add New Category"
 				submitText="Save"
+				isLoading={isCreating}
 			/>
 
 			<CategoryFormModal
@@ -209,6 +212,7 @@ export default function CategoriesPage() {
 				initialData={editCategory}
 				title="Edit Category"
 				submitText="Update"
+				isLoading={isUpdating}
 			/>
 
 			{viewCategory && (

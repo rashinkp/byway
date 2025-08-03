@@ -1,4 +1,4 @@
-import { ILessonContentOutputDTO } from "../../../../domain/dtos/lesson/lesson.dto";
+import { ILessonContentOutputDTO } from "../../../dtos/lesson/lesson.dto";
 import { HttpError } from "../../../../presentation/http/errors/http-error";
 import { ILessonContentRepository } from "../../../repositories/content.repository";
 import { IEnrollmentRepository } from "../../../repositories/enrollment.repository.interface";
@@ -6,7 +6,9 @@ import { ILessonRepository } from "../../../repositories/lesson.repository";
 import { IGetContentByLessonIdUseCase } from "../interfaces/get-content-by-lesson-id.usecase.interface";
 import { ICourseRepository } from "../../../repositories/course.repository.interface";
 
-export class GetContentByLessonIdUseCase implements IGetContentByLessonIdUseCase {
+export class GetContentByLessonIdUseCase
+  implements IGetContentByLessonIdUseCase
+{
   constructor(
     private readonly contentRepository: ILessonContentRepository,
     private readonly lessonRepository: ILessonRepository,
@@ -14,7 +16,10 @@ export class GetContentByLessonIdUseCase implements IGetContentByLessonIdUseCase
     private readonly courseRepository: ICourseRepository
   ) {}
 
-  async execute(lessonId: string, user: { id: string; role: string }): Promise<ILessonContentOutputDTO | null> {
+  async execute(
+    lessonId: string,
+    user: { id: string; role: string }
+  ): Promise<ILessonContentOutputDTO | null> {
     try {
       // Get lesson to find courseId
       const lesson = await this.lessonRepository.findById(lessonId);
@@ -41,12 +46,15 @@ export class GetContentByLessonIdUseCase implements IGetContentByLessonIdUseCase
       }
 
       // For non-instructors, check enrollment
-      const enrollment = await this.enrollmentRepository.findByUserAndCourse(user.id, lesson.courseId);
+      const enrollment = await this.enrollmentRepository.findByUserAndCourse(
+        user.id,
+        lesson.courseId
+      );
       if (!enrollment) {
         throw new HttpError("You are not enrolled in this course", 403);
       }
 
-      if (enrollment.accessStatus !== 'ACTIVE') {
+      if (enrollment.accessStatus !== "ACTIVE") {
         throw new HttpError("Your enrollment is not active", 403);
       }
 

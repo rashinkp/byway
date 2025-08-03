@@ -39,13 +39,7 @@ export function VerifyOtpForm() {
 		initializeAuth();
 	}, [initializeAuth]);
 
-	// Debug logs
-	useEffect(() => {
-		console.log("[OtpForm] email from store:", email);
-		console.log("[OtpForm] email from localStorage:", typeof window !== "undefined" ? localStorage.getItem("auth_email") : null);
-	}, [email]);
 
-	// Handle OTP submission
 	const handleSubmit = (otp: string) => {
 		if (!email) return;
 		setLocalError(null);

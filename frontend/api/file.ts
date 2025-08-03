@@ -1,28 +1,16 @@
+import { GeneratePresignedUrlParams, PresignedUrlResponse } from "@/types/file";
 import { api } from "./api";
+import { ApiResponse } from "@/types/general";
 
-interface PresignedUrlResponse {
-	uploadUrl: string;
-	fileUrl: string;
-}
 
-interface ApiResponse<T> {
-	statusCode: number;
-	success: boolean;
-	message: string;
-	data: T;
-}
 
 export async function getPresignedUrl(
-	fileName: string,
-	fileType: string,
+	params: GeneratePresignedUrlParams
 ): Promise<PresignedUrlResponse> {
 	try {
-		const response = await api.post<ApiResponse<PresignedUrlResponse>>(
+		const response = await api.post<ApiResponse <PresignedUrlResponse>>(
 			"/files/generate-presigned-url",
-			{
-				fileName,
-				fileType,
-			},
+			params,
 		);
 		return response.data.data;
 	} catch (error: any) {
@@ -37,6 +25,58 @@ export async function getPresignedUrl(
 				"Failed to get presigned URL",
 		);
 	}
+}
+
+// Convenience functions for different upload types
+export async function getCoursePresignedUrl(
+	fileName: string,
+	fileType: string,
+	courseId: string,
+	contentType: 'thumbnail' | 'video' | 'document' = 'video'
+): Promise<PresignedUrlResponse> {
+	return getPresignedUrl({
+		fileName,
+		fileType,
+		uploadType: 'course',
+		metadata: {
+			courseId,
+			contentType,
+		},
+	});
+}
+
+export async function getProfilePresignedUrl(
+	fileName: string,
+	fileType: string,
+	userId: string,
+	contentType: 'avatar' | 'cv' = 'avatar'
+): Promise<PresignedUrlResponse> {
+	return getPresignedUrl({
+		fileName,
+		fileType,
+		uploadType: 'profile',
+		metadata: {
+			userId,
+			contentType,
+		},
+	});
+}
+
+export async function getCertificatePresignedUrl(
+	fileName: string,
+	fileType: string,
+	courseId: string,
+	certificateId: string
+): Promise<PresignedUrlResponse> {
+	return getPresignedUrl({
+		fileName,
+		fileType,
+		uploadType: 'certificate',
+		metadata: {
+			courseId,
+			certificateId,
+		},
+	});
 }
 
 export function uploadFileToS3(

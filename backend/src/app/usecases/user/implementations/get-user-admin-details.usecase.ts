@@ -1,4 +1,4 @@
-import { GetUserDto } from "../../../../domain/dtos/user/user.dto";
+import { GetUserDto } from "../../../dtos/user/user.dto";
 import { User } from "../../../../domain/entities/user.entity";
 import { UserProfile } from "../../../../domain/entities/user-profile.entity";
 import { Instructor } from "../../../../domain/entities/instructor.entity";
@@ -13,10 +13,8 @@ export class GetUserAdminDetailsUseCase implements IGetUserAdminDetailsUseCase {
     private instructorRepository: IInstructorRepository
   ) {}
 
-  async execute(
-    dto: GetUserDto
-  ): Promise<{ 
-    user: User; 
+  async execute(dto: GetUserDto): Promise<{
+    user: User;
     profile: UserProfile | null;
     instructor: Instructor | null;
   }> {
@@ -28,9 +26,10 @@ export class GetUserAdminDetailsUseCase implements IGetUserAdminDetailsUseCase {
     const profile = await this.userRepository.findProfileByUserId(dto.userId);
     let instructor = null;
 
-    instructor = await this.instructorRepository.findInstructorByUserId(dto.userId);
-
+    instructor = await this.instructorRepository.findInstructorByUserId(
+      dto.userId
+    );
 
     return { user, profile, instructor };
   }
-} 
+}

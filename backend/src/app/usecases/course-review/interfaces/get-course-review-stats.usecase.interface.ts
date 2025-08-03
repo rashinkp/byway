@@ -1,5 +1,5 @@
-import { CourseReviewSummaryDto } from "../../../../domain/dtos/course-review";
+import { CourseReviewSummaryDto } from "../../../dtos/course-review";
 
 export interface IGetCourseReviewStatsUseCase {
   execute(courseId: string): Promise<CourseReviewSummaryDto>;
-} 
+}

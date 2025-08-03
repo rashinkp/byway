@@ -1,4 +1,7 @@
-import { ICreateLessonContentInputDTO, ILessonContentOutputDTO } from "../../../../domain/dtos/lesson/lesson.dto";
+import {
+  ICreateLessonContentInputDTO,
+  ILessonContentOutputDTO,
+} from "../../../dtos/lesson/lesson.dto";
 import { LessonContent } from "../../../../domain/entities/lesson-content.entity";
 import { HttpError } from "../../../../presentation/http/errors/http-error";
 import { ILessonContentRepository } from "../../../repositories/content.repository";
@@ -31,7 +34,10 @@ export class CreateLessonContentUseCase implements ICreateLessonContentUseCase {
 
       // Verify the user is the instructor of the course
       if (course.createdBy !== dto.userId) {
-        throw new HttpError("You are not authorized to create content for this lesson", 403);
+        throw new HttpError(
+          "You are not authorized to create content for this lesson",
+          403
+        );
       }
 
       const content = LessonContent.create(dto);

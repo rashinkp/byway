@@ -1,8 +1,8 @@
 import { api } from "@/api/api";
-import { ApiResponse, IPaginatedResponse } from "@/types/apiResponse";
 import { PublicUser, User, UserProfileType } from "@/types/user";
 import { IInstructorWithUserDetails } from "@/types/instructor";
 import { useAuthStore } from "@/stores/auth.store";
+import { ApiResponse, IPaginatedResponse } from "@/types/general";
 
 export const getAllUsers = async ({
 	page = 1,
@@ -86,7 +86,7 @@ export async function updateUser(data: {
 }): Promise<User> {
 	try {
 		const response = await api.put(`/user/users`, data);
-		return response.data.data.user; // Extract the user object from IUserWithProfile
+		return response.data.data; // The backend returns user data directly in data.data
 	} catch (error: any) {
 		throw new Error(
 			error.response?.data?.error || "Failed to update user data",

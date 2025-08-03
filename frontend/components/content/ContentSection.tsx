@@ -123,9 +123,7 @@ export const ContentSection = ({ lessonId }: ContentSectionProps) => {
 					<div className="flex gap-3">
 						<Button
 							onClick={() => setIsEditing(true)}
-							className="bg-[#facc15] text-black dark:bg-[#facc15] dark:text-[#18181b] hover:bg-yellow-400 dark:hover:bg-yellow-400 px-4 py-2 rounded shadow-sm"
 							disabled={isDeleting}
-							size="sm"
 						>
 							<Pencil className="mr-2 h-4 w-4" />
 							Edit
@@ -133,8 +131,7 @@ export const ContentSection = ({ lessonId }: ContentSectionProps) => {
 						<Button
 							onClick={() => handleDelete(content.id)}
 							disabled={isDeleting}
-							className="bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300 hover:bg-red-200 dark:hover:bg-red-800 px-4 py-2 rounded shadow-sm"
-							size="sm"
+							
 						>
 							<Trash2 className="mr-2 h-4 w-4" />
 							{isDeleting ? "Deleting..." : "Delete"}

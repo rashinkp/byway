@@ -1,5 +1,10 @@
-import { IInstructorDashboardResponse, IGetInstructorDashboardInput } from '@/domain/dtos/instructor/instructor-dashboard.dto';
+import {
+  IInstructorDashboardResponse,
+  IGetInstructorDashboardInput,
+} from "@/app/dtos/instructor/instructor-dashboard.dto";
 
 export interface IGetInstructorDashboardUseCase {
-  execute(input: IGetInstructorDashboardInput): Promise<IInstructorDashboardResponse>;
-} 
+  execute(
+    input: IGetInstructorDashboardInput
+  ): Promise<IInstructorDashboardResponse>;
+}

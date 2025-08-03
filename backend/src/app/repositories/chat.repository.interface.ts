@@ -1,7 +1,7 @@
 import { ChatId } from "@/domain/value-object/ChatId";
 import { Chat } from "../../domain/entities/chat.entity";
 import { UserId } from "@/domain/value-object/UserId";
-import { PaginatedChatListDTO } from "../../domain/dtos/chat.dto";
+import { PaginatedChatListDTO } from "../dtos/chat.dto";
 
 export interface IChatRepository {
   findById(id: ChatId): Promise<Chat | null>;

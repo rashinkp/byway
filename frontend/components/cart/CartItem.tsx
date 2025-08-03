@@ -1,13 +1,9 @@
-import type { ICart } from "@/types/cart";
+import type { CartItemProps } from "@/types/cart";
 import { Award, BookOpen, Clock, Trash2 } from "lucide-react";
 import { motion } from "framer-motion";
 import Image from "next/image";
 
-interface CartItemProps {
-	item: ICart;
-	isRemoving: boolean;
-	onRemove: (courseId: string) => void;
-}
+
 
 export function CartItem({ item, isRemoving, onRemove }: CartItemProps) {
 	const course = item.course;

@@ -1,4 +1,4 @@
-import { UpdateUserDto } from "../../../../domain/dtos/user/user.dto";
+import { UpdateUserDto } from "../../../dtos/user/user.dto";
 import { User } from "../../../../domain/entities/user.entity";
 import { UserProfile } from "../../../../domain/entities/user-profile.entity";
 import { Role } from "../../../../domain/enum/role.enum";
@@ -8,7 +8,10 @@ import { IUpdateUserUseCase } from "../interfaces/update-user.usecase.interface"
 import { S3ServiceInterface } from "../../../providers/s3.service.interface";
 
 export class UpdateUserUseCase implements IUpdateUserUseCase {
-  constructor(private userRepository: IUserRepository, private s3Service: S3ServiceInterface) {}
+  constructor(
+    private userRepository: IUserRepository,
+    private s3Service: S3ServiceInterface
+  ) {}
 
   async execute(
     dto: UpdateUserDto,
@@ -27,7 +30,7 @@ export class UpdateUserUseCase implements IUpdateUserUseCase {
     ) {
       try {
         await this.s3Service.deleteFile(user.avatar);
-        console.log('[Deleted] deleted old avatar')
+        console.log("[Deleted] deleted old avatar");
       } catch (err) {
         console.error("Failed to delete old avatar from S3:", err);
       }

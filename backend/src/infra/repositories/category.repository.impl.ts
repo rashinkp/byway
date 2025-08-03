@@ -1,7 +1,7 @@
 import { PrismaClient } from "@prisma/client";
 import { Category } from "../../domain/entities/category.entity";
 import { ICategoryRepository } from "../../app/repositories/category.repository";
-import { IGetAllCategoriesInputDTO } from "../../domain/dtos/category/category.dto";
+import { IGetAllCategoriesInputDTO } from "../../app/dtos/category/category.dto";
 export class CategoryRepository implements ICategoryRepository {
   constructor(private prisma: PrismaClient) {}
 
@@ -60,7 +60,7 @@ export class CategoryRepository implements ICategoryRepository {
     if (search) {
       where.OR = [
         { name: { contains: search, mode: "insensitive" } },
-        { description: { contains: search, mode: "insensitive" } }
+        { description: { contains: search, mode: "insensitive" } },
       ];
     }
 

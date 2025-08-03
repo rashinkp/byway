@@ -1,6 +1,6 @@
 import { IAuthRepository } from "../../../repositories/auth.repository";
 import { OtpProvider } from "../../../../infra/providers/otp/otp.provider";
-import { ForgotPasswordDto } from "../../../../domain/dtos/auth/forgot-password.dto";
+import { ForgotPasswordDto } from "../../../dtos/auth/forgot-password.dto";
 import { IForgotPasswordUseCase } from "../interfaces/forgot-passowrd.usecase.interface";
 import { HttpError } from "../../../../presentation/http/errors/http-error";
 

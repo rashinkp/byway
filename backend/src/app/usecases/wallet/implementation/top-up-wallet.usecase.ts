@@ -1,5 +1,8 @@
-import { ITopUpWalletUseCase, TopUpWalletResponse } from "../interfaces/top-up-wallet.usecase.interface";
-import { TopUpWalletDto } from "../../../../domain/dtos/wallet/top-up.dto";
+import {
+  ITopUpWalletUseCase,
+  TopUpWalletResponse,
+} from "../interfaces/top-up-wallet.usecase.interface";
+import { TopUpWalletDto } from "../../../dtos/wallet/top-up.dto";
 import { IWalletRepository } from "../../../repositories/wallet.repository.interface";
 import { ITransactionRepository } from "../../../repositories/transaction.repository";
 import { IPaymentService } from "../../../services/payment/interfaces/payment.service.interface";
@@ -17,7 +20,10 @@ export class TopUpWalletUseCase implements ITopUpWalletUseCase {
     private paymentService: IPaymentService
   ) {}
 
-  async execute(userId: string, input: TopUpWalletDto): Promise<TopUpWalletResponse> {
+  async execute(
+    userId: string,
+    input: TopUpWalletDto
+  ): Promise<TopUpWalletResponse> {
     const { amount, paymentMethod } = input;
 
     // Create a pending transaction without an orderId for wallet top-ups
@@ -31,7 +37,7 @@ export class TopUpWalletUseCase implements ITopUpWalletUseCase {
         paymentMethod,
         metadata: {
           description: "Wallet top-up",
-          isWalletTopUp: true
+          isWalletTopUp: true,
         },
       })
     );
@@ -45,8 +51,11 @@ export class TopUpWalletUseCase implements ITopUpWalletUseCase {
       }
       wallet.addAmount(amount);
       await this.walletRepository.update(wallet);
-      await this.transactionRepository.updateStatus(transaction.id, TransactionStatus.COMPLETED);
-      
+      await this.transactionRepository.updateStatus(
+        transaction.id,
+        TransactionStatus.COMPLETED
+      );
+
       return {
         transaction,
       };
@@ -57,16 +66,18 @@ export class TopUpWalletUseCase implements ITopUpWalletUseCase {
         transaction.id,
         {
           userId,
-          courses: [{
-            id: transaction.id,
-            title: "Wallet Top-up",
-            price: amount,
-          }],
+          courses: [
+            {
+              id: transaction.id,
+              title: "Wallet Top-up",
+              price: amount,
+            },
+          ],
           paymentMethod,
           couponCode: undefined,
           amount,
           isWalletTopUp: true,
-          orderId: transaction.id
+          orderId: transaction.id,
         }
       );
 
@@ -76,4 +87,4 @@ export class TopUpWalletUseCase implements ITopUpWalletUseCase {
       };
     }
   }
-} 
+}

@@ -34,6 +34,7 @@ interface DataTableProps<T> {
 	totalItems?: number;
 	currentPage?: number;
 	setCurrentPage?: (page: number) => void;
+	actionLoading?: boolean;
 }
 
 export function DataTable<T>({
@@ -42,6 +43,7 @@ export function DataTable<T>({
 	isLoading = false,
 	onRowClick,
 	actions = [],
+	actionLoading = false,
 }: DataTableProps<T>) {
 	const [confirmOpen, setConfirmOpen] = useState(false);
 	const [confirmItem, setConfirmItem] = useState<T | null>(null);
@@ -71,10 +73,7 @@ export function DataTable<T>({
 		if (confirmAction) {
 			confirmAction();
 		}
-		setConfirmOpen(false);
-		setConfirmItem(null);
-		setConfirmAction(null);
-		setConfirmActionIndex(null);
+	
 	};
 
 	const rowVariants = {
@@ -174,29 +173,11 @@ export function DataTable<T>({
 																typeof action.label === "function"
 																	? action.label(item)
 																	: action.label;
-															const variant =
-																typeof action.variant === "function"
-																	? action.variant(item)
-																	: action.variant || "outline";
 
 															return (
 																<Button
 																	key={actionIndex}
-																	variant={variant === "default" ? "default" : "secondary"}
 																	size="sm"
-																	className={`
-                                    relative
-                                    text-xs font-medium
-                                    rounded-lg
-                                    transition-all duration-200
-                                    hover:scale-105 hover:shadow-md
-                                    ${variant === "destructive"
-                                        ? "bg-red-100 dark:bg-red-900 text-red-700 dark:text-red-300 hover:bg-red-200 dark:hover:bg-red-800 border-red-200 dark:border-red-700"
-                                        : variant === "default"
-                                            ? "bg-[#facc15]/10 text-[#facc15] dark:hover:text-white hover:bg-[#facc15]/20 border-[#facc15]/30 dark:bg-[#232323] dark:text-[#facc15] dark:hover:bg-[#facc15]/20 dark:border-[#facc15]"
-                                            : "bg-white/80 text-black dark:bg-[#232323] dark:text-white hover:dark:text-white border-gray-200 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-[#232323]"
-                                    }
-                                  `}
 																	onClick={(e) => {
 																		e.stopPropagation();
 																		handleActionClick(
@@ -238,9 +219,19 @@ export function DataTable<T>({
 						</AlertDialogDescription>
 					</AlertDialogHeader>
 					<AlertDialogFooter>
-						<AlertDialogCancel>Cancel</AlertDialogCancel>
-						<AlertDialogAction onClick={handleConfirm}>
-							Confirm
+						<AlertDialogCancel disabled={actionLoading}>Cancel</AlertDialogCancel>
+						<AlertDialogAction 
+							onClick={handleConfirm}
+							disabled={actionLoading}
+							className="relative"
+						>
+							{actionLoading ? (
+								<>
+									<div className="animate-spin rounded-full h-4 w-4 border-b-2 border-current mr-2" />
+								</>
+							) : (
+								"Confirm"
+							)}
 						</AlertDialogAction>
 					</AlertDialogFooter>
 				</AlertDialogContent>

@@ -1,7 +1,6 @@
 "use client";
 
 import React from "react";
-import { Loader2 } from "lucide-react";
 import { useGetCourseById } from "@/hooks/course/useGetCourseById";
 import { useGetAllLessonsInCourse } from "@/hooks/lesson/useGetAllLesson";
 import { useGetPublicUser } from "@/hooks/user/useGetPublicUser";
@@ -13,6 +12,7 @@ import { useSoftDeleteCourse } from "@/hooks/course/useSoftDeleteCourse";
 import { useParams } from "next/navigation";
 import AdminActions from "@/components/course/course-detail/AdminActions";
 import CourseDetailLayout from "../course-detail/CourseDetailLayout";
+import { LoadingSpinner } from "@/components/admin";
 
 // Admin Course Details Component
 const MainAdminCourseDetails: React.FC = () => {
@@ -22,7 +22,6 @@ const MainAdminCourseDetails: React.FC = () => {
   const {
     data: courseData,
     isLoading: isCourseLoading,
-    refetch: refetchCourse,
   } = useGetCourseById(courseId);
   const { data: lessonsData, isLoading: isLessonsLoading } =
     useGetAllLessonsInCourse({
@@ -42,25 +41,22 @@ const MainAdminCourseDetails: React.FC = () => {
   const handleApprove = () => {
     if (!courseData) return;
     approveCourse({ courseId: courseData.id });
-    refetchCourse();
   };
 
   const handleDecline = () => {
     if (!courseData) return;
     declineCourse({ courseId: courseData.id });
-    refetchCourse();
   };
 
   const handleToggleStatus = () => {
     if (!courseData) return;
     toggleCourseStatus(courseData);
-    refetchCourse();
   };
 
   if (isCourseLoading) {
     return (
       <div className="flex items-center justify-center min-h-[50vh]">
-        <Loader2 className="w-8 h-8 text-blue-600 animate-spin" />
+        <LoadingSpinner />
       </div>
     );
   }

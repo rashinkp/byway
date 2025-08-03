@@ -1,5 +1,8 @@
 import { z } from "zod";
-import { ICreateUserProfileRequestDTO, IUpdateUserProfileRequestDTO } from "../../domain/dtos/user/user.dto";
+import {
+  ICreateUserProfileRequestDTO,
+  IUpdateUserProfileRequestDTO,
+} from "../../app/dtos/user/user.dto";
 
 interface ValidationSchema {
   body?: z.ZodSchema;
@@ -46,10 +49,14 @@ export const updateUserProfileSchemaDef: ValidationSchema = {
 };
 
 // Validation functions
-export function validateCreateUserProfile(data: unknown): ICreateUserProfileRequestDTO {
+export function validateCreateUserProfile(
+  data: unknown
+): ICreateUserProfileRequestDTO {
   return createUserProfileSchema.parse(data);
 }
 
-export function validateUpdateUserProfile(data: unknown): IUpdateUserProfileRequestDTO {
+export function validateUpdateUserProfile(
+  data: unknown
+): IUpdateUserProfileRequestDTO {
   return updateUserProfileSchema.parse(data);
 }

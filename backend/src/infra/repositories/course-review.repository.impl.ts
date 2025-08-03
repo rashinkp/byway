@@ -1,8 +1,12 @@
-import { PrismaClient } from '@prisma/client';
-import { CourseReview } from '../../domain/entities/course-review.entity';
-import { QueryCourseReviewDto, CourseReviewResponseDto, CourseReviewSummaryDto } from '../../domain/dtos/course-review';
-import { ICourseReviewRepository } from '../../app/repositories/course-review.repository.interface';
-import { Rating } from '../../domain/value-object/rating';
+import { PrismaClient } from "@prisma/client";
+import { CourseReview } from "../../domain/entities/course-review.entity";
+import {
+  QueryCourseReviewDto,
+  CourseReviewResponseDto,
+  CourseReviewSummaryDto,
+} from "../../app/dtos/course-review";
+import { ICourseReviewRepository } from "../../app/repositories/course-review.repository.interface";
+import { Rating } from "../../domain/value-object/rating";
 
 function toCourseReviewEntity(data: any): CourseReview {
   return new CourseReview({
@@ -100,36 +104,44 @@ export class CourseReviewRepository implements ICourseReviewRepository {
 
   async delete(id: string): Promise<void> {
     await this.prisma.courseReview.delete({
-      where: { id }
+      where: { id },
     });
   }
 
-  async findByCourseId(courseId: string, query: QueryCourseReviewDto, userId?: string): Promise<{ reviews: CourseReviewResponseDto[]; total: number; totalPages: number; }> {
+  async findByCourseId(
+    courseId: string,
+    query: QueryCourseReviewDto,
+    userId?: string
+  ): Promise<{
+    reviews: CourseReviewResponseDto[];
+    total: number;
+    totalPages: number;
+  }> {
     const page = query.page || 1;
     const limit = query.limit || 10;
     const skip = (page - 1) * limit;
-    
+
     const where: any = {
       courseId,
     };
-    
+
     if (!query.includeDisabled) {
       where.deletedAt = null;
     }
-    
+
     if (query.isMyReviews && userId) {
       where.userId = userId;
     }
-    
+
     if (query.rating) {
       where.rating = query.rating;
     }
 
     const orderBy: any = {};
-    if (query.sortBy === 'rating') {
-      orderBy.rating = query.sortOrder || 'desc';
+    if (query.sortBy === "rating") {
+      orderBy.rating = query.sortOrder || "desc";
     } else {
-      orderBy.createdAt = query.sortOrder || 'desc';
+      orderBy.createdAt = query.sortOrder || "desc";
     }
 
     const [total, reviews] = await this.prisma.$transaction([
@@ -150,15 +162,23 @@ export class CourseReviewRepository implements ICourseReviewRepository {
     };
   }
 
-  async findByUserId(userId: string, page = 1, limit = 10): Promise<{ reviews: CourseReviewResponseDto[]; total: number; totalPages: number; }> {
+  async findByUserId(
+    userId: string,
+    page = 1,
+    limit = 10
+  ): Promise<{
+    reviews: CourseReviewResponseDto[];
+    total: number;
+    totalPages: number;
+  }> {
     const skip = (page - 1) * limit;
     const where = { userId, deletedAt: null };
-    
+
     const [total, reviews] = await this.prisma.$transaction([
       this.prisma.courseReview.count({ where }),
       this.prisma.courseReview.findMany({
         where,
-        orderBy: { createdAt: 'desc' },
+        orderBy: { createdAt: "desc" },
         skip,
         take: limit,
         include: { user: { select: { id: true, name: true, avatar: true } } },
@@ -172,38 +192,50 @@ export class CourseReviewRepository implements ICourseReviewRepository {
     };
   }
 
-  async findByUserAndCourse(userId: string, courseId: string): Promise<CourseReview | null> {
+  async findByUserAndCourse(
+    userId: string,
+    courseId: string
+  ): Promise<CourseReview | null> {
     const found = await this.prisma.courseReview.findFirst({
       where: { userId, courseId, deletedAt: null },
     });
     return found ? toCourseReviewEntity(found) : null;
   }
 
-  async getCourseReviewStats(courseId: string): Promise<CourseReviewSummaryDto> {
-    const [average, total, distribution, recentReviews] = await this.prisma.$transaction([
-      this.prisma.courseReview.aggregate({
-        where: { courseId, deletedAt: null },
-        _avg: { rating: true },
-      }),
-      this.prisma.courseReview.count({ where: { courseId, deletedAt: null } }),
-      this.prisma.courseReview.groupBy({
-        by: ['rating'],
-        where: { courseId, deletedAt: null },
-        orderBy: [],
-        _count: { rating: true },
-      }),
-      this.prisma.courseReview.findMany({
-        where: { courseId, deletedAt: null },
-        orderBy: { createdAt: 'desc' },
-        take: 5,
-        include: { user: { select: { id: true, name: true, avatar: true } } },
-      }),
-    ]);
+  async getCourseReviewStats(
+    courseId: string
+  ): Promise<CourseReviewSummaryDto> {
+    const [average, total, distribution, recentReviews] =
+      await this.prisma.$transaction([
+        this.prisma.courseReview.aggregate({
+          where: { courseId, deletedAt: null },
+          _avg: { rating: true },
+        }),
+        this.prisma.courseReview.count({
+          where: { courseId, deletedAt: null },
+        }),
+        this.prisma.courseReview.groupBy({
+          by: ["rating"],
+          where: { courseId, deletedAt: null },
+          orderBy: [],
+          _count: { rating: true },
+        }),
+        this.prisma.courseReview.findMany({
+          where: { courseId, deletedAt: null },
+          orderBy: { createdAt: "desc" },
+          take: 5,
+          include: { user: { select: { id: true, name: true, avatar: true } } },
+        }),
+      ]);
 
     const ratingDistribution: { [key: number]: number } = {};
     for (let i = 1; i <= 5; i++) ratingDistribution[i] = 0;
     for (const d of distribution) {
-      if (d._count && typeof d._count === 'object' && typeof d._count.rating === 'number') {
+      if (
+        d._count &&
+        typeof d._count === "object" &&
+        typeof d._count.rating === "number"
+      ) {
         ratingDistribution[d.rating] = d._count.rating;
       }
     }
@@ -215,4 +247,4 @@ export class CourseReviewRepository implements ICourseReviewRepository {
       recentReviews: recentReviews.map(toCourseReviewResponseDto),
     };
   }
-} 
+}

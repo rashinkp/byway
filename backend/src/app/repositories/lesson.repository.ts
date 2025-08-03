@@ -1,6 +1,10 @@
-import { IGetAllLessonsInputDTO, IGetPublicLessonsInputDTO, ILessonListOutputDTO, IPublicLessonListOutputDTO } from "../../domain/dtos/lesson/lesson.dto";
+import {
+  IGetAllLessonsInputDTO,
+  IGetPublicLessonsInputDTO,
+  ILessonListOutputDTO,
+  IPublicLessonListOutputDTO,
+} from "../dtos/lesson/lesson.dto";
 import { Lesson } from "../../domain/entities/lesson.entity";
-
 
 export interface ILessonRepository {
   getAllLessons(params: IGetAllLessonsInputDTO): Promise<ILessonListOutputDTO>;

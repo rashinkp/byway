@@ -1,8 +1,10 @@
-import { IGetAllLessonsInputDTO, ILessonListOutputDTO } from "../../../../domain/dtos/lesson/lesson.dto";
+import {
+  IGetAllLessonsInputDTO,
+  ILessonListOutputDTO,
+} from "../../../dtos/lesson/lesson.dto";
 import { HttpError } from "../../../../presentation/http/errors/http-error";
 import { ILessonRepository } from "../../../repositories/lesson.repository";
 import { IGetAllLessonsUseCase } from "../interfaces/get-all-lessons.usecase.interface";
-
 
 export class GetAllLessonsUseCase implements IGetAllLessonsUseCase {
   constructor(private readonly lessonRepository: ILessonRepository) {}

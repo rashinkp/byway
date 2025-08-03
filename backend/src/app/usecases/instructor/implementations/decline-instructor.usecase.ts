@@ -1,4 +1,4 @@
-import { DeclineInstructorRequestDTO } from "../../../../domain/dtos/instructor/instructor.dto";
+import { DeclineInstructorRequestDTO } from "../../../dtos/instructor/instructor.dto";
 import { Instructor } from "../../../../domain/entities/instructor.entity";
 import { Role } from "../../../../domain/enum/role.enum";
 import { JwtPayload } from "../../../../presentation/express/middlewares/auth.middleware";
@@ -33,20 +33,25 @@ export class DeclineInstructorUseCase implements IDeclineInstructorUseCase {
     }
 
     instructor.decline();
-    const updatedInstructor = await this.instructorRepository.updateInstructor(instructor);
+    const updatedInstructor = await this.instructorRepository.updateInstructor(
+      instructor
+    );
 
     // Get user details for notification
     const user = await this.userRepository.findById(instructor.userId);
     if (user) {
       // Send notification to the instructor about decline
-      await this.createNotificationsForUsersUseCase.execute([instructor.userId], {
-        eventType: NotificationEventType.INSTRUCTOR_DECLINED,
-        entityType: NotificationEntityType.INSTRUCTOR,
-        entityId: instructor.id,
-        entityName: user.name || user.email,
-        message: `Your instructor application has been declined. You can reapply after 24 hours with updated information.`,
-        link: `/instructor/apply`,
-      });
+      await this.createNotificationsForUsersUseCase.execute(
+        [instructor.userId],
+        {
+          eventType: NotificationEventType.INSTRUCTOR_DECLINED,
+          entityType: NotificationEntityType.INSTRUCTOR,
+          entityId: instructor.id,
+          entityName: user.name || user.email,
+          message: `Your instructor application has been declined. You can reapply after 24 hours with updated information.`,
+          link: `/instructor/apply`,
+        }
+      );
     }
 
     return updatedInstructor;

@@ -1,5 +1,8 @@
 import { IUpdateProgressUseCase } from "../interfaces/update-progress.usecase.interface";
-import { UpdateProgressDto, IProgressOutputDTO } from "../../../../domain/dtos/course/progress.dto";
+import {
+  UpdateProgressDto,
+  IProgressOutputDTO,
+} from "../../../dtos/course/progress.dto";
 import { ApiResponse } from "../../../../presentation/http/interfaces/ApiResponse";
 import { IEnrollmentRepository } from "../../../repositories/enrollment.repository.interface";
 import { ILessonProgressRepository } from "../../../repositories/lesson-progress.repository.interface";
@@ -17,7 +20,9 @@ export class UpdateProgressUseCase implements IUpdateProgressUseCase {
     private readonly lessonRepository: ILessonRepository
   ) {}
 
-  async execute(input: UpdateProgressDto): Promise<ApiResponse<IProgressOutputDTO>> {
+  async execute(
+    input: UpdateProgressDto
+  ): Promise<ApiResponse<IProgressOutputDTO>> {
     try {
       if (!input.lessonId) {
         throw new HttpError("Lesson ID is required", StatusCodes.BAD_REQUEST);
@@ -43,15 +48,19 @@ export class UpdateProgressUseCase implements IUpdateProgressUseCase {
         throw new HttpError("Lesson not found", StatusCodes.NOT_FOUND);
       }
       if (lesson.courseId !== input.courseId) {
-        throw new HttpError("Lesson does not belong to this course", StatusCodes.BAD_REQUEST);
+        throw new HttpError(
+          "Lesson does not belong to this course",
+          StatusCodes.BAD_REQUEST
+        );
       }
 
       // Find or create lesson progress
-      let progress = await this.lessonProgressRepository.findByEnrollmentAndLesson(
-        input.userId,
-        input.courseId,
-        input.lessonId
-      );
+      let progress =
+        await this.lessonProgressRepository.findByEnrollmentAndLesson(
+          input.userId,
+          input.courseId,
+          input.lessonId
+        );
 
       if (!progress) {
         progress = LessonProgress.create({
@@ -81,31 +90,40 @@ export class UpdateProgressUseCase implements IUpdateProgressUseCase {
       // Handle quiz answers if provided
       if (input.quizAnswers && input.quizAnswers.length > 0) {
         if (!progress.id) {
-          throw new HttpError("Progress ID is required", StatusCodes.INTERNAL_SERVER_ERROR);
+          throw new HttpError(
+            "Progress ID is required",
+            StatusCodes.INTERNAL_SERVER_ERROR
+          );
         }
         const progressId = progress.id;
-        const quizAnswers = input.quizAnswers.map(answer => 
+        const quizAnswers = input.quizAnswers.map((answer) =>
           QuizAnswer.create({
             lessonProgressId: progressId,
             quizQuestionId: answer.questionId,
             selectedAnswer: answer.selectedAnswer,
-            isCorrect: answer.isCorrect,  
+            isCorrect: answer.isCorrect,
           })
         );
-        await this.lessonProgressRepository.saveQuizAnswers(progressId, quizAnswers);
+        await this.lessonProgressRepository.saveQuizAnswers(
+          progressId,
+          quizAnswers
+        );
       }
 
       // Get all lesson progress for this enrollment
-      const lessonProgress = await this.lessonProgressRepository.findByEnrollment(
-        input.userId,
+      const lessonProgress =
+        await this.lessonProgressRepository.findByEnrollment(
+          input.userId,
+          input.courseId
+        );
+
+      // Get all lessons in the course
+      const allLessons = await this.lessonRepository.findByCourseId(
         input.courseId
       );
 
-      // Get all lessons in the course
-      const allLessons = await this.lessonRepository.findByCourseId(input.courseId);
-
       // Calculate completed lessons
-      const completedLessons = lessonProgress.filter(p => p.completed).length;
+      const completedLessons = lessonProgress.filter((p) => p.completed).length;
       const totalLessons = allLessons.length;
 
       return {
@@ -118,24 +136,32 @@ export class UpdateProgressUseCase implements IUpdateProgressUseCase {
           accessStatus: enrollment.accessStatus as AccessStatus,
           completedLessons,
           totalLessons,
-          lessonProgress: await Promise.all(lessonProgress.map(async p => {
-            if (!p.id) {
-              throw new HttpError("Progress ID is required", StatusCodes.INTERNAL_SERVER_ERROR);
-            }
-            const answers = await this.lessonProgressRepository.findQuizAnswers(p.id);
-            return {
-              lessonId: p.lessonId,
-              completed: p.completed,
-              completedAt: p.completedAt ? new Date(p.completedAt) : undefined,
-              score: p.score,
-              totalQuestions: p.totalQuestions,
-              answers: answers.map(a => ({
-                questionId: a.quizQuestionId,
-                selectedAnswer: a.selectedAnswer,
-                isCorrect: a.isCorrect
-              }))
-            };
-          }))
+          lessonProgress: await Promise.all(
+            lessonProgress.map(async (p) => {
+              if (!p.id) {
+                throw new HttpError(
+                  "Progress ID is required",
+                  StatusCodes.INTERNAL_SERVER_ERROR
+                );
+              }
+              const answers =
+                await this.lessonProgressRepository.findQuizAnswers(p.id);
+              return {
+                lessonId: p.lessonId,
+                completed: p.completed,
+                completedAt: p.completedAt
+                  ? new Date(p.completedAt)
+                  : undefined,
+                score: p.score,
+                totalQuestions: p.totalQuestions,
+                answers: answers.map((a) => ({
+                  questionId: a.quizQuestionId,
+                  selectedAnswer: a.selectedAnswer,
+                  isCorrect: a.isCorrect,
+                })),
+              };
+            })
+          ),
         },
         message: "Lesson progress updated successfully",
         statusCode: StatusCodes.OK,
@@ -150,4 +176,4 @@ export class UpdateProgressUseCase implements IUpdateProgressUseCase {
       );
     }
   }
-} 
+}

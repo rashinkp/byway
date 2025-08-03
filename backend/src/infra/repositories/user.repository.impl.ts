@@ -1,7 +1,7 @@
 import { PrismaClient, Gender, Role } from "@prisma/client";
 import { User } from "../../domain/entities/user.entity";
 import { UserProfile } from "../../domain/entities/user-profile.entity";
-import { GetAllUsersDto } from "../../domain/dtos/user/user.dto";
+import { GetAllUsersDto } from "../../app/dtos/user/user.dto";
 import {
   IPaginatedResponse,
   IUserRepository,
@@ -141,13 +141,24 @@ export class UserRepository implements IUserRepository {
   }
 
   async getUserStats(): Promise<IUserStats> {
-    const [totalUsers, activeUsers, inactiveUsers, totalInstructors, activeInstructors, inactiveInstructors] = await Promise.all([
+    const [
+      totalUsers,
+      activeUsers,
+      inactiveUsers,
+      totalInstructors,
+      activeInstructors,
+      inactiveInstructors,
+    ] = await Promise.all([
       this.prisma.user.count(),
       this.prisma.user.count({ where: { deletedAt: null } }),
       this.prisma.user.count({ where: { deletedAt: { not: null } } }),
-      this.prisma.user.count({ where: { role: 'INSTRUCTOR' } }),
-      this.prisma.user.count({ where: { role: 'INSTRUCTOR', deletedAt: null } }),
-      this.prisma.user.count({ where: { role: 'INSTRUCTOR', deletedAt: { not: null } } }),
+      this.prisma.user.count({ where: { role: "INSTRUCTOR" } }),
+      this.prisma.user.count({
+        where: { role: "INSTRUCTOR", deletedAt: null },
+      }),
+      this.prisma.user.count({
+        where: { role: "INSTRUCTOR", deletedAt: { not: null } },
+      }),
     ]);
 
     return {
@@ -164,6 +175,6 @@ export class UserRepository implements IUserRepository {
     const users = await this.prisma.user.findMany({
       where: { role },
     });
-    return users.map(u => User.fromPrisma(u));
+    return users.map((u) => User.fromPrisma(u));
   }
 }

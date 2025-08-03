@@ -1,5 +1,9 @@
 import { z } from "zod";
 import { courseEditSchema } from "@/lib/validations/course";
+import { PublicUser, User } from "./user";
+import { ILesson, PublicLesson } from "./lesson";
+import { ReactNode } from "react";
+import { IQuizAnswer } from "./progress";
 
 export type SortByType = "createdAt" | "name" | "updatedAt";
 
@@ -142,4 +146,59 @@ export interface IGetEnrolledCoursesInput {
 // New type for approve/decline operations
 export interface IUpdateCourseApprovalInput {
 	courseId: string;
+}
+
+
+
+export interface GridCourse extends Course {
+	rating: number;
+	reviewCount: number;
+	formattedDuration: string;
+	lessons: number;
+	bestSeller: boolean;
+	thumbnail: string;
+	price: number;
+}
+
+
+
+
+export interface CourseDetailLayoutProps {
+	course: Course | undefined;
+	instructor: (User | PublicUser) | undefined;
+	lessons: (ILesson | PublicLesson)[] | undefined;
+	isLoading: {
+		course: boolean;
+		instructor: boolean;
+		lessons: boolean;
+		user: boolean;
+	};
+	error: any;
+	sidebarProps: {
+		isCartLoading?: boolean;
+		handleAddToCart?: () => void;
+		isEnrolled?: boolean;
+		userLoading?: boolean;
+		adminActions?: ReactNode;
+		instructorActions?: ReactNode;
+		adminActionsProps?: any;
+	};
+	tabContent?: {
+		[key: string]: ReactNode;
+	};
+	showReviews?: boolean;
+	customTabs?: Array<{
+		id: string;
+		label: string;
+		icon: React.ReactNode;
+	}>;
+}
+
+
+export interface LessonWithCompletion extends ILesson {
+	completed: boolean;
+	isLocked?: boolean;
+	score?: number;
+	totalQuestions?: number;
+	answers?: IQuizAnswer[];
 }

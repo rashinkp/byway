@@ -1,4 +1,7 @@
-import { CreateCourseReviewDto, CourseReviewResponseDto } from "../../../../domain/dtos/course-review";
+import {
+  CreateCourseReviewDto,
+  CourseReviewResponseDto,
+} from "../../../dtos/course-review";
 import { CourseReview } from "../../../../domain/entities/course-review.entity";
 import { Rating } from "../../../../domain/value-object/rating";
 import { ICourseReviewRepository } from "../../../repositories/course-review.repository.interface";
@@ -11,15 +14,25 @@ export class CreateCourseReviewUseCase implements ICreateCourseReviewUseCase {
     private readonly enrollmentRepository: IEnrollmentRepository
   ) {}
 
-  async execute(input: CreateCourseReviewDto, userId: string): Promise<CourseReviewResponseDto> {
+  async execute(
+    input: CreateCourseReviewDto,
+    userId: string
+  ): Promise<CourseReviewResponseDto> {
     // Check if user is enrolled in the course
-    const enrollment = await this.enrollmentRepository.findByUserAndCourse(userId, input.courseId);
+    const enrollment = await this.enrollmentRepository.findByUserAndCourse(
+      userId,
+      input.courseId
+    );
     if (!enrollment) {
       throw new Error("You must be enrolled in this course to review it");
     }
 
     // Check if user already has a review for this course
-    const existingReview = await this.courseReviewRepository.findByUserAndCourse(userId, input.courseId);
+    const existingReview =
+      await this.courseReviewRepository.findByUserAndCourse(
+        userId,
+        input.courseId
+      );
     if (existingReview) {
       throw new Error("User has already reviewed this course");
     }
@@ -51,4 +64,4 @@ export class CreateCourseReviewUseCase implements ICreateCourseReviewUseCase {
       updatedAt: savedReview.updatedAt,
     };
   }
-} 
+}

@@ -142,3 +142,11 @@ export interface PublicUser {
 	country?: string;
 	city?: string;
 }
+
+
+export interface EditProfileFormProps {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  user: UserProfileType | undefined;
+  isInstructor?: boolean;
+}

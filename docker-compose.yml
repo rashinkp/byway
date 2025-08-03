@@ -1,19 +1,7 @@
 
 services:
-  db:
-    image: postgres:15
-    restart: always
-    environment:
-      POSTGRES_USER: bywayuser
-      POSTGRES_PASSWORD: bywaypass
-      POSTGRES_DB: bywaydb
-    volumes:
-      - db_data:/var/lib/postgresql/data
-
   backend:
     image: ghcr.io/rashinkp/byway/backend:${COMMIT_SHA:-latest}
-    depends_on:
-      - db
     env_file:
       - ./backend/.env.production
     environment:
@@ -34,14 +22,11 @@ services:
       - "3000:3000"
     restart: always
 
-volumes:
-  db_data:
-
 # ---
-# DB data is persisted in the named volume 'db_data'.
-# To safely clean up unused Docker images, containers, and networks (but NOT volumes/data), run:
+# Database has been migrated to external service.
+# No local database volume is needed anymore.
+# To clean up unused Docker resources, run:
 #   docker system prune -a -f
-# This will keep your database data safe.
 # To also clean up old logs, you can run:
 #   sudo journalctl --vacuum-time=7d
 #   sudo rm -rf /var/lib/docker/containers/*/*-json.log

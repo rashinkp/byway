@@ -1,4 +1,4 @@
-import { PaginatedNotificationListDTO } from '../../../../domain/dtos/notification.dto';
+import { PaginatedNotificationListDTO } from "../../../dtos/notification.dto";
 
 export interface GetUserNotificationsUseCaseInterface {
   execute(options: {
@@ -6,8 +6,8 @@ export interface GetUserNotificationsUseCaseInterface {
     skip?: number;
     take?: number;
     sortBy?: string;
-    sortOrder?: 'asc' | 'desc';
+    sortOrder?: "asc" | "desc";
     eventType?: string;
     search?: string;
   }): Promise<PaginatedNotificationListDTO>;
-} 
+}

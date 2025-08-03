@@ -1,4 +1,7 @@
-import { QueryCourseReviewDto, CourseReviewResponseDto } from "../../../../domain/dtos/course-review";
+import {
+  QueryCourseReviewDto,
+  CourseReviewResponseDto,
+} from "../../../dtos/course-review";
 import { ICourseReviewRepository } from "../../../repositories/course-review.repository.interface";
 import { IGetCourseReviewsUseCase } from "../interfaces/get-course-reviews.usecase.interface";
 
@@ -7,7 +10,10 @@ export class GetCourseReviewsUseCase implements IGetCourseReviewsUseCase {
     private readonly courseReviewRepository: ICourseReviewRepository
   ) {}
 
-  async execute(input: QueryCourseReviewDto, userId?: string): Promise<{
+  async execute(
+    input: QueryCourseReviewDto,
+    userId?: string
+  ): Promise<{
     reviews: CourseReviewResponseDto[];
     total: number;
     totalPages: number;
@@ -18,8 +24,8 @@ export class GetCourseReviewsUseCase implements IGetCourseReviewsUseCase {
       page: input.page || 1,
       limit: input.limit || 10,
       rating: input.rating,
-      sortBy: input.sortBy || 'createdAt',
-      sortOrder: input.sortOrder || 'desc',
+      sortBy: input.sortBy || "createdAt",
+      sortOrder: input.sortOrder || "desc",
       isMyReviews: input.isMyReviews || false,
       includeDisabled: input.includeDisabled || false,
     };
@@ -30,6 +36,10 @@ export class GetCourseReviewsUseCase implements IGetCourseReviewsUseCase {
     }
 
     // Get reviews from repository
-    return await this.courseReviewRepository.findByCourseId(query.courseId, query, userId);
+    return await this.courseReviewRepository.findByCourseId(
+      query.courseId,
+      query,
+      userId
+    );
   }
-} 
+}

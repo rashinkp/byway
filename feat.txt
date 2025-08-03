@@ -1,8 +1,9 @@
 socket io
 google auth api
 facebook auth api
-stripe webhook
+stripe webhook authentication
 sql - (prisma)
 nextjs
 clean architecture
 zustand (store)
+

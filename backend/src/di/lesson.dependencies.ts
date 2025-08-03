@@ -22,7 +22,7 @@ export function createLessonDependencies(
   const updateLessonUseCase = new UpdateLessonUseCase(lessonRepository , deps.lessonContentRepository);
   const getLessonByIdUseCase = new GetLessonByIdUseCase(lessonRepository);
   const getAllLessonsUseCase = new GetAllLessonsUseCase(lessonRepository);
-  const deleteLessonUseCase = new DeleteLessonUseCase(lessonRepository);
+  const deleteLessonUseCase = new DeleteLessonUseCase(lessonRepository, deps.s3Service);
   const getPublicLessonsUseCase = new GetPublicLessonsUseCase(lessonRepository);
 
   const lessonController = new LessonController(

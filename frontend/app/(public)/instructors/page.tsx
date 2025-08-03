@@ -5,6 +5,7 @@ import { Pagination } from "@/components/ui/Pagination";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useGetAllInstructors } from "@/hooks/instructor/useGetAllInstructor";
 import { InstructorCard } from "@/components/instructor/InstructorCard";
+import { InstructorCardData } from "@/types/instructor";
 
 export default function InstructorsPage() {
 	const [page, setPage] = useState(1);
@@ -58,7 +59,7 @@ export default function InstructorsPage() {
 				) : (
 					<>
 						<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-							{data?.data.items.map((instructor) => (
+							{data?.data.items.map((instructor: InstructorCardData) => (
 								<InstructorCard
 									key={instructor.id}
 									instructor={{

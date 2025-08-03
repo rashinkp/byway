@@ -13,33 +13,12 @@ import { PasswordInput } from "@/components/ui/PasswordInput";
 import { Button } from "@/components/ui/button";
 import { SocialAuthButton } from "@/components/ui/SocialAuthButton";
 import { AuthLink } from "@/components/auth/parts/AuthLink";
-import { UseFormReturn, FieldValues, Path } from "react-hook-form";
+import { FieldValues } from "react-hook-form";
 import { Loader2 } from "lucide-react";
 import Link from "next/link";
+import { AuthFormProps } from "@/types/auth";
 
-interface FieldConfig<T extends FieldValues> {
-	name: Path<T>;
-	label: string;
-	type: "text" | "email" | "password";
-	placeholder: string;
-}
 
-interface AuthFormProps<T extends FieldValues> {
-	form: UseFormReturn<T>;
-	onSubmit: (data: T) => void;
-	fields: FieldConfig<T>[];
-	title: string;
-	subtitle: string;
-	submitText: string;
-	isSubmitting: boolean;
-	error?: string | null;
-	googleAuthText: string;
-	facebookAuthText: string;
-	onGoogleAuth: () => void;
-	onFacebookAuth: () => void;
-	authLink: { text: string; linkText: string; href: string };
-	extraLink?: { text: string; linkText: string; href: string };
-}
 
 export function AuthForm<T extends FieldValues>({
 	form,

@@ -1,4 +1,4 @@
-import { WalletResponseDto } from "../../../../domain/dtos/wallet/wallet-response.dto";
+import { WalletResponseDto } from "../../../dtos/wallet/wallet-response.dto";
 import { IWalletRepository } from "../../../repositories/wallet.repository.interface";
 import { IGetWalletUseCase } from "../interfaces/get-wallet.usecase.interface";
 import { Wallet } from "../../../../domain/entities/wallet.entity";
@@ -16,4 +16,4 @@ export class GetWalletUseCase implements IGetWalletUseCase {
 
     return wallet.toResponse();
   }
-} 
+}

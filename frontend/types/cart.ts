@@ -60,3 +60,25 @@ export interface IGetCartInput {
 	limit?: number;
 	includeDeleted?: boolean;
 }
+
+
+
+export interface CartItemProps {
+  item: ICart;
+  isRemoving: boolean;
+  onRemove: (courseId: string) => void;
+}
+
+
+export interface CartItemsProps {
+  cart: ICart[];
+  isRemoving: boolean;
+  removingCourseId?: string;
+  onRemoveCourse: (courseId: string) => void;
+}
+
+
+export 
+interface OrderSummaryProps {
+  cart: ICart[];
+}

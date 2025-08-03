@@ -193,80 +193,95 @@ export default function LatestRevenueList({
 			<Separator />
 
 			{/* Transactions List */}
-			<div className="space-y-4">
-				{latestItems.map((item: any) => (
-					<div
-						key={item.orderId}
-						className="bg-white/60 backdrop-blur-sm border border-gray-200/50 rounded-xl p-4 hover:bg-white/80 hover:shadow-sm transition-all duration-200 dark:bg-[#232323] dark:border-gray-700 dark:hover:bg-[#18181b]"
-					>
-						<div className="flex items-center justify-between">
-							{/* Left side - Essential Info */}
-							<div className="flex items-center space-x-4 flex-1">
-								<div className="bg-[#facc15] p-2 rounded-lg dark:bg-[#232323]">
-									<DollarSign className="w-5 h-5 text-black dark:text-[#facc15]" />
-								</div>
-
-								<div className="flex-1">
-									<div className="flex items-center space-x-2 mb-2">
-										<h4 className="font-semibold text-black dark:text-white">
-											{item.courseTitle}
-										</h4>
-										<button
-											onClick={() => handleTransactionClick(item)}
-											className="text-[#facc15] hover:text-black transition-colors p-1 rounded-full hover:bg-[#facc15]/20 dark:hover:text-[#facc15] dark:hover:bg-[#232323]"
-										>
-											<Info className="w-4 h-4" />
-										</button>
+			{latestItems.length === 0 ? (
+				<div className="flex flex-col items-center justify-center py-16 px-8 text-center">
+					<div className="mb-6">
+						<DollarSign className="w-16 h-16 text-gray-400 dark:text-gray-600" />
+					</div>
+					<h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">No Transactions Yet</h3>
+					<p className="text-lg text-gray-600 dark:text-gray-300 max-w-md mb-8 leading-relaxed">
+						{searchValue 
+							? `No transactions found matching "${searchValue}". Try adjusting your search terms.`
+							: "No revenue transactions have been recorded yet. Transactions will appear here once students start purchasing courses."
+						}
+					</p>
+				</div>
+			) : (
+				<div className="space-y-4">
+					{latestItems.map((item: any) => (
+						<div
+							key={item.orderId}
+							className="bg-white/60 backdrop-blur-sm border border-gray-200/50 rounded-xl p-4 hover:bg-white/80 hover:shadow-sm transition-all duration-200 dark:bg-[#232323] dark:border-gray-700 dark:hover:bg-[#18181b]"
+						>
+							<div className="flex items-center justify-between">
+								{/* Left side - Essential Info */}
+								<div className="flex items-center space-x-4 flex-1">
+									<div className="bg-[#facc15] p-2 rounded-lg dark:bg-[#232323]">
+										<DollarSign className="w-5 h-5 text-black dark:text-[#facc15]" />
 									</div>
 
-									<div className="grid grid-cols-1 md:grid-cols-4 gap-4 text-sm">
-										<div className="flex items-center space-x-2">
-											<User className="w-4 h-4 text-[#facc15] dark:text-[#facc15]" />
-											<div>
-												<span className="text-gray-600 dark:text-gray-300">Instructor:</span>
-												<span className="ml-1 font-medium text-black dark:text-white">
-													{item.creatorName}
-												</span>
-											</div>
+									<div className="flex-1">
+										<div className="flex items-center space-x-2 mb-2">
+											<h4 className="font-semibold text-black dark:text-white">
+												{item.courseTitle}
+											</h4>
+											<button
+												onClick={() => handleTransactionClick(item)}
+												className="text-[#facc15] hover:text-black transition-colors p-1 rounded-full hover:bg-[#facc15]/20 dark:hover:text-[#facc15] dark:hover:bg-[#232323]"
+											>
+												<Info className="w-4 h-4" />
+											</button>
 										</div>
-										<div className="flex items-center space-x-2">
-											<Users className="w-4 h-4 text-[#facc15] dark:text-[#facc15]" />
+
+										<div className="grid grid-cols-1 md:grid-cols-4 gap-4 text-sm">
+											<div className="flex items-center space-x-2">
+												<User className="w-4 h-4 text-[#facc15] dark:text-[#facc15]" />
+												<div>
+													<span className="text-gray-600 dark:text-gray-300">Instructor:</span>
+													<span className="ml-1 font-medium text-black dark:text-white">
+														{item.creatorName}
+													</span>
+												</div>
+											</div>
+											<div className="flex items-center space-x-2">
+												<Users className="w-4 h-4 text-[#facc15] dark:text-[#facc15]" />
+												<div>
+													<span className="text-gray-600 dark:text-gray-300">Customer:</span>
+													<span className="ml-1 font-medium text-black  dark:text-white">
+														{item.customerName}
+													</span>
+												</div>
+											</div>
 											<div>
-												<span className="text-gray-600 dark:text-gray-300">Customer:</span>
+												<span className="text-gray-600 dark:text-gray-300">Offer Price:</span>
 												<span className="ml-1 font-medium text-black  dark:text-white">
-													{item.customerName}
+													{formatCurrency(item.offerPrice)}
+												</span>
+											</div>
+											<div>
+												<span className="text-gray-600 dark:text-gray-300">Admin Share:</span>
+												<span className="ml-1 font-medium text-black  dark:text-white">
+													{item.adminSharePercentage}%
 												</span>
 											</div>
 										</div>
-										<div>
-											<span className="text-gray-600 dark:text-gray-300">Offer Price:</span>
-											<span className="ml-1 font-medium text-black  dark:text-white">
-												{formatCurrency(item.offerPrice)}
-											</span>
-										</div>
-										<div>
-											<span className="text-gray-600 dark:text-gray-300">Admin Share:</span>
-											<span className="ml-1 font-medium text-black  dark:text-white">
-												{item.adminSharePercentage}%
-											</span>
-										</div>
 									</div>
 								</div>
-							</div>
 
-							{/* Right side - Revenue */}
-							<div className="text-right">
-								<div className="text-xl font-bold text-black dark:text-[#facc15]">
-									{formatCurrency(item.transactionAmount)}
-								</div>
-								<div className="text-sm text-gray-500 dark:text-gray-300">
-									{formatDate(item.createdAt)}
+								{/* Right side - Revenue */}
+								<div className="text-right">
+									<div className="text-xl font-bold text-black dark:text-[#facc15]">
+										{formatCurrency(item.transactionAmount)}
+									</div>
+									<div className="text-sm text-gray-500 dark:text-gray-300">
+										{formatDate(item.createdAt)}
+									</div>
 								</div>
 							</div>
 						</div>
-					</div>
-				))}
-			</div>
+					))}
+				</div>
+			)}
 
 			{/* Pagination */}
 			{totalItems >= 10 && (

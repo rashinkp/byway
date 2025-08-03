@@ -6,7 +6,7 @@ import {
   DeclineInstructorRequestDTO,
   GetInstructorByUserIdRequestDTO,
   GetAllInstructorsRequestDTO,
-} from "../../domain/dtos/instructor/instructor.dto";
+} from "../../app/dtos/instructor/instructor.dto";
 import { APPROVALSTATUS } from "../../domain/enum/approval-status.enum";
 
 interface ValidationSchema {
@@ -18,7 +18,9 @@ interface ValidationSchema {
 // Schemas
 const createInstructorSchema = z.object({
   areaOfExpertise: z.string().min(1, "Area of expertise is required"),
-  professionalExperience: z.string().min(1, "Professional experience is required"),
+  professionalExperience: z
+    .string()
+    .min(1, "Professional experience is required"),
   about: z.string().optional(),
   website: z.string().url().optional(),
   education: z.string().min(1, "Education details are required"),
@@ -36,7 +38,11 @@ const updateInstructorSchema = z.object({
   certifications: z.string().optional(),
   cv: z.string().min(1).optional(),
   status: z
-    .enum([APPROVALSTATUS.PENDING, APPROVALSTATUS.APPROVED, APPROVALSTATUS.DECLINED])
+    .enum([
+      APPROVALSTATUS.PENDING,
+      APPROVALSTATUS.APPROVED,
+      APPROVALSTATUS.DECLINED,
+    ])
     .optional(),
 });
 
@@ -56,13 +62,9 @@ export const getAllInstructorsSchema = z.object({
   page: z.coerce.number().min(1).default(1),
   limit: z.coerce.number().min(1).max(100).default(10),
   search: z.string().optional(),
-  sortBy: z.enum([
-    "createdAt",
-    "status",
-    "areaOfExpertise",
-    "user.name",
-    "user.email"
-  ]).default("createdAt"),
+  sortBy: z
+    .enum(["createdAt", "status", "areaOfExpertise", "user.name", "user.email"])
+    .default("createdAt"),
   sortOrder: z.enum(["asc", "desc"]).default("desc"),
   filterBy: z.enum(["All", "Pending", "Approved", "Declined"]).default("All"),
   includeDeleted: z
@@ -97,26 +99,38 @@ export const getAllInstructorsSchemaDef: ValidationSchema = {
 };
 
 // Validation functions
-export function validateCreateInstructor(data: unknown): CreateInstructorRequestDTO {
+export function validateCreateInstructor(
+  data: unknown
+): CreateInstructorRequestDTO {
   return createInstructorSchema.parse(data);
 }
 
-export function validateUpdateInstructor(data: unknown): UpdateInstructorRequestDTO {
+export function validateUpdateInstructor(
+  data: unknown
+): UpdateInstructorRequestDTO {
   return updateInstructorSchema.parse(data);
 }
 
-export function validateApproveInstructor(data: unknown): ApproveInstructorRequestDTO {
+export function validateApproveInstructor(
+  data: unknown
+): ApproveInstructorRequestDTO {
   return approveInstructorSchema.parse(data);
 }
 
-export function validateDeclineInstructor(data: unknown): DeclineInstructorRequestDTO {
+export function validateDeclineInstructor(
+  data: unknown
+): DeclineInstructorRequestDTO {
   return declineInstructorSchema.parse(data);
 }
 
-export function validateGetInstructorByUserId(data: unknown): GetInstructorByUserIdRequestDTO {
+export function validateGetInstructorByUserId(
+  data: unknown
+): GetInstructorByUserIdRequestDTO {
   return getInstructorByUserIdSchema.parse(data);
 }
 
-export function validateGetAllInstructors(data: unknown): GetAllInstructorsRequestDTO {
+export function validateGetAllInstructors(
+  data: unknown
+): GetAllInstructorsRequestDTO {
   return getAllInstructorsSchema.parse(data);
 }

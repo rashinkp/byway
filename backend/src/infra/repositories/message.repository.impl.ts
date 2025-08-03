@@ -5,7 +5,7 @@ import { ChatId } from "../../domain/value-object/ChatId";
 import { UserId } from "../../domain/value-object/UserId";
 import { MessageContent } from "../../domain/value-object/MessageContent";
 import { Timestamp } from "../../domain/value-object/Timestamp";
-import { EnrichedMessageDTO } from "../../domain/dtos/message.dto";
+import { EnrichedMessageDTO } from "../../app/dtos/message.dto";
 import { MessageType as DomainMessageType } from "../../domain/enum/Message-type.enum";
 import { MessageType as PrismaMessageType, PrismaClient } from "@prisma/client";
 

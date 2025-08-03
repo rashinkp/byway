@@ -1,5 +1,5 @@
 import { Certificate } from "../../domain/entities/certificate.entity";
-import { CertificateDTO } from "../../domain/dtos/certificate.dto";
+import { CertificateDTO } from "../dtos/certificate.dto";
 
 export interface CertificateRepositoryInterface {
   create(certificate: Certificate): Promise<CertificateDTO>;

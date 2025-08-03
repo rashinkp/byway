@@ -1,5 +1,10 @@
-import { ITransactionOutputDTO, IUpdateTransactionStatusInputDTO } from "../../../../domain/dtos/transaction/transaction.dto";
+import {
+  ITransactionOutputDTO,
+  IUpdateTransactionStatusInputDTO,
+} from "../../../dtos/transaction/transaction.dto";
 
 export interface IUpdateTransactionStatusUseCase {
-  execute(input: IUpdateTransactionStatusInputDTO): Promise<ITransactionOutputDTO>;
-} 
+  execute(
+    input: IUpdateTransactionStatusInputDTO
+  ): Promise<ITransactionOutputDTO>;
+}

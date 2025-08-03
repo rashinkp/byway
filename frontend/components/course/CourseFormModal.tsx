@@ -10,7 +10,7 @@ import { useCategories } from "@/hooks/category/useCategories";
 import { useMemo, useState } from "react";
 import { courseSchema, courseEditSchema } from "@/lib/validations/course";
 import { FileUploadStatus } from "@/components/FileUploadComponent";
-import { getPresignedUrl, uploadFileToS3 } from "@/api/file";
+import { getCoursePresignedUrl, getPresignedUrl, uploadFileToS3 } from "@/api/file";
 import { z } from "zod";
 
 export const baseFields: FormFieldConfig<CourseFormData>[] = [
@@ -229,9 +229,15 @@ export function CourseFormModal({
 			// Handle thumbnail upload to S3
 			if (data.thumbnail instanceof File) {
 				setThumbnailUploadStatus(FileUploadStatus.UPLOADING);
-				const { uploadUrl, fileUrl } = await getPresignedUrl(
+				
+				// For new courses, we'll use a temporary courseId that will be updated after creation
+				const tempCourseId = isEditing && initialData?.id ? initialData.id : `temp-${Date.now()}`;
+				
+				const { uploadUrl, fileUrl } = await getCoursePresignedUrl(
 					data.thumbnail.name,
 					data.thumbnail.type,
+					tempCourseId,
+					'thumbnail'
 				);
 				await uploadFileToS3(data.thumbnail, uploadUrl, (progress) => {
 					setThumbnailUploadProgress(progress);
@@ -250,11 +256,13 @@ export function CourseFormModal({
 				duration: data.duration,
 				offer: data.offer,
 				categoryId: data.categoryId,
-				prerequisites: data.prerequisites,
-				longDescription: data.longDescription,
-				objectives: data.objectives,
-				targetAudience: data.targetAudience,
 				adminSharePercentage: data.adminSharePercentage || 20,
+				details: {
+					prerequisites: data.prerequisites || null,
+					longDescription: data.longDescription || null,
+					objectives: data.objectives || null,
+					targetAudience: data.targetAudience || null,
+				},
 			};
 
 			if (isEditing && initialData?.id) {

@@ -1,4 +1,4 @@
-import { CourseReviewResponseDto } from "../../../../domain/dtos/course-review";
+import { CourseReviewResponseDto } from "../../../dtos/course-review";
 import { ICourseReviewRepository } from "../../../repositories/course-review.repository.interface";
 import { IGetMyCourseReviewUseCase } from "../interfaces/get-my-course-review.usecase.interface";
 
@@ -7,9 +7,15 @@ export class GetMyCourseReviewUseCase implements IGetMyCourseReviewUseCase {
     private readonly courseReviewRepository: ICourseReviewRepository
   ) {}
 
-  async execute(courseId: string, userId: string): Promise<CourseReviewResponseDto | null> {
-    const review = await this.courseReviewRepository.findByUserAndCourse(userId, courseId);
-    
+  async execute(
+    courseId: string,
+    userId: string
+  ): Promise<CourseReviewResponseDto | null> {
+    const review = await this.courseReviewRepository.findByUserAndCourse(
+      userId,
+      courseId
+    );
+
     if (!review) {
       return null;
     }
@@ -25,4 +31,4 @@ export class GetMyCourseReviewUseCase implements IGetMyCourseReviewUseCase {
       updatedAt: review.updatedAt,
     };
   }
-} 
+}

@@ -4,7 +4,7 @@ import { HttpError } from "../../../../presentation/http/errors/http-error";
 import {
   ICategoryIdInputDTO,
   ICategoryOutputDTO,
-} from "../../../../domain/dtos/category/category.dto";
+} from "../../../dtos/category/category.dto";
 
 export class DeleteCategoryUseCase implements IDeleteCategoryUseCase {
   constructor(private categoryRepository: ICategoryRepository) {}

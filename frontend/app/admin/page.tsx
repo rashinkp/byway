@@ -152,76 +152,88 @@ export default function AdminDashboard() {
 						title="Top Enrolled Courses"
 						subtitle="Most popular courses by enrollment count and revenue"
 					>
-						<div className="space-y-4">
-							{data.topEnrolledCourses.map((course, index) => (
-								<div
-									key={course.courseId}
-									className="bg-white/80 backdrop-blur-sm border border-gray-200 rounded-xl p-4 dark:bg-[#232323] dark:border-gray-700"
-								>
-									<div className="flex items-center space-x-4">
-										<div className="w-10 h-10 rounded-lg flex items-center justify-center">
-											<span className="text-sm font-semibold text-blue-600 dark:text-[#facc15]">
-												#{index + 1}
-											</span>
-										</div>
-										<div className="flex-1 space-y-2">
-											<div className="flex items-center gap-2">
-												<span className="text-sm font-medium text-gray-500">
+						{data.topEnrolledCourses.length === 0 ? (
+							<div className="flex flex-col items-center justify-center py-16 px-8 text-center">
+								<div className="mb-6">
+									<BookOpen className="w-16 h-16 text-gray-400 dark:text-gray-600" />
+								</div>
+								<h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">No Courses Yet</h3>
+								<p className="text-lg text-gray-600 dark:text-gray-300 max-w-md mb-8 leading-relaxed">
+									There are no courses with enrollments yet. Courses will appear here once students start enrolling.
+								</p>
+							</div>
+						) : (
+							<div className="space-y-4">
+								{data.topEnrolledCourses.map((course, index) => (
+									<div
+										key={course.courseId}
+										className="bg-white/80 backdrop-blur-sm border border-gray-200 rounded-xl p-4 dark:bg-[#232323] dark:border-gray-700"
+									>
+										<div className="flex items-center space-x-4">
+											<div className="w-10 h-10 rounded-lg flex items-center justify-center">
+												<span className="text-sm font-semibold text-blue-600 dark:text-[#facc15]">
 													#{index + 1}
 												</span>
-												<button
-													onClick={() => handleCourseClick(course.courseId)}
-													className="text-lg font-semibold text-gray-900 dark:text-white hover:text-blue-600 hover:underline transition-colors cursor-pointer"
-												>
-													{course.courseTitle}
-												</button>
-												<span className="text-sm text-gray-500 dark:text-gray-300">
-													by {course.instructorName}
-												</span>
 											</div>
-											<div className="grid grid-cols-1 md:grid-cols-5 gap-4">
-												<div className="flex items-center space-x-2">
-													<Users className="w-4 h-4 text-gray-400" />
-													<div>
-														<p className="text-xs text-gray-500 dark:text-gray-300">Enrollments</p>
-														<p className="text-sm font-medium dark:text-white">
-															{course.enrollmentCount}
-														</p>
-													</div>
+											<div className="flex-1 space-y-2">
+												<div className="flex items-center gap-2">
+													<span className="text-sm font-medium text-gray-500">
+														#{index + 1}
+													</span>
+													<button
+														onClick={() => handleCourseClick(course.courseId)}
+														className="text-lg font-semibold text-gray-900 dark:text-white hover:text-blue-600 hover:underline transition-colors cursor-pointer"
+													>
+														{course.courseTitle}
+													</button>
+													<span className="text-sm text-gray-500 dark:text-gray-300">
+														by {course.instructorName}
+													</span>
 												</div>
-												<div className="flex items-center space-x-2">
-													<DollarSign className="w-4 h-4 text-gray-400" />
-													<div>
-														<p className="text-xs text-gray-500 dark:text-gray-300">Revenue</p>
-														<p className="text-sm font-medium dark:text-white">
-															${truncateToTwoDecimals(course.revenue)}
-														</p>
+												<div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+													<div className="flex items-center space-x-2">
+														<Users className="w-4 h-4 text-gray-400" />
+														<div>
+															<p className="text-xs text-gray-500 dark:text-gray-300">Enrollments</p>
+															<p className="text-sm font-medium dark:text-white">
+																{course.enrollmentCount}
+															</p>
+														</div>
 													</div>
-												</div>
-												<div className="flex items-center space-x-2">
-													<BarChart3 className="w-4 h-4 text-gray-400" />
-													<div>
-														<p className="text-xs text-gray-500 dark:text-gray-300">Rating</p>
-														<p className="text-sm font-medium dark:text-white">
-															{course.rating}/5
-														</p>
+													<div className="flex items-center space-x-2">
+														<DollarSign className="w-4 h-4 text-gray-400" />
+														<div>
+															<p className="text-xs text-gray-500 dark:text-gray-300">Revenue</p>
+															<p className="text-sm font-medium dark:text-white">
+																${truncateToTwoDecimals(course.revenue)}
+															</p>
+														</div>
 													</div>
-												</div>
-												<div className="flex items-center space-x-2">
-													<MessageSquare className="w-4 h-4 text-gray-400" />
-													<div>
-														<p className="text-xs text-gray-500 dark:text-gray-300">Reviews</p>
-														<p className="text-sm font-medium dark:text-white">
-															{course.reviewCount}
-														</p>
+													<div className="flex items-center space-x-2">
+														<BarChart3 className="w-4 h-4 text-gray-400" />
+														<div>
+															<p className="text-xs text-gray-500 dark:text-gray-300">Rating</p>
+															<p className="text-sm font-medium dark:text-white">
+																{course.rating}/5
+															</p>
+														</div>
+													</div>
+													<div className="flex items-center space-x-2">
+														<MessageSquare className="w-4 h-4 text-gray-400" />
+														<div>
+															<p className="text-xs text-gray-500 dark:text-gray-300">Reviews</p>
+															<p className="text-sm font-medium dark:text-white">
+																{course.reviewCount}
+															</p>
+														</div>
 													</div>
 												</div>
 											</div>
 										</div>
 									</div>
-								</div>
-							))}
-						</div>
+								))}
+							</div>
+						)}
 					</DashboardSection>
 
 					{/* Top Instructors Section */}
@@ -232,90 +244,102 @@ export default function AdminDashboard() {
 						title="Top Performing Instructors"
 						subtitle="Instructors with highest selling rates and revenue"
 					>
-						<div className="space-y-4">
-							{data.topInstructors.map((instructor, index) => (
-								<div
-									key={instructor.instructorId}
-									className="bg-white/80 backdrop-blur-sm border border-gray-200 rounded-xl p-4 dark:bg-[#232323] dark:border-gray-700"
-								>
-									<div className="flex items-center space-x-4">
-										<div className="w-10 h-10 rounded-lg flex items-center justify-center">
-											<span className="text-sm font-semibold text-purple-600 dark:text-[#facc15]">
-												#{index + 1}
-											</span>
-										</div>
-										<div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center dark:bg-[#18181b]">
-											<span className="text-sm font-semibold text-gray-600 dark:text-[#facc15]">
-												{instructor.instructorName
-													.split(" ")
-													.map((n) => n[0])
-													.join("")}
-											</span>
-										</div>
-										<div className="flex-1 space-y-2">
-											<div className="flex items-center gap-2">
-												<span className="text-sm font-medium text-gray-500">
+						{data.topInstructors.length === 0 ? (
+							<div className="flex flex-col items-center justify-center py-16 px-8 text-center">
+								<div className="mb-6">
+									<GraduationCap className="w-16 h-16 text-gray-400 dark:text-gray-600" />
+								</div>
+								<h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">No Instructors Yet</h3>
+								<p className="text-lg text-gray-600 dark:text-gray-300 max-w-md mb-8 leading-relaxed">
+									There are no instructors with performance data yet. Instructors will appear here once they start creating courses and generating revenue.
+								</p>
+							</div>
+						) : (
+							<div className="space-y-4">
+								{data.topInstructors.map((instructor, index) => (
+									<div
+										key={instructor.instructorId}
+										className="bg-white/80 backdrop-blur-sm border border-gray-200 rounded-xl p-4 dark:bg-[#232323] dark:border-gray-700"
+									>
+										<div className="flex items-center space-x-4">
+											<div className="w-10 h-10 rounded-lg flex items-center justify-center">
+												<span className="text-sm font-semibold text-purple-600 dark:text-[#facc15]">
 													#{index + 1}
 												</span>
-												<h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-													{instructor.instructorName}
-												</h3>
-												<span className="text-sm text-gray-500 dark:text-gray-300">
-													{instructor.email}
-												</span>
-												<span
-													className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${
-														instructor.isActive
-															? "bg-green-50 text-green-700 border border-green-200 dark:bg-green-900 dark:text-green-300 dark:border-green-700"
-															: "bg-red-50 text-red-700 border border-red-200 dark:bg-red-900 dark:text-red-300 dark:border-red-700"
-													}`}
-												>
-													{instructor.isActive ? "Active" : "Inactive"}
+											</div>
+											<div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center dark:bg-[#18181b]">
+												<span className="text-sm font-semibold text-gray-600 dark:text-[#facc15]">
+													{instructor.instructorName
+														.split(" ")
+														.map((n) => n[0])
+														.join("")}
 												</span>
 											</div>
-											<div className="grid grid-cols-1 md:grid-cols-6 gap-4">
-												<div className="flex items-center space-x-2">
-													<BookOpen className="w-4 h-4 text-gray-400" />
-													<div>
-														<p className="text-xs text-gray-500 dark:text-gray-300">Courses</p>
-														<p className="text-sm font-medium dark:text-white">
-															{instructor.courseCount}
-														</p>
-													</div>
+											<div className="flex-1 space-y-2">
+												<div className="flex items-center gap-2">
+													<span className="text-sm font-medium text-gray-500">
+														#{index + 1}
+													</span>
+													<h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+														{instructor.instructorName}
+													</h3>
+													<span className="text-sm text-gray-500 dark:text-gray-300">
+														{instructor.email}
+													</span>
+													<span
+														className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${
+															instructor.isActive
+																? "bg-green-50 text-green-700 border border-green-200 dark:bg-green-900 dark:text-green-300 dark:border-green-700"
+																: "bg-red-50 text-red-700 border border-red-200 dark:bg-red-900 dark:text-red-300 dark:border-red-700"
+														}`}
+													>
+														{instructor.isActive ? "Active" : "Inactive"}
+													</span>
 												</div>
-												<div className="flex items-center space-x-2">
-													<Users className="w-4 h-4 text-gray-400" />
-													<div>
-														<p className="text-xs text-gray-500 dark:text-gray-300">Enrollments</p>
-														<p className="text-sm font-medium dark:text-white">
-															{instructor.totalEnrollments}
-														</p>
+												<div className="grid grid-cols-1 md:grid-cols-6 gap-4">
+													<div className="flex items-center space-x-2">
+														<BookOpen className="w-4 h-4 text-gray-400" />
+														<div>
+															<p className="text-xs text-gray-500 dark:text-gray-300">Courses</p>
+															<p className="text-sm font-medium dark:text-white">
+																{instructor.courseCount}
+															</p>
+														</div>
 													</div>
-												</div>
-												<div className="flex items-center space-x-2">
-													<DollarSign className="w-4 h-4 text-gray-400" />
-													<div>
-														<p className="text-xs text-gray-500 dark:text-gray-300">Revenue</p>
-														<p className="text-sm font-medium dark:text-white">
-															${truncateToTwoDecimals(instructor.totalRevenue)}
-														</p>
+													<div className="flex items-center space-x-2">
+														<Users className="w-4 h-4 text-gray-400" />
+														<div>
+															<p className="text-xs text-gray-500 dark:text-gray-300">Enrollments</p>
+															<p className="text-sm font-medium dark:text-white">
+																{instructor.totalEnrollments}
+															</p>
+														</div>
 													</div>
-												</div>
-												<div className="flex items-center space-x-2">
-													<BarChart3 className="w-4 h-4 text-gray-400" />
-													<div>
-														<p className="text-xs text-gray-500 dark:text-gray-300">Rating</p>
-														<p className="text-sm font-medium dark:text-white">
-															{truncateToTwoDecimals(instructor.averageRating)}/5
-														</p>
+													<div className="flex items-center space-x-2">
+														<DollarSign className="w-4 h-4 text-gray-400" />
+														<div>
+															<p className="text-xs text-gray-500 dark:text-gray-300">Revenue</p>
+															<p className="text-sm font-medium dark:text-white">
+																${truncateToTwoDecimals(instructor.totalRevenue)}
+															</p>
+														</div>
+													</div>
+													<div className="flex items-center space-x-2">
+														<BarChart3 className="w-4 h-4 text-gray-400" />
+														<div>
+															<p className="text-xs text-gray-500 dark:text-gray-300">Rating</p>
+															<p className="text-sm font-medium dark:text-white">
+																{truncateToTwoDecimals(instructor.averageRating)}/5
+															</p>
+														</div>
 													</div>
 												</div>
 											</div>
 										</div>
 									</div>
-								</div>
-							))}
-						</div>
+								))}
+							</div>
+						)}
 					</DashboardSection>
 				</div>
 			)}

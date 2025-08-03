@@ -1,6 +1,9 @@
 import { TransactionType } from "../../domain/enum/transaction-type.enum";
 import { TransactionStatus } from "../../domain/enum/transaction-status.enum";
-import { GetLatestRevenueParams, GetLatestRevenueResult } from "../../domain/dtos/revenue/get-latest-revenue.dto";
+import {
+  GetLatestRevenueParams,
+  GetLatestRevenueResult,
+} from "../dtos/revenue/get-latest-revenue.dto";
 
 export interface GetCourseTransactionsParams {
   startDate: Date;
@@ -38,30 +41,34 @@ export interface IRevenueRepository {
     userId: string;
   }): Promise<number>;
 
-  getCourseTransactions(params: GetCourseTransactionsParams): Promise<Array<{
-    courseId: string;
-    amount: number;
-    count: number;
-  }>>;
+  getCourseTransactions(params: GetCourseTransactionsParams): Promise<
+    Array<{
+      courseId: string;
+      amount: number;
+      count: number;
+    }>
+  >;
 
-  getCourseDetails(params: GetCourseDetailsParams): Promise<Array<{
-    id: string;
-    title: string;
-    thumbnail: string | null;
-    creator: {
+  getCourseDetails(params: GetCourseDetailsParams): Promise<
+    Array<{
       id: string;
-      name: string;
-      avatar: string | null;
-    };
-    adminSharePercentage: number;
-  }>>;
+      title: string;
+      thumbnail: string | null;
+      creator: {
+        id: string;
+        name: string;
+        avatar: string | null;
+      };
+      adminSharePercentage: number;
+    }>
+  >;
 
   getTotalCourses(params: GetTotalCoursesParams): Promise<number>;
 
   getLatestRevenue(params: GetLatestRevenueParams): Promise<{
-    items: GetLatestRevenueResult['items'];
+    items: GetLatestRevenueResult["items"];
     total: number;
   }>;
 
   getTotalRevenue(userId: string): Promise<number>;
-} 
+}

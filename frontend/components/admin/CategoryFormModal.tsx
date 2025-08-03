@@ -3,7 +3,6 @@
 import React from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from "zod";
 import { Button } from "@/components/ui/button";
 import {
 	Dialog,
@@ -23,27 +22,9 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { CategoryFormData } from "@/types/category";
-
-const categoryFormSchema = z.object({
-	name: z
-		.string()
-		.min(1, "Name is required")
-		.max(100, "Name must be less than 100 characters"),
-	description: z.string().optional(),
-});
-
-interface CategoryFormModalProps {
-	open: boolean;
-	onOpenChange: (open: boolean) => void;
-	onSubmit: (data: CategoryFormData) => void;
-	initialData?: {
-		name: string;
-		description?: string;
-	};
-	title: string;
-	submitText: string;
-}
+import { CategoryFormData, CategoryFormModalProps } from "@/types/category";
+import { categoryFormSchema } from "@/lib/validations/category";
+import { Loader2 } from "lucide-react";
 
 export default function CategoryFormModal({
 	open,
@@ -52,6 +33,7 @@ export default function CategoryFormModal({
 	initialData,
 	title,
 	submitText,
+	isLoading = false,
 }: CategoryFormModalProps) {
 	const form = useForm<CategoryFormData>({
 		resolver: zodResolver(categoryFormSchema),
@@ -103,7 +85,12 @@ export default function CategoryFormModal({
 								<FormItem>
 									<FormLabel className="text-gray-700 dark:text-gray-300">Name</FormLabel>
 									<FormControl>
-										<Input placeholder="Enter category name" {...field} className="bg-white/80 dark:bg-[#18181b] text-black dark:text-white border border-gray-200 dark:border-gray-700" />
+										<Input 
+											placeholder="Enter category name" 
+											{...field} 
+											className="bg-white/80 dark:bg-[#18181b] text-black dark:text-white border border-gray-200 dark:border-gray-700" 
+											disabled={isLoading}
+										/>
 									</FormControl>
 									<FormMessage />
 								</FormItem>
@@ -121,6 +108,7 @@ export default function CategoryFormModal({
 											className="resize-none bg-white/80 dark:bg-[#18181b] text-black dark:text-white border border-gray-200 dark:border-gray-700"
 											rows={3}
 											{...field}
+											disabled={isLoading}
 										/>
 									</FormControl>
 									<FormMessage />
@@ -132,11 +120,23 @@ export default function CategoryFormModal({
 								type="button"
 								onClick={() => onOpenChange(false)}
 								className="bg-gray-200 dark:bg-gray-700 text-black dark:text-white hover:bg-gray-300 dark:hover:bg-gray-600"
+								disabled={isLoading}
 							>
 								Cancel
 							</Button>
-							<Button type="submit" className="bg-[#facc15] hover:bg-yellow-400 text-black dark:bg-[#facc15] dark:hover:bg-yellow-400 dark:text-[#18181b] font-semibold">
-								{submitText}
+							<Button 
+								type="submit" 
+								className="bg-[#facc15] hover:bg-yellow-400 text-black dark:bg-[#facc15] dark:hover:bg-yellow-400 dark:text-[#18181b] font-semibold"
+								disabled={isLoading}
+							>
+								{isLoading ? (
+									<>
+										<Loader2 className="mr-2 h-4 w-4 animate-spin" />
+										{initialData ? "Updating..." : "Creating..."}
+									</>
+								) : (
+									submitText
+								)}
 							</Button>
 						</DialogFooter>
 					</form>
