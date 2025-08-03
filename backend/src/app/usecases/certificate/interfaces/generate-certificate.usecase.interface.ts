@@ -1,4 +1,4 @@
-import { CertificateDTO } from "../../../../domain/dtos/certificate.dto";
+import { CertificateDTO } from "../../../dtos/certificate.dto";
 
 export interface IGenerateCertificateRequest {
   userId: string;

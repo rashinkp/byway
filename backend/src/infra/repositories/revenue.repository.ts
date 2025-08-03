@@ -2,7 +2,10 @@ import { PrismaClient } from "@prisma/client";
 import { TransactionType } from "../../domain/enum/transaction-type.enum";
 import { TransactionStatus } from "../../domain/enum/transaction-status.enum";
 import { IRevenueRepository } from "@/app/repositories/revenue.repository";
-import { GetLatestRevenueParams, GetLatestRevenueResult } from "@/domain/dtos/revenue/get-latest-revenue.dto";
+import {
+  GetLatestRevenueParams,
+  GetLatestRevenueResult,
+} from "@/app/dtos/revenue/get-latest-revenue.dto";
 
 export class PrismaRevenueRepository implements IRevenueRepository {
   constructor(private readonly prisma: PrismaClient) {}
@@ -96,9 +99,7 @@ export class PrismaRevenueRepository implements IRevenueRepository {
       }));
   }
 
-  async getCourseDetails(params: {
-    courseIds: string[];
-  }): Promise<
+  async getCourseDetails(params: { courseIds: string[] }): Promise<
     Array<{
       id: string;
       title: string;
@@ -177,8 +178,8 @@ export class PrismaRevenueRepository implements IRevenueRepository {
     const result = await this.prisma.transactionHistory.aggregate({
       where: {
         userId,
-        type: 'REVENUE',
-        status: 'COMPLETED',
+        type: "REVENUE",
+        status: "COMPLETED",
       },
       _sum: {
         amount: true,
@@ -189,17 +190,25 @@ export class PrismaRevenueRepository implements IRevenueRepository {
   }
 
   async getLatestRevenue(params: GetLatestRevenueParams): Promise<{
-    items: GetLatestRevenueResult['items'];
+    items: GetLatestRevenueResult["items"];
     total: number;
   }> {
-    const { startDate, endDate, userId, page = 1, limit = 10, search, sortBy = 'latest' } = params;
+    const {
+      startDate,
+      endDate,
+      userId,
+      page = 1,
+      limit = 10,
+      search,
+      sortBy = "latest",
+    } = params;
     const skip = (page - 1) * limit;
 
     // Build where clause
     const whereClause: any = {
       userId,
-      type: 'REVENUE',
-      status: 'COMPLETED',
+      type: "REVENUE",
+      status: "COMPLETED",
     };
 
     // Add date range only if provided
@@ -220,7 +229,7 @@ export class PrismaRevenueRepository implements IRevenueRepository {
                 course: {
                   title: {
                     contains: search,
-                    mode: 'insensitive',
+                    mode: "insensitive",
                   },
                 },
               },
@@ -235,7 +244,7 @@ export class PrismaRevenueRepository implements IRevenueRepository {
                   creator: {
                     name: {
                       contains: search,
-                      mode: 'insensitive',
+                      mode: "insensitive",
                     },
                   },
                 },
@@ -248,7 +257,7 @@ export class PrismaRevenueRepository implements IRevenueRepository {
             user: {
               name: {
                 contains: search,
-                mode: 'insensitive',
+                mode: "insensitive",
               },
             },
           },
@@ -288,7 +297,7 @@ export class PrismaRevenueRepository implements IRevenueRepository {
         },
       },
       orderBy: {
-        createdAt: sortBy === 'latest' ? 'desc' : 'asc',
+        createdAt: sortBy === "latest" ? "desc" : "asc",
       },
       skip,
       take: limit,
@@ -300,22 +309,28 @@ export class PrismaRevenueRepository implements IRevenueRepository {
     });
 
     // Transform the data
-    const items = transactions.flatMap(transaction => 
-      transaction.order?.items.map(item => ({
-        orderId: transaction.orderId || '',
-        courseId: item.courseId,
-        courseTitle: item.course.title,
-        creatorName: item.course.creator.name,
-        coursePrice: Number(item.coursePrice),
-        offerPrice: Number(item.coursePrice) - (Number(item.discount) || 0),
-        adminSharePercentage: Number(item.adminSharePercentage),
-        adminShare: (Number(item.coursePrice) * Number(item.adminSharePercentage)) / 100,
-        netAmount: Number(item.coursePrice) - ((Number(item.coursePrice) * Number(item.adminSharePercentage)) / 100),
-        createdAt: transaction.createdAt,
-        customerName: transaction.order?.user?.name || 'Unknown Customer',
-        customerEmail: transaction.order?.user?.email || '',
-        transactionAmount: Number(transaction.amount),
-      })) || []
+    const items = transactions.flatMap(
+      (transaction) =>
+        transaction.order?.items.map((item) => ({
+          orderId: transaction.orderId || "",
+          courseId: item.courseId,
+          courseTitle: item.course.title,
+          creatorName: item.course.creator.name,
+          coursePrice: Number(item.coursePrice),
+          offerPrice: Number(item.coursePrice) - (Number(item.discount) || 0),
+          adminSharePercentage: Number(item.adminSharePercentage),
+          adminShare:
+            (Number(item.coursePrice) * Number(item.adminSharePercentage)) /
+            100,
+          netAmount:
+            Number(item.coursePrice) -
+            (Number(item.coursePrice) * Number(item.adminSharePercentage)) /
+              100,
+          createdAt: transaction.createdAt,
+          customerName: transaction.order?.user?.name || "Unknown Customer",
+          customerEmail: transaction.order?.user?.email || "",
+          transactionAmount: Number(transaction.amount),
+        })) || []
     );
 
     return {

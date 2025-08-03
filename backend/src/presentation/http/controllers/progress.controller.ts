@@ -5,7 +5,10 @@ import { IHttpErrors } from "../interfaces/http-errors.interface";
 import { IHttpSuccess } from "../interfaces/http-success.interface";
 import { IUpdateProgressUseCase } from "../../../app/usecases/progress/interfaces/update-progress.usecase.interface";
 import { IGetProgressUseCase } from "../../../app/usecases/progress/interfaces/get-progress.usecase.interface";
-import { UpdateProgressSchema, GetProgressSchema } from "../../../domain/dtos/course/progress.dto";
+import {
+  UpdateProgressSchema,
+  GetProgressSchema,
+} from "../../../app/dtos/course/progress.dto";
 import { UnauthorizedError } from "../errors/unautherized-error";
 
 export class ProgressController extends BaseController {
@@ -54,6 +57,4 @@ export class ProgressController extends BaseController {
       return this.success_200(response.data, response.message);
     });
   }
-
- 
-} 
+}

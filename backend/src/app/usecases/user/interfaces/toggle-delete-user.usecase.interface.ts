@@ -1,4 +1,4 @@
-import { ToggleDeleteUserDto } from "../../../../domain/dtos/user/user.dto";
+import { ToggleDeleteUserDto } from "../../../dtos/user/user.dto";
 import { User } from "../../../../domain/entities/user.entity";
 
 export interface IToggleDeleteUserUseCase {

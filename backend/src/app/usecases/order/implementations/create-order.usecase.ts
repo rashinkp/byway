@@ -1,5 +1,5 @@
 import { ICreateOrderUseCase } from "../interfaces/create-order.usecase.interface";
-import { CreateOrderDto } from "../../../../domain/dtos/order/create-order.dto";
+import { CreateOrderDto } from "../../../dtos/order/create-order.dto";
 import { IOrderRepository } from "../../../repositories/order.repository";
 import { IPaymentService } from "../../../services/payment/interfaces/payment.service.interface";
 import { PaymentGateway } from "../../../../domain/enum/payment-gateway.enum";
@@ -20,13 +20,16 @@ export class CreateOrderUseCase implements ICreateOrderUseCase {
   ) {}
 
   async execute(userId: string, input: CreateOrderDto) {
-    const { courses, paymentMethod, couponCode } = input; 
+    const { courses, paymentMethod, couponCode } = input;
 
     // Calculate total amount
-    const totalAmount = courses.reduce((sum, course) => sum + (course.offer || course.price), 0);
+    const totalAmount = courses.reduce(
+      (sum, course) => sum + (course.offer || course.price),
+      0
+    );
 
     // Create order items
-    const orderItems = courses.map(course => ({
+    const orderItems = courses.map((course) => ({
       orderId: "", // Will be set after order creation
       courseId: course.id,
       courseTitle: course.title,
@@ -43,7 +46,7 @@ export class CreateOrderUseCase implements ICreateOrderUseCase {
       createdBy: userId, // Use the current user's ID as creator
       deletedAt: null,
       approvalStatus: "PENDING",
-      details: null
+      details: null,
     }));
 
     // Create Order entity
@@ -76,11 +79,15 @@ export class CreateOrderUseCase implements ICreateOrderUseCase {
     // Handle payment based on method
     if (paymentMethod === "WALLET") {
       // Process wallet payment
-      const paymentResult = await this.paymentService.handleWalletPayment(userId, order.id!, totalAmount);
+      const paymentResult = await this.paymentService.handleWalletPayment(
+        userId,
+        order.id!,
+        totalAmount
+      );
 
       return {
         order,
-        transaction: paymentResult.data.transaction
+        transaction: paymentResult.data.transaction,
       };
     } else if (paymentMethod === "STRIPE") {
       // Create transaction for Stripe payment
@@ -91,22 +98,26 @@ export class CreateOrderUseCase implements ICreateOrderUseCase {
         type: TransactionType.PURCHASE,
         status: TransactionStatus.PENDING,
         paymentGateway: PaymentGateway.STRIPE,
-        paymentMethod: "STRIPE"
+        paymentMethod: "STRIPE",
       });
 
       // Create Stripe checkout session
-      const session = await this.paymentService.createStripeCheckoutSession(userId, order.id!, {
-        ...input,
-        userId
-      });
+      const session = await this.paymentService.createStripeCheckoutSession(
+        userId,
+        order.id!,
+        {
+          ...input,
+          userId,
+        }
+      );
 
       return {
         order,
         transaction,
-        session: session.data.session
+        session: session.data.session,
       };
     }
 
     return { order };
   }
-} 
+}

@@ -2,7 +2,7 @@ import { PrismaClient } from "@prisma/client";
 import {
   ICreateEnrollmentInputDTO,
   IEnrollmentOutputDTO,
-} from "../../domain/dtos/course/course.dto";
+} from "../../app/dtos/course/course.dto";
 import { IEnrollmentRepository } from "../../app/repositories/enrollment.repository.interface";
 import { HttpError } from "../../presentation/http/errors/http-error";
 import { Enrollment } from "../../domain/entities/enrollment.entity";
@@ -33,11 +33,13 @@ export class EnrollmentRepository implements IEnrollmentRepository {
     }
   }
 
-  async create(input: ICreateEnrollmentInputDTO): Promise<IEnrollmentOutputDTO[]> {
-    console.log('Creating enrollments with input:', input);
+  async create(
+    input: ICreateEnrollmentInputDTO
+  ): Promise<IEnrollmentOutputDTO[]> {
+    console.log("Creating enrollments with input:", input);
     const enrollments = await Promise.all(
       input.courseIds.map(async (courseId) => {
-        console.log('Creating enrollment for course:', courseId);
+        console.log("Creating enrollment for course:", courseId);
         try {
           const enrollment = await this.prisma.enrollment.create({
             data: {
@@ -45,10 +47,10 @@ export class EnrollmentRepository implements IEnrollmentRepository {
               courseId,
               enrolledAt: new Date(),
               orderItemId: input.orderItemId,
-              accessStatus: 'ACTIVE',
+              accessStatus: "ACTIVE",
             },
           });
-          console.log('Enrollment created successfully:', enrollment);
+          console.log("Enrollment created successfully:", enrollment);
           return {
             userId: enrollment.userId,
             courseId: enrollment.courseId,
@@ -57,16 +59,20 @@ export class EnrollmentRepository implements IEnrollmentRepository {
             accessStatus: enrollment.accessStatus,
           };
         } catch (error) {
-          console.error('Error creating enrollment:', error);
+          console.error("Error creating enrollment:", error);
           throw error;
         }
       })
     );
-    console.log('All enrollments created:', enrollments);
+    console.log("All enrollments created:", enrollments);
     return enrollments;
   }
 
-  async updateAccessStatus(userId: string, courseId: string, status: 'ACTIVE' | 'BLOCKED' | 'EXPIRED'): Promise<void> {
+  async updateAccessStatus(
+    userId: string,
+    courseId: string,
+    status: "ACTIVE" | "BLOCKED" | "EXPIRED"
+  ): Promise<void> {
     await this.prisma.enrollment.update({
       where: {
         userId_courseId: {
@@ -80,35 +86,44 @@ export class EnrollmentRepository implements IEnrollmentRepository {
     });
   }
 
-  async findByUserIdAndCourseIds(userId: string, courseIds: string[]): Promise<Enrollment[]> {
+  async findByUserIdAndCourseIds(
+    userId: string,
+    courseIds: string[]
+  ): Promise<Enrollment[]> {
     const enrollments = await this.prisma.enrollment.findMany({
       where: {
         userId,
         courseId: { in: courseIds },
       },
     });
-    return enrollments.map(enrollment => new Enrollment(
-      `${enrollment.userId}-${enrollment.courseId}`,
-      enrollment.userId,
-      enrollment.courseId,
-      enrollment.enrolledAt,
-      enrollment.orderItemId || undefined,
-      enrollment.accessStatus
-    ));
+    return enrollments.map(
+      (enrollment) =>
+        new Enrollment(
+          `${enrollment.userId}-${enrollment.courseId}`,
+          enrollment.userId,
+          enrollment.courseId,
+          enrollment.enrolledAt,
+          enrollment.orderItemId || undefined,
+          enrollment.accessStatus
+        )
+    );
   }
 
   async findByUserId(userId: string): Promise<Enrollment[]> {
     const enrollments = await this.prisma.enrollment.findMany({
       where: { userId },
     });
-    return enrollments.map(enrollment => new Enrollment(
-      `${enrollment.userId}-${enrollment.courseId}`,
-      enrollment.userId,
-      enrollment.courseId,
-      enrollment.enrolledAt,
-      enrollment.orderItemId || undefined,
-      enrollment.accessStatus
-    ));
+    return enrollments.map(
+      (enrollment) =>
+        new Enrollment(
+          `${enrollment.userId}-${enrollment.courseId}`,
+          enrollment.userId,
+          enrollment.courseId,
+          enrollment.enrolledAt,
+          enrollment.orderItemId || undefined,
+          enrollment.accessStatus
+        )
+    );
   }
 
   async findByCourseId(courseId: string): Promise<Enrollment[]> {
@@ -117,19 +132,22 @@ export class EnrollmentRepository implements IEnrollmentRepository {
       include: {
         orderItem: {
           include: {
-            order: true
-          }
-        }
-      }
+            order: true,
+          },
+        },
+      },
     });
-    return enrollments.map(enrollment => new Enrollment(
-      `${enrollment.userId}-${enrollment.courseId}`,
-      enrollment.userId,
-      enrollment.courseId,
-      enrollment.enrolledAt,
-      enrollment.orderItemId || undefined,
-      enrollment.accessStatus
-    ));
+    return enrollments.map(
+      (enrollment) =>
+        new Enrollment(
+          `${enrollment.userId}-${enrollment.courseId}`,
+          enrollment.userId,
+          enrollment.courseId,
+          enrollment.enrolledAt,
+          enrollment.orderItemId || undefined,
+          enrollment.accessStatus
+        )
+    );
   }
 
   async delete(userId: string, courseId: string): Promise<void> {

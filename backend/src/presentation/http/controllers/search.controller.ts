@@ -4,7 +4,7 @@ import { IHttpRequest } from "../interfaces/http-request.interface";
 import { IHttpResponse } from "../interfaces/http-response.interface";
 import { IHttpErrors } from "../interfaces/http-errors.interface";
 import { IHttpSuccess } from "../interfaces/http-success.interface";
-import { SearchParamsSchema } from "../../../domain/dtos/search/search.dto";
+import { SearchParamsSchema } from "../../../app/dtos/search/search.dto";
 import { BadRequestError } from "../errors/bad-request-error";
 
 export class SearchController extends BaseController {
@@ -21,7 +21,7 @@ export class SearchController extends BaseController {
       const query = request.query?.query as string;
       const page = request.query?.page as string;
       const limit = request.query?.limit as string;
-      
+
       if (!query) {
         throw new BadRequestError("Search query is required");
       }
@@ -33,8 +33,11 @@ export class SearchController extends BaseController {
       });
 
       const userId = request.user?.id;
-      const result = await this.globalSearchUseCase.execute({ ...validatedParams, userId });
+      const result = await this.globalSearchUseCase.execute({
+        ...validatedParams,
+        userId,
+      });
       return this.success_200(result, "Search results retrieved successfully");
     });
   }
-} 
+}

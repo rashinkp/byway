@@ -1,5 +1,5 @@
-import { Notification } from '../../domain/entities/notification.entity';
-import { NotificationDTO } from '../../domain/dtos/notification.dto';
+import { Notification } from "../../domain/entities/notification.entity";
+import { NotificationDTO } from "../dtos/notification.dto";
 
 export interface NotificationRepositoryInterface {
   create(notification: Notification): Promise<NotificationDTO>;
@@ -13,8 +13,13 @@ export interface NotificationRepositoryInterface {
     skip?: number;
     take?: number;
     sortBy?: string;
-    sortOrder?: 'asc' | 'desc';
+    sortOrder?: "asc" | "desc";
     eventType?: string;
     search?: string;
-  }): Promise<{ items: NotificationDTO[]; total: number; hasMore: boolean; nextPage?: number }>;
-} 
+  }): Promise<{
+    items: NotificationDTO[];
+    total: number;
+    hasMore: boolean;
+    nextPage?: number;
+  }>;
+}

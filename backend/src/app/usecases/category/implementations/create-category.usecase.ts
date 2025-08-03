@@ -5,7 +5,7 @@ import { HttpError } from "../../../../presentation/http/errors/http-error";
 import {
   ICategoryOutputDTO,
   ICreateCategoryInputDTO,
-} from "../../../../domain/dtos/category/category.dto";
+} from "../../../dtos/category/category.dto";
 import { Category } from "../../../../domain/entities/category.entity";
 import { ICategoryRepository } from "../../../repositories/category.repository";
 

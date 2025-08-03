@@ -1,13 +1,23 @@
 import { IOrderRepository } from "../../../repositories/order.repository";
 import { IGetAllOrdersUseCase } from "../interfaces/get-all-orders.usecase.interface";
-import { GetAllOrdersDto } from "../../../../domain/dtos/order/order.dto";
+import { GetAllOrdersDto } from "../../../dtos/order/order.dto";
 
 export class GetAllOrdersUseCase implements IGetAllOrdersUseCase {
   constructor(private orderRepository: IOrderRepository) {}
 
   async execute(userId: string, filters: GetAllOrdersDto) {
     try {
-      const { page, limit, sortBy, sortOrder, status, startDate, endDate, minAmount, maxAmount } = filters;
+      const {
+        page,
+        limit,
+        sortBy,
+        sortOrder,
+        status,
+        startDate,
+        endDate,
+        minAmount,
+        maxAmount,
+      } = filters;
 
       // Calculate skip for pagination
       const skip = (page - 1) * limit;
@@ -63,4 +73,4 @@ export class GetAllOrdersUseCase implements IGetAllOrdersUseCase {
       throw new Error("Failed to fetch orders");
     }
   }
-} 
+}

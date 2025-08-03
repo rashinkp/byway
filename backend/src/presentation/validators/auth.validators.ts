@@ -1,16 +1,14 @@
 import { z } from "zod";
-import {
-  FacebookAuthDto,
-} from "../../domain/dtos/auth/facebook-auth.dto";
+import { FacebookAuthDto } from "../../app/dtos/auth/facebook-auth.dto";
 import { AuthProvider } from "../../domain/enum/auth-provider.enum";
 import { Role } from "../../domain/enum/role.enum";
-import { ForgotPasswordDto } from "../../domain/dtos/auth/forgot-password.dto";
-import { GoogleAuthDto } from "../../domain/dtos/auth/googel-auth.dto";
-import { LoginDto } from "../../domain/dtos/auth/login.dto";
-import { RegisterDto } from "../../domain/dtos/auth/register.dto";
-import { ResendOtpDto } from "../../domain/dtos/auth/resend-otp.dto";
-import { ResetPasswordDto } from "../../domain/dtos/auth/reset-password.dto";
-import { VerifyOtpDto } from "../../domain/dtos/auth/verify-otp.dto";
+import { ForgotPasswordDto } from "../../app/dtos/auth/forgot-password.dto";
+import { GoogleAuthDto } from "../../app/dtos/auth/googel-auth.dto";
+import { LoginDto } from "../../app/dtos/auth/login.dto";
+import { RegisterDto } from "../../app/dtos/auth/register.dto";
+import { ResendOtpDto } from "../../app/dtos/auth/resend-otp.dto";
+import { ResetPasswordDto } from "../../app/dtos/auth/reset-password.dto";
+import { VerifyOtpDto } from "../../app/dtos/auth/verify-otp.dto";
 
 interface ValidationSchema {
   body?: z.ZodSchema;
@@ -40,9 +38,16 @@ const googleAuthSchema = z.object({
 // LoginDto schema
 const loginSchema = z.object({
   email: z.string().email("Invalid email address"),
-  password: z.string().min(6, "Password must be at least 6 characters").optional(),
+  password: z
+    .string()
+    .min(6, "Password must be at least 6 characters")
+    .optional(),
   authProvider: z
-    .enum([AuthProvider.EMAIL_PASSWORD, AuthProvider.GOOGLE, AuthProvider.FACEBOOK])
+    .enum([
+      AuthProvider.EMAIL_PASSWORD,
+      AuthProvider.GOOGLE,
+      AuthProvider.FACEBOOK,
+    ])
     .default(AuthProvider.EMAIL_PASSWORD),
 });
 

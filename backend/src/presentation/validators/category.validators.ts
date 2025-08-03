@@ -4,7 +4,7 @@ import {
   IUpdateCategoryInputDTO,
   IGetAllCategoriesInputDTO,
   ICategoryIdInputDTO,
-} from "../../domain/dtos/category/category.dto";
+} from "../../app/dtos/category/category.dto";
 
 interface ValidationSchema {
   body?: z.ZodSchema;
@@ -86,7 +86,9 @@ export function validateUpdateCategory(data: unknown): IUpdateCategoryInputDTO {
   return updateCategorySchema.parse(data);
 }
 
-export function validateGetAllCategories(data: unknown): IGetAllCategoriesInputDTO {
+export function validateGetAllCategories(
+  data: unknown
+): IGetAllCategoriesInputDTO {
   return getAllCategoriesSchema.parse(data);
 }
 

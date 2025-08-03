@@ -1,7 +1,7 @@
 import {
   GetAllInstructorsRequestDTO,
   InstructorResponseDTO,
-} from "../../../../domain/dtos/instructor/instructor.dto";
+} from "../../../dtos/instructor/instructor.dto";
 import { APPROVALSTATUS } from "../../../../domain/enum/approval-status.enum";
 import { IInstructorRepository } from "../../../repositories/instructor.repository";
 import { IUserRepository } from "../../../repositories/user.repository";

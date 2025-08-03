@@ -1,15 +1,15 @@
 import {
   ICourseWithDetailsDTO,
-   IUpdateCourseApprovalInputDTO,
-} from "../../../../domain/dtos/course/course.dto";
+  IUpdateCourseApprovalInputDTO,
+} from "../../../dtos/course/course.dto";
 import { APPROVALSTATUS } from "../../../../domain/enum/approval-status.enum";
 import { HttpError } from "../../../../presentation/http/errors/http-error";
 import { ICourseRepository } from "../../../repositories/course.repository.interface";
 import { IDeclineCourseUseCase } from "../interfaces/decline-course.usecase.interface";
-import { IUserRepository } from '../../../repositories/user.repository';
-import { CreateNotificationsForUsersUseCase } from '../../notification/implementations/create-notifications-for-users.usecase';
-import { NotificationEventType } from '../../../../domain/enum/notification-event-type.enum';
-import { NotificationEntityType } from '../../../../domain/enum/notification-entity-type.enum';
+import { IUserRepository } from "../../../repositories/user.repository";
+import { CreateNotificationsForUsersUseCase } from "../../notification/implementations/create-notifications-for-users.usecase";
+import { NotificationEventType } from "../../../../domain/enum/notification-event-type.enum";
+import { NotificationEntityType } from "../../../../domain/enum/notification-entity-type.enum";
 
 export class DeclineCourseUseCase implements IDeclineCourseUseCase {
   constructor(

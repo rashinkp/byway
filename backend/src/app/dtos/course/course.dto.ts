@@ -1,11 +1,11 @@
-import { CourseDetails } from "../../entities/course.entity";
-import { APPROVALSTATUS } from "../../enum/approval-status.enum";
-import { CourseLevel } from "../../enum/course-level.enum";
-import { CourseStatus } from "../../enum/course-status.enum";
-import { Duration } from "../../value-object/duration";
-import { Offer } from "../../value-object/offer";
-import { Price } from "../../value-object/price";
-import { RatingLevel } from "../../enum/rating-level.enum";
+import { CourseDetails } from "../../../domain/entities/course.entity";
+import { APPROVALSTATUS } from "../../../domain/enum/approval-status.enum";
+import { CourseLevel } from "../../../domain/enum/course-level.enum";
+import { CourseStatus } from "../../../domain/enum/course-status.enum";
+import { Duration } from "../../../domain/value-object/duration";
+import { Offer } from "../../../domain/value-object/offer";
+import { Price } from "../../../domain/value-object/price";
+import { RatingLevel } from "../../../domain/enum/rating-level.enum";
 
 // Review stats interface for course listing (simplified)
 export interface ICourseReviewStats {
@@ -71,7 +71,11 @@ export interface ICourseInstructorDTO {
 }
 
 // Course with enrollment status - used for course listing
-export interface ICourseWithEnrollmentDTO extends Omit<ICourseDTO, 'createdAt' | 'updatedAt' | 'deletedAt' | 'reviewStats'> {
+export interface ICourseWithEnrollmentDTO
+  extends Omit<
+    ICourseDTO,
+    "createdAt" | "updatedAt" | "deletedAt" | "reviewStats"
+  > {
   createdAt: string;
   updatedAt: string;
   deletedAt: string | null;
@@ -82,7 +86,8 @@ export interface ICourseWithEnrollmentDTO extends Omit<ICourseDTO, 'createdAt' |
 }
 
 // Course with details - used for course details page
-export interface ICourseWithDetailsDTO extends Omit<ICourseDTO, 'createdAt' | 'updatedAt' | 'deletedAt'> {
+export interface ICourseWithDetailsDTO
+  extends Omit<ICourseDTO, "createdAt" | "updatedAt" | "deletedAt"> {
   createdAt: string;
   updatedAt: string;
   deletedAt: string | null;
@@ -130,7 +135,16 @@ export interface IGetAllCoursesInputDTO {
   sortOrder?: "asc" | "desc";
   includeDeleted?: boolean;
   search?: string;
-  filterBy?: "All" | "Active" | "Inactive" | "Approved" | "Declined" | "Pending" | "Published" | "Draft" | "Archived";
+  filterBy?:
+    | "All"
+    | "Active"
+    | "Inactive"
+    | "Approved"
+    | "Declined"
+    | "Pending"
+    | "Published"
+    | "Draft"
+    | "Archived";
   userId?: string;
   myCourses?: boolean;
   role?: "USER" | "INSTRUCTOR" | "ADMIN";
@@ -165,7 +179,7 @@ export interface IEnrollmentOutputDTO {
   courseId: string;
   enrolledAt: string;
   orderItemId?: string;
-  accessStatus: 'ACTIVE' | 'BLOCKED' | 'EXPIRED';
+  accessStatus: "ACTIVE" | "BLOCKED" | "EXPIRED";
 }
 
 // Response DTOs

@@ -1,7 +1,7 @@
 import { MessageId } from "@/domain/value-object/MessageId";
 import { Message } from "../../domain/entities/message.entity";
 import { ChatId } from "@/domain/value-object/ChatId";
-import { EnrichedMessageDTO } from "../../domain/dtos/message.dto";
+import { EnrichedMessageDTO } from "../dtos/message.dto";
 import { UserId } from "@/domain/value-object/UserId";
 
 export interface IMessageRepository {

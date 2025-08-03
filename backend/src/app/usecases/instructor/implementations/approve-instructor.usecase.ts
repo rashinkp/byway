@@ -1,4 +1,4 @@
-import { ApproveInstructorRequestDTO } from "../../../../domain/dtos/instructor/instructor.dto";
+import { ApproveInstructorRequestDTO } from "../../../dtos/instructor/instructor.dto";
 import { Instructor } from "../../../../domain/entities/instructor.entity";
 import { Role } from "../../../../domain/enum/role.enum";
 import { JwtPayload } from "../../../../presentation/express/middlewares/auth.middleware";
@@ -49,7 +49,9 @@ export class ApproveInstructorUseCase implements IApproveInstructorUseCase {
       user.id
     );
 
-    const updatedInstructor = await this.instructorRepository.updateInstructor(instructor);
+    const updatedInstructor = await this.instructorRepository.updateInstructor(
+      instructor
+    );
 
     // Send notification to the instructor about approval
     await this.createNotificationsForUsersUseCase.execute([instructor.userId], {

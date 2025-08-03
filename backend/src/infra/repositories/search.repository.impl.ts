@@ -1,14 +1,23 @@
 import { PrismaClient } from "@prisma/client";
 import { ISearchRepository } from "../../app/repositories/search.repository";
-import { ISearchResult, SearchParams } from "../../domain/dtos/search/search.dto";
+import { ISearchResult, SearchParams } from "../../app/dtos/search/search.dto";
 
 export class SearchRepository implements ISearchRepository {
   constructor(private prisma: PrismaClient) {}
 
-  async search(params: SearchParams & { userId?: string }): Promise<ISearchResult> {
+  async search(
+    params: SearchParams & { userId?: string }
+  ): Promise<ISearchResult> {
     const { query, page = 1, limit = 10, userId } = params;
     const skip = (page - 1) * limit;
-    console.log("[SearchRepository] Received limit:", limit, "skip:", skip, "page:", page);
+    console.log(
+      "[SearchRepository] Received limit:",
+      limit,
+      "skip:",
+      skip,
+      "page:",
+      page
+    );
 
     const [instructors, courses, categories, certificates] = await Promise.all([
       this.searchInstructors(query, skip, limit),
@@ -33,14 +42,18 @@ export class SearchRepository implements ISearchRepository {
             {
               role: "INSTRUCTOR",
               OR: [
-                { name: { contains: query, mode: 'insensitive' } },
-                { instructorDetails: { about: { contains: query, mode: 'insensitive' } } },
+                { name: { contains: query, mode: "insensitive" } },
+                {
+                  instructorDetails: {
+                    about: { contains: query, mode: "insensitive" },
+                  },
+                },
               ],
             },
             {
-              deletedAt: null
-            }
-          ]
+              deletedAt: null,
+            },
+          ],
         },
         select: {
           id: true,
@@ -49,8 +62,8 @@ export class SearchRepository implements ISearchRepository {
           instructorDetails: {
             select: {
               about: true,
-            }
-          }
+            },
+          },
         },
         skip,
         take: limit,
@@ -61,24 +74,28 @@ export class SearchRepository implements ISearchRepository {
             {
               role: "INSTRUCTOR",
               OR: [
-                { name: { contains: query, mode: 'insensitive' } },
-                { instructorDetails: { about: { contains: query, mode: 'insensitive' } } },
+                { name: { contains: query, mode: "insensitive" } },
+                {
+                  instructorDetails: {
+                    about: { contains: query, mode: "insensitive" },
+                  },
+                },
               ],
             },
             {
-              deletedAt: null
-            }
-          ]
+              deletedAt: null,
+            },
+          ],
         },
       }),
     ]);
 
     return {
-      items: items.map(item => ({
+      items: items.map((item) => ({
         id: item.id,
         name: item.name,
         avatar: item.avatar,
-        shortBio: item.instructorDetails?.about?.substring(0, 100) || '',
+        shortBio: item.instructorDetails?.about?.substring(0, 100) || "",
       })),
       total,
       page: Math.floor(skip / limit) + 1,
@@ -93,16 +110,16 @@ export class SearchRepository implements ISearchRepository {
           AND: [
             {
               OR: [
-                { title: { contains: query, mode: 'insensitive' } },
-                { description: { contains: query, mode: 'insensitive' } },
+                { title: { contains: query, mode: "insensitive" } },
+                { description: { contains: query, mode: "insensitive" } },
               ],
             },
             {
               deletedAt: null,
-              approvalStatus: 'APPROVED',
-              status: 'PUBLISHED'
-            }
-          ]
+              approvalStatus: "APPROVED",
+              status: "PUBLISHED",
+            },
+          ],
         },
         select: {
           id: true,
@@ -119,22 +136,22 @@ export class SearchRepository implements ISearchRepository {
           AND: [
             {
               OR: [
-                { title: { contains: query, mode: 'insensitive' } },
-                { description: { contains: query, mode: 'insensitive' } },
+                { title: { contains: query, mode: "insensitive" } },
+                { description: { contains: query, mode: "insensitive" } },
               ],
             },
             {
               deletedAt: null,
-              approvalStatus: 'APPROVED',
-              status: 'PUBLISHED'
-            }
-          ]
+              approvalStatus: "APPROVED",
+              status: "PUBLISHED",
+            },
+          ],
         },
       }),
     ]);
 
     return {
-      items: items.map(item => ({
+      items: items.map((item) => ({
         id: item.id,
         title: item.title,
         thumbnail: item.thumbnail,
@@ -154,14 +171,14 @@ export class SearchRepository implements ISearchRepository {
           AND: [
             {
               OR: [
-                { name: { contains: query, mode: 'insensitive' } },
-                { description: { contains: query, mode: 'insensitive' } },
+                { name: { contains: query, mode: "insensitive" } },
+                { description: { contains: query, mode: "insensitive" } },
               ],
             },
             {
-              deletedAt: null
-            }
-          ]
+              deletedAt: null,
+            },
+          ],
         },
         select: {
           id: true,
@@ -176,23 +193,23 @@ export class SearchRepository implements ISearchRepository {
           AND: [
             {
               OR: [
-                { name: { contains: query, mode: 'insensitive' } },
-                { description: { contains: query, mode: 'insensitive' } },
+                { name: { contains: query, mode: "insensitive" } },
+                { description: { contains: query, mode: "insensitive" } },
               ],
             },
             {
-              deletedAt: null
-            }
-          ]
+              deletedAt: null,
+            },
+          ],
         },
       }),
     ]);
 
     return {
-      items: items.map(item => ({
+      items: items.map((item) => ({
         id: item.id,
         title: item.name,
-        description: item.description || '',
+        description: item.description || "",
       })),
       total,
       page: Math.floor(skip / limit) + 1,
@@ -200,7 +217,12 @@ export class SearchRepository implements ISearchRepository {
     };
   }
 
-  private async searchCertificates(query: string, skip: number, limit: number, userId?: string) {
+  private async searchCertificates(
+    query: string,
+    skip: number,
+    limit: number,
+    userId?: string
+  ) {
     if (!userId) {
       return {
         items: [],
@@ -212,13 +234,13 @@ export class SearchRepository implements ISearchRepository {
     const where: any = {
       userId,
       OR: [
-        { certificateNumber: { contains: query, mode: 'insensitive' } },
-        { course: { title: { contains: query, mode: 'insensitive' } } },
-        { user: { name: { contains: query, mode: 'insensitive' } } },
+        { certificateNumber: { contains: query, mode: "insensitive" } },
+        { course: { title: { contains: query, mode: "insensitive" } } },
+        { user: { name: { contains: query, mode: "insensitive" } } },
       ],
     };
     // Debug log
-     const [items, total] = await Promise.all([
+    const [items, total] = await Promise.all([
       this.prisma.certificate.findMany({
         where,
         include: {
@@ -232,17 +254,17 @@ export class SearchRepository implements ISearchRepository {
     ]);
 
     return {
-      items: items.map(item => ({
+      items: items.map((item) => ({
         id: item.id,
         certificateNumber: item.certificateNumber,
-        courseTitle: item.course?.title || '',
-        userName: item.user?.name || '',
+        courseTitle: item.course?.title || "",
+        userName: item.user?.name || "",
         issuedAt: item.issuedAt ? item.issuedAt.toISOString() : null,
-        pdfUrl: item.pdfUrl || '',
+        pdfUrl: item.pdfUrl || "",
       })),
       total,
       page: Math.floor(skip / limit) + 1,
       limit,
     };
   }
-} 
+}

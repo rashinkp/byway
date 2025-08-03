@@ -1,5 +1,5 @@
-import { APPROVALSTATUS } from "../../enum/approval-status.enum";
-import { Role } from "../../enum/role.enum";
+import { APPROVALSTATUS } from "../../../domain/enum/approval-status.enum";
+import { Role } from "../../../domain/enum/role.enum";
 
 export interface CreateInstructorRequestDTO {
   areaOfExpertise: string;

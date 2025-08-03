@@ -1,5 +1,5 @@
 import { JwtPayload } from "jsonwebtoken";
-import { UpdateInstructorRequestDTO } from "../../../../domain/dtos/instructor/instructor.dto";
+import { UpdateInstructorRequestDTO } from "../../../dtos/instructor/instructor.dto";
 import { Instructor } from "../../../../domain/entities/instructor.entity";
 
 export interface IUpdateInstructorUseCase {
@@ -7,5 +7,4 @@ export interface IUpdateInstructorUseCase {
     dto: UpdateInstructorRequestDTO,
     requestingUser: JwtPayload
   ): Promise<Instructor>;
-
 }

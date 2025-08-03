@@ -1,10 +1,9 @@
-import { GetUserDto } from "../../../../domain/dtos/user/user.dto";
+import { GetUserDto } from "../../../dtos/user/user.dto";
 import { User } from "../../../../domain/entities/user.entity";
 import { UserProfile } from "../../../../domain/entities/user-profile.entity";
 import { HttpError } from "../../../../presentation/http/errors/http-error";
 import { IUserRepository } from "../../../repositories/user.repository";
 import { IGetUserByIdUseCase } from "../interfaces/get-user-by-id.usecase.interface";
-
 
 export class GetUserByIdUseCase implements IGetUserByIdUseCase {
   constructor(private userRepository: IUserRepository) {}

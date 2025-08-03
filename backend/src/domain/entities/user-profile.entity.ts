@@ -1,5 +1,7 @@
-import { ICreateUserProfileRequestDTO, IUpdateUserProfileRequestDTO } from "../dtos/user/user.dto";
-
+import {
+  ICreateUserProfileRequestDTO,
+  IUpdateUserProfileRequestDTO,
+} from "../../app/dtos/user/user.dto";
 
 interface UserProfileInterface {
   id: string;

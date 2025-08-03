@@ -1,11 +1,9 @@
 import { ITransactionRepository } from "../../../repositories/transaction.repository";
 import { IGetTransactionByIdUseCase } from "../interfaces/get-transaction-by-id.usecase.interface";
-import { ITransactionOutputDTO } from "../../../../domain/dtos/transaction/transaction.dto";
+import { ITransactionOutputDTO } from "../../../dtos/transaction/transaction.dto";
 
 export class GetTransactionByIdUseCase implements IGetTransactionByIdUseCase {
-  constructor(
-    private readonly transactionRepository: ITransactionRepository
-  ) {}
+  constructor(private readonly transactionRepository: ITransactionRepository) {}
 
   async execute(id: string): Promise<ITransactionOutputDTO | null> {
     const transaction = await this.transactionRepository.findById(id);
@@ -30,7 +28,7 @@ export class GetTransactionByIdUseCase implements IGetTransactionByIdUseCase {
       transactionId: transaction.transactionId,
       metadata: transaction.metadata,
       createdAt: transaction.createdAt,
-      updatedAt: transaction.updatedAt
+      updatedAt: transaction.updatedAt,
     };
   }
-} 
+}

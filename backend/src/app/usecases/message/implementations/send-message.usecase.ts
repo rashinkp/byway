@@ -10,7 +10,7 @@ import { MessageContent } from "../../../../domain/value-object/MessageContent";
 import { Message } from "../../../../domain/entities/message.entity";
 import { MessageId } from "../../../../domain/value-object/MessageId";
 import { Timestamp } from "../../../../domain/value-object/Timestamp";
-import { MessageResponseDTO } from "@/domain/dtos/chat.dto";
+import { MessageResponseDTO } from "@/app/dtos/chat.dto";
 import { Chat } from "../../../../domain/entities/chat.entity";
 import { MessageType } from "../../../../domain/enum/Message-type.enum";
 

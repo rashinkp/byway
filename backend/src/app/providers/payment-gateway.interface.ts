@@ -1,4 +1,4 @@
-import { CreateCheckoutSessionDto } from "../../domain/dtos/stripe/create-checkout-session.dto";
+import { CreateCheckoutSessionDto } from "../dtos/stripe/create-checkout-session.dto";
 
 export interface CheckoutSession {
   id: string;
@@ -13,4 +13,4 @@ export interface PaymentGateway {
     customerEmail: string,
     orderId: string
   ): Promise<CheckoutSession>;
-} 
+}

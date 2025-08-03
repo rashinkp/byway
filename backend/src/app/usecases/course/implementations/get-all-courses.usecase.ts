@@ -1,7 +1,7 @@
 import {
   ICourseListResponseDTO,
   IGetAllCoursesInputDTO,
-} from "../../../../domain/dtos/course/course.dto";
+} from "../../../dtos/course/course.dto";
 import { HttpError } from "../../../../presentation/http/errors/http-error";
 import { ICourseRepository } from "../../../repositories/course.repository.interface";
 import { IEnrollmentRepository } from "../../../repositories/enrollment.repository.interface";
@@ -21,43 +21,57 @@ export class GetAllCoursesUseCase implements IGetAllCoursesUseCase {
     private lessonRepository: ILessonRepository
   ) {}
 
-  async execute(input: IGetAllCoursesInputDTO): Promise<ICourseListResponseDTO> {
+  async execute(
+    input: IGetAllCoursesInputDTO
+  ): Promise<ICourseListResponseDTO> {
     try {
       const result = await this.courseRepository.findAll(input);
-      
+
       // Enhance courses with additional data
       const enhancedCourses = await Promise.all(
         result.courses.map(async (course) => {
           // Get instructor details
-          const instructor = await this.userRepository.findById(course.createdBy);
+          const instructor = await this.userRepository.findById(
+            course.createdBy
+          );
           // Get review stats
-          const reviewStats = await this.courseReviewRepository.getCourseReviewStats(course.id);
+          const reviewStats =
+            await this.courseReviewRepository.getCourseReviewStats(course.id);
           // Get lesson count
           const lessons = await this.lessonRepository.findByCourseId(course.id);
           const lessonCount = lessons.length;
           // Check enrollment status
           let isEnrolled = false;
           if (input.userId) {
-            const enrollment = await this.enrollmentRepository.findByUserAndCourse(input.userId, course.id);
+            const enrollment =
+              await this.enrollmentRepository.findByUserAndCourse(
+                input.userId,
+                course.id
+              );
             isEnrolled = !!enrollment;
           }
           // Check cart status
           let isInCart = false;
           if (input.userId) {
-            const cartItem = await this.cartRepository.findByUserAndCourse(input.userId, course.id);
+            const cartItem = await this.cartRepository.findByUserAndCourse(
+              input.userId,
+              course.id
+            );
             isInCart = !!cartItem;
           }
           const enhancedCourse = {
             ...course,
-            instructor: instructor ? {
-              id: instructor.id,
-              name: instructor.name,
-              avatar: instructor.avatar || null,
-            } : {
-              id: course.createdBy,
-              name: "Unknown Instructor",
-              avatar: null,
-            },
+            instructor: instructor
+              ? {
+                  id: instructor.id,
+                  name: instructor.name,
+                  avatar: instructor.avatar || null,
+                }
+              : {
+                  id: course.createdBy,
+                  name: "Unknown Instructor",
+                  avatar: null,
+                },
             reviewStats: {
               averageRating: reviewStats.averageRating,
               totalReviews: reviewStats.totalReviews,
@@ -69,7 +83,7 @@ export class GetAllCoursesUseCase implements IGetAllCoursesUseCase {
           return enhancedCourse;
         })
       );
-      
+
       return {
         ...result,
         courses: enhancedCourses,

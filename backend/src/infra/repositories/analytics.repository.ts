@@ -2,7 +2,10 @@ import { PrismaClient } from "@prisma/client";
 import { IRevenueRepository } from "../../app/repositories/revenue.repository";
 import { TransactionType } from "../../domain/enum/transaction-type.enum";
 import { TransactionStatus } from "../../domain/enum/transaction-status.enum";
-import { GetLatestRevenueParams, GetLatestRevenueResult } from "../../domain/dtos/revenue/get-latest-revenue.dto";
+import {
+  GetLatestRevenueParams,
+  GetLatestRevenueResult,
+} from "../../app/dtos/revenue/get-latest-revenue.dto";
 
 export class PrismaAnalyticsRepository implements IRevenueRepository {
   constructor(private readonly prisma: PrismaClient) {}
@@ -96,9 +99,7 @@ export class PrismaAnalyticsRepository implements IRevenueRepository {
       }));
   }
 
-  async getCourseDetails(params: {
-    courseIds: string[];
-  }): Promise<
+  async getCourseDetails(params: { courseIds: string[] }): Promise<
     Array<{
       id: string;
       title: string;
@@ -177,8 +178,8 @@ export class PrismaAnalyticsRepository implements IRevenueRepository {
     const result = await this.prisma.transactionHistory.aggregate({
       where: {
         userId,
-        type: 'REVENUE',
-        status: 'COMPLETED',
+        type: "REVENUE",
+        status: "COMPLETED",
       },
       _sum: {
         amount: true,
@@ -188,8 +189,18 @@ export class PrismaAnalyticsRepository implements IRevenueRepository {
     return result._sum.amount || 0;
   }
 
-  async getLatestRevenue(input: GetLatestRevenueParams): Promise<GetLatestRevenueResult> {
-    const { startDate, endDate, userId, limit = 10, page = 1, search, sortBy } = input;
+  async getLatestRevenue(
+    input: GetLatestRevenueParams
+  ): Promise<GetLatestRevenueResult> {
+    const {
+      startDate,
+      endDate,
+      userId,
+      limit = 10,
+      page = 1,
+      search,
+      sortBy,
+    } = input;
     const skip = (page - 1) * limit;
 
     const where: any = {
@@ -205,9 +216,10 @@ export class PrismaAnalyticsRepository implements IRevenueRepository {
       }),
     };
 
-    const orderBy = sortBy === "oldest" 
-      ? { createdAt: "asc" as const }
-      : { createdAt: "desc" as const };
+    const orderBy =
+      sortBy === "oldest"
+        ? { createdAt: "asc" as const }
+        : { createdAt: "desc" as const };
 
     const [transactions, total] = await Promise.all([
       this.prisma.transactionHistory.findMany({
@@ -221,26 +233,29 @@ export class PrismaAnalyticsRepository implements IRevenueRepository {
 
     // Get course details for the transactions
     const courseIds = transactions
-      .map(t => t.courseId)
-      .filter(id => id !== null) as string[];
-    
-    const courses = courseIds.length > 0 
-      ? await this.prisma.course.findMany({
-          where: { id: { in: courseIds } },
-          include: { creator: true },
-        })
-      : [];
+      .map((t) => t.courseId)
+      .filter((id) => id !== null) as string[];
 
-    const courseMap = new Map(courses.map(c => [c.id, c]));
+    const courses =
+      courseIds.length > 0
+        ? await this.prisma.course.findMany({
+            where: { id: { in: courseIds } },
+            include: { creator: true },
+          })
+        : [];
 
-    const items = transactions.map(transaction => {
-      const course = transaction.courseId ? courseMap.get(transaction.courseId) : null;
+    const courseMap = new Map(courses.map((c) => [c.id, c]));
+
+    const items = transactions.map((transaction) => {
+      const course = transaction.courseId
+        ? courseMap.get(transaction.courseId)
+        : null;
       const adminSharePercentage = course?.adminSharePercentage.toNumber() || 0;
       const coursePrice = course?.price?.toNumber() || 0;
       const offerPrice = transaction.amount;
       const adminShare = (offerPrice * adminSharePercentage) / 100;
       const netAmount = offerPrice - adminShare;
-      
+
       return {
         orderId: transaction.orderId || "",
         courseId: transaction.courseId || "",

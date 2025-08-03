@@ -1,18 +1,18 @@
 import {
   ICreateCourseInputDTO,
-  ICourseWithDetailsDTO
-} from "../../../../domain/dtos/course/course.dto";
+  ICourseWithDetailsDTO,
+} from "../../../dtos/course/course.dto";
 import { Course } from "../../../../domain/entities/course.entity";
 import { HttpError } from "../../../../presentation/http/errors/http-error";
 import { ICategoryRepository } from "../../../repositories/category.repository";
 import { ICourseRepository } from "../../../repositories/course.repository.interface";
 import { IUserRepository } from "../../../repositories/user.repository";
 import { ICreateCourseUseCase } from "../interfaces/create-course.usecase.interface";
-import { NotificationEventType } from '../../../../domain/enum/notification-event-type.enum';
-import { NotificationEntityType } from '../../../../domain/enum/notification-entity-type.enum';
-import { Price } from '../../../../domain/value-object/price';
-import { Duration } from '../../../../domain/value-object/duration';
-import { Offer } from '../../../../domain/value-object/offer';
+import { NotificationEventType } from "../../../../domain/enum/notification-event-type.enum";
+import { NotificationEntityType } from "../../../../domain/enum/notification-entity-type.enum";
+import { Price } from "../../../../domain/value-object/price";
+import { Duration } from "../../../../domain/value-object/duration";
+import { Offer } from "../../../../domain/value-object/offer";
 import { CreateNotificationsForUsersUseCaseInterface } from "../../notification/interfaces/create-notifications-for-users.usecase.interface";
 
 export interface CreateCourseResultDTO extends ICourseWithDetailsDTO {

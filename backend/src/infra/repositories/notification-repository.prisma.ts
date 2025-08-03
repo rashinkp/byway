@@ -1,34 +1,45 @@
-import { NotificationRepositoryInterface } from '../../app/repositories/notification-repository.interface';
-import { Notification } from '../../domain/entities/notification.entity';
-import { NotificationDTO } from '../../domain/dtos/notification.dto';
-import  { PrismaClient}  from '@prisma/client';
-import { NotificationEntityType } from '../../domain/enum/notification-entity-type.enum';
+import { NotificationRepositoryInterface } from "../../app/repositories/notification-repository.interface";
+import { Notification } from "../../domain/entities/notification.entity";
+import { NotificationDTO } from "../../app/dtos/notification.dto";
+import { PrismaClient } from "@prisma/client";
+import { NotificationEntityType } from "../../domain/enum/notification-entity-type.enum";
 
-export class PrismaNotificationRepository implements NotificationRepositoryInterface {
-    constructor(private readonly prisma: PrismaClient) {}
+export class PrismaNotificationRepository
+  implements NotificationRepositoryInterface
+{
+  constructor(private readonly prisma: PrismaClient) {}
 
-    private mapEntityType(entityType: NotificationEntityType): 'COURSE' | 'CHAT' | 'USER' | 'ASSIGNMENT' | 'GENERAL' | 'PAYMENT' | 'REVIEW' {
-        switch (entityType) {
-            case NotificationEntityType.COURSE:
-                return 'COURSE';
-            case NotificationEntityType.CHAT:
-                return 'CHAT';
-            case NotificationEntityType.USER:
-                return 'USER';
-            case NotificationEntityType.ASSIGNMENT:
-                return 'ASSIGNMENT';
-            case NotificationEntityType.GENERAL:
-                return 'GENERAL';
-            case NotificationEntityType.PAYMENT:
-                return 'PAYMENT';
-            case NotificationEntityType.REVIEW:
-                return 'REVIEW';
-            case NotificationEntityType.INSTRUCTOR:
-                return 'USER'; // Map INSTRUCTOR to USER since Prisma doesn't have INSTRUCTOR
-            default:
-                return 'GENERAL';
-        }
+  private mapEntityType(
+    entityType: NotificationEntityType
+  ):
+    | "COURSE"
+    | "CHAT"
+    | "USER"
+    | "ASSIGNMENT"
+    | "GENERAL"
+    | "PAYMENT"
+    | "REVIEW" {
+    switch (entityType) {
+      case NotificationEntityType.COURSE:
+        return "COURSE";
+      case NotificationEntityType.CHAT:
+        return "CHAT";
+      case NotificationEntityType.USER:
+        return "USER";
+      case NotificationEntityType.ASSIGNMENT:
+        return "ASSIGNMENT";
+      case NotificationEntityType.GENERAL:
+        return "GENERAL";
+      case NotificationEntityType.PAYMENT:
+        return "PAYMENT";
+      case NotificationEntityType.REVIEW:
+        return "REVIEW";
+      case NotificationEntityType.INSTRUCTOR:
+        return "USER"; // Map INSTRUCTOR to USER since Prisma doesn't have INSTRUCTOR
+      default:
+        return "GENERAL";
     }
+  }
 
   async create(notification: Notification): Promise<NotificationDTO> {
     const created = await this.prisma.notification.create({
@@ -56,7 +67,7 @@ export class PrismaNotificationRepository implements NotificationRepositoryInter
   async findByUserId(userId: string): Promise<NotificationDTO[]> {
     const found = await this.prisma.notification.findMany({
       where: { userId },
-      orderBy: { createdAt: 'desc' },
+      orderBy: { createdAt: "desc" },
     });
     return found.map(this.toDTO);
   }
@@ -66,16 +77,21 @@ export class PrismaNotificationRepository implements NotificationRepositoryInter
     skip?: number;
     take?: number;
     sortBy?: string;
-    sortOrder?: 'asc' | 'desc';
+    sortOrder?: "asc" | "desc";
     eventType?: string;
     search?: string;
-  }): Promise<{ items: NotificationDTO[]; total: number; hasMore: boolean; nextPage?: number }> {
+  }): Promise<{
+    items: NotificationDTO[];
+    total: number;
+    hasMore: boolean;
+    nextPage?: number;
+  }> {
     const {
       userId,
       skip = 0,
       take = 5,
-      sortBy = 'createdAt',
-      sortOrder = 'desc',
+      sortBy = "createdAt",
+      sortOrder = "desc",
       eventType,
       search,
     } = options;
@@ -83,8 +99,8 @@ export class PrismaNotificationRepository implements NotificationRepositoryInter
     if (eventType) where.eventType = eventType;
     if (search) {
       where.OR = [
-        { message: { contains: search, mode: 'insensitive' } },
-        { entityName: { contains: search, mode: 'insensitive' } },
+        { message: { contains: search, mode: "insensitive" } },
+        { entityName: { contains: search, mode: "insensitive" } },
       ];
     }
     const [items, total] = await Promise.all([
@@ -132,4 +148,4 @@ export class PrismaNotificationRepository implements NotificationRepositoryInter
       expiresAt: notification.expiresAt.toISOString(),
     };
   }
-} 
+}

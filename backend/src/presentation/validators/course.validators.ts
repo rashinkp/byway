@@ -6,7 +6,7 @@ import {
   IGetEnrolledCoursesInputDTO,
   ICreateEnrollmentInputDTO,
   IUpdateCourseApprovalInputDTO,
-} from "../../domain/dtos/course/course.dto";
+} from "../../app/dtos/course/course.dto";
 import { CourseLevel } from "../../domain/enum/course-level.enum";
 import { CourseStatus } from "../../domain/enum/course-status.enum";
 
@@ -16,8 +16,14 @@ interface ValidationSchema {
   params?: z.ZodSchema;
 }
 
-const courseLevelValues = Object.values(CourseLevel) as [CourseLevel, ...CourseLevel[]];
-const courseStatusValues = Object.values(CourseStatus) as [CourseStatus, ...CourseStatus[]];
+const courseLevelValues = Object.values(CourseLevel) as [
+  CourseLevel,
+  ...CourseLevel[]
+];
+const courseStatusValues = Object.values(CourseStatus) as [
+  CourseStatus,
+  ...CourseStatus[]
+];
 const uuidSchema = z.string().uuid("Invalid UUID");
 
 // Common schema for course fields
@@ -33,10 +39,7 @@ const courseFieldsSchema = z.object({
     .nonnegative("Price must be non-negative")
     .optional()
     .nullable(),
-  duration: z
-    .number()
-    .optional()
-    .nullable(),
+  duration: z.number().optional().nullable(),
   level: z.enum(courseLevelValues),
   thumbnail: z.string().url("Invalid URL").optional().nullable(),
   offer: z
@@ -51,30 +54,45 @@ const courseFieldsSchema = z.object({
     .min(0.01, "Admin share must be at least 0.01%")
     .max(100, "Admin share cannot exceed 100%")
     .default(20),
-  details: z.object({
-    prerequisites: z.string().optional().nullable(),
-    longDescription: z.string().optional().nullable(),
-    objectives: z.string().optional().nullable(),
-    targetAudience: z.string().optional().nullable()
-  }).optional().nullable()
+  details: z
+    .object({
+      prerequisites: z.string().optional().nullable(),
+      longDescription: z.string().optional().nullable(),
+      objectives: z.string().optional().nullable(),
+      targetAudience: z.string().optional().nullable(),
+    })
+    .optional()
+    .nullable(),
 });
 
 // Schemas
-const createCourseSchema = courseFieldsSchema as z.ZodType<Omit<ICreateCourseInputDTO, "createdBy">>;
+const createCourseSchema = courseFieldsSchema as z.ZodType<
+  Omit<ICreateCourseInputDTO, "createdBy">
+>;
 const updateCourseSchema = z.object({
   ...courseFieldsSchema.partial().shape,
   adminSharePercentage: z
     .number()
     .min(0.01, "Admin share must be at least 0.01%")
     .max(100, "Admin share cannot exceed 100%")
-    .default(20)
+    .default(20),
 }) as z.ZodType<Partial<Omit<IUpdateCourseInputDTO, "createdBy" | "id">>>;
 const courseIdSchema = z.object({
   id: uuidSchema,
 });
 const getAllCoursesSchema = z.object({
-  page: z.coerce.number().int().positive("Page must be positive").default(1).optional(),
-  limit: z.coerce.number().int().positive("Limit must be positive").default(10).optional(),
+  page: z.coerce
+    .number()
+    .int()
+    .positive("Page must be positive")
+    .default(1)
+    .optional(),
+  limit: z.coerce
+    .number()
+    .int()
+    .positive("Limit must be positive")
+    .default(10)
+    .optional(),
   sortBy: z
     .enum(["title", "createdAt", "updatedAt", "price", "duration"])
     .default("createdAt")
@@ -86,15 +104,34 @@ const getAllCoursesSchema = z.object({
     .default("false")
     .optional(),
   search: z.string().default("").optional(),
-  filterBy: z.enum(["All", "Active", "Inactive", "Approved", "Declined", "Pending", "Published", "Draft", "Archived"]).default("All").optional(),
+  filterBy: z
+    .enum([
+      "All",
+      "Active",
+      "Inactive",
+      "Approved",
+      "Declined",
+      "Pending",
+      "Published",
+      "Draft",
+      "Archived",
+    ])
+    .default("All")
+    .optional(),
   myCourses: z
     .string()
     .transform((val) => val === "true")
     .default("false")
     .optional(),
   role: z.enum(["USER", "INSTRUCTOR", "ADMIN"]).default("USER").optional(),
-  level: z.enum([...courseLevelValues, "All"]).default("All").optional(),
-  duration: z.enum(["All", "Under5", "5to10", "Over10"]).default("All").optional(),
+  level: z
+    .enum([...courseLevelValues, "All"])
+    .default("All")
+    .optional(),
+  duration: z
+    .enum(["All", "Under5", "5to10", "Over10"])
+    .default("All")
+    .optional(),
   price: z.enum(["All", "Free", "Paid"]).default("All").optional(),
   categoryId: uuidSchema.optional(),
 });
@@ -102,12 +139,28 @@ const createEnrollmentSchema = z.object({
   courseIds: z.array(uuidSchema).min(1, "At least one course ID is required"),
 });
 const getEnrolledCoursesSchema = z.object({
-  page: z.coerce.number().int().positive("Page must be positive").default(1).optional(),
-  limit: z.coerce.number().int().positive("Limit must be positive").default(10).optional(),
-  sortBy: z.enum(["title", "enrolledAt", "createdAt"]).default("enrolledAt").optional(),
+  page: z.coerce
+    .number()
+    .int()
+    .positive("Page must be positive")
+    .default(1)
+    .optional(),
+  limit: z.coerce
+    .number()
+    .int()
+    .positive("Limit must be positive")
+    .default(10)
+    .optional(),
+  sortBy: z
+    .enum(["title", "enrolledAt", "createdAt"])
+    .default("enrolledAt")
+    .optional(),
   sortOrder: z.enum(["asc", "desc"]).default("desc").optional(),
   search: z.string().default("").optional(),
-  level: z.enum([...courseLevelValues, "All"]).default("All").optional(),
+  level: z
+    .enum([...courseLevelValues, "All"])
+    .default("All")
+    .optional(),
 });
 const updateCourseApprovalSchema = z.object({
   courseId: uuidSchema,
@@ -148,11 +201,15 @@ export const updateCourseApprovalSchemaDef: ValidationSchema = {
 };
 
 // Validation functions
-export function validateCreateCourse(data: unknown): Omit<ICreateCourseInputDTO, "createdBy"> {
+export function validateCreateCourse(
+  data: unknown
+): Omit<ICreateCourseInputDTO, "createdBy"> {
   return createCourseSchema.parse(data);
 }
 
-export function validateUpdateCourse(data: unknown): Partial<Omit<IUpdateCourseInputDTO, "createdBy" | "id">> {
+export function validateUpdateCourse(
+  data: unknown
+): Partial<Omit<IUpdateCourseInputDTO, "createdBy" | "id">> {
   return updateCourseSchema.parse(data);
 }
 
@@ -168,14 +225,20 @@ export function validateDeleteCourse(data: unknown): { id: string } {
   return courseIdSchema.parse(data);
 }
 
-export function validateCreateEnrollment(data: unknown): Omit<ICreateEnrollmentInputDTO, "userId"> {
+export function validateCreateEnrollment(
+  data: unknown
+): Omit<ICreateEnrollmentInputDTO, "userId"> {
   return createEnrollmentSchema.parse(data);
 }
 
-export function validateGetEnrolledCourses(data: unknown): Omit<IGetEnrolledCoursesInputDTO, "userId"> {
+export function validateGetEnrolledCourses(
+  data: unknown
+): Omit<IGetEnrolledCoursesInputDTO, "userId"> {
   return getEnrolledCoursesSchema.parse(data);
 }
 
-export function validateUpdateCourseApproval(data: unknown): IUpdateCourseApprovalInputDTO {
+export function validateUpdateCourseApproval(
+  data: unknown
+): IUpdateCourseApprovalInputDTO {
   return updateCourseApprovalSchema.parse(data);
 }

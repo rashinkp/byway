@@ -5,7 +5,7 @@ import { IHttpErrors } from "../interfaces/http-errors.interface";
 import { IHttpSuccess } from "../interfaces/http-success.interface";
 import { UnauthorizedError } from "../errors/unautherized-error";
 import { IPaymentService } from "../../../app/services/payment/interfaces/payment.service.interface";
-import { createCheckoutSessionSchema } from "../../../domain/dtos/stripe/create-checkout-session.dto";
+import { createCheckoutSessionSchema } from "../../../app/dtos/stripe/create-checkout-session.dto";
 import { StripeWebhookGateway } from "../../../infra/providers/stripe/stripe-webhook.gateway";
 
 export class StripeController extends BaseController {

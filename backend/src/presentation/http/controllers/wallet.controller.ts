@@ -3,15 +3,15 @@ import { IHttpResponse } from "../interfaces/http-response.interface";
 import { IGetWalletUseCase } from "../../../app/usecases/wallet/interfaces/get-wallet.usecase.interface";
 import { IAddMoneyUseCase } from "../../../app/usecases/wallet/interfaces/add-money.usecase.interface";
 import { IReduceMoneyUseCase } from "../../../app/usecases/wallet/interfaces/reduce-money.usecase.interface";
-import { AddMoneyDto } from "../../../domain/dtos/wallet/add-money.dto";
-import { ReduceMoneyDto } from "../../../domain/dtos/wallet/reduce-money.dto";
+import { AddMoneyDto } from "../../../app/dtos/wallet/add-money.dto";
+import { ReduceMoneyDto } from "../../../app/dtos/wallet/reduce-money.dto";
 import { BaseController } from "./base.controller";
 import { IHttpErrors } from "../interfaces/http-errors.interface";
 import { IHttpSuccess } from "../interfaces/http-success.interface";
 import { UnauthorizedError } from "../errors/unautherized-error";
 import { HttpError } from "../errors/http-error";
 import { ITopUpWalletUseCase } from "../../../app/usecases/wallet/interfaces/top-up-wallet.usecase.interface";
-import { TopUpWalletDtoSchema } from "../../../domain/dtos/wallet/top-up.dto";
+import { TopUpWalletDtoSchema } from "../../../app/dtos/wallet/top-up.dto";
 
 export class WalletController extends BaseController {
   constructor(
@@ -65,7 +65,10 @@ export class WalletController extends BaseController {
       }
 
       const data: ReduceMoneyDto = { amount, currency };
-      const wallet = await this.reduceMoneyUseCase.execute(request.user.id, data);
+      const wallet = await this.reduceMoneyUseCase.execute(
+        request.user.id,
+        data
+      );
       return this.success_200(wallet, "Money reduced successfully");
     });
   }
@@ -77,10 +80,13 @@ export class WalletController extends BaseController {
       }
 
       const validatedData = TopUpWalletDtoSchema.parse(request.body);
-      console.log(validatedData , 'validatedData');
-      const result = await this.topUpWalletUseCase.execute(request.user.id, validatedData);
+      console.log(validatedData, "validatedData");
+      const result = await this.topUpWalletUseCase.execute(
+        request.user.id,
+        validatedData
+      );
 
       return this.success_200(result, "Wallet top-up successful");
     });
   }
-} 
+}

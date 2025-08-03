@@ -1,4 +1,4 @@
-import { RatingLevel } from "../../enum/rating-level.enum";
+import { RatingLevel } from "../../../domain/enum/rating-level.enum";
 
 export class CourseReviewStatsDto {
   courseId!: string;
@@ -37,4 +37,4 @@ export class ReviewAnalyticsDto {
     newReviews: number;
     averageRating: number;
   }[];
-} 
+}

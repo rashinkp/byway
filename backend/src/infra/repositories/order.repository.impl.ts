@@ -6,24 +6,37 @@ import { v4 as uuidv4 } from "uuid";
 import { OrderStatus } from "../../domain/enum/order-status.enum";
 import { PaymentStatus } from "../../domain/enum/payment-status.enum";
 import { PaymentGateway } from "../../domain/enum/payment-gateway.enum";
-import { GetAllOrdersDto } from "../../domain/dtos/order/order.dto";
+import { GetAllOrdersDto } from "../../app/dtos/order/order.dto";
 
 export class OrderRepository implements IOrderRepository {
   constructor(private prisma: PrismaClient) {}
 
-  async findAll(userId: string, filters: GetAllOrdersDto): Promise<{
+  async findAll(
+    userId: string,
+    filters: GetAllOrdersDto
+  ): Promise<{
     orders: Order[];
     total: number;
     page: number;
     limit: number;
     totalPages: number;
   }> {
-    const { page = 1, limit = 10, sortBy = "createdAt", sortOrder = "desc" } = filters;
+    const {
+      page = 1,
+      limit = 10,
+      sortBy = "createdAt",
+      sortOrder = "desc",
+    } = filters;
 
     const where = {
       userId,
       ...(filters.status && filters.status !== "ALL"
-        ? { orderStatus: filters.status as "PENDING" | "CONFIRMED" | "CANCELLED" }
+        ? {
+            orderStatus: filters.status as
+              | "PENDING"
+              | "CONFIRMED"
+              | "CANCELLED",
+          }
         : {}),
       ...(filters.startDate && filters.endDate
         ? {
@@ -83,21 +96,25 @@ export class OrderRepository implements IOrderRepository {
       order.items.map((item: any) => ({
         orderId: item.orderId,
         courseId: item.courseId,
-        courseTitle: item.courseTitle || item.course?.title || 'Unknown Course',
+        courseTitle: item.courseTitle || item.course?.title || "Unknown Course",
         coursePrice: Number(item.coursePrice),
         discount: item.discount ? Number(item.discount) : null,
         couponId: item.couponId,
-        title: item.course?.title || item.courseTitle || 'Unknown Course',
-        description: item.course?.description || 'No description available',
-        level: item.course?.level || 'BEGINNER',
-        price: item.course?.price ? Number(item.course.price) : Number(item.coursePrice),
+        title: item.course?.title || item.courseTitle || "Unknown Course",
+        description: item.course?.description || "No description available",
+        level: item.course?.level || "BEGINNER",
+        price: item.course?.price
+          ? Number(item.course.price)
+          : Number(item.coursePrice),
         thumbnail: item.course?.thumbnail || null,
-        status: item.course?.status || 'ACTIVE',
-        categoryId: item.course?.categoryId || '',
-        createdBy: item.course?.createdBy || '',
-        deletedAt: item.course?.deletedAt ? new Date(item.course.deletedAt).toISOString() : null,
-        approvalStatus: item.course?.approvalStatus || 'PENDING',
-        details: item.course?.details || null
+        status: item.course?.status || "ACTIVE",
+        categoryId: item.course?.categoryId || "",
+        createdBy: item.course?.createdBy || "",
+        deletedAt: item.course?.deletedAt
+          ? new Date(item.course.deletedAt).toISOString()
+          : null,
+        approvalStatus: item.course?.approvalStatus || "PENDING",
+        details: item.course?.details || null,
       }))
     );
     mappedOrder.id = order.id;
@@ -127,15 +144,15 @@ export class OrderRepository implements IOrderRepository {
       include: {
         items: {
           include: {
-            course: true
-          }
-        }
+            course: true,
+          },
+        },
       },
       orderBy: {
-        createdAt: 'desc'
-      }
+        createdAt: "desc",
+      },
     });
-    return orders.map(order => this.mapToOrderEntity(order));
+    return orders.map((order) => this.mapToOrderEntity(order));
   }
 
   async createOrder(
@@ -182,8 +199,8 @@ export class OrderRepository implements IOrderRepository {
               updatedAt: new Date(),
             },
             include: {
-              course: true
-            }
+              course: true,
+            },
           })
         )
       );
@@ -216,7 +233,9 @@ export class OrderRepository implements IOrderRepository {
     });
   }
 
-  private mapOrderStatusToPaymentStatus(orderStatus: OrderStatus): PaymentStatus {
+  private mapOrderStatusToPaymentStatus(
+    orderStatus: OrderStatus
+  ): PaymentStatus {
     switch (orderStatus) {
       case OrderStatus.COMPLETED:
         return PaymentStatus.COMPLETED;
@@ -229,9 +248,15 @@ export class OrderRepository implements IOrderRepository {
     }
   }
 
-  async findMany(params: { where: any; skip: number; take: number; orderBy: any; include?: any }): Promise<Order[]> {
+  async findMany(params: {
+    where: any;
+    skip: number;
+    take: number;
+    orderBy: any;
+    include?: any;
+  }): Promise<Order[]> {
     const orders = await this.prisma.order.findMany(params);
-    return orders.map(order => this.mapToOrderEntity(order));
+    return orders.map((order) => this.mapToOrderEntity(order));
   }
 
   async count(where: any): Promise<number> {
@@ -314,7 +339,10 @@ export class OrderRepository implements IOrderRepository {
     return order ? this.mapToOrderEntity(order) : null;
   }
 
-  async createOrderItems(orderId: string, courses: any[]): Promise<{ id: string; orderId: string; courseId: string }[]> {
+  async createOrderItems(
+    orderId: string,
+    courses: any[]
+  ): Promise<{ id: string; orderId: string; courseId: string }[]> {
     const orderItems = await Promise.all(
       courses.map(async (course) => {
         const orderItem = await this.prisma.orderItem.create({
@@ -335,24 +363,28 @@ export class OrderRepository implements IOrderRepository {
     return orderItems;
   }
 
-  async findOrderItems(orderId: string): Promise<{ id: string; orderId: string; courseId: string; coursePrice: number }[]> {
+  async findOrderItems(
+    orderId: string
+  ): Promise<
+    { id: string; orderId: string; courseId: string; coursePrice: number }[]
+  > {
     const orderItems = await this.prisma.orderItem.findMany({
       where: { orderId },
       include: {
-        course: true
-      }
+        course: true,
+      },
     });
-    return orderItems.map(item => ({
+    return orderItems.map((item) => ({
       id: item.id,
       orderId: item.orderId,
       courseId: item.courseId,
-      coursePrice: Number(item.coursePrice)
+      coursePrice: Number(item.coursePrice),
     }));
   }
 
   async findCourseById(courseId: string): Promise<Course | null> {
     const course = await this.prisma.course.findUnique({
-      where: { id: courseId }
+      where: { id: courseId },
     });
     return course ? Course.fromPrisma(course) : null;
   }

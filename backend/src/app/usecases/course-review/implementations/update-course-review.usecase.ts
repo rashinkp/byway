@@ -1,4 +1,7 @@
-import { UpdateCourseReviewDto, CourseReviewResponseDto } from "../../../../domain/dtos/course-review";
+import {
+  UpdateCourseReviewDto,
+  CourseReviewResponseDto,
+} from "../../../dtos/course-review";
 import { Rating } from "../../../../domain/value-object/rating";
 import { ICourseReviewRepository } from "../../../repositories/course-review.repository.interface";
 import { IUpdateCourseReviewUseCase } from "../interfaces/update-course-review.usecase.interface";
@@ -8,7 +11,11 @@ export class UpdateCourseReviewUseCase implements IUpdateCourseReviewUseCase {
     private readonly courseReviewRepository: ICourseReviewRepository
   ) {}
 
-  async execute(reviewId: string, input: UpdateCourseReviewDto, userId: string): Promise<CourseReviewResponseDto> {
+  async execute(
+    reviewId: string,
+    input: UpdateCourseReviewDto,
+    userId: string
+  ): Promise<CourseReviewResponseDto> {
     // Find the review
     const review = await this.courseReviewRepository.findById(reviewId);
     if (!review) {
@@ -22,7 +29,7 @@ export class UpdateCourseReviewUseCase implements IUpdateCourseReviewUseCase {
 
     // Prepare update data
     const updateData: any = {};
-    
+
     if (input.rating !== undefined) {
       updateData.rating = new Rating(input.rating);
     }
@@ -51,4 +58,4 @@ export class UpdateCourseReviewUseCase implements IUpdateCourseReviewUseCase {
       updatedAt: updatedReview.updatedAt,
     };
   }
-} 
+}

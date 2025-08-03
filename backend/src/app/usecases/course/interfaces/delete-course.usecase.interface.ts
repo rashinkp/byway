@@ -1,4 +1,4 @@
-import { ICourseWithDetailsDTO } from "../../../../domain/dtos/course/course.dto";
+import { ICourseWithDetailsDTO } from "../../../dtos/course/course.dto";
 
 export interface IDeleteCourseUseCase {
   execute(

@@ -1,5 +1,5 @@
-import { NotificationEventType } from '../enum/notification-event-type.enum';
-import { NotificationEntityType } from '../enum/notification-entity-type.enum';
+import { NotificationEventType } from "../../domain/enum/notification-event-type.enum";
+import { NotificationEntityType } from "../../domain/enum/notification-entity-type.enum";
 
 export class NotificationDTO {
   id!: string;
@@ -19,4 +19,4 @@ export class PaginatedNotificationListDTO {
   total!: number;
   hasMore!: boolean;
   nextPage?: number;
-} 
+}

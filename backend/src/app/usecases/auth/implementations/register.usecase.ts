@@ -4,7 +4,7 @@ import { HttpError } from "../../../../presentation/http/errors/http-error";
 import * as bcrypt from "bcrypt";
 import { IRegisterUseCase } from "../interfaces/register.usecase.interface";
 import { OtpProvider } from "../../../../infra/providers/otp/otp.provider";
-import { RegisterDto } from "../../../../domain/dtos/auth/register.dto";
+import { RegisterDto } from "../../../dtos/auth/register.dto";
 import { AuthProvider } from "../../../../domain/enum/auth-provider.enum";
 
 export class RegisterUseCase implements IRegisterUseCase {

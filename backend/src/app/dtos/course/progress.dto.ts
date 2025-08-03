@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { AccessStatus } from "../../enum/access-status.enum";
+import { AccessStatus } from "../../../domain/enum/access-status.enum";
 
 // Quiz Answer Schema
 export const QuizAnswerSchema = z.object({
@@ -70,4 +70,4 @@ export interface IProgressOutputDTO {
       isCorrect: boolean;
     }[];
   }[];
-} 
+}

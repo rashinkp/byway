@@ -1,5 +1,4 @@
-import { MessageType } from "../enum/Message-type.enum";
-
+import { MessageType } from "../../domain/enum/Message-type.enum";
 
 // Enriched message DTO that matches Prisma structure
 export class EnrichedMessageDTO {

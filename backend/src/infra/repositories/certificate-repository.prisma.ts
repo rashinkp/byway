@@ -1,6 +1,6 @@
 import { CertificateRepositoryInterface } from "../../app/repositories/certificate-repository.interface";
 import { Certificate } from "../../domain/entities/certificate.entity";
-import { CertificateDTO } from "../../domain/dtos/certificate.dto";
+import { CertificateDTO } from "../../app/dtos/certificate.dto";
 import { PrismaClient } from "@prisma/client";
 
 export class PrismaCertificateRepository

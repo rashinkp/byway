@@ -1,4 +1,7 @@
-import { ILessonOutputDTO, IUpdateLessonInputDTO } from "../../../../domain/dtos/lesson/lesson.dto";
+import {
+  ILessonOutputDTO,
+  IUpdateLessonInputDTO,
+} from "../../../dtos/lesson/lesson.dto";
 import { Lesson } from "../../../../domain/entities/lesson.entity";
 import { HttpError } from "../../../../presentation/http/errors/http-error";
 import { ILessonRepository } from "../../../repositories/lesson.repository";
@@ -21,7 +24,9 @@ export class UpdateLessonUseCase implements IUpdateLessonUseCase {
 
       // Check if content exists when publishing
       if (dto.status === LessonStatus.PUBLISHED) {
-        const content = await this.contentRepository.findByLessonId(dto.lessonId);
+        const content = await this.contentRepository.findByLessonId(
+          dto.lessonId
+        );
         if (!content) {
           throw new HttpError("Cannot publish lesson without content", 400);
         }

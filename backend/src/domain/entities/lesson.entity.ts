@@ -2,7 +2,7 @@ import { v4 as uuidv4 } from "uuid";
 import { LessonOrder } from "../value-object/lesson-order";
 import { LessonStatus } from "../enum/lesson.enum";
 import { LessonContent } from "./lesson-content.entity";
-import { ILessonContentInputDTO } from "../dtos/lesson/lesson.dto";
+import { ILessonContentInputDTO } from "../../app/dtos/lesson/lesson.dto";
 
 export interface LessonProps {
   id: string;

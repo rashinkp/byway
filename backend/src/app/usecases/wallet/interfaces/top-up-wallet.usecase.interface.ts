@@ -1,4 +1,4 @@
-import { TopUpWalletDto } from "../../../../domain/dtos/wallet/top-up.dto";
+import { TopUpWalletDto } from "../../../dtos/wallet/top-up.dto";
 import { Transaction } from "../../../../domain/entities/transaction.entity";
 
 export interface TopUpWalletResponse {
@@ -13,4 +13,4 @@ export interface TopUpWalletResponse {
 
 export interface ITopUpWalletUseCase {
   execute(userId: string, input: TopUpWalletDto): Promise<TopUpWalletResponse>;
-} 
+}

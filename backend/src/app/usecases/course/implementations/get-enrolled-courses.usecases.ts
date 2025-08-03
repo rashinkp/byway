@@ -1,7 +1,7 @@
 import {
   ICourseListResponseDTO,
   IGetEnrolledCoursesInputDTO,
-} from "../../../../domain/dtos/course/course.dto";
+} from "../../../dtos/course/course.dto";
 import { HttpError } from "../../../../presentation/http/errors/http-error";
 import { ICourseRepository } from "../../../repositories/course.repository.interface";
 import { IUserRepository } from "../../../repositories/user.repository";
@@ -27,31 +27,36 @@ export class GetEnrolledCoursesUseCase implements IGetEnrolledCoursesUseCase {
 
     try {
       const result = await this.courseRepository.findEnrolledCourses(input);
-      
+
       // Enhance courses with additional data
       const enhancedCourses = await Promise.all(
         result.courses.map(async (course) => {
           // Get instructor details
-          const instructor = await this.userRepository.findById(course.createdBy);
-          
+          const instructor = await this.userRepository.findById(
+            course.createdBy
+          );
+
           // Get review stats
-          const reviewStats = await this.courseReviewRepository.getCourseReviewStats(course.id);
-          
+          const reviewStats =
+            await this.courseReviewRepository.getCourseReviewStats(course.id);
+
           // Get lesson count
           const lessons = await this.lessonRepository.findByCourseId(course.id);
           const lessonCount = lessons.length;
-          
+
           return {
             ...course,
-            instructor: instructor ? {
-              id: instructor.id,
-              name: instructor.name,
-              avatar: instructor.avatar || null,
-            } : {
-              id: course.createdBy,
-              name: "Unknown Instructor",
-              avatar: null,
-            },
+            instructor: instructor
+              ? {
+                  id: instructor.id,
+                  name: instructor.name,
+                  avatar: instructor.avatar || null,
+                }
+              : {
+                  id: course.createdBy,
+                  name: "Unknown Instructor",
+                  avatar: null,
+                },
             reviewStats: {
               averageRating: reviewStats.averageRating,
               totalReviews: reviewStats.totalReviews,
@@ -62,7 +67,7 @@ export class GetEnrolledCoursesUseCase implements IGetEnrolledCoursesUseCase {
           };
         })
       );
-      
+
       return {
         ...result,
         courses: enhancedCourses,

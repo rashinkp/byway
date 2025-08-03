@@ -1,14 +1,21 @@
 import { ITransactionRepository } from "../../../repositories/transaction.repository";
 import { IGetTransactionsByOrderUseCase } from "../interfaces/get-transactions-by-order.usecase.interface";
-import { IGetTransactionsByOrderInputDTO, ITransactionOutputDTO } from "../../../../domain/dtos/transaction/transaction.dto";
+import {
+  IGetTransactionsByOrderInputDTO,
+  ITransactionOutputDTO,
+} from "../../../dtos/transaction/transaction.dto";
 
-export class GetTransactionsByOrderUseCase implements IGetTransactionsByOrderUseCase {
-  constructor(
-    private readonly transactionRepository: ITransactionRepository
-  ) {}
+export class GetTransactionsByOrderUseCase
+  implements IGetTransactionsByOrderUseCase
+{
+  constructor(private readonly transactionRepository: ITransactionRepository) {}
 
-  async execute(input: IGetTransactionsByOrderInputDTO): Promise<ITransactionOutputDTO[]> {
-    const transaction = await this.transactionRepository.findByOrderId(input.orderId);
+  async execute(
+    input: IGetTransactionsByOrderInputDTO
+  ): Promise<ITransactionOutputDTO[]> {
+    const transaction = await this.transactionRepository.findByOrderId(
+      input.orderId
+    );
     if (!transaction) {
       return [];
     }
@@ -30,7 +37,7 @@ export class GetTransactionsByOrderUseCase implements IGetTransactionsByOrderUse
       transactionId: transaction.transactionId,
       metadata: transaction.metadata,
       createdAt: transaction.createdAt,
-      updatedAt: transaction.updatedAt
+      updatedAt: transaction.updatedAt,
     };
   }
-} 
+}

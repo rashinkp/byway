@@ -1,5 +1,5 @@
 import { IPaymentService } from "../interfaces/payment.service.interface";
-import { CreateCheckoutSessionDto } from "../../../../domain/dtos/stripe/create-checkout-session.dto";
+import { CreateCheckoutSessionDto } from "../../../dtos/stripe/create-checkout-session.dto";
 import { HttpError } from "../../../../presentation/http/errors/http-error";
 import { StatusCodes } from "http-status-codes";
 import { TransactionType } from "../../../../domain/enum/transaction-type.enum";
@@ -87,13 +87,16 @@ export class PaymentService implements IPaymentService {
     for (const item of orderItems) {
       try {
         // Check if user is already enrolled in this course
-        const existingEnrollment = await this.enrollmentRepository.findByUserAndCourse(
-          userId,
-          item.courseId
-        );
+        const existingEnrollment =
+          await this.enrollmentRepository.findByUserAndCourse(
+            userId,
+            item.courseId
+          );
 
         if (existingEnrollment) {
-          console.log(`User ${userId} is already enrolled in course ${item.courseId}, skipping enrollment creation`);
+          console.log(
+            `User ${userId} is already enrolled in course ${item.courseId}, skipping enrollment creation`
+          );
           continue; // Skip creating duplicate enrollment
         }
 
@@ -103,7 +106,9 @@ export class PaymentService implements IPaymentService {
           courseIds: [item.courseId],
           orderItemId: item.id,
         });
-        console.log(`Successfully created enrollment for course ${item.courseId}`);
+        console.log(
+          `Successfully created enrollment for course ${item.courseId}`
+        );
       } catch (error) {
         console.error(
           "Error creating enrollment for course:",
@@ -296,13 +301,16 @@ export class PaymentService implements IPaymentService {
               console.log("Creating enrollment for course:", item.courseId);
               try {
                 // Check if user is already enrolled in this course
-                const existingEnrollment = await this.enrollmentRepository.findByUserAndCourse(
-                  order.userId,
-                  item.courseId
-                );
+                const existingEnrollment =
+                  await this.enrollmentRepository.findByUserAndCourse(
+                    order.userId,
+                    item.courseId
+                  );
 
                 if (existingEnrollment) {
-                  console.log(`User ${order.userId} is already enrolled in course ${item.courseId}, skipping enrollment creation`);
+                  console.log(
+                    `User ${order.userId} is already enrolled in course ${item.courseId}, skipping enrollment creation`
+                  );
                   continue; // Skip creating duplicate enrollment
                 }
 
@@ -340,7 +348,10 @@ export class PaymentService implements IPaymentService {
             try {
               console.log("Clearing cart items for purchased courses");
               for (const item of orderItems) {
-                await this.cartRepository.deleteByUserAndCourse(order.userId, item.courseId);
+                await this.cartRepository.deleteByUserAndCourse(
+                  order.userId,
+                  item.courseId
+                );
               }
               console.log("Cart items cleared successfully");
             } catch (error) {

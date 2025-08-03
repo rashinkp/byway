@@ -1,4 +1,7 @@
-import { GetLatestRevenueParams, GetLatestRevenueResult } from "../../../../domain/dtos/revenue/get-latest-revenue.dto";
+import {
+  GetLatestRevenueParams,
+  GetLatestRevenueResult,
+} from "../../../dtos/revenue/get-latest-revenue.dto";
 
 export interface CourseRevenueItem {
   orderId: string;
@@ -15,4 +18,4 @@ export interface CourseRevenueItem {
 
 export interface IGetLatestRevenueUseCase {
   execute(params: GetLatestRevenueParams): Promise<GetLatestRevenueResult>;
-} 
+}

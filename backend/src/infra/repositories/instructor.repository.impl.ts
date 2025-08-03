@@ -3,7 +3,7 @@ import { Instructor } from "../../domain/entities/instructor.entity";
 import { APPROVALSTATUS } from "../../domain/enum/approval-status.enum";
 import { IInstructorRepository } from "../../app/repositories/instructor.repository";
 import { IGetTopInstructorsInput } from "@/app/usecases/user/interfaces/get-top-instructors.usecase.interface";
-import { ITopInstructor } from "@/domain/dtos/admin/admin-dashboard.dto";
+import { ITopInstructor } from "@/app/dtos/admin/admin-dashboard.dto";
 
 export class PrismaInstructorRepository implements IInstructorRepository {
   constructor(private prisma: PrismaClient) {}
@@ -166,9 +166,9 @@ export class PrismaInstructorRepository implements IInstructorRepository {
       include: {
         coursesCreated: {
           include: {
-            enrollments: true
-          }
-        }
+            enrollments: true,
+          },
+        },
       },
       take: input.limit || 5,
     });
@@ -180,49 +180,61 @@ export class PrismaInstructorRepository implements IInstructorRepository {
         const courseCount = instructor.coursesCreated.length;
 
         // Calculate total enrollments across all courses
-        const totalEnrollments = instructor.coursesCreated.reduce((sum: number, course: any) => {
-          return sum + course.enrollments.length;
-        }, 0);
+        const totalEnrollments = instructor.coursesCreated.reduce(
+          (sum: number, course: any) => {
+            return sum + course.enrollments.length;
+          },
+          0
+        );
 
         // Calculate total revenue from completed order items for instructor's courses
-        const courseIds = instructor.coursesCreated.map((course: any) => course.id);
+        const courseIds = instructor.coursesCreated.map(
+          (course: any) => course.id
+        );
         const completedOrderItems = await this.prisma.orderItem.findMany({
           where: {
             courseId: {
-              in: courseIds
+              in: courseIds,
             },
             order: {
-              paymentStatus: 'COMPLETED',
-              orderStatus: 'COMPLETED'
-            }
-          }
+              paymentStatus: "COMPLETED",
+              orderStatus: "COMPLETED",
+            },
+          },
         });
 
         // Calculate total revenue (instructor gets the remaining amount after admin share)
-        const totalRevenue = completedOrderItems.reduce((sum: number, item: any) => {
-          const itemPrice = Number(item.coursePrice);
-          const adminSharePercentage = Number(item.adminSharePercentage);
-          const adminRevenue = itemPrice * (adminSharePercentage / 100);
-          const instructorRevenue = itemPrice - adminRevenue; // Instructor gets the remaining amount
-          return sum + instructorRevenue;
-        }, 0);
+        const totalRevenue = completedOrderItems.reduce(
+          (sum: number, item: any) => {
+            const itemPrice = Number(item.coursePrice);
+            const adminSharePercentage = Number(item.adminSharePercentage);
+            const adminRevenue = itemPrice * (adminSharePercentage / 100);
+            const instructorRevenue = itemPrice - adminRevenue; // Instructor gets the remaining amount
+            return sum + instructorRevenue;
+          },
+          0
+        );
 
         // Calculate average rating from course reviews
         const reviews = await this.prisma.courseReview.findMany({
           where: {
             courseId: {
-              in: courseIds
+              in: courseIds,
             },
-            deletedAt: null // Only include active reviews
+            deletedAt: null, // Only include active reviews
           },
           select: {
-            rating: true
-          }
+            rating: true,
+          },
         });
 
-        const averageRating = reviews.length > 0 
-          ? reviews.reduce((sum: number, review: any) => sum + review.rating, 0) / reviews.length
-          : 0;
+        const averageRating =
+          reviews.length > 0
+            ? reviews.reduce(
+                (sum: number, review: any) => sum + review.rating,
+                0
+              ) / reviews.length
+            : 0;
 
         return {
           instructorId: instructor.id,
@@ -238,6 +250,8 @@ export class PrismaInstructorRepository implements IInstructorRepository {
     );
 
     // Sort by total revenue in descending order
-    return instructorsWithMetrics.sort((a, b) => b.totalRevenue - a.totalRevenue);
+    return instructorsWithMetrics.sort(
+      (a, b) => b.totalRevenue - a.totalRevenue
+    );
   }
 }

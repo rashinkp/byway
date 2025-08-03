@@ -5,7 +5,7 @@ import { UserId } from "../../domain/value-object/UserId";
 import {
   PaginatedChatListDTO,
   EnhancedChatListItemDTO,
-} from "../../domain/dtos/chat.dto";
+} from "../../app/dtos/chat.dto";
 import { PrismaClient } from "@prisma/client";
 import { Role } from "../../domain/enum/role.enum";
 

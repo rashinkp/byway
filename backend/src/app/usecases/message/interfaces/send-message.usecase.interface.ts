@@ -1,5 +1,4 @@
-import { MessageResponseDTO } from "@/domain/dtos/chat.dto";
-
+import { MessageResponseDTO } from "@/app/dtos/chat.dto";
 
 export interface SendMessageInput {
   chatId?: string;
@@ -12,4 +11,4 @@ export interface SendMessageInput {
 
 export interface ISendMessageUseCase {
   execute(input: SendMessageInput): Promise<MessageResponseDTO>;
-} 
+}

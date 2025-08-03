@@ -5,7 +5,11 @@ import { IGetCartUseCase } from "../../../app/usecases/cart/interfaces/get-cart.
 import { IRemoveFromCartUseCase } from "../../../app/usecases/cart/interfaces/remove-from-cart.usecase.interface";
 import { IApplyCouponUseCase } from "../../../app/usecases/cart/interfaces/apply-coupon.usecase.interface";
 import { IClearCartUseCase } from "../../../app/usecases/cart/interfaces/clear-cart.usecase.interface";
-import { validateAddToCart, validateGetCart, validateApplyCoupon } from "../../../domain/dtos/cart/cart.dto";
+import {
+  validateAddToCart,
+  validateGetCart,
+  validateApplyCoupon,
+} from "../../../app/dtos/cart/cart.dto";
 import { HttpError } from "../errors/http-error";
 import { BaseController } from "./base.controller";
 import { IHttpErrors } from "../interfaces/http-errors.interface";
@@ -32,7 +36,10 @@ export class CartController extends BaseController {
       }
 
       const validated = validateAddToCart(request.body);
-      const cart = await this.addToCartUseCase.execute(request.user.id, validated);
+      const cart = await this.addToCartUseCase.execute(
+        request.user.id,
+        validated
+      );
 
       return this.success_201(cart, "Course added to cart successfully");
     });
@@ -45,31 +52,39 @@ export class CartController extends BaseController {
       }
 
       const validated = validateGetCart(request.query);
-      const cart = await this.getCartUseCase.execute(request.user.id, validated);
+      const cart = await this.getCartUseCase.execute(
+        request.user.id,
+        validated
+      );
 
       // Format cart items to include course data
-      const formattedCart = cart.map(item => ({
+      const formattedCart = cart.map((item) => ({
         ...item.toJSON(),
-        course: item.course ? {
-          id: item.course.id,
-          title: item.course.title,
-          description: item.course.description,
-          thumbnail: item.course.thumbnail,
-          price: item.course.price?.getValue() ?? null,
-          offer: item.course.offer?.getValue() ?? null,
-          duration: item.course.duration?.getValue() ?? null,
-          level: item.course.level,
-          lessons: item.course.lessons,
-          rating: item.course.rating,
-          reviewCount: item.course.reviewCount,
-          bestSeller: item.course.bestSeller
-        } : undefined
+        course: item.course
+          ? {
+              id: item.course.id,
+              title: item.course.title,
+              description: item.course.description,
+              thumbnail: item.course.thumbnail,
+              price: item.course.price?.getValue() ?? null,
+              offer: item.course.offer?.getValue() ?? null,
+              duration: item.course.duration?.getValue() ?? null,
+              level: item.course.level,
+              lessons: item.course.lessons,
+              rating: item.course.rating,
+              reviewCount: item.course.reviewCount,
+              bestSeller: item.course.bestSeller,
+            }
+          : undefined,
       }));
 
-      return this.success_200({
-        cartItems: formattedCart,
-        total: cart.length
-      }, "Cart retrieved successfully");
+      return this.success_200(
+        {
+          cartItems: formattedCart,
+          total: cart.length,
+        },
+        "Cart retrieved successfully"
+      );
     });
   }
 
@@ -97,7 +112,10 @@ export class CartController extends BaseController {
       }
 
       const validated = validateApplyCoupon(request.body);
-      const cart = await this.applyCouponUseCase.execute(request.user.id, validated);
+      const cart = await this.applyCouponUseCase.execute(
+        request.user.id,
+        validated
+      );
 
       return this.success_200(cart, "Coupon applied successfully");
     });
@@ -113,4 +131,4 @@ export class CartController extends BaseController {
       return this.success_200(null, "Cart cleared successfully");
     });
   }
-} 
+}
