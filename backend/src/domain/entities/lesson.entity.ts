@@ -1,21 +1,6 @@
-import { v4 as uuidv4 } from "uuid";
 import { LessonOrder } from "../value-object/lesson-order";
 import { LessonStatus } from "../enum/lesson.enum";
 import { LessonContent } from "./lesson-content.entity";
-import { ILessonContentInputDTO } from "../../app/dtos/lesson/lesson.dto";
-
-export interface LessonProps {
-  id: string;
-  courseId: string;
-  title: string;
-  description?: string | null;
-  order: LessonOrder;
-  status: LessonStatus;
-  content?: LessonContent | null;
-  createdAt: Date;
-  updatedAt: Date;
-  deletedAt?: Date | null;
-}
 
 export class Lesson {
   private readonly _id: string;
@@ -29,7 +14,20 @@ export class Lesson {
   private _updatedAt: Date;
   private _deletedAt: Date | null;
 
-  private constructor(props: LessonProps) {
+  constructor(props: {
+    id: string;
+    courseId: string;
+    title: string;
+    description?: string | null;
+    order: LessonOrder;
+    status: LessonStatus;
+    content?: LessonContent | null;
+    createdAt: Date;
+    updatedAt: Date;
+    deletedAt?: Date | null;
+  }) {
+    this.validateLesson(props);
+    
     this._id = props.id;
     this._courseId = props.courseId;
     this._title = props.title;
@@ -42,155 +40,29 @@ export class Lesson {
     this._deletedAt = props.deletedAt ?? null;
   }
 
-  static create(dto: {
-    courseId: string;
-    title: string;
-    description?: string | null;
-    order: number;
-    status?: LessonStatus;
-    content?: ILessonContentInputDTO | null;
-  }): Lesson {
-    if (!dto.courseId) {
+  private validateLesson(props: any): void {
+    if (!props.id) {
+      throw new Error("Lesson ID is required");
+    }
+
+    if (!props.courseId) {
       throw new Error("Course ID is required");
     }
-    if (!dto.title || dto.title.trim() === "") {
+
+    if (!props.title || props.title.trim() === "") {
       throw new Error("Lesson title cannot be empty");
     }
 
-    const content = dto.content
-      ? LessonContent.fromPersistence({
-          id: dto.content.id || uuidv4(), // Generate ID if not provided
-          lessonId: dto.content.lessonId,
-          type: dto.content.type,
-          status: dto.content.status,
-          title: dto.content.title ?? null,
-          description: dto.content.description ?? null,
-          fileUrl: dto.content.fileUrl ?? null,
-          thumbnailUrl: dto.content.thumbnailUrl ?? null,
-          quizQuestions: dto.content.quizQuestions ?? null,
-          createdAt: dto.content.createdAt
-            ? new Date(dto.content.createdAt)
-            : new Date(),
-          updatedAt: dto.content.updatedAt
-            ? new Date(dto.content.updatedAt)
-            : new Date(),
-          deletedAt: dto.content.deletedAt
-            ? new Date(dto.content.deletedAt)
-            : null,
-        })
-      : null;
+    if (!props.order) {
+      throw new Error("Lesson order is required");
+    }
 
-    return new Lesson({
-      id: uuidv4(),
-      courseId: dto.courseId,
-      title: dto.title.trim(),
-      description: dto.description?.trim() ?? null,
-      order: new LessonOrder(dto.order),
-      status: dto.status || LessonStatus.DRAFT,
-      content,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-      deletedAt: null,
-    });
+    if (!props.status) {
+      throw new Error("Lesson status is required");
+    }
   }
 
-  static update(
-    existingLesson: Lesson,
-    dto: {
-      title?: string;
-      description?: string | null;
-      order?: number;
-      status?: LessonStatus;
-      content?: ILessonContentInputDTO | null | undefined;
-    }
-  ): Lesson {
-    const props: LessonProps = {
-      ...existingLesson.getProps(),
-      updatedAt: new Date(),
-    };
-
-    if (dto.title && dto.title.trim() !== "") {
-      props.title = dto.title.trim();
-    }
-    if (dto.description !== undefined) {
-      props.description = dto.description?.trim() ?? null;
-    }
-    if (dto.order !== undefined) {
-      props.order = new LessonOrder(dto.order);
-    }
-    if (dto.status) {
-      props.status = dto.status;
-    }
-    if (dto.content !== undefined) {
-      props.content = dto.content
-        ? LessonContent.fromPersistence({
-            id: dto.content.id || existingLesson.content?.id || uuidv4(),
-            lessonId: dto.content.lessonId,
-            type: dto.content.type,
-            status: dto.content.status,
-            title: dto.content.title ?? null,
-            description: dto.content.description ?? null,
-            fileUrl: dto.content.fileUrl ?? null,
-            thumbnailUrl: dto.content.thumbnailUrl ?? null,
-            quizQuestions: dto.content.quizQuestions ?? null,
-            createdAt: dto.content.createdAt
-              ? new Date(dto.content.createdAt)
-              : existingLesson.content?.createdAt || new Date(),
-            updatedAt: dto.content.updatedAt
-              ? new Date(dto.content.updatedAt)
-              : new Date(),
-            deletedAt: dto.content.deletedAt
-              ? new Date(dto.content.deletedAt)
-              : existingLesson.content?.deletedAt || null,
-          })
-        : null;
-    }
-
-    return new Lesson(props);
-  }
-
-  static fromPersistence(data: {
-    id: string;
-    courseId: string;
-    title: string;
-    description?: string | null;
-    order: number;
-    status: LessonStatus;
-    content?: LessonContent | null;
-    createdAt: Date;
-    updatedAt: Date;
-    deletedAt?: Date | null;
-  }): Lesson {
-    return new Lesson({
-      id: data.id,
-      courseId: data.courseId,
-      title: data.title,
-      description: data.description ?? null,
-      order: new LessonOrder(data.order),
-      status: data.status,
-      content: data.content ?? null,
-      createdAt: data.createdAt,
-      updatedAt: data.updatedAt,
-      deletedAt: data.deletedAt ?? null,
-    });
-  }
-
-  softDelete(): void {
-    if (this._deletedAt) {
-      throw new Error("Lesson is already deleted");
-    }
-    this._deletedAt = new Date();
-    this._updatedAt = new Date();
-  }
-
-  recover(): void {
-    if (!this._deletedAt) {
-      throw new Error("Lesson is not deleted");
-    }
-    this._deletedAt = null;
-    this._updatedAt = new Date();
-  }
-
+  // Getters
   get id(): string {
     return this._id;
   }
@@ -231,37 +103,75 @@ export class Lesson {
     return this._deletedAt;
   }
 
-  private getProps(): LessonProps {
-    return {
-      id: this._id,
-      courseId: this._courseId,
-      title: this._title,
-      description: this._description,
-      order: this._order,
-      status: this._status,
-      content: this._content,
-      createdAt: this._createdAt,
-      updatedAt: this._updatedAt,
-      deletedAt: this._deletedAt,
-    };
+  // Business logic methods
+  update(props: {
+    title?: string;
+    description?: string | null;
+    order?: number;
+    status?: LessonStatus;
+  }): void {
+    if (props.title && props.title.trim() !== "") {
+      this._title = props.title.trim();
+    }
+
+    if (props.description !== undefined) {
+      this._description = props.description?.trim() ?? null;
+    }
+
+    if (props.order !== undefined) {
+      this._order = new LessonOrder(props.order);
+    }
+
+    if (props.status !== undefined) {
+      this._status = props.status;
+    }
+
+    this._updatedAt = new Date();
+  }
+
+  setContent(content: LessonContent): void {
+    this._content = content;
+    this._updatedAt = new Date();
+  }
+
+  removeContent(): void {
+    this._content = null;
+    this._updatedAt = new Date();
+  }
+
+  softDelete(): void {
+    if (this._deletedAt) {
+      throw new Error("Lesson is already deleted");
+    }
+    this._deletedAt = new Date();
+    this._updatedAt = new Date();
+  }
+
+  recover(): void {
+    if (!this._deletedAt) {
+      throw new Error("Lesson is not deleted");
+    }
+    this._deletedAt = null;
+    this._updatedAt = new Date();
+  }
+
+  isDeleted(): boolean {
+    return this._deletedAt !== null;
   }
 
   isActive(): boolean {
-    return !this._deletedAt;
+    return !this.isDeleted();
   }
 
-  toJSON(): any {
-    return {
-      id: this._id,
-      courseId: this._courseId,
-      title: this._title,
-      description: this._description,
-      order: this._order.value,
-      status: this._status,
-      content: this._content?.toJSON() ?? null,
-      createdAt: this._createdAt.toISOString(),
-      updatedAt: this._updatedAt.toISOString(),
-      deletedAt: this._deletedAt?.toISOString() ?? null,
-    };
+  isPublished(): boolean {
+    return this._status === LessonStatus.PUBLISHED && !this.isDeleted();
+  }
+
+  hasContent(): boolean {
+    return this._content !== null;
+  }
+
+  canBeAccessed(): boolean {
+    return this.isPublished() && this.hasContent();
   }
 }

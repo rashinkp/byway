@@ -22,18 +22,8 @@ export class CategoryName {
   }
 }
 
-interface CategoryProps {
-  id: string;
-  name: CategoryName;
-  description?: string;
-  createdBy: string; 
-  createdAt: Date;
-  updatedAt: Date;
-  deletedAt?: Date;
-}
-
 export class Category {
-  private _id: string;
+  private readonly _id: string;
   private _name: CategoryName;
   private _description?: string;
   private _createdBy: string;
@@ -41,8 +31,17 @@ export class Category {
   private _updatedAt: Date;
   private _deletedAt?: Date;
 
-  // Private constructor to enforce factory method usage
-  private constructor(props: CategoryProps) {
+  constructor(props: {
+    id: string;
+    name: CategoryName;
+    description?: string;
+    createdBy: string;
+    createdAt: Date;
+    updatedAt: Date;
+    deletedAt?: Date;
+  }) {
+    this.validateCategory(props);
+    
     this._id = props.id;
     this._name = props.name;
     this._description = props.description;
@@ -52,88 +51,22 @@ export class Category {
     this._deletedAt = props.deletedAt;
   }
 
-  // Static factory method to create a new Category
-  static create(dto: {
-    name: string;
-    description?: string;
-    createdBy: string;
-  }): Category {
-    if (!dto.createdBy) {
+  private validateCategory(props: any): void {
+    if (!props.id) {
+      throw new Error("Category ID is required");
+    }
+
+    if (!props.name) {
+      throw new Error("Category name is required");
+    }
+
+    if (!props.createdBy) {
       throw new Error("Creator ID is required");
     }
 
-    return new Category({
-      id: uuid(),
-      name: new CategoryName(dto.name),
-      description: dto.description?.trim(),
-      createdBy: dto.createdBy,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-      deletedAt: undefined,
-    });
-  }
-
-  // Static factory method to update an existing Category
-  static update(
-    existingCategory: Category,
-    dto: {
-      name?: string;
-      description?: string;
+    if (props.description && props.description.length > 500) {
+      throw new Error("Category description cannot exceed 500 characters");
     }
-  ): Category {
-    const props: CategoryProps = {
-      ...existingCategory.getProps(),
-      updatedAt: new Date(),
-    };
-
-    if (dto.name && dto.name.trim() !== "") {
-      props.name = new CategoryName(dto.name);
-    }
-
-    if (dto.description !== undefined) {
-      props.description = dto.description?.trim();
-    }
-
-    return new Category(props);
-  }
-
-  // Static factory method to create from persistence layer (e.g., Prisma)
-  static fromPersistence(data: {
-    id: string;
-    name: string;
-    description?: string | null;
-    createdBy: string;
-    createdAt: Date;
-    updatedAt: Date;
-    deletedAt?: Date | null;
-  }): Category {
-    return new Category({
-      id: data.id,
-      name: new CategoryName(data.name),
-      description: data.description ?? undefined,
-      createdBy: data.createdBy,
-      createdAt: data.createdAt,
-      updatedAt: data.updatedAt,
-      deletedAt: data.deletedAt ?? undefined,
-    });
-  }
-
-  // Method to soft delete
-  softDelete(): void {
-    if (this._deletedAt) {
-      throw new Error("Category is already deleted");
-    }
-    this._deletedAt = new Date();
-    this._updatedAt = new Date();
-  }
-
-  // Method to recover a soft-deleted category
-  recover(): void {
-    if (!this._deletedAt) {
-      throw new Error("Category is not deleted");
-    }
-    this._deletedAt = undefined;
-    this._updatedAt = new Date();
   }
 
   // Getters
@@ -165,21 +98,50 @@ export class Category {
     return this._deletedAt;
   }
 
-  // Helper method to get all properties (for internal use)
-  private getProps(): CategoryProps {
-    return {
-      id: this._id,
-      name: this._name,
-      description: this._description,
-      createdBy: this._createdBy,
-      createdAt: this._createdAt,
-      updatedAt: this._updatedAt,
-      deletedAt: this._deletedAt,
-    };
+  // Business logic methods
+  update(props: {
+    name?: string;
+    description?: string;
+  }): void {
+    if (props.name && props.name.trim() !== "") {
+      this._name = new CategoryName(props.name);
+    }
+
+    if (props.description !== undefined) {
+      if (props.description && props.description.length > 500) {
+        throw new Error("Category description cannot exceed 500 characters");
+      }
+      this._description = props.description?.trim();
+    }
+
+    this._updatedAt = new Date();
   }
 
-  // Method to check if category is active (not deleted)
+  softDelete(): void {
+    if (this._deletedAt) {
+      throw new Error("Category is already deleted");
+    }
+    this._deletedAt = new Date();
+    this._updatedAt = new Date();
+  }
+
+  recover(): void {
+    if (!this._deletedAt) {
+      throw new Error("Category is not deleted");
+    }
+    this._deletedAt = undefined;
+    this._updatedAt = new Date();
+  }
+
+  isDeleted(): boolean {
+    return this._deletedAt !== undefined;
+  }
+
   isActive(): boolean {
-    return !this._deletedAt;
+    return !this.isDeleted();
+  }
+
+  hasDescription(): boolean {
+    return this._description !== undefined && this._description.trim() !== "";
   }
 }

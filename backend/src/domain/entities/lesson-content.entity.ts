@@ -1,4 +1,3 @@
-import { v4 as uuidv4 } from "uuid";
 import { ContentStatus, ContentType } from "../enum/content.enum";
 import { FileUrl } from "../value-object/file-url";
 
@@ -7,22 +6,6 @@ export interface QuizQuestion {
   question: string;
   options: string[];
   correctAnswer: string;
-  // Add other fields as per your QuizQuestion schema
-}
-
-export interface LessonContentProps {
-  id: string;
-  lessonId: string;
-  type: ContentType;
-  status: ContentStatus;
-  title: string | null;
-  description: string | null;
-  fileUrl: FileUrl | null;
-  thumbnailUrl: FileUrl | null;
-  quizQuestions: QuizQuestion[] | null;
-  createdAt: Date;
-  updatedAt: Date;
-  deletedAt: Date | null;
 }
 
 export class LessonContent {
@@ -39,7 +22,22 @@ export class LessonContent {
   private _updatedAt: Date;
   private _deletedAt: Date | null;
 
-  private constructor(props: LessonContentProps) {
+  constructor(props: {
+    id: string;
+    lessonId: string;
+    type: ContentType;
+    status: ContentStatus;
+    title?: string | null;
+    description?: string | null;
+    fileUrl?: FileUrl | null;
+    thumbnailUrl?: FileUrl | null;
+    quizQuestions?: QuizQuestion[] | null;
+    createdAt: Date;
+    updatedAt: Date;
+    deletedAt?: Date | null;
+  }) {
+    this.validateContent(props);
+    
     this._id = props.id;
     this._lessonId = props.lessonId;
     this._type = props.type;
@@ -54,125 +52,33 @@ export class LessonContent {
     this._deletedAt = props.deletedAt ?? null;
   }
 
-  static create(dto: {
-    lessonId: string;
-    type: ContentType;
-    status?: ContentStatus;
-    title?: string | null;
-    description?: string | null;
-    fileUrl?: string | null;
-    thumbnailUrl?: string | null;
-    quizQuestions?: QuizQuestion[] | null;
-  }): LessonContent {
-    if (!dto.lessonId) {
+  private validateContent(props: any): void {
+    if (!props.id) {
+      throw new Error("Content ID is required");
+    }
+
+    if (!props.lessonId) {
       throw new Error("Lesson ID is required");
     }
-    if (!dto.type) {
+
+    if (!props.type) {
       throw new Error("Content type is required");
     }
 
-    return new LessonContent({
-      id: uuidv4(),
-      lessonId: dto.lessonId,
-      type: dto.type,
-      status: dto.status || ContentStatus.DRAFT,
-      title: dto.title?.trim() ?? null,
-      description: dto.description?.trim() ?? null,
-      fileUrl: dto.fileUrl ? new FileUrl(dto.fileUrl) : null,
-      thumbnailUrl: dto.thumbnailUrl ? new FileUrl(dto.thumbnailUrl) : null,
-      quizQuestions: dto.quizQuestions ?? null,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-      deletedAt: null,
-    });
+    if (!props.status) {
+      throw new Error("Content status is required");
+    }
+
+    if (props.title && props.title.length > 200) {
+      throw new Error("Title cannot exceed 200 characters");
+    }
+
+    if (props.description && props.description.length > 1000) {
+      throw new Error("Description cannot exceed 1000 characters");
+    }
   }
 
-  static update(
-    existingContent: LessonContent,
-    dto: {
-      type?: ContentType;
-      status?: ContentStatus;
-      title?: string | null;
-      description?: string | null;
-      fileUrl?: string | null;
-      thumbnailUrl?: string | null;
-      quizQuestions?: QuizQuestion[] | null;
-    }
-  ): LessonContent {
-    const props: LessonContentProps = {
-      ...existingContent.getProps(),
-      updatedAt: new Date(),
-    };
-
-    if (dto.type) {
-      props.type = dto.type;
-    }
-    if (dto.status) {
-      props.status = dto.status;
-    }
-    if (dto.title !== undefined) {
-      props.title = dto.title?.trim() ?? null;
-    }
-    if (dto.description !== undefined) {
-      props.description = dto.description?.trim() ?? null;
-    }
-    if (dto.fileUrl !== undefined) {
-      props.fileUrl = dto.fileUrl ? new FileUrl(dto.fileUrl) : null;
-    }
-    if (dto.thumbnailUrl !== undefined) {
-      props.thumbnailUrl = dto.thumbnailUrl
-        ? new FileUrl(dto.thumbnailUrl)
-        : null;
-    }
-    if (dto.quizQuestions !== undefined) {
-      props.quizQuestions = dto.quizQuestions ?? null;
-    }
-
-    return new LessonContent(props);
-  }
-
-  static fromPersistence(data: {
-    id: string;
-    lessonId: string;
-    type: ContentType;
-    status: ContentStatus;
-    title: string | null;
-    description: string | null;
-    fileUrl: string | null;
-    thumbnailUrl: string | null;
-    quizQuestions: QuizQuestion[] | null;
-    createdAt: Date;
-    updatedAt: Date;
-    deletedAt: Date | null;
-  }): LessonContent {
-    return new LessonContent({
-      id: data.id,
-      lessonId: data.lessonId,
-      type: data.type,
-      status: data.status,
-      title: data.title,
-      description: data.description,
-      fileUrl: data.fileUrl ? new FileUrl(data.fileUrl) : null,
-      thumbnailUrl: data.thumbnailUrl ? new FileUrl(data.thumbnailUrl) : null,
-      quizQuestions: data.quizQuestions ?? null,
-      createdAt: data.createdAt,
-      updatedAt: data.updatedAt,
-      deletedAt: data.deletedAt,
-    });
-  }
-
-  softDelete(): void {
-    if (this._deletedAt) {
-      throw new Error("Content is already deleted");
-    }
-    this._deletedAt = new Date();
-    this._updatedAt = new Date();
-  }
-
-  isActive(): boolean {
-    return !this._deletedAt;
-  }
-
+  // Getters
   get id(): string {
     return this._id;
   }
@@ -221,37 +127,90 @@ export class LessonContent {
     return this._deletedAt;
   }
 
-  private getProps(): LessonContentProps {
-    return {
-      id: this._id,
-      lessonId: this._lessonId,
-      type: this._type,
-      status: this._status,
-      title: this._title,
-      description: this._description,
-      fileUrl: this._fileUrl,
-      thumbnailUrl: this._thumbnailUrl,
-      quizQuestions: this._quizQuestions,
-      createdAt: this._createdAt,
-      updatedAt: this._updatedAt,
-      deletedAt: this._deletedAt,
-    };
+  // Business logic methods
+  update(props: {
+    type?: ContentType;
+    status?: ContentStatus;
+    title?: string | null;
+    description?: string | null;
+    fileUrl?: FileUrl | null;
+    thumbnailUrl?: FileUrl | null;
+    quizQuestions?: QuizQuestion[] | null;
+  }): void {
+    if (props.type !== undefined) {
+      this._type = props.type;
+    }
+
+    if (props.status !== undefined) {
+      this._status = props.status;
+    }
+
+    if (props.title !== undefined) {
+      if (props.title && props.title.length > 200) {
+        throw new Error("Title cannot exceed 200 characters");
+      }
+      this._title = props.title;
+    }
+
+    if (props.description !== undefined) {
+      if (props.description && props.description.length > 1000) {
+        throw new Error("Description cannot exceed 1000 characters");
+      }
+      this._description = props.description;
+    }
+
+    if (props.fileUrl !== undefined) {
+      this._fileUrl = props.fileUrl;
+    }
+
+    if (props.thumbnailUrl !== undefined) {
+      this._thumbnailUrl = props.thumbnailUrl;
+    }
+
+    if (props.quizQuestions !== undefined) {
+      this._quizQuestions = props.quizQuestions;
+    }
+
+    this._updatedAt = new Date();
   }
 
-  toJSON(): any {
-    return {
-      id: this._id,
-      lessonId: this._lessonId,
-      type: this._type,
-      status: this._status,
-      title: this._title,
-      description: this._description,
-      fileUrl: this._fileUrl?.value ?? null,
-      thumbnailUrl: this._thumbnailUrl?.value ?? null,
-      quizQuestions: this._quizQuestions ?? null,
-      createdAt: this._createdAt.toISOString(),
-      updatedAt: this._updatedAt.toISOString(),
-      deletedAt: this._deletedAt?.toISOString() ?? null,
-    };
+  softDelete(): void {
+    if (this._deletedAt) {
+      throw new Error("Content is already deleted");
+    }
+    this._deletedAt = new Date();
+    this._updatedAt = new Date();
+  }
+
+  restore(): void {
+    if (!this._deletedAt) {
+      throw new Error("Content is not deleted");
+    }
+    this._deletedAt = null;
+    this._updatedAt = new Date();
+  }
+
+  isDeleted(): boolean {
+    return this._deletedAt !== null;
+  }
+
+  isActive(): boolean {
+    return !this.isDeleted();
+  }
+
+  isPublished(): boolean {
+    return this._status === ContentStatus.PUBLISHED && !this.isDeleted();
+  }
+
+  hasFile(): boolean {
+    return this._fileUrl !== null;
+  }
+
+  hasThumbnail(): boolean {
+    return this._thumbnailUrl !== null;
+  }
+
+  hasQuiz(): boolean {
+    return this._quizQuestions !== null && this._quizQuestions.length > 0;
   }
 }

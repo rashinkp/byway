@@ -23,70 +23,167 @@ export interface OrderItem {
 }
 
 export class Order {
-  public id?: string;
-  public createdAt?: Date;
-  public updatedAt?: Date;
+  private readonly _id: string;
+  private _userId: string;
+  private _status: OrderStatus;
+  private _paymentStatus: PaymentStatus;
+  private _paymentIntentId: string | null;
+  private _paymentGateway: PaymentGateway | null;
+  private _totalAmount: number;
+  private _couponCode: string | null;
+  private _items: OrderItem[];
+  private _createdAt: Date;
+  private _updatedAt: Date;
 
-  constructor(
-    public readonly userId: string,
-    public readonly status: OrderStatus,
-    public readonly paymentStatus: PaymentStatus,
-    public readonly paymentIntentId: string | null,
-    public readonly paymentGateway: PaymentGateway | null,
-    public readonly totalAmount: number,
-    public readonly couponCode: string | null,
-    public readonly items: OrderItem[]
-  ) {}
-
-  // Domain methods
-  public isCompleted(): boolean {
-    return this.paymentStatus === PaymentStatus.COMPLETED;
+  constructor(props: {
+    id: string;
+    userId: string;
+    status: OrderStatus;
+    paymentStatus: PaymentStatus;
+    paymentIntentId?: string | null;
+    paymentGateway?: PaymentGateway | null;
+    totalAmount: number;
+    couponCode?: string | null;
+    items: OrderItem[];
+    createdAt: Date;
+    updatedAt: Date;
+  }) {
+    this.validateOrder(props);
+    
+    this._id = props.id;
+    this._userId = props.userId;
+    this._status = props.status;
+    this._paymentStatus = props.paymentStatus;
+    this._paymentIntentId = props.paymentIntentId ?? null;
+    this._paymentGateway = props.paymentGateway ?? null;
+    this._totalAmount = props.totalAmount;
+    this._couponCode = props.couponCode ?? null;
+    this._items = props.items;
+    this._createdAt = props.createdAt;
+    this._updatedAt = props.updatedAt;
   }
 
-  public isPending(): boolean {
-    return this.paymentStatus === PaymentStatus.PENDING;
+  private validateOrder(props: any): void {
+    if (!props.id) {
+      throw new Error("Order ID is required");
+    }
+
+    if (!props.userId) {
+      throw new Error("User ID is required");
+    }
+
+    if (!props.status) {
+      throw new Error("Order status is required");
+    }
+
+    if (!props.paymentStatus) {
+      throw new Error("Payment status is required");
+    }
+
+    if (props.totalAmount < 0) {
+      throw new Error("Total amount cannot be negative");
+    }
+
+    if (!props.items || props.items.length === 0) {
+      throw new Error("Order must have at least one item");
+    }
   }
 
-  public isFailed(): boolean {
-    return this.paymentStatus === PaymentStatus.FAILED;
+  // Getters
+  get id(): string {
+    return this._id;
   }
 
-  public isRefunded(): boolean {
-    return this.paymentStatus === PaymentStatus.REFUNDED;
+  get userId(): string {
+    return this._userId;
   }
 
-  public canBeRefunded(): boolean {
+  get status(): OrderStatus {
+    return this._status;
+  }
+
+  get paymentStatus(): PaymentStatus {
+    return this._paymentStatus;
+  }
+
+  get paymentIntentId(): string | null {
+    return this._paymentIntentId;
+  }
+
+  get paymentGateway(): PaymentGateway | null {
+    return this._paymentGateway;
+  }
+
+  get totalAmount(): number {
+    return this._totalAmount;
+  }
+
+  get couponCode(): string | null {
+    return this._couponCode;
+  }
+
+  get items(): OrderItem[] {
+    return this._items;
+  }
+
+  get createdAt(): Date {
+    return this._createdAt;
+  }
+
+  get updatedAt(): Date {
+    return this._updatedAt;
+  }
+
+  // Business logic methods
+  updatePaymentStatus(status: PaymentStatus): void {
+    this._paymentStatus = status;
+    this._updatedAt = new Date();
+  }
+
+  updateOrderStatus(status: OrderStatus): void {
+    this._status = status;
+    this._updatedAt = new Date();
+  }
+
+  setPaymentIntent(paymentIntentId: string): void {
+    this._paymentIntentId = paymentIntentId;
+    this._updatedAt = new Date();
+  }
+
+  setPaymentGateway(gateway: PaymentGateway): void {
+    this._paymentGateway = gateway;
+    this._updatedAt = new Date();
+  }
+
+  isCompleted(): boolean {
+    return this._paymentStatus === PaymentStatus.COMPLETED;
+  }
+
+  isPending(): boolean {
+    return this._paymentStatus === PaymentStatus.PENDING;
+  }
+
+  isFailed(): boolean {
+    return this._paymentStatus === PaymentStatus.FAILED;
+  }
+
+  isRefunded(): boolean {
+    return this._paymentStatus === PaymentStatus.REFUNDED;
+  }
+
+  canBeRefunded(): boolean {
     return this.isCompleted() && !this.isRefunded();
   }
 
-  public getPaymentGateway(): PaymentGateway | null {
-    return this.paymentGateway;
+  hasCoupon(): boolean {
+    return this._couponCode !== null && this._couponCode.trim() !== "";
   }
 
-  public getTotalAmount(): number {
-    return this.totalAmount;
+  hasPaymentIntent(): boolean {
+    return this._paymentIntentId !== null;
   }
 
-  public getCouponCode(): string | null {
-    return this.couponCode;
-  }
-
-  public getItems(): OrderItem[] {
-    return this.items;
-  }
-
-  toJSON(): any {
-    return {
-      id: this.id,
-      userId: this.userId,
-      amount: this.totalAmount,
-      paymentStatus: this.paymentStatus,
-      orderStatus: this.status,
-      paymentId: this.paymentIntentId,
-      paymentGateway: this.paymentGateway,
-      items: this.items,
-      createdAt: this.createdAt,
-      updatedAt: this.updatedAt
-    };
+  getItemCount(): number {
+    return this._items.length;
   }
 } 

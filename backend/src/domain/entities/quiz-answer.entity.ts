@@ -1,69 +1,95 @@
-export interface IQuizAnswerProps {
-  id?: string;
-  lessonProgressId: string;
-  quizQuestionId: string;
-  selectedAnswer: string;
-  isCorrect: boolean;
-  createdAt?: Date;
-  updatedAt?: Date;
-}
-
 export class QuizAnswer {
-  private readonly props: IQuizAnswerProps;
+  private readonly _id: string;
+  private _lessonProgressId: string;
+  private _quizQuestionId: string;
+  private _selectedAnswer: string;
+  private _isCorrect: boolean;
+  private _createdAt: Date;
+  private _updatedAt: Date;
 
-  private constructor(props: IQuizAnswerProps) {
-    this.props = props;
+  constructor(props: {
+    id: string;
+    lessonProgressId: string;
+    quizQuestionId: string;
+    selectedAnswer: string;
+    isCorrect: boolean;
+    createdAt: Date;
+    updatedAt: Date;
+  }) {
+    this.validateQuizAnswer(props);
+    
+    this._id = props.id;
+    this._lessonProgressId = props.lessonProgressId;
+    this._quizQuestionId = props.quizQuestionId;
+    this._selectedAnswer = props.selectedAnswer;
+    this._isCorrect = props.isCorrect;
+    this._createdAt = props.createdAt;
+    this._updatedAt = props.updatedAt;
   }
 
-  public static create(props: Omit<IQuizAnswerProps, 'id' | 'createdAt' | 'updatedAt'>): QuizAnswer {
-    return new QuizAnswer({
-      ...props,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    });
+  private validateQuizAnswer(props: any): void {
+    if (!props.id) {
+      throw new Error("Quiz answer ID is required");
+    }
+
+    if (!props.lessonProgressId) {
+      throw new Error("Lesson progress ID is required");
+    }
+
+    if (!props.quizQuestionId) {
+      throw new Error("Quiz question ID is required");
+    }
+
+    if (!props.selectedAnswer || props.selectedAnswer.trim() === "") {
+      throw new Error("Selected answer is required");
+    }
+
+    if (props.selectedAnswer.length > 500) {
+      throw new Error("Selected answer cannot exceed 500 characters");
+    }
   }
 
-  public static fromPersistence(data: IQuizAnswerProps): QuizAnswer {
-    return new QuizAnswer({
-      ...data,
-      createdAt: data.createdAt ? new Date(data.createdAt) : new Date(),
-      updatedAt: data.updatedAt ? new Date(data.updatedAt) : new Date(),
-    });
+  // Getters
+  get id(): string {
+    return this._id;
   }
 
-  public get id(): string | undefined {
-    return this.props.id;
+  get lessonProgressId(): string {
+    return this._lessonProgressId;
   }
 
-  public get lessonProgressId(): string {
-    return this.props.lessonProgressId;
+  get quizQuestionId(): string {
+    return this._quizQuestionId;
   }
 
-  public get quizQuestionId(): string {
-    return this.props.quizQuestionId;
+  get selectedAnswer(): string {
+    return this._selectedAnswer;
   }
 
-  public get selectedAnswer(): string {
-    return this.props.selectedAnswer;
+  get isCorrect(): boolean {
+    return this._isCorrect;
   }
 
-  public get isCorrect(): boolean {
-    return this.props.isCorrect;
+  get createdAt(): Date {
+    return this._createdAt;
   }
 
-  public get createdAt(): Date {
-    return this.props.createdAt!;
+  get updatedAt(): Date {
+    return this._updatedAt;
   }
 
-  public get updatedAt(): Date {
-    return this.props.updatedAt!;
+  // Business logic methods
+  markAsCorrect(): void {
+    this._isCorrect = true;
+    this._updatedAt = new Date();
   }
 
-  public toJSON(): IQuizAnswerProps {
-    return {
-      ...this.props,
-      createdAt: this.props.createdAt,
-      updatedAt: this.props.updatedAt,
-    };
+  markAsIncorrect(): void {
+    this._isCorrect = false;
+    this._updatedAt = new Date();
+  }
+
+  hasAnswer(): boolean {
+    return this._selectedAnswer !== null && this._selectedAnswer.trim() !== "";
   }
 } 

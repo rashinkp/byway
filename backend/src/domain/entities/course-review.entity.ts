@@ -1,17 +1,5 @@
 import { Rating } from "../value-object/rating";
 
-export interface CourseReviewProps {
-  id?: string;
-  courseId: string;
-  userId: string;
-  rating: Rating;
-  title?: string | null;
-  comment?: string | null;
-  createdAt?: Date;
-  updatedAt?: Date;
-  deletedAt?: Date | null;
-}
-
 export class CourseReview {
   private readonly _id: string;
   private _courseId: string;
@@ -23,16 +11,54 @@ export class CourseReview {
   private _updatedAt: Date;
   private _deletedAt: Date | null;
 
-  constructor(props: CourseReviewProps) {
-    this._id = props.id || '';
+  constructor(props: {
+    id: string;
+    courseId: string;
+    userId: string;
+    rating: Rating;
+    title?: string | null;
+    comment?: string | null;
+    createdAt: Date;
+    updatedAt: Date;
+    deletedAt?: Date | null;
+  }) {
+    this.validateReview(props);
+    
+    this._id = props.id;
     this._courseId = props.courseId;
     this._userId = props.userId;
     this._rating = props.rating;
     this._title = props.title ?? null;
     this._comment = props.comment ?? null;
-    this._createdAt = props.createdAt || new Date();
-    this._updatedAt = props.updatedAt || new Date();
+    this._createdAt = props.createdAt;
+    this._updatedAt = props.updatedAt;
     this._deletedAt = props.deletedAt ?? null;
+  }
+
+  private validateReview(props: any): void {
+    if (!props.id) {
+      throw new Error("Review ID is required");
+    }
+
+    if (!props.courseId) {
+      throw new Error("Course ID is required");
+    }
+
+    if (!props.userId) {
+      throw new Error("User ID is required");
+    }
+
+    if (!props.rating) {
+      throw new Error("Rating is required");
+    }
+
+    if (props.title && props.title.length > 200) {
+      throw new Error("Title cannot exceed 200 characters");
+    }
+
+    if (props.comment && props.comment.length > 1000) {
+      throw new Error("Comment cannot exceed 1000 characters");
+    }
   }
 
   // Getters
@@ -72,30 +98,45 @@ export class CourseReview {
     return this._deletedAt;
   }
 
-  // Business methods
-  updateReview(props: Partial<{
-    rating: Rating;
-    title: string | null;
-    comment: string | null;
-  }>): void {
+  // Business logic methods
+  update(props: {
+    rating?: Rating;
+    title?: string | null;
+    comment?: string | null;
+  }): void {
     if (props.rating !== undefined) {
       this._rating = props.rating;
     }
+
     if (props.title !== undefined) {
+      if (props.title && props.title.length > 200) {
+        throw new Error("Title cannot exceed 200 characters");
+      }
       this._title = props.title;
     }
+
     if (props.comment !== undefined) {
+      if (props.comment && props.comment.length > 1000) {
+        throw new Error("Comment cannot exceed 1000 characters");
+      }
       this._comment = props.comment;
     }
+
     this._updatedAt = new Date();
   }
 
   softDelete(): void {
+    if (this._deletedAt) {
+      throw new Error("Review is already deleted");
+    }
     this._deletedAt = new Date();
     this._updatedAt = new Date();
   }
 
   restore(): void {
+    if (!this._deletedAt) {
+      throw new Error("Review is not deleted");
+    }
     this._deletedAt = null;
     this._updatedAt = new Date();
   }
@@ -104,42 +145,15 @@ export class CourseReview {
     return this._deletedAt !== null;
   }
 
-  // Validation methods
-  canBeUpdatedBy(userId: string): boolean {
-    return this._userId === userId && !this.isDeleted();
+  isActive(): boolean {
+    return !this.isDeleted();
   }
 
-  canBeDeletedBy(userId: string): boolean {
-    return this._userId === userId && !this.isDeleted();
+  hasTitle(): boolean {
+    return this._title !== null && this._title.trim() !== "";
   }
 
-  // Serialization
-  toJSON(): any {
-    return {
-      id: this._id,
-      courseId: this._courseId,
-      userId: this._userId,
-      rating: this._rating.value,
-      title: this._title,
-      comment: this._comment,
-      createdAt: this._createdAt,
-      updatedAt: this._updatedAt,
-      deletedAt: this._deletedAt,
-    };
-  }
-
-  // Factory method for creating from Prisma data
-  static fromPrisma(data: any): CourseReview {
-    return new CourseReview({
-      id: data.id,
-      courseId: data.courseId,
-      userId: data.userId,
-      rating: new Rating(data.rating),
-      title: data.title,
-      comment: data.comment,
-      createdAt: data.createdAt,
-      updatedAt: data.updatedAt,
-      deletedAt: data.deletedAt,
-    });
+  hasComment(): boolean {
+    return this._comment !== null && this._comment.trim() !== "";
   }
 } 

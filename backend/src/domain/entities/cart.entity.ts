@@ -1,21 +1,6 @@
-import { Course } from "./course.entity";
-import { User } from "./user.entity";
-
-export interface CartInterface {
-  id: string;
-  userId: string;
-  courseId: string;
-  couponId?: string;
-  discount?: number;
-  createdAt: Date;
-  updatedAt: Date;
-  deletedAt?: Date;
-  user?: User;
-  course?: Course;
-}
 
 export class Cart {
-  private _id: string;
+  private readonly _id: string;
   private _userId: string;
   private _courseId: string;
   private _couponId?: string;
@@ -23,10 +8,19 @@ export class Cart {
   private _createdAt: Date;
   private _updatedAt: Date;
   private _deletedAt?: Date;
-  private _user?: User;
-  private _course?: Course;
 
-  private constructor(props: CartInterface) {
+  constructor(props: {
+    id: string;
+    userId: string;
+    courseId: string;
+    couponId?: string;
+    discount?: number;
+    createdAt: Date;
+    updatedAt: Date;
+    deletedAt?: Date;
+  }) {
+    this.validateCart(props);
+    
     this._id = props.id;
     this._userId = props.userId;
     this._courseId = props.courseId;
@@ -35,43 +29,24 @@ export class Cart {
     this._createdAt = props.createdAt;
     this._updatedAt = props.updatedAt;
     this._deletedAt = props.deletedAt;
-    this._user = props.user;
-    this._course = props.course;
   }
 
-  static create(props: Omit<CartInterface, 'id' | 'createdAt' | 'updatedAt'>): Cart {
-    return new Cart({
-      ...props,
-      id: crypto.randomUUID(),
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    });
-  }
+  private validateCart(props: any): void {
+    if (!props.id) {
+      throw new Error("Cart ID is required");
+    }
 
-  static fromPrisma(data: {
-    id: string;
-    userId: string;
-    courseId: string;
-    couponId?: string | null;
-    discount: number;
-    createdAt: Date;
-    updatedAt: Date;
-    deletedAt?: Date | null;
-    user?: any;
-    course?: any;
-  }): Cart {
-    return new Cart({
-      id: data.id,
-      userId: data.userId,
-      courseId: data.courseId,
-      couponId: data.couponId ?? undefined,
-      discount: Number(data.discount),
-      createdAt: data.createdAt,
-      updatedAt: data.updatedAt,
-      deletedAt: data.deletedAt ?? undefined,
-      user: data.user ? User.fromPrisma(data.user) : undefined,
-      course: data.course ? Course.fromPrisma(data.course) : undefined,
-    });
+    if (!props.userId) {
+      throw new Error("User ID is required");
+    }
+
+    if (!props.courseId) {
+      throw new Error("Course ID is required");
+    }
+
+    if (props.discount !== undefined && (props.discount < 0 || props.discount > 100)) {
+      throw new Error("Discount must be between 0 and 100");
+    }
   }
 
   // Getters
@@ -107,24 +82,19 @@ export class Cart {
     return this._deletedAt;
   }
 
-  get user(): User | undefined {
-    return this._user;
-  }
-
-  get course(): Course | undefined {
-    return this._course;
-  }
-
-  // Methods
+  // Business logic methods
   applyDiscount(discount: number): void {
-    if (discount < 0) {
-      throw new Error("Discount cannot be negative");
+    if (discount < 0 || discount > 100) {
+      throw new Error("Discount must be between 0 and 100");
     }
     this._discount = discount;
     this._updatedAt = new Date();
   }
 
   applyCoupon(couponId: string): void {
+    if (!couponId || couponId.trim() === "") {
+      throw new Error("Coupon ID is required");
+    }
     this._couponId = couponId;
     this._updatedAt = new Date();
   }
@@ -151,32 +121,19 @@ export class Cart {
     this._updatedAt = new Date();
   }
 
-  // Helper method to get all properties
-  getProps(): CartInterface {
-    return {
-      id: this._id,
-      userId: this._userId,
-      courseId: this._courseId,
-      couponId: this._couponId,
-      discount: this._discount,
-      createdAt: this._createdAt,
-      updatedAt: this._updatedAt,
-      deletedAt: this._deletedAt,
-      user: this._user,
-      course: this._course,
-    };
+  isDeleted(): boolean {
+    return this._deletedAt !== undefined;
   }
 
-  toJSON(): CartInterface {
-    return {
-      id: this._id,
-      userId: this._userId,
-      courseId: this._courseId,
-      couponId: this._couponId,
-      discount: this._discount,
-      createdAt: this._createdAt,
-      updatedAt: this._updatedAt,
-      deletedAt: this._deletedAt,
-    };
+  isActive(): boolean {
+    return !this.isDeleted();
+  }
+
+  hasCoupon(): boolean {
+    return this._couponId !== undefined;
+  }
+
+  hasDiscount(): boolean {
+    return this._discount !== undefined && this._discount > 0;
   }
 } 

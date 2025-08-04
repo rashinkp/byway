@@ -1,124 +1,181 @@
 import { QuizAnswer } from "./quiz-answer.entity";
 
-export interface ILessonProgressProps {
-  id?: string;
-  enrollmentId: string;
-  courseId: string;
-  lessonId: string;
-  completed: boolean;
-  completedAt?: Date | null;
-  score?: number;
-  totalQuestions?: number;
-  answers?: QuizAnswer[];
-  createdAt?: Date;
-  updatedAt?: Date;
-}
-
 export class LessonProgress {
-  private readonly props: ILessonProgressProps;
+  private readonly _id: string;
+  private _enrollmentId: string;
+  private _courseId: string;
+  private _lessonId: string;
+  private _completed: boolean;
+  private _completedAt: Date | null;
+  private _score?: number;
+  private _totalQuestions?: number;
+  private _answers?: QuizAnswer[];
+  private _createdAt: Date;
+  private _updatedAt: Date;
 
-  private constructor(props: ILessonProgressProps) {
-    this.props = props;
+  constructor(props: {
+    id: string;
+    enrollmentId: string;
+    courseId: string;
+    lessonId: string;
+    completed: boolean;
+    completedAt?: Date | null;
+    score?: number;
+    totalQuestions?: number;
+    answers?: QuizAnswer[];
+    createdAt: Date;
+    updatedAt: Date;
+  }) {
+    this.validateLessonProgress(props);
+    
+    this._id = props.id;
+    this._enrollmentId = props.enrollmentId;
+    this._courseId = props.courseId;
+    this._lessonId = props.lessonId;
+    this._completed = props.completed;
+    this._completedAt = props.completedAt ?? null;
+    this._score = props.score;
+    this._totalQuestions = props.totalQuestions;
+    this._answers = props.answers;
+    this._createdAt = props.createdAt;
+    this._updatedAt = props.updatedAt;
   }
 
-  public static create(props: ILessonProgressProps): LessonProgress {
-    return new LessonProgress({
-      ...props,
-      completed: props.completed ?? false,
-      completedAt: props.completedAt ?? null,
-      createdAt: props.createdAt ?? new Date(),
-      updatedAt: props.updatedAt ?? new Date(),
-    });
+  private validateLessonProgress(props: any): void {
+    if (!props.id) {
+      throw new Error("Lesson progress ID is required");
+    }
+
+    if (!props.enrollmentId) {
+      throw new Error("Enrollment ID is required");
+    }
+
+    if (!props.courseId) {
+      throw new Error("Course ID is required");
+    }
+
+    if (!props.lessonId) {
+      throw new Error("Lesson ID is required");
+    }
+
+    if (props.score !== undefined && (props.score < 0 || props.score > 100)) {
+      throw new Error("Score must be between 0 and 100");
+    }
+
+    if (props.totalQuestions !== undefined && props.totalQuestions < 0) {
+      throw new Error("Total questions cannot be negative");
+    }
+
+    if (props.completedAt && !props.completed) {
+      throw new Error("Cannot have completion date when not completed");
+    }
   }
 
-  public static fromPersistence(data: ILessonProgressProps): LessonProgress {
-    return new LessonProgress({
-      ...data,
-      completedAt: data.completedAt ? new Date(data.completedAt) : null,
-      createdAt: data.createdAt ? new Date(data.createdAt) : new Date(),
-      updatedAt: data.updatedAt ? new Date(data.updatedAt) : new Date(),
-    });
+  // Getters
+  get id(): string {
+    return this._id;
   }
 
-  public markAsCompleted(): void {
-    this.props.completed = true;
-    this.props.completedAt = new Date();
-    this.props.updatedAt = new Date();
+  get enrollmentId(): string {
+    return this._enrollmentId;
   }
 
-  public markAsIncomplete(): void {
-    this.props.completed = false;
-    this.props.completedAt = null;
-    this.props.updatedAt = new Date();
+  get courseId(): string {
+    return this._courseId;
   }
 
-  public updateQuizProgress(score: number, totalQuestions: number, answers: QuizAnswer[]): void {
-    this.props.score = score;
-    this.props.totalQuestions = totalQuestions;
-    this.props.answers = answers;
-    this.props.completed = score >= 70; // Consider quiz completed if score is 70% or higher
-    this.props.completedAt = this.props.completed ? new Date() : null;
-    this.props.updatedAt = new Date();
+  get lessonId(): string {
+    return this._lessonId;
   }
 
-  public get id(): string | undefined {
-    return this.props.id;
+  get completed(): boolean {
+    return this._completed;
   }
 
-  public get enrollmentId(): string {
-    return this.props.enrollmentId;
+  get completedAt(): Date | null {
+    return this._completedAt;
   }
 
-  public get courseId(): string {
-    return this.props.courseId;
+  get score(): number | undefined {
+    return this._score;
   }
 
-  public get lessonId(): string {
-    return this.props.lessonId;
+  get totalQuestions(): number | undefined {
+    return this._totalQuestions;
   }
 
-  public get completed(): boolean {
-    return this.props.completed;
+  get answers(): QuizAnswer[] | undefined {
+    return this._answers;
   }
 
-  public get completedAt(): Date | null {
-    return this.props.completedAt ?? null;
+  get createdAt(): Date {
+    return this._createdAt;
   }
 
-  public get score(): number | undefined {
-    return this.props.score;
+  get updatedAt(): Date {
+    return this._updatedAt;
   }
 
-  public get totalQuestions(): number | undefined {
-    return this.props.totalQuestions;
+  // Business logic methods
+  markAsCompleted(): void {
+    this._completed = true;
+    this._completedAt = new Date();
+    this._updatedAt = new Date();
   }
 
-  public get answers(): QuizAnswer[] | undefined {
-    return this.props.answers;
+  markAsIncomplete(): void {
+    this._completed = false;
+    this._completedAt = null;
+    this._updatedAt = new Date();
   }
 
-  public get createdAt(): Date {
-    return this.props.createdAt!;
+  updateQuizProgress(score: number, totalQuestions: number, answers: QuizAnswer[]): void {
+    if (score < 0 || score > 100) {
+      throw new Error("Score must be between 0 and 100");
+    }
+
+    if (totalQuestions < 0) {
+      throw new Error("Total questions cannot be negative");
+    }
+
+    this._score = score;
+    this._totalQuestions = totalQuestions;
+    this._answers = answers;
+    this._completed = score >= 70; // Consider quiz completed if score is 70% or higher
+    this._completedAt = this._completed ? new Date() : null;
+    this._updatedAt = new Date();
   }
 
-  public get updatedAt(): Date {
-    return this.props.updatedAt!;
+  updateScore(score: number): void {
+    if (score < 0 || score > 100) {
+      throw new Error("Score must be between 0 and 100");
+    }
+    
+    this._score = score;
+    this._updatedAt = new Date();
   }
 
-  public updateScore(score: number): void {
-    this.props.score = score;
+  updateTotalQuestions(totalQuestions: number): void {
+    if (totalQuestions < 0) {
+      throw new Error("Total questions cannot be negative");
+    }
+    
+    this._totalQuestions = totalQuestions;
+    this._updatedAt = new Date();
   }
 
-  public updateTotalQuestions(totalQuestions: number): void {
-    this.props.totalQuestions = totalQuestions;
+  hasQuizScore(): boolean {
+    return this._score !== undefined;
   }
 
-  public toJSON(): ILessonProgressProps {
-    return {
-      ...this.props,
-      completedAt: this.props.completedAt,
-      createdAt: this.props.createdAt,
-      updatedAt: this.props.updatedAt,
-    };
+  getQuizPercentage(): number | undefined {
+    if (this._score === undefined || this._totalQuestions === undefined) {
+      return undefined;
+    }
+    return (this._score / this._totalQuestions) * 100;
+  }
+
+  isQuizPassed(): boolean {
+    return this._score !== undefined && this._score >= 70;
   }
 } 

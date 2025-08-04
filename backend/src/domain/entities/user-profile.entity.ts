@@ -1,26 +1,5 @@
-import {
-  ICreateUserProfileRequestDTO,
-  IUpdateUserProfileRequestDTO,
-} from "../../app/dtos/user/user.dto";
-
-interface UserProfileInterface {
-  id: string;
-  userId: string;
-  bio?: string;
-  education?: string;
-  skills?: string;
-  phoneNumber?: string;
-  country?: string;
-  city?: string;
-  address?: string;
-  dateOfBirth?: Date;
-  gender?: string;
-  createdAt: Date;
-  updatedAt: Date;
-}
-
 export class UserProfile {
-  private _id: string;
+  private readonly _id: string;
   private _userId: string;
   private _bio?: string;
   private _education?: string;
@@ -34,88 +13,23 @@ export class UserProfile {
   private _createdAt: Date;
   private _updatedAt: Date;
 
-  static create(dto: ICreateUserProfileRequestDTO): UserProfile {
-    if (!dto.userId) {
-      throw new Error("User ID is required");
-    }
-    return new UserProfile({
-      id: crypto.randomUUID(),
-      userId: dto.userId,
-      bio: dto.bio,
-      education: dto.education,
-      skills: dto.skills,
-      phoneNumber: dto.phoneNumber,
-      country: dto.country,
-      city: dto.city,
-      address: dto.address,
-      dateOfBirth: dto.dateOfBirth,
-      gender: dto.gender,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    });
-  }
-
-  static update(
-    existingProfile: UserProfile,
-    dto: IUpdateUserProfileRequestDTO
-  ): UserProfile {
-    if (existingProfile._id !== dto.id) {
-      throw new Error("Cannot update profile with mismatched ID");
-    }
-
-    const updatedProps: UserProfileInterface = {
-      ...existingProfile.getProps(),
-      updatedAt: new Date(),
-    };
-
-    if (dto.bio !== undefined) updatedProps.bio = dto.bio;
-    if (dto.education !== undefined) updatedProps.education = dto.education;
-    if (dto.skills !== undefined) updatedProps.skills = dto.skills;
-    if (dto.phoneNumber !== undefined)
-      updatedProps.phoneNumber = dto.phoneNumber;
-    if (dto.country !== undefined) updatedProps.country = dto.country;
-    if (dto.city !== undefined) updatedProps.city = dto.city;
-    if (dto.address !== undefined) updatedProps.address = dto.address;
-    if (dto.dateOfBirth !== undefined)
-      updatedProps.dateOfBirth = dto.dateOfBirth;
-    if (dto.gender !== undefined) updatedProps.gender = dto.gender;
-
-    return new UserProfile(updatedProps);
-  }
-
-  static fromPrisma(data: {
+  constructor(props: {
     id: string;
     userId: string;
-    bio?: string | null;
-    education?: string | null;
-    skills?: string | null;
-    phoneNumber?: string | null;
-    country?: string | null;
-    city?: string | null;
-    address?: string | null;
-    dateOfBirth?: Date | null;
-    gender?: string | null;
+    bio?: string;
+    education?: string;
+    skills?: string;
+    phoneNumber?: string;
+    country?: string;
+    city?: string;
+    address?: string;
+    dateOfBirth?: Date;
+    gender?: string;
     createdAt: Date;
     updatedAt: Date;
-  }): UserProfile {
-    return new UserProfile({
-      id: data.id,
-      userId: data.userId,
-      bio: data.bio ?? undefined,
-      education: data.education ?? undefined,
-      skills: data.skills ?? undefined,
-      phoneNumber: data.phoneNumber ?? undefined,
-      country: data.country ?? undefined,
-      city: data.city ?? undefined,
-      address: data.address ?? undefined,
-      dateOfBirth: data.dateOfBirth ?? undefined,
-      gender: data.gender ?? undefined,
-      createdAt: data.createdAt,
-      updatedAt: data.updatedAt,
-    });
-  }
-
-  private constructor(props: UserProfileInterface) {
+  }) {
+    this.validateUserProfile(props);
+    
     this._id = props.id;
     this._userId = props.userId;
     this._bio = props.bio;
@@ -131,6 +45,58 @@ export class UserProfile {
     this._updatedAt = props.updatedAt;
   }
 
+  private validateUserProfile(props: any): void {
+    if (!props.id) {
+      throw new Error("Profile ID is required");
+    }
+
+    if (!props.userId) {
+      throw new Error("User ID is required");
+    }
+
+    if (props.bio && props.bio.length > 500) {
+      throw new Error("Bio cannot exceed 500 characters");
+    }
+
+    if (props.education && props.education.length > 200) {
+      throw new Error("Education cannot exceed 200 characters");
+    }
+
+    if (props.skills && props.skills.length > 300) {
+      throw new Error("Skills cannot exceed 300 characters");
+    }
+
+    if (props.phoneNumber && !this.isValidPhoneNumber(props.phoneNumber)) {
+      throw new Error("Invalid phone number format");
+    }
+
+    if (props.country && props.country.length > 100) {
+      throw new Error("Country cannot exceed 100 characters");
+    }
+
+    if (props.city && props.city.length > 100) {
+      throw new Error("City cannot exceed 100 characters");
+    }
+
+    if (props.address && props.address.length > 300) {
+      throw new Error("Address cannot exceed 300 characters");
+    }
+
+    if (props.dateOfBirth && props.dateOfBirth > new Date()) {
+      throw new Error("Date of birth cannot be in the future");
+    }
+
+    if (props.gender && !['male', 'female', 'other', 'prefer-not-to-say'].includes(props.gender.toLowerCase())) {
+      throw new Error("Invalid gender value");
+    }
+  }
+
+  private isValidPhoneNumber(phoneNumber: string): boolean {
+    const phoneRegex = /^[\+]?[1-9][\d]{0,15}$/;
+    return phoneRegex.test(phoneNumber.replace(/[\s\-\(\)]/g, ''));
+  }
+
+  // Getters
   get id(): string {
     return this._id;
   }
@@ -183,21 +149,129 @@ export class UserProfile {
     return this._updatedAt;
   }
 
-  private getProps(): UserProfileInterface {
-    return {
-      id: this._id,
-      userId: this._userId,
-      bio: this._bio,
-      education: this._education,
-      skills: this._skills,
-      phoneNumber: this._phoneNumber,
-      country: this._country,
-      city: this._city,
-      address: this._address,
-      dateOfBirth: this._dateOfBirth,
-      gender: this._gender,
-      createdAt: this._createdAt,
-      updatedAt: this._updatedAt,
-    };
+  // Business logic methods
+  update(props: {
+    bio?: string;
+    education?: string;
+    skills?: string;
+    phoneNumber?: string;
+    country?: string;
+    city?: string;
+    address?: string;
+    dateOfBirth?: Date;
+    gender?: string;
+  }): void {
+    if (props.bio !== undefined) {
+      if (props.bio && props.bio.length > 500) {
+        throw new Error("Bio cannot exceed 500 characters");
+      }
+      this._bio = props.bio;
+    }
+
+    if (props.education !== undefined) {
+      if (props.education && props.education.length > 200) {
+        throw new Error("Education cannot exceed 200 characters");
+      }
+      this._education = props.education;
+    }
+
+    if (props.skills !== undefined) {
+      if (props.skills && props.skills.length > 300) {
+        throw new Error("Skills cannot exceed 300 characters");
+      }
+      this._skills = props.skills;
+    }
+
+    if (props.phoneNumber !== undefined) {
+      if (props.phoneNumber && !this.isValidPhoneNumber(props.phoneNumber)) {
+        throw new Error("Invalid phone number format");
+      }
+      this._phoneNumber = props.phoneNumber;
+    }
+
+    if (props.country !== undefined) {
+      if (props.country && props.country.length > 100) {
+        throw new Error("Country cannot exceed 100 characters");
+      }
+      this._country = props.country;
+    }
+
+    if (props.city !== undefined) {
+      if (props.city && props.city.length > 100) {
+        throw new Error("City cannot exceed 100 characters");
+      }
+      this._city = props.city;
+    }
+
+    if (props.address !== undefined) {
+      if (props.address && props.address.length > 300) {
+        throw new Error("Address cannot exceed 300 characters");
+      }
+      this._address = props.address;
+    }
+
+    if (props.dateOfBirth !== undefined) {
+      if (props.dateOfBirth && props.dateOfBirth > new Date()) {
+        throw new Error("Date of birth cannot be in the future");
+      }
+      this._dateOfBirth = props.dateOfBirth;
+    }
+
+    if (props.gender !== undefined) {
+      if (props.gender && !['male', 'female', 'other', 'prefer-not-to-say'].includes(props.gender.toLowerCase())) {
+        throw new Error("Invalid gender value");
+      }
+      this._gender = props.gender;
+    }
+
+    this._updatedAt = new Date();
+  }
+
+  hasBio(): boolean {
+    return this._bio !== undefined && this._bio.trim() !== "";
+  }
+
+  hasEducation(): boolean {
+    return this._education !== undefined && this._education.trim() !== "";
+  }
+
+  hasSkills(): boolean {
+    return this._skills !== undefined && this._skills.trim() !== "";
+  }
+
+  hasPhoneNumber(): boolean {
+    return this._phoneNumber !== undefined && this._phoneNumber.trim() !== "";
+  }
+
+  hasLocation(): boolean {
+    return (this._country !== undefined && this._country.trim() !== "") ||
+           (this._city !== undefined && this._city.trim() !== "");
+  }
+
+  hasAddress(): boolean {
+    return this._address !== undefined && this._address.trim() !== "";
+  }
+
+  hasDateOfBirth(): boolean {
+    return this._dateOfBirth !== undefined;
+  }
+
+  hasGender(): boolean {
+    return this._gender !== undefined && this._gender.trim() !== "";
+  }
+
+  getAge(): number | undefined {
+    if (!this._dateOfBirth) return undefined;
+    
+    const today = new Date();
+    const birthDate = new Date(this._dateOfBirth);
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const monthDiff = today.getMonth() - birthDate.getMonth();
+    
+    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+      age--;
+    }
+    
+    return age;
   }
 }

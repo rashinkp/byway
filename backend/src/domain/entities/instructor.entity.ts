@@ -1,22 +1,5 @@
-interface InstructorInterface {
-  id: string;
-  userId: string;
-  areaOfExpertise: string;
-  professionalExperience: string;
-  about?: string;
-  website?: string;
-  education: string;
-  certifications: string;
-  cv: string;
-  status: "PENDING" | "APPROVED" | "DECLINED";
-  totalStudents: number;
-  createdAt: Date;
-  updatedAt: Date;
-  deletedAt?: Date | null;
-}
-
 export class Instructor {
-  private _id: string;
+  private readonly _id: string;
   private _userId: string;
   private _areaOfExpertise: string;
   private _professionalExperience: string;
@@ -31,7 +14,8 @@ export class Instructor {
   private _updatedAt: Date;
   private _deletedAt?: Date | null;
 
-  static create(dto: {
+  constructor(props: {
+    id: string;
     userId: string;
     areaOfExpertise: string;
     professionalExperience: string;
@@ -40,96 +24,14 @@ export class Instructor {
     education: string;
     certifications: string;
     cv: string;
-  }): Instructor {
-    if (!dto.userId || !dto.areaOfExpertise || !dto.professionalExperience || !dto.education || !dto.cv) {
-      throw new Error("Required fields are missing");
-    }
-
-    return new Instructor({
-      id: crypto.randomUUID(),
-      userId: dto.userId,
-      areaOfExpertise: dto.areaOfExpertise,
-      professionalExperience: dto.professionalExperience,
-      about: dto.about,
-      website: dto.website,
-      education: dto.education,
-      certifications: dto.certifications,
-      cv: dto.cv,
-      status: "PENDING",
-      totalStudents: 0,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-      deletedAt: null
-    });
-  }
-
-  static update(existingInstructor: Instructor, dto: {
-    id: string;
-    areaOfExpertise?: string;
-    professionalExperience?: string;
-    about?: string;
-    website?: string;
-    education?: string;
-    certifications?: string;
-    cv?: string;
-    status?: "PENDING" | "APPROVED" | "DECLINED";
-  }): Instructor {
-    if (existingInstructor._id !== dto.id) {
-      throw new Error("Cannot update instructor with mismatched ID");
-    }
-
-    const updatedProps: InstructorInterface = {
-      ...existingInstructor.getProps(),
-      updatedAt: new Date(),
-    };
-
-    if (dto.areaOfExpertise) updatedProps.areaOfExpertise = dto.areaOfExpertise;
-    if (dto.professionalExperience) updatedProps.professionalExperience = dto.professionalExperience;
-    if (dto.about !== undefined) updatedProps.about = dto.about;
-    if (dto.website !== undefined) updatedProps.website = dto.website;
-    if (dto.education) updatedProps.education = dto.education;
-    if (dto.certifications !== undefined) updatedProps.certifications = dto.certifications;
-    if (dto.cv) updatedProps.cv = dto.cv;
-    if (dto.status) updatedProps.status = dto.status;
-
-    return new Instructor(updatedProps);
-  }
-
-  static fromPrisma(data: {
-    id: string;
-    userId: string;
-    areaOfExpertise: string;
-    professionalExperience: string;
-    about?: string | null;
-    website?: string | null;
-    education: string;
-    certifications: string;
-    cv: string;
-    status: string;
+    status: "PENDING" | "APPROVED" | "DECLINED";
     totalStudents: number;
     createdAt: Date;
     updatedAt: Date;
     deletedAt?: Date | null;
-  }): Instructor {
-    return new Instructor({
-      id: data.id,
-      userId: data.userId,
-      areaOfExpertise: data.areaOfExpertise,
-      professionalExperience: data.professionalExperience,
-      about: data.about ?? undefined,
-      website: data.website ?? undefined,
-      education: data.education,
-      certifications: data.certifications,
-      cv: data.cv,
-      status: data.status as "PENDING" | "APPROVED" | "DECLINED",
-      totalStudents: data.totalStudents,
-      createdAt: data.createdAt,
-      updatedAt: data.updatedAt,
-      deletedAt: data.deletedAt
-    });
-  }
-
-  private constructor(props: InstructorInterface) {
+  }) {
+    this.validateInstructor(props);
+    
     this._id = props.id;
     this._userId = props.userId;
     this._areaOfExpertise = props.areaOfExpertise;
@@ -146,6 +48,50 @@ export class Instructor {
     this._deletedAt = props.deletedAt;
   }
 
+  private validateInstructor(props: any): void {
+    if (!props.id) {
+      throw new Error("Instructor ID is required");
+    }
+
+    if (!props.userId) {
+      throw new Error("User ID is required");
+    }
+
+    if (!props.areaOfExpertise || props.areaOfExpertise.trim() === "") {
+      throw new Error("Area of expertise is required");
+    }
+
+    if (!props.professionalExperience || props.professionalExperience.trim() === "") {
+      throw new Error("Professional experience is required");
+    }
+
+    if (!props.education || props.education.trim() === "") {
+      throw new Error("Education is required");
+    }
+
+    if (!props.cv || props.cv.trim() === "") {
+      throw new Error("CV is required");
+    }
+
+    if (props.totalStudents < 0) {
+      throw new Error("Total students cannot be negative");
+    }
+
+    if (props.website && !this.isValidUrl(props.website)) {
+      throw new Error("Invalid website URL");
+    }
+  }
+
+  private isValidUrl(url: string): boolean {
+    try {
+      new URL(url);
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
+  // Getters
   get id(): string {
     return this._id;
   }
@@ -202,9 +148,56 @@ export class Instructor {
     return this._deletedAt;
   }
 
+  // Business logic methods
+  updateProfile(props: {
+    areaOfExpertise?: string;
+    professionalExperience?: string;
+    about?: string;
+    website?: string;
+    education?: string;
+    certifications?: string;
+    cv?: string;
+  }): void {
+    if (props.areaOfExpertise && props.areaOfExpertise.trim() !== "") {
+      this._areaOfExpertise = props.areaOfExpertise;
+    }
+
+    if (props.professionalExperience && props.professionalExperience.trim() !== "") {
+      this._professionalExperience = props.professionalExperience;
+    }
+
+    if (props.about !== undefined) {
+      this._about = props.about;
+    }
+
+    if (props.website !== undefined) {
+      if (props.website && !this.isValidUrl(props.website)) {
+        throw new Error("Invalid website URL");
+      }
+      this._website = props.website;
+    }
+
+    if (props.education && props.education.trim() !== "") {
+      this._education = props.education;
+    }
+
+    if (props.certifications !== undefined) {
+      this._certifications = props.certifications;
+    }
+
+    if (props.cv && props.cv.trim() !== "") {
+      this._cv = props.cv;
+    }
+
+    this._updatedAt = new Date();
+  }
+
   approve(): void {
     if (this._status === "APPROVED") {
       throw new Error("Instructor is already approved");
+    }
+    if (this._status === "DECLINED") {
+      throw new Error("Cannot approve a declined instructor");
     }
     this._status = "APPROVED";
     this._updatedAt = new Date();
@@ -218,22 +211,64 @@ export class Instructor {
     this._updatedAt = new Date();
   }
 
-  private getProps(): InstructorInterface {
-    return {
-      id: this._id,
-      userId: this._userId,
-      areaOfExpertise: this._areaOfExpertise,
-      professionalExperience: this._professionalExperience,
-      about: this._about,
-      website: this._website,
-      education: this._education,
-      certifications: this._certifications,
-      cv: this._cv,
-      status: this._status,
-      totalStudents: this._totalStudents,
-      createdAt: this._createdAt,
-      updatedAt: this._updatedAt,
-      deletedAt: this._deletedAt
-    };
+  incrementStudentCount(): void {
+    this._totalStudents++;
+    this._updatedAt = new Date();
+  }
+
+  decrementStudentCount(): void {
+    if (this._totalStudents > 0) {
+      this._totalStudents--;
+      this._updatedAt = new Date();
+    }
+  }
+
+  softDelete(): void {
+    if (this._deletedAt) {
+      throw new Error("Instructor is already deleted");
+    }
+    this._deletedAt = new Date();
+    this._updatedAt = new Date();
+  }
+
+  restore(): void {
+    if (!this._deletedAt) {
+      throw new Error("Instructor is not deleted");
+    }
+    this._deletedAt = null;
+    this._updatedAt = new Date();
+  }
+
+  isDeleted(): boolean {
+    return this._deletedAt !== null && this._deletedAt !== undefined;
+  }
+
+  isActive(): boolean {
+    return !this.isDeleted();
+  }
+
+  isApproved(): boolean {
+    return this._status === "APPROVED";
+  }
+
+  isPending(): boolean {
+    return this._status === "PENDING";
+  }
+
+  isDeclined(): boolean {
+    return this._status === "DECLINED";
+  }
+
+  canCreateCourses(): boolean {
+    return this.isApproved() && this.isActive();
+  }
+
+  hasCompleteProfile(): boolean {
+    return !!(
+      this._areaOfExpertise &&
+      this._professionalExperience &&
+      this._education &&
+      this._cv
+    );
   }
 }
