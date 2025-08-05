@@ -1,7 +1,6 @@
 import { LessonContentRecord } from "../records/lesson-content.record";
 
-export interface ILessonContentRepository {
-  findById(id: string): Promise<LessonContentRecord | null>;
+export interface IContentRepository {
   findByLessonId(lessonId: string): Promise<LessonContentRecord | null>;
   create(content: LessonContentRecord): Promise<LessonContentRecord>;
   update(content: LessonContentRecord): Promise<LessonContentRecord>;

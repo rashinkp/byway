@@ -1,9 +1,8 @@
 export interface CourseReviewRecord {
   id: string;
-  courseId: string;
   userId: string;
+  courseId: string;
   rating: number;
-  title?: string | null;
   comment?: string | null;
   createdAt: Date;
   updatedAt: Date;

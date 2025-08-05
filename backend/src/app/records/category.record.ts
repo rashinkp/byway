@@ -2,8 +2,8 @@ export interface CategoryRecord {
   id: string;
   name: string;
   description?: string | null;
+  createdBy: string;
   createdAt: Date;
   updatedAt: Date;
-  createdBy: string;
   deletedAt?: Date | null;
 } 

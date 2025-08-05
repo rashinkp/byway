@@ -3,7 +3,7 @@ export interface QuizQuestionRecord {
   lessonContentId: string;
   question: string;
   options: string[];
-  correctAnswer: string;
+  correctAnswer: number;
   createdAt: Date;
   updatedAt: Date;
 } 

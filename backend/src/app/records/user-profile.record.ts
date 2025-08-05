@@ -1,5 +1,3 @@
-import { Gender } from "@prisma/client";
-
 export interface UserProfileRecord {
   id: string;
   userId: string;
@@ -11,7 +9,7 @@ export interface UserProfileRecord {
   city?: string | null;
   address?: string | null;
   dateOfBirth?: Date | null;
-  gender?: Gender | null;
+  gender?: "MALE" | "FEMALE" | "OTHER" | null;
   createdAt: Date;
   updatedAt: Date;
 } 

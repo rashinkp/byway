@@ -1,14 +1,10 @@
-import { EventType, EntityType } from "@prisma/client";
-
 export interface NotificationRecord {
   id: string;
   userId: string;
-  eventType: EventType;
-  entityType: EntityType;
-  entityId: string;
-  entityName: string;
+  title: string;
   message: string;
-  link?: string | null;
+  type: "COURSE_APPROVAL" | "COURSE_DECLINE" | "COURSE_ENABLE" | "COURSE_DISABLE" | "COURSE_PURCHASE" | "REVENUE" | "GENERAL";
+  isRead: boolean;
   createdAt: Date;
-  expiresAt: Date;
+  updatedAt: Date;
 } 

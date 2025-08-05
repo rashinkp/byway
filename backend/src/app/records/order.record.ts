@@ -1,14 +1,10 @@
-import { PaymentStatus, OrderStatus, PaymentGateway } from "@prisma/client";
-
 export interface OrderRecord {
   id: string;
   userId: string;
-  amount: number;
-  paymentStatus: PaymentStatus;
-  paymentGateway?: PaymentGateway | null;
-  paymentId?: string | null;
-  orderStatus: OrderStatus;
+  totalAmount: number;
+  paymentStatus: "PENDING" | "COMPLETED" | "FAILED" | "CANCELLED" | "REFUNDED";
+  orderStatus: "PENDING" | "PROCESSING" | "COMPLETED" | "CANCELLED" | "FAILED";
+  paymentMethod?: string | null;
   createdAt: Date;
   updatedAt: Date;
-  deletedAt?: Date | null;
 } 

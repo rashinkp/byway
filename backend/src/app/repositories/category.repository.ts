@@ -7,9 +7,10 @@ export interface ICategoryRepository {
   findAll(options: {
     page?: number;
     limit?: number;
-    sortBy?: string;
-    sortOrder?: "asc" | "desc";
     search?: string;
     includeDeleted?: boolean;
+    sortBy?: string;
+    sortOrder?: "asc" | "desc";
+    filterBy?: string;
   }): Promise<{ categories: CategoryRecord[]; total: number }>;
 }

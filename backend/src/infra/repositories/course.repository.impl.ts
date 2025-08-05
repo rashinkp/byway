@@ -1,831 +1,517 @@
 import { PrismaClient, Prisma } from "@prisma/client";
-import { Decimal } from "@prisma/client/runtime/library";
-import { Course, CourseDetails } from "../../domain/entities/course.entity";
-import { CourseLevel } from "../../domain/enum/course-level.enum";
-import { Price } from "../../domain/value-object/price";
-import { Duration } from "../../domain/value-object/duration";
-import { Offer } from "../../domain/value-object/offer";
-import { CourseStatus } from "../../domain/enum/course-status.enum";
-import { APPROVALSTATUS } from "../../domain/enum/approval-status.enum";
-import {
-  ICourseListResponseDTO,
-  IGetAllCoursesInputDTO,
-  IGetEnrolledCoursesInputDTO,
-} from "../../app/dtos/course/course.dto";
+import { CourseRecord } from "../../app/records/course.record";
+import { CourseDetailsRecord } from "../../app/records/course-details.record";
 import { ICourseRepository } from "../../app/repositories/course.repository.interface";
-import { HttpError } from "../../presentation/http/errors/http-error";
-import {
-  ICourseStats,
-  IGetCourseStatsInput,
-} from "@/app/usecases/course/interfaces/get-course-stats.usecase.interface";
-import { IGetTopEnrolledCoursesInput } from "@/app/usecases/course/interfaces/get-top-enrolled-courses.usecase.interface";
-import { ITopEnrolledCourse } from "@/app/dtos/admin/admin-dashboard.dto";
 
 export class CourseRepository implements ICourseRepository {
   constructor(private prisma: PrismaClient) {}
 
-  private hasValue<T>(value: T | null | undefined): value is T {
-    return value !== null && value !== undefined;
-  }
-
-  async save(course: Course): Promise<Course> {
+  async save(course: CourseRecord): Promise<CourseRecord> {
     try {
-      const data: Prisma.CourseCreateInput = {
-        id: course.id,
-        title: course.title,
-        description: course.description,
-        level: course.level,
-        price: course.price?.getValue(),
-        thumbnail: course.thumbnail,
-        duration: course.duration?.getValue()
-          ? Number(course.duration.getValue())
-          : null,
-        offer: course.offer?.getValue(),
-        status: course.status,
-        adminSharePercentage: course.adminSharePercentage,
-        category: {
-          connect: { id: course.categoryId }, // Already fixed from previous issue
-        },
-        // Replace createdBy with creator
-        creator: {
-          connect: { id: course.createdBy }, // Use connect to link to the existing user
-        },
-        createdAt: course.createdAt,
-        updatedAt: course.updatedAt,
-        deletedAt: course.deletedAt,
-        approvalStatus: course.approvalStatus,
-        details: course.details
-          ? {
-              create: {
-                prerequisites: course.details.prerequisites,
-                longDescription: course.details.longDescription,
-                objectives: course.details.objectives,
-                targetAudience: course.details.targetAudience,
-              },
-            }
-          : undefined,
-      };
-
       const saved = await this.prisma.course.create({
-        data,
+        data: {
+          id: course.id,
+          title: course.title,
+          description: course.description,
+          level: course.level as any,
+          price: course.price ? new Prisma.Decimal(course.price) : null,
+          thumbnail: course.thumbnail,
+          duration: course.duration,
+          offer: course.offer ? new Prisma.Decimal(course.offer) : null,
+          status: course.status as any,
+          categoryId: course.categoryId,
+          createdBy: course.createdBy,
+          createdAt: course.createdAt,
+          updatedAt: course.updatedAt,
+          deletedAt: course.deletedAt,
+          approvalStatus: course.approvalStatus as any,
+          adminSharePercentage: new Prisma.Decimal(course.adminSharePercentage),
+        },
         include: { details: true },
       });
 
-      return new Course({
-        id: saved.id,
-        title: saved.title,
-        description: saved.description,
-        level: saved.level as CourseLevel,
-        price: saved.price ? Price.create(saved.price.toNumber()) : null,
-        thumbnail: saved.thumbnail,
-        duration: saved.duration ? Duration.create(saved.duration) : null,
-        offer: saved.offer ? Offer.create(saved.offer.toNumber()) : null,
-        status: saved.status as CourseStatus,
-        categoryId: saved.categoryId,
-        createdBy: saved.createdBy,
-        createdAt: saved.createdAt,
-        updatedAt: saved.updatedAt,
-        deletedAt: saved.deletedAt,
-        approvalStatus: saved.approvalStatus as APPROVALSTATUS,
-        adminSharePercentage: saved.adminSharePercentage.toNumber(),
-        details: saved.details
-          ? new CourseDetails({
-              prerequisites: saved.details.prerequisites,
-              longDescription: saved.details.longDescription,
-              objectives: saved.details.objectives,
-              targetAudience: saved.details.targetAudience,
-            })
-          : null,
-      });
+      return this.mapToCourseRecord(saved);
     } catch (error) {
-      console.error("Error saving course in repository", { error, course });
-      throw new HttpError("Failed to save course", 500);
+      throw new Error(`Failed to save course: ${error}`);
     }
   }
-  async findById(id: string): Promise<Course | null> {
+
+  async findById(id: string): Promise<CourseRecord | null> {
     try {
       const course = await this.prisma.course.findUnique({
         where: { id },
-        include: {
-          details: true,
-        },
+        include: { details: true },
       });
 
-      if (!course) return null;
-
-      return new Course({
-        id: course.id,
-        title: course.title,
-        description: course.description,
-        level: course.level as CourseLevel,
-        price: course.price ? Price.create(course.price.toNumber()) : null,
-        thumbnail: course.thumbnail,
-        duration: course.duration ? Duration.create(course.duration) : null,
-        offer: course.offer ? Offer.create(course.offer.toNumber()) : null,
-        status: course.status as CourseStatus,
-        categoryId: course.categoryId,
-        createdBy: course.createdBy,
-        createdAt: course.createdAt,
-        updatedAt: course.updatedAt,
-        deletedAt: course.deletedAt,
-        approvalStatus: course.approvalStatus as APPROVALSTATUS,
-        adminSharePercentage: course.adminSharePercentage.toNumber(),
-        details: course.details
-          ? new CourseDetails({
-              prerequisites: course.details.prerequisites,
-              longDescription: course.details.longDescription,
-              objectives: course.details.objectives,
-              targetAudience: course.details.targetAudience,
-            })
-          : null,
-      });
+      return course ? this.mapToCourseRecord(course) : null;
     } catch (error) {
-      console.error("Error retrieving course by ID in repository", {
-        error,
-        id,
-      });
-      throw new HttpError("Failed to retrieve course", 500);
+      throw new Error(`Failed to find course by id: ${error}`);
     }
   }
 
-  async findByName(title: string): Promise<Course | null> {
+  async findByName(title: string): Promise<CourseRecord | null> {
     try {
       const course = await this.prisma.course.findFirst({
-        where: { title: { equals: title, mode: "insensitive" } },
+        where: { title },
         include: { details: true },
       });
 
-      if (!course) return null;
-
-      return new Course({
-        id: course.id,
-        title: course.title,
-        description: course.description,
-        level: course.level as CourseLevel,
-        price: course.price ? Price.create(course.price.toNumber()) : null,
-        thumbnail: course.thumbnail,
-        duration: course.duration ? Duration.create(course.duration) : null,
-        offer: course.offer ? Offer.create(course.offer.toNumber()) : null,
-        status: course.status as CourseStatus,
-        categoryId: course.categoryId,
-        createdBy: course.createdBy,
-        createdAt: course.createdAt,
-        updatedAt: course.updatedAt,
-        deletedAt: course.deletedAt,
-        approvalStatus: course.approvalStatus as APPROVALSTATUS,
-        details: course.details
-          ? new CourseDetails({
-              prerequisites: course.details.prerequisites,
-              longDescription: course.details.longDescription,
-              objectives: course.details.objectives,
-              targetAudience: course.details.targetAudience,
-            })
-          : null,
-      });
+      return course ? this.mapToCourseRecord(course) : null;
     } catch (error) {
-      console.error("Error retrieving course by name in repository", {
-        error,
-        title,
-      });
-      throw new HttpError("Failed to retrieve course", 500);
+      throw new Error(`Failed to find course by name: ${error}`);
     }
   }
 
-  async findAll(
-    input: IGetAllCoursesInputDTO
-  ): Promise<ICourseListResponseDTO> {
-    const {
-      page = 1,
-      limit = 10,
-      sortBy = "createdAt",
-      sortOrder = "desc",
-      includeDeleted = false,
-      search = "",
-      filterBy = "All",
-      userId,
-      myCourses = false,
-      role = "USER",
-      level = "All",
-      duration = "All",
-      price = "All",
-      categoryId,
-    } = input;
-
-    const where: Prisma.CourseWhereInput = {
-      ...(search ? { title: { contains: search, mode: "insensitive" } } : {}),
-      // Admin can see all courses including deleted ones if includeDeleted is true
-      ...(role === "ADMIN"
-        ? includeDeleted
-          ? {}
-          : { deletedAt: null }
-        : // Instructor can only see their own courses
-        role === "INSTRUCTOR"
-        ? { createdBy: userId, ...(includeDeleted ? {} : { deletedAt: null }) }
-        : // Regular users can only see published, verified and non-deleted courses
-          {
-            deletedAt: null,
-            status: CourseStatus.PUBLISHED,
-            approvalStatus: APPROVALSTATUS.APPROVED,
-          }),
-
-      // Filter by active/inactive status
-      ...(filterBy === "Active" ? { deletedAt: null } : {}),
-      ...(filterBy === "Inactive" ? { deletedAt: { not: null } } : {}),
-
-      // Filter by approval status
-      ...(filterBy === "Approved"
-        ? { approvalStatus: APPROVALSTATUS.APPROVED }
-        : {}),
-      ...(filterBy === "Declined"
-        ? { approvalStatus: APPROVALSTATUS.DECLINED }
-        : {}),
-      ...(filterBy === "Pending"
-        ? { approvalStatus: APPROVALSTATUS.PENDING }
-        : {}),
-
-      // Filter by publish status
-      ...(filterBy === "Published" ? { status: CourseStatus.PUBLISHED } : {}),
-      ...(filterBy === "Draft" ? { status: CourseStatus.DRAFT } : {}),
-      ...(filterBy === "Archived" ? { status: CourseStatus.ARCHIVED } : {}),
-
-      ...(myCourses && userId ? { createdBy: userId } : {}),
-      ...(level !== "All" ? { level } : {}),
-      ...(duration === "Under5" ? { duration: { lte: 5 } } : {}),
-      ...(duration === "5to10" ? { duration: { gte: 5, lte: 10 } } : {}),
-      ...(duration === "Over10" ? { duration: { gt: 10 } } : {}),
-      ...(price === "Free" ? { price: { equals: new Decimal(0) } } : {}),
-      ...(price === "Paid" ? { price: { gt: new Decimal(0) } } : {}),
-      ...(categoryId ? { categoryId } : {}),
-    };
-
+  async findAll(options: {
+    page?: number;
+    limit?: number;
+    sortBy?: string;
+    sortOrder?: "asc" | "desc";
+    includeDeleted?: boolean;
+    search?: string;
+    filterBy?: string;
+    userId?: string;
+    myCourses?: boolean;
+    role?: string;
+    level?: string;
+    duration?: string;
+    price?: string;
+    categoryId?: string;
+  }): Promise<{ courses: CourseRecord[]; total: number; totalPages: number }> {
     try {
+      const {
+        page = 1,
+        limit = 10,
+        sortBy,
+        sortOrder = "desc",
+        includeDeleted = false,
+        search,
+        filterBy,
+        userId,
+        myCourses = false,
+        role,
+        level,
+        duration,
+        price,
+        categoryId,
+      } = options;
+
+      const skip = (page - 1) * limit;
+
+      const where: Prisma.CourseWhereInput = {};
+
+      if (!includeDeleted) {
+        where.deletedAt = null;
+      }
+
+      if (search) {
+        where.OR = [
+          { title: { contains: search, mode: "insensitive" } },
+          { description: { contains: search, mode: "insensitive" } },
+        ];
+      }
+
+      if (filterBy) {
+        switch (filterBy) {
+          case "Active":
+            where.deletedAt = null;
+            break;
+          case "Inactive":
+            where.deletedAt = { not: null };
+            break;
+          case "Approved":
+            where.approvalStatus = "APPROVED";
+            break;
+          case "Declined":
+            where.approvalStatus = "DECLINED";
+            break;
+          case "Pending":
+            where.approvalStatus = "PENDING";
+            break;
+          case "Published":
+            where.status = "PUBLISHED";
+            break;
+          case "Draft":
+            where.status = "DRAFT";
+            break;
+          case "Archived":
+            where.status = "ARCHIVED";
+            break;
+        }
+      }
+
+      if (myCourses && userId) {
+        where.createdBy = userId;
+      }
+
+      if (role === "INSTRUCTOR" && userId) {
+        where.createdBy = userId;
+      }
+
+      if (level && level !== "All") {
+        where.level = level as any;
+      }
+
+      if (duration && duration !== "All") {
+        switch (duration) {
+          case "Under5":
+            where.duration = { lt: 5 };
+            break;
+          case "5to10":
+            where.duration = { gte: 5, lte: 10 };
+            break;
+          case "Over10":
+            where.duration = { gt: 10 };
+            break;
+        }
+      }
+
+      if (price && price !== "All") {
+        switch (price) {
+          case "Free":
+            where.price = 0;
+            break;
+          case "Paid":
+            where.price = { gt: 0 };
+            break;
+        }
+      }
+
+      if (categoryId) {
+        where.categoryId = categoryId;
+      }
+
+      const orderBy: Prisma.CourseOrderByWithRelationInput = {};
+      if (sortBy) {
+        orderBy[sortBy as keyof Prisma.CourseOrderByWithRelationInput] = sortOrder;
+      } else {
+        orderBy.createdAt = sortOrder;
+      }
+
       const [courses, total] = await Promise.all([
         this.prisma.course.findMany({
           where,
-          skip: (page - 1) * limit,
+          orderBy,
+          skip,
           take: limit,
-          orderBy: { [sortBy]: sortOrder },
           include: { details: true },
         }),
         this.prisma.course.count({ where }),
       ]);
 
-      const courseEntities = courses.map(
-        (course) =>
-          new Course({
-            id: course.id,
-            title: course.title,
-            description: course.description,
-            level: course.level as CourseLevel,
-            price: course.price ? Price.create(course.price.toNumber()) : null,
-            thumbnail: course.thumbnail,
-            duration: course.duration ? Duration.create(course.duration) : null,
-            offer: course.offer ? Offer.create(course.offer.toNumber()) : null,
-            status: course.status as CourseStatus,
-            categoryId: course.categoryId,
-            createdBy: course.createdBy,
-            createdAt: course.createdAt,
-            updatedAt: course.updatedAt,
-            deletedAt: course.deletedAt,
-            approvalStatus: course.approvalStatus as APPROVALSTATUS,
-            details: course.details
-              ? new CourseDetails({
-                  prerequisites: course.details.prerequisites,
-                  longDescription: course.details.longDescription,
-                  objectives: course.details.objectives,
-                  targetAudience: course.details.targetAudience,
-                })
-              : null,
-          })
-      );
-
       return {
-        courses: courseEntities.map((course) => course.toJSON()),
+        courses: courses.map(course => this.mapToCourseRecord(course)),
         total,
-        totalPage: Math.ceil(total / limit),
+        totalPages: Math.ceil(total / limit),
       };
     } catch (error) {
-      console.error("Error retrieving courses in repository", { error, input });
-      throw new HttpError("Failed to retrieve courses", 500);
+      throw new Error(`Failed to find all courses: ${error}`);
     }
   }
 
-  async update(course: Course): Promise<Course> {
-    try {
-      const data: Prisma.CourseUpdateInput = {
-        title: course.title,
-        description: course.description,
-        level: course.level,
-        price: course.price?.getValue(),
-        thumbnail: course.thumbnail,
-        duration: course.duration?.getValue()
-          ? Number(course.duration.getValue())
-          : null,
-        offer: course.offer?.getValue(),
-        status: course.status,
-        category: course.categoryId
-          ? { connect: { id: course.categoryId } }
-          : undefined,
-        adminSharePercentage: course.adminSharePercentage
-          ? new Decimal(course.adminSharePercentage.toString())
-          : undefined,
-        details: course.details
-          ? {
-              upsert: {
-                create: {
-                  prerequisites: course.details.prerequisites,
-                  longDescription: course.details.longDescription,
-                  objectives: course.details.objectives,
-                  targetAudience: course.details.targetAudience,
-                },
-                update: {
-                  prerequisites: course.details.prerequisites,
-                  longDescription: course.details.longDescription,
-                  objectives: course.details.objectives,
-                  targetAudience: course.details.targetAudience,
-                },
-              },
-            }
-          : undefined,
-      };
-
-      const updated = await this.prisma.course.update({
-        where: { id: course.id },
-        data,
-        include: { details: true },
-      });
-
-      return new Course({
-        id: updated.id,
-        title: updated.title,
-        description: updated.description,
-        level: updated.level as CourseLevel,
-        price: updated.price ? Price.create(updated.price.toNumber()) : null,
-        thumbnail: updated.thumbnail,
-        duration: updated.duration ? Duration.create(updated.duration) : null,
-        offer: updated.offer ? Offer.create(updated.offer.toNumber()) : null,
-        status: updated.status as CourseStatus,
-        categoryId: updated.categoryId,
-        createdBy: updated.createdBy,
-        createdAt: updated.createdAt,
-        updatedAt: updated.updatedAt,
-        deletedAt: updated.deletedAt,
-        approvalStatus: updated.approvalStatus as APPROVALSTATUS,
-        adminSharePercentage: updated.adminSharePercentage?.toNumber() ?? 0,
-        details: updated.details
-          ? new CourseDetails({
-              prerequisites: updated.details.prerequisites,
-              longDescription: updated.details.longDescription,
-              objectives: updated.details.objectives,
-              targetAudience: updated.details.targetAudience,
-            })
-          : null,
-      });
-    } catch (error) {
-      console.error("Error updating course in repository", { error, course });
-      throw new HttpError("Failed to update course", 500);
-    }
-  }
-  async softDelete(course: Course): Promise<Course> {
+  async update(course: CourseRecord): Promise<CourseRecord> {
     try {
       const updated = await this.prisma.course.update({
         where: { id: course.id },
-        data: { deletedAt: course.deletedAt },
+        data: {
+          title: course.title,
+          description: course.description,
+          level: course.level as any,
+          price: course.price ? new Prisma.Decimal(course.price) : null,
+          thumbnail: course.thumbnail,
+          duration: course.duration,
+          offer: course.offer ? new Prisma.Decimal(course.offer) : null,
+          status: course.status as any,
+          categoryId: course.categoryId,
+          adminSharePercentage: new Prisma.Decimal(course.adminSharePercentage),
+          updatedAt: course.updatedAt,
+          deletedAt: course.deletedAt,
+          approvalStatus: course.approvalStatus as any,
+        },
         include: { details: true },
       });
 
-      return new Course({
-        id: updated.id,
-        title: updated.title,
-        description: updated.description,
-        level: updated.level as CourseLevel,
-        price: updated.price ? Price.create(updated.price.toNumber()) : null,
-        thumbnail: updated.thumbnail,
-        duration: updated.duration ? Duration.create(updated.duration) : null,
-        offer: updated.offer ? Offer.create(updated.offer.toNumber()) : null,
-        status: updated.status as CourseStatus,
-        categoryId: updated.categoryId,
-        createdBy: updated.createdBy,
-        createdAt: updated.createdAt,
-        updatedAt: updated.updatedAt,
-        deletedAt: updated.deletedAt,
-        approvalStatus: updated.approvalStatus as APPROVALSTATUS,
-        details: updated.details
-          ? new CourseDetails({
-              prerequisites: updated.details.prerequisites,
-              longDescription: updated.details.longDescription,
-              objectives: updated.details.objectives,
-              targetAudience: updated.details.targetAudience,
-            })
-          : null,
-      });
+      return this.mapToCourseRecord(updated);
     } catch (error) {
-      console.error("Error soft deleting course in repository", {
-        error,
-        course,
-      });
-      throw new HttpError("Failed to soft delete course", 500);
+      throw new Error(`Failed to update course: ${error}`);
     }
   }
 
-  async findEnrolledCourses(
-    input: IGetEnrolledCoursesInputDTO
-  ): Promise<ICourseListResponseDTO> {
-    const {
-      userId,
-      page = 1,
-      limit = 10,
-      sortBy = "enrolledAt",
-      sortOrder = "desc",
-      search = "",
-      level = "All",
-    } = input;
-
-    const where: Prisma.CourseWhereInput = {
-      enrollments: { some: { userId } },
-      ...(search ? { title: { contains: search, mode: "insensitive" } } : {}),
-      ...(level !== "All" ? { level } : {}),
-      deletedAt: null,
-      status: CourseStatus.PUBLISHED,
-    };
-
+  async softDelete(course: CourseRecord): Promise<CourseRecord> {
     try {
+      const updated = await this.prisma.course.update({
+        where: { id: course.id },
+        data: {
+          deletedAt: new Date(),
+          updatedAt: new Date(),
+        },
+        include: { details: true },
+      });
+
+      return this.mapToCourseRecord(updated);
+    } catch (error) {
+      throw new Error(`Failed to soft delete course: ${error}`);
+    }
+  }
+
+  async findEnrolledCourses(options: {
+    userId: string;
+    page?: number;
+    limit?: number;
+    sortBy?: string;
+    sortOrder?: "asc" | "desc";
+    search?: string;
+    level?: string;
+  }): Promise<{ courses: CourseRecord[]; total: number; totalPages: number }> {
+    try {
+      const {
+        userId,
+        page = 1,
+        limit = 10,
+        sortBy = "enrolledAt",
+        sortOrder = "desc",
+        search,
+        level,
+      } = options;
+
+      const skip = (page - 1) * limit;
+
+      const where: Prisma.CourseWhereInput = {
+        enrollments: {
+          some: {
+            userId: userId,
+            accessStatus: "ACTIVE",
+          },
+        },
+        deletedAt: null,
+      };
+
+      if (search) {
+        where.OR = [
+          { title: { contains: search, mode: "insensitive" } },
+          { description: { contains: search, mode: "insensitive" } },
+        ];
+      }
+
+      if (level && level !== "All") {
+        where.level = level as any;
+      }
+
+      const orderBy: Prisma.CourseOrderByWithRelationInput = {};
+      if (sortBy === "enrolledAt") {
+        orderBy.enrollments = {
+          _count: sortOrder,
+        };
+      } else {
+        orderBy[sortBy as keyof Prisma.CourseOrderByWithRelationInput] = sortOrder;
+      }
+
       const [courses, total] = await Promise.all([
         this.prisma.course.findMany({
           where,
-          skip: (page - 1) * limit,
+          orderBy,
+          skip,
           take: limit,
-          orderBy:
-            sortBy === "enrolledAt"
-              ? { enrollments: { _count: sortOrder } }
-              : { [sortBy]: sortOrder },
           include: { details: true },
         }),
         this.prisma.course.count({ where }),
       ]);
 
-      const courseEntities = courses.map(
-        (course) =>
-          new Course({
-            id: course.id,
-            title: course.title,
-            description: course.description,
-            level: course.level as CourseLevel,
-            price: course.price ? Price.create(course.price.toNumber()) : null,
-            thumbnail: course.thumbnail,
-            duration: course.duration ? Duration.create(course.duration) : null,
-            offer: course.offer ? Offer.create(course.offer.toNumber()) : null,
-            status: course.status as CourseStatus,
-            categoryId: course.categoryId,
-            createdBy: course.createdBy,
-            createdAt: course.createdAt,
-            updatedAt: course.updatedAt,
-            deletedAt: course.deletedAt,
-            approvalStatus: course.approvalStatus as APPROVALSTATUS,
-            details: course.details
-              ? new CourseDetails({
-                  prerequisites: course.details.prerequisites,
-                  longDescription: course.details.longDescription,
-                  objectives: course.details.objectives,
-                  targetAudience: course.details.targetAudience,
-                })
-              : null,
-          })
-      );
-
       return {
-        courses: courseEntities.map((course) => course.toJSON()),
+        courses: courses.map(course => this.mapToCourseRecord(course)),
         total,
-        totalPage: Math.ceil(total / limit),
+        totalPages: Math.ceil(total / limit),
       };
     } catch (error) {
-      console.error("Error retrieving enrolled courses in repository", {
-        error,
-        input,
-      });
-      throw new HttpError("Failed to retrieve enrolled courses", 500);
+      throw new Error(`Failed to find enrolled courses: ${error}`);
     }
   }
 
-  async updateApprovalStatus(course: Course): Promise<Course> {
+  async updateApprovalStatus(course: CourseRecord): Promise<CourseRecord> {
     try {
       const updated = await this.prisma.course.update({
         where: { id: course.id },
-        data: { approvalStatus: course.approvalStatus },
+        data: {
+          approvalStatus: course.approvalStatus as any,
+          updatedAt: new Date(),
+        },
         include: { details: true },
       });
 
-      return new Course({
-        id: updated.id,
-        title: updated.title,
-        description: updated.description,
-        level: updated.level as CourseLevel,
-        price: updated.price ? Price.create(updated.price.toNumber()) : null,
-        thumbnail: updated.thumbnail,
-        duration: updated.duration ? Duration.create(updated.duration) : null,
-        offer: updated.offer ? Offer.create(updated.offer.toNumber()) : null,
-        status: updated.status as CourseStatus,
-        categoryId: updated.categoryId,
-        createdBy: updated.createdBy,
-        createdAt: updated.createdAt,
-        updatedAt: updated.updatedAt,
-        deletedAt: updated.deletedAt,
-        approvalStatus: updated.approvalStatus as APPROVALSTATUS,
-        details: updated.details
-          ? new CourseDetails({
-              prerequisites: updated.details.prerequisites,
-              longDescription: updated.details.longDescription,
-              objectives: updated.details.objectives,
-              targetAudience: updated.details.targetAudience,
-            })
-          : null,
-      });
+      return this.mapToCourseRecord(updated);
     } catch (error) {
-      console.error("Error updating course approval status in repository", {
-        error,
-        course,
-      });
-      throw new HttpError("Failed to update course approval status", 500);
+      throw new Error(`Failed to update approval status: ${error}`);
     }
   }
 
-  async findCourseDetails(courseId: string): Promise<CourseDetails | null> {
+  async findCourseDetails(courseId: string): Promise<CourseDetailsRecord | null> {
     try {
       const details = await this.prisma.courseDetails.findUnique({
         where: { courseId },
       });
 
-      if (!details) return null;
-
-      return new CourseDetails({
-        prerequisites: details.prerequisites,
-        longDescription: details.longDescription,
-        objectives: details.objectives,
-        targetAudience: details.targetAudience,
-      });
+      return details ? this.mapToCourseDetailsRecord(details) : null;
     } catch (error) {
-      console.error("Error retrieving course details", { error, courseId });
-      throw new HttpError("Failed to retrieve course details", 500);
+      throw new Error(`Failed to find course details: ${error}`);
     }
   }
 
-  async updateCourseDetails(
-    courseId: string,
-    details: CourseDetails
-  ): Promise<CourseDetails> {
+  async updateCourseDetails(courseId: string, details: CourseDetailsRecord): Promise<CourseDetailsRecord> {
     try {
-      const updatedDetails = await this.prisma.courseDetails.upsert({
+      const updated = await this.prisma.courseDetails.upsert({
         where: { courseId },
-        create: {
-          courseId,
-          prerequisites: details.prerequisites,
-          longDescription: details.longDescription,
-          objectives: details.objectives,
-          targetAudience: details.targetAudience,
-        },
         update: {
           prerequisites: details.prerequisites,
           longDescription: details.longDescription,
           objectives: details.objectives,
           targetAudience: details.targetAudience,
+          updatedAt: new Date(),
+        },
+        create: {
+          courseId: courseId,
+          prerequisites: details.prerequisites,
+          longDescription: details.longDescription,
+          objectives: details.objectives,
+          targetAudience: details.targetAudience,
+          createdAt: new Date(),
+          updatedAt: new Date(),
         },
       });
 
-      return new CourseDetails({
-        prerequisites: updatedDetails.prerequisites,
-        longDescription: updatedDetails.longDescription,
-        objectives: updatedDetails.objectives,
-        targetAudience: updatedDetails.targetAudience,
-      });
+      return this.mapToCourseDetailsRecord(updated);
     } catch (error) {
-      console.error("Error updating course details", {
-        error,
-        courseId,
-        details,
-      });
-      throw new HttpError("Failed to update course details", 500);
+      throw new Error(`Failed to update course details: ${error}`);
     }
   }
 
-  async getCourseStats(input: IGetCourseStatsInput): Promise<ICourseStats> {
-    const { userId, includeDeleted = false, isAdmin = false } = input;
+  async getCourseStats(options: { userId?: string }): Promise<{
+    totalCourses: number;
+    publishedCourses: number;
+    draftCourses: number;
+    totalEnrollments: number;
+    totalRevenue: number;
+  }> {
+    try {
+      const { userId } = options;
 
-    // Build where clause for filtering
-    const whereClause: Prisma.CourseWhereInput = {};
+      const where: Prisma.CourseWhereInput = { deletedAt: null };
+      if (userId) {
+        where.createdBy = userId;
+      }
 
-    // Filter by instructor if userId is provided
-    if (userId) {
-      whereClause.createdBy = userId;
-    }
-
-    // Handle deleted courses
-    if (!includeDeleted) {
-      whereClause.deletedAt = null;
-    }
-
-    // Build where clause for active courses (non-deleted)
-    const activeWhereClause: Prisma.CourseWhereInput = {
-      ...whereClause,
-      deletedAt: null,
-    };
-
-    // Build where clause for inactive courses (deleted)
-    const inactiveWhereClause: Prisma.CourseWhereInput = {
-      ...whereClause,
-      deletedAt: { not: null },
-    };
-
-    // Build where clause for pending courses (non-deleted)
-    const pendingWhereClause: Prisma.CourseWhereInput = {
-      ...whereClause,
-      approvalStatus: APPROVALSTATUS.PENDING,
-      deletedAt: null,
-    };
-
-    if (!isAdmin) {
-      // Original behavior for non-admin users
-      const [totalCourses, activeCourses, inactiveCourses, pendingCourses] =
-        await Promise.all([
-          this.prisma.course.count({ where: whereClause }),
-          this.prisma.course.count({ where: activeWhereClause }),
-          this.prisma.course.count({ where: inactiveWhereClause }),
-          this.prisma.course.count({ where: pendingWhereClause }),
-        ]);
-
-      return {
-        totalCourses,
-        activeCourses,
-        inactiveCourses,
-        pendingCourses,
-        approvedCourses: 0,
-        declinedCourses: 0,
-        publishedCourses: 0,
-        draftCourses: 0,
-        archivedCourses: 0,
-      };
-    } else {
-      // Comprehensive stats for admin
       const [
         totalCourses,
-        activeCourses,
-        inactiveCourses,
-        pendingCourses,
-        approvedCourses,
-        declinedCourses,
         publishedCourses,
         draftCourses,
-        archivedCourses,
+        totalEnrollments,
+        totalRevenue,
       ] = await Promise.all([
-        // Total courses (including deleted)
-        this.prisma.course.count({}),
-
-        // Active courses (not deleted)
-        this.prisma.course.count({ where: { deletedAt: null } }),
-
-        // Inactive courses (deleted)
-        this.prisma.course.count({ where: { deletedAt: { not: null } } }),
-
-        // Pending courses
-        this.prisma.course.count({
-          where: { approvalStatus: APPROVALSTATUS.PENDING },
+        this.prisma.course.count({ where }),
+        this.prisma.course.count({ where: { ...where, status: "PUBLISHED" } }),
+        this.prisma.course.count({ where: { ...where, status: "DRAFT" } }),
+        this.prisma.enrollment.count({
+          where: {
+            course: where,
+            accessStatus: "ACTIVE",
+          },
         }),
-
-        // Approved courses
-        this.prisma.course.count({
-          where: { approvalStatus: APPROVALSTATUS.APPROVED },
+        this.prisma.transactionHistory.aggregate({
+          where: {
+            course: where,
+            type: "PURCHASE",
+            status: "COMPLETED",
+          },
+          _sum: { amount: true },
         }),
-
-        // Declined courses
-        this.prisma.course.count({
-          where: { approvalStatus: APPROVALSTATUS.DECLINED },
-        }),
-
-        // Published courses
-        this.prisma.course.count({ where: { status: CourseStatus.PUBLISHED } }),
-
-        // Draft courses
-        this.prisma.course.count({ where: { status: CourseStatus.DRAFT } }),
-
-        // Archived courses
-        this.prisma.course.count({ where: { status: CourseStatus.ARCHIVED } }),
       ]);
 
       return {
         totalCourses,
-        activeCourses,
-        inactiveCourses,
-        pendingCourses,
-        approvedCourses,
-        declinedCourses,
         publishedCourses,
         draftCourses,
-        archivedCourses,
+        totalEnrollments,
+        totalRevenue: totalRevenue._sum.amount || 0,
       };
+    } catch (error) {
+      throw new Error(`Failed to get course stats: ${error}`);
     }
   }
 
-  async getTopEnrolledCourses(
-    input: IGetTopEnrolledCoursesInput
-  ): Promise<ITopEnrolledCourse[]> {
-    let allCourses;
-    if (input.role === "INSTRUCTOR") {
-      allCourses = await this.prisma.course.findMany({
+  async getTopEnrolledCourses(options: { limit?: number }): Promise<{
+    courseId: string;
+    title: string;
+    enrollments: number;
+    revenue: number;
+  }[]> {
+    try {
+      const { limit = 10 } = options;
+
+      const courses = await this.prisma.course.findMany({
         where: {
-          createdBy: input.userId,
+          deletedAt: null,
+          status: "PUBLISHED",
         },
         include: {
-          creator: true,
-          enrollments: true,
-        },
-      });
-    } else {
-      allCourses = await this.prisma.course.findMany({
-        include: {
-          creator: true,
-          enrollments: true,
-        },
-      });
-    }
-
-    if (allCourses.length === 0) {
-      return [];
-    }
-
-    const topEnrolledCourses = allCourses
-      .sort((a, b) => b.enrollments.length - a.enrollments.length)
-      .slice(0, input.limit || 5);
-
-    // Step 3: For each course, get revenue through completed order items
-    const coursesWithRevenue = await Promise.all(
-      topEnrolledCourses.map(async (course) => {
-        // Get all completed order items for this course
-        const completedOrderItems = await this.prisma.orderItem.findMany({
-          where: {
-            courseId: course.id,
-            order: {
-              paymentStatus: "COMPLETED",
-              orderStatus: "COMPLETED",
+          enrollments: {
+            where: { accessStatus: "ACTIVE" },
+          },
+          transactions: {
+            where: {
+              type: "PURCHASE",
+              status: "COMPLETED",
             },
           },
-          include: {
-            order: true,
+        },
+        orderBy: {
+          enrollments: {
+            _count: "desc",
           },
-        });
+        },
+        take: limit,
+      });
 
-        // Calculate revenue based on role
-        let totalRevenue = 0;
-        if (input.role === "INSTRUCTOR") {
-          // For instructor: calculate instructor revenue (remaining amount after admin share)
-          totalRevenue = completedOrderItems.reduce((sum, item) => {
-            const itemPrice = Number(item.coursePrice);
-            const adminSharePercentage = Number(item.adminSharePercentage);
-            const adminRevenue = itemPrice * (adminSharePercentage / 100);
-            const instructorRevenue = itemPrice - adminRevenue; // Instructor gets the remaining amount
-            return sum + instructorRevenue;
-          }, 0);
-        } else {
-          // For admin: calculate admin revenue
-          totalRevenue = completedOrderItems.reduce((sum, item) => {
-            const itemPrice = Number(item.coursePrice);
-            const adminSharePercentage = Number(item.adminSharePercentage);
-            const adminRevenue = itemPrice * (adminSharePercentage / 100);
-            return sum + adminRevenue;
-          }, 0);
-        }
+      return courses.map(course => ({
+        courseId: course.id,
+        title: course.title,
+        enrollments: course.enrollments.length,
+        revenue: course.transactions.reduce((sum, t) => sum + t.amount, 0),
+      }));
+    } catch (error) {
+      throw new Error(`Failed to get top enrolled courses: ${error}`);
+    }
+  }
 
-        // Get review stats for this course
-        const reviews = await this.prisma.courseReview.findMany({
-          where: {
-            courseId: course.id,
-            deletedAt: null, // Only include active reviews
-          },
-          select: {
-            rating: true,
-          },
-        });
+  private mapToCourseRecord(prismaCourse: any): CourseRecord {
+    return {
+      id: prismaCourse.id,
+      title: prismaCourse.title,
+      description: prismaCourse.description,
+      level: prismaCourse.level,
+      price: prismaCourse.price ? Number(prismaCourse.price) : null,
+      thumbnail: prismaCourse.thumbnail,
+      duration: prismaCourse.duration,
+      offer: prismaCourse.offer ? Number(prismaCourse.offer) : null,
+      status: prismaCourse.status,
+      categoryId: prismaCourse.categoryId,
+      createdBy: prismaCourse.createdBy,
+      createdAt: prismaCourse.createdAt,
+      updatedAt: prismaCourse.updatedAt,
+      deletedAt: prismaCourse.deletedAt,
+      approvalStatus: prismaCourse.approvalStatus,
+      adminSharePercentage: Number(prismaCourse.adminSharePercentage),
+    };
+  }
 
-        const rating =
-          reviews.length > 0
-            ? reviews.reduce(
-                (sum: number, review: any) => sum + review.rating,
-                0
-              ) / reviews.length
-            : 0;
-        const reviewCount = reviews.length;
-
-        return {
-          courseId: course.id,
-          courseTitle: course.title,
-          instructorName: course.creator?.name || "Unknown",
-          enrollmentCount: course.enrollments.length,
-          revenue: totalRevenue,
-          rating,
-          reviewCount,
-        };
-      })
-    );
-
-    // Sort by revenue in descending order
-    return coursesWithRevenue.sort((a, b) => b.revenue - a.revenue);
+  private mapToCourseDetailsRecord(prismaDetails: any): CourseDetailsRecord {
+    return {
+      id: prismaDetails.id,
+      courseId: prismaDetails.courseId,
+      prerequisites: prismaDetails.prerequisites,
+      longDescription: prismaDetails.longDescription,
+      objectives: prismaDetails.objectives,
+      targetAudience: prismaDetails.targetAudience,
+      createdAt: prismaDetails.createdAt,
+      updatedAt: prismaDetails.updatedAt,
+    };
   }
 }

@@ -1,27 +1,31 @@
 import { PrismaClient, Gender, Role } from "@prisma/client";
 import { UserRecord } from "../../app/records/user.record";
 import { UserProfileRecord } from "../../app/records/user-profile.record";
-import { GetAllUsersRequestDto } from "../../app/dtos/user.dto";
-import {
-  IPaginatedResponse,
-  IUserRepository,
-} from "../../app/repositories/user.repository";
-import { IUserStats } from "../../app/usecases/user/interfaces/get-user-stats.usecase.interface";
+import { IUserRepository } from "../../app/repositories/user.repository";
 
 export class UserRepository implements IUserRepository {
   constructor(private prisma: PrismaClient) {}
 
-  async findAll(dto: GetAllUsersRequestDto): Promise<IPaginatedResponse<UserRecord>> {
+  async findAll(options: {
+    page?: number;
+    limit?: number;
+    sortBy?: string;
+    sortOrder?: "asc" | "desc";
+    includeDeleted?: boolean;
+    search?: string;
+    filterBy?: string;
+    role?: "USER" | "INSTRUCTOR" | "ADMIN";
+  }): Promise<{ items: UserRecord[]; total: number; totalPages: number }> {
     const {
       page = 1,
       limit = 10,
       sortBy,
-      sortOrder,
-      includeDeleted,
+      sortOrder = "asc",
+      includeDeleted = false,
       search,
       filterBy,
       role,
-    } = dto;
+    } = options;
     const skip = (page - 1) * limit;
 
     const where: any = {};
@@ -38,13 +42,13 @@ export class UserRepository implements IUserRepository {
       ];
     }
     if (role) {
-      where.role = role;
+      where.role = role as Role;
     }
 
     const [users, total] = await Promise.all([
       this.prisma.user.findMany({
         where,
-        orderBy: sortBy ? { [sortBy]: sortOrder || "asc" } : undefined,
+        orderBy: sortBy ? { [sortBy]: sortOrder } : undefined,
         skip,
         take: limit,
         include: { userProfile: true },
@@ -53,7 +57,7 @@ export class UserRepository implements IUserRepository {
     ]);
 
     return {
-      items: users.map((u) => this.mapPrismaToUserRecord(u)),
+      items: users.map(user => this.mapToUserRecord(user)),
       total,
       totalPages: Math.ceil(total / limit),
     };
@@ -64,8 +68,7 @@ export class UserRepository implements IUserRepository {
       where: { id },
       include: { userProfile: true },
     });
-    if (!user) return null;
-    return this.mapPrismaToUserRecord(user);
+    return user ? this.mapToUserRecord(user) : null;
   }
 
   async updateUser(userRecord: UserRecord): Promise<UserRecord> {
@@ -77,16 +80,16 @@ export class UserRepository implements IUserRepository {
         password: userRecord.password,
         googleId: userRecord.googleId,
         facebookId: userRecord.facebookId,
-        role: userRecord.role,
-        authProvider: userRecord.authProvider,
-        isVerified: userRecord.isVerified,
         avatar: userRecord.avatar,
+        role: userRecord.role as Role,
+        authProvider: userRecord.authProvider as any,
+        isVerified: userRecord.isVerified,
         deletedAt: userRecord.deletedAt,
         updatedAt: userRecord.updatedAt,
       },
       include: { userProfile: true },
     });
-    return this.mapPrismaToUserRecord(updated);
+    return this.mapToUserRecord(updated);
   }
 
   async updateProfile(profile: UserProfileRecord): Promise<UserProfileRecord> {
@@ -101,19 +104,18 @@ export class UserRepository implements IUserRepository {
         city: profile.city,
         address: profile.address,
         dateOfBirth: profile.dateOfBirth,
-        gender: profile.gender,
+        gender: profile.gender as Gender,
         updatedAt: profile.updatedAt,
       },
     });
-    return this.mapPrismaToUserProfileRecord(updated);
+    return this.mapToUserProfileRecord(updated);
   }
 
   async findProfileByUserId(userId: string): Promise<UserProfileRecord | null> {
     const profile = await this.prisma.userProfile.findUnique({
       where: { userId },
     });
-    if (!profile) return null;
-    return this.mapPrismaToUserProfileRecord(profile);
+    return profile ? this.mapToUserProfileRecord(profile) : null;
   }
 
   async createProfile(profile: UserProfileRecord): Promise<UserProfileRecord> {
@@ -129,53 +131,57 @@ export class UserRepository implements IUserRepository {
         city: profile.city,
         address: profile.address,
         dateOfBirth: profile.dateOfBirth,
-        gender: profile.gender,
+        gender: profile.gender as Gender,
         createdAt: profile.createdAt,
         updatedAt: profile.updatedAt,
       },
     });
-    return this.mapPrismaToUserProfileRecord(created);
+    return this.mapToUserProfileRecord(created);
   }
 
-  async getUserStats(): Promise<IUserStats> {
+  async getUserStats(): Promise<{
+    totalUsers: number;
+    activeUsers: number;
+    inactiveUsers: number;
+    verifiedUsers: number;
+    instructors: number;
+    students: number;
+  }> {
     const [
       totalUsers,
       activeUsers,
       inactiveUsers,
-      totalInstructors,
-      activeInstructors,
-      inactiveInstructors,
+      verifiedUsers,
+      instructors,
+      students,
     ] = await Promise.all([
       this.prisma.user.count(),
       this.prisma.user.count({ where: { deletedAt: null } }),
       this.prisma.user.count({ where: { deletedAt: { not: null } } }),
+      this.prisma.user.count({ where: { isVerified: true } }),
       this.prisma.user.count({ where: { role: "INSTRUCTOR" } }),
-      this.prisma.user.count({
-        where: { role: "INSTRUCTOR", deletedAt: null },
-      }),
-      this.prisma.user.count({
-        where: { role: "INSTRUCTOR", deletedAt: { not: null } },
-      }),
+      this.prisma.user.count({ where: { role: "USER" } }),
     ]);
 
     return {
       totalUsers,
       activeUsers,
       inactiveUsers,
-      totalInstructors,
-      activeInstructors,
-      inactiveInstructors,
+      verifiedUsers,
+      instructors,
+      students,
     };
   }
 
-  async findByRole(role: Role): Promise<UserRecord[]> {
+  async findByRole(role: "USER" | "INSTRUCTOR" | "ADMIN"): Promise<UserRecord[]> {
     const users = await this.prisma.user.findMany({
-      where: { role },
+      where: { role: role as Role },
+      include: { userProfile: true },
     });
-    return users.map((u) => this.mapPrismaToUserRecord(u));
+    return users.map(user => this.mapToUserRecord(user));
   }
 
-  private mapPrismaToUserRecord(prismaUser: any): UserRecord {
+  private mapToUserRecord(prismaUser: any): UserRecord {
     return {
       id: prismaUser.id,
       name: prismaUser.name,
@@ -193,7 +199,7 @@ export class UserRepository implements IUserRepository {
     };
   }
 
-  private mapPrismaToUserProfileRecord(prismaProfile: any): UserProfileRecord {
+  private mapToUserProfileRecord(prismaProfile: any): UserProfileRecord {
     return {
       id: prismaProfile.id,
       userId: prismaProfile.userId,

@@ -1,15 +1,12 @@
-import { ContentType, ContentStatus } from "@prisma/client";
-
 export interface LessonContentRecord {
   id: string;
   lessonId: string;
-  type: ContentType;
-  status: ContentStatus;
-  title?: string | null;
+  contentType: "VIDEO" | "DOCUMENT" | "QUIZ" | "ASSIGNMENT";
+  title: string;
   description?: string | null;
-  fileUrl?: string | null;
-  thumbnailUrl?: string | null;
+  contentUrl?: string | null;
+  duration?: number | null;
+  status: "DRAFT" | "PUBLISHED" | "ARCHIVED";
   createdAt: Date;
   updatedAt: Date;
-  deletedAt?: Date | null;
 } 

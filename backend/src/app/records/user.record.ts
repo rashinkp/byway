@@ -1,5 +1,3 @@
-import { Role, AuthProvider } from "@prisma/client";
-
 export interface UserRecord {
   id: string;
   name: string;
@@ -8,8 +6,8 @@ export interface UserRecord {
   googleId?: string | null;
   facebookId?: string | null;
   avatar?: string | null;
-  role: Role;
-  authProvider: AuthProvider;
+  role: "USER" | "INSTRUCTOR" | "ADMIN";
+  authProvider: "EMAIL_PASSWORD" | "GOOGLE" | "FACEBOOK";
   isVerified: boolean;
   deletedAt?: Date | null;
   createdAt: Date;

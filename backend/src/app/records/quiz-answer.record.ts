@@ -1,8 +1,8 @@
 export interface QuizAnswerRecord {
   id: string;
-  lessonProgressId: string;
   quizQuestionId: string;
-  selectedAnswer: string;
+  userId: string;
+  selectedAnswer: number;
   isCorrect: boolean;
   createdAt: Date;
   updatedAt: Date;

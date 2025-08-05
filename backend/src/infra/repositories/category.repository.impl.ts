@@ -1,45 +1,39 @@
 import { PrismaClient } from "@prisma/client";
-import { Category } from "../../domain/entities/category.entity";
+import { CategoryRecord } from "../../app/records/category.record";
 import { ICategoryRepository } from "../../app/repositories/category.repository";
-import { IGetAllCategoriesInputDTO } from "../../app/dtos/category/category.dto";
+
 export class CategoryRepository implements ICategoryRepository {
   constructor(private prisma: PrismaClient) {}
 
-  async save(category: Category): Promise<Category> {
-    const data = {
-      id: category.id,
-      name: category.name,
-      description: category.description,
-      createdBy: category.createdBy,
-      createdAt: category.createdAt,
-      updatedAt: category.updatedAt,
-      deletedAt: category.deletedAt ? category.deletedAt : null,
-    };
-
+  async save(category: CategoryRecord): Promise<CategoryRecord> {
     const saved = await this.prisma.category.upsert({
       where: { id: category.id },
-      update: data,
-      create: data,
+      update: category,
+      create: category,
     });
 
-    return Category.fromPersistence(saved);
+    return saved;
   }
 
-  async findById(id: string): Promise<Category | null> {
+  async findById(id: string): Promise<CategoryRecord | null> {
     const category = await this.prisma.category.findUnique({ where: { id } });
-    if (!category) return null;
-    return Category.fromPersistence(category);
+    return category;
   }
 
-  async findByName(name: string): Promise<Category | null> {
+  async findByName(name: string): Promise<CategoryRecord | null> {
     const category = await this.prisma.category.findUnique({ where: { name } });
-    if (!category) return null;
-    return Category.fromPersistence(category);
+    return category;
   }
 
-  async findAll(
-    input: IGetAllCategoriesInputDTO
-  ): Promise<{ categories: Category[]; total: number }> {
+  async findAll(options: {
+    page?: number;
+    limit?: number;
+    search?: string;
+    includeDeleted?: boolean;
+    sortBy?: string;
+    sortOrder?: "asc" | "desc";
+    filterBy?: string;
+  }): Promise<{ categories: CategoryRecord[]; total: number }> {
     const {
       page = 1,
       limit = 10,
@@ -48,7 +42,7 @@ export class CategoryRepository implements ICategoryRepository {
       sortBy = "createdAt",
       sortOrder = "asc",
       filterBy = "all",
-    } = input;
+    } = options;
 
     const where: any = {};
     if (!includeDeleted && filterBy !== "Inactive") {
@@ -75,9 +69,7 @@ export class CategoryRepository implements ICategoryRepository {
     ]);
 
     return {
-      categories: categories.map((category) =>
-        Category.fromPersistence(category)
-      ),
+      categories,
       total,
     };
   }

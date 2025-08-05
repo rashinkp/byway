@@ -1,5 +1,3 @@
-import { APPROVALSTATUS } from "@prisma/client";
-
 export interface InstructorDetailsRecord {
   id: string;
   userId: string;
@@ -11,7 +9,7 @@ export interface InstructorDetailsRecord {
   education: string;
   certifications: string;
   cv: string;
-  status: APPROVALSTATUS;
+  status: "PENDING" | "APPROVED" | "DECLINED";
   createdAt: Date;
   updatedAt: Date;
 } 

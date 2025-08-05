@@ -1,19 +1,14 @@
-import { TransactionType, TransactionStatus, PaymentGateway } from "@prisma/client";
-
 export interface TransactionHistoryRecord {
   id: string;
-  orderId?: string | null;
   userId: string;
-  amount: number;
-  type: TransactionType;
-  status: TransactionStatus;
-  paymentGateway: PaymentGateway;
-  paymentMethod?: string | null;
-  paymentDetails?: any | null;
   courseId?: string | null;
+  orderId?: string | null;
+  amount: number;
+  type: "PURCHASE" | "REFUND" | "WITHDRAWAL" | "DEPOSIT" | "ADMIN_SHARE" | "INSTRUCTOR_SHARE";
+  status: "PENDING" | "COMPLETED" | "FAILED" | "CANCELLED";
+  paymentGateway?: "PAYPAL" | "STRIPE" | "INTERNAL" | null;
   transactionId?: string | null;
-  metadata?: any | null;
-  walletId?: string | null;
+  description?: string | null;
   createdAt: Date;
   updatedAt: Date;
 } 

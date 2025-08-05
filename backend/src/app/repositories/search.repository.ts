@@ -7,11 +7,9 @@ export interface ISearchRepository {
     type?: "courses" | "users" | "all";
     page?: number;
     limit?: number;
-    filters?: Record<string, any>;
   }): Promise<{
     courses: CourseRecord[];
     users: UserRecord[];
     total: number;
-    totalPages: number;
   }>;
 }
