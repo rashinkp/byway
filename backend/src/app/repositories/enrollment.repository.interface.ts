@@ -1,34 +1,20 @@
-import {
-  ICreateEnrollmentInputDTO,
-  IEnrollmentOutputDTO,
-} from "../dtos/course/course.dto";
-import { Enrollment } from "../../domain/entities/enrollment.entity";
-import {
-  IEnrollmentStats,
-  IGetEnrollmentStatsInput,
-} from "../usecases/enrollment/interfaces/get-enrollment-stats.usecase.interface";
+
+import { EnrollmentRecord } from "../records/enrollment.record";
 
 export interface IEnrollmentRepository {
-  create(input: ICreateEnrollmentInputDTO): Promise<IEnrollmentOutputDTO[]>;
-  findByUserAndCourse(
-    userId: string,
-    courseId: string
-  ): Promise<IEnrollmentOutputDTO | null>;
-  findByUserIdAndCourseIds(
-    userId: string,
-    courseIds: string[]
-  ): Promise<Enrollment[]>;
-  findByUserId(userId: string): Promise<Enrollment[]>;
-  findByCourseId(courseId: string): Promise<Enrollment[]>;
+  create(enrollment: EnrollmentRecord): Promise<EnrollmentRecord>;
+  findByUserAndCourse(userId: string, courseId: string): Promise<EnrollmentRecord | null>;
+  findByUserIdAndCourseIds(userId: string, courseIds: string[]): Promise<EnrollmentRecord[]>;
+  findByUserId(userId: string): Promise<EnrollmentRecord[]>;
+  findByCourseId(courseId: string): Promise<EnrollmentRecord[]>;
   delete(userId: string, courseId: string): Promise<void>;
-  updateAccessStatus(
-    userId: string,
-    courseId: string,
-    status: "ACTIVE" | "BLOCKED" | "EXPIRED"
-  ): Promise<void>;
+  updateAccessStatus(userId: string, courseId: string, status: "ACTIVE" | "BLOCKED" | "EXPIRED"): Promise<void>;
 
   // Enrollment stats method
-  getEnrollmentStats(
-    input: IGetEnrollmentStatsInput
-  ): Promise<IEnrollmentStats>;
+  getEnrollmentStats(options: { userId?: string }): Promise<{
+    totalEnrollments: number;
+    activeEnrollments: number;
+    completedEnrollments: number;
+    totalCourses: number;
+  }>;
 }

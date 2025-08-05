@@ -1,12 +1,12 @@
-import { LessonProgress } from "../../domain/entities/lesson-progress.entity";
-import { QuizAnswer } from "../../domain/entities/quiz-answer.entity";
+import { LessonProgressRecord } from "../records/lesson-progress.record";
+import { QuizAnswerRecord } from "../records/quiz-answer.record";
 
 export interface ILessonProgressRepository {
-  save(progress: LessonProgress): Promise<LessonProgress>;
-  findByEnrollmentAndLesson(enrollmentId: string, courseId: string, lessonId: string): Promise<LessonProgress | null>;
-  findByEnrollment(enrollmentId: string, courseId: string): Promise<LessonProgress[]>;
-  update(progress: LessonProgress): Promise<LessonProgress>;
+  save(progress: LessonProgressRecord): Promise<LessonProgressRecord>;
+  findByEnrollmentAndLesson(enrollmentId: string, courseId: string, lessonId: string): Promise<LessonProgressRecord | null>;
+  findByEnrollment(enrollmentId: string, courseId: string): Promise<LessonProgressRecord[]>;
+  update(progress: LessonProgressRecord): Promise<LessonProgressRecord>;
   calculateCourseProgress(enrollmentId: string, courseId: string): Promise<number>;
-  saveQuizAnswers(progressId: string, answers: QuizAnswer[]): Promise<void>;
-  findQuizAnswers(progressId: string): Promise<QuizAnswer[]>;
+  saveQuizAnswers(progressId: string, answers: QuizAnswerRecord[]): Promise<void>;
+  findQuizAnswers(progressId: string): Promise<QuizAnswerRecord[]>;
 } 

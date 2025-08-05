@@ -1,31 +1,8 @@
 import { TransactionType } from "../../domain/enum/transaction-type.enum";
 import { TransactionStatus } from "../../domain/enum/transaction-status.enum";
-import {
-  GetLatestRevenueParams,
-  GetLatestRevenueResult,
-} from "../dtos/revenue/get-latest-revenue.dto";
-
-export interface GetCourseTransactionsParams {
-  startDate: Date;
-  endDate: Date;
-  type: TransactionType;
-  status: TransactionStatus;
-  userId?: string;
-}
-
-export interface GetCourseDetailsParams {
-  courseIds: string[];
-}
-
-export interface GetTotalCoursesParams {
-  startDate: Date;
-  endDate: Date;
-  userId?: string;
-  search?: string;
-}
 
 export interface IRevenueRepository {
-  getTransactionAmounts(params: {
+  getTransactionAmounts(options: {
     startDate: Date;
     endDate: Date;
     type: TransactionType;
@@ -33,7 +10,7 @@ export interface IRevenueRepository {
     userId: string;
   }): Promise<{ amount: number }>;
 
-  getTransactionCounts(params: {
+  getTransactionCounts(options: {
     startDate: Date;
     endDate: Date;
     type?: TransactionType;
@@ -41,32 +18,57 @@ export interface IRevenueRepository {
     userId: string;
   }): Promise<number>;
 
-  getCourseTransactions(params: GetCourseTransactionsParams): Promise<
-    Array<{
-      courseId: string;
-      amount: number;
-      count: number;
-    }>
-  >;
+  getCourseTransactions(options: {
+    startDate: Date;
+    endDate: Date;
+    type: TransactionType;
+    status: TransactionStatus;
+    userId?: string;
+  }): Promise<Array<{
+    courseId: string;
+    amount: number;
+    count: number;
+  }>>;
 
-  getCourseDetails(params: GetCourseDetailsParams): Promise<
-    Array<{
+  getCourseDetails(options: {
+    courseIds: string[];
+  }): Promise<Array<{
+    id: string;
+    title: string;
+    thumbnail: string | null;
+    creator: {
       id: string;
-      title: string;
-      thumbnail: string | null;
-      creator: {
+      name: string;
+      avatar: string | null;
+    };
+    adminSharePercentage: number;
+  }>>;
+
+  getTotalCourses(options: {
+    startDate: Date;
+    endDate: Date;
+    userId?: string;
+    search?: string;
+  }): Promise<number>;
+
+  getLatestRevenue(options: {
+    userId: string;
+    page?: number;
+    limit?: number;
+    startDate?: Date;
+    endDate?: Date;
+  }): Promise<{
+    items: Array<{
+      id: string;
+      amount: number;
+      type: string;
+      status: string;
+      createdAt: Date;
+      course?: {
         id: string;
-        name: string;
-        avatar: string | null;
+        title: string;
       };
-      adminSharePercentage: number;
-    }>
-  >;
-
-  getTotalCourses(params: GetTotalCoursesParams): Promise<number>;
-
-  getLatestRevenue(params: GetLatestRevenueParams): Promise<{
-    items: GetLatestRevenueResult["items"];
+    }>;
     total: number;
   }>;
 

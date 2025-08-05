@@ -1,12 +1,9 @@
-import { GetUserDto } from "../../../dtos/user/user.dto";
-import { User } from "../../../../domain/entities/user.entity";
-import { UserProfile } from "../../../../domain/entities/user-profile.entity";
+import { GetUserByIdRequestDto, UserWithProfileResponseDto } from "../../../dtos/user.dto";
 import { Instructor } from "../../../../domain/entities/instructor.entity";
 
 export interface IGetUserAdminDetailsUseCase {
-  execute(dto: GetUserDto): Promise<{
-    user: User;
-    profile: UserProfile | null;
+  execute(dto: GetUserByIdRequestDto): Promise<{
+    user: UserWithProfileResponseDto;
     instructor: Instructor | null;
   }>;
 }

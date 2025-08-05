@@ -1,6 +1,6 @@
-import { LoginDto } from "../../../dtos/auth/login.dto";
+import { LoginRequestDto } from "../../../dtos/auth.dto";
 import { User } from "../../../../domain/entities/user.entity";
 
 export interface ILoginUseCase {
-  execute(dto: LoginDto): Promise<{ user: User; cartCount: number }>;
+  execute(dto: LoginRequestDto): Promise<{ user: User; cartCount: number }>;
 }

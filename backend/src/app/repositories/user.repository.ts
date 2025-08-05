@@ -1,6 +1,6 @@
-import { GetAllUsersDto } from "../dtos/user/user.dto";
-import { User } from "../../domain/entities/user.entity";
-import { UserProfile } from "../../domain/entities/user-profile.entity";
+import { GetAllUsersRequestDto } from "../dtos/user.dto";
+import { UserRecord } from "../records/user.record";
+import { UserProfileRecord } from "../records/user-profile.record";
 import {
   IUserStats,
   IGetUserStatsInput,
@@ -13,14 +13,14 @@ export interface IPaginatedResponse<T> {
 }
 
 export interface IUserRepository {
-  findAll(dto: GetAllUsersDto): Promise<IPaginatedResponse<User>>;
-  findById(id: string): Promise<User | null>;
-  updateUser(user: User): Promise<User>;
-  updateProfile(profile: UserProfile): Promise<UserProfile>;
-  findProfileByUserId(userId: string): Promise<UserProfile | null>;
-  createProfile(profile: UserProfile): Promise<UserProfile>;
+  findAll(dto: GetAllUsersRequestDto): Promise<IPaginatedResponse<UserRecord>>;
+  findById(id: string): Promise<UserRecord | null>;
+  updateUser(userRecord: UserRecord): Promise<UserRecord>;
+  updateProfile(profile: UserProfileRecord): Promise<UserProfileRecord>;
+  findProfileByUserId(userId: string): Promise<UserProfileRecord | null>;
+  createProfile(profile: UserProfileRecord): Promise<UserProfileRecord>;
 
   // User stats methods
   getUserStats(input: IGetUserStatsInput): Promise<IUserStats>;
-  findByRole(role: string): Promise<User[]>;
+  findByRole(role: string): Promise<UserRecord[]>;
 }

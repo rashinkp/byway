@@ -1,20 +1,19 @@
 import { ChatId } from "@/domain/value-object/ChatId";
-import { Chat } from "../../domain/entities/chat.entity";
+import { ChatRecord } from "../records/chat.record";
 import { UserId } from "@/domain/value-object/UserId";
-import { PaginatedChatListDTO } from "../dtos/chat.dto";
 
 export interface IChatRepository {
-  findById(id: ChatId): Promise<Chat | null>;
-  findByUser(userId: UserId): Promise<Chat[]>;
-  findEnhancedChatList(
-    userId: UserId,
-    page?: number,
-    limit?: number,
-    search?: string,
-    sort?: string,
-    filter?: string
-  ): Promise<PaginatedChatListDTO>;
-  create(chat: Chat): Promise<Chat>;
-  save(chat: Chat): Promise<void>;
-  getChatBetweenUsers(user1Id: UserId, user2Id: UserId): Promise<Chat | null>;
+  findById(id: ChatId): Promise<ChatRecord | null>;
+  findByUser(userId: UserId): Promise<ChatRecord[]>;
+  findEnhancedChatList(options: {
+    userId: UserId;
+    page?: number;
+    limit?: number;
+    search?: string;
+    sort?: string;
+    filter?: string;
+  }): Promise<{ chats: ChatRecord[]; total: number; totalPages: number }>;
+  create(chat: ChatRecord): Promise<ChatRecord>;
+  save(chat: ChatRecord): Promise<void>;
+  getChatBetweenUsers(user1Id: UserId, user2Id: UserId): Promise<ChatRecord | null>;
 }

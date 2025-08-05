@@ -3,7 +3,7 @@ import { IAuthRepository } from "../../../repositories/auth.repository";
 import { HttpError } from "../../../../presentation/http/errors/http-error";
 import * as bcrypt from "bcrypt";
 import { AuthProvider } from "../../../../domain/enum/auth-provider.enum";
-import { LoginDto } from "../../../dtos/auth/login.dto";
+import { LoginRequestDto } from "../../../dtos/auth.dto";
 import { ILoginUseCase } from "../interfaces/login.usecase.interface";
 import { ICartRepository } from "../../../repositories/cart.repository";
 
@@ -13,7 +13,7 @@ export class LoginUseCase implements ILoginUseCase {
     private cartRepository: ICartRepository
   ) {}
 
-  async execute(dto: LoginDto): Promise<{ user: User; cartCount: number }> {
+  async execute(dto: LoginRequestDto): Promise<{ user: User; cartCount: number }> {
     const user = await this.authRepository.findUserByEmail(dto.email);
     if (!user) {
       throw new HttpError("Invalid credentials", 401);

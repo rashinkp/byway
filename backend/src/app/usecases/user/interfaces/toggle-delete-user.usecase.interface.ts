@@ -1,9 +1,8 @@
-import { ToggleDeleteUserDto } from "../../../dtos/user/user.dto";
-import { User } from "../../../../domain/entities/user.entity";
+import { ToggleDeleteUserRequestDto, UserResponseDto } from "../../../dtos/user.dto";
 
 export interface IToggleDeleteUserUseCase {
   execute(
-    dto: ToggleDeleteUserDto,
+    dto: ToggleDeleteUserRequestDto,
     currentUser: { id: string; role: string }
-  ): Promise<User>;
+  ): Promise<UserResponseDto>;
 }

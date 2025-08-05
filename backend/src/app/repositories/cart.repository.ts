@@ -1,12 +1,12 @@
-import { Cart } from "../../domain/entities/cart.entity";
+import { CartRecord } from "../records/cart.record";
 
 export interface ICartRepository {
-  findById(id: string): Promise<Cart | null>;
-  findByUserId(userId: string, includeDeleted?: boolean): Promise<Cart[]>;
-  findByCourseId(courseId: string, includeDeleted?: boolean): Promise<Cart[]>;
-  findByUserAndCourse(userId: string, courseId: string): Promise<Cart | null>;
-  create(cart: Cart): Promise<Cart>;
-  update(cart: Cart): Promise<Cart>;
+  findById(id: string): Promise<CartRecord | null>;
+  findByUserId(userId: string, includeDeleted?: boolean): Promise<CartRecord[]>;
+  findByCourseId(courseId: string, includeDeleted?: boolean): Promise<CartRecord[]>;
+  findByUserAndCourse(userId: string, courseId: string): Promise<CartRecord | null>;
+  create(cart: CartRecord): Promise<CartRecord>;
+  update(cart: CartRecord): Promise<CartRecord>;
   delete(id: string): Promise<void>;
   clearUserCart(userId: string): Promise<void>;
   deleteByUserAndCourse(userId: string, courseId: string): Promise<void>;

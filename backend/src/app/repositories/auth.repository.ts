@@ -1,13 +1,13 @@
-import { UserVerification } from "../../domain/entities/user-verification.entity";
-import { User } from "../../domain/entities/user.entity";
+import { UserVerificationRecord } from "../records/user-verification.record";
+import { UserRecord } from "../records/user.record";
 
 export interface IAuthRepository {
-  findUserByEmail(email: string): Promise<User | null>;
-  findUserByGoogleId(googleId: string): Promise<User | null>;
-  findUserByFacebookId(facebookId: string): Promise<User | null>;
-  createUser(user: User): Promise<User>;
-  createVerification(verification: UserVerification): Promise<UserVerification>;
-  findVerificationByEmail(email: string): Promise<UserVerification | null>;
-  updateVerification(verification: UserVerification): Promise<UserVerification>;
-  updateUser(user: User): Promise<User>;
+  findUserByEmail(email: string): Promise<UserRecord | null>;
+  findUserByGoogleId(googleId: string): Promise<UserRecord | null>;
+  findUserByFacebookId(facebookId: string): Promise<UserRecord | null>;
+  createUser(user: UserRecord): Promise<UserRecord>;
+  createVerification(verification: UserVerificationRecord): Promise<UserVerificationRecord>;
+  findVerificationByEmail(email: string): Promise<UserVerificationRecord | null>;
+  updateVerification(verification: UserVerificationRecord): Promise<UserVerificationRecord>;
+  updateUser(user: UserRecord): Promise<UserRecord>;
 }

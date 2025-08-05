@@ -1,11 +1,15 @@
-import { IGetAllCategoriesInputDTO } from "../dtos/category/category.dto";
-import { Category } from "../../domain/entities/category.entity";
+import { CategoryRecord } from "../records/category.record";
 
 export interface ICategoryRepository {
-  save(category: Category): Promise<Category>;
-  findById(id: string): Promise<Category | null>;
-  findByName(name: string): Promise<Category | null>;
-  findAll(
-    input: IGetAllCategoriesInputDTO
-  ): Promise<{ categories: Category[]; total: number }>;
+  save(category: CategoryRecord): Promise<CategoryRecord>;
+  findById(id: string): Promise<CategoryRecord | null>;
+  findByName(name: string): Promise<CategoryRecord | null>;
+  findAll(options: {
+    page?: number;
+    limit?: number;
+    sortBy?: string;
+    sortOrder?: "asc" | "desc";
+    search?: string;
+    includeDeleted?: boolean;
+  }): Promise<{ categories: CategoryRecord[]; total: number }>;
 }

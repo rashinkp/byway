@@ -1,6 +1,6 @@
-import { RegisterDto } from "../../../dtos/auth/register.dto";
+import { RegisterRequestDto } from "../../../dtos/auth.dto";
 import { User } from "../../../../domain/entities/user.entity";
 
 export interface IRegisterUseCase {
-  execute(dto: RegisterDto): Promise<User>;
+  execute(dto: RegisterRequestDto): Promise<User>;
 }

@@ -1,8 +1,8 @@
-import { Wallet } from "../../domain/entities/wallet.entity";
+import { WalletRecord } from "../records/wallet.record";
 
 export interface IWalletRepository {
-  findByUserId(userId: string): Promise<Wallet | null>;
-  create(wallet: Wallet): Promise<Wallet>;
-  update(wallet: Wallet): Promise<Wallet>;
-  findById(id: string): Promise<Wallet | null>;
+  findByUserId(userId: string): Promise<WalletRecord | null>;
+  create(wallet: WalletRecord): Promise<WalletRecord>;
+  update(wallet: WalletRecord): Promise<WalletRecord>;
+  findById(id: string): Promise<WalletRecord | null>;
 } 

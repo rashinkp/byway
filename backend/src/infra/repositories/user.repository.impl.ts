@@ -1,7 +1,7 @@
 import { PrismaClient, Gender, Role } from "@prisma/client";
-import { User } from "../../domain/entities/user.entity";
-import { UserProfile } from "../../domain/entities/user-profile.entity";
-import { GetAllUsersDto } from "../../app/dtos/user/user.dto";
+import { UserRecord } from "../../app/records/user.record";
+import { UserProfileRecord } from "../../app/records/user-profile.record";
+import { GetAllUsersRequestDto } from "../../app/dtos/user.dto";
 import {
   IPaginatedResponse,
   IUserRepository,
@@ -11,10 +11,10 @@ import { IUserStats } from "../../app/usecases/user/interfaces/get-user-stats.us
 export class UserRepository implements IUserRepository {
   constructor(private prisma: PrismaClient) {}
 
-  async findAll(dto: GetAllUsersDto): Promise<IPaginatedResponse<User>> {
+  async findAll(dto: GetAllUsersRequestDto): Promise<IPaginatedResponse<UserRecord>> {
     const {
-      page,
-      limit,
+      page = 1,
+      limit = 10,
       sortBy,
       sortOrder,
       includeDeleted,
@@ -53,46 +53,43 @@ export class UserRepository implements IUserRepository {
     ]);
 
     return {
-      items: users.map((u) => {
-        const user = User.fromPrisma(u);
-        return user;
-      }),
+      items: users.map((u) => this.mapPrismaToUserRecord(u)),
       total,
       totalPages: Math.ceil(total / limit),
     };
   }
 
-  async findById(id: string): Promise<User | null> {
+  async findById(id: string): Promise<UserRecord | null> {
     const user = await this.prisma.user.findUnique({
       where: { id },
       include: { userProfile: true },
     });
     if (!user) return null;
-    return User.fromPrisma(user);
+    return this.mapPrismaToUserRecord(user);
   }
 
-  async updateUser(user: User): Promise<User> {
+  async updateUser(userRecord: UserRecord): Promise<UserRecord> {
     const updated = await this.prisma.user.update({
-      where: { id: user.id },
+      where: { id: userRecord.id },
       data: {
-        name: user.name,
-        email: user.email,
-        password: user.password,
-        googleId: user.googleId,
-        facebookId: user.facebookId,
-        role: user.role,
-        authProvider: user.authProvider,
-        isVerified: user.isVerified,
-        avatar: user.avatar,
-        deletedAt: user.deletedAt ? user.deletedAt : null,
-        updatedAt: user.updatedAt,
+        name: userRecord.name,
+        email: userRecord.email,
+        password: userRecord.password,
+        googleId: userRecord.googleId,
+        facebookId: userRecord.facebookId,
+        role: userRecord.role,
+        authProvider: userRecord.authProvider,
+        isVerified: userRecord.isVerified,
+        avatar: userRecord.avatar,
+        deletedAt: userRecord.deletedAt,
+        updatedAt: userRecord.updatedAt,
       },
       include: { userProfile: true },
     });
-    return User.fromPrisma(updated);
+    return this.mapPrismaToUserRecord(updated);
   }
 
-  async updateProfile(profile: UserProfile): Promise<UserProfile> {
+  async updateProfile(profile: UserProfileRecord): Promise<UserProfileRecord> {
     const updated = await this.prisma.userProfile.update({
       where: { id: profile.id },
       data: {
@@ -104,22 +101,22 @@ export class UserRepository implements IUserRepository {
         city: profile.city,
         address: profile.address,
         dateOfBirth: profile.dateOfBirth,
-        gender: profile.gender as Gender | null,
+        gender: profile.gender,
         updatedAt: profile.updatedAt,
       },
     });
-    return UserProfile.fromPrisma(updated);
+    return this.mapPrismaToUserProfileRecord(updated);
   }
 
-  async findProfileByUserId(userId: string): Promise<UserProfile | null> {
+  async findProfileByUserId(userId: string): Promise<UserProfileRecord | null> {
     const profile = await this.prisma.userProfile.findUnique({
       where: { userId },
     });
     if (!profile) return null;
-    return UserProfile.fromPrisma(profile);
+    return this.mapPrismaToUserProfileRecord(profile);
   }
 
-  async createProfile(profile: UserProfile): Promise<UserProfile> {
+  async createProfile(profile: UserProfileRecord): Promise<UserProfileRecord> {
     const created = await this.prisma.userProfile.create({
       data: {
         id: profile.id,
@@ -132,12 +129,12 @@ export class UserRepository implements IUserRepository {
         city: profile.city,
         address: profile.address,
         dateOfBirth: profile.dateOfBirth,
-        gender: profile.gender as Gender | null,
+        gender: profile.gender,
         createdAt: profile.createdAt,
         updatedAt: profile.updatedAt,
       },
     });
-    return UserProfile.fromPrisma(created);
+    return this.mapPrismaToUserProfileRecord(created);
   }
 
   async getUserStats(): Promise<IUserStats> {
@@ -171,10 +168,46 @@ export class UserRepository implements IUserRepository {
     };
   }
 
-  async findByRole(role: Role): Promise<User[]> {
+  async findByRole(role: Role): Promise<UserRecord[]> {
     const users = await this.prisma.user.findMany({
       where: { role },
     });
-    return users.map((u) => User.fromPrisma(u));
+    return users.map((u) => this.mapPrismaToUserRecord(u));
+  }
+
+  private mapPrismaToUserRecord(prismaUser: any): UserRecord {
+    return {
+      id: prismaUser.id,
+      name: prismaUser.name,
+      email: prismaUser.email,
+      password: prismaUser.password,
+      googleId: prismaUser.googleId,
+      facebookId: prismaUser.facebookId,
+      avatar: prismaUser.avatar,
+      role: prismaUser.role,
+      authProvider: prismaUser.authProvider,
+      isVerified: prismaUser.isVerified,
+      deletedAt: prismaUser.deletedAt,
+      createdAt: prismaUser.createdAt,
+      updatedAt: prismaUser.updatedAt,
+    };
+  }
+
+  private mapPrismaToUserProfileRecord(prismaProfile: any): UserProfileRecord {
+    return {
+      id: prismaProfile.id,
+      userId: prismaProfile.userId,
+      bio: prismaProfile.bio,
+      education: prismaProfile.education,
+      skills: prismaProfile.skills,
+      phoneNumber: prismaProfile.phoneNumber,
+      country: prismaProfile.country,
+      city: prismaProfile.city,
+      address: prismaProfile.address,
+      dateOfBirth: prismaProfile.dateOfBirth,
+      gender: prismaProfile.gender,
+      createdAt: prismaProfile.createdAt,
+      updatedAt: prismaProfile.updatedAt,
+    };
   }
 }

@@ -1,10 +1,8 @@
-import { UpdateUserDto } from "../../../dtos/user/user.dto";
-import { User } from "../../../../domain/entities/user.entity";
-import { UserProfile } from "../../../../domain/entities/user-profile.entity";
+import { UpdateUserRequestDto, UserWithProfileResponseDto } from "../../../dtos/user.dto";
 
 export interface IUpdateUserUseCase {
   execute(
-    dto: UpdateUserDto,
+    dto: UpdateUserRequestDto,
     userId: string
-  ): Promise<{ user: User; profile: UserProfile | null }>;
+  ): Promise<UserWithProfileResponseDto>;
 }

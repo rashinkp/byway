@@ -1,9 +1,7 @@
-import { GetUserDto } from "../../../dtos/user/user.dto";
-import { User } from "../../../../domain/entities/user.entity";
-import { UserProfile } from "../../../../domain/entities/user-profile.entity";
+import { GetUserByIdRequestDto, UserWithProfileResponseDto } from "../../../dtos/user.dto";
 
 export interface IGetUserByIdUseCase {
   execute(
-    dto: GetUserDto
-  ): Promise<{ user: User; profile: UserProfile | null }>;
+    dto: GetUserByIdRequestDto
+  ): Promise<UserWithProfileResponseDto>;
 }

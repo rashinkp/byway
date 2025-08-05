@@ -1,20 +1,19 @@
 import { MessageId } from "@/domain/value-object/MessageId";
-import { Message } from "../../domain/entities/message.entity";
+import { MessageRecord } from "../records/message.record";
 import { ChatId } from "@/domain/value-object/ChatId";
-import { EnrichedMessageDTO } from "../dtos/message.dto";
 import { UserId } from "@/domain/value-object/UserId";
 
 export interface IMessageRepository {
-  findById(id: MessageId): Promise<Message | null>;
-  findByChat(chatId: ChatId): Promise<Message[]>;
-  findByChatWithUserData(
-    chatId: ChatId,
-    limit?: number,
-    beforeMessageId?: string
-  ): Promise<EnrichedMessageDTO[]>;
-  findByIdWithUserData(id: MessageId): Promise<EnrichedMessageDTO | null>;
-  create(message: Message): Promise<void>;
-  save(message: Message): Promise<void>;
+  findById(id: MessageId): Promise<MessageRecord | null>;
+  findByChat(chatId: ChatId): Promise<MessageRecord[]>;
+  findByChatWithUserData(options: {
+    chatId: ChatId;
+    limit?: number;
+    beforeMessageId?: string;
+  }): Promise<MessageRecord[]>;
+  findByIdWithUserData(id: MessageId): Promise<MessageRecord | null>;
+  create(message: MessageRecord): Promise<void>;
+  save(message: MessageRecord): Promise<void>;
   delete(id: MessageId): Promise<void>;
   markAllAsRead(chatId: ChatId, userId: UserId): Promise<void>;
   getTotalUnreadCount(userId: UserId): Promise<number>;

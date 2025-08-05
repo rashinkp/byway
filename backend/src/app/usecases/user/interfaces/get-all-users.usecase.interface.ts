@@ -1,7 +1,6 @@
-import { GetAllUsersDto } from "../../../dtos/user/user.dto";
-import { User } from "../../../../domain/entities/user.entity";
+import { GetAllUsersRequestDto, UserResponseDto } from "../../../dtos/user.dto";
 import { IPaginatedResponse } from "../../../repositories/user.repository";
 
 export interface IGetAllUsersUseCase {
-  execute(dto: GetAllUsersDto): Promise<IPaginatedResponse<User>>;
+  execute(dto: GetAllUsersRequestDto): Promise<IPaginatedResponse<UserResponseDto>>;
 }

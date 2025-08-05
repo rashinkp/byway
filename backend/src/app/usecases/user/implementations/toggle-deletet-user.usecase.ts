@@ -1,4 +1,4 @@
-import { ToggleDeleteUserDto } from "../../../dtos/user/user.dto";
+import { ToggleDeleteUserRequestDto, UserResponseDto } from "../../../dtos/user.dto";
 import { User } from "../../../../domain/entities/user.entity";
 import { HttpError } from "../../../../presentation/http/errors/http-error";
 import { IUserRepository } from "../../../repositories/user.repository";
@@ -14,9 +14,9 @@ export class ToggleDeleteUserUseCase implements IToggleDeleteUserUseCase {
   ) {}
 
   async execute(
-    dto: ToggleDeleteUserDto,
+    dto: ToggleDeleteUserRequestDto,
     currentUser: { id: string; role: string }
-  ): Promise<User> {
+  ): Promise<UserResponseDto> {
     if (currentUser.role !== "ADMIN") {
       throw new HttpError("Unauthorized: Admin role required", 403);
     }
@@ -47,11 +47,21 @@ export class ToggleDeleteUserUseCase implements IToggleDeleteUserUseCase {
       eventType,
       entityType: NotificationEntityType.USER,
       entityId: user.id,
-      entityName: user.name || user.email,
+      entityName: user.name || user.email.address,
       message,
       link: "/login",
     });
 
-    return updatedUser;
+    // Transform to response DTO
+    return {
+      id: updatedUser.id,
+      name: updatedUser.name,
+      email: updatedUser.email.address,
+      avatar: updatedUser.avatar,
+      role: updatedUser.role,
+      isActive: !updatedUser.isDeleted(),
+      createdAt: updatedUser.createdAt,
+      updatedAt: updatedUser.updatedAt,
+    };
   }
 }
