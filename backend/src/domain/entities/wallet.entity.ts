@@ -4,43 +4,18 @@ export class Wallet {
   constructor(
     public readonly id: string,
     public readonly userId: string,
-    public balance: Money,
-    public readonly createdAt: Date,
-    public readonly updatedAt: Date
+    public balance: Money
   ) {}
 
-  static create(
-    userId: string,
-    initialBalance: number = 0,
-    currency: string = 'USD'
-  ): Wallet {
-    return new Wallet(
-      crypto.randomUUID(),
-      userId,
-      Money.create(initialBalance, currency),
-      new Date(),
-      new Date()
-    );
+  static create(id: string, userId: string, initialBalance: Money): Wallet {
+    return new Wallet(id, userId, initialBalance);
   }
 
-  addAmount(amount: number, currency: string = 'USD'): void {
-    const moneyToAdd = Money.create(amount, currency);
-    this.balance = this.balance.add(moneyToAdd);
+  addAmount(amount: Money): void {
+    this.balance = this.balance.add(amount);
   }
 
-  reduceAmount(amount: number, currency: string = 'USD'): void {
-    const moneyToReduce = Money.create(amount, currency);
-    this.balance = this.balance.subtract(moneyToReduce);
+  reduceAmount(amount: Money): void {
+    this.balance = this.balance.subtract(amount);
   }
-
-  toResponse() {
-    return {
-      id: this.id,
-      userId: this.userId,
-      balance: this.balance.amount,
-      currency: this.balance.currency,
-      createdAt: this.createdAt,
-      updatedAt: this.updatedAt
-    };
-  }
-} 
+}

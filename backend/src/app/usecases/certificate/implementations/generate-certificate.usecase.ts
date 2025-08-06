@@ -1,18 +1,18 @@
-import { CertificateRepositoryInterface } from '../../../repositories/certificate-repository.interface';
-import { IEnrollmentRepository } from '../../../repositories/enrollment.repository.interface';
-import { ICourseRepository } from '../../../repositories/course.repository.interface';
-import { IUserRepository } from '../../../repositories/user.repository';
-import { ILessonProgressRepository } from '../../../repositories/lesson-progress.repository.interface';
-import { Certificate } from '../../../../domain/entities/certificate.entity';
-import { CertificateStatus } from '../../../../domain/enum/certificate-status.enum';
-import { LessonProgress } from '../../../../domain/entities/lesson-progress.entity';
-import { 
-  IGenerateCertificateUseCase, 
-  IGenerateCertificateRequest, 
-  IGenerateCertificateResponse 
-} from '../interfaces/generate-certificate.usecase.interface';
-import { CertificatePdfServiceInterface } from '../../../providers/generate-certificate.interface';
-import { S3ServiceInterface } from '../../../providers/s3.service.interface';
+import { CertificateRepositoryInterface } from "../../../repositories/certificate-repository.interface";
+import { IEnrollmentRepository } from "../../../repositories/enrollment.repository.interface";
+import { ICourseRepository } from "../../../repositories/course.repository.interface";
+import { IUserRepository } from "../../../repositories/user.repository";
+import { ILessonProgressRepository } from "../../../repositories/lesson-progress.repository.interface";
+import { Certificate } from "../../../../domain/entities/certificate.entity";
+import { CertificateStatus } from "../../../../domain/enum/certificate-status.enum";
+import { LessonProgress } from "../../../../domain/entities/progress.entity";
+import {
+  IGenerateCertificateUseCase,
+  IGenerateCertificateRequest,
+  IGenerateCertificateResponse,
+} from "../interfaces/generate-certificate.usecase.interface";
+import { CertificatePdfServiceInterface } from "../../../providers/generate-certificate.interface";
+import { S3ServiceInterface } from "../../../providers/s3.service.interface";
 
 export class GenerateCertificateUseCase implements IGenerateCertificateUseCase {
   constructor(
@@ -25,24 +25,39 @@ export class GenerateCertificateUseCase implements IGenerateCertificateUseCase {
     private readonly s3Service: S3ServiceInterface
   ) {}
 
-  async execute(request: IGenerateCertificateRequest): Promise<IGenerateCertificateResponse> {
+  async execute(
+    request: IGenerateCertificateRequest
+  ): Promise<IGenerateCertificateResponse> {
     try {
       const { userId, courseId } = request;
-      console.log(`[Certificate] Searching for enrollment: userId=${userId}, courseId=${courseId}`);
+      console.log(
+        `[Certificate] Searching for enrollment: userId=${userId}, courseId=${courseId}`
+      );
 
       // 1. Check if user is enrolled in the course
-      const enrollment = await this.enrollmentRepository.findByUserAndCourse(userId, courseId);
+      const enrollment = await this.enrollmentRepository.findByUserAndCourse(
+        userId,
+        courseId
+      );
       if (!enrollment) {
-        console.log(`[Certificate] Enrollment not found for userId=${userId}, courseId=${courseId}`);
+        console.log(
+          `[Certificate] Enrollment not found for userId=${userId}, courseId=${courseId}`
+        );
         return {
           success: false,
-          error: 'User is not enrolled in this course'
+          error: "User is not enrolled in this course",
         };
       }
 
       // 2. Check if certificate already exists
-      console.log(`[Certificate] Checking for existing certificate: userId=${userId}, courseId=${courseId}`);
-      const existingCertificate = await this.certificateRepository.findByUserIdAndCourseId(userId, courseId);
+      console.log(
+        `[Certificate] Checking for existing certificate: userId=${userId}, courseId=${courseId}`
+      );
+      const existingCertificate =
+        await this.certificateRepository.findByUserIdAndCourseId(
+          userId,
+          courseId
+        );
       let certificate;
       let isUpdate = false;
       let oldCertificateId = undefined;
@@ -50,20 +65,28 @@ export class GenerateCertificateUseCase implements IGenerateCertificateUseCase {
         // Restrict regeneration to once every 30 days
         const lastUpdated = new Date(existingCertificate.updatedAt);
         const now = new Date();
-        const daysSinceUpdate = (now.getTime() - lastUpdated.getTime()) / (1000 * 60 * 60 * 24);
+        const daysSinceUpdate =
+          (now.getTime() - lastUpdated.getTime()) / (1000 * 60 * 60 * 24);
         if (daysSinceUpdate < 30) {
           return {
             success: false,
-            error: `Certificate can only be regenerated once every 30 days. Please try again after ${Math.ceil(30 - daysSinceUpdate)} day(s).`
+            error: `Certificate can only be regenerated once every 30 days. Please try again after ${Math.ceil(
+              30 - daysSinceUpdate
+            )} day(s).`,
           };
         }
         // Delete from S3 if pdfUrl exists
         if (existingCertificate.pdfUrl) {
           try {
             await this.s3Service.deleteFile(existingCertificate.pdfUrl);
-            console.log(`[Certificate] Deleted old certificate PDF from S3: ${existingCertificate.pdfUrl}`);
+            console.log(
+              `[Certificate] Deleted old certificate PDF from S3: ${existingCertificate.pdfUrl}`
+            );
           } catch (err) {
-            console.error(`[Certificate] Failed to delete old certificate PDF from S3:`, err);
+            console.error(
+              `[Certificate] Failed to delete old certificate PDF from S3:`,
+              err
+            );
           }
         }
         // Prepare to update existing certificate
@@ -72,36 +95,51 @@ export class GenerateCertificateUseCase implements IGenerateCertificateUseCase {
       }
 
       // 3. Check if course is completed
-      console.log(`[Certificate] Checking course completion for userId=${userId}, courseId=${courseId}`);
+      console.log(
+        `[Certificate] Checking course completion for userId=${userId}, courseId=${courseId}`
+      );
       const isCompleted = await this.checkCourseCompletion(userId, courseId);
       if (!isCompleted) {
-        console.log(`[Certificate] Course not completed for userId=${userId}, courseId=${courseId}`);
+        console.log(
+          `[Certificate] Course not completed for userId=${userId}, courseId=${courseId}`
+        );
         return {
           success: false,
-          error: 'Course is not completed yet'
+          error: "Course is not completed yet",
         };
       }
 
       // 4. Get course and user details
-      console.log(`[Certificate] Fetching course and user details: userId=${userId}, courseId=${courseId}`);
+      console.log(
+        `[Certificate] Fetching course and user details: userId=${userId}, courseId=${courseId}`
+      );
       const course = await this.courseRepository.findById(courseId);
       const user = await this.userRepository.findById(userId);
-      
+
       if (!course || !user) {
-        console.log(`[Certificate] Course or user not found: userId=${userId}, courseId=${courseId}`);
+        console.log(
+          `[Certificate] Course or user not found: userId=${userId}, courseId=${courseId}`
+        );
         return {
           success: false,
-          error: 'Course or user not found'
+          error: "Course or user not found",
         };
       }
 
       // 5. Get completion statistics
-      console.log(`[Certificate] Calculating completion statistics: userId=${userId}, courseId=${courseId}`);
-      const completionStats = await this.getCompletionStatistics(userId, courseId);
+      console.log(
+        `[Certificate] Calculating completion statistics: userId=${userId}, courseId=${courseId}`
+      );
+      const completionStats = await this.getCompletionStatistics(
+        userId,
+        courseId
+      );
 
       // 6. Generate certificate number
       const certificateNumber = this.generateCertificateNumber();
-      console.log(`[Certificate] Generating certificate: certificateNumber=${certificateNumber}`);
+      console.log(
+        `[Certificate] Generating certificate: certificateNumber=${certificateNumber}`
+      );
 
       // 7. Create or update certificate entity
       certificate = Certificate.create({
@@ -109,19 +147,24 @@ export class GenerateCertificateUseCase implements IGenerateCertificateUseCase {
         courseId,
         enrollmentId: enrollment.userId, // This should be the enrollment ID
         certificateNumber,
-        status: CertificateStatus.PENDING
+        status: CertificateStatus.PENDING,
       });
       if (isUpdate && oldCertificateId) {
         // Use the same id as the old certificate
         certificate = new Certificate({
           ...certificate.toJSON(),
           id: oldCertificateId,
-          createdAt: existingCertificate && existingCertificate.createdAt ? new Date(existingCertificate.createdAt) : new Date(),
+          createdAt:
+            existingCertificate && existingCertificate.createdAt
+              ? new Date(existingCertificate.createdAt)
+              : new Date(),
         });
       }
 
       // 8. Generate PDF
-      console.log(`[Certificate] Generating PDF for certificateNumber=${certificateNumber}`);
+      console.log(
+        `[Certificate] Generating PDF for certificateNumber=${certificateNumber}`
+      );
       const pdfData = {
         certificateNumber,
         studentName: user.name,
@@ -131,128 +174,170 @@ export class GenerateCertificateUseCase implements IGenerateCertificateUseCase {
         totalLessons: completionStats.totalLessons,
         completedLessons: completionStats.completedLessons,
         averageScore: completionStats.averageScore,
-        issuedDate: new Date().toLocaleDateString()
+        issuedDate: new Date().toLocaleDateString(),
       };
 
       const pdfBuffer = await this.pdfService.generateCertificatePDF(pdfData);
 
       // 9. Upload PDF to cloud storage
-      console.log(`[Certificate] Uploading PDF to cloud for certificateNumber=${certificateNumber}`);
-      let pdfUrl = '';
+      console.log(
+        `[Certificate] Uploading PDF to cloud for certificateNumber=${certificateNumber}`
+      );
+      let pdfUrl = "";
       try {
         pdfUrl = await this.s3Service.uploadFile(
-          pdfBuffer, 
-          `${certificateNumber}.pdf`, 
-          'application/pdf', 
-          'certificate', 
+          pdfBuffer,
+          `${certificateNumber}.pdf`,
+          "application/pdf",
+          "certificate",
           { courseId, certificateId: certificateNumber }
         );
         console.log(`[Certificate] PDF uploaded successfully: url=${pdfUrl}`);
       } catch (err) {
-        console.error(`[Certificate] PDF upload failed for certificateNumber=${certificateNumber}:`, err);
+        console.error(
+          `[Certificate] PDF upload failed for certificateNumber=${certificateNumber}:`,
+          err
+        );
         return {
           success: false,
-          error: 'Failed to upload certificate PDF to cloud storage'
+          error: "Failed to upload certificate PDF to cloud storage",
         };
       }
 
       // 10. Update certificate with PDF URL and metadata
       certificate.generateCertificate(pdfUrl, {
         completionStats,
-        generatedAt: new Date().toISOString()
+        generatedAt: new Date().toISOString(),
       });
 
       // 11. Save certificate to database (update if exists, create if not)
       let savedCertificate;
       if (isUpdate && oldCertificateId) {
         savedCertificate = await this.certificateRepository.update(certificate);
-        console.log(`[Certificate] Certificate updated in database: certificateNumber=${certificateNumber}`);
+        console.log(
+          `[Certificate] Certificate updated in database: certificateNumber=${certificateNumber}`
+        );
       } else {
         savedCertificate = await this.certificateRepository.create(certificate);
-        console.log(`[Certificate] Certificate generation completed: certificateNumber=${certificateNumber}`);
+        console.log(
+          `[Certificate] Certificate generation completed: certificateNumber=${certificateNumber}`
+        );
       }
 
       return {
         success: true,
-        certificate: savedCertificate
+        certificate: savedCertificate,
       };
-
     } catch (error) {
-      console.error('[Certificate] Error generating certificate:', error);
+      console.error("[Certificate] Error generating certificate:", error);
       return {
         success: false,
-        error: 'Failed to generate certificate'
+        error: "Failed to generate certificate",
       };
     }
   }
 
-  private async checkCourseCompletion(userId: string, courseId: string): Promise<boolean> {
+  private async checkCourseCompletion(
+    userId: string,
+    courseId: string
+  ): Promise<boolean> {
     try {
       // Get all lessons for the course
       const course = await this.courseRepository.findById(courseId);
       if (!course) return false;
 
       // Get all lesson progress for this user and course
-      const enrollment = await this.enrollmentRepository.findByUserAndCourse(userId, courseId);
+      const enrollment = await this.enrollmentRepository.findByUserAndCourse(
+        userId,
+        courseId
+      );
       if (!enrollment) {
         return false;
       }
-      const lessonProgress = await this.lessonProgressRepository.findByEnrollment(enrollment.userId, courseId);
-      
+      const lessonProgress =
+        await this.lessonProgressRepository.findByEnrollment(
+          enrollment.userId,
+          courseId
+        );
+
       if (!lessonProgress || lessonProgress.length === 0) return false;
 
       // Check if all lessons are completed
       const totalLessons = lessonProgress.length;
-      const completedLessons = lessonProgress.filter((progress: LessonProgress) => progress.completed).length;
+      const completedLessons = lessonProgress.filter(
+        (progress: LessonProgress) => progress.completed
+      ).length;
 
       // Consider course completed if 90% or more lessons are completed
       const completionPercentage = (completedLessons / totalLessons) * 100;
       return completionPercentage >= 90;
     } catch (error) {
-      console.error('Error checking course completion:', error);
+      console.error("Error checking course completion:", error);
       return false;
     }
   }
 
-  private async getCompletionStatistics(userId: string, courseId: string): Promise<{
+  private async getCompletionStatistics(
+    userId: string,
+    courseId: string
+  ): Promise<{
     completionDate: string;
     instructorName?: string;
     totalLessons: number;
     completedLessons: number;
     averageScore: number;
   }> {
-    const enrollment = await this.enrollmentRepository.findByUserAndCourse(userId, courseId);
+    const enrollment = await this.enrollmentRepository.findByUserAndCourse(
+      userId,
+      courseId
+    );
     if (!enrollment) {
       return {
-        completionDate: '',
+        completionDate: "",
         totalLessons: 0,
         completedLessons: 0,
-        averageScore: 0
+        averageScore: 0,
       };
     }
-    const lessonProgress = await this.lessonProgressRepository.findByEnrollment(enrollment.userId, courseId);
+    const lessonProgress = await this.lessonProgressRepository.findByEnrollment(
+      enrollment.userId,
+      courseId
+    );
     const course = await this.courseRepository.findById(courseId);
-    
+
     const totalLessons = lessonProgress.length;
-    const completedLessons = lessonProgress.filter((progress: LessonProgress) => progress.completed).length;
-    
+    const completedLessons = lessonProgress.filter(
+      (progress: LessonProgress) => progress.completed
+    ).length;
+
     // Calculate average score
     const scores = lessonProgress
       .filter((progress: LessonProgress) => progress.score !== undefined)
       .map((progress: LessonProgress) => progress.score!);
-    
-    const averageScore = scores.length > 0 
-      ? Math.round(scores.reduce((sum: number, score: number) => sum + score, 0) / scores.length)
-      : 0;
+
+    const averageScore =
+      scores.length > 0
+        ? Math.round(
+            scores.reduce((sum: number, score: number) => sum + score, 0) /
+              scores.length
+          )
+        : 0;
 
     // Get completion date (latest completed lesson date)
     const completedProgress = lessonProgress
-      .filter((progress: LessonProgress) => progress.completed && progress.completedAt)
-      .sort((a: LessonProgress, b: LessonProgress) => new Date(b.completedAt!).getTime() - new Date(a.completedAt!).getTime());
+      .filter(
+        (progress: LessonProgress) => progress.completed && progress.completedAt
+      )
+      .sort(
+        (a: LessonProgress, b: LessonProgress) =>
+          new Date(b.completedAt!).getTime() -
+          new Date(a.completedAt!).getTime()
+      );
 
-    const completionDate = completedProgress.length > 0 
-      ? new Date(completedProgress[0].completedAt!).toLocaleDateString()
-      : new Date().toLocaleDateString();
+    const completionDate =
+      completedProgress.length > 0
+        ? new Date(completedProgress[0].completedAt!).toLocaleDateString()
+        : new Date().toLocaleDateString();
 
     // Get instructor name if available
     let instructorName: string | undefined;
@@ -261,7 +346,7 @@ export class GenerateCertificateUseCase implements IGenerateCertificateUseCase {
         const instructor = await this.userRepository.findById(course.createdBy);
         instructorName = instructor?.name;
       } catch (error) {
-        console.error('Error fetching instructor:', error);
+        console.error("Error fetching instructor:", error);
       }
     }
 
@@ -270,7 +355,7 @@ export class GenerateCertificateUseCase implements IGenerateCertificateUseCase {
       instructorName,
       totalLessons,
       completedLessons,
-      averageScore
+      averageScore,
     };
   }
 
@@ -279,4 +364,4 @@ export class GenerateCertificateUseCase implements IGenerateCertificateUseCase {
     const random = Math.random().toString(36).substring(2, 8);
     return `CERT-${timestamp}-${random}`.toUpperCase();
   }
-} 
+}

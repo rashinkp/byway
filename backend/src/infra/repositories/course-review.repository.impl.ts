@@ -1,5 +1,5 @@
 import { PrismaClient } from "@prisma/client";
-import { CourseReview } from "../../domain/entities/course-review.entity";
+import { CourseReview } from "../../domain/entities/review.entity";
 import {
   QueryCourseReviewDto,
   CourseReviewResponseDto,

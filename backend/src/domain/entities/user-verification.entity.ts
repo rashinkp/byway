@@ -1,4 +1,4 @@
-export interface ICreateUserVerificationDTO {
+export interface UserVerificationDTO {
   id: string;
   userId: string;
   email: string;
@@ -7,18 +7,7 @@ export interface ICreateUserVerificationDTO {
   attempts: number;
   isUsed: boolean;
   createdAt: Date;
-}
-
-interface UserVerificationProps {
-  id: string;
-  userId: string;
-  email: string;
-  otp: string;
-  expiresAt: Date;
-  attempts: number;
-  isUsed: boolean;
-  createdAt: Date;
-  updatedAt?: Date; // Made optional
+  updatedAt?: Date;
 }
 
 export class UserVerification {
@@ -32,7 +21,7 @@ export class UserVerification {
   private _createdAt: Date;
   private _updatedAt?: Date;
 
-  static create(dto: ICreateUserVerificationDTO): UserVerification {
+  static create(dto: UserVerificationDTO): UserVerification {
     // Validate required fields
     if (!dto.id) {
       throw new Error("Verification ID is required");
@@ -62,32 +51,11 @@ export class UserVerification {
       attempts: dto.attempts,
       isUsed: dto.isUsed,
       createdAt: dto.createdAt,
+      updatedAt: dto.updatedAt,
     });
   }
 
-  static fromPrisma(data: {
-    id: string;
-    userId: string;
-    email: string;
-    otp: string;
-    expiresAt: Date;
-    attemptCount: number;
-    isUsed: boolean;
-    createdAt: Date;
-  }): UserVerification {
-    return new UserVerification({
-      id: data.id,
-      userId: data.userId,
-      email: data.email,
-      otp: data.otp,
-      expiresAt: data.expiresAt,
-      attempts: data.attemptCount,
-      isUsed: data.isUsed,
-      createdAt: data.createdAt,
-    });
-  }
-
-  private constructor(props: UserVerificationProps) {
+  private constructor(props: UserVerificationDTO) {
     this._id = props.id;
     this._userId = props.userId;
     this._email = props.email;
@@ -143,9 +111,6 @@ export class UserVerification {
   }
 
   markAsUsed(): void {
-    // if (this._isUsed) {
-    //   throw new Error("OTP is already used");
-    // }
     this._isUsed = true;
     this._updatedAt = new Date();
   }
@@ -170,4 +135,5 @@ export class UserVerification {
     }
     this.markAsUsed();
   }
+
 }

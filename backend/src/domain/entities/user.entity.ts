@@ -1,54 +1,13 @@
+import { Email } from "../value-object/email";
 import { AuthProvider } from "../enum/auth-provider.enum";
 import { Role } from "../enum/role.enum";
-import { Email } from "../value-object/email";
+import { CreateUserParams, UpdateUserParams, UserProps } from "../interfaces/user";
 
-// Interface for User creation DTO
-interface ICreateUserRequestDTO {
-  name: string;
-  email: string;
-  password?: string;
-  googleId?: string;
-  facebookId?: string;
-  role?: Role;
-  authProvider?: AuthProvider;
-  avatar?: string;
-}
-
-// Interface for User update DTO
-export interface IUpdateUserRequestDTO {
-  id: string;
-  name?: string;
-  email?: string;
-  role?: Role;
-  password?: string;
-  googleId?: string;
-  facebookId?: string;
-  avatar?: string;
-  isVerified?: boolean;
-  deletedAt?: Date;
-}
-
-// Interface for User properties
-interface UserInterface {
-  id: string;
-  name: string;
-  email: Email;
-  password?: string;
-  googleId?: string;
-  facebookId?: string;
-  role: Role;
-  authProvider: AuthProvider;
-  isVerified: boolean;
-  avatar?: string;
-  deletedAt?: Date;
-  createdAt: Date;
-  updatedAt: Date;
-}
 
 export class User {
-  private _id: string;
+  private readonly _id: string;
   private _name: string;
-  private _email: Email;
+  private readonly _email: Email;
   private _password?: string;
   private _googleId?: string;
   private _facebookId?: string;
@@ -57,112 +16,106 @@ export class User {
   private _isVerified: boolean;
   private _avatar?: string;
   private _deletedAt?: Date;
-  private _createdAt: Date;
+  private readonly _createdAt: Date;
   private _updatedAt: Date;
 
-  // Static factory method to create a new User
-  static create(dto: ICreateUserRequestDTO): User {
-    const email = new Email(dto.email);
+  private constructor(props: UserProps) {
+    this._id = props.id;
+    this._name = props.name;
+    this._email = props.email;
+    this._password = props.password;
+    this._googleId = props.googleId;
+    this._facebookId = props.facebookId;
+    this._role = props.role;
+    this._authProvider = props.authProvider;
+    this._isVerified = props.isVerified;
+    this._avatar = props.avatar;
+    this._deletedAt = props.deletedAt;
+    this._createdAt = props.createdAt;
+    this._updatedAt = props.updatedAt;
+  }
 
-    // Validate required fields
-    if (!dto.name || dto.name.trim() === "") {
-      throw new Error("Name is required");
-    }
-
-    // Ensure at least one authentication method is provided
-    if (!dto.password && !dto.googleId && !dto.facebookId) {
-      throw new Error("At least one authentication method is required");
-    }
-
-    // Ensure authProvider matches the provided credentials
-    const authProvider = dto.authProvider || AuthProvider.EMAIL_PASSWORD;
-    if (authProvider === AuthProvider.EMAIL_PASSWORD && !dto.password) {
-      throw new Error("Password is required for EMAIL_PASSWORD provider");
-    }
-    if (authProvider === AuthProvider.GOOGLE && !dto.googleId) {
-      throw new Error("Google ID is required for GOOGLE provider");
-    }
-    if (authProvider === AuthProvider.FACEBOOK && !dto.facebookId) {
-      throw new Error("Facebook ID is required for FACEBOOK provider");
-    }
+  // Factory method to create a new User
+  static create(params: CreateUserParams): User {
+    const email = new Email(params.email);
+    User.validateCreationParams(params);
 
     return new User({
       id: crypto.randomUUID(),
-      name: dto.name,
+      name: params.name,
       email,
-      password: dto.password,
-      googleId: dto.googleId,
-      facebookId: dto.facebookId,
-      role: dto.role || Role.USER,
-      authProvider,
+      password: params.password,
+      googleId: params.googleId,
+      facebookId: params.facebookId,
+      role: params.role || Role.USER,
+      authProvider: params.authProvider || AuthProvider.EMAIL_PASSWORD,
       isVerified: false,
-      avatar: dto.avatar,
+      avatar: params.avatar,
       deletedAt: undefined,
       createdAt: new Date(),
       updatedAt: new Date(),
     });
   }
 
-  // Static factory method to update an existing User
-  static update(existingUser: User, dto: IUpdateUserRequestDTO): User {
-    if (existingUser._id !== dto.id) {
-      throw new Error("Cannot update user with mismatched ID");
-    }
-
-    const updatedProps: UserInterface = {
-      ...existingUser.getProps(),
+  // Factory method to update an existing User
+  static update(user: User, params: UpdateUserParams): User {
+    const updatedProps: UserProps = {
+      ...user.getProps(),
       updatedAt: new Date(),
     };
 
-    if (dto.name && dto.name.trim() !== "") {
-      updatedProps.name = dto.name;
+    if (params.name && params.name.trim() !== "") {
+      updatedProps.name = params.name;
     }
 
-    if (dto.email) {
-      updatedProps.email = new Email(dto.email);
+    if (params.email) {
+      updatedProps.email = new Email(params.email);
     }
 
-    if (dto.password) {
-      updatedProps.password = dto.password; // Assume hashing is handled elsewhere
+    if (params.password) {
+      updatedProps.password = params.password;
     }
 
-    if (dto.googleId !== undefined) {
-      updatedProps.googleId = dto.googleId;
-      if (dto.googleId && updatedProps.authProvider !== AuthProvider.GOOGLE) {
+    if (params.googleId !== undefined) {
+      updatedProps.googleId = params.googleId;
+      if (
+        params.googleId &&
+        updatedProps.authProvider !== AuthProvider.GOOGLE
+      ) {
         updatedProps.authProvider = AuthProvider.GOOGLE;
       }
     }
 
-    if (dto.facebookId !== undefined) {
-      updatedProps.facebookId = dto.facebookId;
+    if (params.facebookId !== undefined) {
+      updatedProps.facebookId = params.facebookId;
       if (
-        dto.facebookId &&
+        params.facebookId &&
         updatedProps.authProvider !== AuthProvider.FACEBOOK
       ) {
         updatedProps.authProvider = AuthProvider.FACEBOOK;
       }
     }
 
-    if (dto.avatar !== undefined) {
-      updatedProps.avatar = dto.avatar;
+    if (params.avatar !== undefined) {
+      updatedProps.avatar = params.avatar;
     }
 
-    if (dto.isVerified !== undefined) {
-      updatedProps.isVerified = dto.isVerified;
+    if (params.isVerified !== undefined) {
+      updatedProps.isVerified = params.isVerified;
     }
 
-    if (dto.deletedAt !== undefined) {
-      updatedProps.deletedAt = dto.deletedAt;
+    if (params.deletedAt !== undefined) {
+      updatedProps.deletedAt = params.deletedAt;
     }
 
-    if (dto.role !== undefined) {
-      updatedProps.role = dto.role;
+    if (params.role !== undefined) {
+      updatedProps.role = params.role;
     }
 
     return new User(updatedProps);
   }
 
-  // Static method to create User from Prisma data
+  // Factory method to create User from Prisma data
   static fromPrisma(data: {
     id: string;
     name: string;
@@ -195,21 +148,26 @@ export class User {
     });
   }
 
-  // Constructor is private to force usage of factory methods
-  private constructor(props: UserInterface) {
-    this._id = props.id;
-    this._name = props.name;
-    this._email = props.email;
-    this._password = props.password;
-    this._googleId = props.googleId;
-    this._facebookId = props.facebookId;
-    this._role = props.role;
-    this._authProvider = props.authProvider;
-    this._isVerified = props.isVerified;
-    this._avatar = props.avatar;
-    this._deletedAt = props.deletedAt;
-    this._createdAt = props.createdAt;
-    this._updatedAt = props.updatedAt;
+  // Validation logic for creation
+  private static validateCreationParams(params: CreateUserParams): void {
+    if (!params.name || params.name.trim() === "") {
+      throw new Error("Name is required");
+    }
+
+    if (!params.password && !params.googleId && !params.facebookId) {
+      throw new Error("At least one authentication method is required");
+    }
+
+    const authProvider = params.authProvider || AuthProvider.EMAIL_PASSWORD;
+    if (authProvider === AuthProvider.EMAIL_PASSWORD && !params.password) {
+      throw new Error("Password is required for EMAIL_PASSWORD provider");
+    }
+    if (authProvider === AuthProvider.GOOGLE && !params.googleId) {
+      throw new Error("Google ID is required for GOOGLE provider");
+    }
+    if (authProvider === AuthProvider.FACEBOOK && !params.facebookId) {
+      throw new Error("Facebook ID is required for FACEBOOK provider");
+    }
   }
 
   // Getters
@@ -265,44 +223,37 @@ export class User {
     return this._updatedAt;
   }
 
-  // Method to verify email
-  verifyEmail(): void {
+  // Domain methods
+  verifyEmail(): User {
     if (this._isVerified) {
       throw new Error("User is already verified");
     }
-    this._isVerified = true;
-    this._updatedAt = new Date();
+    return User.update(this, { isVerified: true });
   }
 
-  // Method to change password
-  changePassword(newPassword: string): void {
+  changePassword(newPassword: string): User {
     if (!newPassword || newPassword.trim() === "") {
       throw new Error("Password cannot be empty");
     }
-    this._password = newPassword; // Assume hashing is handled elsewhere
-    this._updatedAt = new Date();
+    return User.update(this, { password: newPassword });
   }
 
-  // Method to soft delete
-  softDelete(): void {
+  softDelete(): User {
     if (this._deletedAt) {
       throw new Error("User is already deleted");
     }
-    this._deletedAt = new Date();
-    this._updatedAt = new Date();
+    return User.update(this, { deletedAt: new Date() });
   }
 
-  // Method to restore a soft-deleted user
-  restore(): void {
+  restore(): User {
     if (!this._deletedAt) {
       throw new Error("User is not deleted");
     }
-    this._deletedAt = undefined;
-    this._updatedAt = new Date();
+    return User.update(this, { deletedAt: undefined });
   }
 
-  // Helper method to get all properties (for internal use)
-  private getProps(): UserInterface {
+  // Private helper to get all properties
+  private getProps(): UserProps {
     return {
       id: this._id,
       name: this._name,

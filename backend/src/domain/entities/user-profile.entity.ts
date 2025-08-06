@@ -1,134 +1,75 @@
-import {
-  ICreateUserProfileRequestDTO,
-  IUpdateUserProfileRequestDTO,
-} from "../../app/dtos/user/user.dto";
-
-interface UserProfileInterface {
+interface UserProfileProps {
   id: string;
   userId: string;
-  bio?: string;
-  education?: string;
-  skills?: string;
-  phoneNumber?: string;
-  country?: string;
-  city?: string;
-  address?: string;
-  dateOfBirth?: Date;
-  gender?: string;
+  bio?: string | null;
+  education?: string | null;
+  skills?: string | null;
+  phoneNumber?: string | null;
+  country?: string | null;
+  city?: string | null;
+  address?: string | null;
+  dateOfBirth?: Date | null;
+  gender?: string | null;
   createdAt: Date;
   updatedAt: Date;
+  deletedAt?: Date | null;
 }
 
 export class UserProfile {
-  private _id: string;
-  private _userId: string;
-  private _bio?: string;
-  private _education?: string;
-  private _skills?: string;
-  private _phoneNumber?: string;
-  private _country?: string;
-  private _city?: string;
-  private _address?: string;
-  private _dateOfBirth?: Date;
-  private _gender?: string;
-  private _createdAt: Date;
+  private readonly _id: string;
+  private readonly _userId: string;
+  private readonly _bio: string | null;
+  private readonly _education: string | null;
+  private readonly _skills: string | null;
+  private readonly _phoneNumber: string | null;
+  private readonly _country: string | null;
+  private readonly _city: string | null;
+  private readonly _address: string | null;
+  private readonly _dateOfBirth: Date | null;
+  private readonly _gender: string | null;
+  private readonly _createdAt: Date;
   private _updatedAt: Date;
+  private _deletedAt: Date | null;
 
-  static create(dto: ICreateUserProfileRequestDTO): UserProfile {
-    if (!dto.userId) {
+  constructor(props: UserProfileProps) {
+    if (!props.userId) {
       throw new Error("User ID is required");
     }
-    return new UserProfile({
-      id: crypto.randomUUID(),
-      userId: dto.userId,
-      bio: dto.bio,
-      education: dto.education,
-      skills: dto.skills,
-      phoneNumber: dto.phoneNumber,
-      country: dto.country,
-      city: dto.city,
-      address: dto.address,
-      dateOfBirth: dto.dateOfBirth,
-      gender: dto.gender,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    });
-  }
 
-  static update(
-    existingProfile: UserProfile,
-    dto: IUpdateUserProfileRequestDTO
-  ): UserProfile {
-    if (existingProfile._id !== dto.id) {
-      throw new Error("Cannot update profile with mismatched ID");
-    }
-
-    const updatedProps: UserProfileInterface = {
-      ...existingProfile.getProps(),
-      updatedAt: new Date(),
-    };
-
-    if (dto.bio !== undefined) updatedProps.bio = dto.bio;
-    if (dto.education !== undefined) updatedProps.education = dto.education;
-    if (dto.skills !== undefined) updatedProps.skills = dto.skills;
-    if (dto.phoneNumber !== undefined)
-      updatedProps.phoneNumber = dto.phoneNumber;
-    if (dto.country !== undefined) updatedProps.country = dto.country;
-    if (dto.city !== undefined) updatedProps.city = dto.city;
-    if (dto.address !== undefined) updatedProps.address = dto.address;
-    if (dto.dateOfBirth !== undefined)
-      updatedProps.dateOfBirth = dto.dateOfBirth;
-    if (dto.gender !== undefined) updatedProps.gender = dto.gender;
-
-    return new UserProfile(updatedProps);
-  }
-
-  static fromPrisma(data: {
-    id: string;
-    userId: string;
-    bio?: string | null;
-    education?: string | null;
-    skills?: string | null;
-    phoneNumber?: string | null;
-    country?: string | null;
-    city?: string | null;
-    address?: string | null;
-    dateOfBirth?: Date | null;
-    gender?: string | null;
-    createdAt: Date;
-    updatedAt: Date;
-  }): UserProfile {
-    return new UserProfile({
-      id: data.id,
-      userId: data.userId,
-      bio: data.bio ?? undefined,
-      education: data.education ?? undefined,
-      skills: data.skills ?? undefined,
-      phoneNumber: data.phoneNumber ?? undefined,
-      country: data.country ?? undefined,
-      city: data.city ?? undefined,
-      address: data.address ?? undefined,
-      dateOfBirth: data.dateOfBirth ?? undefined,
-      gender: data.gender ?? undefined,
-      createdAt: data.createdAt,
-      updatedAt: data.updatedAt,
-    });
-  }
-
-  private constructor(props: UserProfileInterface) {
     this._id = props.id;
     this._userId = props.userId;
-    this._bio = props.bio;
-    this._education = props.education;
-    this._skills = props.skills;
-    this._phoneNumber = props.phoneNumber;
-    this._country = props.country;
-    this._city = props.city;
-    this._address = props.address;
-    this._dateOfBirth = props.dateOfBirth;
-    this._gender = props.gender;
+    this._bio = props.bio ? props.bio.trim() : null;
+    this._education = props.education ? props.education.trim() : null;
+    this._skills = props.skills ? props.skills.trim() : null;
+    this._phoneNumber = props.phoneNumber ? props.phoneNumber.trim() : null;
+    this._country = props.country ? props.country.trim() : null;
+    this._city = props.city ? props.city.trim() : null;
+    this._address = props.address ? props.address.trim() : null;
+    this._dateOfBirth = props.dateOfBirth ?? null;
+    this._gender = props.gender ? props.gender.trim() : null;
     this._createdAt = props.createdAt;
     this._updatedAt = props.updatedAt;
+    this._deletedAt = props.deletedAt ?? null;
+  }
+
+  softDelete(): void {
+    if (this._deletedAt) {
+      throw new Error("User profile is already deleted");
+    }
+    this._deletedAt = new Date();
+    this._updatedAt = new Date();
+  }
+
+  recover(): void {
+    if (!this._deletedAt) {
+      throw new Error("User profile is not deleted");
+    }
+    this._deletedAt = null;
+    this._updatedAt = new Date();
+  }
+
+  isActive(): boolean {
+    return !this._deletedAt;
   }
 
   get id(): string {
@@ -139,39 +80,39 @@ export class UserProfile {
     return this._userId;
   }
 
-  get bio(): string | undefined {
+  get bio(): string | null {
     return this._bio;
   }
 
-  get education(): string | undefined {
+  get education(): string | null {
     return this._education;
   }
 
-  get skills(): string | undefined {
+  get skills(): string | null {
     return this._skills;
   }
 
-  get phoneNumber(): string | undefined {
+  get phoneNumber(): string | null {
     return this._phoneNumber;
   }
 
-  get country(): string | undefined {
+  get country(): string | null {
     return this._country;
   }
 
-  get city(): string | undefined {
+  get city(): string | null {
     return this._city;
   }
 
-  get address(): string | undefined {
+  get address(): string | null {
     return this._address;
   }
 
-  get dateOfBirth(): Date | undefined {
+  get dateOfBirth(): Date | null {
     return this._dateOfBirth;
   }
 
-  get gender(): string | undefined {
+  get gender(): string | null {
     return this._gender;
   }
 
@@ -183,21 +124,7 @@ export class UserProfile {
     return this._updatedAt;
   }
 
-  private getProps(): UserProfileInterface {
-    return {
-      id: this._id,
-      userId: this._userId,
-      bio: this._bio,
-      education: this._education,
-      skills: this._skills,
-      phoneNumber: this._phoneNumber,
-      country: this._country,
-      city: this._city,
-      address: this._address,
-      dateOfBirth: this._dateOfBirth,
-      gender: this._gender,
-      createdAt: this._createdAt,
-      updatedAt: this._updatedAt,
-    };
+  get deletedAt(): Date | null {
+    return this._deletedAt;
   }
 }

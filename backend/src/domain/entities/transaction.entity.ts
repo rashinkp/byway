@@ -2,82 +2,136 @@ import { PaymentGateway } from "../enum/payment-gateway.enum";
 import { TransactionStatus } from "../enum/transaction-status.enum";
 import { TransactionType } from "../enum/transaction-type.enum";
 
+interface TransactionProps {
+  id: string;
+  orderId?: string | null;
+  userId: string;
+  amount: number;
+  type: TransactionType;
+  status: TransactionStatus;
+  paymentGateway: PaymentGateway;
+  paymentMethod?: string | null;
+  paymentDetails?: Record<string, any> | null;
+  courseId?: string | null;
+  transactionId?: string | null;
+  metadata?: Record<string, any> | null;
+  walletId?: string | null;
+  description?: string | null;
+  createdAt: Date;
+  updatedAt: Date;
+  deletedAt?: Date | null;
+}
+
 export class Transaction {
   private readonly _id: string;
-  private readonly _orderId?: string;
+  private readonly _orderId: string | null;
   private readonly _userId: string;
   private readonly _amount: number;
   private readonly _type: TransactionType;
-  private readonly _status: TransactionStatus;
+  private _status: TransactionStatus;
   private readonly _paymentGateway: PaymentGateway;
-  private readonly _paymentMethod?: string;
-  private readonly _paymentDetails?: Record<string, any>;
-  private readonly _courseId?: string;
-  private readonly _transactionId?: string;
-  private readonly _metadata?: Record<string, any>;
+  private readonly _paymentMethod: string | null;
+  private readonly _paymentDetails: Record<string, any> | null;
+  private readonly _courseId: string | null;
+  private readonly _transactionId: string | null;
+  private readonly _metadata: Record<string, any> | null;
+  private readonly _walletId: string | null;
+  private readonly _description: string | null;
   private readonly _createdAt: Date;
-  private readonly _updatedAt: Date;
-  private readonly _walletId?: string;
-  private readonly _description?: string;
+  private _updatedAt: Date;
+  private _deletedAt: Date | null;
 
-  constructor(params: {
-    id?: string;
-    orderId?: string;
-    userId: string;
-    walletId?: string;
-    courseId?: string;
-    amount: number;
-    type: TransactionType;
-    status: TransactionStatus;
-    paymentGateway: PaymentGateway;
-    paymentMethod?: string;
-    paymentDetails?: Record<string, any>;
-    transactionId?: string;
-    metadata?: Record<string, any>;
-    createdAt?: Date;
-    updatedAt?: Date;
-    description?: string;
-  }) {
-    console.log("Creating Transaction entity with params:", {
-      orderId: params.orderId,
-      userId: params.userId,
-      amount: params.amount,
-      type: params.type,
-      status: params.status,
-      paymentGateway: params.paymentGateway,
-      transactionId: params.transactionId,
-    });
+  constructor(props: TransactionProps) {
+    if (!props.userId) {
+      throw new Error("User ID is required");
+    }
+    if (props.amount < 0) {
+      throw new Error("Amount cannot be negative");
+    }
 
-    this._id = params.id || crypto.randomUUID();
-    this._orderId = params.orderId;
-    this._userId = params.userId;
-    this._amount = params.amount;
-    this._type = params.type;
-    this._status = params.status;
-    this._paymentGateway = params.paymentGateway;
-    this._paymentMethod = params.paymentMethod;
-    this._paymentDetails = params.paymentDetails;
-    this._courseId = params.courseId;
-    this._transactionId = params.transactionId;
-    this._metadata = params.metadata;
-    this._walletId = params.walletId;
-    this._createdAt = params.createdAt || new Date();
-    this._updatedAt = params.updatedAt || new Date();
-    this._description = params.description;
+    this._id = props.id;
+    this._orderId = props.orderId ?? null;
+    this._userId = props.userId;
+    this._amount = props.amount;
+    this._type = props.type;
+    this._status = props.status;
+    this._paymentGateway = props.paymentGateway;
+    this._paymentMethod = props.paymentMethod ?? null;
+    this._paymentDetails = props.paymentDetails ?? null;
+    this._courseId = props.courseId ?? null;
+    this._transactionId = props.transactionId ?? null;
+    this._metadata = props.metadata ?? null;
+    this._walletId = props.walletId ?? null;
+    this._description = props.description ? props.description.trim() : null;
+    this._createdAt = props.createdAt;
+    this._updatedAt = props.updatedAt;
+    this._deletedAt = props.deletedAt ?? null;
+  }
 
-    console.log("Transaction entity created:", {
-      id: this._id,
-      orderId: this._orderId,
-      amount: this._amount,
-      status: this._status,
-    });
+  setStatus(status: TransactionStatus): void {
+    if (this._deletedAt) {
+      throw new Error("Cannot change status of a deleted transaction");
+    }
+    if (this._status === status) {
+      throw new Error(`Transaction is already ${status}`);
+    }
+    this._status = status;
+    this._updatedAt = new Date();
+  }
+
+  softDelete(): void {
+    if (this._deletedAt) {
+      throw new Error("Transaction is already deleted");
+    }
+    this._deletedAt = new Date();
+    this._updatedAt = new Date();
+  }
+
+  recover(): void {
+    if (!this._deletedAt) {
+      throw new Error("Transaction is not deleted");
+    }
+    this._deletedAt = null;
+    this._updatedAt = new Date();
+  }
+
+  isActive(): boolean {
+    return !this._deletedAt;
+  }
+
+  isCompleted(): boolean {
+    return this._status === TransactionStatus.COMPLETED && !this._deletedAt;
+  }
+
+  isPending(): boolean {
+    return this._status === TransactionStatus.PENDING && !this._deletedAt;
+  }
+
+  isFailed(): boolean {
+    return this._status === TransactionStatus.FAILED && !this._deletedAt;
+  }
+
+  isRefunded(): boolean {
+    return this._status === TransactionStatus.REFUNDED && !this._deletedAt;
+  }
+
+  isCancelled(): boolean {
+    return this._status === TransactionStatus.CANCELLED && !this._deletedAt;
+  }
+
+  isPayment(): boolean {
+    return this._type === TransactionType.PURCHASE;
+  }
+
+  isRefund(): boolean {
+    return this._type === TransactionType.REFUND;
   }
 
   get id(): string {
     return this._id;
   }
 
-  get orderId(): string | undefined {
+  get orderId(): string | null {
     return this._orderId;
   }
 
@@ -101,24 +155,32 @@ export class Transaction {
     return this._paymentGateway;
   }
 
-  get paymentMethod(): string | undefined {
+  get paymentMethod(): string | null {
     return this._paymentMethod;
   }
 
-  get paymentDetails(): Record<string, any> | undefined {
+  get paymentDetails(): Record<string, any> | null {
     return this._paymentDetails;
   }
 
-  get courseId(): string | undefined {
+  get courseId(): string | null {
     return this._courseId;
   }
 
-  get transactionId(): string | undefined {
+  get transactionId(): string | null {
     return this._transactionId;
   }
 
-  get metadata(): Record<string, any> | undefined {
+  get metadata(): Record<string, any> | null {
     return this._metadata;
+  }
+
+  get walletId(): string | null {
+    return this._walletId;
+  }
+
+  get description(): string | null {
+    return this._description;
   }
 
   get createdAt(): Date {
@@ -129,71 +191,7 @@ export class Transaction {
     return this._updatedAt;
   }
 
-  get isCompleted(): boolean {
-    return this._status === TransactionStatus.COMPLETED;
-  }
-
-  get isPending(): boolean {
-    return this._status === TransactionStatus.PENDING;
-  }
-
-  get isFailed(): boolean {
-    return this._status === TransactionStatus.FAILED;
-  }
-
-  get isRefunded(): boolean {
-    return this._status === TransactionStatus.REFUNDED;
-  }
-
-  get isCancelled(): boolean {
-    return this._status === TransactionStatus.CANCELLED;
-  }
-
-  get isPayment(): boolean {
-    return this._type === TransactionType.PURCHASE;
-  }
-
-  get isRefund(): boolean {
-    return this._type === TransactionType.REFUND;
-  }
-
-  get walletId(): string | undefined {
-    return this._walletId;
-  }
-
-  get description(): string | undefined {
-    return this._description;
-  }
-
-  static create(data: {
-    id?: string;
-    orderId?: string;
-    userId: string;
-    walletId?: string;
-    courseId?: string;
-    amount: number;
-    type: TransactionType;
-    status: TransactionStatus;
-    paymentGateway: PaymentGateway;
-    transactionId?: string;
-    createdAt?: Date;
-    updatedAt?: Date;
-    description?: string;
-  }): Transaction {
-    return new Transaction({
-      id: data.id,
-      orderId: data.orderId,
-      userId: data.userId,
-      walletId: data.walletId,
-      courseId: data.courseId,
-      amount: data.amount,
-      type: data.type,
-      status: data.status,
-      paymentGateway: data.paymentGateway,
-      transactionId: data.transactionId,
-      createdAt: data.createdAt,
-      updatedAt: data.updatedAt,
-      description: data.description
-    });
+  get deletedAt(): Date | null {
+    return this._deletedAt;
   }
 }
