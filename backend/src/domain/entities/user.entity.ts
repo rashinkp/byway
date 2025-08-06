@@ -115,39 +115,6 @@ export class User {
     return new User(updatedProps);
   }
 
-  // Factory method to create User from Prisma data
-  static fromPrisma(data: {
-    id: string;
-    name: string;
-    email: string;
-    password?: string | null;
-    googleId?: string | null;
-    facebookId?: string | null;
-    role: string;
-    authProvider: string;
-    isVerified: boolean;
-    avatar?: string | null;
-    deletedAt?: Date | null;
-    createdAt: Date;
-    updatedAt: Date;
-  }): User {
-    return new User({
-      id: data.id,
-      name: data.name,
-      email: new Email(data.email),
-      password: data.password ?? undefined,
-      googleId: data.googleId ?? undefined,
-      facebookId: data.facebookId ?? undefined,
-      role: data.role as Role,
-      authProvider: data.authProvider as AuthProvider,
-      isVerified: data.isVerified,
-      avatar: data.avatar ?? undefined,
-      deletedAt: data.deletedAt ?? undefined,
-      createdAt: data.createdAt,
-      updatedAt: data.updatedAt,
-    });
-  }
-
   // Validation logic for creation
   private static validateCreationParams(params: CreateUserParams): void {
     if (!params.name || params.name.trim() === "") {
