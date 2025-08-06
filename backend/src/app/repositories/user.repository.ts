@@ -1,3 +1,5 @@
+import { User } from "../../domain/entities/user.entity";
+import { UserProfile } from "../../domain/entities/user-profile.entity";
 import { UserRecord } from "../records/user.record";
 import { UserProfileRecord } from "../records/user-profile.record";
 
@@ -14,10 +16,10 @@ export interface IUserRepository {
   }): Promise<{ items: UserRecord[]; total: number; totalPages: number }>;
   
   findById(id: string): Promise<UserRecord | null>;
-  updateUser(userRecord: UserRecord): Promise<UserRecord>;
-  updateProfile(profile: UserProfileRecord): Promise<UserProfileRecord>;
+  updateUser(user: User): Promise<UserRecord>;
+  updateProfile(profile: UserProfile): Promise<UserProfileRecord>;
   findProfileByUserId(userId: string): Promise<UserProfileRecord | null>;
-  createProfile(profile: UserProfileRecord): Promise<UserProfileRecord>;
+  createProfile(profile: UserProfile): Promise<UserProfileRecord>;
 
   // User stats methods
   getUserStats(): Promise<{

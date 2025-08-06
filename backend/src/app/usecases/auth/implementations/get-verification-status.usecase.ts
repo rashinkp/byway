@@ -1,5 +1,6 @@
-import { IAuthRepository } from "../../repositories/auth.repository";
-import { IGetVerificationStatusUseCase } from "./interfaces/get-verification-status.usecase.interface";
+import { IAuthRepository } from "../../../repositories/auth.repository";
+import { UserVerificationMapper } from "../../../mappers/user-verification.mapper";
+import { IGetVerificationStatusUseCase } from "../interfaces/get-verification-status.usecase.interface";
 
 export class GetVerificationStatusUseCase implements IGetVerificationStatusUseCase {
   constructor(private authRepository: IAuthRepository) {}
@@ -8,14 +9,16 @@ export class GetVerificationStatusUseCase implements IGetVerificationStatusUseCa
     cooldownTime: number;
     isExpired: boolean;
   }> {
-    const verification = await this.authRepository.findVerificationByEmail(email);
+    const verificationRecord = await this.authRepository.findVerificationByEmail(email);
     
-    if (!verification) {
+    if (!verificationRecord) {
       return {
         cooldownTime: 0,
         isExpired: true
       };
     }
+
+    const verification = UserVerificationMapper.toDomain(verificationRecord);
 
     const now = new Date();
     const lastUpdateTime = verification.updatedAt || verification.createdAt;

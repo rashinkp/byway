@@ -6,6 +6,8 @@ export interface LoginRequestDto {
   email: string;
   password?: string;
   authProvider?: "EMAIL" | "GOOGLE" | "FACEBOOK";
+  googleId?: string;
+  facebookId?: string;
 }
 
 export interface RegisterRequestDto {
@@ -25,6 +27,7 @@ export interface FacebookAuthRequestDto {
   userId: string;
   name: string;
   email: string;
+  picture?: string; // Optional, can be used for avatar
 }
 
 export interface ForgotPasswordRequestDto {
@@ -40,6 +43,7 @@ export interface ResetPasswordRequestDto {
 export interface VerifyOtpRequestDto {
   email: string;
   otp: string;
+  type:'signup' | 'password-reset'; // Type of verification
 }
 
 export interface ResendOtpRequestDto {
@@ -91,4 +95,4 @@ export interface ResendOtpResponseDto {
 
 export interface LogoutResponseDto {
   message: string;
-} 
+}

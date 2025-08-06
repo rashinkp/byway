@@ -1,5 +1,9 @@
+import { User } from "../../domain/entities/user.entity";
 import { UserRecord } from "../records/user.record";
 import { UserProfileRecord } from "../records/user-profile.record";
+import { Email } from "../../domain/value-object/email";
+import { Role } from "../../domain/enum/role.enum";
+import { AuthProvider } from "../../domain/enum/auth-provider.enum";
 import {
   CreateUserProfileRequestDto,
   UpdateUserProfileRequestDto,
@@ -12,6 +16,44 @@ import {
 } from "../dtos/user.dto";
 
 export class UserMapper {
+  // Record to Domain Entity
+  static toDomain(record: UserRecord): User {
+    return new User({
+      id: record.id,
+      name: record.name,
+      email: new Email(record.email),
+      password: record.password || undefined,
+      googleId: record.googleId || undefined,
+      facebookId: record.facebookId || undefined,
+      role: record.role as Role,
+      authProvider: record.authProvider as AuthProvider,
+      isVerified: record.isVerified,
+      avatar: record.avatar || undefined,
+      deletedAt: record.deletedAt || undefined,
+      createdAt: record.createdAt,
+      updatedAt: record.updatedAt,
+    });
+  }
+
+  // Domain Entity to Record
+  static toRecord(user: User): UserRecord {
+    return {
+      id: user.id,
+      name: user.name,
+      email: user.email.address,
+      password: user.password || null,
+      googleId: user.googleId || null,
+      facebookId: user.facebookId || null,
+      role: user.role,
+      authProvider: user.authProvider,
+      isVerified: user.isVerified,
+      avatar: user.avatar || null,
+      deletedAt: user.deletedAt || null,
+      createdAt: user.createdAt,
+      updatedAt: user.updatedAt,
+    };
+  }
+
   // Record to Response DTOs
   static toUserResponseDto(userRecord: UserRecord): UserResponseDto {
     return {

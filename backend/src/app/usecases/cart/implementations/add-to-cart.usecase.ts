@@ -1,9 +1,9 @@
 import { Cart } from "../../../../domain/entities/cart.entity";
 import { ICartRepository } from "../../../repositories/cart.repository";
 import { IEnrollmentRepository } from "../../../repositories/enrollment.repository.interface";
-import { AddToCartDto } from "../../../dtos/cart/cart.dto";
 import { IAddToCartUseCase } from "../interfaces/add-to-cart.usecase.interface";
 import { HttpError } from "../../../../presentation/http/errors/http-error";
+import { AddToCartRequestDto } from "@/app/dtos/cart.dto";
 
 export class AddToCartUseCase implements IAddToCartUseCase {
   constructor(
@@ -11,7 +11,7 @@ export class AddToCartUseCase implements IAddToCartUseCase {
     private enrollmentRepository: IEnrollmentRepository
   ) {}
 
-  async execute(userId: string, data: AddToCartDto): Promise<Cart> {
+  async execute(userId: string, data: AddToCartRequestDto): Promise<Cart> {
     // Restrict cart size
     const cartCount = await this.cartRepository.countByUserId(userId);
     const MAX_CART_ITEMS = 5;
@@ -43,7 +43,6 @@ export class AddToCartUseCase implements IAddToCartUseCase {
       throw new HttpError("You are already enrolled in this course", 400);
     }
 
-    // Create new cart item
     const cart = Cart.create({
       userId,
       courseId: data.courseId,
