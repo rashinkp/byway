@@ -1,18 +1,6 @@
+
 import { ContentStatus, ContentType } from "../enum/content.enum";
 import { FileUrl } from "../value-object/file-url";
-
-export interface QuizQuestion {
-  id: string;
-  questionText: string;
-  questionType: "MULTIPLE_CHOICE" | "TRUE_FALSE" | "SHORT_ANSWER";
-  options?: string[] | null; // For multiple-choice or true/false questions
-  correctAnswer: string | string[] | boolean; // Supports single answer, multiple answers, or true/false
-  explanation?: string | null; // Optional explanation for the correct answer
-  createdAt: Date;
-  updatedAt: Date;
-  deletedAt?: Date | null; // For soft delete support
-}
-
 
 export interface LessonContentProps {
   id: string;
@@ -27,4 +15,14 @@ export interface LessonContentProps {
   createdAt: Date;
   updatedAt: Date;
   deletedAt?: Date | null;
+}
+
+export interface QuizQuestion {
+  id: string;
+  lessonContentId: string;
+  question: string;
+  options: string[];
+  correctAnswer: string;
+  createdAt: Date;
+  updatedAt: Date;
 }

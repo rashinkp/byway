@@ -3,7 +3,7 @@ import { ICreateTransactionUseCase } from "../interfaces/create-transaction.usec
 import {
   ICreateTransactionInputDTO,
   ITransactionOutputDTO,
-} from "../../../dtos/transaction/transaction.dto";
+} from "../../../dtos/transaction.dto";
 import { Transaction } from "../../../../domain/entities/transaction.entity";
 import { TransactionType } from "../../../../domain/enum/transaction-type.enum";
 import { TransactionStatus } from "../../../../domain/enum/transaction-status.enum";

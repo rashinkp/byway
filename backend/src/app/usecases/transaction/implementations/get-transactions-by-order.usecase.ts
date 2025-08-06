@@ -3,7 +3,7 @@ import { IGetTransactionsByOrderUseCase } from "../interfaces/get-transactions-b
 import {
   IGetTransactionsByOrderInputDTO,
   ITransactionOutputDTO,
-} from "../../../dtos/transaction/transaction.dto";
+} from "../../../dtos/transaction.dto";
 
 export class GetTransactionsByOrderUseCase
   implements IGetTransactionsByOrderUseCase

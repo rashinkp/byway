@@ -1,6 +1,6 @@
 import { CreateOrderDto } from "../../../dtos/order/create-order.dto";
 import { Order } from "../../../../domain/entities/order.entity";
-import { ITransactionOutputDTO } from "../../../dtos/transaction/transaction.dto";
+import { ITransactionOutputDTO } from "../../../dtos/transaction.dto";
 
 export interface CreateOrderResponse {
   order: Order;

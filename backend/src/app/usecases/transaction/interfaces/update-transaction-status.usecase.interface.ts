@@ -1,7 +1,7 @@
 import {
   ITransactionOutputDTO,
   IUpdateTransactionStatusInputDTO,
-} from "../../../dtos/transaction/transaction.dto";
+} from "../../../dtos/transaction.dto";
 
 export interface IUpdateTransactionStatusUseCase {
   execute(

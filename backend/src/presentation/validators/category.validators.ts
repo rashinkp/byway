@@ -4,7 +4,7 @@ import {
   IUpdateCategoryInputDTO,
   IGetAllCategoriesInputDTO,
   ICategoryIdInputDTO,
-} from "../../app/dtos/category/category.dto";
+} from "../../app/dtos/category.dto";
 
 interface ValidationSchema {
   body?: z.ZodSchema;

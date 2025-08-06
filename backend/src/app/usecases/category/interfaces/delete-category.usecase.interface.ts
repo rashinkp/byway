@@ -1,7 +1,7 @@
 import {
   ICategoryIdInputDTO,
   ICategoryOutputDTO,
-} from "../../../dtos/category/category.dto";
+} from "../../../dtos/category.dto";
 
 export interface IDeleteCategoryUseCase {
   execute(input: ICategoryIdInputDTO): Promise<ICategoryOutputDTO>;

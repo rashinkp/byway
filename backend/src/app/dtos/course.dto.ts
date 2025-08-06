@@ -1,11 +1,11 @@
-import { CourseDetails } from "../../../domain/entities/course.entity";
-import { APPROVALSTATUS } from "../../../domain/enum/approval-status.enum";
-import { CourseLevel } from "../../../domain/enum/course-level.enum";
-import { CourseStatus } from "../../../domain/enum/course-status.enum";
-import { Duration } from "../../../domain/value-object/duration";
-import { Offer } from "../../../domain/value-object/offer";
-import { Price } from "../../../domain/value-object/price";
-import { RatingLevel } from "../../../domain/enum/rating-level.enum";
+import { CourseDetails } from "../../domain/entities/course.entity";
+import { APPROVALSTATUS } from "../../domain/enum/approval-status.enum";
+import { CourseLevel } from "../../domain/enum/course-level.enum";
+import { CourseStatus } from "../../domain/enum/course-status.enum";
+import { Duration } from "../../domain/value-object/duration";
+import { Offer } from "../../domain/value-object/offer";
+import { Price } from "../../domain/value-object/price";
+import { RatingLevel } from "../../domain/enum/rating-level.enum";
 
 // Review stats interface for course listing (simplified)
 export interface ICourseReviewStats {

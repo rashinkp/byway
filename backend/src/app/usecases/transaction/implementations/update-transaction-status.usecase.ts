@@ -3,7 +3,7 @@ import { IUpdateTransactionStatusUseCase } from "../interfaces/update-transactio
 import {
   ITransactionOutputDTO,
   IUpdateTransactionStatusInputDTO,
-} from "../../../dtos/transaction/transaction.dto";
+} from "../../../dtos/transaction.dto";
 
 export class UpdateTransactionStatusUseCase
   implements IUpdateTransactionStatusUseCase

@@ -1,7 +1,7 @@
 import { Cart } from "../../../../domain/entities/cart.entity";
 import { ICartRepository } from "../../../repositories/cart.repository";
 import { IEnrollmentRepository } from "../../../repositories/enrollment.repository.interface";
-import { AddToCartDto } from "../../../dtos/cart/cart.dto";
+import { AddToCartDto } from "../../../dtos/cart.dto";
 import { IAddToCartUseCase } from "../interfaces/add-to-cart.usecase.interface";
 import { HttpError } from "../../../../presentation/http/errors/http-error";
 

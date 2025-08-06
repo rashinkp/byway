@@ -1,7 +1,7 @@
 import {
   ICreateTransactionInputDTO,
   ITransactionOutputDTO,
-} from "../../../dtos/transaction/transaction.dto";
+} from "../../../dtos/transaction.dto";
 
 export interface ICreateTransactionUseCase {
   execute(input: ICreateTransactionInputDTO): Promise<ITransactionOutputDTO>;

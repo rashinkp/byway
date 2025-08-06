@@ -1,7 +1,7 @@
 import { PrismaClient, Gender, Role } from "@prisma/client";
 import { User } from "../../domain/entities/user.entity";
 import { UserProfile } from "../../domain/entities/user-profile.entity";
-import { GetAllUsersDto } from "../../app/dtos/user/user.dto";
+import { GetAllUsersDto } from "../../app/dtos/user.dto";
 import {
   IPaginatedResponse,
   IUserRepository,

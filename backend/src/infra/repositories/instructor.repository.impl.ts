@@ -3,7 +3,7 @@ import { Instructor } from "../../domain/entities/instructor.entity";
 import { APPROVALSTATUS } from "../../domain/enum/approval-status.enum";
 import { IInstructorRepository } from "../../app/repositories/instructor.repository";
 import { IGetTopInstructorsInput } from "@/app/usecases/user/interfaces/get-top-instructors.usecase.interface";
-import { ITopInstructor } from "@/app/dtos/admin/admin-dashboard.dto";
+import { ITopInstructor } from "@/app/dtos/admin-dashboard.dto";
 
 export class PrismaInstructorRepository implements IInstructorRepository {
   constructor(private prisma: PrismaClient) {}

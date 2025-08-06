@@ -3,16 +3,14 @@ import { IGetTransactionsByUserUseCase } from "../interfaces/get-transactions-by
 import {
   IGetTransactionsByUserInputDTO,
   ITransactionOutputDTO,
-} from "../../../dtos/transaction/transaction.dto";
+} from "../../../dtos/transaction.dto";
 
 export class GetTransactionsByUserUseCase
   implements IGetTransactionsByUserUseCase
 {
   constructor(private readonly transactionRepository: ITransactionRepository) {}
 
-  async execute(
-    input: IGetTransactionsByUserInputDTO
-  ): Promise<{
+  async execute(input: IGetTransactionsByUserInputDTO): Promise<{
     items: ITransactionOutputDTO[];
     total: number;
     page: number;

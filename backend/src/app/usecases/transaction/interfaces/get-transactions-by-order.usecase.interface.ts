@@ -1,7 +1,7 @@
 import {
   IGetTransactionsByOrderInputDTO,
   ITransactionOutputDTO,
-} from "../../../dtos/transaction/transaction.dto";
+} from "../../../dtos/transaction.dto";
 
 export interface IGetTransactionsByOrderUseCase {
   execute(

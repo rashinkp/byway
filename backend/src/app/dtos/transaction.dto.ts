@@ -1,6 +1,7 @@
-import { PaymentGateway } from "../../../domain/enum/payment-gateway.enum";
-import { TransactionStatus } from "../../../domain/enum/transaction-status.enum";
-import { TransactionType } from "../../../domain/enum/transaction-type.enum";
+import { TransactionStatus } from "@/domain/enum/transaction-status.enum";
+import { TransactionType } from "@/domain/enum/transaction-type.enum";
+import { PaymentGateway } from "../providers/payment-gateway.interface";
+
 
 export interface ICreateTransactionInputDTO {
   orderId?: string;
@@ -29,8 +30,8 @@ export interface ITransactionOutputDTO {
   courseId?: string;
   transactionId?: string;
   metadata?: Record<string, any>;
-  createdAt: Date;
-  updatedAt: Date;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface IUpdateTransactionStatusInputDTO {

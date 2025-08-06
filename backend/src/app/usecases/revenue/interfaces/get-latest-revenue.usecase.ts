@@ -1,7 +1,7 @@
 import {
   GetLatestRevenueParams,
   GetLatestRevenueResult,
-} from "../../../dtos/revenue/get-latest-revenue.dto";
+} from "../../../dtos/get-latest-revenue.dto";
 
 export interface CourseRevenueItem {
   orderId: string;

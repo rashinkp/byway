@@ -1,4 +1,4 @@
-import { IGetAllCategoriesInputDTO } from "../dtos/category/category.dto";
+import { IGetAllCategoriesInputDTO } from "../dtos/category.dto";
 import { Category } from "../../domain/entities/category.entity";
 
 export interface ICategoryRepository {

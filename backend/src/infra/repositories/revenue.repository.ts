@@ -5,7 +5,7 @@ import { IRevenueRepository } from "@/app/repositories/revenue.repository";
 import {
   GetLatestRevenueParams,
   GetLatestRevenueResult,
-} from "@/app/dtos/revenue/get-latest-revenue.dto";
+} from "@/app/dtos/get-latest-revenue.dto";
 
 export class PrismaRevenueRepository implements IRevenueRepository {
   constructor(private readonly prisma: PrismaClient) {}

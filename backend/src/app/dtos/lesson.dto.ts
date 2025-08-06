@@ -1,6 +1,9 @@
-import { QuizQuestion } from "../../../domain/entities/content.entity";
-import { ContentStatus, ContentType } from "../../../domain/enum/content.enum";
-import { LessonStatus } from "../../../domain/enum/lesson.enum";
+import { ContentStatus, ContentType } from "@/domain/enum/content.enum";
+import { LessonStatus } from "@/domain/enum/lesson.enum";
+import { QuizQuestion } from "@/domain/interfaces/content";
+
+
+
 
 export interface ILessonOutputDTO {
   id: string;

@@ -1,5 +1,5 @@
 import { IPaymentService } from "../interfaces/payment.service.interface";
-import { CreateCheckoutSessionDto } from "../../../dtos/stripe/create-checkout-session.dto";
+import { CreateCheckoutSessionDto } from "../../../dtos/stripe.dto";
 import { HttpError } from "../../../../presentation/http/errors/http-error";
 import { StatusCodes } from "http-status-codes";
 import { TransactionType } from "../../../../domain/enum/transaction-type.enum";

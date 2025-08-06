@@ -1,6 +1,6 @@
 import { ContentStatus, ContentType } from "../enum/content.enum";
-import { FileUrl } from "../value-object/file-url";
 import { LessonContentProps, QuizQuestion } from "../interfaces/content";
+import { FileUrl } from "../value-object/file-url";
 
 export class LessonContent {
   private readonly _id: string;

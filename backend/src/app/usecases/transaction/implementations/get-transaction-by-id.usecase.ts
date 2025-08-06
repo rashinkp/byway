@@ -1,6 +1,6 @@
 import { ITransactionRepository } from "../../../repositories/transaction.repository";
 import { IGetTransactionByIdUseCase } from "../interfaces/get-transaction-by-id.usecase.interface";
-import { ITransactionOutputDTO } from "../../../dtos/transaction/transaction.dto";
+import { ITransactionOutputDTO } from "../../../dtos/transaction.dto";
 
 export class GetTransactionByIdUseCase implements IGetTransactionByIdUseCase {
   constructor(private readonly transactionRepository: ITransactionRepository) {}

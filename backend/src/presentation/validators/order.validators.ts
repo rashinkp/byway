@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { GetAllOrdersDtoSchema } from "../../app/dtos/order/order.dto";
+import { GetAllOrdersDtoSchema } from "../../app/dtos/order.dto";
 
 export const getAllOrdersSchema = z.object({
   userId: z.string().min(1, "User ID is required"),

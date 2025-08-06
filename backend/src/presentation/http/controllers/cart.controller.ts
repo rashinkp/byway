@@ -9,7 +9,7 @@ import {
   validateAddToCart,
   validateGetCart,
   validateApplyCoupon,
-} from "../../../app/dtos/cart/cart.dto";
+} from "../../../app/dtos/cart.dto";
 import { HttpError } from "../errors/http-error";
 import { BaseController } from "./base.controller";
 import { IHttpErrors } from "../interfaces/http-errors.interface";

@@ -1,12 +1,10 @@
 import {
   IGetTransactionsByUserInputDTO,
   ITransactionOutputDTO,
-} from "../../../dtos/transaction/transaction.dto";
+} from "../../../dtos/transaction.dto";
 
 export interface IGetTransactionsByUserUseCase {
-  execute(
-    input: IGetTransactionsByUserInputDTO
-  ): Promise<{
+  execute(input: IGetTransactionsByUserInputDTO): Promise<{
     items: ITransactionOutputDTO[];
     total: number;
     page: number;

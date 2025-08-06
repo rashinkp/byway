@@ -4,7 +4,7 @@ import { IGetCategoryByIdUseCase } from "../interfaces/get-cateogry-by-Id.usecas
 import {
   ICategoryIdInputDTO,
   ICategoryOutputDTO,
-} from "../../../dtos/category/category.dto";
+} from "../../../dtos/category.dto";
 
 export class GetCategoryByIdUseCase implements IGetCategoryByIdUseCase {
   constructor(private categoryRepository: ICategoryRepository) {}

@@ -1,5 +1,5 @@
 import { Order } from "../../domain/entities/order.entity";
-import { GetAllOrdersDto } from "../dtos/order/order.dto";
+import { GetAllOrdersDto } from "../dtos/order.dto";
 import { PaymentGateway } from "../../domain/enum/payment-gateway.enum";
 import { Course } from "../../domain/entities/course.entity";
 import { OrderStatus } from "../../domain/enum/order-status.enum";
