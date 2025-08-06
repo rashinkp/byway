@@ -9,6 +9,7 @@ import { motion } from "framer-motion";
 import { CourseCard } from "@/components/course/CourseCard";
 import Link from "next/link";
 import { BookOpen } from "lucide-react";
+import { LoadingSpinner } from "../admin";
 
 export default function MyCoursesSection() {
 	const itemsPerPage = 8;
@@ -70,6 +71,13 @@ export default function MyCoursesSection() {
 				</Link>
 			</div>
 		);
+	}
+
+
+	if (isLoading) {
+		return (
+			<LoadingSpinner />
+		)
 	}
 
 	// Animation variants for staggered appearance (from CourseGrid)
