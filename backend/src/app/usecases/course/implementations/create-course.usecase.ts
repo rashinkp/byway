@@ -1,7 +1,7 @@
 import {
-  ICreateCourseInputDTO,
-  ICourseWithDetailsDTO,
-} from "../../../dtos/course/course.dto";
+  CreateCourseRequestDto,
+  CourseWithDetailsResponseDto,
+} from "../../../dtos/course.dto";
 import { Course } from "../../../../domain/entities/course.entity";
 import { HttpError } from "../../../../presentation/http/errors/http-error";
 import { ICategoryRepository } from "../../../repositories/category.repository";
@@ -14,8 +14,9 @@ import { Price } from "../../../../domain/value-object/price";
 import { Duration } from "../../../../domain/value-object/duration";
 import { Offer } from "../../../../domain/value-object/offer";
 import { CreateNotificationsForUsersUseCaseInterface } from "../../notification/interfaces/create-notifications-for-users.usecase.interface";
+import { CourseMapper } from "../../../mappers/course.mapper";
 
-export interface CreateCourseResultDTO extends ICourseWithDetailsDTO {
+export interface CreateCourseResultDTO extends CourseWithDetailsResponseDto {
   notifiedAdminIds: string[];
 }
 

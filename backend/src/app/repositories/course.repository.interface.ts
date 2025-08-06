@@ -20,7 +20,7 @@ export interface ICourseRepository {
     duration?: string;
     price?: string;
     categoryId?: string;
-  }): Promise<{ courses: CourseRecord[]; total: number; totalPages: number }>;
+  }): Promise<{ items: CourseRecord[]; total: number; totalPages: number }>;
   update(course: CourseRecord): Promise<CourseRecord>;
   softDelete(course: CourseRecord): Promise<CourseRecord>;
   findEnrolledCourses(options: {
@@ -31,7 +31,7 @@ export interface ICourseRepository {
     sortOrder?: "asc" | "desc";
     search?: string;
     level?: string;
-  }): Promise<{ courses: CourseRecord[]; total: number; totalPages: number }>;
+  }): Promise<{ items: CourseRecord[]; total: number; totalPages: number }>;
   updateApprovalStatus(course: CourseRecord): Promise<CourseRecord>;
   findCourseDetails(courseId: string): Promise<CourseDetailsRecord | null>;
   updateCourseDetails(courseId: string, details: CourseDetailsRecord): Promise<CourseDetailsRecord>;

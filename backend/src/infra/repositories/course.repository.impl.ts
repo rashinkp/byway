@@ -77,7 +77,7 @@ export class CourseRepository implements ICourseRepository {
     duration?: string;
     price?: string;
     categoryId?: string;
-  }): Promise<{ courses: CourseRecord[]; total: number; totalPages: number }> {
+  }): Promise<{ items: CourseRecord[]; total: number; totalPages: number }> {
     try {
       const {
         page = 1,
@@ -200,7 +200,7 @@ export class CourseRepository implements ICourseRepository {
       ]);
 
       return {
-        courses: courses.map(course => this.mapToCourseRecord(course)),
+        items: courses.map(course => this.mapToCourseRecord(course)),
         total,
         totalPages: Math.ceil(total / limit),
       };
@@ -262,7 +262,7 @@ export class CourseRepository implements ICourseRepository {
     sortOrder?: "asc" | "desc";
     search?: string;
     level?: string;
-  }): Promise<{ courses: CourseRecord[]; total: number; totalPages: number }> {
+  }): Promise<{ items: CourseRecord[]; total: number; totalPages: number }> {
     try {
       const {
         userId,
@@ -318,7 +318,7 @@ export class CourseRepository implements ICourseRepository {
       ]);
 
       return {
-        courses: courses.map(course => this.mapToCourseRecord(course)),
+        items: courses.map(course => this.mapToCourseRecord(course)),
         total,
         totalPages: Math.ceil(total / limit),
       };

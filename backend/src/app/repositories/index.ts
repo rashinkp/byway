@@ -1,0 +1,21 @@
+// Repository Interfaces
+export { IUserRepository } from "./user.repository";
+export { ICourseRepository } from "./course.repository.interface";
+export { ICategoryRepository } from "./category.repository";
+export { ICartRepository } from "./cart.repository";
+export { ILessonRepository } from "./lesson.repository";
+export { IEnrollmentRepository } from "./enrollment.repository.interface";
+export { IOrderRepository } from "./order.repository";
+export { IWalletRepository } from "./wallet.repository";
+export { ITransactionRepository } from "./transaction.repository";
+export { ICourseReviewRepository } from "./course-review.repository.interface";
+export { IChatRepository } from "./chat.repository.interface";
+export { IMessageRepository } from "./message.repository.interface";
+export { NotificationRepositoryInterface } from "./notification-repository.interface";
+export { CertificateRepositoryInterface } from "./certificate-repository.interface";
+export { IInstructorRepository } from "./instructor.repository";
+export { ISearchRepository } from "./search.repository";
+export { IRevenueRepository } from "./revenue.repository";
+export { IAuthRepository } from "./auth.repository";
+export { IContentRepository } from "./content.repository";
+export { ILessonProgressRepository } from "./lesson-progress.repository.interface"; 
