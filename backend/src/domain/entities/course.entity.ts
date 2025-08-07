@@ -1,4 +1,3 @@
-import { v4 as uuidv4 } from "uuid";
 import { CourseLevel } from "../enum/course-level.enum";
 import { Price } from "../value-object/price";
 import { Duration } from "../value-object/duration";
@@ -40,16 +39,21 @@ export class CourseDetails {
     return this._targetAudience;
   }
 
-  update(props: Partial<{
-    prerequisites: string | null;
-    longDescription: string | null;
-    objectives: string | null;
-    targetAudience: string | null;
-  }>): void {
-    if (props.prerequisites !== undefined) this._prerequisites = props.prerequisites;
-    if (props.longDescription !== undefined) this._longDescription = props.longDescription;
+  update(
+    props: Partial<{
+      prerequisites: string | null;
+      longDescription: string | null;
+      objectives: string | null;
+      targetAudience: string | null;
+    }>
+  ): void {
+    if (props.prerequisites !== undefined)
+      this._prerequisites = props.prerequisites;
+    if (props.longDescription !== undefined)
+      this._longDescription = props.longDescription;
     if (props.objectives !== undefined) this._objectives = props.objectives;
-    if (props.targetAudience !== undefined) this._targetAudience = props.targetAudience;
+    if (props.targetAudience !== undefined)
+      this._targetAudience = props.targetAudience;
   }
 
   toJSON() {
@@ -63,7 +67,7 @@ export class CourseDetails {
 }
 
 export interface CourseProps {
-  id?: string;
+  id: string; // now mandatory
   title: string;
   description?: string | null;
   level: CourseLevel;
@@ -110,7 +114,10 @@ export class Course {
   private _bestSeller?: boolean;
 
   constructor(props: CourseProps) {
-    this._id = props.id || uuidv4();
+    if (!props.id || props.id.trim() === "") {
+      throw new Error("Course ID is required");
+    }
+    this._id = props.id;
     this._title = props.title;
     this._description = props.description ?? null;
     this._level = props.level;
@@ -125,7 +132,7 @@ export class Course {
     this._updatedAt = props.updatedAt || new Date();
     this._deletedAt = props.deletedAt ?? null;
     this._approvalStatus = props.approvalStatus || APPROVALSTATUS.PENDING;
-    this._adminSharePercentage = props.adminSharePercentage ?? 20.00;
+    this._adminSharePercentage = props.adminSharePercentage ?? 20.0;
     this._details = props.details ?? null;
     this._rating = props.rating;
     this._reviewCount = props.reviewCount;
@@ -199,18 +206,20 @@ export class Course {
   }
 
   // Business logic
-  updateBasicInfo(props: Partial<{
-    title: string;
-    description: string | null;
-    level: CourseLevel;
-    price: Price | null;
-    thumbnail: string | null;
-    duration: Duration | null;
-    offer: Offer | null;
-    status: CourseStatus;
-    categoryId: string;
-    adminSharePercentage: number;
-  }>): void {
+  updateBasicInfo(
+    props: Partial<{
+      title: string;
+      description: string | null;
+      level: CourseLevel;
+      price: Price | null;
+      thumbnail: string | null;
+      duration: Duration | null;
+      offer: Offer | null;
+      status: CourseStatus;
+      categoryId: string;
+      adminSharePercentage: number;
+    }>
+  ): void {
     if (props.title) this._title = props.title;
     if (props.description !== undefined) this._description = props.description;
     if (props.level) this._level = props.level;
@@ -220,22 +229,25 @@ export class Course {
     if (props.offer !== undefined) this._offer = props.offer;
     if (props.status) this._status = props.status;
     if (props.categoryId) this._categoryId = props.categoryId;
-    if (props.adminSharePercentage !== undefined) this._adminSharePercentage = props.adminSharePercentage;
+    if (props.adminSharePercentage !== undefined)
+      this._adminSharePercentage = props.adminSharePercentage;
     this._updatedAt = new Date();
   }
 
-  updateDetails(props: Partial<{
-    prerequisites: string | null;
-    longDescription: string | null;
-    objectives: string | null;
-    targetAudience: string | null;
-  }>): void {
+  updateDetails(
+    props: Partial<{
+      prerequisites: string | null;
+      longDescription: string | null;
+      objectives: string | null;
+      targetAudience: string | null;
+    }>
+  ): void {
     if (!this._details) {
       this._details = new CourseDetails({
         prerequisites: props.prerequisites ?? null,
         longDescription: props.longDescription ?? null,
         objectives: props.objectives ?? null,
-        targetAudience: props.targetAudience ?? null
+        targetAudience: props.targetAudience ?? null,
       });
     } else {
       this._details.update(props);
@@ -266,10 +278,15 @@ export class Course {
       title: this._title,
       description: this._description,
       level: this._level,
-      price: this._price instanceof Price ? this._price.getValue() : this._price,
+      price:
+        this._price instanceof Price ? this._price.getValue() : this._price,
       thumbnail: this._thumbnail,
-      duration: this._duration instanceof Duration ? this._duration.getValue() : this._duration,
-      offer: this._offer instanceof Offer ? this._offer.getValue() : this._offer,
+      duration:
+        this._duration instanceof Duration
+          ? this._duration.getValue()
+          : this._duration,
+      offer:
+        this._offer instanceof Offer ? this._offer.getValue() : this._offer,
       status: this._status,
       categoryId: this._categoryId,
       createdBy: this._createdBy,
@@ -305,6 +322,10 @@ export class Course {
       approvalStatus: data.approvalStatus,
       adminSharePercentage: data.adminSharePercentage,
       details: data.details ? new CourseDetails(data.details) : null,
+      rating: data.rating,
+      reviewCount: data.reviewCount,
+      lessons: data.lessons,
+      bestSeller: data.bestSeller,
     });
   }
 }

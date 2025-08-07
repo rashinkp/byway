@@ -51,6 +51,7 @@ export class CreateCourseUseCase implements ICreateCourseUseCase {
 
     // Create course entity with basic info
     const course = new Course({
+      id:'' , 
       title: input.title,
       description: input.description,
       categoryId: input.categoryId,
