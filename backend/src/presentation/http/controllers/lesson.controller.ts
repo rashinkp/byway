@@ -9,7 +9,14 @@ import { IGetLessonByIdUseCase } from "../../../app/usecases/lesson/interfaces/g
 import { IGetAllLessonsUseCase } from "../../../app/usecases/lesson/interfaces/get-all-lessons.usecase.interface";
 import { IDeleteLessonUseCase } from "../../../app/usecases/lesson/interfaces/delete-lesson.usecase.interface";
 import { IGetPublicLessonsUseCase } from "../../../app/usecases/lesson/interfaces/get-public-lessons.usecase.interface";
-import { validateCreateLesson, validateDeleteLesson, validateGetAllLessons, validateGetLessonById, validateGetPublicLessons, validateUpdateLesson } from "../../validators/lesson.validators";
+import {
+  validateCreateLesson,
+  validateDeleteLesson,
+  validateGetAllLessons,
+  validateGetLessonById,
+  validateGetPublicLessons,
+  validateUpdateLesson,
+} from "../../validators/lesson.validators";
 import { BaseController } from "./base.controller";
 
 export class LessonController extends BaseController {
@@ -48,7 +55,9 @@ export class LessonController extends BaseController {
   async getLessonById(httpRequest: IHttpRequest): Promise<IHttpResponse> {
     return this.handleRequest(httpRequest, async (request) => {
       const validated = validateGetLessonById(request.params);
-      const lesson = await this.getLessonByIdUseCase.execute(validated.lessonId);
+      const lesson = await this.getLessonByIdUseCase.execute(
+        validated.lessonId
+      );
       if (!lesson) {
         throw new BadRequestError("Lesson not found");
       }

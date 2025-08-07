@@ -2,11 +2,11 @@ import { IGetInstructorDashboardUseCase } from "../interfaces/get-instructor-das
 import {
   IGetInstructorDashboardInput,
   IInstructorDashboardResponse,
-} from "@/app/dtos/instructor/instructor-dashboard.dto";
-import { IRevenueRepository } from "@/app/repositories/revenue.repository";
-import { IUserRepository } from "@/app/repositories/user.repository";
+} from "../../..//dtos/instructor/instructor-dashboard.dto";
+import { IRevenueRepository } from "../../..//repositories/revenue.repository";
+import { IUserRepository } from "../../..//repositories/user.repository";
+import { IEnrollmentRepository } from "../../..//repositories/enrollment.repository.interface";
 import { ICourseRepository } from "@/app/repositories/course.repository.interface";
-import { IEnrollmentRepository } from "@/app/repositories/enrollment.repository.interface";
 
 export class GetInstructorDashboardUseCase
   implements IGetInstructorDashboardUseCase

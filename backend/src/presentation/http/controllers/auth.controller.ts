@@ -49,12 +49,15 @@ export class AuthController extends BaseController {
       const validated = validateFacebookAuth(request.body);
       const user = await this.facebookAuthUseCase.execute(validated);
       const data = {
-          id: user.id,
-          name: user.name,
-          email: user.email,
-          role: user.role,
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
       };
-      const response = this.success_200(data, "Facebook authentication successful");
+      const response = this.success_200(
+        data,
+        "Facebook authentication successful"
+      );
       return {
         ...response,
         cookie: this.getCookieResponse(user),
@@ -80,7 +83,10 @@ export class AuthController extends BaseController {
         email: user.email,
         role: user.role,
       };
-      const response = this.success_200(data, "Google authentication successful");
+      const response = this.success_200(
+        data,
+        "Google authentication successful"
+      );
       return {
         ...response,
         cookie: this.getCookieResponse(user),
@@ -99,10 +105,24 @@ export class AuthController extends BaseController {
       throw new BadRequestError("No refresh token provided");
     }
     const payload = jwtProvider.verifyRefreshToken(refreshToken);
-    if (!payload || typeof payload !== 'object' || !('email' in payload && 'id' in payload && 'name' in payload && 'role' in payload)) {
+    if (
+      !payload ||
+      typeof payload !== "object" ||
+      !(
+        "email" in payload &&
+        "id" in payload &&
+        "name" in payload &&
+        "role" in payload
+      )
+    ) {
       throw new BadRequestError("Invalid refresh token");
     }
-    const { id, name, email, role } = payload as { id: string; name: string; email: string; role: string };
+    const { id, name, email, role } = payload as {
+      id: string;
+      name: string;
+      email: string;
+      role: string;
+    };
     return { id, name, email, role };
   }
 
@@ -110,10 +130,10 @@ export class AuthController extends BaseController {
     return this.handleRequest(httpRequest, async (request) => {
       const user = this.getUserFromRefreshToken(request);
       const data = {
-          id: user.id,
-          name: user.name,
-          email: user.email,
-          role: user.role,
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
       };
       const response = this.success_200(data, "Tokens issued");
       return {
@@ -128,11 +148,11 @@ export class AuthController extends BaseController {
       const validated = validateLogin(request.body);
       const { user, cartCount } = await this.loginUseCase.execute(validated);
       const data = {
-          id: user.id,
-          name: user.name,
-          email: user.email,
-          role: user.role,
-          cartCount,
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        cartCount,
       };
       const response = this.success_200(data, "Login successful");
       return {
@@ -158,10 +178,10 @@ export class AuthController extends BaseController {
       const validated = validateRegister(request.body);
       const user = await this.registerUseCase.execute(validated);
       const data = {
-          id: user.id,
-          name: user.name,
-          email: user.email,
-          role: user.role,
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
       };
       return this.success_201(data, "Registration successful");
     });
@@ -188,7 +208,10 @@ export class AuthController extends BaseController {
       const validated = validateVerifyOtp(request.body);
       const result = await this.verifyOtpUseCase.execute(validated);
       if (validated.type === "password-reset" && result.resetToken) {
-        return this.success_200({ resetToken: result.resetToken }, "OTP verification successful");
+        return this.success_200(
+          { resetToken: result.resetToken },
+          "OTP verification successful"
+        );
       }
       if (result.user) {
         const user = result.user;
@@ -204,14 +227,19 @@ export class AuthController extends BaseController {
     });
   }
 
-  async getVerificationStatus(httpRequest: IHttpRequest): Promise<IHttpResponse> {
+  async getVerificationStatus(
+    httpRequest: IHttpRequest
+  ): Promise<IHttpResponse> {
     return this.handleRequest(httpRequest, async (request) => {
       const email = request.query?.email as string;
       if (!email) {
         throw new BadRequestError("Email is required");
       }
       const result = await this.getVerificationStatusUseCase.execute(email);
-      return this.success_200(result, "Verification status retrieved successfully");
+      return this.success_200(
+        result,
+        "Verification status retrieved successfully"
+      );
     });
   }
 }

@@ -11,7 +11,7 @@ import { PaymentGateway } from "../../../../domain/enum/payment-gateway.enum";
 import { HttpError } from "../../../../presentation/http/errors/http-error";
 import { StatusCodes } from "http-status-codes";
 import { Transaction } from "../../../../domain/entities/transaction.entity";
-import { TopUpWalletDto } from "@/app/dtos/wallet";
+import { TopUpWalletDto } from "../../../dtos/wallet";
 
 export class TopUpWalletUseCase implements ITopUpWalletUseCase {
   constructor(

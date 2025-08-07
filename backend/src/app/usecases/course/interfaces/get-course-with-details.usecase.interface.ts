@@ -1,4 +1,4 @@
-import { ICourseWithEnrollmentDTO } from "@/app/dtos/course/course.dto";
+import { ICourseWithEnrollmentDTO } from "../../..//dtos/course/course.dto";
 import { JwtPayload } from "jsonwebtoken";
 
 export interface IGetCourseWithDetailsUseCase {

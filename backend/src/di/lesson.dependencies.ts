@@ -16,13 +16,17 @@ export function createLessonDependencies(
 ): LessonDependencies {
   const { lessonRepository } = deps;
 
-  const createLessonUseCase = new CreateLessonUseCase(
+  const createLessonUseCase = new CreateLessonUseCase(lessonRepository);
+  const updateLessonUseCase = new UpdateLessonUseCase(
     lessonRepository,
+    deps.lessonContentRepository
   );
-  const updateLessonUseCase = new UpdateLessonUseCase(lessonRepository , deps.lessonContentRepository);
   const getLessonByIdUseCase = new GetLessonByIdUseCase(lessonRepository);
   const getAllLessonsUseCase = new GetAllLessonsUseCase(lessonRepository);
-  const deleteLessonUseCase = new DeleteLessonUseCase(lessonRepository, deps.s3Service);
+  const deleteLessonUseCase = new DeleteLessonUseCase(
+    lessonRepository,
+    deps.s3Service
+  );
   const getPublicLessonsUseCase = new GetPublicLessonsUseCase(lessonRepository);
 
   const lessonController = new LessonController(
@@ -39,4 +43,4 @@ export function createLessonDependencies(
   return {
     lessonController,
   };
-} 
+}

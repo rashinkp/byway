@@ -34,4 +34,4 @@ export function createProgressDependencies(
   return {
     progressController,
   };
-} 
+}

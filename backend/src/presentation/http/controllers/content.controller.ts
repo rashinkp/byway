@@ -6,7 +6,12 @@ import { ICreateLessonContentUseCase } from "../../../app/usecases/content/inter
 import { IUpdateLessonContentUseCase } from "../../../app/usecases/content/interfaces/update-content.usecase.interface";
 import { IGetContentByLessonIdUseCase } from "../../../app/usecases/content/interfaces/get-content-by-lesson-id.usecase.interface";
 import { IDeleteLessonContentUseCase } from "../../../app/usecases/content/interfaces/delete-content.usecase.interface";
-import { validateCreateLessonContent, validateDeleteLessonContent, validateGetLessonContentByLessonId, validateUpdateLessonContent } from "../../validators/content.validator";
+import {
+  validateCreateLessonContent,
+  validateDeleteLessonContent,
+  validateGetLessonContentByLessonId,
+  validateUpdateLessonContent,
+} from "../../validators/content.validator";
 import { BaseController } from "./base.controller";
 import { HttpError } from "../errors/http-error";
 
@@ -32,7 +37,7 @@ export class LessonContentController extends BaseController {
       const validated = validateCreateLessonContent(request.body);
       const content = await this.createLessonContentUseCase.execute({
         ...validated,
-        userId: request.user.id
+        userId: request.user.id,
       });
       return this.success_201(content, "Lesson content created successfully");
     });
@@ -49,7 +54,9 @@ export class LessonContentController extends BaseController {
     });
   }
 
-  async getLessonContentByLessonId(httpRequest: IHttpRequest): Promise<IHttpResponse> {
+  async getLessonContentByLessonId(
+    httpRequest: IHttpRequest
+  ): Promise<IHttpResponse> {
     return this.handleRequest(httpRequest, async (request) => {
       if (!request.user?.id || !request.user?.role) {
         throw new HttpError("Unauthorized", 401);

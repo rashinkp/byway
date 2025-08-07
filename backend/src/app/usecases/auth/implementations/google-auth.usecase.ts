@@ -3,10 +3,13 @@ import { IAuthRepository } from "../../../repositories/auth.repository";
 import { IGoogleAuthUseCase } from "../interfaces/google-auth.usecase.interface";
 import { Role } from "../../../../domain/enum/role.enum";
 import { AuthProvider } from "../../../../domain/enum/auth-provider.enum";
-import { GoogleAuthGateway, GoogleUserInfo } from "../../../providers/I.google-auth.provider";
+import {
+  GoogleAuthGateway,
+  GoogleUserInfo,
+} from "../../../providers/I.google-auth.provider";
 import { HttpError } from "../../../../presentation/http/errors/http-error";
 import { User } from "../../../../domain/entities/user.entity";
-import { IUpdateUserRequestDTO } from "@/app/dtos/user/user.dto";
+import { IUpdateUserRequestDTO } from "../../../dtos/user/user.dto";
 
 export class GoogleAuthUseCase implements IGoogleAuthUseCase {
   constructor(

@@ -9,22 +9,28 @@ import { GetInstructorDashboardUseCase } from "../app/usecases/dashboard/impleme
 import { DashboardController } from "../presentation/http/controllers/dashboard.controller";
 
 export const createDashboardDependencies = (sharedDeps: SharedDependencies) => {
-  const { 
-    courseRepository, 
-    userRepository, 
-    enrollmentRepository, 
+  const {
+    courseRepository,
+    userRepository,
+    enrollmentRepository,
     instructorRepository,
     revenueRepository,
-    httpErrors, 
-    httpSuccess 
+    httpErrors,
+    httpSuccess,
   } = sharedDeps;
 
   // Create use cases using shared repositories
   const getCourseStatsUseCase = new GetCourseStatsUseCase(courseRepository);
-  const getTopEnrolledCoursesUseCase = new GetTopEnrolledCoursesUseCase(courseRepository);
+  const getTopEnrolledCoursesUseCase = new GetTopEnrolledCoursesUseCase(
+    courseRepository
+  );
   const getUserStatsUseCase = new GetUserStatsUseCase(userRepository);
-  const getTopInstructorsUseCase = new GetTopInstructorsUseCase(instructorRepository);
-  const getEnrollmentStatsUseCase = new GetEnrollmentStatsUseCase(enrollmentRepository);
+  const getTopInstructorsUseCase = new GetTopInstructorsUseCase(
+    instructorRepository
+  );
+  const getEnrollmentStatsUseCase = new GetEnrollmentStatsUseCase(
+    enrollmentRepository
+  );
 
   // Create main dashboard use case
   const getDashboardUseCase = new GetDashboardUseCase(

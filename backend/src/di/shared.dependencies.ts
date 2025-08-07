@@ -74,7 +74,7 @@ export interface SharedDependencies {
   certificateRepository: CertificateRepositoryInterface;
   s3Service: S3Service;
   emailProvider: EmailProviderImpl;
-  getEnrollmentStatsUseCase: GetEnrollmentStatsUseCase
+  getEnrollmentStatsUseCase: GetEnrollmentStatsUseCase;
 }
 
 export function createSharedDependencies(): SharedDependencies {
@@ -126,7 +126,9 @@ export function createSharedDependencies(): SharedDependencies {
   const lessonProgressRepository = new LessonProgressRepository(prismaClient);
   const certificateRepository = new PrismaCertificateRepository(prismaClient);
 
-  const getEnrollmentStatsUseCase = new GetEnrollmentStatsUseCase(enrollmentRepository);  
+  const getEnrollmentStatsUseCase = new GetEnrollmentStatsUseCase(
+    enrollmentRepository
+  );
 
   return {
     prisma: prismaClient,

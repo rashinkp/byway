@@ -29,9 +29,6 @@ export function createCategoryDependencies(
   const deleteCategoryUseCase = new DeleteCategoryUseCase(categoryRepository);
   const recoverCategoryUseCase = new RecoverCategoryUseCase(categoryRepository);
 
-
-
-
   // Initialize controller
   const categoryController = new CategoryController(
     createCategoryUseCase,

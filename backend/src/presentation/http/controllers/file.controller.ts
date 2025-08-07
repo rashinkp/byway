@@ -6,7 +6,6 @@ import { BaseController } from "./base.controller";
 import { IHttpErrors } from "../interfaces/http-errors.interface";
 import { IHttpSuccess } from "../interfaces/http-success.interface";
 
-
 export class FileController extends BaseController {
   constructor(
     private readonly s3Service: S3ServiceInterface,
@@ -16,7 +15,9 @@ export class FileController extends BaseController {
     super(httpErrors, httpSuccess);
   }
 
-  generatePresignedUrl = async (httpRequest: IHttpRequest): Promise<IHttpResponse> => {
+  generatePresignedUrl = async (
+    httpRequest: IHttpRequest
+  ): Promise<IHttpResponse> => {
     return this.handleRequest(httpRequest, async (request) => {
       const validatedData = generatePresignedUrlSchema.parse(request.body);
       const { fileName, fileType, uploadType, metadata } = validatedData;

@@ -9,62 +9,75 @@ export class CartRepository implements ICartRepository {
     const cart = await this.prisma.cart.findUnique({
       where: { id },
       include: {
-        course: true
-      }
+        course: true,
+      },
     });
     if (!cart) return null;
     return Cart.fromPrisma({
       ...cart,
-      discount: Number(cart.discount)
+      discount: Number(cart.discount),
     });
   }
 
-  async findByUserId(userId: string, includeDeleted: boolean = false): Promise<Cart[]> {
+  async findByUserId(
+    userId: string,
+    includeDeleted: boolean = false
+  ): Promise<Cart[]> {
     const carts = await this.prisma.cart.findMany({
       where: {
         userId,
-        ...(includeDeleted ? {} : { deletedAt: null })
+        ...(includeDeleted ? {} : { deletedAt: null }),
       },
       include: {
-        course: true
-      }
+        course: true,
+      },
     });
-    return carts.map(cart => Cart.fromPrisma({
-      ...cart,
-      discount: Number(cart.discount)
-    }));
+    return carts.map((cart) =>
+      Cart.fromPrisma({
+        ...cart,
+        discount: Number(cart.discount),
+      })
+    );
   }
 
-  async findByCourseId(courseId: string, includeDeleted: boolean = false): Promise<Cart[]> {
+  async findByCourseId(
+    courseId: string,
+    includeDeleted: boolean = false
+  ): Promise<Cart[]> {
     const carts = await this.prisma.cart.findMany({
       where: {
         courseId,
-        ...(includeDeleted ? {} : { deletedAt: null })
+        ...(includeDeleted ? {} : { deletedAt: null }),
       },
       include: {
-        course: true
-      }
+        course: true,
+      },
     });
-    return carts.map(cart => Cart.fromPrisma({
-      ...cart,
-      discount: Number(cart.discount)
-    }));
+    return carts.map((cart) =>
+      Cart.fromPrisma({
+        ...cart,
+        discount: Number(cart.discount),
+      })
+    );
   }
 
-  async findByUserAndCourse(userId: string, courseId: string): Promise<Cart | null> {
+  async findByUserAndCourse(
+    userId: string,
+    courseId: string
+  ): Promise<Cart | null> {
     const cart = await this.prisma.cart.findFirst({
       where: {
         userId,
         courseId,
       },
       include: {
-        course: true
-      }
+        course: true,
+      },
     });
     if (!cart) return null;
     return Cart.fromPrisma({
       ...cart,
-      discount: Number(cart.discount)
+      discount: Number(cart.discount),
     });
   }
 
@@ -78,15 +91,15 @@ export class CartRepository implements ICartRepository {
         discount: new Prisma.Decimal(cart.discount ?? 0),
         createdAt: cart.createdAt,
         updatedAt: cart.updatedAt,
-        deletedAt: cart.deletedAt
+        deletedAt: cart.deletedAt,
       },
       include: {
-        course: true
-      }
+        course: true,
+      },
     });
     return Cart.fromPrisma({
       ...created,
-      discount: Number(created.discount)
+      discount: Number(created.discount),
     });
   }
 
@@ -99,29 +112,29 @@ export class CartRepository implements ICartRepository {
         couponId: cart.couponId,
         discount: new Prisma.Decimal(cart.discount ?? 0),
         updatedAt: cart.updatedAt,
-        deletedAt: cart.deletedAt
+        deletedAt: cart.deletedAt,
       },
       include: {
-        course: true
-      }
+        course: true,
+      },
     });
     return Cart.fromPrisma({
       ...updated,
-      discount: Number(updated.discount)
+      discount: Number(updated.discount),
     });
   }
 
   async delete(id: string): Promise<void> {
     await this.prisma.cart.delete({
-      where: { id }
+      where: { id },
     });
   }
 
   async clearUserCart(userId: string): Promise<void> {
     await this.prisma.cart.deleteMany({
       where: {
-        userId
-      }
+        userId,
+      },
     });
   }
 
@@ -149,4 +162,4 @@ export class CartRepository implements ICartRepository {
   async countByUserId(userId: string): Promise<number> {
     return this.prisma.cart.count({ where: { userId, deletedAt: null } });
   }
-} 
+}

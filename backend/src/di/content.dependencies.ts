@@ -22,13 +22,12 @@ export function createLessonContentDependencies(
   const updateLessonContentUseCase = new UpdateLessonContentUseCase(
     lessonContentRepository
   );
-  const getLessonContentByLessonIdUseCase =
-    new GetContentByLessonIdUseCase(
-      lessonContentRepository,
-      lessonRepository,
-      deps.enrollmentRepository,
-      courseRepository
-    );
+  const getLessonContentByLessonIdUseCase = new GetContentByLessonIdUseCase(
+    lessonContentRepository,
+    lessonRepository,
+    deps.enrollmentRepository,
+    courseRepository
+  );
   const deleteLessonContentUseCase = new DeleteLessonContentUseCase(
     lessonContentRepository,
     deps.s3Service

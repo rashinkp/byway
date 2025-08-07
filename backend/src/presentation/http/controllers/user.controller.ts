@@ -43,20 +43,23 @@ export class UserController extends BaseController {
       }
       const validated = validateGetAllUsers(request.query);
       const result = await this.getAllUsersUseCase.execute(validated);
-      return this.success_200({
-        items: result.items.map((user) => ({
-          id: user.id,
-          name: user.name,
-          email: user.email,
-          role: user.role,
-          avatar: user.avatar,
-          deletedAt: user.deletedAt,
-          createdAt: user.createdAt,
-          updatedAt: user.updatedAt,
-        })),
-        total: result.total,
-        totalPages: result.totalPages,
-      }, "Users retrieved successfully");
+      return this.success_200(
+        {
+          items: result.items.map((user) => ({
+            id: user.id,
+            name: user.name,
+            email: user.email,
+            role: user.role,
+            avatar: user.avatar,
+            deletedAt: user.deletedAt,
+            createdAt: user.createdAt,
+            updatedAt: user.updatedAt,
+          })),
+          total: result.total,
+          totalPages: result.totalPages,
+        },
+        "Users retrieved successfully"
+      );
     });
   }
 
@@ -80,30 +83,35 @@ export class UserController extends BaseController {
       const io = getSocketIOInstance();
       if (io) {
         const isCurrentlyDeleted = user.deletedAt ? true : false;
-        const notificationType = isCurrentlyDeleted ? 'USER_DISABLED' : 'USER_ENABLED';
-        const message = isCurrentlyDeleted 
+        const notificationType = isCurrentlyDeleted
+          ? "USER_DISABLED"
+          : "USER_ENABLED";
+        const message = isCurrentlyDeleted
           ? "Your account has been disabled by an administrator. If you believe this is a mistake, please contact support."
           : "Your account has been re-enabled. You can now access the platform again.";
-        
-        io.to(user.id).emit('newNotification', {
+
+        io.to(user.id).emit("newNotification", {
           message: message,
           type: notificationType,
           userId: user.id,
           userName: user.name || user.email,
-          timestamp: new Date().toISOString()
+          timestamp: new Date().toISOString(),
         });
       }
 
-      return this.success_200({
-        id: user.id,
-        name: user.name,
-        email: user.email,
-        role: user.role,
-        avatar: user.avatar,
-        deletedAt: user.deletedAt,
-        createdAt: user.createdAt,
-        updatedAt: user.updatedAt,
-      },  "User data updated successfully");
+      return this.success_200(
+        {
+          id: user.id,
+          name: user.name,
+          email: user.email,
+          role: user.role,
+          avatar: user.avatar,
+          deletedAt: user.deletedAt,
+          createdAt: user.createdAt,
+          updatedAt: user.updatedAt,
+        },
+        "User data updated successfully"
+      );
     });
   }
 
@@ -112,28 +120,34 @@ export class UserController extends BaseController {
       if (!request.user?.id) {
         throw new UnauthorizedError("User not authenticated");
       }
-      const { user, cartCount } = await this.getCurrentUserUseCase.execute(request.user.id);
-      const { user: fetchedUser, profile } = await this.getUserByIdUseCase.execute({ userId: user.id });
-      return this.success_200({
-        id: fetchedUser.id,
-        name: fetchedUser.name,
-        email: fetchedUser.email,
-        role: fetchedUser.role,
-        avatar: fetchedUser.avatar,
-        bio: profile?.bio,
-        education: profile?.education,
-        skills: profile?.skills,
-        phoneNumber: profile?.phoneNumber,
-        country: profile?.country,
-        city: profile?.city,
-        address: profile?.address,
-        dateOfBirth: profile?.dateOfBirth,
-        gender: profile?.gender,
-        deletedAt: fetchedUser.deletedAt,
-        createdAt: fetchedUser.createdAt,
-        updatedAt: fetchedUser.updatedAt,
-        cartCount,
-      }, "User retrieved successfully");
+      const { user, cartCount } = await this.getCurrentUserUseCase.execute(
+        request.user.id
+      );
+      const { user: fetchedUser, profile } =
+        await this.getUserByIdUseCase.execute({ userId: user.id });
+      return this.success_200(
+        {
+          id: fetchedUser.id,
+          name: fetchedUser.name,
+          email: fetchedUser.email,
+          role: fetchedUser.role,
+          avatar: fetchedUser.avatar,
+          bio: profile?.bio,
+          education: profile?.education,
+          skills: profile?.skills,
+          phoneNumber: profile?.phoneNumber,
+          country: profile?.country,
+          city: profile?.city,
+          address: profile?.address,
+          dateOfBirth: profile?.dateOfBirth,
+          gender: profile?.gender,
+          deletedAt: fetchedUser.deletedAt,
+          createdAt: fetchedUser.createdAt,
+          updatedAt: fetchedUser.updatedAt,
+          cartCount,
+        },
+        "User retrieved successfully"
+      );
     });
   }
 
@@ -146,32 +160,36 @@ export class UserController extends BaseController {
         throw new BadRequestError("User ID is required");
       }
       const validated = validateGetUser({ userId: request.params.userId });
-      const { user, profile } = await this.getUserByIdUseCase.execute(validated);
+      const { user, profile } = await this.getUserByIdUseCase.execute(
+        validated
+      );
       if (!user) {
         throw new HttpError("User not found", 404);
       }
 
-
-      return this.success_200({
-        id: user.id,
-        name: user.name,
-        email: user.email,
-        role: user.role,
-        avatar: user.avatar,
-        bio: profile?.bio,
-        isVerified: user.isVerified,
-        education: profile?.education,
-        skills: profile?.skills,
-        phoneNumber: profile?.phoneNumber,
-        country: profile?.country,
-        city: profile?.city,
-        address: profile?.address,
-        dateOfBirth: profile?.dateOfBirth,
-        gender: profile?.gender,
-        deletedAt: user.deletedAt,
-        createdAt: user.createdAt,
-        updatedAt: user.updatedAt,
-      }, "User retrieved successfully");
+      return this.success_200(
+        {
+          id: user.id,
+          name: user.name,
+          email: user.email,
+          role: user.role,
+          avatar: user.avatar,
+          bio: profile?.bio,
+          isVerified: user.isVerified,
+          education: profile?.education,
+          skills: profile?.skills,
+          phoneNumber: profile?.phoneNumber,
+          country: profile?.country,
+          city: profile?.city,
+          address: profile?.address,
+          dateOfBirth: profile?.dateOfBirth,
+          gender: profile?.gender,
+          deletedAt: user.deletedAt,
+          createdAt: user.createdAt,
+          updatedAt: user.updatedAt,
+        },
+        "User retrieved successfully"
+      );
     });
   }
 
@@ -185,25 +203,28 @@ export class UserController extends BaseController {
         validated,
         request.user.id
       );
-      return this.success_200({
-        id: user.id,
-        name: user.name,
-        email: user.email,
-        role: user.role,
-        avatar: user.avatar,
-        bio: profile?.bio,
-        education: profile?.education,
-        skills: profile?.skills,
-        phoneNumber: profile?.phoneNumber,
-        country: profile?.country,
-        city: profile?.city,
-        address: profile?.address,
-        dateOfBirth: profile?.dateOfBirth,
-        gender: profile?.gender,
-        deletedAt: user.deletedAt,
-        createdAt: user.createdAt,
-        updatedAt: user.updatedAt,
-      }, "User updated successfully");
+      return this.success_200(
+        {
+          id: user.id,
+          name: user.name,
+          email: user.email,
+          role: user.role,
+          avatar: user.avatar,
+          bio: profile?.bio,
+          education: profile?.education,
+          skills: profile?.skills,
+          phoneNumber: profile?.phoneNumber,
+          country: profile?.country,
+          city: profile?.city,
+          address: profile?.address,
+          dateOfBirth: profile?.dateOfBirth,
+          gender: profile?.gender,
+          deletedAt: user.deletedAt,
+          createdAt: user.createdAt,
+          updatedAt: user.updatedAt,
+        },
+        "User updated successfully"
+      );
     });
   }
 
@@ -213,20 +234,25 @@ export class UserController extends BaseController {
         throw new BadRequestError("User ID is required");
       }
       const validated = validateGetUser({ userId: request.params.userId });
-      const { user, profile } = await this.getPublicUserUseCase.execute(validated);
+      const { user, profile } = await this.getPublicUserUseCase.execute(
+        validated
+      );
       if (!user) {
         throw new HttpError("User not found", 404);
       }
-      return this.success_200({
-        id: user.id,
-        name: user.name,
-        avatar: user.avatar,
-        bio: profile?.bio,
-        education: profile?.education,
-        skills: profile?.skills,
-        country: profile?.country,
-        city: profile?.city,
-      }, "Public user retrieved successfully");
+      return this.success_200(
+        {
+          id: user.id,
+          name: user.name,
+          avatar: user.avatar,
+          bio: profile?.bio,
+          education: profile?.education,
+          skills: profile?.skills,
+          country: profile?.country,
+          city: profile?.city,
+        },
+        "Public user retrieved successfully"
+      );
     });
   }
 
@@ -236,41 +262,47 @@ export class UserController extends BaseController {
         throw new BadRequestError("User ID is required");
       }
       const validated = validateGetUser({ userId: request.params.userId });
-      const { user, profile, instructor } = await this.getUserAdminDetailsUseCase.execute(validated);
+      const { user, profile, instructor } =
+        await this.getUserAdminDetailsUseCase.execute(validated);
       if (!user) {
         throw new HttpError("User not found", 404);
       }
-      return this.success_200({
-        id: user.id,
-        name: user.name,
-        email: user.email,
-        role: user.role,
-        avatar: user.avatar,
-        bio: profile?.bio,
-        education: profile?.education,
-        skills: profile?.skills,
-        phoneNumber: profile?.phoneNumber,
-        country: profile?.country,
-        city: profile?.city,
-        address: profile?.address,
-        dateOfBirth: profile?.dateOfBirth,
-        gender: profile?.gender,
-        deletedAt: user.deletedAt,
-        createdAt: user.createdAt,
-        updatedAt: user.updatedAt,
-        instructor: instructor ? {
-          id: instructor.id,
-          areaOfExpertise: instructor.areaOfExpertise,
-          professionalExperience: instructor.professionalExperience,
-          about: instructor.about,
-          website: instructor.website,
-          education: instructor.education,
-          certifications: instructor.certifications,
-          cv: instructor.cv,
-          status: instructor.status,
-          totalStudents: instructor.totalStudents,
-        } : null,
-      }, "User admin details retrieved successfully");
+      return this.success_200(
+        {
+          id: user.id,
+          name: user.name,
+          email: user.email,
+          role: user.role,
+          avatar: user.avatar,
+          bio: profile?.bio,
+          education: profile?.education,
+          skills: profile?.skills,
+          phoneNumber: profile?.phoneNumber,
+          country: profile?.country,
+          city: profile?.city,
+          address: profile?.address,
+          dateOfBirth: profile?.dateOfBirth,
+          gender: profile?.gender,
+          deletedAt: user.deletedAt,
+          createdAt: user.createdAt,
+          updatedAt: user.updatedAt,
+          instructor: instructor
+            ? {
+                id: instructor.id,
+                areaOfExpertise: instructor.areaOfExpertise,
+                professionalExperience: instructor.professionalExperience,
+                about: instructor.about,
+                website: instructor.website,
+                education: instructor.education,
+                certifications: instructor.certifications,
+                cv: instructor.cv,
+                status: instructor.status,
+                totalStudents: instructor.totalStudents,
+              }
+            : null,
+        },
+        "User admin details retrieved successfully"
+      );
     });
   }
 }

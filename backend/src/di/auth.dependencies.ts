@@ -30,13 +30,15 @@ export function createAuthDependencies(
     authRepository,
     googleAuthProvider
   );
-  const loginUseCase = new LoginUseCase(authRepository , deps.cartRepository);
+  const loginUseCase = new LoginUseCase(authRepository, deps.cartRepository);
   const logoutUseCase = new LogoutUseCase();
   const registerUseCase = new RegisterUseCase(authRepository, otpProvider);
   const resendOtpUseCase = new ResendOtpUseCase(authRepository, otpProvider);
   const resetPasswordUseCase = new ResetPasswordUseCase(authRepository);
   const verifyOtpUseCase = new VerifyOtpUseCase(authRepository);
-  const getVerificationStatusUseCase = new GetVerificationStatusUseCase(authRepository);
+  const getVerificationStatusUseCase = new GetVerificationStatusUseCase(
+    authRepository
+  );
 
   // Initialize controller
   const authController = new AuthController(

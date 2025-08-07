@@ -16,10 +16,7 @@ export interface CourseReviewDependencies {
 export function createCourseReviewDependencies(
   deps: SharedDependencies
 ): CourseReviewDependencies {
-  const {
-    courseReviewRepository,
-    enrollmentRepository,
-  } = deps;
+  const { courseReviewRepository, enrollmentRepository } = deps;
 
   const createCourseReviewUseCase = new CreateCourseReviewUseCase(
     courseReviewRepository,
@@ -46,13 +43,9 @@ export function createCourseReviewDependencies(
     courseReviewRepository
   );
 
-  const deleteReviewUseCase = new DeleteReviewUseCase(
-    courseReviewRepository
-  );
+  const deleteReviewUseCase = new DeleteReviewUseCase(courseReviewRepository);
 
-  const disableReviewUseCase = new DisableReviewUseCase(
-    courseReviewRepository
-  );
+  const disableReviewUseCase = new DisableReviewUseCase(courseReviewRepository);
 
   const courseReviewController = new CourseReviewController(
     createCourseReviewUseCase,
@@ -70,4 +63,4 @@ export function createCourseReviewDependencies(
   return {
     courseReviewController,
   };
-} 
+}

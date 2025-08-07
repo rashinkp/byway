@@ -49,8 +49,11 @@ export class CourseReviewController extends BaseController {
       }
 
       const validated = createReviewSchemaDef.body!.parse(request.body);
-      const review = await this.createCourseReviewUseCase.execute(validated, request.user.id);
-      
+      const review = await this.createCourseReviewUseCase.execute(
+        validated,
+        request.user.id
+      );
+
       return this.success_201(review, "Review created successfully");
     });
   }
@@ -65,7 +68,9 @@ export class CourseReviewController extends BaseController {
         throw new BadRequestError("Review ID is required");
       }
 
-      const validatedParams = updateReviewSchemaDef.params!.parse({ id: request.params.id });
+      const validatedParams = updateReviewSchemaDef.params!.parse({
+        id: request.params.id,
+      });
       const validatedBody = updateReviewSchemaDef.body!.parse(request.body);
 
       const review = await this.updateCourseReviewUseCase.execute(
@@ -88,7 +93,9 @@ export class CourseReviewController extends BaseController {
         throw new BadRequestError("Review ID is required");
       }
 
-      const validated = deleteReviewSchemaDef.params!.parse({ id: request.params.id });
+      const validated = deleteReviewSchemaDef.params!.parse({
+        id: request.params.id,
+      });
       await this.deleteReviewUseCase.execute(validated.id, request.user.id);
 
       return this.success_200(null, "Review deleted successfully");
@@ -101,8 +108,12 @@ export class CourseReviewController extends BaseController {
         throw new BadRequestError("Course ID is required");
       }
 
-      const validatedParams = getCourseReviewsSchemaDef.params!.parse({ courseId: request.params.courseId });
-      const validatedQuery = getCourseReviewsSchemaDef.query!.parse(request.query);
+      const validatedParams = getCourseReviewsSchemaDef.params!.parse({
+        courseId: request.params.courseId,
+      });
+      const validatedQuery = getCourseReviewsSchemaDef.query!.parse(
+        request.query
+      );
 
       // For guest users, always set isMyReviews to false to show all reviews
       // For authenticated users, use the provided isMyReviews value
@@ -143,16 +154,25 @@ export class CourseReviewController extends BaseController {
     });
   }
 
-  async getCourseReviewStats(httpRequest: IHttpRequest): Promise<IHttpResponse> {
+  async getCourseReviewStats(
+    httpRequest: IHttpRequest
+  ): Promise<IHttpResponse> {
     return this.handleRequest(httpRequest, async (request) => {
       if (!request.params.courseId) {
         throw new BadRequestError("Course ID is required");
       }
 
-      const validated = getReviewStatsSchemaDef.params!.parse({ courseId: request.params.courseId });
-      const stats = await this.getCourseReviewStatsUseCase.execute(validated.courseId);
+      const validated = getReviewStatsSchemaDef.params!.parse({
+        courseId: request.params.courseId,
+      });
+      const stats = await this.getCourseReviewStatsUseCase.execute(
+        validated.courseId
+      );
 
-      return this.success_200(stats, "Course review stats retrieved successfully");
+      return this.success_200(
+        stats,
+        "Course review stats retrieved successfully"
+      );
     });
   }
 
@@ -166,14 +186,20 @@ export class CourseReviewController extends BaseController {
         throw new BadRequestError("Review ID is required");
       }
 
-      const validated = disableReviewSchemaDef.params!.parse({ id: request.params.id });
-      const result = await this.disableReviewUseCase.execute(validated.id, request.user.id);
+      const validated = disableReviewSchemaDef.params!.parse({
+        id: request.params.id,
+      });
+      const result = await this.disableReviewUseCase.execute(
+        validated.id,
+        request.user.id
+      );
 
-      const message = result.action === 'disabled' 
-        ? "Review disabled successfully" 
-        : "Review enabled successfully";
+      const message =
+        result.action === "disabled"
+          ? "Review disabled successfully"
+          : "Review enabled successfully";
 
       return this.success_200({ action: result.action }, message);
     });
   }
-} 
+}

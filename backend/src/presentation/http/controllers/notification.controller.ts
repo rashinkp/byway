@@ -16,18 +16,25 @@ export class NotificationController extends BaseController {
     super(httpErrors, httpSuccess);
   }
 
-  async getUserNotifications(httpRequest: IHttpRequest): Promise<IHttpResponse> {
+  async getUserNotifications(
+    httpRequest: IHttpRequest
+  ): Promise<IHttpResponse> {
     return this.handleRequest(httpRequest, async (request) => {
       if (!request.user?.id) {
         throw new UnauthorizedError("User not authenticated");
       }
       const validated = validateGetUserNotifications(request.query);
-      const notifications = await this.getUserNotificationsUseCase.execute(validated);
-      return this.success_200(notifications, "User notifications retrieved successfully");
+      const notifications = await this.getUserNotificationsUseCase.execute(
+        validated
+      );
+      return this.success_200(
+        notifications,
+        "User notifications retrieved successfully"
+      );
     });
   }
 
   async getUserNotificationsForSocketIO(data: any) {
     return this.getUserNotificationsUseCase.execute(data);
   }
-} 
+}

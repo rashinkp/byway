@@ -16,7 +16,10 @@ export function createCartDependencies(
   const { cartRepository, enrollmentRepository } = deps;
 
   // Initialize use cases
-  const addToCartUseCase = new AddToCartUseCase(cartRepository, enrollmentRepository);
+  const addToCartUseCase = new AddToCartUseCase(
+    cartRepository,
+    enrollmentRepository
+  );
   const getCartUseCase = new GetCartUseCase(cartRepository);
   const removeFromCartUseCase = new RemoveFromCartUseCase(cartRepository);
   const applyCouponUseCase = new ApplyCouponUseCase(cartRepository);
@@ -36,4 +39,4 @@ export function createCartDependencies(
   return {
     cartController,
   };
-} 
+}

@@ -1,5 +1,4 @@
-
-import { ReduceMoneyDto, WalletResponseDto } from "@/app/dtos/wallet";
+import { ReduceMoneyDto, WalletResponseDto } from "../../../dtos/wallet";
 import { IWalletRepository } from "../../../repositories/wallet.repository.interface";
 import { IReduceMoneyUseCase } from "../interfaces/reduce-money.usecase.interface";
 

@@ -5,12 +5,12 @@ import { IOtpProvider } from "../../../app/providers/I.otp-provider";
 import { EmailProvider } from "../../../app/providers/email.provider.interface";
 
 export class OtpProvider implements IOtpProvider {
-  constructor(private authRepository: IAuthRepository, private emailProvider: EmailProvider) {}
+  constructor(
+    private authRepository: IAuthRepository,
+    private emailProvider: EmailProvider
+  ) {}
 
-  async generateOtp(
-    email: string,
-    userId: string,
-  ): Promise<UserVerification> {
+  async generateOtp(email: string, userId: string): Promise<UserVerification> {
     // Generate 6-digit numeric OTP
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
 

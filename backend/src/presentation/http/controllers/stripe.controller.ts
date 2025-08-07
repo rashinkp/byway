@@ -55,30 +55,28 @@ export class StripeController extends BaseController {
         throw new Error("No signature found");
       }
 
-
       const event = await this.webhookGateway.verifySignature(
         request.body,
         signature
       );
 
-
-       const session = event.data.object;
-       const userId = session.metadata?.userId;
+      const session = event.data.object;
+      const userId = session.metadata?.userId;
       const courseId = session.metadata?.courseId;
-      
-       if (!userId || !courseId) {
-         throw new Error("Missing Stripe metadata: userId or courseId");
-       }
 
-       const isEnrolled = await this.getEnrollmentStatsUseCase.execute({
-         userId,
-         courseId,
-       });
+      if (!userId || !courseId) {
+        throw new Error("Missing Stripe metadata: userId or courseId");
+      }
 
-       if (isEnrolled) {
-         console.log(`⚠️ User ${userId} already enrolled in ${courseId}`);
-         return this.success_200(null, "Already enrolled");
-       }
+      const isEnrolled = await this.getEnrollmentStatsUseCase.execute({
+        userId,
+        courseId,
+      });
+
+      if (isEnrolled) {
+        console.log(`⚠️ User ${userId} already enrolled in ${courseId}`);
+        return this.success_200(null, "Already enrolled");
+      }
 
       const response = await this.paymentService.handleStripeWebhook(event);
       return this.success_200(response.data, response.message);
