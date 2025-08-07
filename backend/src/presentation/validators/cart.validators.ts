@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-// Add to Cart DTO
+// AddToCart DTO schema
 export const AddToCartDtoSchema = z.object({
   courseId: z.string().uuid(),
   couponId: z.string().uuid().optional(),
@@ -12,7 +12,7 @@ export function validateAddToCart(data: unknown): AddToCartDto {
   return AddToCartDtoSchema.parse(data);
 }
 
-// Get Cart DTO
+// GetCart DTO schema
 export const GetCartDtoSchema = z.object({
   page: z.coerce.number().int().positive().default(1),
   limit: z.coerce.number().int().positive().default(10),
@@ -25,7 +25,7 @@ export function validateGetCart(data: unknown): GetCartDto {
   return GetCartDtoSchema.parse(data);
 }
 
-// Remove from Cart DTO
+// RemoveFromCart DTO schema
 export const RemoveFromCartDtoSchema = z.object({
   courseId: z.string().uuid(),
 });
@@ -36,7 +36,7 @@ export function validateRemoveFromCart(data: unknown): RemoveFromCartDto {
   return RemoveFromCartDtoSchema.parse(data);
 }
 
-// Apply Coupon DTO
+// ApplyCoupon DTO schema
 export const ApplyCouponDtoSchema = z.object({
   courseId: z.string().uuid(),
   couponId: z.string().uuid(),
@@ -46,4 +46,4 @@ export type ApplyCouponDto = z.infer<typeof ApplyCouponDtoSchema>;
 
 export function validateApplyCoupon(data: unknown): ApplyCouponDto {
   return ApplyCouponDtoSchema.parse(data);
-} 
+}

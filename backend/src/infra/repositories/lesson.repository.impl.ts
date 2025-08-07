@@ -9,7 +9,7 @@ import {
   IGetPublicLessonsInputDTO,
   IPublicLessonListOutputDTO,
   ILessonOutputDTO,
-} from "../../app/dtos/lesson/lesson.dto";
+} from "../../app/dtos/lesson.dto";
 import { LessonStatus } from "../../domain/enum/lesson.enum";
 import { ContentStatus, ContentType } from "../../domain/enum/content.enum";
 import { ILessonRepository } from "../../app/repositories/lesson.repository";

@@ -1,4 +1,4 @@
-import { ICreateCourseInputDTO } from "../../../dtos/course/course.dto";
+import { ICreateCourseInputDTO } from "../../../dtos/course.dto";
 import { CreateCourseResultDTO } from "../implementations/create-course.usecase";
 
 export interface ICreateCourseUseCase {

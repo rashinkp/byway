@@ -1,7 +1,7 @@
 import {
   ILessonContentOutputDTO,
   IUpdateLessonContentInputDTO,
-} from "../../../dtos/lesson/lesson.dto";
+} from "../../../dtos/lesson.dto";
 import { LessonContent } from "../../../../domain/entities/content.entity";
 import { HttpError } from "../../../../presentation/http/errors/http-error";
 import { ILessonContentRepository } from "../../../repositories/content.repository";

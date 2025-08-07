@@ -1,4 +1,4 @@
-import { ILessonContentOutputDTO } from "../../../dtos/lesson/lesson.dto";
+import { ILessonContentOutputDTO } from "../../../dtos/lesson.dto";
 
 export interface IGetContentByLessonIdUseCase {
   execute(

@@ -4,7 +4,7 @@ import { HttpError } from "../../../../presentation/http/errors/http-error";
 import {
   ICategoryOutputDTO,
   IUpdateCategoryInputDTO,
-} from "../../../dtos/category/category.dto";
+} from "../../../dtos/category.dto";
 import { Category } from "../../../../domain/entities/category.entity";
 
 export class UpdateCategoryUseCase implements IUpdateCategoryUseCase {
@@ -29,9 +29,10 @@ export class UpdateCategoryUseCase implements IUpdateCategoryUseCase {
       }
     }
 
-     const updatedCategory = Category.update(category, 
+    const updatedCategory = Category.update(
+      category,
       input.name,
-      input.description,
+      input.description
     );
 
     const savedCategory = await this.categoryRepository.save(updatedCategory);

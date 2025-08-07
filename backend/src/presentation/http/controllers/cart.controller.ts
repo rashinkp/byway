@@ -5,16 +5,16 @@ import { IGetCartUseCase } from "../../../app/usecases/cart/interfaces/get-cart.
 import { IRemoveFromCartUseCase } from "../../../app/usecases/cart/interfaces/remove-from-cart.usecase.interface";
 import { IApplyCouponUseCase } from "../../../app/usecases/cart/interfaces/apply-coupon.usecase.interface";
 import { IClearCartUseCase } from "../../../app/usecases/cart/interfaces/clear-cart.usecase.interface";
-import {
-  validateAddToCart,
-  validateGetCart,
-  validateApplyCoupon,
-} from "../../../app/dtos/cart/cart.dto";
 import { HttpError } from "../errors/http-error";
 import { BaseController } from "./base.controller";
 import { IHttpErrors } from "../interfaces/http-errors.interface";
 import { IHttpSuccess } from "../interfaces/http-success.interface";
 import { UnauthorizedError } from "../errors/unautherized-error";
+import {
+  validateAddToCart,
+  validateApplyCoupon,
+  validateGetCart,
+} from "../../../presentation/validators/cart.validators";
 
 export class CartController extends BaseController {
   constructor(

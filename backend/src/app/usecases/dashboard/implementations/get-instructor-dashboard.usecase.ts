@@ -2,7 +2,7 @@ import { IGetInstructorDashboardUseCase } from "../interfaces/get-instructor-das
 import {
   IGetInstructorDashboardInput,
   IInstructorDashboardResponse,
-} from "../../..//dtos/instructor/instructor-dashboard.dto";
+} from "../../../dtos/instructor-dashboard.dto";
 import { IRevenueRepository } from "../../..//repositories/revenue.repository";
 import { IUserRepository } from "../../..//repositories/user.repository";
 import { IEnrollmentRepository } from "../../..//repositories/enrollment.repository.interface";

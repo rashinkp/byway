@@ -1,7 +1,7 @@
 import {
   UpdateProgressDto,
   IProgressOutputDTO,
-} from "../../../dtos/course/progress.dto";
+} from "../../../dtos/progress.dto";
 import { ApiResponse } from "../../../../presentation/http/interfaces/ApiResponse";
 
 export interface IUpdateProgressUseCase {

@@ -2,7 +2,7 @@ import {
   IGetAllCoursesInputDTO,
   IGetEnrolledCoursesInputDTO,
   ICourseListResponseDTO,
-} from "../dtos/course/course.dto";
+} from "../dtos/course.dto";
 import { Course } from "../../domain/entities/course.entity";
 import { CourseDetails } from "../../domain/entities/course.entity";
 import {

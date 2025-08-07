@@ -2,7 +2,7 @@ import { IUpdateProgressUseCase } from "../interfaces/update-progress.usecase.in
 import {
   UpdateProgressDto,
   IProgressOutputDTO,
-} from "../../../dtos/course/progress.dto";
+} from "../../../dtos/progress.dto";
 import { ApiResponse } from "../../../../presentation/http/interfaces/ApiResponse";
 import { IEnrollmentRepository } from "../../../repositories/enrollment.repository.interface";
 import { ILessonProgressRepository } from "../../../repositories/lesson-progress.repository.interface";

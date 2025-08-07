@@ -1,4 +1,4 @@
-import { IBaseDashboardStats, IBaseCourseStats } from "../shared/dashboard.dto";
+import { IBaseDashboardStats, IBaseCourseStats } from "./shared/dashboard.dto";
 
 // Instructor-specific dashboard stats
 export interface IInstructorDashboardStats extends IBaseDashboardStats {
@@ -46,4 +46,4 @@ export interface IGetInstructorDashboardInput {
   limit?: number;
   startDate?: Date;
   endDate?: Date;
-} 
+}

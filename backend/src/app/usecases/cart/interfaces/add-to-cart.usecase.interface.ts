@@ -1,5 +1,5 @@
 import { Cart } from "../../../../domain/entities/cart.entity";
-import { AddToCartDto } from "../../../dtos/cart/cart.dto";
+import { AddToCartDto } from "../../../dtos/cart.dto";
 
 export interface IAddToCartUseCase {
   execute(userId: string, data: AddToCartDto): Promise<Cart>;

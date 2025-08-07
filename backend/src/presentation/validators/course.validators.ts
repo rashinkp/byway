@@ -6,7 +6,7 @@ import {
   IGetEnrolledCoursesInputDTO,
   ICreateEnrollmentInputDTO,
   IUpdateCourseApprovalInputDTO,
-} from "../../app/dtos/course/course.dto";
+} from "../../app/dtos/course.dto";
 import { CourseLevel } from "../../domain/enum/course-level.enum";
 import { CourseStatus } from "../../domain/enum/course-status.enum";
 

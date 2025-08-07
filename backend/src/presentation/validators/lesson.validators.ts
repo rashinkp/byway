@@ -4,7 +4,7 @@ import {
   IUpdateLessonInputDTO,
   IGetAllLessonsInputDTO,
   IGetPublicLessonsInputDTO,
-} from "../../app/dtos/lesson/lesson.dto";
+} from "../../app/dtos/lesson.dto";
 import { ContentStatus, ContentType } from "../../domain/enum/content.enum";
 import { LessonStatus } from "../../domain/enum/lesson.enum";
 

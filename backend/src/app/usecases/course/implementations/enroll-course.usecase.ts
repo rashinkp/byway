@@ -1,7 +1,7 @@
 import {
   ICreateEnrollmentInputDTO,
   IEnrollmentOutputDTO,
-} from "../../../dtos/course/course.dto";
+} from "../../../dtos/course.dto";
 import { CourseStatus } from "../../../../domain/enum/course-status.enum";
 import { HttpError } from "../../../../presentation/http/errors/http-error";
 import { ICourseRepository } from "../../../repositories/course.repository.interface";

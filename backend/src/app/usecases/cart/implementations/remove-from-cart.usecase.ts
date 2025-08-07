@@ -1,5 +1,5 @@
 import { ICartRepository } from "../../../repositories/cart.repository";
-import { RemoveFromCartDto } from "../../../dtos/cart/cart.dto";
+import { RemoveFromCartDto } from "../../../dtos/cart.dto";
 import { IRemoveFromCartUseCase } from "../interfaces/remove-from-cart.usecase.interface";
 import { HttpError } from "../../../../presentation/http/errors/http-error";
 

@@ -1,4 +1,4 @@
-import { ApproveInstructorRequestDTO } from "../../../dtos/instructor/instructor.dto";
+import { ApproveInstructorRequestDTO } from "../../../dtos/instructor.dto";
 import { Instructor } from "../../../../domain/entities/instructor.entity";
 import { Role } from "../../../../domain/enum/role.enum";
 import { JwtPayload } from "../../../../presentation/express/middlewares/auth.middleware";

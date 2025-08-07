@@ -1,7 +1,7 @@
 import {
   ICourseWithDetailsDTO,
   IUpdateCourseApprovalInputDTO,
-} from "../../../dtos/course/course.dto";
+} from "../../../dtos/course.dto";
 import { APPROVALSTATUS } from "../../../../domain/enum/approval-status.enum";
 import { HttpError } from "../../../../presentation/http/errors/http-error";
 import { ICourseRepository } from "../../../repositories/course.repository.interface";

@@ -1,6 +1,6 @@
 import { Cart } from "../../../../domain/entities/cart.entity";
 import { ICartRepository } from "../../../repositories/cart.repository";
-import { ApplyCouponDto } from "../../../dtos/cart/cart.dto";
+import { ApplyCouponDto } from "../../../dtos/cart.dto";
 import { IApplyCouponUseCase } from "../interfaces/apply-coupon.usecase.interface";
 import { HttpError } from "../../../../presentation/http/errors/http-error";
 

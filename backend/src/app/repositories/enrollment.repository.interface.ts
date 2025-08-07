@@ -1,7 +1,7 @@
 import {
   ICreateEnrollmentInputDTO,
   IEnrollmentOutputDTO,
-} from "../dtos/course/course.dto";
+} from "../dtos/course.dto";
 import { Enrollment } from "../../domain/entities/enrollment.entity";
 import {
   IEnrollmentStats,

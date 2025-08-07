@@ -11,7 +11,7 @@ import {
   ICourseListResponseDTO,
   IGetAllCoursesInputDTO,
   IGetEnrolledCoursesInputDTO,
-} from "../../app/dtos/course/course.dto";
+} from "../../app/dtos/course.dto";
 import { ICourseRepository } from "../../app/repositories/course.repository.interface";
 import { HttpError } from "../../presentation/http/errors/http-error";
 import {
@@ -19,7 +19,7 @@ import {
   IGetCourseStatsInput,
 } from "@/app/usecases/course/interfaces/get-course-stats.usecase.interface";
 import { IGetTopEnrolledCoursesInput } from "@/app/usecases/course/interfaces/get-top-enrolled-courses.usecase.interface";
-import { ITopEnrolledCourse } from "@/app/dtos/admin/admin-dashboard.dto";
+import { ITopEnrolledCourse } from "@/app/dtos/admin-dashboard.dto";
 
 export class CourseRepository implements ICourseRepository {
   constructor(private prisma: PrismaClient) {}
