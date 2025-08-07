@@ -1,6 +1,7 @@
-import { PaymentGateway } from "../../../domain/enum/payment-gateway.enum";
-import { TransactionStatus } from "../../../domain/enum/transaction-status.enum";
-import { TransactionType } from "../../../domain/enum/transaction-type.enum";
+import { PaymentGateway } from "@/domain/enum/payment-gateway.enum";
+import { TransactionStatus } from "../../domain/enum/transaction-status.enum";
+import { TransactionType } from "../../domain/enum/transaction-type.enum";
+
 
 export interface ICreateTransactionInputDTO {
   orderId?: string;

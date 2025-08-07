@@ -1,4 +1,4 @@
-import { UpdateUserDto } from "../../../dtos/user/user.dto";
+import { UpdateUserDto } from "../../../dtos/user.dto";
 import { User } from "../../../../domain/entities/user.entity";
 import { UserProfile } from "../../../../domain/entities/user-profile.entity";
 import { Role } from "../../../../domain/enum/role.enum";

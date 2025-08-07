@@ -3,7 +3,7 @@ import {
   PaymentGateway,
   CheckoutSession,
 } from "../../../app/providers/payment-gateway.interface";
-import { CreateCheckoutSessionDto } from "../../../app/dtos/stripe/create-checkout-session.dto";
+import { CreateCheckoutSessionDto } from "../../../app/dtos/payment.dto";
 import { HttpError } from "../../../presentation/http/errors/http-error";
 import { StatusCodes } from "http-status-codes";
 import { envConfig } from "../../../presentation/express/configs/env.config";

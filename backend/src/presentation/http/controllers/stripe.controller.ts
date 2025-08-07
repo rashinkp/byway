@@ -5,7 +5,7 @@ import { IHttpErrors } from "../interfaces/http-errors.interface";
 import { IHttpSuccess } from "../interfaces/http-success.interface";
 import { UnauthorizedError } from "../errors/unautherized-error";
 import { IPaymentService } from "../../../app/services/payment/interfaces/payment.service.interface";
-import { createCheckoutSessionSchema } from "../../../app/dtos/stripe/create-checkout-session.dto";
+import { createCheckoutSessionSchema } from "../../../app/dtos/payment.dto";
 import { StripeWebhookGateway } from "../../../infra/providers/stripe/stripe-webhook.gateway";
 import { IGetEnrollmentStatsUseCase } from "@/app/usecases/enrollment/interfaces/get-enrollment-stats.usecase.interface";
 

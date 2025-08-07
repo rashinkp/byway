@@ -1,4 +1,4 @@
-import { GetAllUsersDto } from "../dtos/user/user.dto";
+import { GetAllUsersDto } from "../dtos/user.dto";
 import { User } from "../../domain/entities/user.entity";
 import { UserProfile } from "../../domain/entities/user-profile.entity";
 import {

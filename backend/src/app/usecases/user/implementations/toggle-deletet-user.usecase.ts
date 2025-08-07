@@ -1,4 +1,4 @@
-import { ToggleDeleteUserDto } from "../../../dtos/user/user.dto";
+import { ToggleDeleteUserDto } from "../../../dtos/user.dto";
 import { User } from "../../../../domain/entities/user.entity";
 import { HttpError } from "../../../../presentation/http/errors/http-error";
 import { IUserRepository } from "../../../repositories/user.repository";

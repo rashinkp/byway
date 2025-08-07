@@ -1,4 +1,4 @@
-import { CreateCheckoutSessionDto } from "../dtos/stripe/create-checkout-session.dto";
+import { CreateCheckoutSessionDto } from "../dtos/payment.dto";
 
 export interface CheckoutSession {
   id: string;

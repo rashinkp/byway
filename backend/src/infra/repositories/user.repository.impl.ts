@@ -1,7 +1,7 @@
 import { PrismaClient, Gender, Role } from "@prisma/client";
 import { User } from "../../domain/entities/user.entity";
 import { UserProfile } from "../../domain/entities/user-profile.entity";
-import { GetAllUsersDto } from "../../app/dtos/user/user.dto";
+import { GetAllUsersDto } from "../../app/dtos/user.dto";
 import {
   IPaginatedResponse,
   IUserRepository,
@@ -13,8 +13,8 @@ export class UserRepository implements IUserRepository {
 
   async findAll(dto: GetAllUsersDto): Promise<IPaginatedResponse<User>> {
     const {
-      page,
-      limit,
+      page = 1,
+      limit = 10,
       sortBy,
       sortOrder,
       includeDeleted,
