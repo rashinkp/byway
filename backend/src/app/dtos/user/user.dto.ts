@@ -90,3 +90,14 @@ export type GetUserDto = z.infer<typeof GetUserDtoSchema>;
 export function validateGetUser(data: unknown): GetUserDto {
   return GetUserDtoSchema.parse(data);
 }
+
+
+
+export interface IUpdateUserRequestDTO {
+  id: string, 
+  name?:string,
+  facebookId?: string, 
+  googleId?:string,
+  avatar?: string, 
+  isVerified?:boolean
+}

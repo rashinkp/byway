@@ -39,7 +39,6 @@ export class RegisterUseCase implements IRegisterUseCase {
       } else {
         // Update existing unverified user
         user = User.update(user, {
-          id: user.id,
           name: dto.name,
           password: hashedPassword,
         });
@@ -47,8 +46,6 @@ export class RegisterUseCase implements IRegisterUseCase {
       }
 
       await this.otpProvider.generateOtp(user.email, user.id);
-      // TODO: Implement email sending
-      // await this.emailProvider.sendOtpEmail(user.email, verification.otp);
 
       return user;
     } catch (error) {

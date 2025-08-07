@@ -1,11 +1,11 @@
 import { User } from "../../../../domain/entities/user.entity";
 import { IAuthRepository } from "../../../repositories/auth.repository";
-import { IUpdateUserRequestDTO } from "../../../../domain/entities/user.entity";
 import { IFacebookAuthUseCase } from "../interfaces/facebook-auth.usecase.interface";
 import { FacebookAuthDto } from "../../../dtos/auth/facebook-auth.dto";
 import { AuthProvider } from "../../../../domain/enum/auth-provider.enum";
 import { Role } from "../../../../domain/enum/role.enum";
 import { HttpError } from "../../../../presentation/http/errors/http-error";
+import { IUpdateUserRequestDTO } from "@/app/dtos/user/user.dto";
 
 export class FacebookAuthUseCase implements IFacebookAuthUseCase {
   constructor(private authRepository: IAuthRepository) {}
@@ -33,7 +33,6 @@ export class FacebookAuthUseCase implements IFacebookAuthUseCase {
         return await this.authRepository.createUser(user);
       }
 
-      // Update existing user
       const updates: IUpdateUserRequestDTO = {
         id: user.id,
         facebookId: userId,

@@ -37,7 +37,6 @@ export class UpdateUserUseCase implements IUpdateUserUseCase {
     }
 
     const updatedUser = User.update(user, {
-      id: user.id,
       name: dto.name,
       avatar: dto.avatar,
       role: dto.role as Role,
