@@ -59,7 +59,7 @@ import { ILessonRepository } from "../app/repositories/lesson.repository";
 import { Router } from "express";
 import { RevenueDistributionService } from "../app/services/revenue-distribution/implementations/revenue-distribution.service";
 import { PaymentService } from "../app/services/payment/implementations/payment.service";
-import { GetTotalUnreadCountUseCase } from "@/app/usecases/message/implementations/get-total-unread-count.usecase";
+import { GetTotalUnreadCountUseCase } from "../app/usecases/message/implementations/get-total-unread-count.usecase";
 
 export interface AppDependencies {
   authController: AuthController;
