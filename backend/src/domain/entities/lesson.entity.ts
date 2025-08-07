@@ -1,4 +1,4 @@
-import { v4 as uuidv4 } from "uuid";
+
 import { LessonOrder } from "../value-object/lesson-order";
 import { LessonStatus } from "../enum/lesson.enum";
 import { ILessonContentInput, LessonContent } from "./content.entity";
@@ -30,7 +30,7 @@ export class Lesson {
   private _deletedAt: Date | null;
 
   private constructor(props: LessonProps) {
-    this._id = props.id;
+    this._id  = props.id;
     this._courseId = props.courseId;
     this._title = props.title;
     this._description = props.description ?? null;
@@ -59,7 +59,7 @@ export class Lesson {
 
     const content = input.content
       ? LessonContent.fromPersistence({
-          id: input.content.id || uuidv4(), 
+          id: input.content.id , 
           lessonId: input.content.lessonId,
           type: input.content.type,
           status: input.content.status as ContentStatus,
@@ -81,7 +81,7 @@ export class Lesson {
       : null;
 
     return new Lesson({
-      id: uuidv4(),
+      id:'',
       courseId: input.courseId,
       title: input.title.trim(),
       description: input.description?.trim() ?? null,
@@ -124,7 +124,7 @@ export class Lesson {
     if (input.content !== undefined) {
       props.content = input.content
         ? LessonContent.fromPersistence({
-            id: input.content.id || existingLesson.content?.id || uuidv4(),
+            id: input.content.id || existingLesson.content?.id || '',
             lessonId: input.content.lessonId,
             type: input.content.type,
             status: input.content.status as ContentStatus,

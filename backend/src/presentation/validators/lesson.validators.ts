@@ -24,7 +24,7 @@ const quizQuestionSchema = z.object({
 
 // LessonContent schema (used in create and update)
 const lessonContentSchema = z.object({
-  id: z.string().uuid().optional(),
+  id: z.string().uuid(),
   lessonId: z.string().uuid("Invalid lesson ID"),
   type: z.enum([ContentType.VIDEO, ContentType.QUIZ, ContentType.DOCUMENT], {
     message: "Invalid content type",

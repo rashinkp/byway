@@ -1,9 +1,6 @@
 import { PrismaClient } from "@prisma/client";
 import { ContentStatus, ContentType } from "../../domain/enum/content.enum";
-import {
-  LessonContent,
-  QuizQuestion,
-} from "../../domain/entities/content.entity";
+import { LessonContent, QuizQuestion } from "../../domain/entities/content.entity";
 import { ILessonContentRepository } from "../../app/repositories/content.repository";
 
 export class LessonContentRepository implements ILessonContentRepository {
@@ -183,6 +180,7 @@ export class LessonContentRepository implements ILessonContentRepository {
       deletedAt: updatedContent.deletedAt,
     });
   }
+
 
   async delete(id: string): Promise<void> {
     await this.prisma.lessonContent.delete({

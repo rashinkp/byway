@@ -1,4 +1,4 @@
-import { v4 as uuidv4 } from "uuid";
+
 import { ContentStatus, ContentType } from "../enum/content.enum";
 import { FileUrl } from "../value-object/file-url";
 
@@ -36,7 +36,7 @@ export interface QuizQuestion {
 }
 
 export interface ILessonContentInput {
-  id?: string; // optional, since you assign new id if missing
+  id: string; // optional, since you assign new id if missing
   lessonId: string; // required
   type: ContentType; // required
   status?: ContentStatus; // optional, use enum
@@ -98,7 +98,7 @@ export class LessonContent {
     }
 
     return new LessonContent({
-      id: uuidv4(),
+      id: '',
       lessonId: input.lessonId,
       type: input.type,
       status: input.status || ContentStatus.DRAFT,

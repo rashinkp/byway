@@ -1,4 +1,5 @@
-import { QuizQuestion } from "../../../domain/entities/content.entity";
+
+import { QuizQuestion } from "@/domain/entities/content.entity";
 import { ContentStatus, ContentType } from "../../../domain/enum/content.enum";
 import { LessonStatus } from "../../../domain/enum/lesson.enum";
 
@@ -42,7 +43,7 @@ export interface ILessonContentOutputDTO {
 }
 
 export interface ILessonContentInputDTO {
-  id?: string; // Optional for create, required for update
+  id: string; // Optional for create, required for update
   lessonId: string;
   type: ContentType;
   status: ContentStatus;
