@@ -44,7 +44,7 @@ import { PrismaCertificateRepository } from "../infra/repositories/certificate-r
 import { CertificateRepositoryInterface } from "../app/repositories/certificate-repository.interface";
 import { S3Service } from "../infra/providers/s3/s3.service";
 import { EmailProviderImpl } from "../infra/providers/email/email.provider";
-import { GetEnrollmentStatsUseCase } from "@/app/usecases/enrollment/implementations/get-enrollment-stats.usecase";
+import { GetEnrollmentStatsUseCase } from "../app/usecases/enrollment/implementations/get-enrollment-stats.usecase";
 
 export interface SharedDependencies {
   prisma: typeof prismaClient;

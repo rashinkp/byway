@@ -1,8 +1,8 @@
-import { ICheckoutSessionRepository } from "@/app/repositories/checkout-session.repository";
+import { ICheckoutSessionRepository } from "../../../app/repositories/checkout-session.repository";
 import { ICheckoutSessionUseCases } from "./checkout-session.usecase.interface";
-import { CheckoutSessionInput } from "@/app/records/checkout-session.records";
-import { CheckoutSessionStatus } from "@/domain/enum/checkout-session.enum";
-import { HttpError } from "@/presentation/http/errors/http-error";
+import { CheckoutSessionInput } from "../../../app/records/checkout-session.records";
+import { CheckoutSessionStatus } from "../../../domain/enum/checkout-session.enum";
+import { HttpError } from "../../../presentation/http/errors/http-error";
 
 
 export class CheckoutSessionUseCases implements ICheckoutSessionUseCases {
