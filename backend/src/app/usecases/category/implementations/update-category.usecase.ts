@@ -29,10 +29,10 @@ export class UpdateCategoryUseCase implements IUpdateCategoryUseCase {
       }
     }
 
-    const updatedCategory = Category.update(category, {
-      name: input.name,
-      description: input.description,
-    });
+     const updatedCategory = Category.update(category, 
+      input.name,
+      input.description,
+    );
 
     const savedCategory = await this.categoryRepository.save(updatedCategory);
 
