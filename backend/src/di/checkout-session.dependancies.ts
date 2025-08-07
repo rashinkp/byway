@@ -7,13 +7,13 @@ import { CheckoutSessionUseCases } from "../app/usecases/checkout-session/checko
 
 export function getCheckoutSessionDependencies(sharedDeps?: ReturnType<typeof createSharedDependencies>) {
   const deps = sharedDeps || createSharedDependencies();
-  const checkoutSessionRepository = new CheckoutSessionRepository();
+ 
   const checkoutSessionUseCases = new CheckoutSessionUseCases(
-    checkoutSessionRepository,
+    deps.checkoutSessionRepository,
   );
 
   return {
-    checkoutSessionRepository,
+    checkoutSessionRepository : deps.checkoutSessionRepository,
     checkoutSessionUseCases
   };
 }

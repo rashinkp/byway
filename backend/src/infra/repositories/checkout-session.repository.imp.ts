@@ -1,6 +1,6 @@
 import { CheckoutSessionInput, CheckoutSessionRecord } from "@/app/records/checkout-session.records";
 import { ICheckoutSessionRepository } from "@/app/repositories/checkout-session.repository";
-import { PrismaClient } from "@prisma/client";
+import { CheckoutSessionStatus, PrismaClient } from "@prisma/client";
 
 export class CheckoutSessionRepository implements ICheckoutSessionRepository {
   private prisma: PrismaClient;
@@ -69,12 +69,30 @@ export class CheckoutSessionRepository implements ICheckoutSessionRepository {
     });
   }
 
-
-  async findBySessionId(sessionId: string): Promise<CheckoutSessionRecord | null> {
+  async findBySessionId(
+    sessionId: string
+  ): Promise<CheckoutSessionRecord | null> {
     const record = await this.prisma.checkoutSession.findUnique({
       where: { sessionId },
     });
     return record ? this.toRecord(record) : null;
+  }
+
+  async findAnyPendingSessionForUserAndCourses(
+    userId: string,
+    courseIds: string[]
+  ): Promise<Boolean> {
+    const record =  this.prisma.checkoutSession.findMany({
+      where: {
+        userId,
+        courseId: { in: courseIds },
+        status: 'PENDING',
+      },
+
+
+    });
+
+    return record !== null ? true : false;
   }
 
   // Helper to convert Prisma model to your domain record type

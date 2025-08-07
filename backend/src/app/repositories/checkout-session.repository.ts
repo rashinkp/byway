@@ -8,4 +8,8 @@ export interface ICheckoutSessionRepository {
   findBySessionId(sessionId: string): Promise<CheckoutSessionRecord | null>;
   update(session: CheckoutSessionInput): Promise<CheckoutSessionRecord>;
   deleteById(id: string): Promise<void>;
+  findAnyPendingSessionForUserAndCourses(
+    userId: string,
+    courseIds: string[]
+  ): Promise<Boolean>;
 }

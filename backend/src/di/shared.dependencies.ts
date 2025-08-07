@@ -45,6 +45,7 @@ import { CertificateRepositoryInterface } from "../app/repositories/certificate-
 import { S3Service } from "../infra/providers/s3/s3.service";
 import { EmailProviderImpl } from "../infra/providers/email/email.provider";
 import { GetEnrollmentStatsUseCase } from "../app/usecases/enrollment/implementations/get-enrollment-stats.usecase";
+import { CheckoutSessionRepository } from "../infra/repositories/checkout-session.repository.imp";
 
 export interface SharedDependencies {
   prisma: typeof prismaClient;
@@ -75,6 +76,7 @@ export interface SharedDependencies {
   s3Service: S3Service;
   emailProvider: EmailProviderImpl;
   getEnrollmentStatsUseCase: GetEnrollmentStatsUseCase
+  checkoutSessionRepository: CheckoutSessionRepository;
 }
 
 export function createSharedDependencies(): SharedDependencies {
@@ -94,8 +96,9 @@ export function createSharedDependencies(): SharedDependencies {
   const emailProvider = new EmailProviderImpl();
   const otpProvider = new OtpProvider(authRepository, emailProvider);
   const googleAuthProvider = new GoogleAuthProvider(envConfig.GOOGLE_CLIENT_ID);
+   const checkoutSessionRepository = new CheckoutSessionRepository();
   const walletRepository = new WalletRepository(prismaClient);
-  const paymentGateway = new StripePaymentGateway();
+  const paymentGateway = new StripePaymentGateway(checkoutSessionRepository);
   const webhookGateway = new StripeWebhookGateway();
 
   // Create a temporary mock revenue distribution service
@@ -157,5 +160,6 @@ export function createSharedDependencies(): SharedDependencies {
     s3Service,
     emailProvider,
     getEnrollmentStatsUseCase,
+    checkoutSessionRepository
   };
 }

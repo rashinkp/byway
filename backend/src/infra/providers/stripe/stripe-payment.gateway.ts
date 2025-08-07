@@ -7,11 +7,15 @@ import { CreateCheckoutSessionDto } from "../../../app/dtos/stripe/create-checko
 import { HttpError } from "../../../presentation/http/errors/http-error";
 import { StatusCodes } from "http-status-codes";
 import { envConfig } from "../../../presentation/express/configs/env.config";
+import { ICheckoutSessionRepository } from "@/app/repositories/checkout-session.repository";
+import { CheckoutSessionStatus } from "../../../domain/enum/checkout-session.enum";
 
 export class StripePaymentGateway implements PaymentGateway {
   private stripe: Stripe;
 
-  constructor() {
+  constructor(
+    private checkoutSessionRepository: ICheckoutSessionRepository
+  ) {
     const stripeKey = envConfig.STRIPE_SECRET_KEY;
     if (!stripeKey) {
       throw new Error("STRIPE_SECRET_KEY is not defined");
@@ -27,7 +31,21 @@ export class StripePaymentGateway implements PaymentGateway {
     customerEmail: string,
     orderId: string
   ): Promise<CheckoutSession> {
-    const { courses, couponCode, isWalletTopUp, amount } = input;
+    const { courses, couponCode, isWalletTopUp, amount , userId } = input;
+
+    const courseIds = courses?.map((course) => course.id);
+
+    const existingSession =
+      await this.checkoutSessionRepository.findAnyPendingSessionForUserAndCourses(
+        userId,
+        courseIds
+      );
+
+    if (existingSession && existingSession.length > 0) {
+      throw new Error(
+        "You already have a pending payment session for one or more of these courses."
+      );
+    }
 
     // Validate FRONTEND_URL
     const frontendUrl = (envConfig.FRONTEND_URL || "").split(",")[0].trim();
@@ -121,6 +139,17 @@ export class StripePaymentGateway implements PaymentGateway {
         },
         discounts: couponCode ? [{ coupon: couponCode }] : undefined,
       });
+
+
+       await this.checkoutSessionRepository.create({
+         sessionId: session.id,
+         userId: input.userId,
+         courseId: input.courses
+           ? input.courses.map((c) => c.id).join(",")
+           : "", 
+         status: CheckoutSessionStatus.PENDING,
+       });
+
 
       return {
         id: session.id,
