@@ -6,10 +6,11 @@ export interface StripeDependencies {
 }
 
 export const createStripeDependencies = (sharedDeps: SharedDependencies): StripeDependencies => {
-  const { httpErrors, httpSuccess, paymentService } = sharedDeps;
+  const { httpErrors, httpSuccess, paymentService,getEnrollmentStatsUseCase  } = sharedDeps;
 
   const stripeController = new StripeController(
     paymentService,
+    getEnrollmentStatsUseCase,
     httpErrors,
     httpSuccess
   );

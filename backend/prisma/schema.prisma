@@ -39,6 +39,7 @@ model User {
   sentMessages      Message[]       @relation("MessageSender")
   notifications     Notification[]  // User's notifications
   certificates      Certificate[]   @relation("UserToCertificate")
+  checkoutSessions  CheckoutSession[] 
 }
 
 model UserProfile {
@@ -219,6 +220,7 @@ model Enrollment {
   @@id([userId, courseId])
   @@index([userId])
   @@index([courseId])
+  @@unique([userId, courseId])  
 }
 
 // New model to track lesson progress
@@ -621,4 +623,18 @@ enum CertificateStatus {
   ISSUED
   EXPIRED
   REVOKED
+}
+
+
+model CheckoutSession {
+  id            String    @id @default(cuid())          
+  sessionId     String    @unique                       
+  userId        String                                    
+  user          User      @relation(fields: [userId], references: [id])
+  courseId      String                                 
+  status        String                                 
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([userId, status])
 }
