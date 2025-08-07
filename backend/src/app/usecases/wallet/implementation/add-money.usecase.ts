@@ -1,5 +1,5 @@
-import { AddMoneyDto } from "../../../dtos/wallet/add-money.dto";
-import { WalletResponseDto } from "../../../dtos/wallet/wallet-response.dto";
+
+import { AddMoneyDto, WalletResponseDto } from "@/app/dtos/wallet";
 import { Wallet } from "../../../../domain/entities/wallet.entity";
 import { IWalletRepository } from "../../../repositories/wallet.repository.interface";
 import { IAddMoneyUseCase } from "../interfaces/add-money.usecase.interface";
