@@ -632,9 +632,18 @@ model CheckoutSession {
   userId        String                                    
   user          User      @relation(fields: [userId], references: [id])
   courseId      String                                 
-  status        String                                 
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  status        CheckoutSessionStatus @default(PENDING)                       
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
 
   @@index([userId, status])
 }
+
+
+enum CheckoutSessionStatus {
+  PENDING
+  COMPLETED
+  EXPIRED
+  FAILED
+}
+

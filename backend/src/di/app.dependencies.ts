@@ -60,6 +60,8 @@ import { Router } from "express";
 import { RevenueDistributionService } from "../app/services/revenue-distribution/implementations/revenue-distribution.service";
 import { PaymentService } from "../app/services/payment/implementations/payment.service";
 import { GetTotalUnreadCountUseCase } from "@/app/usecases/message/implementations/get-total-unread-count.usecase";
+import { getCheckoutSessionDependencies } from "./checkout-session.dependancies";
+import { ICheckoutSessionRepository } from "@/app/repositories/checkout-session.repository";
 
 export interface AppDependencies {
   authController: AuthController;
@@ -103,7 +105,7 @@ export interface AppDependencies {
   lessonRepository: ILessonRepository;
   certificateController: CertificateController;
   getTotalUnreadCountUseCase: GetTotalUnreadCountUseCase;
-
+  checkoutSessionRepository: ICheckoutSessionRepository
 }
 
 export function createAppDependencies(): AppDependencies {
@@ -157,6 +159,7 @@ export function createAppDependencies(): AppDependencies {
   const revenueDeps = createRevenueDependencies(shared);
   const dashboardDeps = createDashboardDependencies(shared);
   const chatDeps = createChatDependencies(shared);
+  const checkoutSessionDeps = getCheckoutSessionDependencies(shared);
 
   const searchRepository = new SearchRepository(prisma);
   const globalSearchUseCase = new GlobalSearchUseCase(searchRepository);
@@ -226,6 +229,7 @@ export function createAppDependencies(): AppDependencies {
     lessonRepository: shared.lessonRepository,
     certificateController: certificateDeps.certificateController,
     getTotalUnreadCountUseCase: chatDeps.getTotalUnreadCountUseCase,
+    checkoutSessionRepository: checkoutSessionDeps.checkoutSessionRepository,
   };
 }
 
