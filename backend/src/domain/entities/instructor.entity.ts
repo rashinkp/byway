@@ -31,7 +31,7 @@ export class Instructor {
   private _updatedAt: Date;
   private _deletedAt?: Date | null;
 
-  static create(dto: {
+  static create(input: {
     userId: string;
     areaOfExpertise: string;
     professionalExperience: string;
@@ -41,20 +41,20 @@ export class Instructor {
     certifications: string;
     cv: string;
   }): Instructor {
-    if (!dto.userId || !dto.areaOfExpertise || !dto.professionalExperience || !dto.education || !dto.cv) {
+    if (!input.userId || !input.areaOfExpertise || !input.professionalExperience || !input.education || !input.cv) {
       throw new Error("Required fields are missing");
     }
 
     return new Instructor({
       id: crypto.randomUUID(),
-      userId: dto.userId,
-      areaOfExpertise: dto.areaOfExpertise,
-      professionalExperience: dto.professionalExperience,
-      about: dto.about,
-      website: dto.website,
-      education: dto.education,
-      certifications: dto.certifications,
-      cv: dto.cv,
+      userId: input.userId,
+      areaOfExpertise: input.areaOfExpertise,
+      professionalExperience: input.professionalExperience,
+      about: input.about,
+      website: input.website,
+      education: input.education,
+      certifications: input.certifications,
+      cv: input.cv,
       status: "PENDING",
       totalStudents: 0,
       createdAt: new Date(),
@@ -63,7 +63,7 @@ export class Instructor {
     });
   }
 
-  static update(existingInstructor: Instructor, dto: {
+  static update(existingInstructor: Instructor, input: {
     id: string;
     areaOfExpertise?: string;
     professionalExperience?: string;
@@ -74,7 +74,7 @@ export class Instructor {
     cv?: string;
     status?: "PENDING" | "APPROVED" | "DECLINED";
   }): Instructor {
-    if (existingInstructor._id !== dto.id) {
+    if (existingInstructor._id !== input.id) {
       throw new Error("Cannot update instructor with mismatched ID");
     }
 
@@ -83,14 +83,14 @@ export class Instructor {
       updatedAt: new Date(),
     };
 
-    if (dto.areaOfExpertise) updatedProps.areaOfExpertise = dto.areaOfExpertise;
-    if (dto.professionalExperience) updatedProps.professionalExperience = dto.professionalExperience;
-    if (dto.about !== undefined) updatedProps.about = dto.about;
-    if (dto.website !== undefined) updatedProps.website = dto.website;
-    if (dto.education) updatedProps.education = dto.education;
-    if (dto.certifications !== undefined) updatedProps.certifications = dto.certifications;
-    if (dto.cv) updatedProps.cv = dto.cv;
-    if (dto.status) updatedProps.status = dto.status;
+    if (input.areaOfExpertise) updatedProps.areaOfExpertise = input.areaOfExpertise;
+    if (input.professionalExperience) updatedProps.professionalExperience = input.professionalExperience;
+    if (input.about !== undefined) updatedProps.about = input.about;
+    if (input.website !== undefined) updatedProps.website = input.website;
+    if (input.education) updatedProps.education = input.education;
+    if (input.certifications !== undefined) updatedProps.certifications = input.certifications;
+    if (input.cv) updatedProps.cv = input.cv;
+    if (input.status) updatedProps.status = input.status;
 
     return new Instructor(updatedProps);
   }

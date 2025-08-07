@@ -25,6 +25,32 @@ export interface LessonContentProps {
   deletedAt: Date | null;
 }
 
+
+
+export interface QuizQuestion {
+  id?: string;
+  question: string;
+  options: string[];
+  correctAnswer: string;
+  // any other quiz question fields you want to add
+}
+
+export interface ILessonContentInput {
+  id?: string; // optional, since you assign new id if missing
+  lessonId: string; // required
+  type: ContentType; // required
+  status?: ContentStatus; // optional, use enum
+  title?: string | null;
+  description?: string | null;
+  fileUrl?: string | null;
+  thumbnailUrl?: string | null;
+  quizQuestions?: QuizQuestion[] | null;
+  createdAt?: string | Date;
+  updatedAt?: string | Date;
+  deletedAt?: string | Date | null;
+}
+
+
 export class LessonContent {
   private readonly _id: string;
   private _lessonId: string;
@@ -54,7 +80,7 @@ export class LessonContent {
     this._deletedAt = props.deletedAt ?? null;
   }
 
-  static create(dto: {
+  static create(input: {
     lessonId: string;
     type: ContentType;
     status?: ContentStatus;
@@ -64,23 +90,23 @@ export class LessonContent {
     thumbnailUrl?: string | null;
     quizQuestions?: QuizQuestion[] | null;
   }): LessonContent {
-    if (!dto.lessonId) {
+    if (!input.lessonId) {
       throw new Error("Lesson ID is required");
     }
-    if (!dto.type) {
+    if (!input.type) {
       throw new Error("Content type is required");
     }
 
     return new LessonContent({
       id: uuidv4(),
-      lessonId: dto.lessonId,
-      type: dto.type,
-      status: dto.status || ContentStatus.DRAFT,
-      title: dto.title?.trim() ?? null,
-      description: dto.description?.trim() ?? null,
-      fileUrl: dto.fileUrl ? new FileUrl(dto.fileUrl) : null,
-      thumbnailUrl: dto.thumbnailUrl ? new FileUrl(dto.thumbnailUrl) : null,
-      quizQuestions: dto.quizQuestions ?? null,
+      lessonId: input.lessonId,
+      type: input.type,
+      status: input.status || ContentStatus.DRAFT,
+      title: input.title?.trim() ?? null,
+      description: input.description?.trim() ?? null,
+      fileUrl: input.fileUrl ? new FileUrl(input.fileUrl) : null,
+      thumbnailUrl: input.thumbnailUrl ? new FileUrl(input.thumbnailUrl) : null,
+      quizQuestions: input.quizQuestions ?? null,
       createdAt: new Date(),
       updatedAt: new Date(),
       deletedAt: null,
@@ -89,7 +115,7 @@ export class LessonContent {
 
   static update(
     existingContent: LessonContent,
-    dto: {
+    input: {
       type?: ContentType;
       status?: ContentStatus;
       title?: string | null;
@@ -104,28 +130,28 @@ export class LessonContent {
       updatedAt: new Date(),
     };
 
-    if (dto.type) {
-      props.type = dto.type;
+    if (input.type) {
+      props.type = input.type;
     }
-    if (dto.status) {
-      props.status = dto.status;
+    if (input.status) {
+      props.status = input.status;
     }
-    if (dto.title !== undefined) {
-      props.title = dto.title?.trim() ?? null;
+    if (input.title !== undefined) {
+      props.title = input.title?.trim() ?? null;
     }
-    if (dto.description !== undefined) {
-      props.description = dto.description?.trim() ?? null;
+    if (input.description !== undefined) {
+      props.description = input.description?.trim() ?? null;
     }
-    if (dto.fileUrl !== undefined) {
-      props.fileUrl = dto.fileUrl ? new FileUrl(dto.fileUrl) : null;
+    if (input.fileUrl !== undefined) {
+      props.fileUrl = input.fileUrl ? new FileUrl(input.fileUrl) : null;
     }
-    if (dto.thumbnailUrl !== undefined) {
-      props.thumbnailUrl = dto.thumbnailUrl
-        ? new FileUrl(dto.thumbnailUrl)
+    if (input.thumbnailUrl !== undefined) {
+      props.thumbnailUrl = input.thumbnailUrl
+        ? new FileUrl(input.thumbnailUrl)
         : null;
     }
-    if (dto.quizQuestions !== undefined) {
-      props.quizQuestions = dto.quizQuestions ?? null;
+    if (input.quizQuestions !== undefined) {
+      props.quizQuestions = input.quizQuestions ?? null;
     }
 
     return new LessonContent(props);

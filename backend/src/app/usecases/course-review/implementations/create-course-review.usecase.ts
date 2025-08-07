@@ -2,7 +2,7 @@ import {
   CreateCourseReviewDto,
   CourseReviewResponseDto,
 } from "../../../dtos/course-review";
-import { CourseReview } from "../../../../domain/entities/course-review.entity";
+import { CourseReview } from "../../../../domain/entities/review.entity";
 import { Rating } from "../../../../domain/value-object/rating";
 import { ICourseReviewRepository } from "../../../repositories/course-review.repository.interface";
 import { IEnrollmentRepository } from "../../../repositories/enrollment.repository.interface";

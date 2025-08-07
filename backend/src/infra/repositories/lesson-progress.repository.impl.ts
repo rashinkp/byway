@@ -1,5 +1,5 @@
 import { PrismaClient } from "@prisma/client";
-import { LessonProgress } from "../../domain/entities/lesson-progress.entity";
+import { LessonProgress } from "../../domain/entities/progress.entity";
 import { ILessonProgressRepository } from "../../app/repositories/lesson-progress.repository.interface";
 import { HttpError } from "../../presentation/http/errors/http-error";
 import { QuizAnswer } from "../../domain/entities/quiz-answer.entity";
@@ -40,7 +40,7 @@ export class LessonProgressRepository implements ILessonProgressRepository {
       completedAt: created.completedAt,
       score: created.score ?? undefined,
       totalQuestions: created.totalQuestions ?? undefined,
-      answers: created.answers.map(answer => 
+      answers: created.answers.map((answer) =>
         QuizAnswer.fromPersistence({
           id: answer.id,
           lessonProgressId: answer.lessonProgressId,
@@ -91,7 +91,7 @@ export class LessonProgressRepository implements ILessonProgressRepository {
       completedAt: progress.completedAt,
       score: progress.score ?? undefined,
       totalQuestions: progress.totalQuestions ?? undefined,
-      answers: progress.answers.map(answer => 
+      answers: progress.answers.map((answer) =>
         QuizAnswer.fromPersistence({
           id: answer.id,
           lessonProgressId: answer.lessonProgressId,
@@ -125,7 +125,7 @@ export class LessonProgressRepository implements ILessonProgressRepository {
       },
     });
 
-    return progress.map(p => 
+    return progress.map((p) =>
       LessonProgress.fromPersistence({
         id: p.id,
         enrollmentId: p.enrollmentId,
@@ -135,7 +135,7 @@ export class LessonProgressRepository implements ILessonProgressRepository {
         completedAt: p.completedAt,
         score: p.score ?? undefined,
         totalQuestions: p.totalQuestions ?? undefined,
-        answers: p.answers.map(answer => 
+        answers: p.answers.map((answer) =>
           QuizAnswer.fromPersistence({
             id: answer.id,
             lessonProgressId: answer.lessonProgressId,
@@ -183,7 +183,7 @@ export class LessonProgressRepository implements ILessonProgressRepository {
       completedAt: updated.completedAt,
       score: updated.score ?? undefined,
       totalQuestions: updated.totalQuestions ?? undefined,
-      answers: updated.answers.map(answer => 
+      answers: updated.answers.map((answer) =>
         QuizAnswer.fromPersistence({
           id: answer.id,
           lessonProgressId: answer.lessonProgressId,
@@ -231,7 +231,10 @@ export class LessonProgressRepository implements ILessonProgressRepository {
     }
   }
 
-  async saveQuizAnswers(progressId: string, answers: QuizAnswer[]): Promise<void> {
+  async saveQuizAnswers(
+    progressId: string,
+    answers: QuizAnswer[]
+  ): Promise<void> {
     await this.prisma.$transaction(async (prisma) => {
       // Delete existing answers
       await prisma.quizAnswer.deleteMany({
@@ -240,7 +243,7 @@ export class LessonProgressRepository implements ILessonProgressRepository {
 
       // Create new answers
       await prisma.quizAnswer.createMany({
-        data: answers.map(answer => ({
+        data: answers.map((answer) => ({
           id: answer.id,
           lessonProgressId: progressId,
           quizQuestionId: answer.quizQuestionId,
@@ -259,7 +262,7 @@ export class LessonProgressRepository implements ILessonProgressRepository {
       include: { quizQuestion: true },
     });
 
-    return answers.map(answer => 
+    return answers.map((answer) =>
       QuizAnswer.fromPersistence({
         id: answer.id,
         lessonProgressId: answer.lessonProgressId,
@@ -271,4 +274,4 @@ export class LessonProgressRepository implements ILessonProgressRepository {
       })
     );
   }
-} 
+}

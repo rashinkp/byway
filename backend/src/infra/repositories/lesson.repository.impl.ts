@@ -17,7 +17,7 @@ import { Lesson } from "../../domain/entities/lesson.entity";
 import {
   LessonContent,
   QuizQuestion,
-} from "../../domain/entities/lesson-content.entity";
+} from "../../domain/entities/content.entity";
 
 export class LessonRepository implements ILessonRepository {
   constructor(private readonly prisma: PrismaClient) {}
