@@ -1,14 +1,3 @@
-export interface ICreateUserVerificationDTO {
-  id: string;
-  userId: string;
-  email: string;
-  otp: string;
-  expiresAt: Date;
-  attempts: number;
-  isUsed: boolean;
-  createdAt: Date;
-}
-
 interface UserVerificationProps {
   id: string;
   userId: string;
@@ -18,7 +7,7 @@ interface UserVerificationProps {
   attempts: number;
   isUsed: boolean;
   createdAt: Date;
-  updatedAt?: Date; // Made optional
+  updatedAt?: Date;
 }
 
 export class UserVerification {
@@ -32,36 +21,68 @@ export class UserVerification {
   private _createdAt: Date;
   private _updatedAt?: Date;
 
-  static create(dto: ICreateUserVerificationDTO): UserVerification {
-    // Validate required fields
-    if (!dto.id) {
+  private constructor(props: UserVerificationProps) {
+    this._id = props.id;
+    this._userId = props.userId;
+    this._email = props.email;
+    this._otp = props.otp;
+    this._expiresAt = props.expiresAt;
+    this._attempts = props.attempts;
+    this._isUsed = props.isUsed;
+    this._createdAt = props.createdAt;
+    this._updatedAt = props.updatedAt;
+  }
+
+  // Create method with explicit parameters or a params object (choose one style)
+  static create(params: {
+    id: string;
+    userId: string;
+    email: string;
+    otp: string;
+    expiresAt: Date;
+    attempts?: number;
+    isUsed?: boolean;
+    createdAt?: Date;
+  }): UserVerification {
+    const {
+      id,
+      userId,
+      email,
+      otp,
+      expiresAt,
+      attempts = 0,
+      isUsed = false,
+      createdAt = new Date(),
+    } = params;
+
+    if (!id) {
       throw new Error("Verification ID is required");
     }
-    if (!dto.userId) {
+    if (!userId) {
       throw new Error("User ID is required");
     }
-    if (!dto.email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(dto.email)) {
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
       throw new Error("Valid email is required");
     }
-    if (!dto.otp || dto.otp.length < 6) {
+    if (!otp || otp.length < 6) {
       throw new Error("OTP must be at least 6 characters");
     }
-    if (!dto.expiresAt || dto.expiresAt <= new Date()) {
+    if (!expiresAt || expiresAt <= new Date()) {
       throw new Error("Valid future expiration date is required");
     }
-    if (dto.attempts < 0) {
+    if (attempts < 0) {
       throw new Error("Attempts cannot be negative");
     }
 
     return new UserVerification({
-      id: dto.id,
-      userId: dto.userId,
-      email: dto.email,
-      otp: dto.otp,
-      expiresAt: dto.expiresAt,
-      attempts: dto.attempts,
-      isUsed: dto.isUsed,
-      createdAt: dto.createdAt,
+      id,
+      userId,
+      email,
+      otp,
+      expiresAt,
+      attempts,
+      isUsed,
+      createdAt,
     });
   }
 
@@ -74,6 +95,7 @@ export class UserVerification {
     attemptCount: number;
     isUsed: boolean;
     createdAt: Date;
+    updatedAt?: Date;
   }): UserVerification {
     return new UserVerification({
       id: data.id,
@@ -84,19 +106,8 @@ export class UserVerification {
       attempts: data.attemptCount,
       isUsed: data.isUsed,
       createdAt: data.createdAt,
+      updatedAt: data.updatedAt,
     });
-  }
-
-  private constructor(props: UserVerificationProps) {
-    this._id = props.id;
-    this._userId = props.userId;
-    this._email = props.email;
-    this._otp = props.otp;
-    this._expiresAt = props.expiresAt;
-    this._attempts = props.attempts;
-    this._isUsed = props.isUsed;
-    this._createdAt = props.createdAt;
-    this._updatedAt = props.updatedAt;
   }
 
   // Getters
@@ -143,9 +154,6 @@ export class UserVerification {
   }
 
   markAsUsed(): void {
-    // if (this._isUsed) {
-    //   throw new Error("OTP is already used");
-    // }
     this._isUsed = true;
     this._updatedAt = new Date();
   }

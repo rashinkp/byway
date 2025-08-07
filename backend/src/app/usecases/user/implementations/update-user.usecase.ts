@@ -44,9 +44,10 @@ export class UpdateUserUseCase implements IUpdateUserUseCase {
     });
 
     let profile = await this.userRepository.findProfileByUserId(userId);
+
     if (!profile) {
-      profile = UserProfile.create({
-        userId,
+      profile = UserProfile.create(userId, {
+        // userId as first param, other fields in an options object
         bio: dto.bio,
         education: dto.education,
         skills: dto.skills,
@@ -60,7 +61,7 @@ export class UpdateUserUseCase implements IUpdateUserUseCase {
       profile = await this.userRepository.createProfile(profile);
     } else {
       profile = UserProfile.update(profile, {
-        id: profile.id,
+        // no id passed here, update only uses changes object
         bio: dto.bio,
         education: dto.education,
         skills: dto.skills,
