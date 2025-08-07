@@ -21,7 +21,7 @@ const createCategorySchema = z.object({
     .string()
     .min(1, "Category name cannot be empty")
     .max(100, "Category name cannot exceed 100 characters"),
-  description: z.string().optional(),
+  description: z.string(),
   createdBy: uuidSchema,
 });
 

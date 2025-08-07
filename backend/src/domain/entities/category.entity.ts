@@ -1,5 +1,3 @@
-import { v4 as uuid } from "uuid";
-
 export class CategoryName {
   private readonly _value: string;
 
@@ -51,18 +49,22 @@ export class Category {
     this._deletedAt = props.deletedAt;
   }
 
-  // Static factory method to create a new Category (params)
+  // Now the caller must supply the id
   static create(
+    id: string,
     name: string,
     createdBy: string,
     description?: string
   ): Category {
+    if (!id || id.trim() === "") {
+      throw new Error("Category ID is required");
+    }
     if (!createdBy) {
       throw new Error("Creator ID is required");
     }
 
     return new Category({
-      id: uuid(),
+      id,
       name: new CategoryName(name),
       description: description?.trim(),
       createdBy,
@@ -72,7 +74,6 @@ export class Category {
     });
   }
 
-  // Static factory method to update an existing Category (params)
   static update(
     existingCategory: Category,
     name?: string,
@@ -94,7 +95,6 @@ export class Category {
     return new Category(props);
   }
 
-  // Static factory method to create from persistence layer (unchanged)
   static fromPersistence(data: {
     id: string;
     name: string;
@@ -115,7 +115,6 @@ export class Category {
     });
   }
 
-  // Method to soft delete
   softDelete(): void {
     if (this._deletedAt) {
       throw new Error("Category is already deleted");
@@ -124,7 +123,6 @@ export class Category {
     this._updatedAt = new Date();
   }
 
-  // Method to recover a soft-deleted category
   recover(): void {
     if (!this._deletedAt) {
       throw new Error("Category is not deleted");
@@ -133,7 +131,6 @@ export class Category {
     this._updatedAt = new Date();
   }
 
-  // Getters
   get id(): string {
     return this._id;
   }

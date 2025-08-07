@@ -13,6 +13,8 @@ import {
 } from "../interfaces/generate-certificate.usecase.interface";
 import { CertificatePdfServiceInterface } from "../../../providers/generate-certificate.interface";
 import { S3ServiceInterface } from "../../../providers/s3.service.interface";
+import { v4 as uuidv4 } from "uuid";
+
 
 export class GenerateCertificateUseCase implements IGenerateCertificateUseCase {
   constructor(
@@ -143,6 +145,7 @@ export class GenerateCertificateUseCase implements IGenerateCertificateUseCase {
 
       // 7. Create or update certificate entity
       certificate = Certificate.create({
+        id: uuidv4(),
         userId,
         courseId,
         enrollmentId: enrollment.userId, // This should be the enrollment ID

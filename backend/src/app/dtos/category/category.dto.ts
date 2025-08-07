@@ -1,6 +1,6 @@
 export interface ICreateCategoryInputDTO {
   name: string;
-  description?: string;
+  description: string;
   createdBy: string;
 }
 

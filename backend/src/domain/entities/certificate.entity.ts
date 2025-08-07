@@ -1,13 +1,12 @@
-import { v4 as uuidv4 } from "uuid";
 import { CertificateStatus } from "../enum/certificate-status.enum";
 
 export interface CertificateProps {
-  id?: string;
+  id: string; // Now mandatory
   userId: string;
   courseId: string;
   enrollmentId: string;
   certificateNumber: string;
-  status: CertificateStatus;
+  status?: CertificateStatus;
   issuedAt?: Date | null;
   expiresAt?: Date | null;
   pdfUrl?: string | null;
@@ -31,12 +30,15 @@ export class Certificate {
   private _updatedAt: Date;
 
   constructor(props: CertificateProps) {
-    this._id = props.id || uuidv4();
+    if (!props.id || props.id.trim() === "") {
+      throw new Error("Certificate ID is required");
+    }
+    this._id = props.id;
     this._userId = props.userId;
     this._courseId = props.courseId;
     this._enrollmentId = props.enrollmentId;
     this._certificateNumber = props.certificateNumber;
-    this._status = props.status;
+    this._status = props.status ?? CertificateStatus.PENDING;
     this._issuedAt = props.issuedAt ?? null;
     this._expiresAt = props.expiresAt ?? null;
     this._pdfUrl = props.pdfUrl ?? null;
@@ -94,14 +96,18 @@ export class Certificate {
     return this._updatedAt;
   }
 
-  // Business logic methods
-  public static create(props: Omit<CertificateProps, 'id' | 'createdAt' | 'updatedAt'>): Certificate {
+  // Factory method - creates a certificate; requires id explicitly
+  public static create(props: CertificateProps): Certificate {
+    if (!props.id || props.id.trim() === "") {
+      throw new Error("Certificate ID is required");
+    }
     return new Certificate({
       ...props,
-      status: props.status || CertificateStatus.PENDING,
+      status: props.status ?? CertificateStatus.PENDING,
     });
   }
 
+  // Factory method for rebuilding from persistence
   public static fromPersistence(data: CertificateProps): Certificate {
     return new Certificate({
       ...data,
@@ -112,10 +118,14 @@ export class Certificate {
     });
   }
 
-  public generateCertificate(pdfUrl: string, metadata?: Record<string, any>): void {
+  // Business logic methods
+  public generateCertificate(
+    pdfUrl: string,
+    metadata?: Record<string, any>
+  ): void {
     this._status = CertificateStatus.GENERATED;
     this._pdfUrl = pdfUrl;
-    this._metadata = metadata || this._metadata;
+    this._metadata = metadata ?? this._metadata;
     this._updatedAt = new Date();
   }
 
@@ -152,6 +162,7 @@ export class Certificate {
     return this._status === CertificateStatus.GENERATED && !this.isExpired();
   }
 
+  // Convert entity to plain object for serialization or persistence
   public toJSON(): CertificateProps {
     return {
       id: this._id,
@@ -168,4 +179,4 @@ export class Certificate {
       updatedAt: this._updatedAt,
     };
   }
-} 
+}
