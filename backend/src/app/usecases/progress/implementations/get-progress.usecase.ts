@@ -1,8 +1,5 @@
 import { IGetProgressUseCase } from "../interfaces/get-progress.usecase.interface";
-import {
-  GetProgressDto,
-  IProgressOutputDTO,
-} from "../../../dtos/course/progress.dto";
+import { GetProgressDto, IProgressOutputDTO } from "../../../dtos/progress.dto";
 import { ApiResponse } from "../../../../presentation/http/interfaces/ApiResponse";
 import { IEnrollmentRepository } from "../../../repositories/enrollment.repository.interface";
 import { ILessonProgressRepository } from "../../../repositories/lesson-progress.repository.interface";

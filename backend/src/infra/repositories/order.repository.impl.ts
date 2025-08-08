@@ -6,7 +6,7 @@ import { v4 as uuidv4 } from "uuid";
 import { OrderStatus } from "../../domain/enum/order-status.enum";
 import { PaymentStatus } from "../../domain/enum/payment-status.enum";
 import { PaymentGateway } from "../../domain/enum/payment-gateway.enum";
-import { GetAllOrdersDto } from "../../app/dtos/order/order.dto";
+import { GetAllOrdersDto } from "../../app/dtos/order.dto";
 
 export class OrderRepository implements IOrderRepository {
   constructor(private prisma: PrismaClient) {}

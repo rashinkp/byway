@@ -24,7 +24,7 @@ import {
 } from "../../validators/course.validators";
 import { BaseController } from "./base.controller";
 import { IGetCourseWithDetailsUseCase } from "../../../app/usecases/course/interfaces/get-course-with-details.usecase.interface";
-import { getSocketIOInstance } from '../../socketio';
+import { getSocketIOInstance } from "../../socketio";
 
 export class CourseController extends BaseController {
   constructor(
@@ -62,9 +62,9 @@ export class CourseController extends BaseController {
       const io = getSocketIOInstance();
       if (io && course.notifiedAdminIds) {
         (course.notifiedAdminIds as string[]).forEach((adminId: string) => {
-          io.to(adminId).emit('newNotification', {
+          io.to(adminId).emit("newNotification", {
             message: `A new course "${course.title}" has been created.`,
-            type: 'COURSE_CREATION',
+            type: "COURSE_CREATION",
             courseId: course.id,
             courseTitle: course.title,
             // ...any other notification data
@@ -154,12 +154,14 @@ export class CourseController extends BaseController {
       const io = getSocketIOInstance();
       if (io && course.createdBy) {
         const isCurrentlyDeleted = course.deletedAt ? false : true; // If deletedAt is null, it was just disabled
-        const message = isCurrentlyDeleted 
+        const message = isCurrentlyDeleted
           ? `Your course "${course.title}" has been disabled and is no longer available to students.`
           : `Your course "${course.title}" has been enabled and is now available to students.`;
-        const notificationType = isCurrentlyDeleted ? 'COURSE_DISABLED' : 'COURSE_ENABLED';
-        
-        io.to(course.createdBy).emit('newNotification', {
+        const notificationType = isCurrentlyDeleted
+          ? "COURSE_DISABLED"
+          : "COURSE_ENABLED";
+
+        io.to(course.createdBy).emit("newNotification", {
           message: message,
           type: notificationType,
           courseId: course.id,
@@ -212,9 +214,9 @@ export class CourseController extends BaseController {
       // Emit real-time notification to the instructor (creator)
       const io = getSocketIOInstance();
       if (io && course.createdBy) {
-        io.to(course.createdBy).emit('newNotification', {
+        io.to(course.createdBy).emit("newNotification", {
           message: `Your course "${course.title}" has been approved!`,
-          type: 'COURSE_APPROVED',
+          type: "COURSE_APPROVED",
           courseId: course.id,
           courseTitle: course.title,
           // ...any other notification data
@@ -240,9 +242,9 @@ export class CourseController extends BaseController {
       // Emit real-time notification to the instructor (creator)
       const io = getSocketIOInstance();
       if (io && course.createdBy) {
-        io.to(course.createdBy).emit('newNotification', {
+        io.to(course.createdBy).emit("newNotification", {
           message: `Your course "${course.title}" has been declined. Please review and update as needed.`,
-          type: 'COURSE_DECLINED',
+          type: "COURSE_DECLINED",
           courseId: course.id,
           courseTitle: course.title,
           // ...any other notification data
@@ -272,7 +274,10 @@ export class CourseController extends BaseController {
   async getCourseStats(httpRequest: IHttpRequest): Promise<IHttpResponse> {
     return this.handleRequest(httpRequest, async () => {
       const stats = await this.getCourseStatsUseCase.execute({ isAdmin: true });
-      return this.success_200(stats, "Course statistics retrieved successfully");
+      return this.success_200(
+        stats,
+        "Course statistics retrieved successfully"
+      );
     });
   }
 }

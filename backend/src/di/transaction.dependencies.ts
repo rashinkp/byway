@@ -18,11 +18,21 @@ export function createTransactionDependencies(
   const prisma = new PrismaClient();
   const transactionRepository = new TransactionRepository(prisma);
 
-  const createTransactionUseCase = new CreateTransactionUseCase(transactionRepository);
-  const getTransactionByIdUseCase = new GetTransactionByIdUseCase(transactionRepository);
-  const getTransactionsByOrderUseCase = new GetTransactionsByOrderUseCase(transactionRepository);
-  const getTransactionsByUserUseCase = new GetTransactionsByUserUseCase(transactionRepository);
-  const updateTransactionStatusUseCase = new UpdateTransactionStatusUseCase(transactionRepository);
+  const createTransactionUseCase = new CreateTransactionUseCase(
+    transactionRepository
+  );
+  const getTransactionByIdUseCase = new GetTransactionByIdUseCase(
+    transactionRepository
+  );
+  const getTransactionsByOrderUseCase = new GetTransactionsByOrderUseCase(
+    transactionRepository
+  );
+  const getTransactionsByUserUseCase = new GetTransactionsByUserUseCase(
+    transactionRepository
+  );
+  const updateTransactionStatusUseCase = new UpdateTransactionStatusUseCase(
+    transactionRepository
+  );
 
   const transactionController = new TransactionController(
     createTransactionUseCase,
@@ -35,6 +45,6 @@ export function createTransactionDependencies(
   );
 
   return {
-    transactionController
+    transactionController,
   };
-} 
+}

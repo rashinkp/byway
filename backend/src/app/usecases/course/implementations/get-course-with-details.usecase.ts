@@ -1,4 +1,4 @@
-import { ICourseWithEnrollmentDTO } from "../../../dtos/course/course.dto";
+import { ICourseWithEnrollmentDTO } from "../../../dtos/course.dto";
 import { HttpError } from "../../../../presentation/http/errors/http-error";
 import { ICourseRepository } from "../../../repositories/course.repository.interface";
 import { IEnrollmentRepository } from "../../../repositories/enrollment.repository.interface";
@@ -84,7 +84,7 @@ export class GetCourseWithDetailsUseCase
             ([rating, count]) => [
               rating,
               reviewStats.totalReviews > 0
-                ? (count / reviewStats.totalReviews) * 100
+                ? (count as number / reviewStats.totalReviews) * 100
                 : 0,
             ]
           )

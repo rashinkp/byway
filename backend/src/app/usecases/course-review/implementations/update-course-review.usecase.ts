@@ -1,8 +1,6 @@
-import {
-  UpdateCourseReviewDto,
-  CourseReviewResponseDto,
-} from "../../../dtos/course-review";
+
 import { Rating } from "../../../../domain/value-object/rating";
+import { CourseReviewResponseDto, UpdateCourseReviewDto } from "../../../dtos/review.dto";
 import { ICourseReviewRepository } from "../../../repositories/course-review.repository.interface";
 import { IUpdateCourseReviewUseCase } from "../interfaces/update-course-review.usecase.interface";
 

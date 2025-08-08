@@ -20,7 +20,10 @@ export function createInstructorDependencies(
 ): InstructorDependencies {
   const { instructorRepository, userRepository } = deps;
 
-  const updateUserUseCase = new UpdateUserUseCase(userRepository, deps.s3Service);
+  const updateUserUseCase = new UpdateUserUseCase(
+    userRepository,
+    deps.s3Service
+  );
   const createInstructorUseCase = new CreateInstructorUseCase(
     instructorRepository,
     userRepository

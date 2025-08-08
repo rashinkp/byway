@@ -1,6 +1,6 @@
 import { WebhookEvent } from "../../../../domain/value-object/webhook-event.value-object";
 import { Transaction } from "../../../../domain/entities/transaction.entity";
-import { CreateCheckoutSessionDto } from "../../../dtos/stripe/create-checkout-session.dto";
+import { CreateCheckoutSessionDto } from "../../../dtos/payment.dto";
 
 interface ServiceResponse<T> {
   data: T;

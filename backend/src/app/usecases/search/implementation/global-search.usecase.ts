@@ -1,4 +1,4 @@
-import { ISearchResult, SearchParams } from "../../../dtos/search/search.dto";
+import { ISearchResult, SearchParams } from "../../../dtos/search.dto";
 import { ISearchRepository } from "../../../repositories/search.repository";
 import { IGlobalSearchUseCase } from "../interfaces/global-search.usecase.interface";
 

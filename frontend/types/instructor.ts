@@ -177,15 +177,15 @@ export interface InstructorCardData {
   id: string;
   areaOfExpertise: string;
   professionalExperience: string;
-  about: string;
-  website: string;
+  about?: string | undefined;
+  website?: string;
   education: string;
   certifications: string;
   totalStudents: number;
   user: {
     id: string;
     name: string;
-    avatar: string;
+    avatar?: string;
   };
 }
 

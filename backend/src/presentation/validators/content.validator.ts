@@ -2,7 +2,7 @@ import { z } from "zod";
 import {
   ICreateLessonContentInputDTO,
   IUpdateLessonContentInputDTO,
-} from "../../app/dtos/lesson/lesson.dto";
+} from "../../app/dtos/lesson.dto";
 import { ContentType, ContentStatus } from "../../domain/enum/content.enum";
 
 interface ValidationSchema {

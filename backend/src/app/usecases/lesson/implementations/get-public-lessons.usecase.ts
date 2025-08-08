@@ -1,7 +1,7 @@
 import {
   IGetPublicLessonsInputDTO,
   IPublicLessonListOutputDTO,
-} from "../../../dtos/lesson/lesson.dto";
+} from "../../../dtos/lesson.dto";
 import { HttpError } from "../../../../presentation/http/errors/http-error";
 import { ILessonRepository } from "../../../repositories/lesson.repository";
 import { IGetPublicLessonsUseCase } from "../interfaces/get-public-lessons.usecase.interface";

@@ -20,7 +20,7 @@ export class CertificatePdfService implements CertificatePdfServiceInterface {
       // Load the certificate template image
       const templatePath = this.certificateTemplate;
       const image = await loadImage(templatePath);
-      
+
       // Create canvas with same dimensions as template
       const canvas = createCanvas(image.width, image.height);
       const ctx = canvas.getContext("2d");
@@ -47,7 +47,8 @@ export class CertificatePdfService implements CertificatePdfServiceInterface {
       ctx.fillText(instructorName, 470, 1135);
 
       // Date - bottom right
-      const issuedDate = data.issuedDate || new Date().toLocaleDateString("en-GB");
+      const issuedDate =
+        data.issuedDate || new Date().toLocaleDateString("en-GB");
       ctx.font = "20px Arial";
       ctx.textAlign = "right";
       ctx.fillText(issuedDate, image.width - 60, image.height - 35);
@@ -55,7 +56,11 @@ export class CertificatePdfService implements CertificatePdfServiceInterface {
       // Certificate Number - top right
       ctx.font = "16px Arial";
       ctx.textAlign = "right";
-      ctx.fillText(`Certificate No: ${data.certificateNumber}`, image.width - 60, 80);
+      ctx.fillText(
+        `Certificate No: ${data.certificateNumber}`,
+        image.width - 60,
+        80
+      );
 
       // Convert canvas to PNG buffer
       const pngBuffer = canvas.toBuffer("image/png");
@@ -64,7 +69,7 @@ export class CertificatePdfService implements CertificatePdfServiceInterface {
       const pdfDoc = await PDFDocument.create();
       const page = pdfDoc.addPage([image.width, image.height]);
       const pngImage = await pdfDoc.embedPng(pngBuffer);
-      
+
       page.drawImage(pngImage, {
         x: 0,
         y: 0,
@@ -75,16 +80,13 @@ export class CertificatePdfService implements CertificatePdfServiceInterface {
       // Save PDF as buffer
       const pdfBytes = await pdfDoc.save();
       return Buffer.from(pdfBytes);
-
     } catch (error) {
       console.error("Error generating certificate PDF:", error);
       throw new Error("Failed to generate certificate PDF");
     }
   }
 
-  generateCertificatePDFStream(
-    data: CertificateTemplateData
-  ): any {
+  generateCertificatePDFStream(data: CertificateTemplateData): any {
     // For streaming, we'll return the buffer for now
     // You can implement streaming if needed
     throw new Error("Streaming not implemented for image-based certificates");
@@ -92,7 +94,15 @@ export class CertificatePdfService implements CertificatePdfServiceInterface {
 
   private getTemplatePath(): string {
     // Path to your certificate template image
-    return path.join(__dirname, "..", "..", "..", "..", "public", "certificate_template.png");
+    return path.join(
+      __dirname,
+      "..",
+      "..",
+      "..",
+      "..",
+      "public",
+      "certificate_template.png"
+    );
   }
 
   private getDefaultTemplate(): string {

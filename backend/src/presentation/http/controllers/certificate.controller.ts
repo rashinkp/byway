@@ -16,22 +16,34 @@ export class CertificateController extends BaseController {
     super(httpErrors, httpSuccess);
   }
 
-  generateCertificate = async (httpRequest: IHttpRequest): Promise<IHttpResponse> => {
+  generateCertificate = async (
+    httpRequest: IHttpRequest
+  ): Promise<IHttpResponse> => {
     return this.handleRequest(httpRequest, async (request) => {
       const userId = request.user?.id;
       const { courseId } = request.body;
       if (!userId || !courseId) {
         return this.httpErrors.error_400("User ID or Course ID missing");
       }
-      const result = await this.generateCertificateUseCase.execute({ userId, courseId });
+      const result = await this.generateCertificateUseCase.execute({
+        userId,
+        courseId,
+      });
       if (!result.success) {
-        return this.httpErrors.error_400(result.error || "Certificate generation failed");
+        return this.httpErrors.error_400(
+          result.error || "Certificate generation failed"
+        );
       }
-      return this.success_200(result.certificate, "Certificate generated successfully");
+      return this.success_200(
+        result.certificate,
+        "Certificate generated successfully"
+      );
     });
   };
 
-  getCertificate = async (httpRequest: IHttpRequest): Promise<IHttpResponse> => {
+  getCertificate = async (
+    httpRequest: IHttpRequest
+  ): Promise<IHttpResponse> => {
     return this.handleRequest(httpRequest, async (request) => {
       const userId = request.user?.id;
       const courseId = request.query?.["courseId"];
@@ -41,7 +53,11 @@ export class CertificateController extends BaseController {
       }
 
       // Try to fetch certificate
-      const certificate = await this.certificateRepository.findByUserIdAndCourseId(userId, courseId as string);
+      const certificate =
+        await this.certificateRepository.findByUserIdAndCourseId(
+          userId,
+          courseId as string
+        );
 
       if (!certificate) {
         return this.httpErrors.error_404("Certificate not found");
@@ -51,7 +67,9 @@ export class CertificateController extends BaseController {
     });
   };
 
-  listUserCertificates = async (httpRequest: IHttpRequest): Promise<IHttpResponse> => {
+  listUserCertificates = async (
+    httpRequest: IHttpRequest
+  ): Promise<IHttpResponse> => {
     return this.handleRequest(httpRequest, async (request) => {
       const userId = request.user?.id;
       if (!userId) {
@@ -61,7 +79,8 @@ export class CertificateController extends BaseController {
       const page = parseInt(request.query?.["page"] as string) || 1;
       const limit = parseInt(request.query?.["limit"] as string) || 10;
       const sortBy = (request.query?.["sortBy"] as string) || "createdAt";
-      const sortOrder = (request.query?.["sortOrder"] as string) === "asc" ? "asc" : "desc";
+      const sortOrder =
+        (request.query?.["sortOrder"] as string) === "asc" ? "asc" : "desc";
       const status = request.query?.["status"] as string | undefined;
       const search = request.query?.["search"] as string | undefined;
       const skip = (page - 1) * limit;
@@ -74,14 +93,17 @@ export class CertificateController extends BaseController {
         status,
         search,
       });
-      return this.success_200({
-        items: result.items,
-        total: result.total,
-        page,
-        totalPages: Math.ceil(result.total / limit),
-        hasMore: result.hasMore,
-        nextPage: result.nextPage,
-      }, "Certificates found");
+      return this.success_200(
+        {
+          items: result.items,
+          total: result.total,
+          page,
+          totalPages: Math.ceil(result.total / limit),
+          hasMore: result.hasMore,
+          nextPage: result.nextPage,
+        },
+        "Certificates found"
+      );
     });
   };
-} 
+}

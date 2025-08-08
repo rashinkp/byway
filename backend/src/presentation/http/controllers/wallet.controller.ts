@@ -3,15 +3,14 @@ import { IHttpResponse } from "../interfaces/http-response.interface";
 import { IGetWalletUseCase } from "../../../app/usecases/wallet/interfaces/get-wallet.usecase.interface";
 import { IAddMoneyUseCase } from "../../../app/usecases/wallet/interfaces/add-money.usecase.interface";
 import { IReduceMoneyUseCase } from "../../../app/usecases/wallet/interfaces/reduce-money.usecase.interface";
-import { AddMoneyDto } from "../../../app/dtos/wallet/add-money.dto";
-import { ReduceMoneyDto } from "../../../app/dtos/wallet/reduce-money.dto";
 import { BaseController } from "./base.controller";
 import { IHttpErrors } from "../interfaces/http-errors.interface";
 import { IHttpSuccess } from "../interfaces/http-success.interface";
 import { UnauthorizedError } from "../errors/unautherized-error";
 import { HttpError } from "../errors/http-error";
 import { ITopUpWalletUseCase } from "../../../app/usecases/wallet/interfaces/top-up-wallet.usecase.interface";
-import { TopUpWalletDtoSchema } from "../../../app/dtos/wallet/top-up.dto";
+import { AddMoneyDto, ReduceMoneyDto } from "../../../app/dtos/wallet";
+import { TopUpWalletDtoSchema } from "../../../presentation/validators/wallet";
 
 export class WalletController extends BaseController {
   constructor(

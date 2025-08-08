@@ -1,7 +1,5 @@
-import {
-  CreateCourseReviewDto,
-  CourseReviewResponseDto,
-} from "../../../dtos/course-review";
+import { CourseReviewResponseDto, CreateCourseReviewDto } from "../../../dtos/review.dto";
+
 
 export interface ICreateCourseReviewUseCase {
   execute(

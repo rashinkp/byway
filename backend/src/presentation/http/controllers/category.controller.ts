@@ -9,7 +9,12 @@ import { IGetCategoryByIdUseCase } from "../../../app/usecases/category/interfac
 import { IGetAllCategoriesUseCase } from "../../../app/usecases/category/interfaces/get-all-categories.usecases.interface";
 import { IDeleteCategoryUseCase } from "../../../app/usecases/category/interfaces/delete-category.usecase.interface";
 import { IRecoverCategoryUseCase } from "../../../app/usecases/category/interfaces/recover-category.usecase.interface";
-import { validateCreateCategory, validateCategoryId, validateGetAllCategories, validateUpdateCategory } from "../../validators/category.validators";
+import {
+  validateCreateCategory,
+  validateCategoryId,
+  validateGetAllCategories,
+  validateUpdateCategory,
+} from "../../validators/category.validators";
 import { BaseController } from "./base.controller";
 
 export class CategoryController extends BaseController {
@@ -30,7 +35,7 @@ export class CategoryController extends BaseController {
     return this.handleRequest(httpRequest, async (request) => {
       const validated = validateCreateCategory({
         ...request.body,
-        createdBy: request.user?.id
+        createdBy: request.user?.id,
       });
       const category = await this.createCategoryUseCase.execute(validated);
       return this.success_201(category, "Category created successfully");

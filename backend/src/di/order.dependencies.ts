@@ -13,7 +13,9 @@ export function createOrderDependencies(
   deps: SharedDependencies
 ): OrderDependencies {
   // Initialize use cases
-  const createTransactionUseCase = new CreateTransactionUseCase(deps.transactionRepository);
+  const createTransactionUseCase = new CreateTransactionUseCase(
+    deps.transactionRepository
+  );
   const createOrderUseCase = new CreateOrderUseCase(
     deps.orderRepository,
     deps.paymentService,

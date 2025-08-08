@@ -1,6 +1,6 @@
 import jwt from "jsonwebtoken";
 import { envConfig } from "../../../presentation/express/configs/env.config";
-import { IJwtProvider } from "../../../app/providers/I.jwt.provider";
+import { IJwtProvider } from "../../../app/providers/jwt.provider.interface";
 
 export class JwtProvider implements IJwtProvider {
   signAccessToken(payload: object): string {

@@ -2,7 +2,7 @@ import { IGetMessagesByChatUseCase } from "../interfaces/get-messages-by-chat.us
 import { IMessageRepository } from "../../../repositories/message.repository.interface";
 import { IChatRepository } from "../../../repositories/chat.repository.interface";
 import { ChatId } from "../../../../domain/value-object/ChatId";
-import { MessageResponseDTO } from "@/app/dtos/chat.dto";
+import { MessageResponseDTO } from "../../..//dtos/chat.dto";
 
 export class GetMessagesByChatUseCase implements IGetMessagesByChatUseCase {
   constructor(

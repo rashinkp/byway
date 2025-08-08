@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
-import { getInstructorProfile } from "@/api/instructor.api";
 import { useAuth } from "../auth/useAuth";
+import { getInstructorProfile } from "@/api/instructor";
 
 export function useDetailedInstructorData() {
 	const { user, isLoading: authLoading, isAuthenticated } = useAuth();

@@ -1,5 +1,5 @@
 import { PrismaClient } from "@prisma/client";
-import { ILogger } from "../../../app/providers/I.logger";
+import { ILogger } from "../../../app/providers/logger-provider.interface";
 
 export interface IDatabaseProvider {
   connect(): Promise<void>;

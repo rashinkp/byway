@@ -1,8 +1,8 @@
-import { v4 as uuidv4 } from "uuid";
+
 import { LessonOrder } from "../value-object/lesson-order";
 import { LessonStatus } from "../enum/lesson.enum";
-import { LessonContent } from "./lesson-content.entity";
-import { ILessonContentInputDTO } from "../../app/dtos/lesson/lesson.dto";
+import { ILessonContentInput, LessonContent } from "./content.entity";
+import { ContentStatus } from "../enum/content.enum";
 
 export interface LessonProps {
   id: string;
@@ -30,7 +30,7 @@ export class Lesson {
   private _deletedAt: Date | null;
 
   private constructor(props: LessonProps) {
-    this._id = props.id;
+    this._id  = props.id;
     this._courseId = props.courseId;
     this._title = props.title;
     this._description = props.description ?? null;
@@ -42,51 +42,51 @@ export class Lesson {
     this._deletedAt = props.deletedAt ?? null;
   }
 
-  static create(dto: {
+  static create(input: {
     courseId: string;
     title: string;
     description?: string | null;
     order: number;
     status?: LessonStatus;
-    content?: ILessonContentInputDTO | null;
+    content?: ILessonContentInput | null;
   }): Lesson {
-    if (!dto.courseId) {
+    if (!input.courseId) {
       throw new Error("Course ID is required");
     }
-    if (!dto.title || dto.title.trim() === "") {
+    if (!input.title || input.title.trim() === "") {
       throw new Error("Lesson title cannot be empty");
     }
 
-    const content = dto.content
+    const content = input.content
       ? LessonContent.fromPersistence({
-          id: dto.content.id || uuidv4(), // Generate ID if not provided
-          lessonId: dto.content.lessonId,
-          type: dto.content.type,
-          status: dto.content.status,
-          title: dto.content.title ?? null,
-          description: dto.content.description ?? null,
-          fileUrl: dto.content.fileUrl ?? null,
-          thumbnailUrl: dto.content.thumbnailUrl ?? null,
-          quizQuestions: dto.content.quizQuestions ?? null,
-          createdAt: dto.content.createdAt
-            ? new Date(dto.content.createdAt)
+          id: input.content.id , 
+          lessonId: input.content.lessonId,
+          type: input.content.type,
+          status: input.content.status as ContentStatus,
+          title: input.content.title ?? null,
+          description: input.content.description ?? null,
+          fileUrl: input.content.fileUrl ?? null,
+          thumbnailUrl: input.content.thumbnailUrl ?? null,
+          quizQuestions: input.content.quizQuestions ?? null,
+          createdAt: input.content.createdAt
+            ? new Date(input.content.createdAt)
             : new Date(),
-          updatedAt: dto.content.updatedAt
-            ? new Date(dto.content.updatedAt)
+          updatedAt: input.content.updatedAt
+            ? new Date(input.content.updatedAt)
             : new Date(),
-          deletedAt: dto.content.deletedAt
-            ? new Date(dto.content.deletedAt)
+          deletedAt: input.content.deletedAt
+            ? new Date(input.content.deletedAt)
             : null,
         })
       : null;
 
     return new Lesson({
-      id: uuidv4(),
-      courseId: dto.courseId,
-      title: dto.title.trim(),
-      description: dto.description?.trim() ?? null,
-      order: new LessonOrder(dto.order),
-      status: dto.status || LessonStatus.DRAFT,
+      id:'',
+      courseId: input.courseId,
+      title: input.title.trim(),
+      description: input.description?.trim() ?? null,
+      order: new LessonOrder(input.order),
+      status: input.status || LessonStatus.DRAFT,
       content,
       createdAt: new Date(),
       updatedAt: new Date(),
@@ -96,12 +96,12 @@ export class Lesson {
 
   static update(
     existingLesson: Lesson,
-    dto: {
+    input: {
       title?: string;
       description?: string | null;
       order?: number;
       status?: LessonStatus;
-      content?: ILessonContentInputDTO | null | undefined;
+      content?: ILessonContentInput | null ;
     }
   ): Lesson {
     const props: LessonProps = {
@@ -109,38 +109,38 @@ export class Lesson {
       updatedAt: new Date(),
     };
 
-    if (dto.title && dto.title.trim() !== "") {
-      props.title = dto.title.trim();
+    if (input.title && input.title.trim() !== "") {
+      props.title = input.title.trim();
     }
-    if (dto.description !== undefined) {
-      props.description = dto.description?.trim() ?? null;
+    if (input.description !== undefined) {
+      props.description = input.description?.trim() ?? null;
     }
-    if (dto.order !== undefined) {
-      props.order = new LessonOrder(dto.order);
+    if (input.order !== undefined) {
+      props.order = new LessonOrder(input.order);
     }
-    if (dto.status) {
-      props.status = dto.status;
+    if (input.status) {
+      props.status = input.status;
     }
-    if (dto.content !== undefined) {
-      props.content = dto.content
+    if (input.content !== undefined) {
+      props.content = input.content
         ? LessonContent.fromPersistence({
-            id: dto.content.id || existingLesson.content?.id || uuidv4(),
-            lessonId: dto.content.lessonId,
-            type: dto.content.type,
-            status: dto.content.status,
-            title: dto.content.title ?? null,
-            description: dto.content.description ?? null,
-            fileUrl: dto.content.fileUrl ?? null,
-            thumbnailUrl: dto.content.thumbnailUrl ?? null,
-            quizQuestions: dto.content.quizQuestions ?? null,
-            createdAt: dto.content.createdAt
-              ? new Date(dto.content.createdAt)
+            id: input.content.id || existingLesson.content?.id || '',
+            lessonId: input.content.lessonId,
+            type: input.content.type,
+            status: input.content.status as ContentStatus,
+            title: input.content.title ?? null,
+            description: input.content.description ?? null,
+            fileUrl: input.content.fileUrl ?? null,
+            thumbnailUrl: input.content.thumbnailUrl ?? null,
+            quizQuestions: input.content.quizQuestions ?? null,
+            createdAt: input.content.createdAt
+              ? new Date(input.content.createdAt)
               : existingLesson.content?.createdAt || new Date(),
-            updatedAt: dto.content.updatedAt
-              ? new Date(dto.content.updatedAt)
+            updatedAt: input.content.updatedAt
+              ? new Date(input.content.updatedAt)
               : new Date(),
-            deletedAt: dto.content.deletedAt
-              ? new Date(dto.content.deletedAt)
+            deletedAt: input.content.deletedAt
+              ? new Date(input.content.deletedAt)
               : existingLesson.content?.deletedAt || null,
           })
         : null;

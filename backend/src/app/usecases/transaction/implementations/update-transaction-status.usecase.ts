@@ -1,9 +1,6 @@
+import { ITransactionOutputDTO, IUpdateTransactionStatusInputDTO } from "../../../../app/dtos/transaction.dto";
 import { ITransactionRepository } from "../../../repositories/transaction.repository";
 import { IUpdateTransactionStatusUseCase } from "../interfaces/update-transaction-status.usecase.interface";
-import {
-  ITransactionOutputDTO,
-  IUpdateTransactionStatusInputDTO,
-} from "../../../dtos/transaction/transaction.dto";
 
 export class UpdateTransactionStatusUseCase
   implements IUpdateTransactionStatusUseCase

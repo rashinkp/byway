@@ -8,7 +8,7 @@ export class WalletRepository implements IWalletRepository {
 
   async findByUserId(userId: string): Promise<Wallet | null> {
     const wallet = await this.prisma.wallet.findUnique({
-      where: { userId }
+      where: { userId },
     });
 
     if (!wallet) return null;
@@ -29,8 +29,8 @@ export class WalletRepository implements IWalletRepository {
         userId: wallet.userId,
         balance: wallet.balance.amount,
         createdAt: wallet.createdAt,
-        updatedAt: wallet.updatedAt
-      }
+        updatedAt: wallet.updatedAt,
+      },
     });
 
     return new Wallet(
@@ -47,8 +47,8 @@ export class WalletRepository implements IWalletRepository {
       where: { id: wallet.id },
       data: {
         balance: wallet.balance.amount,
-        updatedAt: new Date()
-      }
+        updatedAt: new Date(),
+      },
     });
 
     return new Wallet(
@@ -62,7 +62,7 @@ export class WalletRepository implements IWalletRepository {
 
   async findById(id: string): Promise<Wallet | null> {
     const wallet = await this.prisma.wallet.findUnique({
-      where: { id }
+      where: { id },
     });
 
     if (!wallet) return null;
@@ -75,4 +75,4 @@ export class WalletRepository implements IWalletRepository {
       wallet.updatedAt
     );
   }
-} 
+}

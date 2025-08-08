@@ -1,4 +1,4 @@
-import { ILessonContentOutputDTO } from "../../../dtos/lesson/lesson.dto";
+import { ILessonContentOutputDTO } from "../../../dtos/lesson.dto";
 import { HttpError } from "../../../../presentation/http/errors/http-error";
 import { ILessonContentRepository } from "../../../repositories/content.repository";
 import { IEnrollmentRepository } from "../../../repositories/enrollment.repository.interface";

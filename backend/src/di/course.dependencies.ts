@@ -9,8 +9,8 @@ import { DeclineCourseUseCase } from "../app/usecases/course/implementations/dec
 import { EnrollCourseUseCase } from "../app/usecases/course/implementations/enroll-course.usecase";
 import { GetCourseWithDetailsUseCase } from "../app/usecases/course/implementations/get-course-with-details.usecase";
 import { GetCourseStatsUseCase } from "../app/usecases/course/implementations/get-course-stats.usecase";
-import { SharedDependencies } from './shared.dependencies';
-import { CreateNotificationsForUsersUseCase } from '../app/usecases/notification/implementations/create-notifications-for-users.usecase';
+import { SharedDependencies } from "./shared.dependencies";
+import { CreateNotificationsForUsersUseCase } from "../app/usecases/notification/implementations/create-notifications-for-users.usecase";
 
 export interface CourseDependencies {
   courseController: CourseController;
@@ -29,7 +29,7 @@ export function createCourseDependencies(
     courseReviewRepository,
   } = deps;
 
-  const createCourseUseCase =   new CreateCourseUseCase(
+  const createCourseUseCase = new CreateCourseUseCase(
     courseRepository,
     categoryRepository,
     userRepository,
@@ -49,9 +49,7 @@ export function createCourseDependencies(
     courseReviewRepository,
     cartRepository
   );
-  const updateCourseUseCase = new UpdateCourseUseCase(
-    courseRepository,
-  );
+  const updateCourseUseCase = new UpdateCourseUseCase(courseRepository);
   const deleteCourseUseCase = new DeleteCourseUseCase(
     courseRepository,
     createNotificationsForUsersUseCase
@@ -62,8 +60,16 @@ export function createCourseDependencies(
     courseReviewRepository,
     deps.lessonRepository
   );
-  const approveCourseUseCase = new ApproveCourseUseCase(courseRepository, userRepository, createNotificationsForUsersUseCase);
-  const declineCourseUseCase = new DeclineCourseUseCase(courseRepository, userRepository, createNotificationsForUsersUseCase);
+  const approveCourseUseCase = new ApproveCourseUseCase(
+    courseRepository,
+    userRepository,
+    createNotificationsForUsersUseCase
+  );
+  const declineCourseUseCase = new DeclineCourseUseCase(
+    courseRepository,
+    userRepository,
+    createNotificationsForUsersUseCase
+  );
   const enrollCourseUseCase = new EnrollCourseUseCase(
     courseRepository,
     enrollmentRepository,
@@ -83,7 +89,7 @@ export function createCourseDependencies(
     enrollCourseUseCase,
     getCourseStatsUseCase,
     deps.httpErrors,
-    deps.httpSuccess,
+    deps.httpSuccess
   );
 
   return {

@@ -11,7 +11,6 @@ import { TopUpWalletUseCase } from "../app/usecases/wallet/implementation/top-up
 import { ITopUpWalletUseCase } from "../app/usecases/wallet/interfaces/top-up-wallet.usecase.interface";
 import { TransactionRepository } from "../infra/repositories/transaction.repository.impl";
 
-
 export interface WalletDependencies {
   walletController: WalletController;
   getWalletUseCase: IGetWalletUseCase;
@@ -20,7 +19,9 @@ export interface WalletDependencies {
   topUpWalletUseCase: ITopUpWalletUseCase;
 }
 
-export const createWalletDependencies = (sharedDeps: SharedDependencies): WalletDependencies => {
+export const createWalletDependencies = (
+  sharedDeps: SharedDependencies
+): WalletDependencies => {
   const { prisma, httpErrors, httpSuccess, paymentService } = sharedDeps;
 
   const walletRepository = new WalletRepository(prisma);
@@ -47,6 +48,6 @@ export const createWalletDependencies = (sharedDeps: SharedDependencies): Wallet
     getWalletUseCase,
     addMoneyUseCase,
     reduceMoneyUseCase,
-    topUpWalletUseCase
+    topUpWalletUseCase,
   };
 };

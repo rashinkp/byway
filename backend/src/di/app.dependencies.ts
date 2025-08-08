@@ -59,7 +59,7 @@ import { ILessonRepository } from "../app/repositories/lesson.repository";
 import { Router } from "express";
 import { RevenueDistributionService } from "../app/services/revenue-distribution/implementations/revenue-distribution.service";
 import { PaymentService } from "../app/services/payment/implementations/payment.service";
-import { GetTotalUnreadCountUseCase } from "@/app/usecases/message/implementations/get-total-unread-count.usecase";
+import { GetTotalUnreadCountUseCase } from "../app/usecases/message/implementations/get-total-unread-count.usecase";
 
 export interface AppDependencies {
   authController: AuthController;
@@ -103,7 +103,6 @@ export interface AppDependencies {
   lessonRepository: ILessonRepository;
   certificateController: CertificateController;
   getTotalUnreadCountUseCase: GetTotalUnreadCountUseCase;
-
 }
 
 export function createAppDependencies(): AppDependencies {
@@ -137,8 +136,14 @@ export function createAppDependencies(): AppDependencies {
   shared.paymentService = paymentService;
 
   const authDeps = createAuthDependencies(shared);
-  const userDeps = createUserDependencies(shared, notificationDeps.createNotificationsForUsersUseCase);
-  const instructorDeps = createInstructorDependencies(shared, notificationDeps.createNotificationsForUsersUseCase);
+  const userDeps = createUserDependencies(
+    shared,
+    notificationDeps.createNotificationsForUsersUseCase
+  );
+  const instructorDeps = createInstructorDependencies(
+    shared,
+    notificationDeps.createNotificationsForUsersUseCase
+  );
   const categoryDeps = createCategoryDependencies(shared);
   const courseDeps = createCourseDependencies(
     shared,
@@ -171,7 +176,9 @@ export function createAppDependencies(): AppDependencies {
   const dashboardRouterInstance = dashboardRouter(
     dashboardDeps.dashboardController
   );
-  const courseReviewRouterInstance = courseReviewRouter(courseReviewDeps.courseReviewController);
+  const courseReviewRouterInstance = courseReviewRouter(
+    courseReviewDeps.courseReviewController
+  );
 
   // Certificate dependencies
   const certificateDeps = createCertificateDependencies(
@@ -216,7 +223,8 @@ export function createAppDependencies(): AppDependencies {
     messageRepository: chatDeps.messageRepository,
     getUserNotificationsUseCase: notificationDeps.getUserNotificationsUseCase,
     notificationController: notificationDeps.notificationController,
-    createNotificationsForUsersUseCase: notificationDeps.createNotificationsForUsersUseCase,
+    createNotificationsForUsersUseCase:
+      notificationDeps.createNotificationsForUsersUseCase,
     courseRepository: shared.courseRepository,
     categoryRepository: shared.categoryRepository,
     userRepository: shared.userRepository,

@@ -11,22 +11,18 @@ import {
   ICourseListResponseDTO,
   IGetAllCoursesInputDTO,
   IGetEnrolledCoursesInputDTO,
-} from "../../app/dtos/course/course.dto";
+} from "../../app/dtos/course.dto";
 import { ICourseRepository } from "../../app/repositories/course.repository.interface";
 import { HttpError } from "../../presentation/http/errors/http-error";
+import { CourseStats } from "../../app/dtos/stats.dto";
 import {
   ICourseStats,
   IGetCourseStatsInput,
-} from "@/app/usecases/course/interfaces/get-course-stats.usecase.interface";
-import { IGetTopEnrolledCoursesInput } from "@/app/usecases/course/interfaces/get-top-enrolled-courses.usecase.interface";
-import { ITopEnrolledCourse } from "@/app/dtos/admin/admin-dashboard.dto";
+} from "../../app/usecases/course/interfaces/get-course-stats.usecase.interface";
+import { IGetTopEnrolledCoursesInput } from "../../app/usecases/course/interfaces/top-enrolled-courses.usecase.interface";
 
 export class CourseRepository implements ICourseRepository {
   constructor(private prisma: PrismaClient) {}
-
-  private hasValue<T>(value: T | null | undefined): value is T {
-    return value !== null && value !== undefined;
-  }
 
   async save(course: Course): Promise<Course> {
     try {
@@ -726,7 +722,7 @@ export class CourseRepository implements ICourseRepository {
 
   async getTopEnrolledCourses(
     input: IGetTopEnrolledCoursesInput
-  ): Promise<ITopEnrolledCourse[]> {
+  ): Promise<CourseStats[]> {
     let allCourses;
     if (input.role === "INSTRUCTOR") {
       allCourses = await this.prisma.course.findMany({

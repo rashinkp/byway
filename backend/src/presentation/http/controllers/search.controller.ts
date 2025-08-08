@@ -4,8 +4,8 @@ import { IHttpRequest } from "../interfaces/http-request.interface";
 import { IHttpResponse } from "../interfaces/http-response.interface";
 import { IHttpErrors } from "../interfaces/http-errors.interface";
 import { IHttpSuccess } from "../interfaces/http-success.interface";
-import { SearchParamsSchema } from "../../../app/dtos/search/search.dto";
 import { BadRequestError } from "../errors/bad-request-error";
+import { SearchParamsSchema } from "../../validators/search.validators";
 
 export class SearchController extends BaseController {
   constructor(

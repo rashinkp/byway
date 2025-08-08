@@ -4,7 +4,7 @@ import {
   IUpdateLessonInputDTO,
   IGetAllLessonsInputDTO,
   IGetPublicLessonsInputDTO,
-} from "../../app/dtos/lesson/lesson.dto";
+} from "../../app/dtos/lesson.dto";
 import { ContentStatus, ContentType } from "../../domain/enum/content.enum";
 import { LessonStatus } from "../../domain/enum/lesson.enum";
 
@@ -24,7 +24,7 @@ const quizQuestionSchema = z.object({
 
 // LessonContent schema (used in create and update)
 const lessonContentSchema = z.object({
-  id: z.string().uuid().optional(),
+  id: z.string().uuid(),
   lessonId: z.string().uuid("Invalid lesson ID"),
   type: z.enum([ContentType.VIDEO, ContentType.QUIZ, ContentType.DOCUMENT], {
     message: "Invalid content type",

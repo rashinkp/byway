@@ -9,9 +9,9 @@ import { useCreateInstructor } from "@/hooks/instructor/useCreateInstructor";
 import { Loader2 } from "lucide-react";
 import {
 	InstructorFormModal,
-	InstructorSubmitData,
 } from "@/components/instructor/InstructorAdd";
 import Image from "next/image";
+import { InstructorSubmitData } from "@/lib/validations/instructor";
 
 interface HeroSectionProps {
 	className?: string;

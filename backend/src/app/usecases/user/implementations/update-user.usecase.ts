@@ -1,4 +1,4 @@
-import { UpdateUserDto } from "../../../dtos/user/user.dto";
+import { UpdateUserDto } from "../../../dtos/user.dto";
 import { User } from "../../../../domain/entities/user.entity";
 import { UserProfile } from "../../../../domain/entities/user-profile.entity";
 import { Role } from "../../../../domain/enum/role.enum";
@@ -37,16 +37,16 @@ export class UpdateUserUseCase implements IUpdateUserUseCase {
     }
 
     const updatedUser = User.update(user, {
-      id: user.id,
       name: dto.name,
       avatar: dto.avatar,
       role: dto.role as Role,
     });
 
     let profile = await this.userRepository.findProfileByUserId(userId);
+
     if (!profile) {
-      profile = UserProfile.create({
-        userId,
+      profile = UserProfile.create(userId, {
+        // userId as first param, other fields in an options object
         bio: dto.bio,
         education: dto.education,
         skills: dto.skills,
@@ -60,7 +60,7 @@ export class UpdateUserUseCase implements IUpdateUserUseCase {
       profile = await this.userRepository.createProfile(profile);
     } else {
       profile = UserProfile.update(profile, {
-        id: profile.id,
+        // no id passed here, update only uses changes object
         bio: dto.bio,
         education: dto.education,
         skills: dto.skills,

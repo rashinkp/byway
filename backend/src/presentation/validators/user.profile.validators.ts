@@ -2,7 +2,7 @@ import { z } from "zod";
 import {
   ICreateUserProfileRequestDTO,
   IUpdateUserProfileRequestDTO,
-} from "../../app/dtos/user/user.dto";
+} from "../../app/dtos/user.dto";
 
 interface ValidationSchema {
   body?: z.ZodSchema;

@@ -1,7 +1,7 @@
 import {
   IUpdateCourseInputDTO,
   ICourseWithDetailsDTO,
-} from "../../../dtos/course/course.dto";
+} from "../../../dtos/course.dto";
 import { HttpError } from "../../../../presentation/http/errors/http-error";
 import { ICourseRepository } from "../../../repositories/course.repository.interface";
 import { IUpdateCourseUseCase } from "../interfaces/update-course.usecase.interface";

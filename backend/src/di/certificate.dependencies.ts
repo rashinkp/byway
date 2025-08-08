@@ -23,7 +23,7 @@ export function createCertificateDependencies(
 ): CertificateDependencies {
   // Create infrastructure services
   const certificatePdfService = new CertificatePdfService();
-  
+
   // Create use case
   const generateCertificateUseCase = new GenerateCertificateUseCase(
     certificateRepository,
@@ -47,4 +47,4 @@ export function createCertificateDependencies(
     generateCertificateUseCase,
     certificateController,
   };
-} 
+}

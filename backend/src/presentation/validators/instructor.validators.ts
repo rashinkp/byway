@@ -6,7 +6,7 @@ import {
   DeclineInstructorRequestDTO,
   GetInstructorByUserIdRequestDTO,
   GetAllInstructorsRequestDTO,
-} from "../../app/dtos/instructor/instructor.dto";
+} from "../../app/dtos/instructor.dto";
 import { APPROVALSTATUS } from "../../domain/enum/approval-status.enum";
 
 interface ValidationSchema {

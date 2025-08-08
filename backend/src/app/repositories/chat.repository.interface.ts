@@ -1,6 +1,6 @@
-import { ChatId } from "@/domain/value-object/ChatId";
 import { Chat } from "../../domain/entities/chat.entity";
-import { UserId } from "@/domain/value-object/UserId";
+import { ChatId } from "../../domain/value-object/ChatId";
+import { UserId } from "../../domain/value-object/UserId";
 import { PaginatedChatListDTO } from "../dtos/chat.dto";
 
 export interface IChatRepository {

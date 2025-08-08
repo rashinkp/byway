@@ -1,9 +1,5 @@
 import { z } from "zod";
-import {
-  CreateCourseReviewDto,
-  UpdateCourseReviewDto,
-  QueryCourseReviewDto,
-} from "../../app/dtos/course-review";
+import { CreateCourseReviewDto, QueryCourseReviewDto, UpdateCourseReviewDto } from "../../app/dtos/review.dto";
 
 interface ValidationSchema {
   body?: z.ZodSchema;

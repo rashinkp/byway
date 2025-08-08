@@ -1,4 +1,5 @@
-import { CourseReviewResponseDto } from "../../../dtos/course-review";
+// import { CourseReviewResponseDto } from "../../../dtos/course-review";
+import { CourseReviewResponseDto } from "../../../dtos/review.dto";
 import { ICourseReviewRepository } from "../../../repositories/course-review.repository.interface";
 import { IGetUserReviewsUseCase } from "../interfaces/get-user-reviews.usecase.interface";
 

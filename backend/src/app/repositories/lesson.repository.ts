@@ -3,7 +3,7 @@ import {
   IGetPublicLessonsInputDTO,
   ILessonListOutputDTO,
   IPublicLessonListOutputDTO,
-} from "../dtos/lesson/lesson.dto";
+} from "../dtos/lesson.dto";
 import { Lesson } from "../../domain/entities/lesson.entity";
 
 export interface ILessonRepository {

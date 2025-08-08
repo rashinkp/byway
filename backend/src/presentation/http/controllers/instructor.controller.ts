@@ -36,7 +36,7 @@ export class InstructorController extends BaseController {
     private userRepository: IUserRepository,
     private getInstructorDetailsUseCase: GetInstructorDetailsUseCase,
     httpErrors: IHttpErrors,
-    httpSuccess: IHttpSuccess,
+    httpSuccess: IHttpSuccess
   ) {
     super(httpErrors, httpSuccess);
   }
@@ -51,13 +51,16 @@ export class InstructorController extends BaseController {
         { ...validated, userId: request.user.id },
         request.user
       );
-      
+
       // Fetch user data for response
       const user = await this.userRepository.findById(request.user.id);
       if (!user) {
-        throw new HttpError("User data not found after instructor creation", StatusCodes.INTERNAL_SERVER_ERROR);
+        throw new HttpError(
+          "User data not found after instructor creation",
+          StatusCodes.INTERNAL_SERVER_ERROR
+        );
       }
-      
+
       return this.success_201(
         {
           id: instructor.id,
@@ -141,16 +144,16 @@ export class InstructorController extends BaseController {
 
       // Get user details for Socket.IO notification
       const user = await this.userRepository.findById(instructor.userId);
-      
+
       // Emit real-time notification to the instructor
       const io = getSocketIOInstance();
       if (io && user) {
-        io.to(instructor.userId).emit('newNotification', {
+        io.to(instructor.userId).emit("newNotification", {
           message: `Congratulations! Your instructor application has been approved. You can now create and publish courses.`,
-          type: 'INSTRUCTOR_APPROVED',
+          type: "INSTRUCTOR_APPROVED",
           instructorId: instructor.id,
           instructorName: user.name || user.email,
-          timestamp: new Date().toISOString()
+          timestamp: new Date().toISOString(),
         });
       }
 
@@ -177,16 +180,16 @@ export class InstructorController extends BaseController {
 
       // Get user details for Socket.IO notification
       const user = await this.userRepository.findById(instructor.userId);
-      
+
       // Emit real-time notification to the instructor
       const io = getSocketIOInstance();
       if (io && user) {
-        io.to(instructor.userId).emit('newNotification', {
+        io.to(instructor.userId).emit("newNotification", {
           message: `Your instructor application has been declined. You can reapply after 24 hours with updated information.`,
-          type: 'INSTRUCTOR_DECLINED',
+          type: "INSTRUCTOR_DECLINED",
           instructorId: instructor.id,
           instructorName: user.name || user.email,
-          timestamp: new Date().toISOString()
+          timestamp: new Date().toISOString(),
         });
       }
 
@@ -200,7 +203,9 @@ export class InstructorController extends BaseController {
     });
   }
 
-  async getInstructorByUserId(httpRequest: IHttpRequest): Promise<IHttpResponse> {
+  async getInstructorByUserId(
+    httpRequest: IHttpRequest
+  ): Promise<IHttpResponse> {
     return this.handleRequest(httpRequest, async (request) => {
       if (!request.user?.id) {
         throw new UnauthorizedError("User not authenticated");
@@ -208,7 +213,9 @@ export class InstructorController extends BaseController {
       const validated = validateGetInstructorByUserId({
         userId: request.user.id,
       });
-      const instructor = await this.getInstructorByUserIdUseCase.execute(validated);
+      const instructor = await this.getInstructorByUserIdUseCase.execute(
+        validated
+      );
       const user = await this.userRepository.findById(request.user.id);
       if (!user) {
         throw new HttpError("User not found", StatusCodes.NOT_FOUND);
@@ -251,11 +258,16 @@ export class InstructorController extends BaseController {
     });
   }
 
-  async getInstructorDetails(httpRequest: IHttpRequest): Promise<IHttpResponse> {
+  async getInstructorDetails(
+    httpRequest: IHttpRequest
+  ): Promise<IHttpResponse> {
     return this.handleRequest(httpRequest, async (request) => {
       const { userId } = request.params;
       const result = await this.getInstructorDetailsUseCase.execute(userId);
-      return this.success_200(result, "Instructor details retrieved successfully");
+      return this.success_200(
+        result,
+        "Instructor details retrieved successfully"
+      );
     });
   }
 }

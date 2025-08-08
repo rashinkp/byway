@@ -1,16 +1,16 @@
 import { v4 as uuidv4 } from "uuid";
 import { UserVerification } from "../../../domain/entities/user-verification.entity";
 import { IAuthRepository } from "../../../app/repositories/auth.repository";
-import { IOtpProvider } from "../../../app/providers/I.otp-provider";
+import { IOtpProvider } from "../../../app/providers/otp-provider.interface";
 import { EmailProvider } from "../../../app/providers/email.provider.interface";
 
 export class OtpProvider implements IOtpProvider {
-  constructor(private authRepository: IAuthRepository, private emailProvider: EmailProvider) {}
+  constructor(
+    private authRepository: IAuthRepository,
+    private emailProvider: EmailProvider
+  ) {}
 
-  async generateOtp(
-    email: string,
-    userId: string,
-  ): Promise<UserVerification> {
+  async generateOtp(email: string, userId: string): Promise<UserVerification> {
     // Generate 6-digit numeric OTP
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
 

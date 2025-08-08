@@ -3,7 +3,7 @@ import { IRevenueRepository } from "../../../repositories/revenue.repository";
 import {
   GetLatestRevenueParams,
   GetLatestRevenueResult,
-} from "../../../dtos/revenue/get-latest-revenue.dto";
+} from "../../../dtos/revenue.dto";
 
 export class GetLatestRevenueUseCase implements IGetLatestRevenueUseCase {
   constructor(private readonly revenueRepository: IRevenueRepository) {}

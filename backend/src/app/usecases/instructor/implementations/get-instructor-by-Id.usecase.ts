@@ -1,4 +1,4 @@
-import { GetInstructorByUserIdRequestDTO } from "../../../dtos/instructor/instructor.dto";
+import { GetInstructorByUserIdRequestDTO } from "../../../dtos/instructor.dto";
 import { Instructor } from "../../../../domain/entities/instructor.entity";
 import { IInstructorRepository } from "../../../repositories/instructor.repository";
 import { IGetInstructorByUserIdUseCase } from "../interfaces/get-instructor-by-Id.usecase.interface";

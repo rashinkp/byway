@@ -1,11 +1,8 @@
 import { PrismaClient } from "@prisma/client";
 import { TransactionType } from "../../domain/enum/transaction-type.enum";
 import { TransactionStatus } from "../../domain/enum/transaction-status.enum";
-import { IRevenueRepository } from "@/app/repositories/revenue.repository";
-import {
-  GetLatestRevenueParams,
-  GetLatestRevenueResult,
-} from "@/app/dtos/revenue/get-latest-revenue.dto";
+import { IRevenueRepository } from "../../app/repositories/revenue.repository";
+import { GetLatestRevenueParams, GetLatestRevenueResult } from "../../app/dtos/revenue.dto";
 
 export class PrismaRevenueRepository implements IRevenueRepository {
   constructor(private readonly prisma: PrismaClient) {}

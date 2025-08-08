@@ -40,7 +40,9 @@ export class DashboardController extends BaseController {
     });
   }
 
-  async getInstructorDashboard(httpRequest: IHttpRequest): Promise<IHttpResponse> {
+  async getInstructorDashboard(
+    httpRequest: IHttpRequest
+  ): Promise<IHttpResponse> {
     if (!this.getInstructorDashboardUseCase) {
       throw new Error("Instructor dashboard use case not available");
     }
@@ -54,7 +56,10 @@ export class DashboardController extends BaseController {
         instructorId: request?.user?.id,
         limit: limit || 5,
       });
-      return this.success_200(result, "Instructor dashboard data retrieved successfully");
+      return this.success_200(
+        result,
+        "Instructor dashboard data retrieved successfully"
+      );
     });
   }
 }

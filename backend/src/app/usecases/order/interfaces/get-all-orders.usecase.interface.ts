@@ -1,5 +1,5 @@
 import { Order } from "../../../../domain/entities/order.entity";
-import { GetAllOrdersDto } from "../../../dtos/order/order.dto";
+import { GetAllOrdersDto } from "../../../dtos/order.dto";
 
 export interface IGetAllOrdersUseCase {
   execute(

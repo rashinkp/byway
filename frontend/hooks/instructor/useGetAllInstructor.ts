@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { getAllInstructors } from "@/api/instructor";
 import { IInstructorWithUserDetails } from "@/types/instructor";
-import { ApiResponse } from "@/types/apiResponse";
+import type { ApiResponse } from "@/types/general";
 
 interface UseGetAllInstructorsParams {
 	page?: number;

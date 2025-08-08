@@ -1,18 +1,9 @@
-export interface ITopInstructor {
-  instructorId: string;
-  instructorName: string;
-  email: string;
-  courseCount: number;
-  totalEnrollments: number;
-  totalRevenue: number;
-  averageRating: number;
-  isActive: boolean;
-}
+import { InstructorStats } from "../../../dtos/stats.dto";
 
 export interface IGetTopInstructorsInput {
   limit?: number;
 }
 
 export interface IGetTopInstructorsUseCase {
-  execute(input: IGetTopInstructorsInput): Promise<ITopInstructor[]>;
+  execute(input: IGetTopInstructorsInput): Promise<InstructorStats[]>;
 } 

@@ -1,7 +1,7 @@
 import {
   ICreateLessonContentInputDTO,
   ILessonContentOutputDTO,
-} from "../../../dtos/lesson/lesson.dto";
+} from "../../../dtos/lesson.dto";
 
 export interface ICreateLessonContentUseCase {
   execute(

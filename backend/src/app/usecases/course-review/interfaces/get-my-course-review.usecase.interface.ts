@@ -1,4 +1,5 @@
-import { CourseReviewResponseDto } from "../../../dtos/course-review";
+import { CourseReviewResponseDto } from "../../../dtos/review.dto";
+
 
 export interface IGetMyCourseReviewUseCase {
   execute(

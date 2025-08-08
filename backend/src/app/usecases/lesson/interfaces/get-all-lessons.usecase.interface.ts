@@ -1,7 +1,7 @@
 import {
   IGetAllLessonsInputDTO,
   ILessonListOutputDTO,
-} from "../../../dtos/lesson/lesson.dto";
+} from "../../../dtos/lesson.dto";
 
 export interface IGetAllLessonsUseCase {
   execute(params: IGetAllLessonsInputDTO): Promise<ILessonListOutputDTO>;

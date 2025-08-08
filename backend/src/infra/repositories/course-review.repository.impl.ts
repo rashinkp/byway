@@ -1,12 +1,9 @@
 import { PrismaClient } from "@prisma/client";
-import { CourseReview } from "../../domain/entities/course-review.entity";
-import {
-  QueryCourseReviewDto,
-  CourseReviewResponseDto,
-  CourseReviewSummaryDto,
-} from "../../app/dtos/course-review";
+import { CourseReview } from "../../domain/entities/review.entity";
+
 import { ICourseReviewRepository } from "../../app/repositories/course-review.repository.interface";
 import { Rating } from "../../domain/value-object/rating";
+import { CourseReviewResponseDto, CourseReviewSummaryDto, QueryCourseReviewDto } from "../../app/dtos/review.dto";
 
 function toCourseReviewEntity(data: any): CourseReview {
   return new CourseReview({

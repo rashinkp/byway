@@ -1,8 +1,8 @@
 import {
   ICreateLessonContentInputDTO,
   ILessonContentOutputDTO,
-} from "../../../dtos/lesson/lesson.dto";
-import { LessonContent } from "../../../../domain/entities/lesson-content.entity";
+} from "../../../dtos/lesson.dto";
+import { LessonContent } from "../../../../domain/entities/content.entity";
 import { HttpError } from "../../../../presentation/http/errors/http-error";
 import { ILessonContentRepository } from "../../../repositories/content.repository";
 import { ICreateLessonContentUseCase } from "../interfaces/create-content.usecase.interface";

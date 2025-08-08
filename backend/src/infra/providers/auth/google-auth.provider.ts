@@ -1,9 +1,10 @@
 // infra/providers/auth/google-auth.provider.ts
-import { GoogleAuthGateway, GoogleUserInfo } from "../../../app/providers/I.google-auth.provider";
+import {
+  GoogleAuthGateway,
+  GoogleUserInfo,
+} from "../../../app/providers/google-auth.interface";
 import axios from "axios";
 import { HttpError } from "../../../presentation/http/errors/http-error";
-
-
 
 export class GoogleAuthProvider implements GoogleAuthGateway {
   constructor(googleClientId: string) {

@@ -2,7 +2,6 @@
 
 import { useQuery } from "@tanstack/react-query";
 import { getAllUsers } from "@/api/users";
-import { ApiResponse, IPaginatedResponse } from "@/types/apiResponse";
 import {
 	User,
 	IGetAllUsersInput,
@@ -10,6 +9,7 @@ import {
 	NegativeSortByField,
 	UserRoleType,
 } from "@/types/user";
+import { ApiResponse, IPaginatedResponse } from "@/types/general";
 
 export type FilterBy =
 	| "All"

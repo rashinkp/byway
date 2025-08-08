@@ -85,8 +85,8 @@ export class TransactionRepository implements ITransactionRepository {
           courseId: transaction.courseId,
           transactionId: transaction.transactionId,
           metadata: transaction.metadata,
-          orderId: transaction.orderId
-        }
+          orderId: transaction.orderId,
+        },
       });
 
       return new Transaction({
@@ -104,7 +104,7 @@ export class TransactionRepository implements ITransactionRepository {
         updatedAt: createdTransaction.updatedAt,
       });
     } catch (error) {
-      console.error('Error creating transaction:', error);
+      console.error("Error creating transaction:", error);
       throw error;
     }
   }
@@ -119,7 +119,7 @@ export class TransactionRepository implements ITransactionRepository {
   async findByOrderId(orderId: string): Promise<Transaction | null> {
     const transaction = await this.prisma.transactionHistory.findFirst({
       where: { orderId },
-      orderBy: { createdAt: 'desc' }
+      orderBy: { createdAt: "desc" },
     });
     return transaction ? this.mapToTransaction(transaction) : null;
   }

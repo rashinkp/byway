@@ -1,7 +1,7 @@
 import {
   ICreateCourseInputDTO,
   ICourseWithDetailsDTO,
-} from "../../../dtos/course/course.dto";
+} from "../../../dtos/course.dto";
 import { Course } from "../../../../domain/entities/course.entity";
 import { HttpError } from "../../../../presentation/http/errors/http-error";
 import { ICategoryRepository } from "../../../repositories/category.repository";
@@ -51,6 +51,7 @@ export class CreateCourseUseCase implements ICreateCourseUseCase {
 
     // Create course entity with basic info
     const course = new Course({
+      id: "",
       title: input.title,
       description: input.description,
       categoryId: input.categoryId,

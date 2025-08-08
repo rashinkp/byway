@@ -1,4 +1,4 @@
-import { ILessonOutputDTO } from "../../../dtos/lesson/lesson.dto";
+import { ILessonOutputDTO } from "../../../dtos/lesson.dto";
 import { HttpError } from "../../../../presentation/http/errors/http-error";
 import { ILessonRepository } from "../../../repositories/lesson.repository";
 import { IGetLessonByIdUseCase } from "../interfaces/get-lesson-by-id.usecase.interface";

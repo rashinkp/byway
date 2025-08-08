@@ -1,14 +1,8 @@
 import { z } from "zod";
-import { FacebookAuthDto } from "../../app/dtos/auth/facebook-auth.dto";
 import { AuthProvider } from "../../domain/enum/auth-provider.enum";
 import { Role } from "../../domain/enum/role.enum";
-import { ForgotPasswordDto } from "../../app/dtos/auth/forgot-password.dto";
-import { GoogleAuthDto } from "../../app/dtos/auth/googel-auth.dto";
-import { LoginDto } from "../../app/dtos/auth/login.dto";
-import { RegisterDto } from "../../app/dtos/auth/register.dto";
-import { ResendOtpDto } from "../../app/dtos/auth/resend-otp.dto";
-import { ResetPasswordDto } from "../../app/dtos/auth/reset-password.dto";
-import { VerifyOtpDto } from "../../app/dtos/auth/verify-otp.dto";
+import { FacebookAuthDto, ForgotPasswordDto, GoogleAuthDto, LoginDto, RegisterDto, ResendOtpDto, ResetPasswordDto, VerifyOtpDto } from "../../app/dtos/auth.dto";
+
 
 interface ValidationSchema {
   body?: z.ZodSchema;

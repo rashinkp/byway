@@ -2,8 +2,6 @@ import nodemailer, { Transporter } from "nodemailer";
 import { envConfig } from "../../../presentation/express/configs/env.config";
 import { EmailProvider } from "../../../app/providers/email.provider.interface";
 
-
-
 export class EmailProviderImpl implements EmailProvider {
   private transporter: Transporter;
 
@@ -50,7 +48,7 @@ export class EmailProviderImpl implements EmailProvider {
   }
 
   async sendResetTokenEmail(email: string, token: string): Promise<void> {
-    const frontendBaseUrl = (envConfig.FRONTEND_URL || '').split(',')[0].trim();
+    const frontendBaseUrl = (envConfig.FRONTEND_URL || "").split(",")[0].trim();
     const resetUrl = `${frontendBaseUrl}/reset-password?token=${token}`;
     const html = `
       <div style="font-family: 'Segoe UI', Arial, sans-serif; background: #f7f7fa; padding: 32px;">
@@ -81,7 +79,12 @@ export class EmailProviderImpl implements EmailProvider {
     });
   }
 
-  async sendContactFormEmail(data: { name: string; email: string; subject: string; message: string }): Promise<void> {
+  async sendContactFormEmail(data: {
+    name: string;
+    email: string;
+    subject: string;
+    message: string;
+  }): Promise<void> {
     const html = `
       <div style="font-family: 'Segoe UI', Arial, sans-serif; background: #f7f7fa; padding: 32px;">
         <div style="max-width: 600px; margin: 0 auto; background: #fff; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); padding: 32px 24px;">
@@ -93,11 +96,15 @@ export class EmailProviderImpl implements EmailProvider {
             <h3 style="margin: 0 0 16px 0; font-size: 1.2rem;">Contact Details</h3>
             <p style="margin: 8px 0;"><strong>Name:</strong> ${data.name}</p>
             <p style="margin: 8px 0;"><strong>Email:</strong> ${data.email}</p>
-            <p style="margin: 8px 0;"><strong>Subject:</strong> ${data.subject}</p>
+            <p style="margin: 8px 0;"><strong>Subject:</strong> ${
+              data.subject
+            }</p>
           </div>
           <div style="background: #f8f9fa; border-radius: 8px; padding: 20px; margin-bottom: 24px;">
             <h3 style="margin: 0 0 16px 0; font-size: 1.2rem; color: #2d3748;">Message</h3>
-            <p style="color: #4a5568; font-size: 1rem; line-height: 1.6; margin: 0; white-space: pre-wrap;">${data.message}</p>
+            <p style="color: #4a5568; font-size: 1rem; line-height: 1.6; margin: 0; white-space: pre-wrap;">${
+              data.message
+            }</p>
           </div>
           <div style="text-align: center; color: #a0aec0; font-size: 0.95rem;">
             This message was sent from the Byway contact form.<br />
@@ -115,7 +122,11 @@ export class EmailProviderImpl implements EmailProvider {
     });
   }
 
-  async sendContactConfirmationEmail(data: { name: string; email: string; subject: string }): Promise<void> {
+  async sendContactConfirmationEmail(data: {
+    name: string;
+    email: string;
+    subject: string;
+  }): Promise<void> {
     const html = `
       <div style="font-family: 'Segoe UI', Arial, sans-serif; background: #f7f7fa; padding: 32px;">
         <div style="max-width: 480px; margin: 0 auto; background: #fff; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); padding: 32px 24px;">
@@ -125,10 +136,16 @@ export class EmailProviderImpl implements EmailProvider {
           </div>
           <div style="background: #f6e05e; color: #2d3748; border-radius: 8px; padding: 20px; margin-bottom: 24px;">
             <p style="margin: 8px 0; font-size: 1.1rem;">Hi ${data.name},</p>
-            <p style="margin: 8px 0; font-size: 1rem;">Thank you for reaching out to us. We've received your message about "<strong>${data.subject}</strong>" and will get back to you within 24 hours.</p>
+            <p style="margin: 8px 0; font-size: 1rem;">Thank you for reaching out to us. We've received your message about "<strong>${
+              data.subject
+            }</strong>" and will get back to you within 24 hours.</p>
           </div>
           <p style="color: #4a5568; font-size: 1rem; text-align: center; margin-bottom: 24px;">
-            In the meantime, you can check out our <a href="${envConfig.FRONTEND_URL}/courses" style="color: #f6e05e;">course catalog</a> or visit our <a href="${envConfig.FRONTEND_URL}/contact" style="color: #f6e05e;">FAQ section</a> for quick answers.
+            In the meantime, you can check out our <a href="${
+              envConfig.FRONTEND_URL
+            }/courses" style="color: #f6e05e;">course catalog</a> or visit our <a href="${
+      envConfig.FRONTEND_URL
+    }/contact" style="color: #f6e05e;">FAQ section</a> for quick answers.
           </p>
           <div style="text-align: center; color: #a0aec0; font-size: 0.95rem;">
             &copy; ${new Date().getFullYear()} Byway eLearning Platform

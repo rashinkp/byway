@@ -4,7 +4,7 @@ import {
   IUpdateCategoryInputDTO,
   IGetAllCategoriesInputDTO,
   ICategoryIdInputDTO,
-} from "../../app/dtos/category/category.dto";
+} from "../../app/dtos/category.dto";
 
 interface ValidationSchema {
   body?: z.ZodSchema;
@@ -21,7 +21,7 @@ const createCategorySchema = z.object({
     .string()
     .min(1, "Category name cannot be empty")
     .max(100, "Category name cannot exceed 100 characters"),
-  description: z.string().optional(),
+  description: z.string(),
   createdBy: uuidSchema,
 });
 

@@ -5,14 +5,16 @@ import { IHttpErrors } from "../interfaces/http-errors.interface";
 import { IHttpSuccess } from "../interfaces/http-success.interface";
 import { UnauthorizedError } from "../errors/unautherized-error";
 import { IPaymentService } from "../../../app/services/payment/interfaces/payment.service.interface";
-import { createCheckoutSessionSchema } from "../../../app/dtos/stripe/create-checkout-session.dto";
+import { createCheckoutSessionSchema } from "../../../app/dtos/payment.dto";
 import { StripeWebhookGateway } from "../../../infra/providers/stripe/stripe-webhook.gateway";
+import { IGetEnrollmentStatsUseCase } from "../../../app/usecases/enrollment/interfaces/get-enrollment-stats.usecase.interface";
 
 export class StripeController extends BaseController {
   private webhookGateway: StripeWebhookGateway;
 
   constructor(
     private paymentService: IPaymentService,
+    private getEnrollmentStatsUseCase: IGetEnrollmentStatsUseCase,
     httpErrors: IHttpErrors,
     httpSuccess: IHttpSuccess
   ) {
@@ -57,6 +59,25 @@ export class StripeController extends BaseController {
         request.body,
         signature
       );
+
+      const session = event.data.object;
+      const userId = session.metadata?.userId;
+      const courseId = session.metadata?.courseId;
+
+      if (!userId || !courseId) {
+        throw new Error("Missing Stripe metadata: userId or courseId");
+      }
+
+      const isEnrolled = await this.getEnrollmentStatsUseCase.execute({
+        userId,
+        courseId,
+      });
+
+      if (isEnrolled) {
+        console.log(`⚠️ User ${userId} already enrolled in ${courseId}`);
+        return this.success_200(null, "Already enrolled");
+      }
+
       const response = await this.paymentService.handleStripeWebhook(event);
       return this.success_200(response.data, response.message);
     });

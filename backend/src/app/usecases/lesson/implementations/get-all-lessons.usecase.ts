@@ -1,7 +1,7 @@
 import {
   IGetAllLessonsInputDTO,
   ILessonListOutputDTO,
-} from "../../../dtos/lesson/lesson.dto";
+} from "../../../dtos/lesson.dto";
 import { HttpError } from "../../../../presentation/http/errors/http-error";
 import { ILessonRepository } from "../../../repositories/lesson.repository";
 import { IGetAllLessonsUseCase } from "../interfaces/get-all-lessons.usecase.interface";

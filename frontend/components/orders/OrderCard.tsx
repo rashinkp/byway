@@ -2,10 +2,11 @@ import React from "react";
 import { RefreshCw, Calendar, DollarSign, BookOpen } from "lucide-react";
 import { StatusBadge } from "./StatusBadge";
 import { Order } from "@/types/order";
-import { formatDate, formatPrice } from "@/utils/formatPrice";
+import {  formatPrice } from "@/utils/formatPrice";
 import { Button } from "@/components/ui/button";
 import { useRetryOrder } from "@/hooks/order/useRetryOrder";
 import Image from "next/image";
+import { formatDate } from "@/lib/utils";
 
 interface OrderCardProps {
   order: Order;

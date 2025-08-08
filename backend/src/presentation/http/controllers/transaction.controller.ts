@@ -25,7 +25,9 @@ export class TransactionController extends BaseController {
 
   async createTransaction(httpRequest: IHttpRequest): Promise<IHttpResponse> {
     return this.handleRequest(httpRequest, async (request) => {
-      const transaction = await this.createTransactionUseCase.execute(request.body);
+      const transaction = await this.createTransactionUseCase.execute(
+        request.body
+      );
       return this.success_201(transaction, "Transaction created successfully");
     });
   }
@@ -34,46 +36,74 @@ export class TransactionController extends BaseController {
     return this.handleRequest(httpRequest, async (request) => {
       const { id } = request.params;
       const transaction = await this.getTransactionByIdUseCase.execute(id);
-      
+
       if (!transaction) {
         throw new Error("Transaction not found");
       }
 
-      return this.success_200(transaction, "Transaction retrieved successfully");
+      return this.success_200(
+        transaction,
+        "Transaction retrieved successfully"
+      );
     });
   }
 
-  async getTransactionsByOrder(httpRequest: IHttpRequest): Promise<IHttpResponse> {
+  async getTransactionsByOrder(
+    httpRequest: IHttpRequest
+  ): Promise<IHttpResponse> {
     return this.handleRequest(httpRequest, async (request) => {
       const { orderId } = request.params;
-      const transactions = await this.getTransactionsByOrderUseCase.execute({ orderId });
-      return this.success_200(transactions, "Transactions retrieved successfully");
+      const transactions = await this.getTransactionsByOrderUseCase.execute({
+        orderId,
+      });
+      return this.success_200(
+        transactions,
+        "Transactions retrieved successfully"
+      );
     });
   }
 
-  async getTransactionsByUser(httpRequest: IHttpRequest): Promise<IHttpResponse> {
+  async getTransactionsByUser(
+    httpRequest: IHttpRequest
+  ): Promise<IHttpResponse> {
     return this.handleRequest(httpRequest, async (request) => {
       const user = request.user as JwtPayload | undefined;
       if (!user?.id) {
         throw new Error("User not authenticated");
       }
-      const page = request.query?.page ? parseInt(request.query.page as string) : 1;
-      const limit = request.query?.limit ? parseInt(request.query.limit as string) : 10;
-      const transactions = await this.getTransactionsByUserUseCase.execute({ userId: user.id, page, limit });
-      return this.success_200(transactions || [], "Transactions retrieved successfully");
+      const page = request.query?.page
+        ? parseInt(request.query.page as string)
+        : 1;
+      const limit = request.query?.limit
+        ? parseInt(request.query.limit as string)
+        : 10;
+      const transactions = await this.getTransactionsByUserUseCase.execute({
+        userId: user.id,
+        page,
+        limit,
+      });
+      return this.success_200(
+        transactions || [],
+        "Transactions retrieved successfully"
+      );
     });
   }
 
-  async updateTransactionStatus(httpRequest: IHttpRequest): Promise<IHttpResponse> {
+  async updateTransactionStatus(
+    httpRequest: IHttpRequest
+  ): Promise<IHttpResponse> {
     return this.handleRequest(httpRequest, async (request) => {
       const { id, status, metadata } = request.body;
       const transaction = await this.updateTransactionStatusUseCase.execute({
         id,
         status,
-        metadata
+        metadata,
       });
 
-      return this.success_200(transaction, "Transaction status updated successfully");
+      return this.success_200(
+        transaction,
+        "Transaction status updated successfully"
+      );
     });
   }
-} 
+}

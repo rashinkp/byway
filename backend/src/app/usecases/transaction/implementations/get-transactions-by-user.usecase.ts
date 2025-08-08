@@ -1,9 +1,6 @@
+import { IGetTransactionsByUserInputDTO, ITransactionOutputDTO } from "../../../../app/dtos/transaction.dto";
 import { ITransactionRepository } from "../../../repositories/transaction.repository";
 import { IGetTransactionsByUserUseCase } from "../interfaces/get-transactions-by-user.usecase.interface";
-import {
-  IGetTransactionsByUserInputDTO,
-  ITransactionOutputDTO,
-} from "../../../dtos/transaction/transaction.dto";
 
 export class GetTransactionsByUserUseCase
   implements IGetTransactionsByUserUseCase

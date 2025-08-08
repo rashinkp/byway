@@ -1,7 +1,7 @@
 import { HttpError } from "../../../../presentation/http/errors/http-error";
 import { ICourseRepository } from "../../../repositories/course.repository.interface";
 import { IDeleteCourseUseCase } from "../interfaces/delete-course.usecase.interface";
-import { ICourseWithDetailsDTO } from "../../../dtos/course/course.dto";
+import { ICourseWithDetailsDTO } from "../../../dtos/course.dto";
 import { CreateNotificationsForUsersUseCase } from "../../notification/implementations/create-notifications-for-users.usecase";
 import { NotificationEventType } from "../../../../domain/enum/notification-event-type.enum";
 import { NotificationEntityType } from "../../../../domain/enum/notification-entity-type.enum";

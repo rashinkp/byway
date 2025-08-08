@@ -5,7 +5,6 @@ import { GetCourseRevenueUseCase } from "../app/usecases/revenue/implementations
 import { RevenueController } from "../presentation/http/controllers/revenue.controller";
 import { GetLatestRevenueUseCase } from "../app/usecases/revenue/implementations/get-latest-revenue.usecase";
 
-
 export const createRevenueDependencies = (sharedDeps: SharedDependencies) => {
   const { prisma, httpErrors, httpSuccess } = sharedDeps;
   const revenueRepository = new PrismaRevenueRepository(prisma);

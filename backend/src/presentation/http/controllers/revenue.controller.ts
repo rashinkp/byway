@@ -6,31 +6,9 @@ import { z } from "zod";
 import { BaseController } from "./base.controller";
 import { IHttpErrors } from "../interfaces/http-errors.interface";
 import { IHttpSuccess } from "../interfaces/http-success.interface";
-import { IGetLatestRevenueUseCase } from "@/app/usecases/revenue/interfaces/get-latest-revenue.usecase";
+import { IGetLatestRevenueUseCase } from "../../../app/usecases/revenue/interfaces/get-latest-revenue.usecase";
+import { getCourseRevenueSchema, getLatestRevenueSchema, getOverallRevenueSchema } from "../../validators/revenue.validator";
 
-const getOverallRevenueSchema = z.object({
-  startDate: z.string().transform((str) => new Date(str)),
-  endDate: z.string().transform((str) => new Date(str)),
-});
-
-const getCourseRevenueSchema = z.object({
-  startDate: z.string().transform((str) => new Date(str)),
-  endDate: z.string().transform((str) => new Date(str)),
-  sortBy: z.enum(["revenue", "enrollments", "name"]).optional(),
-  sortOrder: z.enum(["asc", "desc"]).optional(),
-  search: z.string().optional(),
-  page: z.string().transform((str) => parseInt(str)).optional(),
-  limit: z.string().transform((str) => parseInt(str)).optional(),
-});
-
-const getLatestRevenueSchema = z.object({
-  startDate: z.string().transform((str) => new Date(str)),
-  endDate: z.string().transform((str) => new Date(str)),
-  page: z.string().transform((str) => parseInt(str)).optional(),
-  limit: z.string().transform((str) => parseInt(str)).optional(),
-  search: z.string().optional(),
-  sortBy: z.enum(["latest", "oldest"]).optional(),
-});
 
 export class RevenueController extends BaseController {
   constructor(
@@ -68,15 +46,16 @@ export class RevenueController extends BaseController {
   async getCourseRevenue(httpRequest: IHttpRequest): Promise<IHttpResponse> {
     return this.handleRequest(httpRequest, async (request) => {
       const query = request.query || {};
-      const { startDate, endDate, sortBy, sortOrder, search, page, limit } = getCourseRevenueSchema.parse({
-        startDate: query.startDate,
-        endDate: query.endDate,
-        sortBy: query.sortBy,
-        sortOrder: query.sortOrder,
-        search: query.search,
-        page: query.page,
-        limit: query.limit,
-      });
+      const { startDate, endDate, sortBy, sortOrder, search, page, limit } =
+        getCourseRevenueSchema.parse({
+          startDate: query.startDate,
+          endDate: query.endDate,
+          sortBy: query.sortBy,
+          sortOrder: query.sortOrder,
+          search: query.search,
+          page: query.page,
+          limit: query.limit,
+        });
 
       if (!request.user?.id) {
         throw new Error("User not authenticated");
@@ -100,14 +79,15 @@ export class RevenueController extends BaseController {
   async getLatestRevenue(httpRequest: IHttpRequest): Promise<IHttpResponse> {
     return this.handleRequest(httpRequest, async (request) => {
       const query = request.query || {};
-      const { startDate, endDate, page, limit, search, sortBy } = getLatestRevenueSchema.parse({
-        startDate: query.startDate,
-        endDate: query.endDate,
-        page: query.page,
-        limit: query.limit,
-        search: query.search,
-        sortBy: query.sortBy,
-      });
+      const { startDate, endDate, page, limit, search, sortBy } =
+        getLatestRevenueSchema.parse({
+          startDate: query.startDate,
+          endDate: query.endDate,
+          page: query.page,
+          limit: query.limit,
+          search: query.search,
+          sortBy: query.sortBy,
+        });
 
       if (!request.user?.id) {
         throw new Error("User not authenticated");
@@ -126,4 +106,4 @@ export class RevenueController extends BaseController {
       return this.success_200(result, "Latest revenue retrieved successfully");
     });
   }
-} 
+}

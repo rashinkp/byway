@@ -33,7 +33,6 @@ import { IPaymentService } from "../app/services/payment/interfaces/payment.serv
 import { StripePaymentGateway } from "../infra/providers/stripe/stripe-payment.gateway";
 import { StripeWebhookGateway } from "../infra/providers/stripe/stripe-webhook.gateway";
 import { IRevenueDistributionService } from "../app/services/revenue-distribution/interfaces/revenue-distribution.service.interface";
-import { IUserRepository } from "@/app/repositories/user.repository";
 import { PrismaRevenueRepository } from "../infra/repositories/revenue.repository";
 import { IRevenueRepository } from "../app/repositories/revenue.repository";
 import { CourseReviewRepository } from "../infra/repositories/course-review.repository.impl";
@@ -44,6 +43,10 @@ import { PrismaCertificateRepository } from "../infra/repositories/certificate-r
 import { CertificateRepositoryInterface } from "../app/repositories/certificate-repository.interface";
 import { S3Service } from "../infra/providers/s3/s3.service";
 import { EmailProviderImpl } from "../infra/providers/email/email.provider";
+import { GetEnrollmentStatsUseCase } from "../app/usecases/enrollment/implementations/get-enrollment-stats.usecase";
+import { IUserRepository } from "../app/repositories/user.repository";
+import { IPasswordHasher } from "../app/providers/password-hasher.interface";
+import { BcryptPasswordHasher } from "../infra/providers/password-hasher.ts";
 
 export interface SharedDependencies {
   prisma: typeof prismaClient;
@@ -73,6 +76,8 @@ export interface SharedDependencies {
   certificateRepository: CertificateRepositoryInterface;
   s3Service: S3Service;
   emailProvider: EmailProviderImpl;
+  getEnrollmentStatsUseCase: GetEnrollmentStatsUseCase;
+  passwordHasher: IPasswordHasher;
 }
 
 export function createSharedDependencies(): SharedDependencies {
@@ -95,6 +100,7 @@ export function createSharedDependencies(): SharedDependencies {
   const walletRepository = new WalletRepository(prismaClient);
   const paymentGateway = new StripePaymentGateway();
   const webhookGateway = new StripeWebhookGateway();
+  const passwordHasher = new BcryptPasswordHasher();
 
   // Create a temporary mock revenue distribution service
   // This will be replaced with the real one in app.dependencies.ts
@@ -124,6 +130,10 @@ export function createSharedDependencies(): SharedDependencies {
   const lessonProgressRepository = new LessonProgressRepository(prismaClient);
   const certificateRepository = new PrismaCertificateRepository(prismaClient);
 
+  const getEnrollmentStatsUseCase = new GetEnrollmentStatsUseCase(
+    enrollmentRepository
+  );
+
   return {
     prisma: prismaClient,
     userRepository,
@@ -152,5 +162,7 @@ export function createSharedDependencies(): SharedDependencies {
     certificateRepository,
     s3Service,
     emailProvider,
+    getEnrollmentStatsUseCase,
+    passwordHasher,
   };
 }

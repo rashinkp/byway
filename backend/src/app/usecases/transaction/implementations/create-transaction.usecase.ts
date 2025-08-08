@@ -1,12 +1,9 @@
 import { ITransactionRepository } from "../../../repositories/transaction.repository";
 import { ICreateTransactionUseCase } from "../interfaces/create-transaction.usecase.interface";
-import {
-  ICreateTransactionInputDTO,
-  ITransactionOutputDTO,
-} from "../../../dtos/transaction/transaction.dto";
 import { Transaction } from "../../../../domain/entities/transaction.entity";
 import { TransactionType } from "../../../../domain/enum/transaction-type.enum";
 import { TransactionStatus } from "../../../../domain/enum/transaction-status.enum";
+import { ICreateTransactionInputDTO, ITransactionOutputDTO } from "../../../../app/dtos/transaction.dto";
 import { PaymentGateway } from "../../../../domain/enum/payment-gateway.enum";
 
 export class CreateTransactionUseCase implements ICreateTransactionUseCase {
@@ -21,7 +18,7 @@ export class CreateTransactionUseCase implements ICreateTransactionUseCase {
       amount: input.amount,
       type: input.type || TransactionType.PURCHASE,
       status: input.status || TransactionStatus.PENDING,
-      paymentGateway: input.paymentGateway || PaymentGateway.STRIPE,
+      paymentGateway: input.paymentGateway || PaymentGateway.INTERNAL ,
       paymentMethod: input.paymentMethod,
       paymentDetails: input.paymentDetails,
       courseId: input.courseId,

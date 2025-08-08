@@ -8,7 +8,7 @@ import { IGetChatHistoryUseCase } from "../../../app/usecases/chat/interfaces/ge
 import { IGetMessagesByChatUseCase } from "../../../app/usecases/message/interfaces/get-messages-by-chat.usecase.interface";
 import { IGetMessageByIdUseCase } from "../../../app/usecases/message/interfaces/get-message-by-id.usecase.interface";
 import { IDeleteMessageUseCase } from "../../../app/usecases/message/interfaces/delete-message.usecase.interface";
-import { IMarkReadMessagesUseCase } from '../../../app/usecases/message/interfaces/mark-read-messages.usecase.interface';
+import { IMarkReadMessagesUseCase } from "../../../app/usecases/message/interfaces/mark-read-messages.usecase.interface";
 import { UserId } from "../../../domain/value-object/UserId";
 import { ChatId } from "../../../domain/value-object/ChatId";
 import { MessageId } from "../../../domain/value-object/MessageId";
@@ -23,7 +23,7 @@ import {
   getMessageByIdSchema,
   deleteMessageSchema,
 } from "../../validators/chat.validators";
-import { IGetTotalUnreadCountUseCase } from "@/app/usecases/message/interfaces/get-total-unread-count.usecase.interface";
+import { IGetTotalUnreadCountUseCase } from "../../../app/usecases/message/interfaces/get-total-unread-count.usecase.interface";
 
 export class ChatController extends BaseController {
   constructor(
@@ -47,7 +47,14 @@ export class ChatController extends BaseController {
     const { chatId, content, imageUrl, audioUrl } = validated;
     const senderId = socketData.senderId;
     const userId = socketData.userId;
-    const message = await this.sendMessageUseCase.execute({ chatId, userId, senderId, content, imageUrl, audioUrl });
+    const message = await this.sendMessageUseCase.execute({
+      chatId,
+      userId,
+      senderId,
+      content,
+      imageUrl,
+      audioUrl,
+    });
     return message;
   }
 
@@ -75,22 +82,22 @@ export class ChatController extends BaseController {
   async listUserChats(httpRequest: IHttpRequest): Promise<IHttpResponse> {
     return this.handleRequest(httpRequest, async (request) => {
       const validated = listUserChatsSchema.parse(request.query);
-      
+
       const page = validated.page || 1;
       const limit = validated.limit || 10;
       const search = validated.search || undefined;
       const sort = validated.sort || undefined;
       const filter = validated.filter || undefined;
-      
+
       const result = await this.listUserChatsUseCase.execute(
-        new UserId(validated.userId), 
-        page, 
+        new UserId(validated.userId),
+        page,
         limit,
         search,
         sort,
         filter
       );
-      
+
       return this.success_200(result, "User chats retrieved successfully");
     });
   }
@@ -111,9 +118,14 @@ export class ChatController extends BaseController {
       const { chatId, userId, content } = request.body;
       const senderId = request.user?.id;
       if (!senderId) {
-        return this.httpErrors.error_401('Unauthorized: No user id');
+        return this.httpErrors.error_401("Unauthorized: No user id");
       }
-      const message = await this.sendMessageUseCase.execute({ chatId, userId, senderId, content });
+      const message = await this.sendMessageUseCase.execute({
+        chatId,
+        userId,
+        senderId,
+        content,
+      });
       return this.success_201(message, "Message sent successfully");
     });
   }
@@ -123,7 +135,11 @@ export class ChatController extends BaseController {
       const validated = getMessagesByChatSchema.parse(request.query);
       const limit = validated.limit || 20;
       const beforeMessageId = validated.beforeMessageId || undefined;
-      const messages = await this.getMessagesByChatUseCase.execute(new ChatId(validated.chatId), limit, beforeMessageId);
+      const messages = await this.getMessagesByChatUseCase.execute(
+        new ChatId(validated.chatId),
+        limit,
+        beforeMessageId
+      );
       return this.success_200(messages, "Messages retrieved successfully");
     });
   }
@@ -131,7 +147,9 @@ export class ChatController extends BaseController {
   async getMessageById(httpRequest: IHttpRequest): Promise<IHttpResponse> {
     return this.handleRequest(httpRequest, async (request) => {
       const validated = getMessageByIdSchema.parse(request.params);
-      const message = await this.getMessageByIdUseCase.execute(new MessageId(validated.messageId));
+      const message = await this.getMessageByIdUseCase.execute(
+        new MessageId(validated.messageId)
+      );
       return this.success_200(message, "Message retrieved successfully");
     });
   }
@@ -139,7 +157,9 @@ export class ChatController extends BaseController {
   async deleteMessage(httpRequest: IHttpRequest): Promise<IHttpResponse> {
     return this.handleRequest(httpRequest, async (request) => {
       const validated = deleteMessageSchema.parse(request.params);
-      await this.deleteMessageUseCase.execute(new MessageId(validated.messageId));
+      await this.deleteMessageUseCase.execute(
+        new MessageId(validated.messageId)
+      );
       return this.success_200({}, "Message deleted successfully");
     });
   }
@@ -159,11 +179,13 @@ export class ChatController extends BaseController {
   }
 
   // Efficiently get only the participants of a chat by chatId
-  async getChatParticipantsById(chatId: string): Promise<{ user1Id: string, user2Id: string } | null> {
+  async getChatParticipantsById(
+    chatId: string
+  ): Promise<{ user1Id: string; user2Id: string } | null> {
     return this.listUserChatsUseCase.getChatParticipantsById(chatId);
   }
 
-  async markMessagesAsRead(socketData: { chatId: string, userId: string }) {
+  async markMessagesAsRead(socketData: { chatId: string; userId: string }) {
     await this.markReadMessagesUseCase.execute(
       new ChatId(socketData.chatId),
       new UserId(socketData.userId)
@@ -171,9 +193,8 @@ export class ChatController extends BaseController {
     return { success: true };
   }
 
-
   // Add this method to ChatController
   async getTotalUnreadCount(userId: string) {
     return this.getTotalUnreadCountUseCase.execute(new UserId(userId));
   }
-} 
+}

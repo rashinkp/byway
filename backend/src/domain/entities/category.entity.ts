@@ -1,5 +1,3 @@
-import { v4 as uuid } from "uuid";
-
 export class CategoryName {
   private readonly _value: string;
 
@@ -26,7 +24,7 @@ interface CategoryProps {
   id: string;
   name: CategoryName;
   description?: string;
-  createdBy: string; 
+  createdBy: string;
   createdAt: Date;
   updatedAt: Date;
   deletedAt?: Date;
@@ -41,7 +39,6 @@ export class Category {
   private _updatedAt: Date;
   private _deletedAt?: Date;
 
-  // Private constructor to enforce factory method usage
   private constructor(props: CategoryProps) {
     this._id = props.id;
     this._name = props.name;
@@ -52,52 +49,52 @@ export class Category {
     this._deletedAt = props.deletedAt;
   }
 
-  // Static factory method to create a new Category
-  static create(dto: {
-    name: string;
-    description?: string;
-    createdBy: string;
-  }): Category {
-    if (!dto.createdBy) {
+  // Now the caller must supply the id
+  static create(
+    id: string,
+    name: string,
+    createdBy: string,
+    description?: string
+  ): Category {
+    if (!id || id.trim() === "") {
+      throw new Error("Category ID is required");
+    }
+    if (!createdBy) {
       throw new Error("Creator ID is required");
     }
 
     return new Category({
-      id: uuid(),
-      name: new CategoryName(dto.name),
-      description: dto.description?.trim(),
-      createdBy: dto.createdBy,
+      id,
+      name: new CategoryName(name),
+      description: description?.trim(),
+      createdBy,
       createdAt: new Date(),
       updatedAt: new Date(),
       deletedAt: undefined,
     });
   }
 
-  // Static factory method to update an existing Category
   static update(
     existingCategory: Category,
-    dto: {
-      name?: string;
-      description?: string;
-    }
+    name?: string,
+    description?: string
   ): Category {
     const props: CategoryProps = {
       ...existingCategory.getProps(),
       updatedAt: new Date(),
     };
 
-    if (dto.name && dto.name.trim() !== "") {
-      props.name = new CategoryName(dto.name);
+    if (name && name.trim() !== "") {
+      props.name = new CategoryName(name);
     }
 
-    if (dto.description !== undefined) {
-      props.description = dto.description?.trim();
+    if (description !== undefined) {
+      props.description = description.trim();
     }
 
     return new Category(props);
   }
 
-  // Static factory method to create from persistence layer (e.g., Prisma)
   static fromPersistence(data: {
     id: string;
     name: string;
@@ -118,7 +115,6 @@ export class Category {
     });
   }
 
-  // Method to soft delete
   softDelete(): void {
     if (this._deletedAt) {
       throw new Error("Category is already deleted");
@@ -127,7 +123,6 @@ export class Category {
     this._updatedAt = new Date();
   }
 
-  // Method to recover a soft-deleted category
   recover(): void {
     if (!this._deletedAt) {
       throw new Error("Category is not deleted");
@@ -136,7 +131,6 @@ export class Category {
     this._updatedAt = new Date();
   }
 
-  // Getters
   get id(): string {
     return this._id;
   }
@@ -165,7 +159,6 @@ export class Category {
     return this._deletedAt;
   }
 
-  // Helper method to get all properties (for internal use)
   private getProps(): CategoryProps {
     return {
       id: this._id,
@@ -178,7 +171,6 @@ export class Category {
     };
   }
 
-  // Method to check if category is active (not deleted)
   isActive(): boolean {
     return !this._deletedAt;
   }

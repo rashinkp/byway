@@ -1,7 +1,11 @@
-import { S3Client, PutObjectCommand, DeleteObjectCommand } from '@aws-sdk/client-s3';
-import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
-import { S3ServiceInterface } from '../../../app/providers/s3.service.interface';
-import { awsConfig } from '../../../infra/config/aws.config';
+import {
+  S3Client,
+  PutObjectCommand,
+  DeleteObjectCommand,
+} from "@aws-sdk/client-s3";
+import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
+import { S3ServiceInterface } from "../../../app/providers/s3.service.interface";
+import { awsConfig } from "../../../infra/config/aws.config";
 
 export class S3Service implements S3ServiceInterface {
   private readonly s3Client: S3Client;
@@ -10,7 +14,7 @@ export class S3Service implements S3ServiceInterface {
 
   constructor() {
     if (!awsConfig.bucketName) {
-      throw new Error('AWS bucket name is required');
+      throw new Error("AWS bucket name is required");
     }
     this.bucketName = awsConfig.bucketName;
     this.s3Client = new S3Client({
@@ -20,21 +24,21 @@ export class S3Service implements S3ServiceInterface {
   }
 
   async generatePresignedUrl(
-    fileName: string, 
-    fileType: string, 
-    uploadType: 'course' | 'profile' | 'certificate',
+    fileName: string,
+    fileType: string,
+    uploadType: "course" | "profile" | "certificate",
     metadata?: {
       courseId?: string;
       userId?: string;
       certificateId?: string;
-      contentType?: 'thumbnail' | 'video' | 'document' | 'avatar' | 'cv';
+      contentType?: "thumbnail" | "video" | "document" | "avatar" | "cv";
     }
   ): Promise<{
     uploadUrl: string;
     fileUrl: string;
   }> {
     const key = this.generateS3Key(fileName, uploadType, metadata);
-    
+
     const command = new PutObjectCommand({
       Bucket: this.bucketName,
       Key: key,
@@ -58,24 +62,24 @@ export class S3Service implements S3ServiceInterface {
     fileBuffer: Buffer,
     fileName: string,
     fileType: string,
-    uploadType: 'course' | 'profile' | 'certificate',
+    uploadType: "course" | "profile" | "certificate",
     metadata?: {
       courseId?: string;
       userId?: string;
       certificateId?: string;
-      contentType?: 'thumbnail' | 'video' | 'document' | 'avatar' | 'cv';
+      contentType?: "thumbnail" | "video" | "document" | "avatar" | "cv";
     }
   ): Promise<string> {
     try {
       const key = this.generateS3Key(fileName, uploadType, metadata);
-      
+
       const command = new PutObjectCommand({
         Bucket: this.bucketName,
         Key: key,
         Body: fileBuffer,
         ContentType: fileType,
-        ContentDisposition: 'inline',
-        CacheControl: 'public, max-age=31536000', // 1 year cache
+        ContentDisposition: "inline",
+        CacheControl: "public, max-age=31536000", // 1 year cache
       });
 
       await this.s3Client.send(command);
@@ -84,56 +88,58 @@ export class S3Service implements S3ServiceInterface {
       const fileUrl = `https://${this.bucketName}.s3.${awsConfig.region}.amazonaws.com/${key}`;
       return fileUrl;
     } catch (error) {
-      console.error('Error uploading file to S3:', error);
-      throw new Error('Failed to upload file to cloud storage');
+      console.error("Error uploading file to S3:", error);
+      throw new Error("Failed to upload file to cloud storage");
     }
   }
 
   private generateS3Key(
-    fileName: string, 
-    uploadType: 'course' | 'profile' | 'certificate',
+    fileName: string,
+    uploadType: "course" | "profile" | "certificate",
     metadata?: {
       courseId?: string;
       userId?: string;
       certificateId?: string;
-      contentType?: 'thumbnail' | 'video' | 'document' | 'avatar' | 'cv';
+      contentType?: "thumbnail" | "video" | "document" | "avatar" | "cv";
     }
   ): string {
     const timestamp = Date.now();
-    const sanitizedFileName = fileName.replace(/[^a-zA-Z0-9.-]/g, '_');
+    const sanitizedFileName = fileName.replace(/[^a-zA-Z0-9.-]/g, "_");
 
     switch (uploadType) {
-      case 'certificate':
+      case "certificate":
         if (!metadata?.courseId || !metadata?.certificateId) {
-          throw new Error('Course ID and Certificate ID are required for certificate uploads');
+          throw new Error(
+            "Course ID and Certificate ID are required for certificate uploads"
+          );
         }
         return `certificates/${metadata.courseId}/${metadata.certificateId}.pdf`;
 
-      case 'course':
+      case "course":
         if (!metadata?.courseId) {
-          throw new Error('Course ID is required for course uploads');
+          throw new Error("Course ID is required for course uploads");
         }
-        
-        if (metadata.contentType === 'thumbnail') {
+
+        if (metadata.contentType === "thumbnail") {
           return `courses/${metadata.courseId}/thumbnail/${timestamp}-${sanitizedFileName}`;
-        } else if (metadata.contentType === 'video') {
+        } else if (metadata.contentType === "video") {
           return `courses/${metadata.courseId}/videos/${timestamp}-${sanitizedFileName}`;
-        } else if (metadata.contentType === 'document') {
+        } else if (metadata.contentType === "document") {
           return `courses/${metadata.courseId}/documents/${timestamp}-${sanitizedFileName}`;
         } else {
           // Default course content
           return `courses/${metadata.courseId}/content/${timestamp}-${sanitizedFileName}`;
         }
 
-      case 'profile':
+      case "profile":
         if (!metadata?.userId) {
-          throw new Error('User ID is required for profile uploads');
+          throw new Error("User ID is required for profile uploads");
         }
-        
+
         // Simplified profile structure - no subfolders
-        if (metadata.contentType === 'avatar') {
+        if (metadata.contentType === "avatar") {
           return `profile/${metadata.userId}/avatar.jpg`;
-        } else if (metadata.contentType === 'cv') {
+        } else if (metadata.contentType === "cv") {
           return `profile/${metadata.userId}/cv.pdf`;
         } else {
           // Generic profile files
@@ -148,7 +154,9 @@ export class S3Service implements S3ServiceInterface {
   async deleteFile(fileUrl: string): Promise<void> {
     try {
       const url = new URL(fileUrl);
-      const key = url.pathname.startsWith("/") ? url.pathname.slice(1) : url.pathname;
+      const key = url.pathname.startsWith("/")
+        ? url.pathname.slice(1)
+        : url.pathname;
       const command = new DeleteObjectCommand({
         Bucket: this.bucketName,
         Key: key,
@@ -159,4 +167,4 @@ export class S3Service implements S3ServiceInterface {
       throw new Error("Failed to delete file from S3");
     }
   }
-} 
+}

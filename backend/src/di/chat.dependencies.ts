@@ -12,19 +12,31 @@ import { DeleteMessageUseCase } from "../app/usecases/message/implementations/de
 import { MarkReadMessagesUseCase } from "../app/usecases/message/implementations/mark-read-messages.usecase";
 import { GetTotalUnreadCountUseCase } from "../app/usecases/message/implementations/get-total-unread-count.usecase";
 
-export function createChatDependencies(sharedDeps?: ReturnType<typeof createSharedDependencies>) {
+export function createChatDependencies(
+  sharedDeps?: ReturnType<typeof createSharedDependencies>
+) {
   const deps = sharedDeps || createSharedDependencies();
   const chatRepository = new ChatRepository();
   const messageRepository = new MessageRepository();
-  const sendMessageUseCase = new SendMessageUseCase(chatRepository, messageRepository);
+  const sendMessageUseCase = new SendMessageUseCase(
+    chatRepository,
+    messageRepository
+  );
   const createChatUseCase = new CreateChatUseCase(chatRepository);
   const listUserChatsUseCase = new ListUserChatsUseCase(chatRepository);
   const getChatHistoryUseCase = new GetChatHistoryUseCase(chatRepository);
-  const getMessagesByChatUseCase = new GetMessagesByChatUseCase(messageRepository, chatRepository);
+  const getMessagesByChatUseCase = new GetMessagesByChatUseCase(
+    messageRepository,
+    chatRepository
+  );
   const getMessageByIdUseCase = new GetMessageByIdUseCase(messageRepository);
   const deleteMessageUseCase = new DeleteMessageUseCase(messageRepository);
-  const markReadMessagesUseCase = new MarkReadMessagesUseCase(messageRepository);
-  const getTotalUnreadCountUseCase = new GetTotalUnreadCountUseCase(messageRepository);
+  const markReadMessagesUseCase = new MarkReadMessagesUseCase(
+    messageRepository
+  );
+  const getTotalUnreadCountUseCase = new GetTotalUnreadCountUseCase(
+    messageRepository
+  );
   const chatController = new ChatController(
     sendMessageUseCase,
     createChatUseCase,
@@ -51,4 +63,4 @@ export function createChatDependencies(sharedDeps?: ReturnType<typeof createShar
     messageRepository,
     getTotalUnreadCountUseCase,
   };
-} 
+}

@@ -64,7 +64,7 @@
     "@types/node": "^22.13.17",
     "@types/paypal__checkout-server-sdk": "^1.0.8",
     "@types/pdfkit": "^0.14.0",
-    "@typescript-eslint/eslint-plugin": "^8.38.0",
+    "@typescript-eslint/eslint-plugin": "^8.39.0",
     "@typescript-eslint/parser": "^8.38.0",
     "eslint": "^9.31.0",
     "jest": "^30.0.0",

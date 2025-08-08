@@ -1,5 +1,4 @@
-import { AddMoneyDto } from "../../../dtos/wallet/add-money.dto";
-import { WalletResponseDto } from "../../../dtos/wallet/wallet-response.dto";
+import { AddMoneyDto, WalletResponseDto } from "../../../dtos/wallet";
 
 export interface IAddMoneyUseCase {
   execute(userId: string, data: AddMoneyDto): Promise<WalletResponseDto>;

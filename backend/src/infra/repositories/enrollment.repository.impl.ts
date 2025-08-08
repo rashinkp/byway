@@ -2,7 +2,7 @@ import { PrismaClient } from "@prisma/client";
 import {
   ICreateEnrollmentInputDTO,
   IEnrollmentOutputDTO,
-} from "../../app/dtos/course/course.dto";
+} from "../../app/dtos/course.dto";
 import { IEnrollmentRepository } from "../../app/repositories/enrollment.repository.interface";
 import { HttpError } from "../../presentation/http/errors/http-error";
 import { Enrollment } from "../../domain/entities/enrollment.entity";

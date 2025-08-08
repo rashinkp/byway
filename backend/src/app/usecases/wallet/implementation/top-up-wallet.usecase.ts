@@ -2,7 +2,6 @@ import {
   ITopUpWalletUseCase,
   TopUpWalletResponse,
 } from "../interfaces/top-up-wallet.usecase.interface";
-import { TopUpWalletDto } from "../../../dtos/wallet/top-up.dto";
 import { IWalletRepository } from "../../../repositories/wallet.repository.interface";
 import { ITransactionRepository } from "../../../repositories/transaction.repository";
 import { IPaymentService } from "../../../services/payment/interfaces/payment.service.interface";
@@ -12,6 +11,7 @@ import { PaymentGateway } from "../../../../domain/enum/payment-gateway.enum";
 import { HttpError } from "../../../../presentation/http/errors/http-error";
 import { StatusCodes } from "http-status-codes";
 import { Transaction } from "../../../../domain/entities/transaction.entity";
+import { TopUpWalletDto } from "../../../dtos/wallet";
 
 export class TopUpWalletUseCase implements ITopUpWalletUseCase {
   constructor(

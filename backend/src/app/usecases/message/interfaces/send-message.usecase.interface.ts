@@ -1,4 +1,5 @@
-import { MessageResponseDTO } from "@/app/dtos/chat.dto";
+import { MessageResponseDTO } from "../../../dtos/chat.dto";
+
 
 export interface SendMessageInput {
   chatId?: string;
