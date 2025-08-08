@@ -2,7 +2,7 @@
 import {
   GoogleAuthGateway,
   GoogleUserInfo,
-} from "../../../app/providers/I.google-auth.provider";
+} from "../../../app/providers/google-auth.interface";
 import axios from "axios";
 import { HttpError } from "../../../presentation/http/errors/http-error";
 

@@ -6,7 +6,7 @@ import { AuthProvider } from "../../../../domain/enum/auth-provider.enum";
 import {
   GoogleAuthGateway,
   GoogleUserInfo,
-} from "../../../providers/I.google-auth.provider";
+} from "../../../providers/google-auth.interface";
 import { HttpError } from "../../../../presentation/http/errors/http-error";
 import { User } from "../../../../domain/entities/user.entity";
 import { IUpdateUserRequestDTO } from "../../../dtos/user.dto";

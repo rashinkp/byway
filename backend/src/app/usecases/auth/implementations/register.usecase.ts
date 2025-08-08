@@ -4,14 +4,14 @@ import { HttpError } from "../../../../presentation/http/errors/http-error";
 import { IRegisterUseCase } from "../interfaces/register.usecase.interface";
 import { AuthProvider } from "../../../../domain/enum/auth-provider.enum";
 import { RegisterDto } from "../../../dtos/auth.dto";
-import { IOtpProvider } from "../../../providers/IOtpProvider";
-import { IPasswordHasher } from "../../../providers/IPasswordHasher";
+import { IOtpProvider } from "../../../providers/otp-provider.interface";
+import { IPasswordHasher } from "../../../providers/password-hasher.interface";
 
 export class RegisterUseCase implements IRegisterUseCase {
   constructor(
     private authRepository: IAuthRepository,
-    private otpProvider: IOtpProvider , 
-    private passwordHasher:IPasswordHasher,
+    private otpProvider: IOtpProvider,
+    private passwordHasher: IPasswordHasher
   ) {}
 
   async execute(dto: RegisterDto): Promise<User> {

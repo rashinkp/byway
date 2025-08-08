@@ -1,7 +1,7 @@
 import { v4 as uuidv4 } from "uuid";
 import { UserVerification } from "../../../domain/entities/user-verification.entity";
 import { IAuthRepository } from "../../../app/repositories/auth.repository";
-import { IOtpProvider } from "../../../app/providers/IOtpProvider";
+import { IOtpProvider } from "../../../app/providers/otp-provider.interface";
 import { EmailProvider } from "../../../app/providers/email.provider.interface";
 
 export class OtpProvider implements IOtpProvider {

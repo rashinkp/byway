@@ -45,7 +45,7 @@ import { S3Service } from "../infra/providers/s3/s3.service";
 import { EmailProviderImpl } from "../infra/providers/email/email.provider";
 import { GetEnrollmentStatsUseCase } from "../app/usecases/enrollment/implementations/get-enrollment-stats.usecase";
 import { IUserRepository } from "../app/repositories/user.repository";
-import { IPasswordHasher } from "../app/providers/IPasswordHasher";
+import { IPasswordHasher } from "../app/providers/password-hasher.interface";
 import { BcryptPasswordHasher } from "../infra/providers/password-hasher.ts";
 
 export interface SharedDependencies {
@@ -77,7 +77,7 @@ export interface SharedDependencies {
   s3Service: S3Service;
   emailProvider: EmailProviderImpl;
   getEnrollmentStatsUseCase: GetEnrollmentStatsUseCase;
-  passwordHasher: IPasswordHasher
+  passwordHasher: IPasswordHasher;
 }
 
 export function createSharedDependencies(): SharedDependencies {

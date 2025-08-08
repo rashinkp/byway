@@ -1,6 +1,6 @@
 import winston from "winston";
 import { envConfig } from "../../../presentation/express/configs/env.config";
-import { ILogger } from "../../../app/providers/I.logger";
+import { ILogger } from "../../../app/providers/logger-provider.interface";
 
 export class WinstonLogger implements ILogger {
   private logger: winston.Logger;
