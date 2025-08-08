@@ -17,9 +17,9 @@ export class StripePaymentGateway implements PaymentGateway {
       throw new Error("STRIPE_SECRET_KEY is not defined");
     }
 
-    this.stripe = new Stripe(stripeKey, {
-      apiVersion: "2025-06-30.basil",
-    });
+   this.stripe = new Stripe(stripeKey, {
+    apiVersion: "2025-07-30.basil",
+  });
   }
 
   async createCheckoutSession(
