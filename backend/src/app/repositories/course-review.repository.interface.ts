@@ -1,9 +1,5 @@
 import { CourseReview } from "../../domain/entities/review.entity";
-import {
-  QueryCourseReviewDto,
-  CourseReviewResponseDto,
-  CourseReviewSummaryDto,
-} from "../dtos/course-review";
+import { CourseReviewResponseDto, CourseReviewSummaryDto, QueryCourseReviewDto } from "../dtos/review.dto";
 
 export interface ICourseReviewRepository {
   // Basic CRUD operations

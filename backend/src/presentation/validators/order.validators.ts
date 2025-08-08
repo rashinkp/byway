@@ -5,24 +5,38 @@ export const getAllOrdersSchema = z.object({
 });
 
 
+
+export const CourseDetailSchema = z.object({
+  prerequisites: z.string().nullable(),
+  longDescription: z.string().nullable(),
+  objectives: z.string().nullable(),
+  targetAudience: z.string().nullable(),
+});
+
+const CourseSchema = z.object({
+  id: z.string(),
+  title: z.string(),
+  description: z.string().nullable(),
+  level: z.string(),
+  price: z.number(),
+  thumbnail: z.string().nullable(),
+  status: z.string(),
+  categoryId: z.string(),
+  createdBy: z.string(),
+  createdAt: z.string(),
+  updatedAt: z.string().optional(),
+  deletedAt: z.string().nullable(),
+  approvalStatus: z.string(),
+  details: CourseDetailSchema.nullable().default(null), 
+  offer: z.number().optional(),
+});
+
 export const CreateOrderDtoSchema = z.object({
-  courses: z.array(
-    z.object({
-      id: z.string(),
-      title: z.string(),
-      description: z.string().optional(),
-      price: z.number(),
-      offer: z.number().optional(),
-      thumbnail: z.string().optional(),
-      duration: z.string().optional(),
-      level: z.string().optional(),
-    })
-  ),
+  courses: z.array(CourseSchema),
   paymentMethod: z.enum(["WALLET", "STRIPE", "PAYPAL", "RAZORPAY"]),
   couponCode: z.string().optional(),
 });
 
-export type CreateOrderDto = z.infer<typeof CreateOrderDtoSchema>;
 
 
 export const GetAllOrdersDtoSchema = z.object({

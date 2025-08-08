@@ -1,5 +1,6 @@
-import { TopUpWalletDto } from "../../../dtos/wallet/top-up.dto";
+
 import { Transaction } from "../../../../domain/entities/transaction.entity";
+import { TopUpWalletDto } from "../../../dtos/wallet";
 
 export interface TopUpWalletResponse {
   transaction: Transaction;

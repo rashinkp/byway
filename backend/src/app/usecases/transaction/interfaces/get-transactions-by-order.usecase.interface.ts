@@ -1,7 +1,5 @@
-import {
-  IGetTransactionsByOrderInputDTO,
-  ITransactionOutputDTO,
-} from "../../../dtos/transaction/transaction.dto";
+import { IGetTransactionsByOrderInputDTO, ITransactionOutputDTO } from "../../../dtos/transaction.dto";
+
 
 export interface IGetTransactionsByOrderUseCase {
   execute(

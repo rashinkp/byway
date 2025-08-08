@@ -19,7 +19,7 @@ export interface IDashboardStats {
 export interface ITopEnrolledCourse {
   courseId: string;
   courseTitle: string;
-  instructorName: string;
+  instructorName?: string;
   enrollmentCount: number;
   revenue: number;
   rating: number;

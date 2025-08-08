@@ -28,12 +28,12 @@ export interface CourseStats {
 export interface InstructorStats {
   instructorId: string;
   instructorName: string;
-  email?: string;
+  email: string;
   courseCount: number;
   totalEnrollments: number;
   totalRevenue: number;
   averageRating: number;
-  isActive?: boolean;
+  isActive: boolean;
 }
 
 

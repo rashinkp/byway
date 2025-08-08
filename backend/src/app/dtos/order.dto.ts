@@ -10,6 +10,15 @@ export interface GetAllOrdersDto {
   maxAmount?: number;
 }
 
+
+
+export interface CourseDetail {
+  prerequisites: string | null;
+  longDescription: string | null;
+  objectives: string | null;
+  targetAudience: string | null;
+}
+
 export interface CourseDto {
   id: string;
   title: string;
@@ -21,10 +30,10 @@ export interface CourseDto {
   categoryId: string;
   createdBy: string;
   createdAt: string;
-  updatedAt: string;
+  updatedAt?: string;
   deletedAt: string | null;
   approvalStatus: string;
-  details: any | null;
+  details: CourseDetail | null;
   offer?: number;
 }
 

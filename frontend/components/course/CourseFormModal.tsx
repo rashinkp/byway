@@ -10,7 +10,7 @@ import { useCategories } from "@/hooks/category/useCategories";
 import { useMemo, useState } from "react";
 import { courseSchema, courseEditSchema } from "@/lib/validations/course";
 import { FileUploadStatus } from "@/components/FileUploadComponent";
-import { getCoursePresignedUrl, getPresignedUrl, uploadFileToS3 } from "@/api/file";
+import { getCoursePresignedUrl, uploadFileToS3 } from "@/api/file";
 import { z } from "zod";
 
 export const baseFields: FormFieldConfig<CourseFormData>[] = [

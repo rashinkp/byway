@@ -3,7 +3,6 @@ import { Course } from "@/types/course";
 import { IUpdateCourseApprovalInput } from "@/types/course";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { ApiResponse, IPaginatedResponse } from "@/types/general";
 
 interface UseCourseApprovalReturn {
 	mutate: (input: IUpdateCourseApprovalInput) => void;
