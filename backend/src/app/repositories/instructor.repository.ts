@@ -1,5 +1,6 @@
 import { Instructor } from "../../domain/entities/instructor.entity";
-import { IGetTopInstructorsInput, ITopInstructor } from "../usecases/user/interfaces/get-top-instructors.usecase.interface";
+import { InstructorStats } from "../dtos/stats.dto";
+import { IGetTopInstructorsInput } from "../usecases/user/interfaces/get-top-instructors.usecase.interface";
 
 export interface IInstructorRepository {
   createInstructor(instructor: Instructor): Promise<Instructor>;
@@ -17,5 +18,5 @@ export interface IInstructorRepository {
       includeDeleted?: boolean;
     }
   ): Promise<{ items: Instructor[]; total: number; totalPages: number }>;
-  getTopInstructors(input: IGetTopInstructorsInput): Promise<ITopInstructor[]>;
+  getTopInstructors(input: IGetTopInstructorsInput): Promise<InstructorStats[]>;
 }

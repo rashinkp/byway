@@ -1,16 +1,11 @@
 import { IGetInstructorDashboardUseCase } from "../interfaces/get-instructor-dashboard.usecase.interface";
-import {
-  IGetInstructorDashboardInput,
-  IInstructorDashboardResponse,
-} from "../../../dtos/instructor-dashboard.dto";
 import { IRevenueRepository } from "../../..//repositories/revenue.repository";
 import { IUserRepository } from "../../..//repositories/user.repository";
 import { IEnrollmentRepository } from "../../..//repositories/enrollment.repository.interface";
-import { ICourseRepository } from "@/app/repositories/course.repository.interface";
+import { ICourseRepository } from "../../../repositories/course.repository.interface";
+import { DashboardInput, InstructorDashboardResponse } from "../../../dtos/stats.dto";
 
-export class GetInstructorDashboardUseCase
-  implements IGetInstructorDashboardUseCase
-{
+export class GetInstructorDashboardUseCase implements IGetInstructorDashboardUseCase {
   constructor(
     private courseRepository: ICourseRepository,
     private enrollmentRepository: IEnrollmentRepository,
@@ -18,9 +13,7 @@ export class GetInstructorDashboardUseCase
     private userRepository: IUserRepository
   ) {}
 
-  async execute(
-    input: IGetInstructorDashboardInput
-  ): Promise<IInstructorDashboardResponse> {
+  async execute(input: DashboardInput): Promise<InstructorDashboardResponse> {
     const { instructorId, limit = 5 } = input;
 
     // Get all courses by this instructor (including deleted courses)

@@ -3,7 +3,7 @@ import { Instructor } from "../../domain/entities/instructor.entity";
 import { APPROVALSTATUS } from "../../domain/enum/approval-status.enum";
 import { IInstructorRepository } from "../../app/repositories/instructor.repository";
 import { IGetTopInstructorsInput } from "@/app/usecases/user/interfaces/get-top-instructors.usecase.interface";
-import { ITopInstructor } from "@/app/dtos/admin-dashboard.dto";
+import { InstructorStats } from "../../app/dtos/stats.dto";
 
 export class PrismaInstructorRepository implements IInstructorRepository {
   constructor(private prisma: PrismaClient) {}
@@ -156,7 +156,7 @@ export class PrismaInstructorRepository implements IInstructorRepository {
 
   async getTopInstructors(
     input: IGetTopInstructorsInput
-  ): Promise<ITopInstructor[]> {
+  ): Promise<InstructorStats[]> {
     // Get all instructors with their courses and enrollments
     const instructors = await this.prisma.user.findMany({
       where: {

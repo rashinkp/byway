@@ -1,7 +1,7 @@
 import {
   IInstructorDashboardResponse,
   IGetInstructorDashboardInput,
-} from "../../../dtos/instructor-dashboard.dto";
+} from "../../../dtos/stats.dto";
 
 export interface IGetInstructorDashboardUseCase {
   execute(

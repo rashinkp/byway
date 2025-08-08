@@ -1,6 +1,10 @@
-import { IGetDashboardUseCase, IDashboardResponse, IGetDashboardInput } from "../interfaces/get-dashboard.usecase.interface";
+import {
+  IGetDashboardUseCase,
+  IDashboardResponse,
+  IGetDashboardInput,
+} from "../interfaces/get-dashboard.usecase.interface";
 import { IGetCourseStatsUseCase } from "../../course/interfaces/get-course-stats.usecase.interface";
-import { IGetTopEnrolledCoursesUseCase } from "../../course/interfaces/get-top-enrolled-courses.usecase.interface";
+import { IGetTopEnrolledCoursesUseCase } from "../../course/interfaces/top-enrolled-courses.usecase.interface";
 import { IGetUserStatsUseCase } from "../../user/interfaces/get-user-stats.usecase.interface";
 import { IGetTopInstructorsUseCase } from "../../user/interfaces/get-top-instructors.usecase.interface";
 import { IGetEnrollmentStatsUseCase } from "../../enrollment/interfaces/get-enrollment-stats.usecase.interface";
@@ -23,14 +27,18 @@ export class GetDashboardUseCase implements IGetDashboardUseCase {
       userStats,
       topInstructors,
       enrollmentStats,
-      totalRevenue
+      totalRevenue,
     ] = await Promise.all([
       this.getCourseStatsUseCase.execute({}),
-      this.getTopEnrolledCoursesUseCase.execute({ userId: input.userId, limit: 5, role: "ADMIN" }),
+      this.getTopEnrolledCoursesUseCase.execute({
+        userId: input.userId,
+        limit: 5,
+        role: "ADMIN",
+      }),
       this.getUserStatsUseCase.execute({}),
       this.getTopInstructorsUseCase.execute({ limit: 5 }),
       this.getEnrollmentStatsUseCase.execute({}),
-      this.revenueRepository.getTotalRevenue(input.userId)
+      this.revenueRepository.getTotalRevenue(input.userId),
     ]);
 
     return {
@@ -44,4 +52,4 @@ export class GetDashboardUseCase implements IGetDashboardUseCase {
       topInstructors,
     };
   }
-} 
+}

@@ -1,6 +1,6 @@
 import { SharedDependencies } from "./shared.dependencies";
 import { GetCourseStatsUseCase } from "../app/usecases/course/implementations/get-course-stats.usecase";
-import { GetTopEnrolledCoursesUseCase } from "../app/usecases/course/implementations/get-top-enrolled-courses.usecase";
+import { GetTopEnrolledCoursesUseCase } from "../app/usecases/course/implementations/top-enrolled-courses.usecase";
 import { GetUserStatsUseCase } from "../app/usecases/user/implementations/get-user-stats.usecase";
 import { GetTopInstructorsUseCase } from "../app/usecases/user/implementations/get-top-instructors.usecase";
 import { GetEnrollmentStatsUseCase } from "../app/usecases/enrollment/implementations/get-enrollment-stats.usecase";

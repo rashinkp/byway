@@ -1,6 +1,6 @@
 import { PrismaClient } from "@prisma/client";
 import { ISearchRepository } from "../../app/repositories/search.repository";
-import { ISearchResult, SearchParams } from "../../app/dtos/search/search.dto";
+import { ISearchResult, SearchParams } from "../../app/dtos/search.dto";
 
 export class SearchRepository implements ISearchRepository {
   constructor(private prisma: PrismaClient) {}
