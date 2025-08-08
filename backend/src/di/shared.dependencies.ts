@@ -33,7 +33,6 @@ import { IPaymentService } from "../app/services/payment/interfaces/payment.serv
 import { StripePaymentGateway } from "../infra/providers/stripe/stripe-payment.gateway";
 import { StripeWebhookGateway } from "../infra/providers/stripe/stripe-webhook.gateway";
 import { IRevenueDistributionService } from "../app/services/revenue-distribution/interfaces/revenue-distribution.service.interface";
-import { IUserRepository } from "@/app/repositories/user.repository";
 import { PrismaRevenueRepository } from "../infra/repositories/revenue.repository";
 import { IRevenueRepository } from "../app/repositories/revenue.repository";
 import { CourseReviewRepository } from "../infra/repositories/course-review.repository.impl";
@@ -45,6 +44,7 @@ import { CertificateRepositoryInterface } from "../app/repositories/certificate-
 import { S3Service } from "../infra/providers/s3/s3.service";
 import { EmailProviderImpl } from "../infra/providers/email/email.provider";
 import { GetEnrollmentStatsUseCase } from "../app/usecases/enrollment/implementations/get-enrollment-stats.usecase";
+import { IUserRepository } from "../app/repositories/user.repository";
 
 export interface SharedDependencies {
   prisma: typeof prismaClient;

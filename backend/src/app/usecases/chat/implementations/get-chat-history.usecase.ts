@@ -1,7 +1,7 @@
 import { IGetChatHistoryUseCase } from "../interfaces/get-chat-history.usecase.interface";
 import { IChatRepository } from "../../../repositories/chat.repository.interface";
 import { Chat } from "../../../../domain/entities/chat.entity";
-import { UserId } from "@/domain/value-object/UserId";
+import { UserId } from "../../../../domain/value-object/UserId";
 
 export class GetChatHistoryUseCase implements IGetChatHistoryUseCase {
   constructor(private readonly chatRepository: IChatRepository) {}

@@ -1,9 +1,7 @@
-import {
-  CreateCourseReviewDto,
-  CourseReviewResponseDto,
-} from "../../../dtos/course-review";
+
 import { CourseReview } from "../../../../domain/entities/review.entity";
 import { Rating } from "../../../../domain/value-object/rating";
+import { CourseReviewResponseDto, CreateCourseReviewDto } from "../../../dtos/review.dto";
 import { ICourseReviewRepository } from "../../../repositories/course-review.repository.interface";
 import { IEnrollmentRepository } from "../../../repositories/enrollment.repository.interface";
 import { ICreateCourseReviewUseCase } from "../interfaces/create-course-review.usecase.interface";

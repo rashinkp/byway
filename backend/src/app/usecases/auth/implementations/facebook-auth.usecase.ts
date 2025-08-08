@@ -5,7 +5,7 @@ import { FacebookAuthDto } from "../../../dtos/auth/facebook-auth.dto";
 import { AuthProvider } from "../../../../domain/enum/auth-provider.enum";
 import { Role } from "../../../../domain/enum/role.enum";
 import { HttpError } from "../../../../presentation/http/errors/http-error";
-import { IUpdateUserRequestDTO } from "@/app/dtos/user.dto";
+import { IUpdateUserRequestDTO } from "../../../dtos/user.dto";
 
 export class FacebookAuthUseCase implements IFacebookAuthUseCase {
   constructor(private authRepository: IAuthRepository) {}

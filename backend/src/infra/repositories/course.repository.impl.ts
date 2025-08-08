@@ -14,12 +14,12 @@ import {
 } from "../../app/dtos/course.dto";
 import { ICourseRepository } from "../../app/repositories/course.repository.interface";
 import { HttpError } from "../../presentation/http/errors/http-error";
-import { IGetTopEnrolledCoursesInput } from "@/app/usecases/course/interfaces/top-enrolled-courses.usecase.interface";
 import { CourseStats } from "../../app/dtos/stats.dto";
 import {
   ICourseStats,
   IGetCourseStatsInput,
 } from "../../app/usecases/course/interfaces/get-course-stats.usecase.interface";
+import { IGetTopEnrolledCoursesInput } from "../../app/usecases/course/interfaces/top-enrolled-courses.usecase.interface";
 
 export class CourseRepository implements ICourseRepository {
   constructor(private prisma: PrismaClient) {}

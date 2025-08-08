@@ -84,7 +84,7 @@ export class GetCourseWithDetailsUseCase
             ([rating, count]) => [
               rating,
               reviewStats.totalReviews > 0
-                ? (count / reviewStats.totalReviews) * 100
+                ? (count as number / reviewStats.totalReviews) * 100
                 : 0,
             ]
           )

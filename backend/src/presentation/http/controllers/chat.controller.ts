@@ -23,7 +23,7 @@ import {
   getMessageByIdSchema,
   deleteMessageSchema,
 } from "../../validators/chat.validators";
-import { IGetTotalUnreadCountUseCase } from "@/app/usecases/message/interfaces/get-total-unread-count.usecase.interface";
+import { IGetTotalUnreadCountUseCase } from "../../../app/usecases/message/interfaces/get-total-unread-count.usecase.interface";
 
 export class ChatController extends BaseController {
   constructor(
