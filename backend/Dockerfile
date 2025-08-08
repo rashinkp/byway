@@ -2,6 +2,15 @@
 FROM node:20-alpine AS builder
 WORKDIR /app
 COPY package*.json ./
+RUN apk add --no-cache \
+    build-base \
+    libc6-compat \
+    cairo-dev \
+    pango-dev \
+    giflib-dev \
+    jpeg-dev \
+    musl-dev
+
 RUN npm ci --omit=optional 
 COPY prisma ./prisma/
 RUN npx prisma generate
