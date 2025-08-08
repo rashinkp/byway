@@ -1,6 +1,6 @@
+import { getInstructorCourses } from "@/api/instructor";
+import { InstructorCourse } from "@/types/instructor";
 import { useQuery } from "@tanstack/react-query";
-import { getInstructorCourses } from "@/api/instructor.api";
-import { InstructorCourse } from "@/types/instructor.types";
 
 export function useInstructorCourses() {
 	return useQuery<InstructorCourse[]>({

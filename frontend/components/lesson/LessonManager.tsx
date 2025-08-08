@@ -28,7 +28,7 @@ export function LessonManager({ courseId }: { courseId: string }) {
 	const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
 	const limit = 10;
 
-	const { data, isLoading, error, refetch } = useGetAllLessonsInCourse({
+	const { data, isLoading, error } = useGetAllLessonsInCourse({
 		courseId,
 		page,
 		limit,
@@ -129,7 +129,6 @@ export function LessonManager({ courseId }: { courseId: string }) {
 					{ value: "order", label: "Order" },
 					{ value: "createdAt", label: "Created At" },
 				]}
-				onRefresh={refetch}
 				filterTabs={[
 					{ value: "ALL", label: "All" },
 					{ value: "PUBLISHED", label: "Published" },

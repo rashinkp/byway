@@ -1,7 +1,7 @@
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
-import { InstructorDashboardResponse } from "@/types/instructorDashboard";
 import { format } from "date-fns";
+import { InstructorDashboardResponse } from "@/types/instructor";
 
 export function generateInstructorDashboardReport(data: InstructorDashboardResponse) {
   const doc = new jsPDF({ orientation: "landscape" });

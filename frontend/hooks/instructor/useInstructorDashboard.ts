@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
-import { InstructorDashboardResponse } from "@/types/instructorDashboard";
 import { getInstructorDashboard } from "@/api/dashboard";
+import { InstructorDashboardResponse } from "@/types/instructor";
 
 export function useInstructorDashboard() {
 	return useQuery<InstructorDashboardResponse, Error>({

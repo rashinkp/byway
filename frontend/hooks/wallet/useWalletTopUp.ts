@@ -1,6 +1,7 @@
 import { useMutation } from "@tanstack/react-query";
-import { createWalletTopUp, CreateWalletTopUpRequest } from "@/api/wallet";
+import { createWalletTopUp } from "@/api/wallet";
 import { toast } from "sonner";
+import { CreateWalletTopUpRequest } from "@/types/wallet.types";
 
 export const useWalletTopUp = () => {
 	return useMutation({

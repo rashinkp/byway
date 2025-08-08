@@ -11,7 +11,7 @@ interface InstructorCardProps {
 		user: {
 			id: string;
 			name: string;
-			avatar: string;
+			avatar?: string;
 		};
 	};
 }
