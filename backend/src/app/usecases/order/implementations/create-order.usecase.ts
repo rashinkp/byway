@@ -1,5 +1,4 @@
 import { ICreateOrderUseCase } from "../interfaces/create-order.usecase.interface";
-import { CreateOrderDto } from "../../../dtos/order/create-order.dto";
 import { IOrderRepository } from "../../../repositories/order.repository";
 import { IPaymentService } from "../../../services/payment/interfaces/payment.service.interface";
 import { PaymentGateway } from "../../../../domain/enum/payment-gateway.enum";
@@ -11,6 +10,7 @@ import { OrderStatus } from "../../../../domain/enum/order-status.enum";
 import { PaymentStatus } from "../../../../domain/enum/payment-status.enum";
 import { StatusCodes } from "http-status-codes";
 import { HttpError } from "../../../../presentation/http/errors/http-error";
+import { CreateOrderDto } from "../../../dtos/order.dto";
 
 export class CreateOrderUseCase implements ICreateOrderUseCase {
   constructor(

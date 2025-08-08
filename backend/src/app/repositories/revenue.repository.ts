@@ -3,7 +3,7 @@ import { TransactionStatus } from "../../domain/enum/transaction-status.enum";
 import {
   GetLatestRevenueParams,
   GetLatestRevenueResult,
-} from "../dtos/revenue/get-latest-revenue.dto";
+} from "../dtos/revenue.dto";
 
 export interface GetCourseTransactionsParams {
   startDate: Date;

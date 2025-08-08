@@ -4,8 +4,7 @@ import { ICreateOrderUseCase } from "../../../app/usecases/order/interfaces/crea
 import { IRetryOrderUseCase } from "../../../app/usecases/order/interfaces/retry-order.usecase.interface";
 import { IHttpErrors } from "../interfaces/http-errors.interface";
 import { IHttpSuccess } from "../interfaces/http-success.interface";
-import { validateGetAllOrders } from "../../validators/order.validators";
-import { CreateOrderDtoSchema } from "../../../app/dtos/order/create-order.dto";
+import { CreateOrderDtoSchema, validateGetAllOrders } from "../../validators/order.validators";
 import { IHttpRequest } from "../interfaces/http-request.interface";
 import { IHttpResponse } from "../interfaces/http-response.interface";
 import { BadRequestError } from "../errors/bad-request-error";

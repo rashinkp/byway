@@ -5,7 +5,7 @@ import { TransactionStatus } from "../../domain/enum/transaction-status.enum";
 import {
   GetLatestRevenueParams,
   GetLatestRevenueResult,
-} from "../../app/dtos/revenue/get-latest-revenue.dto";
+} from "../../app/dtos/revenue.dto";
 
 export class PrismaAnalyticsRepository implements IRevenueRepository {
   constructor(private readonly prisma: PrismaClient) {}
