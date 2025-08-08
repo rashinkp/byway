@@ -1,9 +1,9 @@
 import { User } from "../../../../domain/entities/user.entity";
 import { IAuthRepository } from "../../../repositories/auth.repository";
 import { HttpError } from "../../../../presentation/http/errors/http-error";
-import { VerifyOtpDto } from "../../../dtos/auth/verify-otp.dto";
 import { JwtProvider } from "../../../../infra/providers/auth/jwt.provider";
 import { IVerifyOtpUseCase } from "../interfaces/verify-otp.usecase.interface";
+import { VerifyOtpDto } from "../../../dtos/auth.dto";
 
 export class VerifyOtpUseCase implements IVerifyOtpUseCase {
   constructor(private authRepository: IAuthRepository) {}

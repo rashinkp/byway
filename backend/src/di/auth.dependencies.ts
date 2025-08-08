@@ -32,7 +32,7 @@ export function createAuthDependencies(
   );
   const loginUseCase = new LoginUseCase(authRepository, deps.cartRepository);
   const logoutUseCase = new LogoutUseCase();
-  const registerUseCase = new RegisterUseCase(authRepository, otpProvider);
+  const registerUseCase = new RegisterUseCase(authRepository, otpProvider , deps.passwordHasher);
   const resendOtpUseCase = new ResendOtpUseCase(authRepository, otpProvider);
   const resetPasswordUseCase = new ResetPasswordUseCase(authRepository);
   const verifyOtpUseCase = new VerifyOtpUseCase(authRepository);

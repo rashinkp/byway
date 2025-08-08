@@ -4,6 +4,5 @@ export interface IOtpProvider {
   generateOtp(
     email: string,
     userId: string,
-    type: "VERIFICATION" | "RESET"
   ): Promise<UserVerification>;
 }

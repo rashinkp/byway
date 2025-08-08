@@ -1,16 +1,17 @@
 import { User } from "../../../../domain/entities/user.entity";
 import { IAuthRepository } from "../../../repositories/auth.repository";
 import { HttpError } from "../../../../presentation/http/errors/http-error";
-import * as bcrypt from "bcrypt";
 import { IRegisterUseCase } from "../interfaces/register.usecase.interface";
-import { OtpProvider } from "../../../../infra/providers/otp/otp.provider";
-import { RegisterDto } from "../../../dtos/auth/register.dto";
 import { AuthProvider } from "../../../../domain/enum/auth-provider.enum";
+import { RegisterDto } from "../../../dtos/auth.dto";
+import { IOtpProvider } from "../../../providers/IOtpProvider";
+import { IPasswordHasher } from "../../../providers/IPasswordHasher";
 
 export class RegisterUseCase implements IRegisterUseCase {
   constructor(
     private authRepository: IAuthRepository,
-    private otpProvider: OtpProvider
+    private otpProvider: IOtpProvider , 
+    private passwordHasher:IPasswordHasher,
   ) {}
 
   async execute(dto: RegisterDto): Promise<User> {
@@ -24,7 +25,8 @@ export class RegisterUseCase implements IRegisterUseCase {
       if (!dto.password) {
         throw new HttpError("Password is required", 400);
       }
-      const hashedPassword = await bcrypt.hash(dto.password, 10);
+
+      const hashedPassword = await this.passwordHasher.hash(dto.password);
 
       if (!user) {
         // Create new user
