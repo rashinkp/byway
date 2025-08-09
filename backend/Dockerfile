@@ -1,24 +1,23 @@
 # Build stage
-FROM node:20-alpine AS builder
+FROM node:20 AS builder
 WORKDIR /app
 COPY package*.json ./
-RUN apk add --no-cache \
-    build-base \
-    libc6-compat \
-    cairo-dev \
-    pango-dev \
-    giflib-dev \
-    jpeg-dev \
-    musl-dev
+RUN apt-get update && apt-get install -y \
+    build-essential \
+    libcairo2-dev \
+    libjpeg-dev \
+    libpango1.0-dev \
+    libgif-dev \
+    && rm -rf /var/lib/apt/lists/*
 
-RUN npm ci --omit=optional 
+RUN npm ci --omit=optional
 COPY prisma ./prisma/
 RUN npx prisma generate
 COPY . .
 RUN npm run build
 
 # Production stage
-FROM node:20-alpine
+FROM node:20
 WORKDIR /app
 ENV NODE_ENV=production
 
