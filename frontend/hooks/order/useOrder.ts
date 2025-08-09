@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { CreateOrderRequest, Order } from "@/types/order";
-import { createOrderSchema } from "@/lib/validations/order";
+import { CreateOrderDtoSchema } from "@/lib/validations/order";
 import { createOrder } from "@/api/order";
 
 export const useCreateOrder = () => {
@@ -8,7 +8,7 @@ export const useCreateOrder = () => {
 
   return useMutation<Order, Error, CreateOrderRequest>({
     mutationFn: async (data) => {
-      const validatedData = createOrderSchema.parse(data);
+      const validatedData = CreateOrderDtoSchema.parse(data);
       const response = await createOrder(validatedData);
       return response.data.order;
     },
