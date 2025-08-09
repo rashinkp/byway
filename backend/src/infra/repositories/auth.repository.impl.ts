@@ -27,7 +27,6 @@ export class AuthRepository implements IAuthRepository {
   async createUser(user: User): Promise<User> {
     const created = await this.prisma.user.create({
       data: {
-        id: user.id,
         name: user.name,
         email: user.email,
         password: user.password,

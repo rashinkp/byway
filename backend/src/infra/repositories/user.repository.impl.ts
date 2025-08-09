@@ -122,7 +122,6 @@ export class UserRepository implements IUserRepository {
   async createProfile(profile: UserProfile): Promise<UserProfile> {
     const created = await this.prisma.userProfile.create({
       data: {
-        id: profile.id,
         userId: profile.userId,
         bio: profile.bio,
         education: profile.education,

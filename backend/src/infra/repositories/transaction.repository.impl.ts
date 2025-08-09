@@ -74,7 +74,6 @@ export class TransactionRepository implements ITransactionRepository {
     try {
       const createdTransaction = await this.prisma.transactionHistory.create({
         data: {
-          id: transaction.id,
           userId: transaction.userId,
           amount: transaction.amount,
           type: transaction.type as PrismaTransactionType,

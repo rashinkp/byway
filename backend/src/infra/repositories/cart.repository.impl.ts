@@ -84,7 +84,6 @@ export class CartRepository implements ICartRepository {
   async create(cart: Cart): Promise<Cart> {
     const created = await this.prisma.cart.create({
       data: {
-        id: cart.id,
         userId: cart.userId,
         courseId: cart.courseId,
         couponId: cart.couponId,

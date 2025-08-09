@@ -44,7 +44,6 @@ export class PrismaNotificationRepository
   async create(notification: Notification): Promise<NotificationDTO> {
     const created = await this.prisma.notification.create({
       data: {
-        id: notification.id,
         userId: notification.userId.value,
         eventType: notification.eventType,
         entityType: this.mapEntityType(notification.entityType),

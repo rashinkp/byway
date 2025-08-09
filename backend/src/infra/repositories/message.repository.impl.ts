@@ -118,7 +118,6 @@ export class MessageRepository implements IMessageRepository {
   async create(message: Message): Promise<void> {
     await prisma.message.create({
       data: {
-        id: message.id.value,
         chatId: message.chatId.value,
         senderId: message.senderId.value,
         content: message.content?.value || null,

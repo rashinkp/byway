@@ -11,7 +11,6 @@ export class LessonProgressRepository implements ILessonProgressRepository {
     const data = progress.toJSON();
     const created = await this.prisma.lessonProgress.create({
       data: {
-        id: data.id,
         enrollmentId: data.enrollmentId,
         courseId: data.courseId,
         lessonId: data.lessonId,

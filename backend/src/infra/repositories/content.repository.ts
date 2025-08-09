@@ -80,7 +80,6 @@ export class LessonContentRepository implements ILessonContentRepository {
 
     const createdContent = await this.prisma.lessonContent.create({
       data: {
-        id: contentData.id,
         lessonId: contentData.lessonId,
         type: contentData.type,
         status: contentData.status,

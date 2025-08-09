@@ -171,7 +171,6 @@ export class OrderRepository implements IOrderRepository {
       // Create the order
       const newOrder = await prisma.order.create({
         data: {
-          id: uuidv4(),
           userId,
           orderStatus: "PENDING",
           paymentStatus: "PENDING",
@@ -188,7 +187,6 @@ export class OrderRepository implements IOrderRepository {
         courses.map((course) =>
           prisma.orderItem.create({
             data: {
-              id: uuidv4(),
               orderId: newOrder.id,
               courseId: course.id,
               coursePrice: course.offer || course.price,

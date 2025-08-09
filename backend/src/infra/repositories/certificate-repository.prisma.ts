@@ -11,7 +11,6 @@ export class PrismaCertificateRepository
   async create(certificate: Certificate): Promise<CertificateDTO> {
     const created = await this.prisma.certificate.create({
       data: {
-        id: certificate.id,
         userId: certificate.userId,
         courseId: certificate.courseId,
         enrollmentId: certificate.enrollmentId,
