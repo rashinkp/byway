@@ -16,6 +16,8 @@ export class CategoryRepository implements ICategoryRepository {
       deletedAt: category.deletedAt ? category.deletedAt : null,
     };
 
+    console.log("Saving category with createdBy:", data.createdBy);
+
     const saved = await this.prisma.category.upsert({
       where: { id: category.id },
       update: data,

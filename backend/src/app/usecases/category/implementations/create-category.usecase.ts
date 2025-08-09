@@ -36,9 +36,12 @@ export class CreateCategoryUseCase implements ICreateCategoryUseCase {
     // Create category entity
     const category = Category.create(
       input.name,
+      input.description,
       input.createdBy,
-      input.description
     );
+
+
+    console.log('category ', category);
 
     // Persist category
     const savedCategory = await this.categoryRepository.save(category);
