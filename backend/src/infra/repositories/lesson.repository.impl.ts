@@ -151,7 +151,6 @@ export class LessonRepository implements ILessonRepository {
 
     const createdLesson = await this.prisma.lesson.create({
       data: {
-        id: lessonData.id,
         course: { connect: { id: lessonData.courseId } },
         title: lessonData.title,
         description: lessonData.description,
