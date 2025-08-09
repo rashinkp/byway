@@ -176,6 +176,15 @@ export class PaymentService implements IPaymentService {
       throw new HttpError("User not found", StatusCodes.NOT_FOUND);
     }
 
+    const courseIds = input.courses?.map(c => c.id)
+    const isEnrolled = await this.enrollmentRepository.findByUserIdAndCourseIds(userId, courseIds || [])
+
+    console.log(isEnrolled , 'courseneroleled -=-==============>')
+    
+    if (isEnrolled && isEnrolled.length > 0) {
+      throw new HttpError("User already enrolled in this course", 400);
+    }
+
     const session = await this.paymentGateway.createCheckoutSession(
       {
         userId,
