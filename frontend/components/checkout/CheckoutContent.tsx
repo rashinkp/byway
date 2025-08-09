@@ -121,27 +121,40 @@ export default function CheckoutContent() {
     }
 
     try {
-      setIsCreatingOrder(true);
-      const orderData = {
-        courses: courseDetails.map((course) => ({
-          id: course.id,
-          title: course.title,
-          description: course.description || "",
-          thumbnail: course.thumbnail || "",
-          price: Number(course.price),
-          offer: course.offer ? Number(course.offer) : Number(course.price),
-          duration: course.duration?.toString() || "",
-          lectures: course.lectures || 0,
-          level: course.level || "",
-          creator: {
-            name: course.creator?.name || "",
-          },
-        })),
-        paymentMethod: selectedMethod,
-        couponCode: couponCode || undefined,
-      };
+     setIsCreatingOrder(true);
 
-      const response = await createOrder.mutateAsync(orderData);
+const orderData = {
+  courses: courseDetails.map((course) => ({
+    id: course.id,
+    title: course.title,
+    description: course.description ?? null, // backend expects string|null
+    level: course.level || "",
+    price: Number(course.price),
+    thumbnail: course.thumbnail ?? null,
+
+    // Backend-required fields ↓
+    status: "active", 
+    createdBy: course.creator?.name || "", // map from creator object
+    createdAt: new Date().toISOString(), // or actual created date
+    updatedAt: undefined,
+    deletedAt: null,
+    approvalStatus: "pending", // or actual status
+
+    details: {
+      prerequisites: null,
+      longDescription: null,
+      objectives: null,
+      targetAudience: null,
+    },
+
+    offer: course.offer ? Number(course.offer) : undefined,
+  })),
+  paymentMethod: selectedMethod,
+  couponCode: couponCode || undefined,
+};
+
+const response = await createOrder.mutateAsync(orderData);
+
 
       if (response.data) {
         if (selectedMethod === "STRIPE" && response.data.session?.url) {

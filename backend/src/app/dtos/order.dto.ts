@@ -27,7 +27,7 @@ export interface CourseDto {
   price: number;
   thumbnail: string | null;
   status: string;
-  categoryId: string;
+  categoryId?: string;
   createdBy: string;
   createdAt: string;
   updatedAt?: string;

@@ -21,7 +21,7 @@ const CourseSchema = z.object({
   price: z.number(),
   thumbnail: z.string().nullable(),
   status: z.string(),
-  categoryId: z.string(),
+  categoryId: z.string().optional(),
   createdBy: z.string(),
   createdAt: z.string(),
   updatedAt: z.string().optional(),

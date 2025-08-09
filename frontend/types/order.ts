@@ -56,23 +56,36 @@ export interface GetOrdersParams {
 	minAmount?: number;
 	maxAmount?: number;
 }
+
+
+
+export interface CourseDetail {
+  prerequisites: string | null;
+  longDescription: string | null;
+  objectives: string | null;
+  targetAudience: string | null;
+}
+
 export interface CreateOrderRequest {
-	courses: {
-		id: string;
-		title: string;
-		description: string;
-		thumbnail: string;
-		price: number;
-		offer: number;
-		duration: string;
-		lectures: number;
-		level: string;
-		creator: {
-			name: string;
-		};
-	}[];
-	paymentMethod: "WALLET" | "STRIPE" | "PAYPAL" | "RAZORPAY";
-	couponCode?: string;
+  courses: {
+    id: string;
+    title: string;
+    description: string | null;
+    level: string;
+    price: number;
+    thumbnail: string | null;
+    status: string; // required
+    categoryId?: string; // required
+    createdBy: string; // required (instead of creator.name)
+    createdAt: string; // required
+    updatedAt?: string;
+    deletedAt: string | null; // required, can be null
+    approvalStatus: string; // required
+    details: CourseDetail | null;
+    offer?: number;
+  }[];
+  paymentMethod: "WALLET" | "STRIPE" | "PAYPAL" | "RAZORPAY";
+  couponCode?: string;
 }
 
 export interface OrderResponse {
