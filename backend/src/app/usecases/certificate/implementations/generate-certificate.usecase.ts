@@ -8,12 +8,10 @@ import { CertificateStatus } from "../../../../domain/enum/certificate-status.en
 import { LessonProgress } from "../../../../domain/entities/progress.entity";
 import {
   IGenerateCertificateUseCase,
-  IGenerateCertificateRequest,
-  IGenerateCertificateResponse,
 } from "../interfaces/generate-certificate.usecase.interface";
 import { CertificatePdfServiceInterface } from "../../../providers/generate-certificate.interface";
 import { S3ServiceInterface } from "../../../providers/s3.service.interface";
-import { v4 as uuidv4 } from "uuid";
+import { GenerateCertificateInputDto, GenerateCertificateOutputDto } from "../../../dtos/certificate.dto";
 
 
 export class GenerateCertificateUseCase implements IGenerateCertificateUseCase {
@@ -28,8 +26,8 @@ export class GenerateCertificateUseCase implements IGenerateCertificateUseCase {
   ) {}
 
   async execute(
-    request: IGenerateCertificateRequest
-  ): Promise<IGenerateCertificateResponse> {
+    request: GenerateCertificateInputDto
+  ): Promise<GenerateCertificateOutputDto> {
     try {
       const { userId, courseId } = request;
       console.log(
@@ -145,7 +143,6 @@ export class GenerateCertificateUseCase implements IGenerateCertificateUseCase {
 
       // 7. Create or update certificate entity
       certificate = Certificate.create({
-        id: uuidv4(),
         userId,
         courseId,
         enrollmentId: enrollment.userId, // This should be the enrollment ID
@@ -155,7 +152,11 @@ export class GenerateCertificateUseCase implements IGenerateCertificateUseCase {
       if (isUpdate && oldCertificateId) {
         // Use the same id as the old certificate
         certificate = new Certificate({
-          ...certificate.toJSON(),
+          userId: certificate.userId,
+          courseId: certificate.courseId,
+          enrollmentId: certificate.enrollmentId,
+          certificateNumber: certificate.certificateNumber,
+          expiresAt: certificate.expiresAt,
           id: oldCertificateId,
           createdAt:
             existingCertificate && existingCertificate.createdAt

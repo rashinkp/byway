@@ -1,7 +1,7 @@
 import { CertificateStatus } from "../enum/certificate-status.enum";
 
 export interface CertificateProps {
-  id: string; // Now mandatory
+  id?: string; 
   userId: string;
   courseId: string;
   enrollmentId: string;
@@ -107,17 +107,6 @@ export class Certificate {
     });
   }
 
-  // Factory method for rebuilding from persistence
-  public static fromPersistence(data: CertificateProps): Certificate {
-    return new Certificate({
-      ...data,
-      issuedAt: data.issuedAt ? new Date(data.issuedAt) : null,
-      expiresAt: data.expiresAt ? new Date(data.expiresAt) : null,
-      createdAt: data.createdAt ? new Date(data.createdAt) : new Date(),
-      updatedAt: data.updatedAt ? new Date(data.updatedAt) : new Date(),
-    });
-  }
-
   // Business logic methods
   public generateCertificate(
     pdfUrl: string,
@@ -162,21 +151,50 @@ export class Certificate {
     return this._status === CertificateStatus.GENERATED && !this.isExpired();
   }
 
-  // Convert entity to plain object for serialization or persistence
-  public toJSON(): CertificateProps {
+  public static toDomain(raw: {
+    id: string;
+    userId: string;
+    courseId: string;
+    enrollmentId: string;
+    certificateNumber: string;
+    status: string;
+    issuedAt?: Date | null;
+    expiresAt?: Date | null;
+    pdfUrl?: string | null;
+    metadata?: any;
+    createdAt: Date;
+    updatedAt: Date;
+  }): Certificate {
+    return new Certificate({
+      id: raw.id,
+      userId: raw.userId,
+      courseId: raw.courseId,
+      enrollmentId: raw.enrollmentId,
+      certificateNumber: raw.certificateNumber,
+      status: raw.status as CertificateStatus,
+      issuedAt: raw.issuedAt ?? null,
+      expiresAt: raw.expiresAt ?? null,
+      pdfUrl: raw.pdfUrl ?? null,
+      metadata: raw.metadata ?? null,
+      createdAt: raw.createdAt,
+      updatedAt: raw.updatedAt,
+    });
+  }
+
+  static toPersistence(certificate: Certificate): any {
     return {
-      id: this._id,
-      userId: this._userId,
-      courseId: this._courseId,
-      enrollmentId: this._enrollmentId,
-      certificateNumber: this._certificateNumber,
-      status: this._status,
-      issuedAt: this._issuedAt,
-      expiresAt: this._expiresAt,
-      pdfUrl: this._pdfUrl,
-      metadata: this._metadata,
-      createdAt: this._createdAt,
-      updatedAt: this._updatedAt,
+      id: certificate.id,
+      userId: certificate.userId,
+      courseId: certificate.courseId,
+      enrollmentId: certificate.enrollmentId,
+      certificateNumber: certificate.certificateNumber,
+      status: certificate.status,
+      issuedAt: certificate.issuedAt,
+      expiresAt: certificate.expiresAt,
+      pdfUrl: certificate.pdfUrl,
+      metadata: certificate.metadata,
+      createdAt: certificate.createdAt,
+      updatedAt: certificate.updatedAt,
     };
   }
 }

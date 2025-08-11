@@ -39,7 +39,7 @@ import { CourseReviewRepository } from "../infra/repositories/course-review.repo
 import { ICourseReviewRepository } from "../app/repositories/course-review.repository.interface";
 import { LessonProgressRepository } from "../infra/repositories/lesson-progress.repository.impl";
 import { ILessonProgressRepository } from "../app/repositories/lesson-progress.repository.interface";
-import { PrismaCertificateRepository } from "../infra/repositories/certificate-repository.prisma";
+import { PrismaCertificateRepository } from "../infra/repositories/certificate-repository";
 import { CertificateRepositoryInterface } from "../app/repositories/certificate-repository.interface";
 import { S3Service } from "../infra/providers/s3/s3.service";
 import { EmailProviderImpl } from "../infra/providers/email/email.provider";
