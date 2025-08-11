@@ -4,6 +4,7 @@ import {
   IUserStats,
   IGetUserStatsInput,
 } from "../usecases/user/interfaces/get-user-stats.usecase.interface";
+import { PaginationFilter } from "../../domain/types/pagination-filter.interface";
 
 export interface IPaginatedResponse<T> {
   users: T[];
@@ -12,22 +13,12 @@ export interface IPaginatedResponse<T> {
 }
 
 export interface IUserRepository {
-  findAll(input: {
-    page: number;
-    limit: number;
-    sortBy: "name" | "email" | "createdAt" | "updatedAt";
-    sortOrder: "asc" | "desc";
-    includeDeleted?: boolean;
-    search: string;
-    filterBy: "All" | "Active" | "Inactive";
-    role: "USER" | "INSTRUCTOR" | "ADMIN";
-  }): Promise<IPaginatedResponse<User>>;
+  findAll(input: PaginationFilter): Promise<IPaginatedResponse<User>>;
   findById(id: string): Promise<User | null>;
   updateUser(user: User): Promise<User>;
   updateProfile(profile: UserProfile): Promise<UserProfile>;
   findProfileByUserId(userId: string): Promise<UserProfile | null>;
   createProfile(profile: UserProfile): Promise<UserProfile>;
-
   getUserStats(input: IGetUserStatsInput): Promise<IUserStats>;
   findByRole(role: string): Promise<User[]>;
 }

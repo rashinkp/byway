@@ -6,20 +6,12 @@ import {
   IUserRepository,
 } from "../../app/repositories/user.repository";
 import { IUserStats } from "../../app/usecases/user/interfaces/get-user-stats.usecase.interface";
+import { PaginationFilter } from "../../domain/types/pagination-filter.interface";
 
 export class UserRepository implements IUserRepository {
   constructor(private prisma: PrismaClient) {}
 
-  async findAll(input: {
-    page: number;
-    limit: number;
-    sortBy: "name" | "email" | "createdAt" | "updatedAt";
-    sortOrder: "asc" | "desc";
-    includeDeleted?: boolean;
-    search: string;
-    filterBy: "All" | "Active" | "Inactive";
-    role: "USER" | "INSTRUCTOR" | "ADMIN";
-  }): Promise<IPaginatedResponse<User>> {
+  async findAll(input: PaginationFilter): Promise<IPaginatedResponse<User>> {
     const {
       page = 1,
       limit = 10,
