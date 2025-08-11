@@ -29,18 +29,23 @@ export class RevenueDistributionService implements IRevenueDistributionService {
   async distributeRevenue(orderId: string): Promise<void> {
     try {
       const orderItems = await this.orderRepository.findOrderItems(orderId);
-      
+
       if (!orderItems || orderItems.length === 0) {
         throw new HttpError("No order items found", StatusCodes.NOT_FOUND);
       }
 
-      console.log(`Distributing revenue for order ${orderId} with ${orderItems.length} items`);
+      console.log(
+        `Distributing revenue for order ${orderId} with ${orderItems.length} items`
+      );
 
       for (const orderItem of orderItems) {
         try {
           await this.distributeRevenueForOrderItem(orderItem);
         } catch (error) {
-          console.error(`Error distributing revenue for order item ${orderItem.id}:`, error);
+          console.error(
+            `Error distributing revenue for order item ${orderItem.id}:`,
+            error
+          );
           throw error; // Re-throw to handle in the main try-catch
         }
       }
@@ -54,10 +59,14 @@ export class RevenueDistributionService implements IRevenueDistributionService {
   }
 
   private async distributeRevenueForOrderItem(orderItem: any): Promise<void> {
-    console.log(`Processing order item ${orderItem.id} with price ${orderItem.coursePrice}`);
+    console.log(
+      `Processing order item ${orderItem.id} with price ${orderItem.coursePrice}`
+    );
     const coursePrice = orderItem.coursePrice;
-    const course = await this.orderRepository.findCourseById(orderItem.courseId);
-    
+    const course = await this.orderRepository.findCourseById(
+      orderItem.courseId
+    );
+
     if (!course) {
       throw new HttpError("Course not found", StatusCodes.NOT_FOUND);
     }
@@ -65,7 +74,9 @@ export class RevenueDistributionService implements IRevenueDistributionService {
     const instructorId = course.createdBy;
     const { adminShare, instructorShare } = this.calculateShares(coursePrice);
 
-    console.log(`Calculated shares - Admin: ${adminShare}, Instructor: ${instructorShare}`);
+    console.log(
+      `Calculated shares - Admin: ${adminShare}, Instructor: ${instructorShare}`
+    );
 
     await this.updateWallets(instructorId, adminShare, instructorShare);
     await this.createTransactions(
@@ -77,27 +88,40 @@ export class RevenueDistributionService implements IRevenueDistributionService {
     );
 
     // Send notifications to instructor and admin
-    await this.sendPurchaseNotifications(course, orderItem, instructorShare, adminShare);
+    await this.sendPurchaseNotifications(
+      course,
+      orderItem,
+      instructorShare,
+      adminShare
+    );
   }
 
-  private calculateShares(coursePrice: number): { adminShare: number; instructorShare: number } {
+  private calculateShares(coursePrice: number): {
+    adminShare: number;
+    instructorShare: number;
+  } {
     const adminShare = (coursePrice * this.ADMIN_SHARE_PERCENTAGE) / 100;
-    const instructorShare = (coursePrice * this.INSTRUCTOR_SHARE_PERCENTAGE) / 100;
+    const instructorShare =
+      (coursePrice * this.INSTRUCTOR_SHARE_PERCENTAGE) / 100;
     return { adminShare, instructorShare };
   }
 
   private async getAdminUserId(): Promise<string> {
-    const { items } = await this.userRepository.findAll({
+    const { users } = await this.userRepository.findAll({
       role: "ADMIN",
       page: 1,
       limit: 1,
-      includeDeleted: false
+      includeDeleted: false,
+      sortBy: "createdAt",
+      filterBy: "All",
+      search: "",
+      sortOrder: "asc",
     });
-    
-    if (!items || items.length === 0) {
+
+    if (!users || users.length === 0) {
       throw new HttpError("Admin user not found", StatusCodes.NOT_FOUND);
     }
-    return items[0].id;
+    return users[0].id;
   }
 
   private async updateWallets(
@@ -111,7 +135,7 @@ export class RevenueDistributionService implements IRevenueDistributionService {
     // Get or create admin wallet
     let adminWallet = await this.walletRepository.findByUserId(adminId);
     if (!adminWallet) {
-      console.log('Creating admin wallet');
+      console.log("Creating admin wallet");
       adminWallet = Wallet.create(adminId);
       adminWallet = await this.walletRepository.create(adminWallet);
     }
@@ -119,9 +143,11 @@ export class RevenueDistributionService implements IRevenueDistributionService {
     await this.walletRepository.update(adminWallet);
 
     // Get or create instructor wallet
-    let instructorWallet = await this.walletRepository.findByUserId(instructorId);
+    let instructorWallet = await this.walletRepository.findByUserId(
+      instructorId
+    );
     if (!instructorWallet) {
-      console.log('Creating instructor wallet for:', instructorId);
+      console.log("Creating instructor wallet for:", instructorId);
       instructorWallet = Wallet.create(instructorId);
       instructorWallet = await this.walletRepository.create(instructorWallet);
     }
@@ -137,7 +163,7 @@ export class RevenueDistributionService implements IRevenueDistributionService {
     coursePrice: number
   ): Promise<void> {
     const adminId = await this.getAdminUserId();
-    
+
     const adminTransaction = Transaction.create({
       userId: adminId,
       amount: adminShare,
@@ -145,7 +171,7 @@ export class RevenueDistributionService implements IRevenueDistributionService {
       status: TransactionStatus.COMPLETED,
       paymentGateway: PaymentGateway.INTERNAL,
       orderId,
-      description: `Revenue share from course purchase (${coursePrice})`
+      description: `Revenue share from course purchase (${coursePrice})`,
     });
 
     const instructorTransaction = Transaction.create({
@@ -155,7 +181,7 @@ export class RevenueDistributionService implements IRevenueDistributionService {
       status: TransactionStatus.COMPLETED,
       paymentGateway: PaymentGateway.INTERNAL,
       orderId,
-      description: `Revenue share from course purchase (${coursePrice})`
+      description: `Revenue share from course purchase (${coursePrice})`,
     });
 
     await this.transactionRepository.create(adminTransaction);
@@ -172,21 +198,26 @@ export class RevenueDistributionService implements IRevenueDistributionService {
       // Get admin user ID and order details
       const adminId = await this.getAdminUserId();
       const order = await this.orderRepository.findById(orderItem.orderId);
-      
+
       if (!order) {
-        console.error('Order not found for notifications');
+        console.error("Order not found for notifications");
         return;
       }
 
       // 1. Notify instructor about revenue earned
-      await this.createNotificationsForUsersUseCase.execute([course.createdBy], {
-        eventType: NotificationEventType.REVENUE_EARNED,
-        entityType: NotificationEntityType.PAYMENT,
-        entityId: course.id,
-        entityName: course.title,
-        message: `Revenue earned: $${instructorShare.toFixed(2)} from course "${course.title}" purchase.`,
-        link: `/instructor/wallet`,
-      });
+      await this.createNotificationsForUsersUseCase.execute(
+        [course.createdBy],
+        {
+          eventType: NotificationEventType.REVENUE_EARNED,
+          entityType: NotificationEntityType.PAYMENT,
+          entityId: course.id,
+          entityName: course.title,
+          message: `Revenue earned: $${instructorShare.toFixed(
+            2
+          )} from course "${course.title}" purchase.`,
+          link: `/instructor/wallet`,
+        }
+      );
 
       // 2. Notify admin about revenue earned
       await this.createNotificationsForUsersUseCase.execute([adminId], {
@@ -194,7 +225,9 @@ export class RevenueDistributionService implements IRevenueDistributionService {
         entityType: NotificationEntityType.PAYMENT,
         entityId: course.id,
         entityName: course.title,
-        message: `Revenue earned: $${adminShare.toFixed(2)} from course "${course.title}" purchase.`,
+        message: `Revenue earned: $${adminShare.toFixed(2)} from course "${
+          course.title
+        }" purchase.`,
         link: `/admin/wallet`,
       });
 
@@ -207,10 +240,9 @@ export class RevenueDistributionService implements IRevenueDistributionService {
         message: `Course "${course.title}" purchase completed! You're ready to start learning.`,
         link: `/user/my-courses`,
       });
-
     } catch (error) {
-      console.error('Error sending purchase notifications:', error);
+      console.error("Error sending purchase notifications:", error);
       // Don't throw error to avoid breaking the revenue distribution process
     }
   }
-} 
+}

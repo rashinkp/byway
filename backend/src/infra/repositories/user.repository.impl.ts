@@ -1,7 +1,6 @@
 import { PrismaClient, Gender, Role } from "@prisma/client";
 import { User } from "../../domain/entities/user.entity";
 import { UserProfile } from "../../domain/entities/user-profile.entity";
-import { GetAllUsersDto } from "../../app/dtos/user.dto";
 import {
   IPaginatedResponse,
   IUserRepository,
@@ -11,7 +10,16 @@ import { IUserStats } from "../../app/usecases/user/interfaces/get-user-stats.us
 export class UserRepository implements IUserRepository {
   constructor(private prisma: PrismaClient) {}
 
-  async findAll(dto: GetAllUsersDto): Promise<IPaginatedResponse<User>> {
+  async findAll(input: {
+    page: number;
+    limit: number;
+    sortBy: "name" | "email" | "createdAt" | "updatedAt";
+    sortOrder: "asc" | "desc";
+    includeDeleted?: boolean;
+    search: string;
+    filterBy: "All" | "Active" | "Inactive";
+    role: "USER" | "INSTRUCTOR" | "ADMIN";
+  }): Promise<IPaginatedResponse<User>> {
     const {
       page = 1,
       limit = 10,
@@ -21,7 +29,7 @@ export class UserRepository implements IUserRepository {
       search,
       filterBy,
       role,
-    } = dto;
+    } = input;
     const skip = (page - 1) * limit;
 
     const where: any = {};
@@ -53,7 +61,7 @@ export class UserRepository implements IUserRepository {
     ]);
 
     return {
-      items: users.map((u) => {
+      users: users.map((u) => {
         const user = User.fromPrisma(u);
         return user;
       }),

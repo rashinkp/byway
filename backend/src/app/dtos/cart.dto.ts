@@ -1,28 +1,25 @@
 import { Course } from "../../domain/entities/course.entity";
 import { User } from "../../domain/entities/user.entity";
 
-// Add to Cart DTO
 export interface AddToCartDto {
-  courseId: string; // expected to be a UUID string
-  couponId?: string; // optional UUID string
+  courseId: string; 
+  couponId?: string; 
 }
 
 // Get Cart DTO
 export interface GetCartDto {
-  page?: number; // positive integer, default to 1 if missing (validate externally)
-  limit?: number; // positive integer, default to 10 if missing (validate externally)
-  includeDeleted?: boolean; // defaults to false if missing (validate externally)
+  page?: number; 
+  limit?: number; 
+  includeDeleted?: boolean;
 }
 
-// Remove from Cart DTO
 export interface RemoveFromCartDto {
-  courseId: string; // expected to be a UUID string
+  courseId: string; 
 }
 
-// Apply Coupon DTO
 export interface ApplyCouponDto {
-  courseId: string; // expected to be a UUID string
-  couponId: string; // expected to be a UUID string
+  courseId: string;
+  couponId: string; 
 }
 
 

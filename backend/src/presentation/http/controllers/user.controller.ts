@@ -45,7 +45,7 @@ export class UserController extends BaseController {
       const result = await this.getAllUsersUseCase.execute(validated);
       return this.success_200(
         {
-          items: result.items.map((user) => ({
+          items: result.users.map((user) => ({
             id: user.id,
             name: user.name,
             email: user.email,

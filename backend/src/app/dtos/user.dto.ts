@@ -31,8 +31,8 @@ export interface IUpdateUserProfileRequestDTO {
 
 // Get All Users DTO
 export interface GetAllUsersDto {
-  page?: number; // positive integer, default to 1 where applicable
-  limit?: number; // positive integer, default to 10 where applicable
+  page?: number; 
+  limit?: number; 
   sortBy?: "name" | "email" | "createdAt" | "updatedAt";
   sortOrder?: "asc" | "desc";
   includeDeleted?: boolean;
