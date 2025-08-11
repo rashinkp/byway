@@ -7,11 +7,11 @@ export class Chat {
   public readonly messages: Message[] = [];
 
   constructor(
-    public readonly id: ChatId,
     public readonly user1Id: UserId,
     public readonly user2Id: UserId,
-    public readonly createdAt: Timestamp,
-    public readonly updatedAt: Timestamp,
+    public readonly createdAt?: string,
+    public readonly updatedAt?: string,
+    public readonly id ?: ChatId,
     messages?: Message[]
   ) {
     if (messages) {

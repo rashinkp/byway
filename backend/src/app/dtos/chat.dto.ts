@@ -1,3 +1,7 @@
+import { Message } from "../../domain/entities/message.entity";
+import { ChatId } from "../../domain/value-object/ChatId";
+import { UserId } from "../../domain/value-object/UserId";
+
 // DTO for message responses sent to frontend (minimal for one-to-one chat)
 export interface MessageResponseDTO {
   id: string;
@@ -38,3 +42,14 @@ export class PaginatedChatListDTO {
   hasMore!: boolean;
   nextPage?: number;
 } 
+
+
+
+export interface ChatResponseDTO {
+  id?: ChatId;
+  user1Id: UserId;
+  user2Id: UserId;
+  updatedAt?: string;
+  createdAt?: string;
+  messages: Message[];
+}
