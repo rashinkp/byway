@@ -1,6 +1,6 @@
 import { Cart } from "../../../../domain/entities/cart.entity";
-import { ApplyCouponDto } from "../../../dtos/cart.dto";
+import { ApplyCouponDto, CartResponseDTO } from "../../../dtos/cart.dto";
 
 export interface IApplyCouponUseCase {
-  execute(userId: string, data: ApplyCouponDto): Promise<Cart>;
+  execute(userId: string, data: ApplyCouponDto): Promise<CartResponseDTO>;
 }

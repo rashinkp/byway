@@ -1,3 +1,6 @@
+import { AuthProvider } from "@prisma/client";
+import { Role } from "../../domain/enum/role.enum";
+
 // Create User Profile Request DTO
 export interface ICreateUserProfileRequestDTO {
   userId: string;
@@ -72,4 +75,20 @@ export interface IUpdateUserRequestDTO {
   googleId?: string;
   avatar?: string;
   isVerified?: boolean;
+}
+
+
+export interface UserResponseDTO {
+  id: string,
+  name: string,
+  email: string,
+  password?: string,
+  googleId?: string,
+  role: Role,
+  authProvider: AuthProvider,
+  isVerified: boolean,
+  avatar?: string,
+  deletedAT?: Date,
+  updatedAt?: Date,
+  createdAt: Date
 }

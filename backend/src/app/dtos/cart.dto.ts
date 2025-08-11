@@ -1,3 +1,6 @@
+import { Course } from "../../domain/entities/course.entity";
+import { User } from "../../domain/entities/user.entity";
+
 // Add to Cart DTO
 export interface AddToCartDto {
   courseId: string; // expected to be a UUID string
@@ -20,4 +23,18 @@ export interface RemoveFromCartDto {
 export interface ApplyCouponDto {
   courseId: string; // expected to be a UUID string
   couponId: string; // expected to be a UUID string
+}
+
+
+export interface CartResponseDTO {
+  id: string,
+  userId: string,
+  courseId: string,
+  couponId?: string,
+  discount?: number,
+  createdAt: Date,
+  updatedAt?: Date,
+  deletedAt?: Date,
+  user?: User,
+  course? : Course
 }

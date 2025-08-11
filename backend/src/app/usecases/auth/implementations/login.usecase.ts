@@ -6,6 +6,7 @@ import { AuthProvider } from "../../../../domain/enum/auth-provider.enum";
 import { ILoginUseCase } from "../interfaces/login.usecase.interface";
 import { ICartRepository } from "../../../repositories/cart.repository";
 import { LoginDto } from "../../../dtos/auth.dto";
+import { UserResponseDTO } from "../../../dtos/user.dto";
 
 export class LoginUseCase implements ILoginUseCase {
   constructor(
@@ -13,7 +14,7 @@ export class LoginUseCase implements ILoginUseCase {
     private cartRepository: ICartRepository
   ) {}
 
-  async execute(dto: LoginDto): Promise<{ user: User; cartCount: number }> {
+  async execute(dto: LoginDto): Promise<{ user: UserResponseDTO; cartCount: number }> {
     const user = await this.authRepository.findUserByEmail(dto.email);
     if (!user) {
       throw new HttpError("Invalid credentials", 401);

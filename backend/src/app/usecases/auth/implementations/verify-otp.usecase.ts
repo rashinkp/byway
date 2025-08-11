@@ -4,13 +4,14 @@ import { HttpError } from "../../../../presentation/http/errors/http-error";
 import { JwtProvider } from "../../../../infra/providers/auth/jwt.provider";
 import { IVerifyOtpUseCase } from "../interfaces/verify-otp.usecase.interface";
 import { VerifyOtpDto } from "../../../dtos/auth.dto";
+import { UserResponseDTO } from "../../../dtos/user.dto";
 
 export class VerifyOtpUseCase implements IVerifyOtpUseCase {
   constructor(private authRepository: IAuthRepository) {}
 
   async execute(
     dto: VerifyOtpDto
-  ): Promise<{ user?: User; resetToken?: string }> {
+  ): Promise<{ user?: UserResponseDTO; resetToken?: string }> {
     const verification = await this.authRepository.findVerificationByEmail(
       dto.email
     );
