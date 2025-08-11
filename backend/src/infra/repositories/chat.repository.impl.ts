@@ -1,11 +1,8 @@
-import { IChatRepository } from "../../app/repositories/chat.repository.interface";
+import { EnhancedChatListItem, IChatRepository, PaginatedChatList } from "../../app/repositories/chat.repository.interface";
 import { Chat } from "../../domain/entities/chat.entity";
 import { ChatId } from "../../domain/value-object/ChatId";
 import { UserId } from "../../domain/value-object/UserId";
-import {
-  PaginatedChatListDTO,
-  EnhancedChatListItemDTO,
-} from "../../app/dtos/chat.dto";
+
 import { PrismaClient } from "@prisma/client";
 import { Role } from "../../domain/enum/role.enum";
 
@@ -37,10 +34,10 @@ export class ChatRepository implements IChatRepository {
     limit: number = 10,
     search?: string,
     sort?: string
-  ): Promise<PaginatedChatListDTO> {
+  ): Promise<PaginatedChatList> {
     const offset = (page - 1) * limit;
 
-    let chatItems: EnhancedChatListItemDTO[] = [];
+    let chatItems: EnhancedChatListItem[] = [];
     if (search) {
       const normalizedSearch = search.trim().toLowerCase();
       const roleMap: Record<string, Role> = {
@@ -266,7 +263,7 @@ export class ChatRepository implements IChatRepository {
     }
 
     // If we have fewer chats than the limit, fill with other users
-    let userItems: EnhancedChatListItemDTO[] = [];
+    let userItems: EnhancedChatListItem[] = [];
     if (chatItems.length < limit) {
       const remainingSlots = limit - chatItems.length;
       const existingUserIds = new Set([
@@ -353,8 +350,8 @@ export class ChatRepository implements IChatRepository {
       data: {
         user1Id: chat.user1Id.value,
         user2Id: chat.user2Id.value,
-        createdAt: chat.createdAt.value,
-        updatedAt: chat.updatedAt.value,
+        createdAt: chat.createdAt?.toString(),
+        updatedAt: chat.updatedAt?.toString(),
       },
     });
     console.log("[ChatRepository] Chat created in DB:", created.id);
@@ -363,9 +360,9 @@ export class ChatRepository implements IChatRepository {
 
   async save(chat: Chat): Promise<void> {
     await prisma.chat.update({
-      where: { id: chat.id.value },
+      where: { id: chat?.id?.value },
       data: {
-        updatedAt: chat.updatedAt.value,
+        updatedAt: chat.updatedAt?.toString(),
       },
     });
   }
@@ -388,22 +385,16 @@ export class ChatRepository implements IChatRepository {
       },
       include: { messages: true },
     });
-    if (!chat) {
-      console.log("[ChatRepository] No chat found between users");
-      return null;
-    }
-    console.log("[ChatRepository] Found chat:", chat.id);
-    return this.toDomain(chat);
+    
+    return chat ? this.toDomain(chat) : null;
   }
 
   private toDomain(prismaChat: any): Chat {
     return new Chat(
-      new ChatId(prismaChat.id),
       new UserId(prismaChat.user1Id),
       new UserId(prismaChat.user2Id),
       prismaChat.createdAt,
       prismaChat.updatedAt,
-      [] // Map messages if needed
     );
   }
 

@@ -132,7 +132,7 @@ export class MessageRepository implements IMessageRepository {
 
   async save(message: Message): Promise<void> {
     await prisma.message.update({
-      where: { id: message.id.value },
+      where: { id: message.id?.value },
       data: {
         content: message.content?.value || null,
         imageUrl: message.imageUrl?.toString() || null,
@@ -174,12 +174,11 @@ export class MessageRepository implements IMessageRepository {
 
   private toDomain(prismaMessage: any): Message {
     return new Message(
-      new MessageId(prismaMessage.id),
       new ChatId(prismaMessage.chatId),
       new UserId(prismaMessage.senderId),
       prismaMessage.content ? new MessageContent(prismaMessage.content) : null,
-      prismaMessage.imageUrl ? prismaMessage.imageUrl : null,
-      prismaMessage.audioUrl ? prismaMessage.audioUrl : null,
+      prismaMessage.imageUrl ?? null,
+      prismaMessage.audioUrl ?? null,
       prismaMessage.type,
       prismaMessage.isRead,
       new Timestamp(prismaMessage.createdAt)
