@@ -10,9 +10,59 @@ import { APPROVALSTATUS } from "../../domain/enum/approval-status.enum";
 import { ICourseRepository } from "../../app/repositories/course.repository.interface";
 import { HttpError } from "../../presentation/http/errors/http-error";
 import { IGetTopEnrolledCoursesInput } from "../../app/usecases/course/interfaces/top-enrolled-courses.usecase.interface";
-import { ICourseListResponseDTO, IGetAllCoursesInputDTO, IGetCourseStatsInput, IGetEnrolledCoursesInputDTO } from "../../app/dtos/course.dto";
-import { CourseOverallStats, CourseStats } from "../../domain/types/course-stats.interface";export class CourseRepository implements ICourseRepository {
+import { CourseOverallStats, CourseStats } from "../../domain/types/course-stats.interface";import { FilterCourse, PaginatedResult } from "../../domain/types/pagination-filter.interface";
+import { CourseStatsInput, CourseWithEnrollment } from "../../domain/types/course.interface";
+export class CourseRepository implements ICourseRepository {
   constructor(private prisma: PrismaClient) {}
+
+  private async transformCourseToEnrollmentData(
+    course: Course,
+    userId?: string
+  ): Promise<CourseWithEnrollment> {
+    const courseData = course.toJSON();
+    
+    // Get instructor data
+    const instructor = await this.prisma.user.findUnique({
+      where: { id: courseData.createdBy },
+      select: { id: true, name: true, email: true, userProfile: true }
+    });
+
+    // Get review stats
+    const reviews = await this.prisma.courseReview.findMany({
+      where: { courseId: courseData.id, deletedAt: null },
+      select: { rating: true }
+    });
+
+    const rating = reviews.length > 0 
+      ? reviews.reduce((sum, review) => sum + review.rating, 0) / reviews.length 
+      : 0;
+
+    // Check if user is enrolled (if userId is provided)
+    const isEnrolled = userId ? await this.prisma.enrollment.findFirst({
+      where: { userId, courseId: courseData.id }
+    }).then(enrollment => !!enrollment) : false;
+
+    // Check if course is in cart (if userId is provided)
+    const isInCart = userId ? await this.prisma.cart.findFirst({
+      where: { userId, courseId: courseData.id }
+    }).then(cart => !!cart) : false;
+
+    return {
+      ...courseData,
+      isEnrolled,
+      isInCart,
+      instructor: instructor ? {
+        id: instructor.id,
+        name: instructor.name,
+        email: instructor.email,
+        profile: instructor.userProfile
+      } : null,
+      reviewStats: {
+        rating,
+        reviewCount: reviews.length
+      }
+    };
+  }
 
   async save(course: Course): Promise<Course> {
     try {
@@ -177,8 +227,8 @@ import { CourseOverallStats, CourseStats } from "../../domain/types/course-stats
   }
 
   async findAll(
-    input: IGetAllCoursesInputDTO
-  ): Promise<ICourseListResponseDTO> {
+    input: FilterCourse
+  ): Promise<PaginatedResult<CourseWithEnrollment>> {
     const {
       page = 1,
       limit = 10,
@@ -284,8 +334,13 @@ import { CourseOverallStats, CourseStats } from "../../domain/types/course-stats
           })
       );
 
+      // Transform courses to include enrollment and additional data
+      const coursesWithEnrollment = await Promise.all(
+        courseEntities.map(course => this.transformCourseToEnrollmentData(course, input.userId))
+      );
+
       return {
-        courses: courseEntities.map((course) => course.toJSON()),
+        items: coursesWithEnrollment,
         total,
         totalPage: Math.ceil(total / limit),
       };
@@ -414,8 +469,8 @@ import { CourseOverallStats, CourseStats } from "../../domain/types/course-stats
   }
 
   async findEnrolledCourses(
-    input: IGetEnrolledCoursesInputDTO
-  ): Promise<ICourseListResponseDTO> {
+    input: FilterCourse
+  ): Promise<PaginatedResult<CourseWithEnrollment>> {
     const {
       userId,
       page = 1,
@@ -478,8 +533,13 @@ import { CourseOverallStats, CourseStats } from "../../domain/types/course-stats
           })
       );
 
+      // Transform courses to include enrollment and additional data
+      const coursesWithEnrollment = await Promise.all(
+        courseEntities.map(course => this.transformCourseToEnrollmentData(course, input.userId))
+      );
+
       return {
-        courses: courseEntities.map((course) => course.toJSON()),
+        items: coursesWithEnrollment,
         total,
         totalPage: Math.ceil(total / limit),
       };
@@ -592,9 +652,7 @@ import { CourseOverallStats, CourseStats } from "../../domain/types/course-stats
     }
   }
 
-  async getCourseStats(
-    input: IGetCourseStatsInput
-  ): Promise<CourseOverallStats> {
+  async getCourseStats(input: CourseStatsInput): Promise<CourseOverallStats> {
     const { userId, includeDeleted = false, isAdmin = false } = input;
 
     // Build where clause for filtering

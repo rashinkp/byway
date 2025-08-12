@@ -25,7 +25,6 @@ export interface ICourseReviewStatsDetailed {
   };
 }
 
-// Base course interface matching frontend Course interface
 export interface ICourseDTO {
   id: string;
   title: string;
@@ -135,16 +134,7 @@ export interface IGetAllCoursesInputDTO {
   sortOrder?: "asc" | "desc";
   includeDeleted?: boolean;
   search?: string;
-  filterBy?:
-    | "All"
-    | "Active"
-    | "Inactive"
-    | "Approved"
-    | "Declined"
-    | "Pending"
-    | "Published"
-    | "Draft"
-    | "Archived";
+  filterBy?: string;
   userId?: string;
   myCourses?: boolean;
   role?: "USER" | "INSTRUCTOR" | "ADMIN";
@@ -185,8 +175,8 @@ export interface IEnrollmentOutputDTO {
 // Response DTOs
 export interface ICourseListResponseDTO {
   courses: ICourseWithEnrollmentDTO[];
-  total: number;
-  totalPage: number;
+  total?: number;
+  totalPage?: number;
 }
 
 export type ICourseResponseDTO = ICourseListResponseDTO;
