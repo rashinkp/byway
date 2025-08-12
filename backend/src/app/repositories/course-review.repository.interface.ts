@@ -1,5 +1,5 @@
 import { CourseReview } from "../../domain/entities/review.entity";
-import { CourseReviewResponseDto, CourseReviewSummaryDto, QueryCourseReviewDto } from "../dtos/review.dto";
+import {  ICourseReviewSummary, ICourseReviewQuery, ICourseReviewPaginatedResult } from "../../domain/types/review.interface";
 
 export interface ICourseReviewRepository {
   // Basic CRUD operations
@@ -13,23 +13,15 @@ export interface ICourseReviewRepository {
   // Query operations
   findByCourseId(
     courseId: string,
-    query: QueryCourseReviewDto,
+    query: ICourseReviewQuery,
     userId?: string
-  ): Promise<{
-    reviews: CourseReviewResponseDto[];
-    total: number;
-    totalPages: number;
-  }>;
+  ): Promise<ICourseReviewPaginatedResult>;
 
   findByUserId(
     userId: string,
     page?: number,
     limit?: number
-  ): Promise<{
-    reviews: CourseReviewResponseDto[];
-    total: number;
-    totalPages: number;
-  }>;
+  ): Promise<ICourseReviewPaginatedResult>;
 
   findByUserAndCourse(
     userId: string,
@@ -37,5 +29,5 @@ export interface ICourseReviewRepository {
   ): Promise<CourseReview | null>;
 
   // Statistics
-  getCourseReviewStats(courseId: string): Promise<CourseReviewSummaryDto>;
+  getCourseReviewStats(courseId: string): Promise<ICourseReviewSummary>;
 }
