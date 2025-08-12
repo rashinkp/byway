@@ -1,4 +1,5 @@
-import { CourseStats } from "../../../dtos/stats.dto";
+
+import { CourseStatsDTO } from "../../../dtos/course.dto";
 import { ICourseRepository } from "../../../repositories/course.repository.interface";
 import {
   IGetTopEnrolledCoursesUseCase,
@@ -10,7 +11,7 @@ export class GetTopEnrolledCoursesUseCase
 {
   constructor(private readonly courseRepository: ICourseRepository) {}
 
-  async execute(input: IGetTopEnrolledCoursesInput): Promise<CourseStats[]> {
+  async execute(input: IGetTopEnrolledCoursesInput): Promise<CourseStatsDTO[]> {
     return this.courseRepository.getTopEnrolledCourses(input);
   }
 }

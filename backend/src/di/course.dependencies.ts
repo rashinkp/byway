@@ -67,7 +67,6 @@ export function createCourseDependencies(
   );
   const declineCourseUseCase = new DeclineCourseUseCase(
     courseRepository,
-    userRepository,
     createNotificationsForUsersUseCase
   );
   const enrollCourseUseCase = new EnrollCourseUseCase(

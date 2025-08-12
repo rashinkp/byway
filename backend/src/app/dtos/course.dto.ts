@@ -190,3 +190,41 @@ export interface ICourseListResponseDTO {
 }
 
 export type ICourseResponseDTO = ICourseListResponseDTO;
+
+
+
+
+
+export interface IGetCourseStatsInput {
+  userId?: string;
+  includeDeleted?: boolean;
+  isAdmin?: boolean;
+}
+
+
+export interface CourseOverallStatsDTO {
+  totalCourses: number;
+  activeCourses: number;
+  inactiveCourses: number;
+  pendingCourses: number;
+  approvedCourses: number;
+  declinedCourses: number;
+  publishedCourses: number;
+  draftCourses: number;
+  archivedCourses: number;
+}
+
+
+
+export interface CourseStatsDTO {
+  courseId: string;
+  courseTitle: string;
+  instructorName?: string;
+  enrollmentCount: number;
+  revenue: number;
+  rating: number;
+  reviewCount: number;
+  status?: string; // For instructor-specific stats
+  createdAt?: Date;
+  lastEnrollmentDate?: Date;
+}

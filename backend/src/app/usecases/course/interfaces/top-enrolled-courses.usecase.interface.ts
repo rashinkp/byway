@@ -1,5 +1,4 @@
-import { CourseStats } from "../../../dtos/stats.dto";
-
+import { CourseStatsDTO } from "../../../dtos/course.dto";
 
 export interface IGetTopEnrolledCoursesInput {
   userId: string;
@@ -8,5 +7,5 @@ export interface IGetTopEnrolledCoursesInput {
 }
 
 export interface IGetTopEnrolledCoursesUseCase {
-  execute(input: IGetTopEnrolledCoursesInput): Promise<CourseStats[]>;
+  execute(input: IGetTopEnrolledCoursesInput): Promise<CourseStatsDTO[]>;
 } 

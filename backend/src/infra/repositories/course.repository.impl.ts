@@ -7,21 +7,11 @@ import { Duration } from "../../domain/value-object/duration";
 import { Offer } from "../../domain/value-object/offer";
 import { CourseStatus } from "../../domain/enum/course-status.enum";
 import { APPROVALSTATUS } from "../../domain/enum/approval-status.enum";
-import {
-  ICourseListResponseDTO,
-  IGetAllCoursesInputDTO,
-  IGetEnrolledCoursesInputDTO,
-} from "../../app/dtos/course.dto";
 import { ICourseRepository } from "../../app/repositories/course.repository.interface";
 import { HttpError } from "../../presentation/http/errors/http-error";
-import { CourseStats } from "../../app/dtos/stats.dto";
-import {
-  ICourseStats,
-  IGetCourseStatsInput,
-} from "../../app/usecases/course/interfaces/get-course-stats.usecase.interface";
 import { IGetTopEnrolledCoursesInput } from "../../app/usecases/course/interfaces/top-enrolled-courses.usecase.interface";
-
-export class CourseRepository implements ICourseRepository {
+import { ICourseListResponseDTO, IGetAllCoursesInputDTO, IGetCourseStatsInput, IGetEnrolledCoursesInputDTO } from "../../app/dtos/course.dto";
+import { CourseOverallStats, CourseStats } from "../../domain/types/course-stats.interface";export class CourseRepository implements ICourseRepository {
   constructor(private prisma: PrismaClient) {}
 
   async save(course: Course): Promise<Course> {
@@ -40,11 +30,10 @@ export class CourseRepository implements ICourseRepository {
         status: course.status,
         adminSharePercentage: course.adminSharePercentage,
         category: {
-          connect: { id: course.categoryId }, // Already fixed from previous issue
+          connect: { id: course.categoryId },
         },
-        // Replace createdBy with creator
         creator: {
-          connect: { id: course.createdBy }, // Use connect to link to the existing user
+          connect: { id: course.createdBy },
         },
         createdAt: course.createdAt,
         updatedAt: course.updatedAt,
@@ -603,7 +592,9 @@ export class CourseRepository implements ICourseRepository {
     }
   }
 
-  async getCourseStats(input: IGetCourseStatsInput): Promise<ICourseStats> {
+  async getCourseStats(
+    input: IGetCourseStatsInput
+  ): Promise<CourseOverallStats> {
     const { userId, includeDeleted = false, isAdmin = false } = input;
 
     // Build where clause for filtering

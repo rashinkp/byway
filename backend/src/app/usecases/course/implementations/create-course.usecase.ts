@@ -80,7 +80,6 @@ export class CreateCourseUseCase implements ICreateCourseUseCase {
       adminSharePercentage: input.adminSharePercentage,
     });
 
-    // Add course details if provided
     if (input.details) {
       course.updateDetails({
         prerequisites: input.details.prerequisites,
@@ -90,8 +89,13 @@ export class CreateCourseUseCase implements ICreateCourseUseCase {
       });
     }
 
-    // Persist course
     const savedCourse = await this.courseRepository.save(course);
+
+
+
+
+
+    
 
     // Notify all admins using the notification use case
     const admins = await this.userRepository.findByRole("ADMIN");

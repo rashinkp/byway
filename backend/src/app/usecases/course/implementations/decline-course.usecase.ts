@@ -14,7 +14,6 @@ import { NotificationEntityType } from "../../../../domain/enum/notification-ent
 export class DeclineCourseUseCase implements IDeclineCourseUseCase {
   constructor(
     private courseRepository: ICourseRepository,
-    private userRepository: IUserRepository,
     private createNotificationsForUsersUseCase: CreateNotificationsForUsersUseCase
   ) {}
 
