@@ -1,11 +1,11 @@
-import { ICreateCourseReviewUseCase } from "../../../app/usecases/course-review/interfaces/create-course-review.usecase.interface";
-import { IUpdateCourseReviewUseCase } from "../../../app/usecases/course-review/interfaces/update-course-review.usecase.interface";
-import { IDeleteCourseReviewUseCase } from "../../../app/usecases/course-review/interfaces/delete-course-review.usecase.interface";
-import { IGetCourseReviewsUseCase } from "../../../app/usecases/course-review/interfaces/get-course-reviews.usecase.interface";
-import { IGetCourseReviewStatsUseCase } from "../../../app/usecases/course-review/interfaces/get-course-review-stats.usecase.interface";
-import { IGetUserReviewsUseCase } from "../../../app/usecases/course-review/interfaces/get-user-reviews.usecase.interface";
-import { IDeleteReviewUseCase } from "../../../app/usecases/course-review/interfaces/delete-review.usecase.interface";
-import { IDisableReviewUseCase } from "../../../app/usecases/course-review/interfaces/disable-review.usecase.interface";
+import { ICreateCourseReviewUseCase } from "../../../app/usecases/review/interfaces/create-course-review.usecase.interface";
+import { IUpdateCourseReviewUseCase } from "../../../app/usecases/review/interfaces/update-course-review.usecase.interface";
+import { IDeleteCourseReviewUseCase } from "../../../app/usecases/review/interfaces/delete-course-review.usecase.interface";
+import { IGetCourseReviewsUseCase } from "../../../app/usecases/review/interfaces/get-course-reviews.usecase.interface";
+import { IGetCourseReviewStatsUseCase } from "../../../app/usecases/review/interfaces/get-course-review-stats.usecase.interface";
+import { IGetUserReviewsUseCase } from "../../../app/usecases/review/interfaces/get-user-reviews.usecase.interface";
+import { IDeleteReviewUseCase } from "../../../app/usecases/review/interfaces/delete-review.usecase.interface";
+import { IDisableReviewUseCase } from "../../../app/usecases/review/interfaces/disable-review.usecase.interface";
 
 import { IHttpErrors } from "../interfaces/http-errors.interface";
 import { IHttpSuccess } from "../interfaces/http-success.interface";

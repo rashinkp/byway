@@ -1,7 +1,5 @@
 import {
   IGetDashboardUseCase,
-  IDashboardResponse,
-  IGetDashboardInput,
 } from "../interfaces/get-dashboard.usecase.interface";
 import { IGetCourseStatsUseCase } from "../../course/interfaces/get-course-stats.usecase.interface";
 import { IGetTopEnrolledCoursesUseCase } from "../../course/interfaces/top-enrolled-courses.usecase.interface";
@@ -9,6 +7,7 @@ import { IGetUserStatsUseCase } from "../../user/interfaces/get-user-stats.useca
 import { IGetTopInstructorsUseCase } from "../../user/interfaces/get-top-instructors.usecase.interface";
 import { IGetEnrollmentStatsUseCase } from "../../enrollment/interfaces/get-enrollment-stats.usecase.interface";
 import { IRevenueRepository } from "../../../repositories/revenue.repository";
+import { IDashboardResponseDTO, IGetDashboardInputDTO } from "../../../dtos/dashboard.dto";
 
 export class GetDashboardUseCase implements IGetDashboardUseCase {
   constructor(
@@ -20,7 +19,7 @@ export class GetDashboardUseCase implements IGetDashboardUseCase {
     private readonly revenueRepository: IRevenueRepository
   ) {}
 
-  async execute(input: IGetDashboardInput): Promise<IDashboardResponse> {
+  async execute(input: IGetDashboardInputDTO): Promise<IDashboardResponseDTO> {
     const [
       courseStats,
       topEnrolledCourses,

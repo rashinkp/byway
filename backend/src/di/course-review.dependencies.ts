@@ -1,12 +1,12 @@
 import { CourseReviewController } from "../presentation/http/controllers/course-review.controller";
-import { CreateCourseReviewUseCase } from "../app/usecases/course-review/implementations/create-course-review.usecase";
-import { UpdateCourseReviewUseCase } from "../app/usecases/course-review/implementations/update-course-review.usecase";
-import { DeleteCourseReviewUseCase } from "../app/usecases/course-review/implementations/delete-course-review.usecase";
-import { GetCourseReviewsUseCase } from "../app/usecases/course-review/implementations/get-course-reviews.usecase";
-import { GetCourseReviewStatsUseCase } from "../app/usecases/course-review/implementations/get-course-review-stats.usecase";
-import { GetUserReviewsUseCase } from "../app/usecases/course-review/implementations/get-user-reviews.usecase";
-import { DeleteReviewUseCase } from "../app/usecases/course-review/implementations/delete-review.usecase";
-import { DisableReviewUseCase } from "../app/usecases/course-review/implementations/disable-review.usecase";
+import { CreateCourseReviewUseCase } from "../app/usecases/review/implementations/create-course-review.usecase";
+import { UpdateCourseReviewUseCase } from "../app/usecases/review/implementations/update-course-review.usecase";
+import { DeleteCourseReviewUseCase } from "../app/usecases/review/implementations/delete-course-review.usecase";
+import { GetCourseReviewsUseCase } from "../app/usecases/review/implementations/get-course-reviews.usecase";
+import { GetCourseReviewStatsUseCase } from "../app/usecases/review/implementations/get-course-review-stats.usecase";
+import { GetUserReviewsUseCase } from "../app/usecases/review/implementations/get-user-reviews.usecase";
+import { DeleteReviewUseCase } from "../app/usecases/review/implementations/delete-review.usecase";
+import { DisableReviewUseCase } from "../app/usecases/review/implementations/disable-review.usecase";
 import { SharedDependencies } from "./shared.dependencies";
 
 export interface CourseReviewDependencies {

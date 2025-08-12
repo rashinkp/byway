@@ -1,12 +1,8 @@
 import { PrismaClient } from "@prisma/client";
-import {
-  ICreateEnrollmentInputDTO,
-  IEnrollmentOutputDTO,
-} from "../../app/dtos/course.dto";
 import { IEnrollmentRepository } from "../../app/repositories/enrollment.repository.interface";
 import { HttpError } from "../../presentation/http/errors/http-error";
 import { Enrollment } from "../../domain/entities/enrollment.entity";
-import { IEnrollmentStats } from "../../app/usecases/enrollment/interfaces/get-enrollment-stats.usecase.interface";
+import { IEnrollmentWithDetails, ICreateEnrollmentInput, IEnrollmentStats, IGetEnrollmentStatsInput } from "../../domain/types/enrollment.interface";
 
 export class EnrollmentRepository implements IEnrollmentRepository {
   constructor(private prisma: PrismaClient) {}
@@ -14,7 +10,7 @@ export class EnrollmentRepository implements IEnrollmentRepository {
   async findByUserAndCourse(
     userId: string,
     courseId: string
-  ): Promise<IEnrollmentOutputDTO | null> {
+  ): Promise<IEnrollmentWithDetails | null> {
     try {
       const enrollment = await this.prisma.enrollment.findFirst({
         where: { userId, courseId },
@@ -23,7 +19,7 @@ export class EnrollmentRepository implements IEnrollmentRepository {
       return {
         userId: enrollment.userId,
         courseId: enrollment.courseId,
-        enrolledAt: enrollment.enrolledAt.toISOString(),
+        enrolledAt: enrollment.enrolledAt,
         orderItemId: enrollment.orderItemId || undefined,
         accessStatus: enrollment.accessStatus,
       };
@@ -34,8 +30,8 @@ export class EnrollmentRepository implements IEnrollmentRepository {
   }
 
   async create(
-    input: ICreateEnrollmentInputDTO
-  ): Promise<IEnrollmentOutputDTO[]> {
+    input: ICreateEnrollmentInput
+  ): Promise<IEnrollmentWithDetails[]> {
     console.log("Creating enrollments with input:", input);
     const enrollments = await Promise.all(
       input.courseIds.map(async (courseId) => {
@@ -54,7 +50,7 @@ export class EnrollmentRepository implements IEnrollmentRepository {
           return {
             userId: enrollment.userId,
             courseId: enrollment.courseId,
-            enrolledAt: enrollment.enrolledAt.toISOString(),
+            enrolledAt: enrollment.enrolledAt,
             orderItemId: enrollment.orderItemId || undefined,
             accessStatus: enrollment.accessStatus,
           };
@@ -161,9 +157,8 @@ export class EnrollmentRepository implements IEnrollmentRepository {
     });
   }
 
-  async getEnrollmentStats(): Promise<IEnrollmentStats> {
+  async getEnrollmentStats(input: IGetEnrollmentStatsInput): Promise<IEnrollmentStats> {
     const totalEnrollments = await this.prisma.enrollment.count();
-
     return {
       totalEnrollments,
     };
