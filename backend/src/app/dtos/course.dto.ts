@@ -184,7 +184,6 @@ export type ICourseResponseDTO = ICourseListResponseDTO;
 
 
 
-
 export interface IGetCourseStatsInput {
   userId?: string;
   includeDeleted?: boolean;
