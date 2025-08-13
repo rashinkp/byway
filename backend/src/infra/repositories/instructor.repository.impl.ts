@@ -6,8 +6,8 @@ import { IGetTopInstructorsInput } from "../../app/usecases/user/interfaces/get-
 import { InstructorStats } from "../../domain/types/instructor.interface";
 
 export class PrismaInstructorRepository implements IInstructorRepository {
-  constructor(private prisma: PrismaClient) {}
-
+  constructor(private prisma: PrismaClient) { }
+  
   async createInstructor(instructor: Instructor): Promise<Instructor> {
     const upserted = await this.prisma.instructorDetails.upsert({
       where: {
@@ -157,7 +157,6 @@ export class PrismaInstructorRepository implements IInstructorRepository {
   async getTopInstructors(
     input: IGetTopInstructorsInput
   ): Promise<InstructorStats[]> {
-    // Get all instructors with their courses and enrollments
     const instructors = await this.prisma.user.findMany({
       where: {
         role: "INSTRUCTOR",
