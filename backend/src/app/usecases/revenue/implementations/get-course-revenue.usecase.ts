@@ -1,12 +1,13 @@
-import { IGetCourseRevenueUseCase, GetCourseRevenueParams, GetCourseRevenueResult } from "../interfaces/get-course-revenue.usecase";
+import { IGetCourseRevenueUseCase, } from "../interfaces/get-course-revenue.usecase";
 import { IRevenueRepository } from "../../../repositories/revenue.repository";
 import { TransactionType } from "../../../../domain/enum/transaction-type.enum";
 import { TransactionStatus } from "../../../../domain/enum/transaction-status.enum";
+import { GetCourseRevenueParamsDTO, GetCourseRevenueResultDTO } from "../../../dtos/revenue.dto";
 
 export class GetCourseRevenueUseCase implements IGetCourseRevenueUseCase {
   constructor(private readonly revenueRepository: IRevenueRepository) {}
 
-  async execute(params: GetCourseRevenueParams): Promise<GetCourseRevenueResult> {
+  async execute(params: GetCourseRevenueParamsDTO): Promise<GetCourseRevenueResultDTO> {
     const { startDate, endDate, userId, sortBy = "totalRevenue", sortOrder = "desc", search, page = 1, limit = 10 } = params;
 
     // Get course transactions

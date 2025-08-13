@@ -1,9 +1,6 @@
 import { TransactionType } from "../../domain/enum/transaction-type.enum";
 import { TransactionStatus } from "../../domain/enum/transaction-status.enum";
-import {
-  GetLatestRevenueParams,
-  GetLatestRevenueResult,
-} from "../dtos/revenue.dto";
+import { LatestRevenue } from "../../domain/types/revenue.interface";
 
 export interface GetCourseTransactionsParams {
   startDate: Date;
@@ -65,8 +62,16 @@ export interface IRevenueRepository {
 
   getTotalCourses(params: GetTotalCoursesParams): Promise<number>;
 
-  getLatestRevenue(params: GetLatestRevenueParams): Promise<{
-    items: GetLatestRevenueResult["items"];
+  getLatestRevenue(params: {
+    startDate?: Date;
+    endDate?: Date;
+    userId: string;
+    page?: number;
+    limit?: number;
+    search?: string;
+    sortBy?: "latest" | "oldest";
+  }): Promise<{
+    items: LatestRevenue["items"];
     total: number;
   }>;
 

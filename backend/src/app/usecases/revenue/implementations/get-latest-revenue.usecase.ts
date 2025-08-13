@@ -1,16 +1,13 @@
 import { IGetLatestRevenueUseCase } from "../interfaces/get-latest-revenue.usecase";
 import { IRevenueRepository } from "../../../repositories/revenue.repository";
-import {
-  GetLatestRevenueParams,
-  GetLatestRevenueResult,
-} from "../../../dtos/revenue.dto";
+import { GetLatestRevenueParamsDTO, GetLatestRevenueResultDTO } from "../../../dtos/revenue.dto";
 
 export class GetLatestRevenueUseCase implements IGetLatestRevenueUseCase {
   constructor(private readonly revenueRepository: IRevenueRepository) {}
 
   async execute(
-    params: GetLatestRevenueParams
-  ): Promise<GetLatestRevenueResult> {
+    params: GetLatestRevenueParamsDTO
+  ): Promise<GetLatestRevenueResultDTO> {
     const { page = 1, limit = 10 } = params;
 
     // Get latest revenue data from repository
