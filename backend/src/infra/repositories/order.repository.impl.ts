@@ -2,25 +2,18 @@ import { PrismaClient } from "@prisma/client";
 import { IOrderRepository } from "../../app/repositories/order.repository";
 import { Order } from "../../domain/entities/order.entity";
 import { Course } from "../../domain/entities/course.entity";
-import { v4 as uuidv4 } from "uuid";
 import { OrderStatus } from "../../domain/enum/order-status.enum";
 import { PaymentStatus } from "../../domain/enum/payment-status.enum";
 import { PaymentGateway } from "../../domain/enum/payment-gateway.enum";
-import { GetAllOrdersDto } from "../../app/dtos/order.dto";
+import { OrderFilters, PaginatedOrderResult, OrderItemCreation, CourseOrderData } from "../../domain/types/order.interface";
 
 export class OrderRepository implements IOrderRepository {
   constructor(private prisma: PrismaClient) {}
 
   async findAll(
     userId: string,
-    filters: GetAllOrdersDto
-  ): Promise<{
-    orders: Order[];
-    total: number;
-    page: number;
-    limit: number;
-    totalPages: number;
-  }> {
+    filters: OrderFilters
+  ): Promise<PaginatedOrderResult> {
     const {
       page = 1,
       limit = 10,
@@ -157,7 +150,7 @@ export class OrderRepository implements IOrderRepository {
 
   async createOrder(
     userId: string,
-    courses: any[],
+    courses: CourseOrderData[],
     paymentMethod: PaymentGateway,
     couponCode?: string
   ): Promise<Order> {
@@ -339,8 +332,8 @@ export class OrderRepository implements IOrderRepository {
 
   async createOrderItems(
     orderId: string,
-    courses: any[]
-  ): Promise<{ id: string; orderId: string; courseId: string }[]> {
+    courses: CourseOrderData[]
+  ): Promise<OrderItemCreation[]> {
     const orderItems = await Promise.all(
       courses.map(async (course) => {
         const orderItem = await this.prisma.orderItem.create({
@@ -363,9 +356,7 @@ export class OrderRepository implements IOrderRepository {
 
   async findOrderItems(
     orderId: string
-  ): Promise<
-    { id: string; orderId: string; courseId: string; coursePrice: number }[]
-  > {
+  ): Promise<OrderItemCreation[]> {
     const orderItems = await this.prisma.orderItem.findMany({
       where: { orderId },
       include: {
@@ -376,7 +367,6 @@ export class OrderRepository implements IOrderRepository {
       id: item.id,
       orderId: item.orderId,
       courseId: item.courseId,
-      coursePrice: Number(item.coursePrice),
     }));
   }
 

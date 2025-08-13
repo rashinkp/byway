@@ -1,11 +1,11 @@
 import { IOrderRepository } from "../../../repositories/order.repository";
 import { IGetAllOrdersUseCase } from "../interfaces/get-all-orders.usecase.interface";
-import { GetAllOrdersDto } from "../../../dtos/order.dto";
+import { OrdersResponseDto, OrderDto, GetAllOrdersDto } from "../../../dtos/order.dto";
 
 export class GetAllOrdersUseCase implements IGetAllOrdersUseCase {
   constructor(private orderRepository: IOrderRepository) {}
 
-  async execute(userId: string, filters: GetAllOrdersDto) {
+  async execute(userId: string, filters: GetAllOrdersDto): Promise<OrdersResponseDto> {
     try {
       const {
         page = 1,
@@ -63,7 +63,7 @@ export class GetAllOrdersUseCase implements IGetAllOrdersUseCase {
       });
 
       return {
-        orders,
+        orders: orders,
         total,
         page,
         limit,
