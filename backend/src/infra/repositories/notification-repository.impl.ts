@@ -1,8 +1,11 @@
 import { NotificationRepositoryInterface } from "../../app/repositories/notification-repository.interface";
 import { Notification } from "../../domain/entities/notification.entity";
-import { NotificationDTO } from "../../app/dtos/notification.dto";
 import { PrismaClient } from "@prisma/client";
 import { NotificationEntityType } from "../../domain/enum/notification-entity-type.enum";
+import { NotificationEventType } from "../../domain/enum/notification-event-type.enum";
+import { UserId } from "../../domain/value-object/UserId";
+import { Timestamp } from "../../domain/value-object/Timestamp";
+import { PaginatedNotificationList } from "../../domain/types/notification.interface";
 
 export class PrismaNotificationRepository
   implements NotificationRepositoryInterface
@@ -41,7 +44,22 @@ export class PrismaNotificationRepository
     }
   }
 
-  async create(notification: Notification): Promise<NotificationDTO> {
+  private toDomain(row: any): Notification {
+    return new Notification(
+      row.id,
+      new UserId(row.userId),
+      row.eventType as NotificationEventType,
+      row.entityType as NotificationEntityType,
+      row.entityId,
+      row.entityName,
+      row.message,
+      row.link,
+      new Timestamp(row.createdAt),
+      new Timestamp(row.expiresAt)
+    );
+  }
+
+  async create(notification: Notification): Promise<Notification> {
     const created = await this.prisma.notification.create({
       data: {
         userId: notification.userId.value,
@@ -55,20 +73,20 @@ export class PrismaNotificationRepository
         expiresAt: notification.expiresAt.value,
       },
     });
-    return this.toDTO(created);
+    return this.toDomain(created);
   }
 
-  async findById(id: string): Promise<NotificationDTO | null> {
+  async findById(id: string): Promise<Notification | null> {
     const found = await this.prisma.notification.findUnique({ where: { id } });
-    return found ? this.toDTO(found) : null;
+    return found ? this.toDomain(found) : null;
   }
 
-  async findByUserId(userId: string): Promise<NotificationDTO[]> {
+  async findByUserId(userId: string): Promise<Notification[]> {
     const found = await this.prisma.notification.findMany({
       where: { userId },
       orderBy: { createdAt: "desc" },
     });
-    return found.map(this.toDTO);
+    return found.map((n) => this.toDomain(n));
   }
 
   async findManyByUserId(options: {
@@ -79,12 +97,7 @@ export class PrismaNotificationRepository
     sortOrder?: "asc" | "desc";
     eventType?: string;
     search?: string;
-  }): Promise<{
-    items: NotificationDTO[];
-    total: number;
-    hasMore: boolean;
-    nextPage?: number;
-  }> {
+  }): Promise<PaginatedNotificationList> {
     const {
       userId,
       skip = 0,
@@ -114,7 +127,7 @@ export class PrismaNotificationRepository
     const hasMore = skip + take < total;
     const nextPage = hasMore ? Math.floor(skip / take) + 2 : undefined;
     return {
-      items: items.map(this.toDTO),
+      items: items.map((n) => this.toDomain(n)),
       total,
       hasMore,
       nextPage,
@@ -131,20 +144,5 @@ export class PrismaNotificationRepository
       where: { expiresAt: { lt: now } },
     });
     return deleted.count;
-  }
-
-  private toDTO(notification: any): NotificationDTO {
-    return {
-      id: notification.id,
-      userId: notification.userId,
-      eventType: notification.eventType,
-      entityType: notification.entityType,
-      entityId: notification.entityId,
-      entityName: notification.entityName,
-      message: notification.message,
-      link: notification.link,
-      createdAt: notification.createdAt.toISOString(),
-      expiresAt: notification.expiresAt.toISOString(),
-    };
   }
 }

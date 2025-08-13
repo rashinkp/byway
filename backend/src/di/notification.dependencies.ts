@@ -1,4 +1,4 @@
-import { PrismaNotificationRepository } from "../infra/repositories/notification-repository.prisma";
+import { PrismaNotificationRepository } from "../infra/repositories/notification-repository.impl";
 import { NotificationRepositoryInterface } from "../app/repositories/notification-repository.interface";
 import { GetUserNotificationsUseCase } from "../app/usecases/notification/implementations/get-user-notifications.usecase";
 import { CreateNotificationsForUsersUseCase } from "../app/usecases/notification/implementations/create-notifications-for-users.usecase";
