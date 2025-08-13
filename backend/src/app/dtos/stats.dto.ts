@@ -16,7 +16,7 @@ export interface Person {
 
 
 
-export interface InstructorStats {
+export interface InstructorStatsDTO {
   instructorId: string;
   instructorName: string;
   email: string;
@@ -71,7 +71,7 @@ export interface DashboardStats {
 export interface DashboardResponse {
   stats: DashboardStats;
   topCourses?: CourseStats[];
-  topInstructors?: InstructorStats[];
+  topInstructors?: InstructorStatsDTO[];
   topStudents?: StudentStats[];
 }
 
