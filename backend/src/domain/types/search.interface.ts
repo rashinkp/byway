@@ -55,18 +55,9 @@ export interface CertificateList {
   limit: number;
 }
 
-
-export interface ISearchResultDTO {
+export interface ISearchResult {
   instructors: InstructorList;
   courses: CourseList;
   categories: CategoryList;
   certificates: CertificateList;
-}
-
-
-export interface SearchParamsDTO {
-  query: string;
-  page?: number;
-  limit?: number;
-  userId?: string;
 }
