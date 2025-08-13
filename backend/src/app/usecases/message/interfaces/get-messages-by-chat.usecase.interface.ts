@@ -1,4 +1,4 @@
-import { MessageResponseDTO } from "../../..//dtos/chat.dto";
+import { MessageResponseDTO } from "../../../dtos/message.dto";
 import { ChatId } from "../../../../domain/value-object/ChatId";
 
 export interface IGetMessagesByChatUseCase {

@@ -1,4 +1,22 @@
-import { MessageType } from "../../domain/enum/Message-type.enum";
+import { MessageType } from "../enum/Message-type.enum";
+
+// Domain interfaces for repositories (not DTOs)
+export interface IMessageWithUserData {
+  id: string;
+  chatId: string;
+  senderId: string;
+  content?: string;
+  imageUrl?: string;
+  audioUrl?: string;
+  isRead: boolean;
+  type: MessageType;
+  createdAt: Date;
+  sender: {
+    id: string;
+    name: string;
+    role: string;
+  };
+}
 
 // Input DTO for sending messages
 export interface SendMessageInputDTO {
@@ -76,3 +94,4 @@ export class EnrichedMessageDTO {
     role: string;
   };
 }
+

@@ -5,7 +5,7 @@ import { ChatId } from "../../domain/value-object/ChatId";
 import { UserId } from "../../domain/value-object/UserId";
 import { MessageContent } from "../../domain/value-object/MessageContent";
 import { Timestamp } from "../../domain/value-object/Timestamp";
-import { EnrichedMessageDTO } from "../../app/dtos/message.dto";
+import { IMessageWithUserData } from "../../domain/types/message.interface";
 import { MessageType as DomainMessageType } from "../../domain/enum/Message-type.enum";
 import { MessageType as PrismaMessageType, PrismaClient } from "@prisma/client";
 
@@ -32,7 +32,7 @@ export class MessageRepository implements IMessageRepository {
     chatId: ChatId,
     limit = 20,
     beforeMessageId?: string
-  ): Promise<EnrichedMessageDTO[]> {
+  ): Promise<IMessageWithUserData[]> {
     let beforeDate: Date | undefined = undefined;
     if (beforeMessageId) {
       const beforeMsg = await prisma.message.findUnique({
@@ -81,7 +81,7 @@ export class MessageRepository implements IMessageRepository {
 
   async findByIdWithUserData(
     id: MessageId
-  ): Promise<EnrichedMessageDTO | null> {
+  ): Promise<IMessageWithUserData | null> {
     const message = await prisma.message.findUnique({
       where: { id: id.value },
       include: {
@@ -147,8 +147,8 @@ export class MessageRepository implements IMessageRepository {
     await prisma.message.delete({ where: { id: id.value } });
   }
 
-  async markAllAsRead(chatId: ChatId, userId: UserId): Promise<void> {
-    await prisma.message.updateMany({
+  async markAllAsRead(chatId: ChatId, userId: UserId): Promise<number> {
+    const result = await prisma.message.updateMany({
       where: {
         chatId: chatId.value,
         senderId: { not: userId.value },
@@ -156,6 +156,7 @@ export class MessageRepository implements IMessageRepository {
       },
       data: { isRead: true },
     });
+    return result.count;
   }
 
   async getTotalUnreadCount(userId: UserId): Promise<number> {

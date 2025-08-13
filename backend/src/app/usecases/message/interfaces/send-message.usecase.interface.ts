@@ -1,15 +1,5 @@
-import { MessageResponseDTO } from "../../../dtos/chat.dto";
-
-
-export interface SendMessageInput {
-  chatId?: string;
-  userId?: string; // recipient
-  senderId: string;
-  content?: string;
-  imageUrl?: string;
-  audioUrl?: string;
-}
+import { MessageResponseDTO, SendMessageInputDTO } from "../../../dtos/message.dto";
 
 export interface ISendMessageUseCase {
-  execute(input: SendMessageInput): Promise<MessageResponseDTO>;
+  execute(input: SendMessageInputDTO): Promise<MessageResponseDTO>;
 }

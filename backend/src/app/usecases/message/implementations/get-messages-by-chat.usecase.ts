@@ -2,7 +2,7 @@ import { IGetMessagesByChatUseCase } from "../interfaces/get-messages-by-chat.us
 import { IMessageRepository } from "../../../repositories/message.repository.interface";
 import { IChatRepository } from "../../../repositories/chat.repository.interface";
 import { ChatId } from "../../../../domain/value-object/ChatId";
-import { MessageResponseDTO } from "../../..//dtos/chat.dto";
+import { MessageResponseDTO } from "../../../dtos/message.dto";
 
 export class GetMessagesByChatUseCase implements IGetMessagesByChatUseCase {
   constructor(
@@ -37,6 +37,7 @@ export class GetMessagesByChatUseCase implements IGetMessagesByChatUseCase {
         imageUrl: msg.imageUrl ? msg.imageUrl : undefined, // Include S3 image URL
         audioUrl: msg.audioUrl ? msg.audioUrl : undefined, // Include S3 audio URL
         isRead: msg.isRead,
+        type: msg.type,
         timestamp: msg.createdAt ? new Date(msg.createdAt).toISOString() : "",
       };
     });
