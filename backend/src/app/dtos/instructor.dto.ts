@@ -59,18 +59,10 @@ export interface InstructorResponseDTO {
   education: string;
   certifications: string;
   cv: string;
-  status: APPROVALSTATUS;
+  status: string;
   totalStudents: number;
   createdAt: Date;
   updatedAt: Date;
-  user: {
-    id: string;
-    name: string;
-    email: string;
-    role: Role;
-    avatar?: string;
-    deletedAt?: Date | string | null;
-  };
 }
 
 export interface PublicInstructorResponseDTO {
@@ -87,3 +79,37 @@ export interface PublicInstructorResponseDTO {
     avatar?: string;
   };
 }
+
+
+
+export interface InstructorWithUserDTO extends InstructorResponseDTO {
+  user:{
+    id: string;
+    name: string;
+    email: string;
+    role: Role;
+    avatar?: string;
+    deletedAt?: Date | string | null;
+  };
+}
+
+
+export interface CombinedInstructorDTO  {
+  userId: string;
+  instructorId: string;
+  name: string;
+  email: string;
+  avatar: string | null;
+  areaOfExpertise: string;
+  professionalExperience: string;
+  about?: string;
+  website?: string;
+  education: string;
+  certifications: string;
+  cv: string;
+  totalStudents: number;
+  status: string;
+  createdAt: Date | string;
+  updatedAt: Date | string;
+  deletedAt: Date | string | null;
+};

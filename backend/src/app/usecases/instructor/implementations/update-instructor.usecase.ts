@@ -1,22 +1,20 @@
-import { UpdateInstructorRequestDTO } from "../../../dtos/instructor.dto";
+import { InstructorResponseDTO, UpdateInstructorRequestDTO } from "../../../dtos/instructor.dto";
 import { Instructor } from "../../../../domain/entities/instructor.entity";
 import { Role } from "../../../../domain/enum/role.enum";
 import { HttpError } from "../../../../presentation/http/errors/http-error";
 import { IInstructorRepository } from "../../../repositories/instructor.repository";
-import { IUserRepository } from "../../../repositories/user.repository";
 import { IUpdateInstructorUseCase } from "../interfaces/update-instructor.usecase.interface";
 import { UserDTO } from "../../../dtos/general.dto";
 
 export class UpdateInstructorUseCase implements IUpdateInstructorUseCase {
   constructor(
     private instructorRepository: IInstructorRepository,
-    private userRepository: IUserRepository
   ) {}
 
   async execute(
     dto: UpdateInstructorRequestDTO,
     requestingUser: UserDTO
-  ): Promise<Instructor> {
+  ): Promise<InstructorResponseDTO> {
     const instructor = await this.instructorRepository.findInstructorById(
       dto.id
     );

@@ -1,6 +1,7 @@
 import {
   GetAllInstructorsRequestDTO,
   InstructorResponseDTO,
+  InstructorWithUserDTO,
 } from "../../../dtos/instructor.dto";
 import { APPROVALSTATUS } from "../../../../domain/enum/approval-status.enum";
 import { IInstructorRepository } from "../../../repositories/instructor.repository";
@@ -31,7 +32,7 @@ export class GetAllInstructorsUseCase implements IGetAllInstructorsUseCase {
         }
       );
 
-    const instructorResponses: InstructorResponseDTO[] = [];
+    const instructorResponses: InstructorWithUserDTO[] = [];
     for (const instructor of items) {
       const user = await this.userRepository.findById(instructor.userId);
       if (user) {

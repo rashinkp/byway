@@ -1,5 +1,4 @@
-import { DeclineInstructorRequestDTO } from "../../../dtos/instructor.dto";
-import { Instructor } from "../../../../domain/entities/instructor.entity";
+import { DeclineInstructorRequestDTO, InstructorResponseDTO } from "../../../dtos/instructor.dto";
 import { Role } from "../../../../domain/enum/role.enum";
 import { HttpError } from "../../../../presentation/http/errors/http-error";
 import { IInstructorRepository } from "../../../repositories/instructor.repository";
@@ -20,7 +19,7 @@ export class DeclineInstructorUseCase implements IDeclineInstructorUseCase {
   async execute(
     dto: DeclineInstructorRequestDTO,
     requestingUser: UserDTO
-  ): Promise<Instructor> {
+  ): Promise<InstructorResponseDTO> {
     if (requestingUser.role !== Role.ADMIN) {
       throw new HttpError("Unauthorized: Admin access required", 403);
     }

@@ -1,4 +1,4 @@
-import { CreateInstructorRequestDTO } from "../../../dtos/instructor.dto";
+import { CreateInstructorRequestDTO, InstructorResponseDTO } from "../../../dtos/instructor.dto";
 import { Instructor } from "../../../../domain/entities/instructor.entity";
 import { Role } from "../../../../domain/enum/role.enum";
 import { HttpError } from "../../../../presentation/http/errors/http-error";
@@ -16,7 +16,7 @@ export class CreateInstructorUseCase implements ICreateInstructorUseCase {
   async execute(
     dto: CreateInstructorRequestDTO & { userId: string },
     requestingUser: UserDTO
-  ): Promise<Instructor> {
+  ): Promise<InstructorResponseDTO> {
     if (
       requestingUser.id !== dto.userId &&
       requestingUser.role !== Role.ADMIN
