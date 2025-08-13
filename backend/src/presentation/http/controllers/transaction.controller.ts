@@ -8,7 +8,7 @@ import { IGetTransactionByIdUseCase } from "../../../app/usecases/transaction/in
 import { IGetTransactionsByOrderUseCase } from "../../../app/usecases/transaction/interfaces/get-transactions-by-order.usecase.interface";
 import { IGetTransactionsByUserUseCase } from "../../../app/usecases/transaction/interfaces/get-transactions-by-user.usecase.interface";
 import { IUpdateTransactionStatusUseCase } from "../../../app/usecases/transaction/interfaces/update-transaction-status.usecase.interface";
-import { JwtPayload } from "../../express/middlewares/auth.middleware";
+import { UserDTO } from "../../../app/dtos/general.dto";
 
 export class TransactionController extends BaseController {
   constructor(
@@ -67,7 +67,7 @@ export class TransactionController extends BaseController {
     httpRequest: IHttpRequest
   ): Promise<IHttpResponse> {
     return this.handleRequest(httpRequest, async (request) => {
-      const user = request.user as JwtPayload | undefined;
+      const user = request.user as UserDTO | undefined;
       if (!user?.id) {
         throw new Error("User not authenticated");
       }

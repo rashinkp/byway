@@ -1,10 +1,10 @@
 import { CreateInstructorRequestDTO } from "../../../dtos/instructor.dto";
 import { Instructor } from "../../../../domain/entities/instructor.entity";
-import { JwtPayload } from "../../../../presentation/express/middlewares/auth.middleware";
+import { UserDTO } from "../../../dtos/general.dto";
 
 export interface ICreateInstructorUseCase {
   execute(
     dto: CreateInstructorRequestDTO & { userId: string },
-    requestingUser: JwtPayload
+    requestingUser: UserDTO
   ): Promise<Instructor>;
 }

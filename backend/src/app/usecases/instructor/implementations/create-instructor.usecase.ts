@@ -1,11 +1,11 @@
 import { CreateInstructorRequestDTO } from "../../../dtos/instructor.dto";
 import { Instructor } from "../../../../domain/entities/instructor.entity";
 import { Role } from "../../../../domain/enum/role.enum";
-import { JwtPayload } from "../../../../presentation/express/middlewares/auth.middleware";
 import { HttpError } from "../../../../presentation/http/errors/http-error";
 import { IInstructorRepository } from "../../../repositories/instructor.repository";
 import { IUserRepository } from "../../../repositories/user.repository";
 import { ICreateInstructorUseCase } from "../interfaces/create-instructor.usecase.interface";
+import { UserDTO } from "../../../dtos/general.dto";
 
 export class CreateInstructorUseCase implements ICreateInstructorUseCase {
   constructor(
@@ -15,7 +15,7 @@ export class CreateInstructorUseCase implements ICreateInstructorUseCase {
 
   async execute(
     dto: CreateInstructorRequestDTO & { userId: string },
-    requestingUser: JwtPayload
+    requestingUser: UserDTO
   ): Promise<Instructor> {
     if (
       requestingUser.id !== dto.userId &&

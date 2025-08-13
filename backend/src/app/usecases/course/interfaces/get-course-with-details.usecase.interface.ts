@@ -1,9 +1,9 @@
 import { ICourseWithEnrollmentDTO } from "../../../dtos/course.dto";
-import { JwtPayload } from "jsonwebtoken";
+import { UserDTO } from "../../../dtos/general.dto";
 
 export interface IGetCourseWithDetailsUseCase {
   execute(
     courseId: string,
-    user?: JwtPayload
+    user?: UserDTO
   ): Promise<ICourseWithEnrollmentDTO | null>;
 }

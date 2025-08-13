@@ -1,4 +1,4 @@
-import { JwtPayload } from "../../express/middlewares/auth.middleware";
+import { UserDTO } from "../../../app/dtos/general.dto";
 import { Response } from "express";
 
 export interface IHttpRequest {
@@ -6,7 +6,8 @@ export interface IHttpRequest {
   body?: any;
   params: Record<string, string>;
   query?: Record<string, string>;
-  user?: JwtPayload; 
+  user?: UserDTO;
   cookies?: Record<string, any>;
   res?: Response;
 }
+                                                                                                         
