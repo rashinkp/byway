@@ -1,5 +1,4 @@
-import { ToggleDeleteUserDto } from "../../../dtos/user.dto";
-import { User } from "../../../../domain/entities/user.entity";
+import { ToggleDeleteUserDto, UserResponseDTO } from "../../../dtos/user.dto";
 import { HttpError } from "../../../../presentation/http/errors/http-error";
 import { IUserRepository } from "../../../repositories/user.repository";
 import { IToggleDeleteUserUseCase } from "../interfaces/toggle-delete-user.usecase.interface";
@@ -16,7 +15,7 @@ export class ToggleDeleteUserUseCase implements IToggleDeleteUserUseCase {
   async execute(
     dto: ToggleDeleteUserDto,
     currentUser: { id: string; role: string }
-  ): Promise<User> {
+  ): Promise<UserResponseDTO> {
     if (currentUser.role !== "ADMIN") {
       throw new HttpError("Unauthorized: Admin role required", 403);
     }

@@ -1,11 +1,9 @@
-import { GetUserDto } from "../../../dtos/user.dto";
-import { User } from "../../../../domain/entities/user.entity";
-import { UserProfile } from "../../../../domain/entities/user-profile.entity";
-import { Instructor } from "../../../../domain/entities/instructor.entity";
+import { GetUserDto, ProfileDTO, UserResponseDTO } from "../../../dtos/user.dto";
 import { HttpError } from "../../../../presentation/http/errors/http-error";
 import { IUserRepository } from "../../../repositories/user.repository";
 import { IInstructorRepository } from "../../../repositories/instructor.repository";
 import { IGetUserAdminDetailsUseCase } from "../interfaces/get-user-admin-details.usecase.interface";
+import { InstructorResponseDTO } from "../../../dtos/instructor.dto";
 
 export class GetUserAdminDetailsUseCase implements IGetUserAdminDetailsUseCase {
   constructor(
@@ -14,9 +12,9 @@ export class GetUserAdminDetailsUseCase implements IGetUserAdminDetailsUseCase {
   ) {}
 
   async execute(dto: GetUserDto): Promise<{
-    user: User;
-    profile: UserProfile | null;
-    instructor: Instructor | null;
+    user: UserResponseDTO;
+    profile: ProfileDTO | null;
+    instructor: InstructorResponseDTO | null;
   }> {
     const user = await this.userRepository.findById(dto.userId);
     if (!user) {

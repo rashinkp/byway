@@ -1,10 +1,11 @@
+import { IGetUserStatsInputDTO, IUserStatsDTO } from "../../../dtos/user.dto";
 import { IUserRepository } from "../../../repositories/user.repository";
-import { IGetUserStatsUseCase, IUserStats, IGetUserStatsInput } from "../interfaces/get-user-stats.usecase.interface";
+import { IGetUserStatsUseCase } from "../interfaces/get-user-stats.usecase.interface";
 
 export class GetUserStatsUseCase implements IGetUserStatsUseCase {
   constructor(private readonly userRepository: IUserRepository) {}
 
-  async execute(input: IGetUserStatsInput): Promise<IUserStats> {
+  async execute(input: IGetUserStatsInputDTO): Promise<IUserStatsDTO> {
     return this.userRepository.getUserStats(input);
   }
 } 

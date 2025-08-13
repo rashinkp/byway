@@ -1,5 +1,8 @@
-import { User } from "../../../../domain/entities/user.entity";
+
+import { UserResponseDTO } from "../../../dtos/user.dto";
 
 export interface IGetCurrentUserUseCase {
-  execute(userId: string): Promise<{ user: User, cartCount: number }>;
+  execute(
+    userId: string
+  ): Promise<{ user: UserResponseDTO; cartCount: number }>;
 }

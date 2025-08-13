@@ -1,4 +1,4 @@
-import { UpdateUserDto } from "../../../dtos/user.dto";
+import { ProfileDTO, UpdateUserDto, UserResponseDTO } from "../../../dtos/user.dto";
 import { User } from "../../../../domain/entities/user.entity";
 import { UserProfile } from "../../../../domain/entities/user-profile.entity";
 import { Role } from "../../../../domain/enum/role.enum";
@@ -16,7 +16,7 @@ export class UpdateUserUseCase implements IUpdateUserUseCase {
   async execute(
     dto: UpdateUserDto,
     userId: string
-  ): Promise<{ user: User; profile: UserProfile | null }> {
+  ): Promise<{ user: UserResponseDTO; profile: ProfileDTO | null }> {
     const user = await this.userRepository.findById(userId);
     if (!user) {
       throw new HttpError("User not found", 404);

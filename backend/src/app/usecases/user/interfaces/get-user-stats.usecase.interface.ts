@@ -1,14 +1,6 @@
-export interface IUserStats {
-  totalUsers: number;
-  activeUsers: number;
-  inactiveUsers: number;
-  totalInstructors: number;
-  activeInstructors: number;
-  inactiveInstructors: number;
-}
+import { IGetUserStatsInputDTO, IUserStatsDTO } from "../../../dtos/user.dto";
 
-export type IGetUserStatsInput = object;
 
 export interface IGetUserStatsUseCase {
-  execute(input: IGetUserStatsInput): Promise<IUserStats>;
+  execute(input: IGetUserStatsInputDTO): Promise<IUserStatsDTO>;
 } 

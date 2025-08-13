@@ -31,43 +31,12 @@ export class TransactionRepository implements ITransactionRepository {
     });
   }
 
-  private mapPrismaTransactionType(
-    type: PrismaTransactionType
-  ): TransactionType {
-    return type as TransactionType;
-  }
 
-  private mapPrismaTransactionStatus(
-    status: PrismaTransactionStatus
-  ): TransactionStatus {
-    return status as TransactionStatus;
-  }
-
-  private mapPrismaPaymentGateway(
-    gateway: PrismaPaymentGateway | null
-  ): PaymentGateway {
-    if (!gateway) {
-      throw new Error("Payment gateway is required");
-    }
-    return gateway as PaymentGateway;
-  }
-
-  private mapToPrismaTransactionType(
-    type: TransactionType
-  ): PrismaTransactionType {
-    return type as PrismaTransactionType;
-  }
 
   private mapToPrismaTransactionStatus(
     status: TransactionStatus
   ): PrismaTransactionStatus {
     return status as PrismaTransactionStatus;
-  }
-
-  private mapToPrismaPaymentGateway(
-    gateway: PaymentGateway
-  ): PrismaPaymentGateway {
-    return gateway as PrismaPaymentGateway;
   }
 
   async create(transaction: Transaction): Promise<Transaction> {
@@ -155,4 +124,6 @@ export class TransactionRepository implements ITransactionRepository {
   async countByUserId(userId: string): Promise<number> {
     return this.prisma.transactionHistory.count({ where: { userId } });
   }
+
+  
 }

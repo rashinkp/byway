@@ -92,3 +92,33 @@ export interface UserResponseDTO {
   updatedAt?: Date,
   createdAt: Date
 }
+
+
+export interface ProfileDTO {
+  id: string;
+  userId: string;
+  bio?: string;
+  education?: string;
+  skills?: string;
+  phoneNumber?: string;
+  country?: string;
+  city?: string;
+  address?: string;
+  dateOfBirth?: Date;
+  gender?: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+
+
+export interface IUserStatsDTO {
+  totalUsers: number;
+  activeUsers: number;
+  inactiveUsers: number;
+  totalInstructors: number;
+  activeInstructors: number;
+  inactiveInstructors: number;
+}
+
+export type IGetUserStatsInputDTO = object;
