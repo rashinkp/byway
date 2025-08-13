@@ -482,7 +482,7 @@ export class PaymentService implements IPaymentService {
         return;
       }
 
-      const { users: admins } = await this.userRepository.findAll({
+      const { items: admins } = await this.userRepository.findAll({
         role: "ADMIN",
         page: 1,
         limit: 1,

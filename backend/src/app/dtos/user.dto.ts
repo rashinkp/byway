@@ -88,7 +88,7 @@ export interface UserResponseDTO {
   authProvider: AuthProvider,
   isVerified: boolean,
   avatar?: string,
-  deletedAT?: Date,
+  deletedAt?: Date,
   updatedAt?: Date,
   createdAt: Date
 }

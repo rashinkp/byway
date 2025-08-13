@@ -1,7 +1,7 @@
+import { PaginatedResult } from "../../../../domain/types/pagination-filter.interface";
 import { GetAllUsersDto, UserResponseDTO } from "../../../dtos/user.dto";
 
 import {
-  IPaginatedResponse,
   IUserRepository,
 } from "../../../repositories/user.repository";
 import { IGetAllUsersUseCase } from "../interfaces/get-all-users.usecase.interface";
@@ -11,7 +11,7 @@ export class GetAllUsersUseCase implements IGetAllUsersUseCase {
 
   async execute(
     dto: GetAllUsersDto
-  ): Promise<IPaginatedResponse<UserResponseDTO>> {
+  ): Promise<PaginatedResult<UserResponseDTO>> {
     let input = {
       page: dto.page || 1,
       limit: dto.limit || 10,

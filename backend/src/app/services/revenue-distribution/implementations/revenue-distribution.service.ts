@@ -107,7 +107,7 @@ export class RevenueDistributionService implements IRevenueDistributionService {
   }
 
   private async getAdminUserId(): Promise<string> {
-    const { users } = await this.userRepository.findAll({
+    const { items } = await this.userRepository.findAll({
       role: "ADMIN",
       page: 1,
       limit: 1,
@@ -118,10 +118,10 @@ export class RevenueDistributionService implements IRevenueDistributionService {
       sortOrder: "asc",
     });
 
-    if (!users || users.length === 0) {
+    if (!items || items.length === 0) {
       throw new HttpError("Admin user not found", StatusCodes.NOT_FOUND);
     }
-    return users[0].id;
+    return items[0].id;
   }
 
   private async updateWallets(
@@ -242,7 +242,6 @@ export class RevenueDistributionService implements IRevenueDistributionService {
       });
     } catch (error) {
       console.error("Error sending purchase notifications:", error);
-      // Don't throw error to avoid breaking the revenue distribution process
     }
   }
 }
