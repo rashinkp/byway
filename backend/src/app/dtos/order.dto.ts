@@ -1,3 +1,7 @@
+import { Order } from "../../domain/entities/order.entity";
+import { Transaction } from "../../domain/entities/transaction.entity";
+import { ITransactionOutputDTO } from "./transaction.dto";
+
 export interface GetAllOrdersDto {
   page?: number; // default 1
   limit?: number; // default 10
@@ -86,4 +90,30 @@ export interface CreateOrderDto {
   courses: CourseDto[];
   paymentMethod: PaymentMethod;
   couponCode?: string;
+}
+
+
+
+export interface RetryOrderResponseDTO {
+  order: Order;
+  transaction: Transaction;
+  session: {
+    id: string;
+    url: string;
+    payment_status: string;
+    amount_total: number;
+  };
+}
+
+
+
+export interface CreateOrderResponseDTO {
+  order: Order;
+  transaction?: ITransactionOutputDTO;
+  session?: {
+    id: string;
+    url: string;
+    payment_status: string;
+    amount_total: number;
+  };
 }
