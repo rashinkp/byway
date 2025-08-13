@@ -1,3 +1,5 @@
+import { Transaction } from "../../domain/entities/transaction.entity";
+
 export interface AddMoneyDto {
   amount: number;
   currency?: string;
@@ -21,3 +23,14 @@ export interface WalletResponseDto {
   createdAt: Date;
   updatedAt: Date;
 } 
+
+
+export interface TopUpWalletResponseDTO {
+  transaction: Transaction;
+  session?: {
+    id: string;
+    url: string;
+    payment_status: string;
+    amount_total: number;
+  };
+}
