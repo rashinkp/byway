@@ -59,7 +59,7 @@ export class CartController extends BaseController {
 
       // Format cart items to include course data
       const formattedCart = cart.map((item) => ({
-        ...item.toJSON(),
+        ...item,
         course: item.course
           ? {
               id: item.course.id,

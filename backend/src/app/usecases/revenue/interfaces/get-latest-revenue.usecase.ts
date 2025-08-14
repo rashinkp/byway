@@ -1,6 +1,6 @@
 import {
-  GetLatestRevenueParams,
-  GetLatestRevenueResult,
+  GetLatestRevenueParamsDTO,
+  GetLatestRevenueResultDTO,
 } from "../../../dtos/revenue.dto";
 
 export interface CourseRevenueItem {
@@ -17,5 +17,5 @@ export interface CourseRevenueItem {
 }
 
 export interface IGetLatestRevenueUseCase {
-  execute(params: GetLatestRevenueParams): Promise<GetLatestRevenueResult>;
+  execute(params: GetLatestRevenueParamsDTO): Promise<GetLatestRevenueResultDTO>;
 }

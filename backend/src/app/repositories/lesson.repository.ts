@@ -1,16 +1,16 @@
-import {
-  IGetAllLessonsInputDTO,
-  IGetPublicLessonsInputDTO,
-  ILessonListOutputDTO,
-  IPublicLessonListOutputDTO,
-} from "../dtos/lesson.dto";
 import { Lesson } from "../../domain/entities/lesson.entity";
+import {
+  ILessonFilterOptions,
+  ILessonListResponse,
+  IPublicLessonFilterOptions,
+  IPublicLessonListResponse,
+} from "../../domain/types/lesson.interface";
 
 export interface ILessonRepository {
-  getAllLessons(params: IGetAllLessonsInputDTO): Promise<ILessonListOutputDTO>;
+  getAllLessons(params: ILessonFilterOptions): Promise<ILessonListResponse>;
   getPublicLessons(
-    params: IGetPublicLessonsInputDTO
-  ): Promise<IPublicLessonListOutputDTO>;
+    params: IPublicLessonFilterOptions
+  ): Promise<IPublicLessonListResponse>;
   findById(id: string): Promise<Lesson | null>;
   findByCourseIdAndOrder(
     courseId: string,

@@ -1,7 +1,9 @@
 import { PrismaClient } from "@prisma/client";
 import { Category } from "../../domain/entities/category.entity";
 import { ICategoryRepository } from "../../app/repositories/category.repository";
-import { IGetAllCategoriesInputDTO } from "../../app/dtos/category.dto";
+import { PaginationFilter } from "../../domain/types/pagination-filter.interface";
+
+
 export class CategoryRepository implements ICategoryRepository {
   constructor(private prisma: PrismaClient) {}
 
@@ -15,8 +17,6 @@ export class CategoryRepository implements ICategoryRepository {
       updatedAt: category.updatedAt,
       deletedAt: category.deletedAt ? category.deletedAt : null,
     };
-
-    console.log("Saving category with createdBy:", data.createdBy);
 
     const saved = await this.prisma.category.upsert({
       where: { id: category.id },
@@ -40,7 +40,7 @@ export class CategoryRepository implements ICategoryRepository {
   }
 
   async findAll(
-    input: IGetAllCategoriesInputDTO
+    input: PaginationFilter
   ): Promise<{ categories: Category[]; total: number }> {
     const {
       page = 1,

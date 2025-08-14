@@ -1,14 +1,11 @@
 import { CertificateRepositoryInterface } from "../../app/repositories/certificate-repository.interface";
 import { Certificate } from "../../domain/entities/certificate.entity";
-import { CertificateDTO } from "../../app/dtos/certificate.dto";
 import { PrismaClient } from "@prisma/client";
 
-export class PrismaCertificateRepository
-  implements CertificateRepositoryInterface
-{
+export class PrismaCertificateRepository implements CertificateRepositoryInterface {
   constructor(private readonly prisma: PrismaClient) {}
 
-  async create(certificate: Certificate): Promise<CertificateDTO> {
+  async create(certificate: Certificate): Promise<Certificate> {
     const created = await this.prisma.certificate.create({
       data: {
         userId: certificate.userId,
@@ -24,50 +21,50 @@ export class PrismaCertificateRepository
         updatedAt: certificate.updatedAt,
       },
     });
-    return this.toDTO(created);
+    return Certificate.toDomain(created);
   }
 
-  async findById(id: string): Promise<CertificateDTO | null> {
+  async findById(id: string): Promise<Certificate | null> {
     const found = await this.prisma.certificate.findUnique({ where: { id } });
-    return found ? this.toDTO(found) : null;
+    return found ? Certificate.toDomain(found) : null;
   }
 
   async findByCertificateNumber(
     certificateNumber: string
-  ): Promise<CertificateDTO | null> {
+  ): Promise<Certificate | null> {
     const found = await this.prisma.certificate.findUnique({
       where: { certificateNumber },
     });
-    return found ? this.toDTO(found) : null;
+    return found ? Certificate.toDomain(found) : null;
   }
 
-  async findByUserId(userId: string): Promise<CertificateDTO[]> {
+  async findByUserId(userId: string): Promise<Certificate[]> {
     const found = await this.prisma.certificate.findMany({
       where: { userId },
       orderBy: { createdAt: "desc" },
     });
-    return found.map((item) => this.toDTO(item));
+    return found.map((item) => Certificate.toDomain(item));
   }
 
-  async findByCourseId(courseId: string): Promise<CertificateDTO[]> {
+  async findByCourseId(courseId: string): Promise<Certificate[]> {
     const found = await this.prisma.certificate.findMany({
       where: { courseId },
       orderBy: { createdAt: "desc" },
     });
-    return found.map((item) => this.toDTO(item));
+    return found.map((item) => Certificate.toDomain(item));
   }
 
   async findByUserIdAndCourseId(
     userId: string,
     courseId: string
-  ): Promise<CertificateDTO | null> {
+  ): Promise<Certificate | null> {
     const found = await this.prisma.certificate.findUnique({
       where: { userId_courseId: { userId, courseId } },
     });
-    return found ? this.toDTO(found) : null;
+    return found ? Certificate.toDomain(found) : null;
   }
 
-  async update(certificate: Certificate): Promise<CertificateDTO> {
+  async update(certificate: Certificate): Promise<Certificate> {
     const updated = await this.prisma.certificate.update({
       where: { id: certificate.id },
       data: {
@@ -79,7 +76,7 @@ export class PrismaCertificateRepository
         updatedAt: certificate.updatedAt,
       },
     });
-    return this.toDTO(updated);
+    return Certificate.toDomain(updated);
   }
 
   async deleteById(id: string): Promise<void> {
@@ -95,7 +92,7 @@ export class PrismaCertificateRepository
     status?: string;
     search?: string;
   }): Promise<{
-    items: CertificateDTO[];
+    items: { user: {name:string , email:string}; course: {title:string }; }[];
     total: number;
     hasMore: boolean;
     nextPage?: number;
@@ -145,14 +142,14 @@ export class PrismaCertificateRepository
     const nextPage = hasMore ? Math.floor(skip / take) + 2 : undefined;
 
     return {
-      items: items.map((item) => this.toDTOWithDetails(item)),
+      items,
       total,
       hasMore,
       nextPage,
     };
   }
 
-  async findExpiredCertificates(): Promise<CertificateDTO[]> {
+  async findExpiredCertificates(): Promise<Certificate[]> {
     const now = new Date();
     const found = await this.prisma.certificate.findMany({
       where: {
@@ -160,44 +157,14 @@ export class PrismaCertificateRepository
         status: { not: "EXPIRED" },
       },
     });
-    return found.map((item) => this.toDTO(item));
+    return found.map(item => Certificate.toDomain(item));
   }
 
-  async findCertificatesByStatus(status: string): Promise<CertificateDTO[]> {
+  async findCertificatesByStatus(status: string): Promise<Certificate[]> {
     const found = await this.prisma.certificate.findMany({
       where: { status: status as any },
       orderBy: { createdAt: "desc" },
     });
-    return found.map((item) => this.toDTO(item));
-  }
-
-  private toDTO(certificate: any): CertificateDTO {
-    return {
-      id: certificate.id,
-      userId: certificate.userId,
-      courseId: certificate.courseId,
-      enrollmentId: certificate.enrollmentId,
-      certificateNumber: certificate.certificateNumber,
-      status: certificate.status,
-      issuedAt: certificate.issuedAt?.toISOString() || null,
-      expiresAt: certificate.expiresAt?.toISOString() || null,
-      pdfUrl: certificate.pdfUrl,
-      metadata: certificate.metadata,
-      createdAt: certificate.createdAt.toISOString(),
-      updatedAt: certificate.updatedAt.toISOString(),
-    };
-  }
-
-  private toDTOWithDetails(certificate: any): CertificateDTO & {
-    courseTitle?: string;
-    userName?: string;
-    userEmail?: string;
-  } {
-    return {
-      ...this.toDTO(certificate),
-      courseTitle: certificate.course?.title,
-      userName: certificate.user?.name,
-      userEmail: certificate.user?.email,
-    };
+     return found.map((item) => Certificate.toDomain(item));
   }
 }

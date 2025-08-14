@@ -1,4 +1,4 @@
-import { IRetryOrderUseCase, RetryOrderResponse } from "../interfaces/retry-order.usecase.interface";
+import { IRetryOrderUseCase } from "../interfaces/retry-order.usecase.interface";
 import { IOrderRepository } from "../../../repositories/order.repository";
 import { IPaymentService } from "../../../services/payment/interfaces/payment.service.interface";
 import { ICreateTransactionUseCase } from "../../transaction/interfaces/create-transaction.usecase.interface";
@@ -7,6 +7,7 @@ import { TransactionStatus } from "../../../../domain/enum/transaction-status.en
 import { PaymentGateway } from "../../../../domain/enum/payment-gateway.enum";
 import { HttpError } from "../../../../presentation/http/errors/http-error";
 import { StatusCodes } from "http-status-codes";
+import { RetryOrderResponseDTO } from "../../../dtos/order.dto";
 
 export class RetryOrderUseCase implements IRetryOrderUseCase {
   constructor(
@@ -15,7 +16,7 @@ export class RetryOrderUseCase implements IRetryOrderUseCase {
     private readonly createTransactionUseCase: ICreateTransactionUseCase
   ) {}
 
-  async execute(userId: string, orderId: string): Promise<RetryOrderResponse> {
+  async execute(userId: string, orderId: string): Promise<RetryOrderResponseDTO> {
     // Get the existing order
     const order = await this.orderRepository.findById(orderId);
     if (!order) {

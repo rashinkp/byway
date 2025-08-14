@@ -1,19 +1,20 @@
 import { Certificate } from "../../domain/entities/certificate.entity";
-import { CertificateDTO } from "../dtos/certificate.dto";
+import { Course } from "../../domain/entities/course.entity";
+import { User } from "../../domain/entities/user.entity";
 
 export interface CertificateRepositoryInterface {
-  create(certificate: Certificate): Promise<CertificateDTO>;
-  findById(id: string): Promise<CertificateDTO | null>;
+  create(certificate: Certificate): Promise<Certificate>;
+  findById(id: string): Promise<Certificate | null>;
   findByCertificateNumber(
     certificateNumber: string
-  ): Promise<CertificateDTO | null>;
-  findByUserId(userId: string): Promise<CertificateDTO[]>;
-  findByCourseId(courseId: string): Promise<CertificateDTO[]>;
+  ): Promise<Certificate | null>;
+  findByUserId(userId: string): Promise<Certificate[]>;
+  findByCourseId(courseId: string): Promise<Certificate[]>;
   findByUserIdAndCourseId(
     userId: string,
     courseId: string
-  ): Promise<CertificateDTO | null>;
-  update(certificate: Certificate): Promise<CertificateDTO>;
+  ): Promise<Certificate | null>;
+  update(certificate: Certificate): Promise<Certificate>;
   deleteById(id: string): Promise<void>;
   findManyByUserId(options: {
     userId: string;
@@ -24,11 +25,11 @@ export interface CertificateRepositoryInterface {
     status?: string;
     search?: string;
   }): Promise<{
-    items: CertificateDTO[];
+    items:{ user: {name:string , email:string}; course: {title:string }; }[]
     total: number;
     hasMore: boolean;
     nextPage?: number;
   }>;
-  findExpiredCertificates(): Promise<CertificateDTO[]>;
-  findCertificatesByStatus(status: string): Promise<CertificateDTO[]>;
+  findExpiredCertificates(): Promise<Certificate[]>;
+  findCertificatesByStatus(status: string): Promise<Certificate[]>;
 }

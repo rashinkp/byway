@@ -2,6 +2,7 @@ import { GetInstructorDetailsUseCase } from "../interfaces/get-instructor-detail
 import { HttpError } from "../../../../presentation/http/errors/http-error";
 import { IInstructorRepository } from "../../../repositories/instructor.repository";
 import { IUserRepository } from "../../../repositories/user.repository";
+import { CombinedInstructorDTO } from "../../../dtos/instructor.dto";
 
 export class GetInstructorDetailsUseCaseImpl implements GetInstructorDetailsUseCase {
   constructor(
@@ -9,13 +10,11 @@ export class GetInstructorDetailsUseCaseImpl implements GetInstructorDetailsUseC
     private readonly userRepository: IUserRepository
   ) {}
 
-  async execute(userId: string) {
+  async execute(userId: string): Promise<CombinedInstructorDTO> {
     const user = await this.userRepository.findById(userId);
     if (!user) {
       throw new HttpError("User not found for instructor", 404);
     }
-
- 
 
     const instructor = await this.instructorRepository.findInstructorByUserId(
       userId
@@ -33,8 +32,8 @@ export class GetInstructorDetailsUseCaseImpl implements GetInstructorDetailsUseC
       avatar: user.avatar ?? null,
       areaOfExpertise: instructor.areaOfExpertise,
       professionalExperience: instructor.professionalExperience,
-      about: instructor.about ?? null,
-      website: instructor.website ?? null,
+      about: instructor.about,
+      website: instructor.website,
       education: instructor.education,
       certifications: instructor.certifications,
       cv: instructor.cv,
@@ -42,7 +41,7 @@ export class GetInstructorDetailsUseCaseImpl implements GetInstructorDetailsUseC
       status: instructor.status,
       createdAt: user.createdAt,
       updatedAt: user.updatedAt,
-      deletedAt: user.deletedAt ?? null
+      deletedAt: user.deletedAt ?? null,
     };
   }
 } 

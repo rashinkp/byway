@@ -3,35 +3,31 @@ import { JwtProvider } from "../../../infra/providers/auth/jwt.provider";
 import { HttpError } from "../../http/errors/http-error";
 import { CookieUtils } from "./cookie.utils";
 import { getAppDependencies } from '../../../di/app.dependencies';
+import { UserDTO } from "../../../app/dtos/general.dto";
 
-export interface JwtPayload {
-  id: string;
-  email: string;
-  role: string;
-}
 
 // In-memory store for used refresh tokens (use Redis/database in production)
 const usedRefreshTokens = new Set<string>();
 
 // Track ongoing refresh operations to prevent race conditions
-const ongoingRefreshes = new Map<string, Promise<{ accessToken: string; refreshToken: string; user: JwtPayload }>>();
+const ongoingRefreshes = new Map<string, Promise<{ accessToken: string; refreshToken: string; user: UserDTO }>>();
 
 // Track recently issued tokens to handle frontend using old tokens
-const recentlyIssuedTokens = new Map<string, { accessToken: string; refreshToken: string; user: JwtPayload; timestamp: number }>();
+const recentlyIssuedTokens = new Map<string, { accessToken: string; refreshToken: string; user: UserDTO; timestamp: number }>();
 
 // Extend Express Request interface using module augmentation
 declare module 'express-serve-static-core' {
   interface Request {
-    user?: JwtPayload;
+    user?: UserDTO;
   }
 }
 
 // Helper function to perform token refresh
 async function performTokenRefresh(
   refreshToken: string,
-  refreshPayload: JwtPayload,
+  refreshPayload: UserDTO,
   jwtProvider: JwtProvider
-): Promise<{ accessToken: string; refreshToken: string; user: JwtPayload }> {
+): Promise<{ accessToken: string; refreshToken: string; user: UserDTO }> {
   // Create clean payload for new tokens
   const cleanPayload = {
     id: refreshPayload.id,
@@ -57,7 +53,7 @@ async function performTokenRefresh(
 }
 
 // Helper function to check if we have recently issued tokens for this user
-function getRecentlyIssuedTokens(refreshToken: string): { accessToken: string; refreshToken: string; user: JwtPayload } | null {
+function getRecentlyIssuedTokens(refreshToken: string): { accessToken: string; refreshToken: string; user: UserDTO } | null {
   const recent = recentlyIssuedTokens.get(refreshToken);
   if (recent && Date.now() - recent.timestamp < 5000) { // 5 seconds window
     return recent;
@@ -75,7 +71,7 @@ export const authenticate = async (req: Request, res: Response, next: NextFuncti
   }
 
   // 1. Try access token first
-  const payload = accessToken ? jwtProvider.verifyAccessToken(accessToken) as JwtPayload : null;
+  const payload = accessToken ? jwtProvider.verifyAccessToken(accessToken) as UserDTO : null;
 
   // 2. If access token is valid, proceed
   if (payload && payload.id && payload.email && payload.role) {
@@ -123,7 +119,7 @@ export const authenticate = async (req: Request, res: Response, next: NextFuncti
         
         if (!refreshPromise) {
           // Start a new refresh operation
-          refreshPromise = performTokenRefresh(refreshToken, refreshPayload as JwtPayload, jwtProvider);
+          refreshPromise = performTokenRefresh(refreshToken, refreshPayload as UserDTO, jwtProvider);
           ongoingRefreshes.set(refreshToken, refreshPromise);
           
           // Clean up the promise from the map after completion
@@ -170,7 +166,7 @@ export const restrictTo =
       }
 
       // 1. Try access token first
-      const payload = accessToken ? jwtProvider.verifyAccessToken(accessToken) as JwtPayload : null;
+      const payload = accessToken ? jwtProvider.verifyAccessToken(accessToken) as UserDTO : null;
 
       // 2. If access token is valid, proceed
       if (payload && payload.id && payload.email && payload.role) {
@@ -213,7 +209,7 @@ export const restrictTo =
               
               if (!refreshPromise) {
                 // Start a new refresh operation
-                refreshPromise = performTokenRefresh(refreshToken, refreshPayload as JwtPayload, jwtProvider);
+                refreshPromise = performTokenRefresh(refreshToken, refreshPayload as UserDTO, jwtProvider);
                 ongoingRefreshes.set(refreshToken, refreshPromise);
                 
                 // Clean up the promise from the map after completion
@@ -277,7 +273,7 @@ export const optionalAuth = async (
   const accessToken = req.cookies.access_token;
   if (accessToken) {
     try {
-      const payload = jwtProvider.verifyAccessToken(accessToken) as JwtPayload;
+      const payload = jwtProvider.verifyAccessToken(accessToken) as UserDTO;
       if (payload) {
         req.user = payload;
       }

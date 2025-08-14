@@ -1,5 +1,6 @@
 import { FacebookAuthUseCase } from "../app/usecases/auth/implementations/facebook-auth.usecase";
 import { ForgotPasswordUseCase } from "../app/usecases/auth/implementations/forgot-passowrd.usecase";
+import { GetVerificationStatusUseCase } from "../app/usecases/auth/implementations/get-verification-status.usecase";
 import { GoogleAuthUseCase } from "../app/usecases/auth/implementations/google-auth.usecase";
 import { LoginUseCase } from "../app/usecases/auth/implementations/login.usecase";
 import { LogoutUseCase } from "../app/usecases/auth/implementations/logout.usecase";
@@ -7,7 +8,6 @@ import { RegisterUseCase } from "../app/usecases/auth/implementations/register.u
 import { ResendOtpUseCase } from "../app/usecases/auth/implementations/resend-otp-usecase";
 import { ResetPasswordUseCase } from "../app/usecases/auth/implementations/reset-password.usecase";
 import { VerifyOtpUseCase } from "../app/usecases/auth/implementations/verify-otp.usecase";
-import { GetVerificationStatusUseCase } from "../app/usecases/auth/get-verification-status.usecase";
 import { AuthController } from "../presentation/http/controllers/auth.controller";
 import { SharedDependencies } from "./shared.dependencies";
 

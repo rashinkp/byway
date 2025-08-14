@@ -2,12 +2,12 @@ import { PrismaClient } from "@prisma/client";
 import { Instructor } from "../../domain/entities/instructor.entity";
 import { APPROVALSTATUS } from "../../domain/enum/approval-status.enum";
 import { IInstructorRepository } from "../../app/repositories/instructor.repository";
-import { InstructorStats } from "../../app/dtos/stats.dto";
 import { IGetTopInstructorsInput } from "../../app/usecases/user/interfaces/get-top-instructors.usecase.interface";
+import { InstructorStats } from "../../domain/types/instructor.interface";
 
 export class PrismaInstructorRepository implements IInstructorRepository {
-  constructor(private prisma: PrismaClient) {}
-
+  constructor(private prisma: PrismaClient) { }
+  
   async createInstructor(instructor: Instructor): Promise<Instructor> {
     const upserted = await this.prisma.instructorDetails.upsert({
       where: {
@@ -157,7 +157,6 @@ export class PrismaInstructorRepository implements IInstructorRepository {
   async getTopInstructors(
     input: IGetTopInstructorsInput
   ): Promise<InstructorStats[]> {
-    // Get all instructors with their courses and enrollments
     const instructors = await this.prisma.user.findMany({
       where: {
         role: "INSTRUCTOR",

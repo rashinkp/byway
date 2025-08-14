@@ -2,10 +2,8 @@ import { PrismaClient } from "@prisma/client";
 import { IRevenueRepository } from "../../app/repositories/revenue.repository";
 import { TransactionType } from "../../domain/enum/transaction-type.enum";
 import { TransactionStatus } from "../../domain/enum/transaction-status.enum";
-import {
-  GetLatestRevenueParams,
-  GetLatestRevenueResult,
-} from "../../app/dtos/revenue.dto";
+import { LatestRevenue } from "../../domain/types/revenue.interface";
+
 
 export class PrismaAnalyticsRepository implements IRevenueRepository {
   constructor(private readonly prisma: PrismaClient) {}
@@ -189,9 +187,15 @@ export class PrismaAnalyticsRepository implements IRevenueRepository {
     return result._sum.amount || 0;
   }
 
-  async getLatestRevenue(
-    input: GetLatestRevenueParams
-  ): Promise<GetLatestRevenueResult> {
+  async getLatestRevenue(input: {
+    startDate?: Date;
+    endDate?: Date;
+    userId: string;
+    page?: number;
+    limit?: number;
+    search?: string;
+    sortBy?: "latest" | "oldest";
+  }): Promise<LatestRevenue> {
     const {
       startDate,
       endDate,

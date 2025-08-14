@@ -1,3 +1,5 @@
+import { CourseStats } from "../../domain/types/course-stats.interface";
+
 export interface Period {
   start: Date;
   end: Date;
@@ -12,20 +14,9 @@ export interface Person {
 
 
 
-export interface CourseStats {
-  courseId: string;
-  courseTitle: string;
-  instructorName?: string;
-  enrollmentCount: number;
-  revenue: number;
-  rating: number;
-  reviewCount: number;
-  status?: string; // For instructor-specific stats
-  createdAt?: Date;
-  lastEnrollmentDate?: Date;
-}
 
-export interface InstructorStats {
+
+export interface InstructorStatsDTO {
   instructorId: string;
   instructorName: string;
   email: string;
@@ -80,7 +71,7 @@ export interface DashboardStats {
 export interface DashboardResponse {
   stats: DashboardStats;
   topCourses?: CourseStats[];
-  topInstructors?: InstructorStats[];
+  topInstructors?: InstructorStatsDTO[];
   topStudents?: StudentStats[];
 }
 

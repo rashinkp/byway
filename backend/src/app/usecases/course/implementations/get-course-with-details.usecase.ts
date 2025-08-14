@@ -6,8 +6,10 @@ import { ICourseReviewRepository } from "../../../repositories/course-review.rep
 import { ICartRepository } from "../../../repositories/cart.repository";
 import { APPROVALSTATUS } from "../../../../domain/enum/approval-status.enum";
 import { CourseStatus } from "../../../../domain/enum/course-status.enum";
-import { JwtPayload } from "jsonwebtoken";
 import { IGetCourseWithDetailsUseCase } from "../interfaces/get-course-with-details.usecase.interface";
+import { UserDTO } from "../../../dtos/general.dto";
+
+
 
 export class GetCourseWithDetailsUseCase
   implements IGetCourseWithDetailsUseCase
@@ -17,11 +19,14 @@ export class GetCourseWithDetailsUseCase
     private enrollmentRepository: IEnrollmentRepository,
     private courseReviewRepository: ICourseReviewRepository,
     private cartRepository: ICartRepository
-  ) {}
+  ) { }
+  
+
+  
 
   async execute(
     courseId: string,
-    user?: JwtPayload
+    user?: UserDTO
   ): Promise<ICourseWithEnrollmentDTO | null> {
     const course = await this.courseRepository.findById(courseId);
     if (!course) {

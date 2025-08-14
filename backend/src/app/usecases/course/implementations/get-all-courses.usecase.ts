@@ -29,7 +29,7 @@ export class GetAllCoursesUseCase implements IGetAllCoursesUseCase {
 
       // Enhance courses with additional data
       const enhancedCourses = await Promise.all(
-        result.courses.map(async (course) => {
+        result.items.map(async (course) => {
           // Get instructor details
           const instructor = await this.userRepository.findById(
             course.createdBy

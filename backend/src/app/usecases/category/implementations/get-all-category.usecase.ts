@@ -5,17 +5,40 @@ import {
   ICategoryListOutputDTO,
   IGetAllCategoriesInputDTO,
 } from "../../../dtos/category.dto";
+import { PaginationFilter } from "../../../../domain/types/pagination-filter.interface";
 
 export class GetAllCategoriesUseCase implements IGetAllCategoriesUseCase {
   constructor(private categoryRepository: ICategoryRepository) {}
 
   async execute(
-    input: IGetAllCategoriesInputDTO
+    dto: IGetAllCategoriesInputDTO
   ): Promise<ICategoryListOutputDTO> {
     try {
-      const { categories, total } = await this.categoryRepository.findAll(
-        input
-      );
+
+
+     const {
+       page,
+       limit,
+       sortBy,
+       sortOrder,
+       includeDeleted,
+       search,
+       filterBy,
+     } = dto;
+
+     const paginationFilter: PaginationFilter = {
+       page,
+       limit,
+       sortBy,
+       sortOrder,
+       includeDeleted,
+       search,
+       filterBy,
+     };
+
+     const { categories, total } = await this.categoryRepository.findAll(
+       paginationFilter
+     );
       return {
         categories: categories.map((category) => ({
           id: category.id,

@@ -1,6 +1,6 @@
-import { ISearchResult } from "../../../dtos/search.dto";
-import { SearchParams } from "../../../dtos/search.dto";
+import { ISearchResultDTO } from "../../../dtos/search.dto";
+import { SearchParamsDTO } from "../../../dtos/search.dto";
 
 export interface IGlobalSearchUseCase {
-  execute(params: SearchParams): Promise<ISearchResult>;
+  execute(params: SearchParamsDTO): Promise<ISearchResultDTO>;
 }

@@ -1,6 +1,11 @@
-import { ISearchResult } from "../dtos/search.dto";
-import { SearchParams } from "../dtos/search.dto";
+import { ISearchResult } from "../../domain/types/search.interface";
+
 
 export interface ISearchRepository {
-  search(params: SearchParams): Promise<ISearchResult>;
+  search(params: {
+    query: string;
+    page?: number;
+    limit?: number;
+    userId?: string;
+  }): Promise<ISearchResult>;
 }

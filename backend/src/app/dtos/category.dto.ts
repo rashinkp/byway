@@ -12,10 +12,10 @@ export interface IUpdateCategoryInputDTO {
 
 // Input DTO for retrieving all categories with pagination, search, and sorting
 export interface IGetAllCategoriesInputDTO {
-  page?: number; // Page number for pagination (default: 1)
-  limit?: number; // Number of items per page (default: 10)
-  search?: string; // Search term for filtering by name
-  includeDeleted?: boolean; // Whether to include soft-deleted categories (default: false)
+  page?: number; 
+  limit?: number; 
+  search?: string;
+  includeDeleted?: boolean; 
   sortBy?: string; // Field to sort by (e.g., "name", "createdAt")
   sortOrder?: "asc" | "desc"; // Sort order (default: "asc")
   filterBy?: string; // Additional filtering criteria (e.g., "All")

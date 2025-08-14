@@ -5,7 +5,7 @@ import { ChatId } from "../../domain/value-object/ChatId";
 import { UserId } from "../../domain/value-object/UserId";
 import { MessageContent } from "../../domain/value-object/MessageContent";
 import { Timestamp } from "../../domain/value-object/Timestamp";
-import { EnrichedMessageDTO } from "../../app/dtos/message.dto";
+import { IMessageWithUserData } from "../../domain/types/message.interface";
 import { MessageType as DomainMessageType } from "../../domain/enum/Message-type.enum";
 import { MessageType as PrismaMessageType, PrismaClient } from "@prisma/client";
 
@@ -32,7 +32,7 @@ export class MessageRepository implements IMessageRepository {
     chatId: ChatId,
     limit = 20,
     beforeMessageId?: string
-  ): Promise<EnrichedMessageDTO[]> {
+  ): Promise<IMessageWithUserData[]> {
     let beforeDate: Date | undefined = undefined;
     if (beforeMessageId) {
       const beforeMsg = await prisma.message.findUnique({
@@ -81,7 +81,7 @@ export class MessageRepository implements IMessageRepository {
 
   async findByIdWithUserData(
     id: MessageId
-  ): Promise<EnrichedMessageDTO | null> {
+  ): Promise<IMessageWithUserData | null> {
     const message = await prisma.message.findUnique({
       where: { id: id.value },
       include: {
@@ -132,7 +132,7 @@ export class MessageRepository implements IMessageRepository {
 
   async save(message: Message): Promise<void> {
     await prisma.message.update({
-      where: { id: message.id.value },
+      where: { id: message.id?.value },
       data: {
         content: message.content?.value || null,
         imageUrl: message.imageUrl?.toString() || null,
@@ -147,8 +147,8 @@ export class MessageRepository implements IMessageRepository {
     await prisma.message.delete({ where: { id: id.value } });
   }
 
-  async markAllAsRead(chatId: ChatId, userId: UserId): Promise<void> {
-    await prisma.message.updateMany({
+  async markAllAsRead(chatId: ChatId, userId: UserId): Promise<number> {
+    const result = await prisma.message.updateMany({
       where: {
         chatId: chatId.value,
         senderId: { not: userId.value },
@@ -156,6 +156,7 @@ export class MessageRepository implements IMessageRepository {
       },
       data: { isRead: true },
     });
+    return result.count;
   }
 
   async getTotalUnreadCount(userId: UserId): Promise<number> {
@@ -174,12 +175,11 @@ export class MessageRepository implements IMessageRepository {
 
   private toDomain(prismaMessage: any): Message {
     return new Message(
-      new MessageId(prismaMessage.id),
       new ChatId(prismaMessage.chatId),
       new UserId(prismaMessage.senderId),
       prismaMessage.content ? new MessageContent(prismaMessage.content) : null,
-      prismaMessage.imageUrl ? prismaMessage.imageUrl : null,
-      prismaMessage.audioUrl ? prismaMessage.audioUrl : null,
+      prismaMessage.imageUrl ?? null,
+      prismaMessage.audioUrl ?? null,
       prismaMessage.type,
       prismaMessage.isRead,
       new Timestamp(prismaMessage.createdAt)

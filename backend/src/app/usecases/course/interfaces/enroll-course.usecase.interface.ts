@@ -1,8 +1,5 @@
-import {
-  ICreateEnrollmentInputDTO,
-  IEnrollmentOutputDTO,
-} from "../../../dtos/course.dto";
+import { ICreateEnrollmentInput, IEnrollmentWithDetails } from "../../../../domain/types/enrollment.interface";
 
 export interface IEnrollCourseUseCase {
-  execute(input: ICreateEnrollmentInputDTO): Promise<IEnrollmentOutputDTO[]>;
+  execute(input: ICreateEnrollmentInput): Promise<IEnrollmentWithDetails[]>;
 }

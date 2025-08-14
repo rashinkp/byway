@@ -1,4 +1,4 @@
-import { InstructorStats } from "../../../dtos/stats.dto";
+import { InstructorStatsDTO } from "../../../dtos/stats.dto";
 import { IInstructorRepository } from "../../../repositories/instructor.repository";
 import {
   IGetTopInstructorsUseCase,
@@ -8,7 +8,7 @@ import {
 export class GetTopInstructorsUseCase implements IGetTopInstructorsUseCase {
   constructor(private readonly instructorRepository: IInstructorRepository) {}
 
-  async execute(input: IGetTopInstructorsInput): Promise<InstructorStats[]> {
+  async execute(input: IGetTopInstructorsInput): Promise<InstructorStatsDTO[]> {
     return this.instructorRepository.getTopInstructors(input);
   }
 }

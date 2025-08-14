@@ -1,7 +1,7 @@
 import { Cart } from "../../../../domain/entities/cart.entity";
 import { ICartRepository } from "../../../repositories/cart.repository";
 import { IEnrollmentRepository } from "../../../repositories/enrollment.repository.interface";
-import { AddToCartDto } from "../../../dtos/cart.dto";
+import { AddToCartDto, CartResponseDTO } from "../../../dtos/cart.dto";
 import { IAddToCartUseCase } from "../interfaces/add-to-cart.usecase.interface";
 import { HttpError } from "../../../../presentation/http/errors/http-error";
 
@@ -11,7 +11,7 @@ export class AddToCartUseCase implements IAddToCartUseCase {
     private enrollmentRepository: IEnrollmentRepository
   ) {}
 
-  async execute(userId: string, data: AddToCartDto): Promise<Cart> {
+  async execute(userId: string, data: AddToCartDto): Promise<CartResponseDTO> {
     // Restrict cart size
     const cartCount = await this.cartRepository.countByUserId(userId);
     const MAX_CART_ITEMS = 5;

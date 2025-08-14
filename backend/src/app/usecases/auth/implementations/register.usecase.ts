@@ -6,6 +6,7 @@ import { AuthProvider } from "../../../../domain/enum/auth-provider.enum";
 import { RegisterDto } from "../../../dtos/auth.dto";
 import { IOtpProvider } from "../../../providers/otp-provider.interface";
 import { IPasswordHasher } from "../../../providers/password-hasher.interface";
+import { UserResponseDTO } from "../../../dtos/user.dto";
 
 export class RegisterUseCase implements IRegisterUseCase {
   constructor(
@@ -14,7 +15,7 @@ export class RegisterUseCase implements IRegisterUseCase {
     private passwordHasher: IPasswordHasher
   ) {}
 
-  async execute(dto: RegisterDto): Promise<User> {
+  async execute(dto: RegisterDto): Promise<UserResponseDTO> {
     let user = await this.authRepository.findUserByEmail(dto.email);
 
     try {

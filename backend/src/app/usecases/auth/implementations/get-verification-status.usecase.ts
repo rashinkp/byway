@@ -1,5 +1,6 @@
-import { IAuthRepository } from "../../repositories/auth.repository";
-import { IGetVerificationStatusUseCase } from "./interfaces/get-verification-status.usecase.interface";
+import { IAuthRepository } from "../../../repositories/auth.repository";
+import { IGetVerificationStatusUseCase } from "../interfaces/get-verification-status.usecase.interface";
+
 
 export class GetVerificationStatusUseCase implements IGetVerificationStatusUseCase {
   constructor(private authRepository: IAuthRepository) {}

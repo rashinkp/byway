@@ -11,7 +11,18 @@ export class CreateNotificationUseCase
   ) {}
 
   async execute(notification: Notification): Promise<NotificationDTO> {
-    // Business logic (if any) goes here, not in the repository
-    return this.notificationRepository.create(notification);
+    const created = await this.notificationRepository.create(notification);
+    return {
+      id: created.id,
+      userId: created.userId.value,
+      eventType: created.eventType,
+      entityType: created.entityType,
+      entityId: created.entityId,
+      entityName: created.entityName,
+      message: created.message,
+      link: created.link,
+      createdAt: created.createdAt.value.toISOString(),
+      expiresAt: created.expiresAt.value.toISOString(),
+    };
   }
 }

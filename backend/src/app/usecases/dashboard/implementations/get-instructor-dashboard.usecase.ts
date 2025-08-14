@@ -24,7 +24,7 @@ export class GetInstructorDashboardUseCase implements IGetInstructorDashboardUse
       page: 1,
       limit: 1000, // Get all courses
     });
-    const courses = coursesResponse.courses;
+    const courses = coursesResponse.items;
     const courseIds = courses.map((c: any) => c.id);
 
     // Total courses (including deleted)

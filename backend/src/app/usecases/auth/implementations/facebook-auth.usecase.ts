@@ -4,13 +4,13 @@ import { IFacebookAuthUseCase } from "../interfaces/facebook-auth.usecase.interf
 import { AuthProvider } from "../../../../domain/enum/auth-provider.enum";
 import { Role } from "../../../../domain/enum/role.enum";
 import { HttpError } from "../../../../presentation/http/errors/http-error";
-import { IUpdateUserRequestDTO } from "../../../dtos/user.dto";
+import { IUpdateUserRequestDTO, UserResponseDTO } from "../../../dtos/user.dto";
 import { FacebookAuthDto } from "../../../dtos/auth.dto";
 
 export class FacebookAuthUseCase implements IFacebookAuthUseCase {
   constructor(private authRepository: IAuthRepository) {}
 
-  async execute(dto: FacebookAuthDto): Promise<User> {
+  async execute(dto: FacebookAuthDto): Promise<UserResponseDTO> {
     const { userId, name, email, picture } = dto;
 
     // Use email if provided, otherwise generate a placeholder

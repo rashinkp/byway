@@ -13,7 +13,7 @@ interface UserInterface {
   authProvider: AuthProvider;
   isVerified: boolean;
   avatar?: string;
-  deletedAt?: Date;
+  deletedAt?: Date; 
   createdAt: Date;
   updatedAt: Date;
 }

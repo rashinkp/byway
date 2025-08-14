@@ -9,7 +9,7 @@ import {
 } from "../../../providers/google-auth.interface";
 import { HttpError } from "../../../../presentation/http/errors/http-error";
 import { User } from "../../../../domain/entities/user.entity";
-import { IUpdateUserRequestDTO } from "../../../dtos/user.dto";
+import { IUpdateUserRequestDTO, UserResponseDTO } from "../../../dtos/user.dto";
 
 export class GoogleAuthUseCase implements IGoogleAuthUseCase {
   constructor(
@@ -17,7 +17,7 @@ export class GoogleAuthUseCase implements IGoogleAuthUseCase {
     private googleAuthGateway: GoogleAuthGateway
   ) {}
 
-  async execute(accessToken: string): Promise<User> {
+  async execute(accessToken: string): Promise<UserResponseDTO> {
     let googleUser: GoogleUserInfo;
     try {
       googleUser = await this.googleAuthGateway.getUserInfo(accessToken);

@@ -1,17 +1,16 @@
 import { PrismaClient, Gender, Role } from "@prisma/client";
 import { User } from "../../domain/entities/user.entity";
 import { UserProfile } from "../../domain/entities/user-profile.entity";
-import { GetAllUsersDto } from "../../app/dtos/user.dto";
 import {
-  IPaginatedResponse,
   IUserRepository,
 } from "../../app/repositories/user.repository";
-import { IUserStats } from "../../app/usecases/user/interfaces/get-user-stats.usecase.interface";
+import { PaginatedResult, PaginationFilter } from "../../domain/types/pagination-filter.interface";
+import { UserStats } from "../../domain/types/user.interface";
 
 export class UserRepository implements IUserRepository {
   constructor(private prisma: PrismaClient) {}
 
-  async findAll(dto: GetAllUsersDto): Promise<IPaginatedResponse<User>> {
+  async findAll(input: PaginationFilter): Promise<PaginatedResult<User>> {
     const {
       page = 1,
       limit = 10,
@@ -21,7 +20,7 @@ export class UserRepository implements IUserRepository {
       search,
       filterBy,
       role,
-    } = dto;
+    } = input;
     const skip = (page - 1) * limit;
 
     const where: any = {};
@@ -58,7 +57,7 @@ export class UserRepository implements IUserRepository {
         return user;
       }),
       total,
-      totalPages: Math.ceil(total / limit),
+      totalPage: Math.ceil(total / limit),
     };
   }
 
@@ -139,7 +138,7 @@ export class UserRepository implements IUserRepository {
     return UserProfile.fromPrisma(created);
   }
 
-  async getUserStats(): Promise<IUserStats> {
+  async getUserStats(): Promise<UserStats> {
     const [
       totalUsers,
       activeUsers,

@@ -7,7 +7,6 @@ import { MessageType } from '../enum/Message-type.enum';
 
 export class Message {
   constructor(
-    public readonly id: MessageId,
     public readonly chatId: ChatId,
     public readonly senderId: UserId,
     public readonly content: MessageContent | null,
@@ -15,7 +14,8 @@ export class Message {
     public readonly audioUrl: string | null,
     public readonly type: MessageType,
     public readonly isRead: boolean,
-    public readonly createdAt: Timestamp
+    public readonly createdAt: Timestamp,
+    public readonly id?: MessageId,
   ) {}
 
   isFromUser(userId: UserId): boolean {
@@ -28,7 +28,6 @@ export class Message {
 
   markAsRead(): Message {
     return new Message(
-      this.id,
       this.chatId,
       this.senderId,
       this.content,

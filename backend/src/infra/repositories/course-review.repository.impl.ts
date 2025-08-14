@@ -3,7 +3,7 @@ import { CourseReview } from "../../domain/entities/review.entity";
 
 import { ICourseReviewRepository } from "../../app/repositories/course-review.repository.interface";
 import { Rating } from "../../domain/value-object/rating";
-import { CourseReviewResponseDto, CourseReviewSummaryDto, QueryCourseReviewDto } from "../../app/dtos/review.dto";
+import { ICourseReviewWithUser, ICourseReviewSummary, ICourseReviewQuery, ICourseReviewPaginatedResult } from "../../domain/types/review.interface";
 
 function toCourseReviewEntity(data: any): CourseReview {
   return new CourseReview({
@@ -19,7 +19,7 @@ function toCourseReviewEntity(data: any): CourseReview {
   });
 }
 
-function toCourseReviewResponseDto(data: any): CourseReviewResponseDto {
+function toCourseReviewWithUser(data: any): ICourseReviewWithUser {
   return {
     id: data.id,
     courseId: data.courseId,
@@ -107,13 +107,9 @@ export class CourseReviewRepository implements ICourseReviewRepository {
 
   async findByCourseId(
     courseId: string,
-    query: QueryCourseReviewDto,
+    query: ICourseReviewQuery,
     userId?: string
-  ): Promise<{
-    reviews: CourseReviewResponseDto[];
-    total: number;
-    totalPages: number;
-  }> {
+  ): Promise<ICourseReviewPaginatedResult> {
     const page = query.page || 1;
     const limit = query.limit || 10;
     const skip = (page - 1) * limit;
@@ -153,7 +149,7 @@ export class CourseReviewRepository implements ICourseReviewRepository {
     ]);
 
     return {
-      reviews: reviews.map(toCourseReviewResponseDto),
+      reviews: reviews.map(toCourseReviewWithUser),
       total,
       totalPages: Math.ceil(total / limit),
     };
@@ -163,11 +159,7 @@ export class CourseReviewRepository implements ICourseReviewRepository {
     userId: string,
     page = 1,
     limit = 10
-  ): Promise<{
-    reviews: CourseReviewResponseDto[];
-    total: number;
-    totalPages: number;
-  }> {
+  ): Promise<ICourseReviewPaginatedResult> {
     const skip = (page - 1) * limit;
     const where = { userId, deletedAt: null };
 
@@ -183,7 +175,7 @@ export class CourseReviewRepository implements ICourseReviewRepository {
     ]);
 
     return {
-      reviews: reviews.map(toCourseReviewResponseDto),
+      reviews: reviews.map(toCourseReviewWithUser),
       total,
       totalPages: Math.ceil(total / limit),
     };
@@ -201,7 +193,7 @@ export class CourseReviewRepository implements ICourseReviewRepository {
 
   async getCourseReviewStats(
     courseId: string
-  ): Promise<CourseReviewSummaryDto> {
+  ): Promise<ICourseReviewSummary> {
     const [average, total, distribution, recentReviews] =
       await this.prisma.$transaction([
         this.prisma.courseReview.aggregate({
@@ -241,7 +233,7 @@ export class CourseReviewRepository implements ICourseReviewRepository {
       averageRating: average._avg.rating || 0,
       totalReviews: total,
       ratingDistribution,
-      recentReviews: recentReviews.map(toCourseReviewResponseDto),
+      recentReviews: recentReviews.map(toCourseReviewWithUser),
     };
   }
 }

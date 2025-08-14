@@ -1,6 +1,5 @@
 import {
   ITopUpWalletUseCase,
-  TopUpWalletResponse,
 } from "../interfaces/top-up-wallet.usecase.interface";
 import { IWalletRepository } from "../../../repositories/wallet.repository.interface";
 import { ITransactionRepository } from "../../../repositories/transaction.repository";
@@ -11,7 +10,7 @@ import { PaymentGateway } from "../../../../domain/enum/payment-gateway.enum";
 import { HttpError } from "../../../../presentation/http/errors/http-error";
 import { StatusCodes } from "http-status-codes";
 import { Transaction } from "../../../../domain/entities/transaction.entity";
-import { TopUpWalletDto } from "../../../dtos/wallet";
+import { TopUpWalletDto, TopUpWalletResponseDTO } from "../../../dtos/wallet";
 
 export class TopUpWalletUseCase implements ITopUpWalletUseCase {
   constructor(
@@ -23,7 +22,7 @@ export class TopUpWalletUseCase implements ITopUpWalletUseCase {
   async execute(
     userId: string,
     input: TopUpWalletDto
-  ): Promise<TopUpWalletResponse> {
+  ): Promise<TopUpWalletResponseDTO> {
     const { amount, paymentMethod } = input;
 
     // Create a pending transaction without an orderId for wallet top-ups

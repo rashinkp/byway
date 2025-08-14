@@ -1,7 +1,6 @@
-import { GetAllUsersDto } from "../../../dtos/user.dto";
-import { User } from "../../../../domain/entities/user.entity";
-import { IPaginatedResponse } from "../../../repositories/user.repository";
+import { PaginatedResult } from "../../../../domain/types/pagination-filter.interface";
+import { GetAllUsersDto, UserResponseDTO } from "../../../dtos/user.dto";
 
 export interface IGetAllUsersUseCase {
-  execute(dto: GetAllUsersDto): Promise<IPaginatedResponse<User>>;
+  execute(dto: GetAllUsersDto): Promise<PaginatedResult<UserResponseDTO>>;
 }

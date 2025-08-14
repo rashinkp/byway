@@ -6,7 +6,6 @@ import { APPROVALSTATUS } from "../../../../domain/enum/approval-status.enum";
 import { ICourseRepository } from "../../../repositories/course.repository.interface";
 import { HttpError } from "../../../../presentation/http/errors/http-error";
 import { IApproveCourseUseCase } from "../interfaces/approve-course.usecase.interface";
-import { IUserRepository } from "../../../repositories/user.repository";
 import { CreateNotificationsForUsersUseCase } from "../../notification/implementations/create-notifications-for-users.usecase";
 import { NotificationEventType } from "../../../../domain/enum/notification-event-type.enum";
 import { NotificationEntityType } from "../../../../domain/enum/notification-entity-type.enum";
@@ -14,7 +13,6 @@ import { NotificationEntityType } from "../../../../domain/enum/notification-ent
 export class ApproveCourseUseCase implements IApproveCourseUseCase {
   constructor(
     private courseRepository: ICourseRepository,
-    private userRepository: IUserRepository,
     private createNotificationsForUsersUseCase: CreateNotificationsForUsersUseCase
   ) {}
 

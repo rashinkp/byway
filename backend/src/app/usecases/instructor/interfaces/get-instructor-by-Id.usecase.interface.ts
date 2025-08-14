@@ -1,6 +1,7 @@
-import { GetInstructorByUserIdRequestDTO } from "../../../dtos/instructor.dto";
-import { Instructor } from "../../../../domain/entities/instructor.entity";
+import { GetInstructorByUserIdRequestDTO, InstructorResponseDTO } from "../../../dtos/instructor.dto";
 
 export interface IGetInstructorByUserIdUseCase {
-  execute(dto: GetInstructorByUserIdRequestDTO): Promise<Instructor | null>;
+  execute(
+    dto: GetInstructorByUserIdRequestDTO
+  ): Promise<InstructorResponseDTO | null>;
 }

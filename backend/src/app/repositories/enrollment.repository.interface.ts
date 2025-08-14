@@ -1,19 +1,13 @@
-import {
-  ICreateEnrollmentInputDTO,
-  IEnrollmentOutputDTO,
-} from "../dtos/course.dto";
 import { Enrollment } from "../../domain/entities/enrollment.entity";
-import {
-  IEnrollmentStats,
-  IGetEnrollmentStatsInput,
-} from "../usecases/enrollment/interfaces/get-enrollment-stats.usecase.interface";
+import { IEnrollmentWithDetails, ICreateEnrollmentInput, IEnrollmentStats, IGetEnrollmentStatsInput } from "../../domain/types/enrollment.interface";
+
 
 export interface IEnrollmentRepository {
-  create(input: ICreateEnrollmentInputDTO): Promise<IEnrollmentOutputDTO[]>;
+  create(input: ICreateEnrollmentInput): Promise<IEnrollmentWithDetails[]>;
   findByUserAndCourse(
     userId: string,
     courseId: string
-  ): Promise<IEnrollmentOutputDTO | null>;
+  ): Promise<IEnrollmentWithDetails | null>;
   findByUserIdAndCourseIds(
     userId: string,
     courseIds: string[]

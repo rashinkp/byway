@@ -5,12 +5,12 @@ export interface CertificateDTO {
   enrollmentId: string;
   certificateNumber: string;
   status: string;
-  issuedAt: string | null;
-  expiresAt: string | null;
+  issuedAt: Date | null;
+  expiresAt: Date | null;
   pdfUrl: string | null;
   metadata: Record<string, any> | null;
-  createdAt: string;
-  updatedAt: string;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 export interface CreateCertificateDTO {
@@ -46,3 +46,15 @@ export interface CertificateWithDetailsDTO extends CertificateDTO {
   completedLessons?: number;
   averageScore?: number;
 } 
+
+
+export interface GenerateCertificateInputDto {
+  userId: string;
+  courseId: string;
+}
+
+export interface GenerateCertificateOutputDto {
+  success: boolean;
+  certificate?: CertificateDTO;
+  error?: string;
+}

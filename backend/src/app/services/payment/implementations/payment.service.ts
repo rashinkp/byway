@@ -482,12 +482,15 @@ export class PaymentService implements IPaymentService {
         return;
       }
 
-      // Get admin user ID
       const { items: admins } = await this.userRepository.findAll({
         role: "ADMIN",
         page: 1,
         limit: 1,
         includeDeleted: false,
+        sortBy: 'createdAt',
+        filterBy: 'All',
+        search: '',
+        sortOrder:'asc'
       });
 
       if (!admins || admins.length === 0) {

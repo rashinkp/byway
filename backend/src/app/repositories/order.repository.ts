@@ -1,26 +1,20 @@
 import { Order } from "../../domain/entities/order.entity";
-import { GetAllOrdersDto } from "../dtos/order.dto";
 import { PaymentGateway } from "../../domain/enum/payment-gateway.enum";
 import { Course } from "../../domain/entities/course.entity";
 import { OrderStatus } from "../../domain/enum/order-status.enum";
+import { OrderFilters, PaginatedOrderResult, OrderItemCreation, CourseOrderData } from "../../domain/types/order.interface";
 
 export interface IOrderRepository {
   findAll(
     userId: string,
-    filters: GetAllOrdersDto
-  ): Promise<{
-    orders: Order[];
-    total: number;
-    page: number;
-    limit: number;
-    totalPages: number;
-  }>;
+    filters: OrderFilters
+  ): Promise<PaginatedOrderResult>;
   findById(id: string): Promise<Order | null>;
   findByPaymentId(paymentId: string): Promise<Order | null>;
   getAllOrders(userId: string): Promise<Order[]>;
   createOrder(
     userId: string,
-    courses: any[],
+    courses: CourseOrderData[],
     paymentMethod: PaymentGateway,
     couponCode?: string
   ): Promise<Order>;
@@ -43,10 +37,10 @@ export interface IOrderRepository {
   delete(id: string): Promise<void>;
   createOrderItems(
     orderId: string,
-    courses: any[]
-  ): Promise<{ id: string; orderId: string; courseId: string }[]>;
+    courses: CourseOrderData[]
+  ): Promise<OrderItemCreation[]>;
   findOrderItems(
     orderId: string
-  ): Promise<{ id: string; orderId: string; courseId: string }[]>;
+  ): Promise<OrderItemCreation[]>;
   findCourseById(courseId: string): Promise<Course | null>;
 }

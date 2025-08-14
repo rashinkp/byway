@@ -1,5 +1,5 @@
 import { Instructor } from "../../domain/entities/instructor.entity";
-import { InstructorStats } from "../dtos/stats.dto";
+import { InstructorStats } from "../../domain/types/instructor.interface";
 import { IGetTopInstructorsInput } from "../usecases/user/interfaces/get-top-instructors.usecase.interface";
 
 export interface IInstructorRepository {

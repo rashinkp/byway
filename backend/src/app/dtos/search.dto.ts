@@ -56,7 +56,7 @@ export interface CertificateList {
 }
 
 
-export interface ISearchResult {
+export interface ISearchResultDTO {
   instructors: InstructorList;
   courses: CourseList;
   categories: CategoryList;
@@ -64,7 +64,7 @@ export interface ISearchResult {
 }
 
 
-export interface SearchParams {
+export interface SearchParamsDTO {
   query: string;
   page?: number;
   limit?: number;

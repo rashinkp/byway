@@ -1,18 +1,8 @@
-import { CertificateDTO } from "../../../dtos/certificate.dto";
+import { GenerateCertificateInputDto, GenerateCertificateOutputDto } from "../../../dtos/certificate.dto";
 
-export interface IGenerateCertificateRequest {
-  userId: string;
-  courseId: string;
-}
-
-export interface IGenerateCertificateResponse {
-  success: boolean;
-  certificate?: CertificateDTO;
-  error?: string;
-}
 
 export interface IGenerateCertificateUseCase {
   execute(
-    request: IGenerateCertificateRequest
-  ): Promise<IGenerateCertificateResponse>;
+    request: GenerateCertificateInputDto
+  ): Promise<GenerateCertificateOutputDto>;
 }

@@ -1,9 +1,5 @@
-export interface IEnrollmentStats {
-  totalEnrollments: number;
-}
-
-export type IGetEnrollmentStatsInput = object;
+import { IEnrollmentStatsDTO, IGetEnrollmentStatsInputDTO } from "../../../dtos/enrollment.dto";
 
 export interface IGetEnrollmentStatsUseCase {
-  execute(input: IGetEnrollmentStatsInput): Promise<IEnrollmentStats>;
+  execute(input: IGetEnrollmentStatsInputDTO): Promise<IEnrollmentStatsDTO>;
 } 

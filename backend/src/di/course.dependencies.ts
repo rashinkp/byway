@@ -62,12 +62,10 @@ export function createCourseDependencies(
   );
   const approveCourseUseCase = new ApproveCourseUseCase(
     courseRepository,
-    userRepository,
     createNotificationsForUsersUseCase
   );
   const declineCourseUseCase = new DeclineCourseUseCase(
     courseRepository,
-    userRepository,
     createNotificationsForUsersUseCase
   );
   const enrollCourseUseCase = new EnrollCourseUseCase(

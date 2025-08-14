@@ -1,4 +1,4 @@
-export interface GetLatestRevenueParams {
+export interface GetLatestRevenueParamsDTO {
   startDate?: Date;
   endDate?: Date;
   userId: string;
@@ -8,7 +8,7 @@ export interface GetLatestRevenueParams {
   sortBy?: 'latest' | 'oldest';
 }
 
-export interface CourseRevenueItem {
+export interface CourseRevenueItemDTO {
   orderId: string;
   courseId: string;
   courseTitle: string;
@@ -24,10 +24,47 @@ export interface CourseRevenueItem {
   transactionAmount: number;
 }
 
-export interface GetLatestRevenueResult {
-  items: CourseRevenueItem[];
+export interface GetLatestRevenueResultDTO {
+  items: CourseRevenueItemDTO[];
   total: number;
   page: number;
   limit: number;
   totalPages: number;
 } 
+
+
+
+
+export interface GetCourseRevenueParamsDTO {
+  startDate: Date;
+  endDate: Date;
+  userId: string;
+  sortBy?: "revenue" | "enrollments" | "name";
+  sortOrder?: "asc" | "desc";
+  search?: string;
+  page?: number;
+  limit?: number;
+}
+
+export interface CourseRevenueDTO {
+  courseId: string;
+  title: string;
+  thumbnail: string | null;
+  creator: {
+    id: string;
+    name: string;
+    avatar: string | null;
+  };
+  totalRevenue: number;
+  enrollments: number;
+  adminShare: number;
+  netRevenue: number;
+}
+
+export interface GetCourseRevenueResultDTO {
+  courses: CourseRevenueDTO[];
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
+}

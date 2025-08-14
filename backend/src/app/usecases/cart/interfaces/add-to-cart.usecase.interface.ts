@@ -1,6 +1,5 @@
-import { Cart } from "../../../../domain/entities/cart.entity";
-import { AddToCartDto } from "../../../dtos/cart.dto";
+import { AddToCartDto, CartResponseDTO } from "../../../dtos/cart.dto";
 
 export interface IAddToCartUseCase {
-  execute(userId: string, data: AddToCartDto): Promise<Cart>;
+  execute(userId: string, data: AddToCartDto): Promise<CartResponseDTO>;
 }

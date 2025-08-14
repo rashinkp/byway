@@ -1,3 +1,6 @@
+import { AuthProvider } from "@prisma/client";
+import { Role } from "../../domain/enum/role.enum";
+
 // Create User Profile Request DTO
 export interface ICreateUserProfileRequestDTO {
   userId: string;
@@ -28,8 +31,8 @@ export interface IUpdateUserProfileRequestDTO {
 
 // Get All Users DTO
 export interface GetAllUsersDto {
-  page?: number; // positive integer, default to 1 where applicable
-  limit?: number; // positive integer, default to 10 where applicable
+  page?: number; 
+  limit?: number; 
   sortBy?: "name" | "email" | "createdAt" | "updatedAt";
   sortOrder?: "asc" | "desc";
   includeDeleted?: boolean;
@@ -73,3 +76,49 @@ export interface IUpdateUserRequestDTO {
   avatar?: string;
   isVerified?: boolean;
 }
+
+
+export interface UserResponseDTO {
+  id: string,
+  name: string,
+  email: string,
+  password?: string,
+  googleId?: string,
+  role: Role,
+  authProvider: AuthProvider,
+  isVerified: boolean,
+  avatar?: string,
+  deletedAt?: Date,
+  updatedAt?: Date,
+  createdAt: Date
+}
+
+
+export interface ProfileDTO {
+  id: string;
+  userId: string;
+  bio?: string;
+  education?: string;
+  skills?: string;
+  phoneNumber?: string;
+  country?: string;
+  city?: string;
+  address?: string;
+  dateOfBirth?: Date;
+  gender?: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+
+
+export interface IUserStatsDTO {
+  totalUsers: number;
+  activeUsers: number;
+  inactiveUsers: number;
+  totalInstructors: number;
+  activeInstructors: number;
+  inactiveInstructors: number;
+}
+
+export type IGetUserStatsInputDTO = object;

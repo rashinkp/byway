@@ -1,12 +1,17 @@
 import { PrismaClient } from "@prisma/client";
 import { ISearchRepository } from "../../app/repositories/search.repository";
-import { ISearchResult, SearchParams } from "../../app/dtos/search.dto";
+import { ISearchResult } from "../../domain/types/search.interface";
 
 export class SearchRepository implements ISearchRepository {
   constructor(private prisma: PrismaClient) {}
 
   async search(
-    params: SearchParams & { userId?: string }
+    params: {
+      query: string;
+      page?: number;
+      limit?: number;
+      userId?: string;
+    } & { userId?: string }
   ): Promise<ISearchResult> {
     const { query, page = 1, limit = 10, userId } = params;
     const skip = (page - 1) * limit;

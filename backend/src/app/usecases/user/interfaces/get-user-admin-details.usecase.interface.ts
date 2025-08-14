@@ -1,12 +1,10 @@
-import { GetUserDto } from "../../../dtos/user.dto";
-import { User } from "../../../../domain/entities/user.entity";
-import { UserProfile } from "../../../../domain/entities/user-profile.entity";
-import { Instructor } from "../../../../domain/entities/instructor.entity";
+import { GetUserDto, ProfileDTO, UserResponseDTO } from "../../../dtos/user.dto";
+import { InstructorResponseDTO } from "../../../dtos/instructor.dto";
 
 export interface IGetUserAdminDetailsUseCase {
   execute(dto: GetUserDto): Promise<{
-    user: User;
-    profile: UserProfile | null;
-    instructor: Instructor | null;
+    user: UserResponseDTO;
+    profile: ProfileDTO | null;
+    instructor: InstructorResponseDTO | null;
   }>;
 }

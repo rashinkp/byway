@@ -30,7 +30,6 @@ export function createInstructorDependencies(
   );
   const updateInstructorUseCase = new UpdateInstructorUseCase(
     instructorRepository,
-    userRepository
   );
   const approveInstructorUseCase = new ApproveInstructorUseCase(
     instructorRepository,
