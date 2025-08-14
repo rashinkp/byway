@@ -1,11 +1,12 @@
 import { CourseOverallStats } from "../../domain/types/course-stats.interface";
 import { IEnrollmentStats } from "../../domain/types/enrollment.interface";
-import { IUserStats } from "../usecases/user/interfaces/get-user-stats.usecase.interface";
+
 import { ITopEnrolledCourse, ITopInstructor } from "./admin.dto";
+import { IUserStatsDTO } from "./user.dto";
 
 export interface IDashboardStatsDTO {
     courseStats: CourseOverallStats;
-    userStats: IUserStats;
+    userStats: IUserStatsDTO;
     enrollmentStats: IEnrollmentStats;
     totalRevenue: number;
   }
