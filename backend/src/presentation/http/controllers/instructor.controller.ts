@@ -262,7 +262,10 @@ export class InstructorController extends BaseController {
     httpRequest: IHttpRequest
   ): Promise<IHttpResponse> {
     return this.handleRequest(httpRequest, async (request) => {
-      const { userId } = request.params;
+      const { userId } = request.params || {};
+      if (!userId) {
+        throw new HttpError("User ID is required", StatusCodes.BAD_REQUEST);
+      }
       const result = await this.getInstructorDetailsUseCase.execute(userId);
       return this.success_200(
         result,

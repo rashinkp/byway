@@ -34,7 +34,7 @@ export class LessonContentController extends BaseController {
         throw new HttpError("Unauthorized", 401);
       }
 
-      const validated = validateCreateLessonContent(request.body);
+      const validated = validateCreateLessonContent(request.body as any);
       const content = await this.createLessonContentUseCase.execute({
         ...validated,
         userId: request.user.id,

@@ -206,7 +206,7 @@ export class PrismaAnalyticsRepository implements IRevenueRepository {
     } = input;
     const skip = (page - 1) * limit;
 
-    const where: any = {
+    const where: Record<string, unknown> = {
       createdAt: {
         gte: startDate,
         lte: endDate,

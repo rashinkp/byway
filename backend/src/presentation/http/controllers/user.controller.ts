@@ -55,8 +55,8 @@ export class UserController extends BaseController {
             createdAt: user.createdAt,
             updatedAt: user.updatedAt,
           })),
-          total: result.total,
-          totalPages: result.totalPage,
+          total: result.total || 0,
+          totalPages: result.totalPage || Math.ceil((result.total || 0) / (validated.limit || 10)),
         },
         "Users retrieved successfully"
       );
@@ -68,7 +68,7 @@ export class UserController extends BaseController {
       if (!request.user?.id) {
         throw new UnauthorizedError("User not authenticated");
       }
-      if (!request.params.id) {
+      if (!request.params?.id) {
         throw new BadRequestError("User ID is required");
       }
       const validated = validateToggleDeleteUser({
@@ -156,7 +156,7 @@ export class UserController extends BaseController {
       if (!request.user?.id) {
         throw new UnauthorizedError("User not authenticated");
       }
-      if (!request.params.userId) {
+      if (!request.params?.userId) {
         throw new BadRequestError("User ID is required");
       }
       const validated = validateGetUser({ userId: request.params.userId });
@@ -230,7 +230,7 @@ export class UserController extends BaseController {
 
   async getPublicUser(httpRequest: IHttpRequest): Promise<IHttpResponse> {
     return this.handleRequest(httpRequest, async (request) => {
-      if (!request.params.userId) {
+      if (!request.params?.userId) {
         throw new BadRequestError("User ID is required");
       }
       const validated = validateGetUser({ userId: request.params.userId });
@@ -258,7 +258,7 @@ export class UserController extends BaseController {
 
   async getUserAdminDetails(httpRequest: IHttpRequest): Promise<IHttpResponse> {
     return this.handleRequest(httpRequest, async (request) => {
-      if (!request.params.userId) {
+      if (!request.params?.userId) {
         throw new BadRequestError("User ID is required");
       }
       const validated = validateGetUser({ userId: request.params.userId });

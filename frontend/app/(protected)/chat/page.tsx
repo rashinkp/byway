@@ -17,6 +17,7 @@ import {
 } from "@/services/socketChat";
 import socket from "@/lib/socket";
 import { useRouter } from "next/navigation";
+import { ChatMessage, ChatListItem } from "@/types/chat";
 
 export default function ChatPage() {
   const user = useAuthStore((state) => state.user);
@@ -73,11 +74,11 @@ export default function ChatPage() {
     try {
       listUserChats(
         { page: 1, limit: 10, search: searchQuery },
-        (result: any) => {
-          const chatData = result?.body?.data || result?.data || result;
-          if (chatData && Array.isArray(chatData.items)) {
-            setChatItems(chatData.items);
-            setHasMore(chatData.hasMore || false);
+        (result: ChatListItem[]) => {
+          const chatData = result;
+          if (chatData && Array.isArray(chatData)) {
+            setChatItems(chatData);
+            setHasMore(chatData.length === 10); // Assuming 10 is the limit
             setCurrentPage(1);
             setLoading(false);
           } else {
@@ -96,12 +97,12 @@ export default function ChatPage() {
 
     setLoading(true);
 
-    listUserChats({ page: currentPage + 1, limit: 10 }, (result: any) => {
-      const chatData = result?.body?.data || result?.data || result;
+    listUserChats({ page: currentPage + 1, limit: 10 }, (result: ChatListItem[]) => {
+      const chatData = result;
 
-      if (chatData && Array.isArray(chatData.items)) {
-        setChatItems((prev) => [...prev, ...chatData.items]);
-        setHasMore(chatData.hasMore || false);
+      if (chatData && Array.isArray(chatData)) {
+        setChatItems((prev) => [...prev, ...chatData]);
+        setHasMore(chatData.length === 10);
         setCurrentPage(currentPage + 1);
         setLoading(false);
       } else {
@@ -117,8 +118,8 @@ export default function ChatPage() {
       joinChat(selectedChat.chatId);
       getMessagesByChat(
         { chatId: selectedChat.chatId, limit: 20 },
-        (result: any) => {
-          const msgs = result?.body?.data || result?.data || result;
+        (result: ChatMessage[]) => {
+          const msgs = result;
           // Backend now returns ASC order (oldest first), which matches display expectations
           setMessages(Array.isArray(msgs) ? msgs : []);
         }
@@ -189,8 +190,8 @@ export default function ChatPage() {
           audioUrl: pendingAudioUrl || undefined,
         },
         () => {
-          getMessagesByChat({ chatId: selectedChat.chatId }, (result: any) => {
-            const msgs = result?.body?.data || result?.data || result;
+          getMessagesByChat({ chatId: selectedChat.chatId }, (result: ChatMessage[]) => {
+            const msgs = result;
             // Backend now returns ASC order (oldest first), which matches display expectations
             setMessages(Array.isArray(msgs) ? msgs : []);
           });
@@ -242,7 +243,7 @@ export default function ChatPage() {
           messageId,
           chatId: selectedChat.chatId,
         },
-        (response: any) => {
+        (response: { success?: boolean }) => {
           console.log("[Frontend] Delete message response:", response);
 
           if (response?.success) {
@@ -252,8 +253,8 @@ export default function ChatPage() {
             // Then refresh messages from server
             getMessagesByChat(
               { chatId: selectedChat.chatId },
-              (result: any) => {
-                const msgs = result?.body?.data || result?.data || result;
+              (result: ChatMessage[]) => {
+                const msgs = result;
                 setMessages(Array.isArray(msgs) ? msgs : []);
               }
             );
@@ -261,11 +262,11 @@ export default function ChatPage() {
             // Refresh chat list as well
             listUserChats(
               { page: 1, limit: 10, search: searchQuery },
-              (result: any) => {
-                const chatData = result?.body?.data || result?.data || result;
-                if (chatData && Array.isArray(chatData.items)) {
-                  setChatItems(chatData.items);
-                  setHasMore(chatData.hasMore || false);
+              (result: ChatListItem[]) => {
+                const chatData = result;
+                if (chatData && Array.isArray(chatData)) {
+                  setChatItems(chatData);
+                  setHasMore(chatData.length === 10);
                   setCurrentPage(1);
                 }
               }
@@ -287,11 +288,11 @@ export default function ChatPage() {
       );
       listUserChats(
         { page: 1, limit: 10, search: searchQuery },
-        (result: any) => {
-          const chatData = result?.body?.data || result?.data || result;
-          if (chatData && Array.isArray(chatData.items)) {
-            setChatItems(chatData.items);
-            setHasMore(chatData.hasMore || false);
+        (result: ChatListItem[]) => {
+          const chatData = result;
+          if (chatData && Array.isArray(chatData)) {
+            setChatItems(chatData);
+            setHasMore(chatData.length === 10);
             setCurrentPage(1);
           }
         }
@@ -350,22 +351,23 @@ export default function ChatPage() {
                 )
               );
               // Re-fetch chat list and messages from backend for stability
-              listUserChats({ page: 1, limit: 10 }, (result: any) => {
-                const chatData = result?.body?.data || result?.data || result;
-                if (chatData && Array.isArray(chatData.items)) {
-                  setChatItems(chatData.items);
-                  setHasMore(chatData.hasMore || false);
+              listUserChats({ page: 1, limit: 10 }, (result: ChatListItem[]) => {
+                const chatData = result;
+                if (chatData && Array.isArray(chatData)) {
+                  setChatItems(chatData);
+                  setHasMore(chatData.length === 10);
                   setCurrentPage(1);
                 }
               });
-              getMessagesByChat({ chatId: msg.chatId }, (result: any) => {
-                const msgs = result?.body?.data || result?.data || result;
-                // Backend now returns ASC order (oldest first), which matches display expectations
-                setMessages(Array.isArray(msgs) ? msgs : []);
+              getMessagesByChat({ chatId: msg.chatId }, (result: ChatMessage[]) => {
+                const msgs = result;
+                if (Array.isArray(msgs)) {
+                  setMessages(msgs);
+                }
               });
             }
           },
-          (err: any) => {
+          (err: { message?: string }) => {
             alert(err?.message || "Failed to send message");
           }
         );
@@ -387,7 +389,7 @@ export default function ChatPage() {
           );
           // Do not update chatItems here; rely on chatListUpdated event to refetch from backend
         },
-        (err: any) => {
+        (err: { message?: string }) => {
           alert(err?.message || "Failed to send message");
         }
       );
@@ -433,8 +435,8 @@ export default function ChatPage() {
       console.log("[SocketIO] messagesRead event received:", chatId);
       if (selectedChat?.chatId === chatId) {
         console.log("[SocketIO] Refetching messages for chat:", chatId);
-        getMessagesByChat({ chatId }, (result: any) => {
-          const msgs = result?.body?.data || result?.data || result;
+        getMessagesByChat({ chatId }, (result: ChatMessage[]) => {
+          const msgs = result;
           console.log("[SocketIO] Updated messages:", msgs);
           setMessages(Array.isArray(msgs) ? msgs : []);
         });
@@ -443,12 +445,12 @@ export default function ChatPage() {
       console.log("[SocketIO] Refetching chat list after messagesRead");
       listUserChats(
         { page: 1, limit: 10, search: searchQuery },
-        (result: any) => {
-          const chatData = result?.body?.data || result?.data || result;
+        (result: ChatListItem[]) => {
+          const chatData = result;
           console.log("[SocketIO] Updated chat list:", chatData);
-          if (chatData && Array.isArray(chatData.items)) {
-            setChatItems(chatData.items);
-            setHasMore(chatData.hasMore || false);
+          if (chatData && Array.isArray(chatData)) {
+            setChatItems(chatData);
+            setHasMore(chatData.length === 10);
             setCurrentPage(1);
           }
         }

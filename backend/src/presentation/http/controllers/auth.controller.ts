@@ -107,7 +107,7 @@ export class AuthController extends BaseController {
 
   private getUserFromRefreshToken(request: IHttpRequest): UserData {
     const jwtProvider = new JwtProvider();
-    const refreshToken = request.cookies?.refresh_token;
+    const refreshToken = request.cookies?.refresh_token as string;
     if (!refreshToken) {
       throw new BadRequestError("No refresh token provided");
     }

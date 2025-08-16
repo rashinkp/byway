@@ -303,28 +303,33 @@ export class Course {
     };
   }
 
-  static fromPrisma(data: { 
-    id: string; 
-    title: string; 
-    description: string | null; 
-    level: string; 
-    price: { toNumber(): number } | null; 
-    thumbnail: string | null; 
-    duration: number | null; 
-    offer: { toNumber(): number } | null; 
-    status: string; 
-    categoryId: string; 
-    createdBy: string; 
-    createdAt: Date; 
-    updatedAt: Date; 
-    deletedAt: Date | null; 
-    approvalStatus: string; 
-    adminSharePercentage: { toNumber(): number }; 
-    details: { prerequisites: string | null; longDescription: string | null; objectives: string | null; targetAudience: string | null } | null; 
-    rating: number | null; 
-    reviewCount: number | null; 
-    lessons: unknown[]; 
-    bestSeller: boolean; 
+  static fromPrisma(data: {
+    id: string;
+    title: string;
+    description: string | null;
+    level: string;
+    price?: { toNumber(): number } | null;
+    thumbnail?: string | null;
+    duration?: number | null;
+    offer?: { toNumber(): number } | null;
+    status: string;
+    categoryId: string;
+    createdBy: string;
+    createdAt: Date;
+    updatedAt: Date;
+    deletedAt?: Date | null;
+    approvalStatus: string;
+    adminSharePercentage: { toNumber(): number };
+    details?: {
+      prerequisites: string | null;
+      longDescription: string | null;
+      objectives: string | null;
+      targetAudience: string | null;
+    } | null;
+    rating?: number | null;
+    reviewCount?: number | null;
+    lessons?: unknown[];
+    bestSeller?: boolean;
   }): Course {
     return new Course({
       id: data.id,
@@ -332,7 +337,7 @@ export class Course {
       description: data.description,
       level: data.level as CourseLevel,
       price: data.price ? Price.create(data.price.toNumber()) : null,
-      thumbnail: data.thumbnail,
+      thumbnail: data.thumbnail ?? null,
       duration: data.duration ? Duration.create(data.duration) : null,
       offer: data.offer ? Offer.create(data.offer.toNumber()) : null,
       status: data.status as CourseStatus,
@@ -340,14 +345,14 @@ export class Course {
       createdBy: data.createdBy,
       createdAt: data.createdAt,
       updatedAt: data.updatedAt,
-      deletedAt: data.deletedAt,
+      deletedAt: data.deletedAt ?? null,
       approvalStatus: data.approvalStatus as APPROVALSTATUS,
       adminSharePercentage: data.adminSharePercentage.toNumber(),
       details: data.details ? new CourseDetails(data.details) : null,
       rating: data.rating ?? undefined,
       reviewCount: data.reviewCount ?? undefined,
-      lessons: data.lessons.length,
-      bestSeller: data.bestSeller,
+      lessons: data.lessons?.length,
+      bestSeller: data.bestSeller ?? false,
     });
   }
 }

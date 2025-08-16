@@ -69,8 +69,8 @@ export class Cart {
       createdAt: data.createdAt,
       updatedAt: data.updatedAt,
       deletedAt: data.deletedAt ?? undefined,
-      user: data.user ? User.fromPrisma(data.user) : undefined,
-      course: data.course ? Course.fromPrisma(data.course) : undefined,
+      user: undefined, // Don't try to reconstruct User entity from incomplete data
+      course: undefined, // Don't try to reconstruct Course entity from incomplete data
     });
   }
 
@@ -177,6 +177,8 @@ export class Cart {
       createdAt: this._createdAt,
       updatedAt: this._updatedAt,
       deletedAt: this._deletedAt,
+      user: this._user,
+      course: this._course,
     };
   }
 } 

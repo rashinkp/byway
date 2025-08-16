@@ -22,12 +22,18 @@ export class PrismaCertificateRepository implements CertificateRepositoryInterfa
         updatedAt: certificate.updatedAt,
       },
     });
-    return Certificate.toDomain(created);
+    return Certificate.toDomain({
+      ...created,
+      metadata: created.metadata as Record<string, unknown> | undefined
+    });
   }
 
   async findById(id: string): Promise<Certificate | null> {
     const found = await this.prisma.certificate.findUnique({ where: { id } });
-    return found ? Certificate.toDomain(found) : null;
+    return found ? Certificate.toDomain({
+      ...found,
+      metadata: found.metadata as Record<string, unknown> | undefined
+    }) : null;
   }
 
   async findByCertificateNumber(
@@ -36,7 +42,10 @@ export class PrismaCertificateRepository implements CertificateRepositoryInterfa
     const found = await this.prisma.certificate.findUnique({
       where: { certificateNumber },
     });
-    return found ? Certificate.toDomain(found) : null;
+    return found ? Certificate.toDomain({
+      ...found,
+      metadata: found.metadata as Record<string, unknown> | undefined
+    }) : null;
   }
 
   async findByUserId(userId: string): Promise<Certificate[]> {
@@ -44,7 +53,10 @@ export class PrismaCertificateRepository implements CertificateRepositoryInterfa
       where: { userId },
       orderBy: { createdAt: "desc" },
     });
-    return found.map((item) => Certificate.toDomain(item));
+    return found.map((item) => Certificate.toDomain({
+      ...item,
+      metadata: item.metadata as Record<string, unknown> | undefined
+    }));
   }
 
   async findByCourseId(courseId: string): Promise<Certificate[]> {
@@ -52,7 +64,10 @@ export class PrismaCertificateRepository implements CertificateRepositoryInterfa
       where: { courseId },
       orderBy: { createdAt: "desc" },
     });
-    return found.map((item) => Certificate.toDomain(item));
+    return found.map((item) => Certificate.toDomain({
+      ...item,
+      metadata: item.metadata as Record<string, unknown> | undefined
+    }));
   }
 
   async findByUserIdAndCourseId(
@@ -62,7 +77,10 @@ export class PrismaCertificateRepository implements CertificateRepositoryInterfa
     const found = await this.prisma.certificate.findUnique({
       where: { userId_courseId: { userId, courseId } },
     });
-    return found ? Certificate.toDomain(found) : null;
+    return found ? Certificate.toDomain({
+      ...found,
+      metadata: found.metadata as Record<string, unknown> | undefined
+    }) : null;
   }
 
   async update(certificate: Certificate): Promise<Certificate> {
@@ -77,7 +95,10 @@ export class PrismaCertificateRepository implements CertificateRepositoryInterfa
         updatedAt: certificate.updatedAt,
       },
     });
-    return Certificate.toDomain(updated);
+    return Certificate.toDomain({
+      ...updated,
+      metadata: updated.metadata as Record<string, unknown> | undefined
+    });
   }
 
   async deleteById(id: string): Promise<void> {
@@ -93,7 +114,7 @@ export class PrismaCertificateRepository implements CertificateRepositoryInterfa
     status?: string;
     search?: string;
   }): Promise<{
-    items: { user: {name:string , email:string}; course: {title:string }; }[];
+    items: { user: {name: string; email: string}; course: {title: string}; }[];
     total: number;
     hasMore: boolean;
     nextPage?: number;
@@ -158,7 +179,10 @@ export class PrismaCertificateRepository implements CertificateRepositoryInterfa
         status: { not: "EXPIRED" },
       },
     });
-    return found.map(item => Certificate.toDomain(item));
+    return found.map(item => Certificate.toDomain({
+      ...item,
+      metadata: item.metadata as Record<string, unknown> | undefined
+    }));
   }
 
   async findCertificatesByStatus(status: string): Promise<Certificate[]> {
@@ -166,6 +190,9 @@ export class PrismaCertificateRepository implements CertificateRepositoryInterfa
       where: { status: status as CertificateStatus },
       orderBy: { createdAt: "desc" },
     });
-     return found.map((item) => Certificate.toDomain(item));
+     return found.map((item) => Certificate.toDomain({
+      ...item,
+      metadata: item.metadata as Record<string, unknown> | undefined
+    }));
   }
 }

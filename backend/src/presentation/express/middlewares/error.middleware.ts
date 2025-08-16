@@ -66,7 +66,7 @@ export function errorMiddleware(
     };
     res.status(err.statusCode).json(response);
   } else if (err instanceof ZodError) {
-    const response: ApiResponse<{ details: any }> = {
+    const response: ApiResponse<{ details: Array<{ path: (string | number)[]; message: string; code: string }> }> = {
       statusCode: 400,
       success: false,
       message: "Validation failed",

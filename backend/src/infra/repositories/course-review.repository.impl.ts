@@ -5,7 +5,17 @@ import { ICourseReviewRepository } from "../../app/repositories/course-review.re
 import { Rating } from "../../domain/value-object/rating";
 import { ICourseReviewWithUser, ICourseReviewSummary, ICourseReviewQuery, ICourseReviewPaginatedResult } from "../../domain/types/review.interface";
 
-function toCourseReviewEntity(data: any): CourseReview {
+function toCourseReviewEntity(data: {
+  id: string;
+  courseId: string;
+  userId: string;
+  rating: number;
+  title: string | null;
+  comment: string | null;
+  createdAt: Date;
+  updatedAt: Date;
+  deletedAt: Date | null;
+}): CourseReview {
   return new CourseReview({
     id: data.id,
     courseId: data.courseId,
@@ -19,7 +29,22 @@ function toCourseReviewEntity(data: any): CourseReview {
   });
 }
 
-function toCourseReviewWithUser(data: any): ICourseReviewWithUser {
+function toCourseReviewWithUser(data: {
+  id: string;
+  courseId: string;
+  userId: string;
+  rating: number;
+  title: string | null;
+  comment: string | null;
+  createdAt: Date;
+  updatedAt: Date;
+  deletedAt: Date | null;
+  user?: {
+    id: string;
+    name: string;
+    avatar: string | null;
+  } | null;
+}): ICourseReviewWithUser {
   return {
     id: data.id,
     courseId: data.courseId,
@@ -114,7 +139,7 @@ export class CourseReviewRepository implements ICourseReviewRepository {
     const limit = query.limit || 10;
     const skip = (page - 1) * limit;
 
-    const where: any = {
+    const where: Record<string, unknown> = {
       courseId,
     };
 
@@ -130,7 +155,7 @@ export class CourseReviewRepository implements ICourseReviewRepository {
       where.rating = query.rating;
     }
 
-    const orderBy: any = {};
+    const orderBy: Record<string, 'asc' | 'desc'> = {};
     if (query.sortBy === "rating") {
       orderBy.rating = query.sortOrder || "desc";
     } else {

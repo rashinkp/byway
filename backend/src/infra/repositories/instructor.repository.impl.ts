@@ -202,17 +202,14 @@ export class PrismaInstructorRepository implements IInstructorRepository {
           },
         });
 
-        // Calculate total revenue (instructor gets the remaining amount after admin share)
-        const totalRevenue = completedOrderItems.reduce(
-          (sum: number, item: { coursePrice: string | number; adminSharePercentage: string | number }) => {
-            const itemPrice = Number(item.coursePrice);
-            const adminSharePercentage = Number(item.adminSharePercentage);
-            const adminRevenue = itemPrice * (adminSharePercentage / 100);
-            const instructorRevenue = itemPrice - adminRevenue; // Instructor gets the remaining amount
-            return sum + instructorRevenue;
-          },
-          0
-        );
+    const totalRevenue = completedOrderItems.reduce((sum, item) => {
+      const itemPrice = Number(item.coursePrice); // Decimal is converted
+      const adminSharePercentage = Number(item.adminSharePercentage);
+      const adminRevenue = itemPrice * (adminSharePercentage / 100);
+      const instructorRevenue = itemPrice - adminRevenue;
+      return sum + instructorRevenue;
+    }, 0);
+
 
         // Calculate average rating from course reviews
         const reviews = await this.prisma.courseReview.findMany({

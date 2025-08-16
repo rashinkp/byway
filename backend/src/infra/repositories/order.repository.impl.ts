@@ -77,42 +77,47 @@ export class OrderRepository implements IOrderRepository {
     };
   }
 
-  private mapToOrderEntity(order: any): Order {
+  private mapToOrderEntity(order: Record<string, unknown>): Order {
     const mappedOrder = new Order(
-      order.userId,
+      order.userId as string,
       order.orderStatus as OrderStatus,
       order.paymentStatus as PaymentStatus,
-      order.paymentId,
+      order.paymentId as string | null,
       order.paymentGateway as PaymentGateway,
-      Number(order.amount),
-      order.couponCode,
-      order.items.map((item: any) => ({
-        orderId: item.orderId,
-        courseId: item.courseId,
-        courseTitle: item.courseTitle || item.course?.title || "Unknown Course",
-        coursePrice: Number(item.coursePrice),
-        discount: item.discount ? Number(item.discount) : null,
-        couponId: item.couponId,
-        title: item.course?.title || item.courseTitle || "Unknown Course",
-        description: item.course?.description || "No description available",
-        level: item.course?.level || "BEGINNER",
-        price: item.course?.price
-          ? Number(item.course.price)
-          : Number(item.coursePrice),
-        thumbnail: item.course?.thumbnail || null,
-        status: item.course?.status || "ACTIVE",
-        categoryId: item.course?.categoryId || "",
-        createdBy: item.course?.createdBy || "",
-        deletedAt: item.course?.deletedAt
-          ? new Date(item.course.deletedAt).toISOString()
+      typeof order.amount === 'number' ? order.amount : (order.amount as { toNumber(): number }).toNumber(),
+      order.couponCode as string | null,
+      (order.items as Array<Record<string, unknown>>).map((item) => ({
+        orderId: item.orderId as string,
+        courseId: item.courseId as string,
+        courseTitle: (item.courseTitle as string) || (item.course as Record<string, unknown>)?.title as string || "Unknown Course",
+        coursePrice: typeof item.coursePrice === 'number' ? item.coursePrice : (item.coursePrice as { toNumber(): number }).toNumber(),
+        discount: item.discount ? (typeof item.discount === 'number' ? item.discount : (item.discount as { toNumber(): number }).toNumber()) : null,
+        couponId: item.couponId as string | null,
+        title: (item.course as Record<string, unknown>)?.title as string || (item.courseTitle as string) || "Unknown Course",
+        description: (item.course as Record<string, unknown>)?.description as string || "No description available",
+        level: (item.course as Record<string, unknown>)?.level as string || "BEGINNER",
+        price: (item.course as Record<string, unknown>)?.price
+          ? (typeof (item.course as Record<string, unknown>).price === 'number' ? (item.course as Record<string, unknown>).price as number : ((item.course as Record<string, unknown>).price as { toNumber(): number }).toNumber())
+          : (typeof item.coursePrice === 'number' ? item.coursePrice : (item.coursePrice as { toNumber(): number }).toNumber()),
+        thumbnail: (item.course as Record<string, unknown>)?.thumbnail as string | null,
+        status: (item.course as Record<string, unknown>)?.status as string || "ACTIVE",
+        categoryId: (item.course as Record<string, unknown>)?.categoryId as string || "",
+        createdBy: (item.course as Record<string, unknown>)?.createdBy as string || "",
+        deletedAt: (item.course as Record<string, unknown>)?.deletedAt
+          ? new Date((item.course as Record<string, unknown>).deletedAt as Date).toISOString()
           : null,
-        approvalStatus: item.course?.approvalStatus || "PENDING",
-        details: item.course?.details || null,
+        approvalStatus: (item.course as Record<string, unknown>)?.approvalStatus as string || "PENDING",
+        details: (item.course as Record<string, unknown>)?.details ? {
+          prerequisites: ((item.course as Record<string, unknown>)?.details as Record<string, unknown>)?.prerequisites as string | null || null,
+          longDescription: ((item.course as Record<string, unknown>)?.details as Record<string, unknown>)?.longDescription as string | null || null,
+          objectives: ((item.course as Record<string, unknown>)?.details as Record<string, unknown>)?.objectives as string | null || null,
+          targetAudience: ((item.course as Record<string, unknown>)?.details as Record<string, unknown>)?.targetAudience as string | null || null,
+        } : null,
       }))
     );
-    mappedOrder.id = order.id;
-    mappedOrder.createdAt = order.createdAt;
-    mappedOrder.updatedAt = order.updatedAt;
+    mappedOrder.id = order.id as string;
+    mappedOrder.createdAt = order.createdAt as Date;
+    mappedOrder.updatedAt = order.updatedAt as Date;
     return mappedOrder;
   }
 

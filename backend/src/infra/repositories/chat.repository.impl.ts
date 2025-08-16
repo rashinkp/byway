@@ -269,10 +269,10 @@ export class ChatRepository implements IChatRepository {
       const remainingSlots = limit - chatItems.length;
       const existingUserIds = new Set([
         userId.value,
-        ...chatItems.map((chat: any) => chat.userId),
+        ...chatItems.map((chat: { userId: string | undefined }) => chat.userId).filter((id): id is string => id !== undefined),
       ]);
       // Build user where clause for search
-      const userWhere: any = {
+      const userWhere: Record<string, unknown> = {
         id: { notIn: Array.from(existingUserIds) },
         deletedAt: null,
       };

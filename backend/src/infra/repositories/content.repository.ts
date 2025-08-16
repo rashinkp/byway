@@ -6,6 +6,29 @@ import {
 } from "../../domain/entities/content.entity";
 import { ILessonContentRepository } from "../../app/repositories/content.repository";
 
+// Type definitions for content data
+interface ContentData {
+  id?: string;
+  lessonId: string;
+  type: ContentType;
+  status: ContentStatus;
+  title: string;
+  description: string | null;
+  fileUrl: string | null;
+  thumbnailUrl: string | null;
+  quizQuestions?: QuizQuestionData[] | null;
+  createdAt: string | Date;
+  updatedAt: string | Date;
+  deletedAt: string | Date | null;
+}
+
+interface QuizQuestionData {
+  id?: string;
+  question: string;
+  options: string[];
+  correctAnswer: string;
+}
+
 export class LessonContentRepository implements ILessonContentRepository {
   constructor(private readonly prisma: PrismaClient) {}
 
@@ -76,7 +99,7 @@ export class LessonContentRepository implements ILessonContentRepository {
   }
 
   async create(content: LessonContent): Promise<LessonContent> {
-    const contentData = content.toJSON();
+    const contentData = content.toJSON() as unknown as ContentData;
 
     const createdContent = await this.prisma.lessonContent.create({
       data: {
@@ -89,7 +112,7 @@ export class LessonContentRepository implements ILessonContentRepository {
         thumbnailUrl: contentData.thumbnailUrl,
         quizQuestions: contentData.quizQuestions
           ? {
-              create: contentData.quizQuestions.map((q: QuizQuestion) => ({
+              create: contentData.quizQuestions.map((q: QuizQuestionData) => ({
                 id: q.id || undefined,
                 question: q.question,
                 options: q.options,
@@ -130,7 +153,7 @@ export class LessonContentRepository implements ILessonContentRepository {
   }
 
   async update(content: LessonContent): Promise<LessonContent> {
-    const contentData = content.toJSON();
+    const contentData = content.toJSON() as unknown as ContentData;
 
     const updatedContent = await this.prisma.lessonContent.update({
       where: { id: contentData.id },
@@ -144,7 +167,7 @@ export class LessonContentRepository implements ILessonContentRepository {
         quizQuestions: contentData.quizQuestions
           ? {
               deleteMany: {},
-              create: contentData.quizQuestions.map((q: QuizQuestion) => ({
+              create: contentData.quizQuestions.map((q: QuizQuestionData) => ({
                 id: q.id || undefined,
                 question: q.question,
                 options: q.options,

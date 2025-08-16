@@ -19,6 +19,41 @@ import {
   QuizQuestion,
 } from "../../domain/entities/content.entity";
 
+// Type definitions for lesson data
+interface LessonData {
+  id: string;
+  courseId: string;
+  title: string;
+  description: string | null;
+  order: number;
+  status: LessonStatus;
+  createdAt: string | Date;
+  updatedAt: string | Date;
+  deletedAt: string | Date | null;
+  content?: ContentData | null;
+}
+
+interface ContentData {
+  id?: string;
+  type: ContentType;
+  status: ContentStatus;
+  title: string;
+  description: string | null;
+  fileUrl: string | null;
+  thumbnailUrl: string | null;
+  quizQuestions?: QuizQuestionData[] | null;
+  createdAt: string | Date;
+  updatedAt: string | Date;
+  deletedAt: string | Date | null;
+}
+
+interface QuizQuestionData {
+  id?: string;
+  question: string;
+  options: string[];
+  correctAnswer: string;
+}
+
 export class LessonRepository implements ILessonRepository {
   constructor(private readonly prisma: PrismaClient) {}
 
@@ -146,7 +181,7 @@ export class LessonRepository implements ILessonRepository {
   }
 
   async create(lesson: Lesson): Promise<Lesson> {
-    const lessonData = lesson.toJSON();
+    const lessonData = lesson.toJSON() as unknown as LessonData;
     const contentData = lessonData.content;
 
     const createdLesson = await this.prisma.lesson.create({
@@ -172,7 +207,7 @@ export class LessonRepository implements ILessonRepository {
                 quizQuestions: contentData.quizQuestions
                   ? {
                       create: contentData.quizQuestions.map(
-                        (q: QuizQuestion) => ({
+                        (q: QuizQuestionData) => ({
                           id: q.id || undefined,
                           question: q.question,
                           options: q.options,
@@ -197,7 +232,7 @@ export class LessonRepository implements ILessonRepository {
   }
 
   async update(lesson: Lesson): Promise<Lesson> {
-    const lessonData = lesson.toJSON();
+    const lessonData = lesson.toJSON() as unknown as LessonData;
     const contentData = lessonData.content;
 
     // Check if LessonContent exists before attempting delete
@@ -229,7 +264,7 @@ export class LessonRepository implements ILessonRepository {
                   quizQuestions: contentData.quizQuestions
                     ? {
                         create: contentData.quizQuestions.map(
-                          (q: QuizQuestion) => ({
+                          (q: QuizQuestionData) => ({
                             id: q.id || undefined,
                             question: q.question,
                             options: q.options,
@@ -255,7 +290,7 @@ export class LessonRepository implements ILessonRepository {
                     ? {
                         deleteMany: {},
                         create: contentData.quizQuestions.map(
-                          (q: QuizQuestion) => ({
+                          (q: QuizQuestionData) => ({
                             id: q.id || undefined,
                             question: q.question,
                             options: q.options,
@@ -302,7 +337,7 @@ export class LessonRepository implements ILessonRepository {
 
   private mapToLessonEntity(
     lesson: PrismaLesson & {
-      content?: (PrismaLessonContent & { quizQuestions: any[] }) | null;
+      content?: (PrismaLessonContent & { quizQuestions: Array<{ id: string; question: string; options: string[]; correctAnswer: string }> }) | null;
     }
   ): Lesson {
     return Lesson.fromPersistence({
@@ -343,7 +378,7 @@ export class LessonRepository implements ILessonRepository {
 
   private mapToLessonOutputDTO(
     lesson: PrismaLesson & {
-      content?: (PrismaLessonContent & { quizQuestions: any[] }) | null;
+      content?: (PrismaLessonContent & { quizQuestions: Array<{ id: string; question: string; options: string[]; correctAnswer: string }> }) | null;
     }
   ): ILessonOutputDTO {
     return {

@@ -39,7 +39,18 @@ export class StripeWebhookGateway implements WebhookGateway {
         webhookSecret
       );
 
-      return WebhookEvent.create(constructedEvent.type, constructedEvent.data);
+      return WebhookEvent.create(constructedEvent.type, constructedEvent.data as unknown as {
+        object: {
+          id: string;
+          payment_status: string;
+          payment_intent: string;
+          metadata: Record<string, string>;
+          amount_total?: number;
+          failure_message?: string;
+          last_payment_error?: { message: string };
+          amount?: number;
+        };
+      });
     } catch (error) {
       if (error instanceof Stripe.errors.StripeSignatureVerificationError) {
         throw new HttpError(

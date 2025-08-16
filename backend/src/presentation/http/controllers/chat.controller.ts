@@ -24,6 +24,7 @@ import {
   deleteMessageSchema,
 } from "../../validators/chat.validators";
 import { IGetTotalUnreadCountUseCase } from "../../../app/usecases/message/interfaces/get-total-unread-count.usecase.interface";
+import { SendMessageBodyDTO } from "../../../app/dtos/chat.dto";
 
 interface SendMessageSocketData {
   chatId?: string;
@@ -127,9 +128,11 @@ export class ChatController extends BaseController {
     });
   }
 
-  async sendMessage(httpRequest: IHttpRequest): Promise<IHttpResponse> {
+  async sendMessage(
+    httpRequest: IHttpRequest<SendMessageBodyDTO>
+  ): Promise<IHttpResponse> {
     return this.handleRequest(httpRequest, async (request) => {
-      const { chatId, userId, content } = request.body;
+      const { chatId, userId, content } = request.body as SendMessageBodyDTO;
       const senderId = request.user?.id;
       if (!senderId) {
         return this.httpErrors.error_401("Unauthorized: No user id");

@@ -21,7 +21,7 @@ export class CertificateController extends BaseController {
   ): Promise<IHttpResponse> => {
     return this.handleRequest(httpRequest, async (request) => {
       const userId = request.user?.id;
-      const { courseId } = request.body;
+      const { courseId } = request.body as { courseId: string };
       if (!userId || !courseId) {
         return this.httpErrors.error_400("User ID or Course ID missing");
       }

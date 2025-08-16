@@ -68,7 +68,7 @@ export class CookieUtils {
   static setAuthCookiesFromUser(
     res: Response,
     user: { id: string; email: string; role: string },
-    jwtProvider: any
+    jwtProvider: { signAccessToken: (user: { id: string; email: string; role: string }) => string; signRefreshToken: (user: { id: string; email: string; role: string }) => string }
   ): void {
     const accessToken = jwtProvider.signAccessToken(user);
     const refreshToken = jwtProvider.signRefreshToken(user);

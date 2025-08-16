@@ -12,6 +12,7 @@ import { HttpError } from "../../presentation/http/errors/http-error";
 import { IGetTopEnrolledCoursesInput } from "../../app/usecases/course/interfaces/top-enrolled-courses.usecase.interface";
 import { CourseOverallStats, CourseStats } from "../../domain/types/course-stats.interface";import { FilterCourse, PaginatedResult } from "../../domain/types/pagination-filter.interface";
 import { CourseStatsInput, CourseWithEnrollment } from "../../domain/types/course.interface";
+import { UserProfile } from "../../domain/entities/user-profile.entity";
 export class CourseRepository implements ICourseRepository {
   constructor(private prisma: PrismaClient) {}
 
@@ -23,13 +24,13 @@ export class CourseRepository implements ICourseRepository {
     
     // Get instructor data
     const instructor = await this.prisma.user.findUnique({
-      where: { id: courseData.createdBy },
+      where: { id: courseData.createdBy as string },
       select: { id: true, name: true, email: true, userProfile: true }
     });
 
     // Get review stats
     const reviews = await this.prisma.courseReview.findMany({
-      where: { courseId: courseData.id, deletedAt: null },
+      where: { courseId: courseData.id as string, deletedAt: null },
       select: { rating: true }
     });
 
@@ -39,29 +40,55 @@ export class CourseRepository implements ICourseRepository {
 
     // Check if user is enrolled (if userId is provided)
     const isEnrolled = userId ? await this.prisma.enrollment.findFirst({
-      where: { userId, courseId: courseData.id }
+      where: { userId, courseId : courseData.id as string }
     }).then(enrollment => !!enrollment) : false;
 
     // Check if course is in cart (if userId is provided)
-    const isInCart = userId ? await this.prisma.cart.findFirst({
-      where: { userId, courseId: courseData.id }
-    }).then(cart => !!cart) : false;
+    const isInCart = userId
+      ? await this.prisma.cart
+          .findFirst({
+            where: { userId, courseId: courseData.id as string },
+          })
+          .then((cart) => !!cart)
+      : false;
 
     return {
-      ...courseData,
+      id: course.id,
+      title: course.title,
+      description: course.description,
+      level: course.level,
+      price: course.price?.getValue()?.toNumber() ?? null,
+      thumbnail: course.thumbnail,
+      duration: course.duration?.getValue() ?? null,
+      offer: course.offer?.getValue()?.toNumber() ?? null,
+      status: course.status,
+      categoryId: course.categoryId,
+      createdBy: course.createdBy,
+      createdAt: course.createdAt.toISOString(),
+      updatedAt: course.updatedAt.toISOString(),
+      deletedAt: course.deletedAt?.toISOString() ?? null,
+      approvalStatus: course.approvalStatus,
+      adminSharePercentage: course.adminSharePercentage,
+      instructorSharePercentage: 0, // Default value since Course entity doesn't have this property
+      details: course.details,
       isEnrolled,
       isInCart,
-      instructor: instructor ? {
-        id: instructor.id,
-        name: instructor.name,
-        email: instructor.email,
-        profile: instructor.userProfile
-      } : null,
+      instructor: instructor
+        ? {
+            id: instructor.id,
+            name: instructor.name,
+            email: instructor.email,
+            profile: instructor.userProfile
+              ? UserProfile.fromPrisma(instructor.userProfile)
+              : null,
+          }
+        : null,
       reviewStats: {
         rating,
-        reviewCount: reviews.length
-      }
+        reviewCount: reviews.length,
+      },
     };
+
   }
 
   async save(course: Course): Promise<Course> {

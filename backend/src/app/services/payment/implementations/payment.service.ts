@@ -19,6 +19,7 @@ import { OrderStatus } from "../../../../domain/enum/order-status.enum";
 import { IRevenueDistributionService } from "../../revenue-distribution/interfaces/revenue-distribution.service.interface";
 import { ICartRepository } from "../../../repositories/cart.repository";
 import { getSocketIOInstance } from "../../../../presentation/socketio";
+import { Order } from "../../../../domain/entities/order.entity";
 
 interface ServiceResponse<T> {
   data: T;
@@ -147,7 +148,16 @@ export class PaymentService implements IPaymentService {
     }
 
     // Send real-time notifications via Socket.IO
-    await this.sendPurchaseNotifications({ userId }, orderItems);
+    const orderItemsWithPrices = await Promise.all(
+      orderItems.map(async (item) => {
+        const course = await this.orderRepository.findCourseById(item.courseId);
+        return {
+          courseId: item.courseId,
+          coursePrice: course?.price?.getValue()?.toNumber() || 0
+        };
+      })
+    );
+    await this.sendPurchaseNotifications({ userId }, orderItemsWithPrices);
 
     return {
       data: {
@@ -176,8 +186,8 @@ export class PaymentService implements IPaymentService {
       throw new HttpError("User not found", StatusCodes.NOT_FOUND);
     }
 
-    const courseIds = input.courses?.map(c => c.id)
-    const isEnrolled = await this.enrollmentRepository.findByUserIdAndCourseIds(userId, courseIds || [])
+    const courseIds = input.courses?.map(c => c.id) || [];
+    const isEnrolled = await this.enrollmentRepository.findByUserIdAndCourseIds(userId, courseIds);
 
     console.log(isEnrolled , 'courseneroleled -=-==============>')
     
@@ -213,7 +223,7 @@ export class PaymentService implements IPaymentService {
 
   async handleStripeWebhook(
     event: WebhookEvent
-  ): Promise<ServiceResponse<{ order?: any; transaction?: Transaction }>> {
+  ): Promise<ServiceResponse<{ order?: Order; transaction?: Transaction }>> {
     try {
       // Handle successful payments
       if (event.type === "checkout.session.completed") {
@@ -370,7 +380,16 @@ export class PaymentService implements IPaymentService {
             }
 
             // Send real-time notifications via Socket.IO
-            await this.sendPurchaseNotifications(order, orderItems);
+            const orderItemsWithPrices = await Promise.all(
+              orderItems.map(async (item) => {
+                const course = await this.orderRepository.findCourseById(item.courseId);
+                                 return {
+                   courseId: item.courseId,
+                   coursePrice: course?.price?.getValue()?.toNumber() || 0
+                 };
+              })
+            );
+            await this.sendPurchaseNotifications(order, orderItemsWithPrices);
 
             return {
               data: { order, transaction },
@@ -447,13 +466,13 @@ export class PaymentService implements IPaymentService {
           PaymentGatewayEnum.STRIPE
         );
 
-        return {
-          data: {
-            order: order.toJSON(),
-            transaction: transaction || undefined,
-          },
-          message: "Payment failure handled",
-        };
+                 return {
+           data: {
+             order: order,
+             transaction: transaction || undefined,
+           },
+           message: "Payment failure handled",
+         };
       }
 
       console.log("=== Webhook Processing End ===");

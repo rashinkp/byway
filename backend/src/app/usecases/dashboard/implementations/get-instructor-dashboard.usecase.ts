@@ -25,28 +25,38 @@ export class GetInstructorDashboardUseCase implements IGetInstructorDashboardUse
       limit: 1000, // Get all courses
     });
     const courses = coursesResponse.items;
-    const courseIds = courses.map((c: any) => c.id);
+    const courseIds = courses.map((c: { id: string }) => c.id);
 
     // Total courses (including deleted)
     const totalCourses = courses.length;
 
     // Active courses (only non-deleted PUBLISHED courses)
     const activeCourses = courses.filter(
-      (c: any) => c.status === "PUBLISHED" && !c.deletedAt
+      (c: { status: string; deletedAt: Date | null }) => c.status === "PUBLISHED" && !c.deletedAt
     ).length;
 
     // Pending courses (including deleted)
     const pendingCourses = courses.filter(
-      (c: any) => c.status === "PENDING"
+      (c: { status: string }) => c.status === "PENDING"
     ).length;
 
     // Completed/Archived courses (including deleted)
     const completedCourses = courses.filter(
-      (c: any) => c.status === "ARCHIVED"
+      (c: { status: string }) => c.status === "ARCHIVED"
     ).length;
 
     // Get enrollments for these courses using existing method
-    const enrollments: any[] = [];
+    const enrollments: Array<{
+      userId: string;
+      enrolledAt: Date;
+      orderItem?: {
+        coursePrice: string | number;
+        adminSharePercentage: string | number;
+        order?: {
+          paymentStatus: string;
+        };
+      };
+    }> = [];
     for (const courseId of courseIds) {
       const courseEnrollments = await this.enrollmentRepository.findByCourseId(
         courseId
@@ -55,7 +65,7 @@ export class GetInstructorDashboardUseCase implements IGetInstructorDashboardUse
     }
 
     const totalEnrollments = enrollments.length;
-    const totalStudents = new Set(enrollments.map((e: any) => e.userId)).size;
+    const totalStudents = new Set(enrollments.map((e: { userId: string }) => e.userId)).size;
 
     // Get revenue for these courses (using existing method if available)
     let totalRevenue = 0;
@@ -63,7 +73,7 @@ export class GetInstructorDashboardUseCase implements IGetInstructorDashboardUse
       totalRevenue = await this.revenueRepository.getTotalRevenue(instructorId);
     } catch {
       // Fallback: calculate from enrollments if revenue method not available
-      totalRevenue = enrollments.reduce((sum: number, e: any) => {
+      totalRevenue = enrollments.reduce((sum: number, e: { orderItem?: { coursePrice: string | number; adminSharePercentage: string | number; order?: { paymentStatus: string } } }) => {
         if (
           e.orderItem &&
           e.orderItem.order &&
@@ -88,7 +98,7 @@ export class GetInstructorDashboardUseCase implements IGetInstructorDashboardUse
       });
 
     // Map to correct type (no need to filter since repository handles it)
-    const topCourses = topCoursesResponse.map((course: any) => ({
+    const topCourses = topCoursesResponse.map((course: { courseId: string; courseTitle: string; enrollmentCount: number; revenue: number; rating: number; reviewCount: number }) => ({
       courseId: course.courseId,
       courseTitle: course.courseTitle,
       enrollmentCount: course.enrollmentCount,
@@ -96,9 +106,9 @@ export class GetInstructorDashboardUseCase implements IGetInstructorDashboardUse
       rating: course.rating,
       reviewCount: course.reviewCount,
       status:
-        courses.find((c: any) => c.id === course.courseId)?.status || "DRAFT",
+        courses.find((c: { id: string }) => c.id === course.courseId)?.status || "DRAFT",
       createdAt: new Date(
-        courses.find((c: any) => c.id === course.courseId)?.createdAt ||
+        courses.find((c: { id: string; createdAt: Date }) => c.id === course.courseId)?.createdAt ||
           new Date()
       ),
       lastEnrollmentDate: undefined,
@@ -106,9 +116,9 @@ export class GetInstructorDashboardUseCase implements IGetInstructorDashboardUse
 
     // Recent students - get unique student IDs and fetch their data
     const studentIds = Array.from(
-      new Set(enrollments.map((e: any) => e.userId))
+      new Set(enrollments.map((e: { userId: string }) => e.userId))
     );
-    const recentStudents: any[] = [];
+    const recentStudents: Array<{ id: string; name: string; email: string; [key: string]: unknown }> = [];
     for (const studentId of studentIds.slice(0, limit)) {
       const student = await this.userRepository.findById(studentId);
       if (student) recentStudents.push(student);
@@ -116,23 +126,23 @@ export class GetInstructorDashboardUseCase implements IGetInstructorDashboardUse
 
     // Recent enrollments
     const recentEnrollments = enrollments
-      .sort((a: any, b: any) => b.enrolledAt.getTime() - a.enrolledAt.getTime())
+      .sort((a: { enrolledAt: Date }, b: { enrolledAt: Date }) => b.enrolledAt.getTime() - a.enrolledAt.getTime())
       .slice(0, limit)
-      .map((e: any) => ({
+      .map((e: { courseId: string; userId: string; enrolledAt: Date }) => ({
         courseId: e.courseId,
-        courseTitle: courses.find((c: any) => c.id === e.courseId)?.title || "",
+        courseTitle: courses.find((c: { id: string }) => c.id === e.courseId)?.title || "",
         studentName:
-          recentStudents.find((s: any) => s.id === e.userId)?.name || "",
+          recentStudents.find((s: { id: string }) => s.id === e.userId)?.name || "",
         enrolledAt: e.enrolledAt,
       }));
 
     // Average rating and total reviews (if available) - including deleted courses
     const averageRating = courses.length
-      ? courses.reduce((sum: number, c: any) => sum + (c.rating || 0), 0) /
+      ? courses.reduce((sum: number, c: { rating: number | undefined }) => sum + (c.rating || 0), 0) /
         courses.length
       : 0;
     const totalReviews = courses.reduce(
-      (sum: number, c: any) => sum + (c.reviewCount || 0),
+      (sum: number, c: { reviewCount: number | undefined }) => sum + (c.reviewCount || 0),
       0
     );
 
@@ -149,9 +159,9 @@ export class GetInstructorDashboardUseCase implements IGetInstructorDashboardUse
         totalReviews,
       },
       topCourses,
-      recentStudents: recentStudents.map((s: any) => {
+      recentStudents: recentStudents.map((s: { id: string; name: string; email: string; [key: string]: unknown }) => {
         const studentEnrollments = enrollments.filter(
-          (e: any) => e.userId === s.id
+          (e: { userId: string }) => e.userId === s.id
         );
         return {
           studentId: s.id,
@@ -159,7 +169,7 @@ export class GetInstructorDashboardUseCase implements IGetInstructorDashboardUse
           email: s.email,
           enrolledCourses: studentEnrollments.length,
           lastEnrollmentDate: studentEnrollments.sort(
-            (a: any, b: any) => b.enrolledAt.getTime() - a.enrolledAt.getTime()
+            (a: { enrolledAt: Date }, b: { enrolledAt: Date }) => b.enrolledAt.getTime() - a.enrolledAt.getTime()
           )[0]?.enrolledAt,
           isActive: !s.deletedAt,
         };

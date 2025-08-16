@@ -1,5 +1,6 @@
 import {
   PrismaClient,
+  Prisma,
   TransactionHistory,
   TransactionType as PrismaTransactionType,
   TransactionStatus as PrismaTransactionStatus,
@@ -49,10 +50,10 @@ export class TransactionRepository implements ITransactionRepository {
           status: transaction.status as PrismaTransactionStatus,
           paymentGateway: transaction.paymentGateway as PrismaPaymentGateway,
           paymentMethod: transaction.paymentMethod,
-          paymentDetails: transaction.paymentDetails,
+          paymentDetails: transaction.paymentDetails ? (transaction.paymentDetails as Prisma.InputJsonValue) : undefined,
           courseId: transaction.courseId,
           transactionId: transaction.transactionId,
-          metadata: transaction.metadata,
+          metadata: transaction.metadata ? (transaction.metadata as Prisma.InputJsonValue) : undefined,
           orderId: transaction.orderId,
         },
       });
@@ -115,7 +116,8 @@ export class TransactionRepository implements ITransactionRepository {
       where: { id },
       data: {
         status: this.mapToPrismaTransactionStatus(status),
-        ...(metadata && { metadata: JSON.stringify(metadata) }),
+        updatedAt: new Date(),
+        ...(metadata && { metadata: metadata as Prisma.InputJsonValue }),
       },
     });
     return this.mapToTransaction(updated);

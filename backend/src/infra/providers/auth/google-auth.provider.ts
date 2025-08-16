@@ -34,8 +34,9 @@ export class GoogleAuthProvider implements GoogleAuthGateway {
         name: payload.name || "Google User",
         googleId: payload.sub,
       };
-    } catch (error: any) {
-      console.error("Google auth error:", error.message);
+    } catch (error: unknown) {
+      const err = error as Error;
+      console.error("Google auth error:", err.message);
       throw new HttpError("Failed to fetch Google user info", 401);
     }
   }
