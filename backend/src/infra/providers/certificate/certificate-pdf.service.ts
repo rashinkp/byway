@@ -86,9 +86,7 @@ export class CertificatePdfService implements CertificatePdfServiceInterface {
     }
   }
 
-  generateCertificatePDFStream(data: CertificateTemplateData): Buffer {
-    // For streaming, we'll return the buffer for now
-    // You can implement streaming if needed
+  generateCertificatePDFStream(data: CertificateTemplateData): any {
     throw new Error("Streaming not implemented for image-based certificates");
   }
 

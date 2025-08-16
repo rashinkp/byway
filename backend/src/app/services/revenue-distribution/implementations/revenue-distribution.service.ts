@@ -46,7 +46,7 @@ export class RevenueDistributionService implements IRevenueDistributionService {
             `Error distributing revenue for order item ${orderItem.id}:`,
             error
           );
-          throw error; // Re-throw to handle in the main try-catch
+          throw error; 
         }
       }
     } catch (error) {
@@ -61,13 +61,13 @@ export class RevenueDistributionService implements IRevenueDistributionService {
   private async distributeRevenueForOrderItem(orderItem: { 
     id: string; 
     courseId: string; 
-    coursePrice: string | number; 
     orderId: string; 
   }): Promise<void> {
     console.log(
-      `Processing order item ${orderItem.id} with price ${orderItem.coursePrice}`
+      `Processing order item ${orderItem.id}`
     );
-    const coursePrice = orderItem.coursePrice;
+    
+    // Get the course to get the price
     const course = await this.orderRepository.findCourseById(
       orderItem.courseId
     );
@@ -76,6 +76,7 @@ export class RevenueDistributionService implements IRevenueDistributionService {
       throw new HttpError("Course not found", StatusCodes.NOT_FOUND);
     }
 
+    const coursePrice = course.price?.getValue()?.toNumber() || 0;
     const instructorId = course.createdBy;
     const { adminShare, instructorShare } = this.calculateShares(coursePrice);
 

@@ -152,7 +152,7 @@ export class SendMessageUseCase implements ISendMessageUseCase {
         imageUrl: enrichedMessage.imageUrl || undefined,
         audioUrl: enrichedMessage.audioUrl || undefined,
         isRead: false,
-        type: enrichedMessage.type,
+        type: enrichedMessage.type as MessageType,
         timestamp: enrichedMessage.createdAt
           ? new Date(enrichedMessage.createdAt).toISOString()
           : "",
@@ -174,7 +174,7 @@ export class SendMessageUseCase implements ISendMessageUseCase {
       imageUrl: enrichedMessage.imageUrl || undefined,
       audioUrl: enrichedMessage.audioUrl || undefined,
       isRead: false,
-      type: enrichedMessage.type,
+      type: enrichedMessage.type as MessageType,
       timestamp: enrichedMessage.createdAt
         ? new Date(enrichedMessage.createdAt).toISOString()
         : "",

@@ -7,8 +7,11 @@ export class GetTransactionsByOrderUseCase implements IGetTransactionsByOrderUse
   constructor(private readonly transactionRepository: ITransactionRepository) {}
 
   async execute(input: IGetTransactionsByOrderInputDTO): Promise<ITransactionOutputDTO[]> {
-    const transactions = await this.transactionRepository.findByOrderId(input.orderId);
-    return transactions.map(transaction => this.mapToDTO(transaction));
+    const transaction = await this.transactionRepository.findByOrderId(input.orderId);
+    if (!transaction) {
+      return [];
+    }
+    return [this.mapToDTO(transaction)];
   }
 
   private mapToDTO(transaction: Transaction): ITransactionOutputDTO {
