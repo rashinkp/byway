@@ -9,6 +9,7 @@ import { IGetTransactionsByOrderUseCase } from "../../../app/usecases/transactio
 import { IGetTransactionsByUserUseCase } from "../../../app/usecases/transaction/interfaces/get-transactions-by-user.usecase.interface";
 import { IUpdateTransactionStatusUseCase } from "../../../app/usecases/transaction/interfaces/update-transaction-status.usecase.interface";
 import { UserDTO } from "../../../app/dtos/general.dto";
+import { ICreateTransactionInputDTO, IUpdateTransactionStatusInputDTO } from "../../../app/dtos/transaction.dto";
 
 export class TransactionController extends BaseController {
   constructor(
@@ -26,7 +27,7 @@ export class TransactionController extends BaseController {
   async createTransaction(httpRequest: IHttpRequest): Promise<IHttpResponse> {
     return this.handleRequest(httpRequest, async (request) => {
       const transaction = await this.createTransactionUseCase.execute(
-        request.body
+        request.body  as ICreateTransactionInputDTO
       );
       return this.success_201(transaction, "Transaction created successfully");
     });
@@ -34,7 +35,7 @@ export class TransactionController extends BaseController {
 
   async getTransactionById(httpRequest: IHttpRequest): Promise<IHttpResponse> {
     return this.handleRequest(httpRequest, async (request) => {
-      const { id } = request.params;
+      const { id } = request.params as { id: string };
       const transaction = await this.getTransactionByIdUseCase.execute(id);
 
       if (!transaction) {
@@ -52,7 +53,7 @@ export class TransactionController extends BaseController {
     httpRequest: IHttpRequest
   ): Promise<IHttpResponse> {
     return this.handleRequest(httpRequest, async (request) => {
-      const { orderId } = request.params;
+      const { orderId } = request.params as { orderId: string };
       const transactions = await this.getTransactionsByOrderUseCase.execute({
         orderId,
       });
@@ -93,7 +94,7 @@ export class TransactionController extends BaseController {
     httpRequest: IHttpRequest
   ): Promise<IHttpResponse> {
     return this.handleRequest(httpRequest, async (request) => {
-      const { id, status, metadata } = request.body;
+      const { id, status, metadata } = request.body as IUpdateTransactionStatusInputDTO;
       const transaction = await this.updateTransactionStatusUseCase.execute({
         id,
         status,

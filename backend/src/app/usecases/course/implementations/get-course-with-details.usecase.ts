@@ -73,28 +73,17 @@ export class GetCourseWithDetailsUseCase
       courseId
     );
 
-    const courseData = course.toJSON();
+    const courseData = course.toJSON() as any;
     return {
       ...courseData,
       isEnrolled,
       isInCart,
       details: courseDetails?.toJSON() ?? null,
-      instructorSharePercentage: 100 - courseData.adminSharePercentage,
+      instructorSharePercentage: 100 - (courseData.adminSharePercentage as number),
       reviewStats: {
         averageRating: reviewStats.averageRating,
         totalReviews: reviewStats.totalReviews,
-        ratingDistribution: reviewStats.ratingDistribution,
-        ratingPercentages: Object.fromEntries(
-          Object.entries(reviewStats.ratingDistribution).map(
-            ([rating, count]) => [
-              rating,
-              reviewStats.totalReviews > 0
-                ? (count as number / reviewStats.totalReviews) * 100
-                : 0,
-            ]
-          )
-        ),
       },
-    };
+    } as ICourseWithEnrollmentDTO;
   }
 }

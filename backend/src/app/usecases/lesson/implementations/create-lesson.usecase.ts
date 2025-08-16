@@ -25,7 +25,7 @@ export class CreateLessonUseCase implements ICreateLessonUseCase {
 
       const lesson = Lesson.create(dto);
       const createdLesson = await this.lessonRepository.create(lesson);
-      return createdLesson.toJSON();
+      return createdLesson.toJSON() as unknown as ILessonOutputDTO;
     } catch (error) {
       if (error instanceof Error) {
         throw new HttpError(error.message, 400);

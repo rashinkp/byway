@@ -36,13 +36,13 @@ export class GetContentByLessonIdUseCase
       // If user is admin, allow access
       if (user.role === "ADMIN") {
         const content = await this.contentRepository.findByLessonId(lessonId);
-        return content && content.isActive() ? content.toJSON() : null;
+        return content && content.isActive() ? content.toJSON() as unknown as ILessonContentOutputDTO : null;
       }
 
       // If user is the course instructor, allow access without enrollment check
       if (course.createdBy === user.id) {
         const content = await this.contentRepository.findByLessonId(lessonId);
-        return content && content.isActive() ? content.toJSON() : null;
+        return content && content.isActive() ? content.toJSON() as unknown as ILessonContentOutputDTO : null;
       }
 
       // For non-instructors, check enrollment
@@ -59,7 +59,7 @@ export class GetContentByLessonIdUseCase
       }
 
       const content = await this.contentRepository.findByLessonId(lessonId);
-      return content && content.isActive() ? content.toJSON() : null;
+      return content && content.isActive() ? content.toJSON() as unknown as ILessonContentOutputDTO : null;
     } catch (error) {
       if (error instanceof HttpError) {
         throw error;

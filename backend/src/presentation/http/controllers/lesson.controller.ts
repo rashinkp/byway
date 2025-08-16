@@ -35,7 +35,7 @@ export class LessonController extends BaseController {
 
   async createLesson(httpRequest: IHttpRequest): Promise<IHttpResponse> {
     return this.handleRequest(httpRequest, async (request) => {
-      const validated = validateCreateLesson(request.body);
+      const validated = validateCreateLesson(request.body as Record<string, unknown>);
       const lesson = await this.createLessonUseCase.execute(validated);
       return this.success_201(lesson, "Lesson created successfully");
     });
@@ -43,8 +43,11 @@ export class LessonController extends BaseController {
 
   async updateLesson(httpRequest: IHttpRequest): Promise<IHttpResponse> {
     return this.handleRequest(httpRequest, async (request) => {
+      if (!request.params?.lessonId) {
+        throw new BadRequestError("Lesson ID is required");
+      }
       const validated = validateUpdateLesson({
-        ...request.body,
+        ...(request.body as Record<string, unknown>),
         lessonId: request.params.lessonId,
       });
       const lesson = await this.updateLessonUseCase.execute(validated);
@@ -54,6 +57,9 @@ export class LessonController extends BaseController {
 
   async getLessonById(httpRequest: IHttpRequest): Promise<IHttpResponse> {
     return this.handleRequest(httpRequest, async (request) => {
+      if (!request.params?.lessonId) {
+        throw new BadRequestError("Lesson ID is required");
+      }
       const validated = validateGetLessonById(request.params);
       const lesson = await this.getLessonByIdUseCase.execute(
         validated.lessonId
@@ -69,7 +75,7 @@ export class LessonController extends BaseController {
     return this.handleRequest(httpRequest, async (request) => {
       const validated = validateGetAllLessons({
         ...request.query,
-        courseId: request.params.courseId,
+        courseId: request.params?.courseId,
       });
       const result = await this.getAllLessonsUseCase.execute(validated);
       return this.success_200(result, "Lessons retrieved successfully");
@@ -88,7 +94,7 @@ export class LessonController extends BaseController {
     return this.handleRequest(httpRequest, async (request) => {
       const validated = validateGetPublicLessons({
         ...request.query,
-        courseId: request.params.courseId,
+        courseId: request.params?.courseId,
       });
       const result = await this.getPublicLessonsUseCase.execute(validated);
       return this.success_200(result, "Public lessons retrieved successfully");

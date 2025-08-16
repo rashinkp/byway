@@ -21,7 +21,7 @@ export class UpdateLessonContentUseCase implements IUpdateLessonContentUseCase {
 
       const updatedContent = LessonContent.update(content, dto);
       const savedContent = await this.contentRepository.update(updatedContent);
-      return savedContent.toJSON();
+      return savedContent.toJSON() as unknown as ILessonContentOutputDTO;
     } catch (error) {
       if (error instanceof Error) {
         throw new HttpError(

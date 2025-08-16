@@ -45,8 +45,11 @@ export class LessonContentController extends BaseController {
 
   async updateLessonContent(httpRequest: IHttpRequest): Promise<IHttpResponse> {
     return this.handleRequest(httpRequest, async (request) => {
+      if (!request.params?.contentId) {
+        throw new HttpError("Content ID is required", 400);
+      }
       const validated = validateUpdateLessonContent({
-        ...request.body,
+        ...(request.body as any),
         contentId: request.params.contentId,
       });
       const content = await this.updateLessonContentUseCase.execute(validated);
@@ -62,6 +65,9 @@ export class LessonContentController extends BaseController {
         throw new HttpError("Unauthorized", 401);
       }
 
+      if (!request.params?.lessonId) {
+        throw new HttpError("Lesson ID is required", 400);
+      }
       const validated = validateGetLessonContentByLessonId({
         lessonId: request.params.lessonId,
       });
@@ -75,6 +81,9 @@ export class LessonContentController extends BaseController {
 
   async deleteLessonContent(httpRequest: IHttpRequest): Promise<IHttpResponse> {
     return this.handleRequest(httpRequest, async (request) => {
+      if (!request.params?.contentId) {
+        throw new HttpError("Content ID is required", 400);
+      }
       const validated = validateDeleteLessonContent({
         id: request.params.contentId,
       });

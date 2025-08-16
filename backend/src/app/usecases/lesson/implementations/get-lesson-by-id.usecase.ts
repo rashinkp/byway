@@ -12,7 +12,7 @@ export class GetLessonByIdUseCase implements IGetLessonByIdUseCase {
       if (!lesson || !lesson.isActive()) {
         throw new HttpError("Lesson not found or deleted", 404);
       }
-      return lesson.toJSON();
+      return lesson.toJSON() as unknown as ILessonOutputDTO;
     } catch (error) {
       if (error instanceof Error) {
         throw new HttpError(

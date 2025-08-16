@@ -48,7 +48,7 @@ export class CourseReviewController extends BaseController {
         throw new UnauthorizedError("User not authenticated");
       }
 
-      const validated = createReviewSchemaDef.body!.parse(request.body);
+      const validated = createReviewSchemaDef.body!.parse(request.body as any);
       const review = await this.createCourseReviewUseCase.execute(
         validated,
         request.user.id
@@ -64,14 +64,14 @@ export class CourseReviewController extends BaseController {
         throw new UnauthorizedError("User not authenticated");
       }
 
-      if (!request.params.id) {
+      if (!request.params?.id) {
         throw new BadRequestError("Review ID is required");
       }
 
       const validatedParams = updateReviewSchemaDef.params!.parse({
         id: request.params.id,
       });
-      const validatedBody = updateReviewSchemaDef.body!.parse(request.body);
+      const validatedBody = updateReviewSchemaDef.body!.parse(request.body as any);
 
       const review = await this.updateCourseReviewUseCase.execute(
         validatedParams.id,
@@ -89,7 +89,7 @@ export class CourseReviewController extends BaseController {
         throw new UnauthorizedError("User not authenticated");
       }
 
-      if (!request.params.id) {
+      if (!request.params?.id) {
         throw new BadRequestError("Review ID is required");
       }
 
@@ -104,7 +104,7 @@ export class CourseReviewController extends BaseController {
 
   async getCourseReviews(httpRequest: IHttpRequest): Promise<IHttpResponse> {
     return this.handleRequest(httpRequest, async (request) => {
-      if (!request.params.courseId) {
+      if (!request.params?.courseId) {
         throw new BadRequestError("Course ID is required");
       }
 
@@ -158,7 +158,7 @@ export class CourseReviewController extends BaseController {
     httpRequest: IHttpRequest
   ): Promise<IHttpResponse> {
     return this.handleRequest(httpRequest, async (request) => {
-      if (!request.params.courseId) {
+      if (!request.params?.courseId) {
         throw new BadRequestError("Course ID is required");
       }
 
@@ -182,7 +182,7 @@ export class CourseReviewController extends BaseController {
         throw new UnauthorizedError("User not authenticated");
       }
 
-      if (!request.params.id) {
+      if (!request.params?.id) {
         throw new BadRequestError("Review ID is required");
       }
 

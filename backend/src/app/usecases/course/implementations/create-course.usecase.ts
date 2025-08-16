@@ -91,12 +91,6 @@ export class CreateCourseUseCase implements ICreateCourseUseCase {
 
     const savedCourse = await this.courseRepository.save(course);
 
-
-
-
-
-    
-
     // Notify all admins using the notification use case
     const admins = await this.userRepository.findByRole("ADMIN");
     const adminIds = admins.map((a) => a.id);
@@ -109,9 +103,10 @@ export class CreateCourseUseCase implements ICreateCourseUseCase {
       link: `/admin/courses/${savedCourse.id}`,
     });
 
+    const courseData = savedCourse.toJSON() as unknown as ICourseWithDetailsDTO;
     return {
-      ...savedCourse.toJSON(),
+      ...courseData,
       notifiedAdminIds: adminIds,
-    };
+    } as CreateCourseResultDTO;
   }
 }

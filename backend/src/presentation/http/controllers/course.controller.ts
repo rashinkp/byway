@@ -50,7 +50,7 @@ export class CourseController extends BaseController {
         throw new UnauthorizedError("User not authenticated");
       }
       const validated = createCourseSchemaDef.body!.parse({
-        ...request.body,
+        ...(request.body as any),
         createdBy: request.user.id,
       });
       const course = await this.createCourseUseCase.execute({
@@ -94,7 +94,7 @@ export class CourseController extends BaseController {
 
   async getCourseById(httpRequest: IHttpRequest): Promise<IHttpResponse> {
     return this.handleRequest(httpRequest, async (request) => {
-      if (!request.params.id) {
+      if (!request.params?.id) {
         throw new BadRequestError("Course ID is required");
       }
       const validated = getCourseByIdSchemaDef.params!.parse({
@@ -116,11 +116,11 @@ export class CourseController extends BaseController {
       if (!request.user?.id) {
         throw new UnauthorizedError("User not authenticated");
       }
-      if (!request.params.id) {
+      if (!request.params?.id) {
         throw new BadRequestError("Course ID is required");
       }
       const validated = updateCourseSchemaDef.body!.parse({
-        ...request.body,
+        ...(request.body as any),
         createdBy: request.user.id,
       });
 
@@ -138,7 +138,7 @@ export class CourseController extends BaseController {
       if (!request.user?.id || !request.user?.role) {
         throw new UnauthorizedError("User not authenticated");
       }
-      if (!request.params.id) {
+      if (!request.params?.id) {
         throw new BadRequestError("Course ID is required");
       }
       const validated = deleteCourseSchemaDef.params!.parse({
@@ -204,11 +204,11 @@ export class CourseController extends BaseController {
       if (!request.user?.id) {
         throw new UnauthorizedError("User not authenticated");
       }
-      if (!request.body.courseId) {
+      if (!(request.body as any)?.courseId) {
         throw new BadRequestError("Course ID is required");
       }
       const course = await this.approveCourseUseCase.execute({
-        courseId: request.body.courseId,
+        courseId: (request.body as any).courseId,
       });
 
       // Emit real-time notification to the instructor (creator)
@@ -232,11 +232,11 @@ export class CourseController extends BaseController {
       if (!request.user?.id) {
         throw new UnauthorizedError("User not authenticated");
       }
-      if (!request.body.courseId) {
+      if (!(request.body as any)?.courseId) {
         throw new BadRequestError("Course ID is required");
       }
       const course = await this.declineCourseUseCase.execute({
-        courseId: request.body.courseId,
+        courseId: (request.body as any).courseId,
       });
 
       // Emit real-time notification to the instructor (creator)
@@ -261,7 +261,7 @@ export class CourseController extends BaseController {
         throw new UnauthorizedError("User not authenticated");
       }
       const validated = createEnrollmentSchemaDef.body!.parse({
-        courseIds: request.body.courseIds,
+        courseIds: (request.body as any).courseIds,
       });
       const enrollments = await this.enrollCourseUseCase.execute({
         userId: request.user.id,

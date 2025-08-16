@@ -34,7 +34,7 @@ export class UpdateLessonUseCase implements IUpdateLessonUseCase {
 
       const updatedLesson = Lesson.update(lesson, dto);
       const savedLesson = await this.lessonRepository.update(updatedLesson);
-      return savedLesson.toJSON();
+      return savedLesson.toJSON() as unknown as ILessonOutputDTO;
     } catch (error) {
       if (error instanceof Error) {
         throw new HttpError(

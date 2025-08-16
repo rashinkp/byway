@@ -50,13 +50,13 @@ export class StripeController extends BaseController {
       console.log("Request Body:", request.body);
       console.log("Request Headers:", request.headers);
 
-      const signature = request.headers?.["stripe-signature"];
+      const signature = request.headers?.["stripe-signature"] as string;
       if (!signature) {
         throw new Error("No signature found");
       }
 
       const event = await this.webhookGateway.verifySignature(
-        request.body,
+        request.body as unknown as string | Buffer,
         signature
       );
 

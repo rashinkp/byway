@@ -2,6 +2,7 @@ import { HttpError } from "../../../../presentation/http/errors/http-error";
 import { ILessonContentRepository } from "../../../repositories/content.repository";
 import { IDeleteLessonContentUseCase } from "../interfaces/delete-content.usecase.interface";
 import { S3ServiceInterface } from "../../../providers/s3.service.interface";
+import { ILessonContentOutputDTO } from "../../../dtos/lesson.dto";
 
 export class DeleteLessonContentUseCase implements IDeleteLessonContentUseCase {
   constructor(
@@ -17,7 +18,7 @@ export class DeleteLessonContentUseCase implements IDeleteLessonContentUseCase {
       }
 
       // Delete files from S3 if they exist
-      const contentData = content.toJSON();
+      const contentData = content.toJSON() as unknown as ILessonContentOutputDTO;
       
       // Delete main file if it exists
       if (contentData.fileUrl) {

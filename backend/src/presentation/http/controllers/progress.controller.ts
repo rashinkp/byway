@@ -27,8 +27,8 @@ export class ProgressController extends BaseController {
       console.log(req.body);
 
       const validatedData = UpdateProgressSchema.parse({
-        ...req.body,
-        courseId: req.params.courseId,
+        ...(req.body as Record<string, unknown>),
+        courseId: req.params?.courseId,
         userId: req.user.id,
       });
 
@@ -47,7 +47,7 @@ export class ProgressController extends BaseController {
 
       const validatedData = GetProgressSchema.parse({
         userId: req.user.id,
-        courseId: req.params.courseId,
+        courseId: req.params?.courseId,
       });
 
       const response = await this.getProgressUseCase.execute(validatedData);

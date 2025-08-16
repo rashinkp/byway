@@ -53,6 +53,6 @@ export class DeleteCourseUseCase implements IDeleteCourseUseCase {
       link: `/instructor/courses/${course.id}`,
     });
 
-    return updatedCourse.toJSON();
+    return updatedCourse.toJSON() as unknown as ICourseWithDetailsDTO;
   }
 }
