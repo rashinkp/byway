@@ -2,17 +2,18 @@ import { api } from "@/api/api";
 import { User } from "@/types/user";
 import { useAuthStore } from "@/stores/auth.store";
 import { ApiResponse } from "@/types/general";
+import { AuthResponse, ApiError } from "@/types/error";
 import { FacebookAuthRequest, SignupData } from "@/types/auth";
-
 
 export async function signup(data: SignupData): Promise<ApiResponse<User>> {
 	try {
 		const response = await api.post<ApiResponse<User>>("/auth/register", data);
 		return response.data;
-	} catch (error: any) {
+	} catch (error: unknown) {
+		const apiError = error as ApiError;
 		throw new Error(
-			error.response?.data?.message ||
-				error.response?.data?.error ||
+			apiError.response?.data?.message ||
+				apiError.response?.data?.error ||
 				"Signup failed",
 		);
 	}
@@ -31,10 +32,11 @@ export async function login(email: string, password: string) {
 		}
 		useAuthStore.getState().setUser(user);
 		return user;
-	} catch (error: any) {
+	} catch (error: unknown) {
+		const apiError = error as ApiError;
 		throw new Error(
-			error.response?.data?.message ||
-				error.response?.data?.error ||
+			apiError.response?.data?.message ||
+				apiError.response?.data?.error ||
 				"Login failed",
 		);
 	}
@@ -54,10 +56,11 @@ export async function googleAuth(
 		}
 		useAuthStore.getState().setUser(user);
 		return response.data;
-	} catch (error: any) {
+	} catch (error: unknown) {
+		const apiError = error as ApiError;
 		throw new Error(
-			error.response?.data?.message ||
-				error.response?.data?.error ||
+			apiError.response?.data?.message ||
+				apiError.response?.data?.error ||
 				"Google authentication failed",
 		);
 	}
@@ -67,18 +70,19 @@ export async function verifyOtp(
 	otp: string,
 	email: string,
 	type: "signup" | "password-reset" = "signup",
-): Promise<ApiResponse<any>> {
+): Promise<ApiResponse<AuthResponse>> {
 	try {
-		const response = await api.post<ApiResponse<any>>("/auth/verify-otp", {
+		const response = await api.post<ApiResponse<AuthResponse>>("/auth/verify-otp", {
 			otp,
 			email,
 			type,
 		});
 		return response.data;
-	} catch (error: any) {
+	} catch (error: unknown) {
+		const apiError = error as ApiError;
 		throw new Error(
-			error.response?.data?.message ||
-				error.response?.data?.error ||
+			apiError.response?.data?.message ||
+				apiError.response?.data?.error ||
 				"OTP verification failed",
 		);
 	}
@@ -87,10 +91,11 @@ export async function verifyOtp(
 export async function resendOtp(email: string): Promise<void> {
 	try {
 		await api.post<ApiResponse<unknown>>("/auth/resend-otp", { email });
-	} catch (error: any) {
+	} catch (error: unknown) {
+		const apiError = error as ApiError;
 		throw new Error(
-			error.response?.data?.message ||
-				error.response?.data?.error ||
+			apiError.response?.data?.message ||
+				apiError.response?.data?.error ||
 				"Resend OTP failed",
 		);
 	}
@@ -99,10 +104,11 @@ export async function resendOtp(email: string): Promise<void> {
 export async function forgotPassword(email: string): Promise<void> {
 	try {
 		await api.post<ApiResponse<unknown>>("/auth/forgot-password", { email });
-	} catch (error: any) {
+	} catch (error: unknown) {
+		const apiError = error as ApiError;
 		throw new Error(
-			error.response?.data?.message ||
-				error.response?.data?.error ||
+			apiError.response?.data?.message ||
+				apiError.response?.data?.error ||
 				"Forgot password request failed",
 		);
 	}
@@ -117,10 +123,11 @@ export async function resetPassword(
 			resetToken,
 			newPassword,
 		});
-	} catch (error: any) {
+	} catch (error: unknown) {
+		const apiError = error as ApiError;
 		throw new Error(
-			error.response?.data?.message ||
-				error.response?.data?.error ||
+			apiError.response?.data?.message ||
+				apiError.response?.data?.error ||
 				"Password reset failed",
 		);
 	}
@@ -136,16 +143,17 @@ export async function getCurrentUser(): Promise<User | null> {
 		}
 		useAuthStore.getState().setUser(user);
 		return user;
-	} catch (error: any) {
-		useAuthStore.getState().handleAuthError(error);
+	} catch (error: unknown) {
+		const apiError = error as ApiError;
+		useAuthStore.getState().handleAuthError(apiError);
 		
-		if (error.response?.status === 401) {
+		if (apiError.response?.status === 401) {
 			return null;
 		}
 		
 		throw new Error(
-			error.response?.data?.message ||
-				error.response?.data?.error ||
+			apiError.response?.data?.message ||
+				apiError.response?.data?.error ||
 				"Failed to fetch current user",
 		);
 	}
@@ -160,10 +168,11 @@ export async function logout(): Promise<void> {
 			console.log("[auth.ts] Cleared user and email from localStorage on logout");
 		}
 		useAuthStore.getState().clearAuth();
-	} catch (error: any) {
+	} catch (error: unknown) {
+		const apiError = error as ApiError;
 		throw new Error(
-			error.response?.data?.message ||
-				error.response?.data?.error ||
+			apiError.response?.data?.message ||
+				apiError.response?.data?.error ||
 				"Logout failed",
 		);
 	}
@@ -179,11 +188,16 @@ export async function getCurrentUserServer(
 			},
 		});
 		return response.data.data;
-	} catch (error: any) {
-		if (error.response?.status === 401) {
+	} catch (error: unknown) {
+		const apiError = error as ApiError;
+		if (apiError.response?.status === 401) {
 			return null;
 		}
-		throw error;
+		throw new Error(
+			apiError.response?.data?.message ||
+				apiError.response?.data?.error ||
+				"Failed to fetch current user",
+		);
 	}
 }
 
@@ -199,15 +213,16 @@ export async function facebookAuth(
 		}
 		useAuthStore.getState().setUser(user);
 		return response.data;
-	} catch (error: any) {
+	} catch (error: unknown) {
+		const apiError = error as ApiError;
 		console.error("Facebook auth error:", {
-			status: error.response?.status,
-			data: error.response?.data,
-			message: error.message,
+			status: apiError.response?.status,
+			data: apiError.response?.data,
+			message: apiError.message,
 		});
 		throw new Error(
-			error.response?.data?.message ||
-				error.response?.data?.error ||
+			apiError.response?.data?.message ||
+				apiError.response?.data?.error ||
 				"Failed to authenticate with Facebook",
 		);
 	}
@@ -222,10 +237,11 @@ export async function getVerificationStatus(email: string): Promise<{
 			`/auth/verification-status?email=${encodeURIComponent(email)}`,
 		);
 		return response.data.data;
-	} catch (error: any) {
-		console.error("Get verification status error:", error);
+	} catch (error: unknown) {
+		const apiError = error as ApiError;
+		console.error("Get verification status error:", apiError);
 		throw new Error(
-			error.response?.data?.message || "Failed to get verification status",
+			apiError.response?.data?.message || "Failed to get verification status",
 		);
 	}
 }

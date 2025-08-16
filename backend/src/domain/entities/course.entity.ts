@@ -272,7 +272,7 @@ export class Course {
     this._updatedAt = new Date();
   }
 
-  toJSON(): any {
+  toJSON(): Record<string, unknown> {
     return {
       id: this._id,
       title: this._title,
@@ -303,28 +303,50 @@ export class Course {
     };
   }
 
-  static fromPrisma(data: any): Course {
+  static fromPrisma(data: { 
+    id: string; 
+    title: string; 
+    description: string | null; 
+    level: string; 
+    price: { toNumber(): number } | null; 
+    thumbnail: string | null; 
+    duration: number | null; 
+    offer: { toNumber(): number } | null; 
+    status: string; 
+    categoryId: string; 
+    createdBy: string; 
+    createdAt: Date; 
+    updatedAt: Date; 
+    deletedAt: Date | null; 
+    approvalStatus: string; 
+    adminSharePercentage: { toNumber(): number }; 
+    details: { prerequisites: string | null; longDescription: string | null; objectives: string | null; targetAudience: string | null } | null; 
+    rating: number | null; 
+    reviewCount: number | null; 
+    lessons: unknown[]; 
+    bestSeller: boolean; 
+  }): Course {
     return new Course({
       id: data.id,
       title: data.title,
       description: data.description,
-      level: data.level,
+      level: data.level as CourseLevel,
       price: data.price ? Price.create(data.price.toNumber()) : null,
       thumbnail: data.thumbnail,
       duration: data.duration ? Duration.create(data.duration) : null,
       offer: data.offer ? Offer.create(data.offer.toNumber()) : null,
-      status: data.status,
+      status: data.status as CourseStatus,
       categoryId: data.categoryId,
       createdBy: data.createdBy,
       createdAt: data.createdAt,
       updatedAt: data.updatedAt,
       deletedAt: data.deletedAt,
-      approvalStatus: data.approvalStatus,
-      adminSharePercentage: data.adminSharePercentage,
+      approvalStatus: data.approvalStatus as APPROVALSTATUS,
+      adminSharePercentage: data.adminSharePercentage.toNumber(),
       details: data.details ? new CourseDetails(data.details) : null,
-      rating: data.rating,
-      reviewCount: data.reviewCount,
-      lessons: data.lessons,
+      rating: data.rating ?? undefined,
+      reviewCount: data.reviewCount ?? undefined,
+      lessons: data.lessons.length,
       bestSeller: data.bestSeller,
     });
   }

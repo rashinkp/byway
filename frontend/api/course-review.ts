@@ -1,12 +1,12 @@
-import { api } from "./api";
+import { api } from "@/api/api";
+import { ApiError } from "@/types/error";
 import {
 	CourseReview,
 	CreateCourseReviewParams,
 	UpdateCourseReviewParams,
+	QueryCourseReviewParams,
 	CourseReviewApiResponse,
 	CourseReviewStats,
-	DisableReviewResponse,
-	QueryCourseReviewParams,
 	GetUserReviewsResponse,
 } from "@/types/course-review";
 
@@ -19,9 +19,10 @@ export async function createCourseReview(
 			reviewData,
 		);
 		return response.data.data;
-	} catch (error: any) {
-		console.error("Failed to create review:", error);
-		throw new Error(error.response?.data?.message || "Failed to create review");
+	} catch (error: unknown) {
+		const apiError = error as ApiError;
+		console.error("Failed to create review:", apiError);
+		throw new Error(apiError.response?.data?.message || "Failed to create review");
 	}
 }
 
@@ -35,18 +36,20 @@ export async function updateCourseReview(
 			reviewData,
 		);
 		return response.data.data;
-	} catch (error: any) {
-		console.error("Failed to update review:", error);
-		throw new Error(error.response?.data?.message || "Failed to update review");
+	} catch (error: unknown) {
+		const apiError = error as ApiError;
+		console.error("Failed to update review:", apiError);
+		throw new Error(apiError.response?.data?.message || "Failed to update review");
 	}
 }
 
 export async function deleteCourseReview(id: string): Promise<void> {
 	try {
 		await api.delete(`/reviews/${id}`);
-	} catch (error: any) {
-		console.error("Failed to delete review:", error);
-		throw new Error(error.response?.data?.message || "Failed to delete review");
+	} catch (error: unknown) {
+		const apiError = error as ApiError;
+		console.error("Failed to delete review:", apiError);
+		throw new Error(apiError.response?.data?.message || "Failed to delete review");
 	}
 }
 
@@ -55,7 +58,7 @@ export async function getCourseReviews(
 	params: QueryCourseReviewParams = {} as QueryCourseReviewParams,
 ): Promise<CourseReviewApiResponse> {
 	try {
-		const queryParams: any = {
+		const queryParams: Record<string, unknown> = {
 			page: params.page || 1,
 			limit: params.limit || 10,
 			rating: params.rating,
@@ -75,10 +78,11 @@ export async function getCourseReviews(
 			},
 		);
 		return response.data.data;
-	} catch (error: any) {
-		console.error("Failed to fetch course reviews:", error);
+	} catch (error: unknown) {
+		const apiError = error as ApiError;
+		console.error("Failed to fetch course reviews:", apiError);
 		throw new Error(
-			error.response?.data?.message || "Failed to fetch course reviews",
+			apiError.response?.data?.message || "Failed to fetch course reviews",
 		);
 	}
 }
@@ -91,10 +95,11 @@ export async function getCourseReviewStats(
 			`/reviews/course/${courseId}/stats`,
 		);
 		return response.data.data;
-	} catch (error: any) {
-		console.error("Failed to fetch course review stats:", error);
+	} catch (error: unknown) {
+		const apiError = error as ApiError;
+		console.error("Failed to fetch course review stats:", apiError);
 		throw new Error(
-			error.response?.data?.message || "Failed to fetch course review stats",
+			apiError.response?.data?.message || "Failed to fetch course review stats",
 		);
 	}
 }
@@ -116,26 +121,11 @@ export async function getUserReviews(
 			},
 		);
 		return response.data.data;
-	} catch (error: any) {
-		console.error("Failed to fetch user reviews:", error);
+	} catch (error: unknown) {
+		const apiError = error as ApiError;
+		console.error("Failed to fetch user reviews:", apiError);
 		throw new Error(
-			error.response?.data?.message || "Failed to fetch user reviews",
-		);
-	}
-}
-
-export async function disableReview(
-	id: string,
-): Promise<DisableReviewResponse> {
-	try {
-		const response = await api.patch<{ data: DisableReviewResponse }>(
-			`/reviews/${id}/disable`,
-		);
-		return response.data.data;
-	} catch (error: any) {
-		console.error("Failed to disable review:", error);
-		throw new Error(
-			error.response?.data?.message || "Failed to disable review",
+			apiError.response?.data?.message || "Failed to fetch user reviews",
 		);
 	}
 }

@@ -247,9 +247,10 @@ export function ModernAudioRecorder({
       }, 1000);
 
       drawWaveform();
-    } catch (err: any) {
+    } catch (err: unknown) {
+      const error = err as Error;
       setError(
-        err.message || "Could not access microphone. Please check permissions."
+        error.message || "Could not access microphone. Please check permissions."
       );
       setRecordingState("idle");
     }

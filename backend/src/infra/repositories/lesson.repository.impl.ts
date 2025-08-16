@@ -37,7 +37,7 @@ export class LessonRepository implements ILessonRepository {
     } = params;
 
     const skip = (page - 1) * limit;
-    const where: any = {
+    const where: Record<string, unknown> = {
       courseId,
       ...(includeDeleted ? {} : { deletedAt: null }),
       ...(filterBy !== "ALL" && filterBy !== "INACTIVE"
@@ -88,7 +88,7 @@ export class LessonRepository implements ILessonRepository {
     } = params;
 
     const skip = (page - 1) * limit;
-    const where: any = {
+    const where: Record<string, unknown> = {
       courseId,
       status: LessonStatus.PUBLISHED,
       deletedAt: null,

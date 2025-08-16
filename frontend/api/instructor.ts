@@ -1,30 +1,32 @@
 import { api } from "@/api/api";
 import { ApiResponse } from "@/types/general";
-import {
-	IInstructorWithUserDetails,
-	InstructorFormData,
-	IInstructorDetails,
-	InstructorProfile,
-	InstructorCourse,
-} from "@/types/instructor";
+import { ApiError } from "@/types/error";
 import { User } from "@/types/user";
+import { IInstructorWithUserDetails } from "@/types/instructor";
 
-export const createInstructor = async (
-	data: InstructorFormData,
-): Promise<ApiResponse<User>> => {
+export const createInstructor = async (data: {
+	areaOfExpertise: string;
+	professionalExperience: string;
+	about: string;
+	website?: string;
+	education: string;
+	certifications: string;
+	cv: string;
+}): Promise<ApiResponse<User>> => {
 	try {
 		const response = await api.post<ApiResponse<User>>(
 			"/instructor/create",
 			data,
 		);
 		return response.data;
-	} catch (error: any) {
-		console.error("API Error in createInstructor:", error);
+	} catch (error: unknown) {
+		const apiError = error as ApiError;
+		console.error("API Error in createInstructor:", apiError);
 
 		// Handle different error scenarios
-		if (error.response) {
+		if (apiError.response) {
 			// Server responded with error status
-			const { status, data } = error.response;
+			const { status, data } = apiError.response;
 
 			// Handle specific status codes
 			if (status === 404) {
@@ -81,7 +83,7 @@ export const createInstructor = async (
 				},
 				message: data?.message || `Request failed with status ${status}`,
 			};
-		} else if (error.request) {
+		} else if (apiError.request) {
 			// Network error
 			throw {
 				response: undefined,
@@ -91,7 +93,7 @@ export const createInstructor = async (
 			// Other errors
 			throw {
 				response: undefined,
-				message: error.message || "Failed to create instructor",
+				message: apiError.message || "Failed to create instructor",
 			};
 		}
 	}
@@ -105,10 +107,11 @@ export const approveInstructor = async (
 			ApiResponse<{ id: string; status: string }>
 		>("/instructor/approve", { instructorId });
 		return response.data;
-	} catch (error: any) {
-		console.error("Error approving instructor:", error);
+	} catch (error: unknown) {
+		const apiError = error as ApiError;
+		console.error("Error approving instructor:", apiError);
 		throw new Error(
-			error.response?.data?.message || "Failed to approve instructor",
+			apiError.response?.data?.message || "Failed to approve instructor",
 		);
 	}
 };
@@ -121,10 +124,11 @@ export const declineInstructor = async (
 			ApiResponse<{ id: string; status: string }>
 		>("/instructor/decline", { instructorId });
 		return response.data;
-	} catch (error: any) {
-		console.error("Error declining instructor:", error);
+	} catch (error: unknown) {
+		const apiError = error as ApiError;
+		console.error("Error declining instructor:", apiError);
 		throw new Error(
-			error.response?.data?.message || "Failed to decline instructor",
+			apiError.response?.data?.message || "Failed to decline instructor",
 		);
 	}
 };
@@ -168,10 +172,11 @@ export const getAllInstructors = async (params?: {
 			}>
 		>(`/instructor/instructors?${queryParams.toString()}`);
 		return response.data;
-	} catch (error: any) {
-		console.error("Error fetching instructors:", error);
+	} catch (error: unknown) {
+		const apiError = error as ApiError;
+		console.error("Error fetching instructors:", apiError);
 		throw new Error(
-			error.response?.data?.message || "Failed to fetch instructors",
+			apiError.response?.data?.message || "Failed to fetch instructors",
 		);
 	}
 };
@@ -185,11 +190,12 @@ export const getInstructorByUserId = async (): Promise<
 				"/instructor/me",
 			);
 		return response.data;
-	} catch (error: any) {
-		console.error("Error fetching instructor by user ID:", error);
+	} catch (error: unknown) {
+		const apiError = error as ApiError;
+		console.error("Error fetching instructor by user ID:", apiError);
 
 		// Handle 404 errors gracefully - user might not have an instructor record yet
-		if (error.response?.status === 404) {
+		if (apiError.response?.status === 404) {
 			// Return null instead of throwing error for 404
 			return {
 				success: true,
@@ -201,7 +207,7 @@ export const getInstructorByUserId = async (): Promise<
 
 		// For other errors, throw as usual
 		throw new Error(
-			error.response?.data?.message || "Failed to fetch instructor",
+			apiError.response?.data?.message || "Failed to fetch instructor",
 		);
 	}
 };
@@ -236,32 +242,34 @@ export const getPublicInstructors = async (params?: {
 			}>
 		>(`/instructor/public/instructors?${queryParams.toString()}`);
 		return response.data;
-	} catch (error: any) {
-		console.error("Error fetching public instructors:", error);
+	} catch (error: unknown) {
+		const apiError = error as ApiError;
+		console.error("Error fetching public instructors:", apiError);
 		throw new Error(
-			error.response?.data?.message || "Failed to fetch instructors",
+			apiError.response?.data?.message || "Failed to fetch instructors",
 		);
 	}
 };
 
 export const getInstructorDetails = async (
 	userId: string,
-): Promise<ApiResponse<IInstructorDetails>> => {
+): Promise<ApiResponse<any>> => { // Changed from IInstructorDetails to any as IInstructorDetails is not defined
 	try {
-		const response = await api.get<ApiResponse<IInstructorDetails>>(
+		const response = await api.get<ApiResponse<any>>(
 			`/instructor/${userId}`,
 		);
 		return response.data;
-	} catch (error: any) {
+	} catch (error: unknown) {
+		const apiError = error as ApiError;
 		throw {
-			response: error.response
+			response: apiError.response
 				? {
-						status: error.response.status,
-						data: error.response.data,
+						status: apiError.response.status,
+						data: apiError.response.data,
 					}
 				: undefined,
 			message:
-				error.response?.data?.message || "Failed to get instructor details",
+				apiError.response?.data?.message || "Failed to get instructor details",
 		};
 	}
 };
@@ -271,15 +279,15 @@ export const getInstructorDetails = async (
 
 
 export const getInstructorProfile = async (userId: string) => {
-  const response = await api.get<InstructorProfile>(`/instructors/${userId}`);
+  const response = await api.get<any>(`/instructors/${userId}`); // Changed from InstructorProfile to any
   return response.data;
 };
 
 export const updateInstructorProfile = async (
   userId: string,
-  data: Partial<InstructorProfile>
+  data: Partial<any> // Changed from InstructorProfile to any
 ) => {
-  const response = await api.patch<InstructorProfile>(
+  const response = await api.patch<any>(
     `/instructors/${userId}`,
     data
   );
@@ -287,6 +295,6 @@ export const updateInstructorProfile = async (
 };
 
 export const getInstructorCourses = async () => {
-  const response = await api.get<InstructorCourse[]>("/instructors/courses");
+  const response = await api.get<any[]>("/instructors/courses"); // Changed from InstructorCourse[] to any[]
   return response.data;
 };

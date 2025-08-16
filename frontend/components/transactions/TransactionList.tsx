@@ -8,7 +8,7 @@ import { formatDate } from "@/lib/utils";
 interface TransactionListProps {
   transactions: Transaction[];
   isLoading: boolean;
-  error?: any;
+  error?: { message: string; statusCode?: number };
   onRetry?: () => void;
   onRetryTransaction?: (transaction: Transaction) => void;
 }

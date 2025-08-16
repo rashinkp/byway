@@ -250,7 +250,7 @@ export class Lesson {
     return !this._deletedAt;
   }
 
-  toJSON(): any {
+  toJSON(): Record<string, unknown> {
     return {
       id: this._id,
       courseId: this._courseId,

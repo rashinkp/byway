@@ -26,8 +26,9 @@ export function useOrders(): UseOrdersResult {
 				const response = await getOrders(params);
 				setOrders(response.data);
 				setCurrentParams(params);
-			} catch (err: any) {
-				setError(err.message);
+			} catch (err: unknown) {
+				const error = err as Error;
+				setError(error.message);
 			} finally {
 				setIsLoading(false);
 			}

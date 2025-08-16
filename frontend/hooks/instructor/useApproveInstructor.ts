@@ -24,7 +24,7 @@ export function useApproveInstructor() {
 			// Update instructor listing cache
 			queryClient.setQueriesData(
 				{ queryKey: ["instructors"] },
-				(oldData: any) => {
+				(oldData: { data: { items: IInstructorWithUserDetails[] } } | undefined) => {
 					if (!oldData?.data?.items) return oldData;
 					
 					return {

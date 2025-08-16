@@ -4,9 +4,10 @@ import { Search, Loader2, BookOpen, Clock, Users } from "lucide-react";
 import { useGlobalSearch } from "@/hooks/search/useGlobalSearch";
 import { useDebounce } from "@/hooks/useDebounce";
 import Image from "next/image";
+import { User } from "@/types/user";
 
 interface HeaderSearchBarProps {
-	user: any;
+	user: User;
 	searchQuery: string;
 	setSearchQuery: (q: string) => void;
 	showSearchResults: boolean;

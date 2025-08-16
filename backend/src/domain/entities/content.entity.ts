@@ -264,7 +264,7 @@ export class LessonContent {
     };
   }
 
-  toJSON(): any {
+  toJSON(): Record<string, unknown> {
     return {
       id: this._id,
       lessonId: this._lessonId,

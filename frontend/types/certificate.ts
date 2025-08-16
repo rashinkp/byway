@@ -8,7 +8,7 @@ export interface CertificateDTO {
 	issuedAt: string | null;
 	expiresAt: string | null;
 	pdfUrl: string;
-	metadata?: any;
+	metadata?: Record<string, unknown>;
 	createdAt: string;
 	updatedAt: string;
 	// Optionally, add courseTitle, userName, userEmail if your backend returns them

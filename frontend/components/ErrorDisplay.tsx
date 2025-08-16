@@ -2,7 +2,7 @@ import React, { FC, ReactNode, useEffect, useRef } from "react";
 import { AlertCircle } from "lucide-react";
 
 interface ErrorDisplayProps {
-	error: any;
+	error: Error | string | { message?: string; status?: number; statusCode?: number } | null;
 	onRetry?: () => void;
 	title?: string;
 	description?: string;

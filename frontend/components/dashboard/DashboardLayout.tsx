@@ -5,7 +5,7 @@ interface DashboardLayoutProps {
 	subtitle: string;
 	isLoading: boolean;
 	error: Error | null;
-	data: any;
+	data: Record<string, unknown> | null;
 	children: React.ReactNode;
 }
 

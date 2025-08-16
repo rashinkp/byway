@@ -59,7 +59,7 @@ export interface OrderItemDto {
   createdBy: string;
   deletedAt: string | null;
   approvalStatus: string;
-  details: any | null;
+  details: CourseDetail | null;
 }
 
 export interface OrderDto {

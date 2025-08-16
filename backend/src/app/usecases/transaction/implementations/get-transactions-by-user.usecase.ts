@@ -1,10 +1,9 @@
 import { IGetTransactionsByUserInputDTO, ITransactionOutputDTO } from "../../../../app/dtos/transaction.dto";
 import { ITransactionRepository } from "../../../repositories/transaction.repository";
 import { IGetTransactionsByUserUseCase } from "../interfaces/get-transactions-by-user.usecase.interface";
+import { Transaction } from "../../../../domain/entities/transaction.entity";
 
-export class GetTransactionsByUserUseCase
-  implements IGetTransactionsByUserUseCase
-{
+export class GetTransactionsByUserUseCase implements IGetTransactionsByUserUseCase {
   constructor(private readonly transactionRepository: ITransactionRepository) {}
 
   async execute(
@@ -29,7 +28,7 @@ export class GetTransactionsByUserUseCase
     };
   }
 
-  private mapToDTO(transaction: any): ITransactionOutputDTO {
+  private mapToDTO(transaction: Transaction): ITransactionOutputDTO {
     return {
       id: transaction.id,
       orderId: transaction.orderId,

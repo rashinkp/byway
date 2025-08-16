@@ -97,8 +97,9 @@ export function InstructorFormModal({
 				...data,
 				cv: fileUrl,
 			});
-		} catch (error: any) {
-			console.error("Error submitting form:", error);
+		} catch (error: unknown) {
+			const err = error as Error;
+			console.error("Error submitting form:", err);
 		}
 	};
 

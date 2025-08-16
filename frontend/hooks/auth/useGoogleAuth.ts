@@ -36,7 +36,8 @@ export function useGoogleAuth(): UseGoogleAuthResult {
 
 				setUser(response.data); // Set user in the store
 				redirectByRole(response.data.role || "/");
-			} catch (err: any) {
+			} catch (err: unknown) {
+				const error = err as Error;
 				const errorMessages: Record<string, string> = {
 					"This email is registered with a different authentication method":
 						"This email is already registered with email/password. Please sign in with that method.",
@@ -46,8 +47,8 @@ export function useGoogleAuth(): UseGoogleAuthResult {
 						"Failed to authenticate with Google. Please try again.",
 				};
 				const message =
-					errorMessages[err.message] ||
-					err.message ||
+					errorMessages[error.message] ||
+					error.message ||
 					"Google authentication failed";
 				setError(message);
 				toast.error(message);
@@ -55,7 +56,7 @@ export function useGoogleAuth(): UseGoogleAuthResult {
 				setIsSubmitting(false);
 			}
 		},
-		onError: (error: any) => {
+		onError: (error: { error?: string; message?: string }) => {
 			const message =
 				error.error === "popup_blocked"
 					? "Please allow popups and try again"

@@ -12,20 +12,20 @@ import {
 import { ReactNode, useCallback } from "react";
 import { AlertDialogFooter, AlertDialogHeader } from "./alert-dialog";
 
-interface AlertProps {
+interface AlertProps<T = unknown> {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   title?: string;
-  description?: string | ((item: any) => string) | ReactNode;
+  description?: string | ((item: T) => string) | ReactNode;
   confirmText?: string;
   cancelText?: string | null;
   onConfirm: () => void;
-  item?: any;
-  actions?: Array<{ confirmationMessage?: (item: any) => string }>;
+  item?: T;
+  actions?: Array<{ confirmationMessage?: (item: T) => string }>;
   actionIndex?: number;
 }
 
-export function AlertComponent({
+export function AlertComponent<T = unknown>({
   open,
   onOpenChange,
   title = "Are you sure?",
@@ -36,7 +36,7 @@ export function AlertComponent({
   item,
   actions,
   actionIndex,
-}: AlertProps) {
+}: AlertProps<T>) {
   const getDynamicDescription = useCallback(() => {
     if (
       item &&

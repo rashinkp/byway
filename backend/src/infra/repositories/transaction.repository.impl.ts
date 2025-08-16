@@ -109,7 +109,7 @@ export class TransactionRepository implements ITransactionRepository {
   async updateStatus(
     id: string,
     status: TransactionStatus,
-    metadata?: Record<string, any>
+    metadata?: Record<string, unknown>
   ): Promise<Transaction> {
     const updated = await this.prisma.transactionHistory.update({
       where: { id },

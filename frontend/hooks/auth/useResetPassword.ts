@@ -23,7 +23,7 @@ export function useResetPassword() {
 				description: "Your password has been successfully updated.",
 			});
 		},
-		onError: (error: any) => {
+		onError: (error: Error) => {
 			toast.error("Failed to reset password", {
 				description: error.message || "Something went wrong",
 			});

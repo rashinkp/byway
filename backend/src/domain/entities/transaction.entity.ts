@@ -11,10 +11,10 @@ export class Transaction {
   private readonly _status: TransactionStatus;
   private readonly _paymentGateway: PaymentGateway;
   private readonly _paymentMethod?: string;
-  private readonly _paymentDetails?: Record<string, any>;
+  private readonly _paymentDetails?: Record<string, unknown>;
   private readonly _courseId?: string;
   private readonly _transactionId?: string;
-  private readonly _metadata?: Record<string, any>;
+  private readonly _metadata?: Record<string, unknown>;
   private readonly _createdAt: Date;
   private readonly _updatedAt: Date;
   private readonly _walletId?: string;
@@ -31,9 +31,9 @@ export class Transaction {
     status: TransactionStatus;
     paymentGateway: PaymentGateway;
     paymentMethod?: string;
-    paymentDetails?: Record<string, any>;
+    paymentDetails?: Record<string, unknown>;
     transactionId?: string;
-    metadata?: Record<string, any>;
+    metadata?: Record<string, unknown>;
     createdAt?: Date;
     updatedAt?: Date;
     description?: string;
@@ -105,7 +105,7 @@ export class Transaction {
     return this._paymentMethod;
   }
 
-  get paymentDetails(): Record<string, any> | undefined {
+  get paymentDetails(): Record<string, unknown> | undefined {
     return this._paymentDetails;
   }
 
@@ -117,7 +117,7 @@ export class Transaction {
     return this._transactionId;
   }
 
-  get metadata(): Record<string, any> | undefined {
+  get metadata(): Record<string, unknown> | undefined {
     return this._metadata;
   }
 

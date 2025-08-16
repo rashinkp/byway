@@ -23,7 +23,7 @@ export function useApproveCourse(): UseCourseApprovalReturn {
 			// Update all courses queries in the cache
 			queryClient.setQueriesData(
 				{ queryKey: ["courses"] },
-				(oldData: any) => {
+				(oldData: { courses: Course[] } | undefined) => {
 					if (!oldData?.courses) return oldData;
 					
 					return {
@@ -56,7 +56,7 @@ export function useApproveCourse(): UseCourseApprovalReturn {
 			// Update instructor courses cache
 			queryClient.setQueriesData(
 				{ queryKey: ["instructor-courses"] },
-				(oldData: any) => {
+				(oldData: { data: { items: Course[] } } | undefined) => {
 					if (!oldData?.data?.items) return oldData;
 					
 					return {
@@ -106,7 +106,7 @@ export function useDeclineCourse(): UseCourseApprovalReturn {
 			// Update all courses queries in the cache
 			queryClient.setQueriesData(
 				{ queryKey: ["courses"] },
-				(oldData: any) => {
+				(oldData: { courses: Course[] } | undefined) => {
 					if (!oldData?.courses) return oldData;
 					
 					return {
@@ -139,7 +139,7 @@ export function useDeclineCourse(): UseCourseApprovalReturn {
 			// Update instructor courses cache
 			queryClient.setQueriesData(
 				{ queryKey: ["instructor-courses"] },
-				(oldData: any) => {
+				(oldData: { data: { items: Course[] } } | undefined) => {
 					if (!oldData?.data?.items) return oldData;
 					
 					return {

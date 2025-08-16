@@ -7,7 +7,12 @@ import { clearAllCache } from "@/lib/utils";
 declare global {
 	interface Window {
 		fbAsyncInit?: () => void;
-		FB: any;
+		FB: {
+			init: (config: { appId: string; cookie: boolean; xfbml: boolean; version: string }) => void;
+			login: (callback: (response: { authResponse?: AuthResponse }) => void, options: { scope: string }) => void;
+			getLoginStatus: (callback: (response: { status: string; authResponse?: AuthResponse }) => void) => void;
+			api: (path: string, callback: (response: FacebookUserData) => void) => void;
+		};
 	}
 }
 
@@ -20,7 +25,7 @@ interface FacebookUserData {
 			url: string;
 		};
 	};
-	error?: any;
+	error?: { message: string; type: string };
 }
 
 interface AuthResponse {
@@ -131,9 +136,10 @@ export function useFacebookAuth(): UseFacebookAuthResult {
 			setIsAuthenticated(true);
 			setIsLoading(false);
 			redirectByRole(backendResponse.data.role || "/");
-		} catch (err: any) {
+		} catch (err: unknown) {
+			const error = err as Error;
 			setError(
-				err.message || "An error occurred during Facebook authentication",
+				error.message || "An error occurred during Facebook authentication",
 			);
 			setIsLoading(false);
 		}

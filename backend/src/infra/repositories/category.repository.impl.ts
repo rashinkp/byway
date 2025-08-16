@@ -52,7 +52,7 @@ export class CategoryRepository implements ICategoryRepository {
       filterBy = "all",
     } = input;
 
-    const where: any = {};
+    const where: Record<string, unknown> = {};
     if (!includeDeleted && filterBy !== "Inactive") {
       where.deletedAt = null;
     }

@@ -19,7 +19,14 @@ interface LessonWithCompletion extends ILesson {
 
 interface LessonContentProps {
   selectedLesson: LessonWithCompletion;
-  content: any; 
+  content: {
+    id: string;
+    lessonId: string;
+    type: string;
+    content: string;
+    quizQuestions?: QuizQuestion[];
+    [key: string]: unknown;
+  } | null; 
   isContentLoading: boolean;
   isContentError: boolean;
   contentError: Error | null;

@@ -12,7 +12,7 @@ interface AuthState {
 	setEmail: (email: string) => void;
 	clearAuth: () => void;
 	initializeAuth: () => Promise<void>;
-	handleAuthError: (error: any) => void;
+	handleAuthError: (error: { message: string; statusCode?: number }) => void;
 }
 
 // Helper functions for localStorage
@@ -114,12 +114,12 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 		});
 		console.log("AuthStore: Auth cleared");
 	},
-	handleAuthError: (error: any) => {
-		if (error?.status === 401 || error?.response?.status === 401) {
+	handleAuthError: (error: { message: string; statusCode?: number }) => {
+		if (error?.statusCode === 401 || error?.statusCode === 401) {
 			console.log("Unauthorized error detected, clearing auth");
 			get().clearAuth();
 		} else {
-			console.log("Non-unauthorized error, keeping user data:", error?.status || error?.response?.status);
+			console.log("Non-unauthorized error, keeping user data:", error?.statusCode || error?.statusCode);
 		}
 	},
 	initializeAuth: async () => {

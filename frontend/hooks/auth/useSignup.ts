@@ -38,7 +38,7 @@ export function useSignup() {
 				});
 			}
 		},
-		onError: (error: any) => {
+		onError: (error: Error) => {
 			console.error("Signup error:", error);
 			toast.error("Signup failed", {
 				description: error.message || "Something went wrong",

@@ -1,6 +1,7 @@
 import { CertificateDTO } from "@/types/certificate";
-import { api } from "./api";
+import { api } from "@/api/api";
 import { ApiResponse } from "@/types/general";
+import { ApiError } from "@/types/error";
 
 export async function getCertificate(
 	courseId: string,
@@ -10,9 +11,10 @@ export async function getCertificate(
 			`/certificates?courseId=${courseId}`,
 		);
 		return response.data.data;
-	} catch (error: any) {
-		if (error.response?.status === 404) return null;
-		throw error;
+	} catch (error: unknown) {
+		const apiError = error as ApiError;
+		if (apiError.response?.status === 404) return null;
+		throw apiError;
 	}
 }
 
@@ -50,7 +52,14 @@ export async function listUserCertificates(params?: {
 		if (params.status) query.append("status", params.status);
 		if (params.search) query.append("search", params.search);
 	}
-	const response = await api.get<ApiResponse<any>>(
+	const response = await api.get<ApiResponse<{
+		items: CertificateDTO[];
+		total: number;
+		page: number;
+		totalPages: number;
+		hasMore: boolean;
+		nextPage?: number;
+	}>>(
 		`/certificates/list${query.toString() ? `?${query.toString()}` : ""}`,
 	);
 	return response.data.data;

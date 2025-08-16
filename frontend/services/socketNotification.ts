@@ -1,33 +1,16 @@
 import socket from "@/lib/socket";
+import { Notification, NotificationResponse, GetNotificationsData } from "@/types/notification";
 
 export const getUserNotificationsSocket = (
-	data: {
-		userId: string;
-		skip?: number;
-		take?: number;
-		sortBy?: string;
-		sortOrder?: "asc" | "desc";
-		eventType?: string;
-		search?: string;
-	},
-	callback: (result: {
-		items: any[];
-		total: number;
-		hasMore: boolean;
-		nextPage?: number;
-	}) => void,
+	data: GetNotificationsData,
+	callback: (result: NotificationResponse) => void,
 ) => {
 	// Remove any previous listener before adding a new one
 	socket.off("userNotifications");
 	socket.emit("getUserNotifications", data);
 	socket.once(
 		"userNotifications",
-		(result: {
-			items: any[];
-			total: number;
-			hasMore: boolean;
-			nextPage?: number;
-		}) => {
+		(result: NotificationResponse) => {
 			callback(result);
 		},
 	);

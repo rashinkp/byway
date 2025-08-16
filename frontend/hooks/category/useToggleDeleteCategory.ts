@@ -21,7 +21,7 @@ export function useToggleDeleteCategory() {
 			// Update all category queries in cache
 			queryClient.setQueriesData(
 				{ queryKey: ["categories"] },
-				(oldData: any) => {
+				(oldData: { data?: Category[]; items?: Category[]; total?: number; page?: number; limit?: number; totalPages?: number } | undefined) => {
 					if (!oldData) return oldData;
 					
 					// Handle different possible data structures
@@ -48,7 +48,7 @@ export function useToggleDeleteCategory() {
 			);
 
 		},
-		onError: (error: any, category) => {
+		onError: (error: Error, category: Category) => {
 			toast.error(
 				`Failed to ${category.deletedAt ? "restore" : "delete"} category`
 			);

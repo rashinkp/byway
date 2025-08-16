@@ -1,7 +1,7 @@
-import { updateCourse } from "@/api/course";
-import { Course, CourseEditFormData } from "@/types/course";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
+import { Course, CourseEditFormData } from "@/types/course";
+import { updateCourse } from "@/api/course";
 
 export const useUpdateCourse = () => {
 	const queryClient = useQueryClient();
@@ -30,9 +30,9 @@ export const useUpdateCourse = () => {
 			await queryClient.cancelQueries({ queryKey: ["course", id] });
 
 			// Optimistically update the course list
-			const previousCourses = queryClient.getQueryData<any>(["courses"]);
+			const previousCourses = queryClient.getQueryData<{ courses: Course[] }>(["courses"]);
 
-			queryClient.setQueryData(["courses"], (old: any) => {
+			queryClient.setQueryData(["courses"], (old: { courses: Course[] } | undefined) => {
 				if (!old?.courses) return old;
 				return {
 					...old,
@@ -54,7 +54,7 @@ export const useUpdateCourse = () => {
 			// Update all courses queries in the cache
 			queryClient.setQueriesData(
 				{ queryKey: ["courses"] },
-				(oldData: any) => {
+				(oldData: { courses: Course[] } | undefined) => {
 					if (!oldData?.courses) return oldData;
 					
 					return {
@@ -78,9 +78,9 @@ export const useUpdateCourse = () => {
 			console.log("Course updated successfully:", data);
 		},
 		onError: (
-			error: any,
+			error: Error,
 			variables: { id: string; data: CourseEditFormData },
-			context: any,
+			context: { previousCourses: { courses: Course[] } | undefined; previousCourse: Course | undefined } | undefined,
 		) => {
 			// Rollback course list
 			queryClient.setQueryData(

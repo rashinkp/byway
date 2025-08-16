@@ -6,7 +6,7 @@ import { UserId } from "../../domain/value-object/UserId";
 import { MessageContent } from "../../domain/value-object/MessageContent";
 import { Timestamp } from "../../domain/value-object/Timestamp";
 import { IMessageWithUserData } from "../../domain/types/message.interface";
-import { MessageType as DomainMessageType } from "../../domain/enum/Message-type.enum";
+import { MessageType as DomainMessageType, MessageType } from "../../domain/enum/Message-type.enum";
 import { MessageType as PrismaMessageType, PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
@@ -173,14 +173,23 @@ export class MessageRepository implements IMessageRepository {
     return count;
   }
 
-  private toDomain(prismaMessage: any): Message {
+  private toDomain(prismaMessage: { 
+    chatId: string; 
+    senderId: string; 
+    content: string | null; 
+    imageUrl: string | null; 
+    audioUrl: string | null; 
+    type: string; 
+    isRead: boolean; 
+    createdAt: Date; 
+  }): Message {
     return new Message(
       new ChatId(prismaMessage.chatId),
       new UserId(prismaMessage.senderId),
       prismaMessage.content ? new MessageContent(prismaMessage.content) : null,
       prismaMessage.imageUrl ?? null,
       prismaMessage.audioUrl ?? null,
-      prismaMessage.type,
+      DomainMessageType[prismaMessage.type as keyof typeof DomainMessageType],
       prismaMessage.isRead,
       new Timestamp(prismaMessage.createdAt)
     );

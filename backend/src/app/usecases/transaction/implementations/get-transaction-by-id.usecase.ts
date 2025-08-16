@@ -1,6 +1,7 @@
 import { ITransactionOutputDTO } from "../../../../app/dtos/transaction.dto";
 import { ITransactionRepository } from "../../../repositories/transaction.repository";
 import { IGetTransactionByIdUseCase } from "../interfaces/get-transaction-by-id.usecase.interface";
+import { Transaction } from "../../../../domain/entities/transaction.entity";
 
 export class GetTransactionByIdUseCase implements IGetTransactionByIdUseCase {
   constructor(private readonly transactionRepository: ITransactionRepository) {}
@@ -13,7 +14,7 @@ export class GetTransactionByIdUseCase implements IGetTransactionByIdUseCase {
     return this.mapToDTO(transaction);
   }
 
-  private mapToDTO(transaction: any): ITransactionOutputDTO {
+  private mapToDTO(transaction: Transaction): ITransactionOutputDTO {
     return {
       id: transaction.id,
       orderId: transaction.orderId,

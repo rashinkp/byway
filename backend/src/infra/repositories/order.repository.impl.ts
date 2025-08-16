@@ -1,4 +1,4 @@
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient, Order as PrismaOrder, OrderItem as PrismaOrderItem, Course as PrismaCourse } from "@prisma/client";
 import { IOrderRepository } from "../../app/repositories/order.repository";
 import { Order } from "../../domain/entities/order.entity";
 import { Course } from "../../domain/entities/course.entity";
@@ -240,18 +240,18 @@ export class OrderRepository implements IOrderRepository {
   }
 
   async findMany(params: {
-    where: any;
+    where: Record<string, unknown>;
     skip: number;
     take: number;
-    orderBy: any;
-    include?: any;
+    orderBy: Record<string, 'asc' | 'desc' | undefined>;
+    include?: Record<string, unknown>;
   }): Promise<Order[]> {
-    const orders = await this.prisma.order.findMany(params);
+    const orders = await this.prisma.order.findMany(params as any);
     return orders.map((order) => this.mapToOrderEntity(order));
   }
 
-  async count(where: any): Promise<number> {
-    return this.prisma.order.count({ where });
+  async count(where: Record<string, unknown>): Promise<number> {
+    return this.prisma.order.count({ where: where as any });
   }
 
   async create(order: Order): Promise<Order> {

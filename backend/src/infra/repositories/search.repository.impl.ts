@@ -236,7 +236,7 @@ export class SearchRepository implements ISearchRepository {
         limit,
       };
     }
-    const where: any = {
+    const where: Record<string, unknown> = {
       userId,
       OR: [
         { certificateNumber: { contains: query, mode: "insensitive" } },

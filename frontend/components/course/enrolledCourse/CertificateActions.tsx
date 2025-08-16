@@ -60,8 +60,9 @@ export function CertificateActions({ courseId }: { courseId: string }) {
             try {
               await createCertificate();
               await fetchCertificate();
-            } catch (err: any) {
-              setRegenError(err?.message || "Failed to regenerate certificate");
+            } catch (err: unknown) {
+              const error = err as Error;
+              setRegenError(error?.message || "Failed to regenerate certificate");
             }
           }}
           disabled={certLoading || !canRegenerate}

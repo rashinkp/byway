@@ -23,7 +23,7 @@ export function useLogin() {
 						: "/";
 			router.push(redirectPath);
 		},
-		onError: (error: any) => {
+		onError: (error: Error) => {
 			console.error("Login failed:", error.message);
 		},
 	});

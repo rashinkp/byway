@@ -852,7 +852,7 @@ export class CourseRepository implements ICourseRepository {
         const rating =
           reviews.length > 0
             ? reviews.reduce(
-                (sum: number, review: any) => sum + review.rating,
+                (sum: number, review: { rating: number }) => sum + review.rating,
                 0
               ) / reviews.length
             : 0;

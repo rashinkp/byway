@@ -44,7 +44,18 @@ export class PrismaNotificationRepository
     }
   }
 
-  private toDomain(row: any): Notification {
+  private toDomain(row: { 
+    id: string; 
+    userId: string; 
+    eventType: string; 
+    entityType: string; 
+    entityId: string; 
+    entityName: string; 
+    message: string; 
+    link: string | null; 
+    createdAt: Date; 
+    expiresAt: Date; 
+  }): Notification {
     return new Notification(
       row.id,
       new UserId(row.userId),
@@ -107,7 +118,7 @@ export class PrismaNotificationRepository
       eventType,
       search,
     } = options;
-    const where: any = { userId };
+    const where: Record<string, unknown> = { userId };
     if (eventType) where.eventType = eventType;
     if (search) {
       where.OR = [

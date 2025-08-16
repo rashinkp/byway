@@ -1,19 +1,24 @@
 import socket from "@/lib/socket";
+import { 
+  ChatMessage, 
+  Chat, 
+  ChatListItem, 
+  SendMessageData, 
+  CreateChatData, 
+  GetChatHistoryData, 
+  GetMessagesData, 
+  GetMessageData, 
+  DeleteMessageData 
+} from "@/types/chat";
 
 export const joinChat = (chatId: string) => {
 	socket.emit("joinChat", { chatId });
 };
 
 export const sendMessage = (
-	data: {
-		chatId?: string;
-		content: string;
-		userId?: string;
-		imageUrl?: string;
-		audioUrl?: string;
-	},
-	onSuccess?: (message: any) => void,
-	onError?: (error: any) => void,
+	data: SendMessageData,
+	onSuccess?: (message: ChatMessage) => void,
+	onError?: (error: { message: string }) => void,
 ) => {
 	if (!socket.connected) {
 		console.warn("[SocketChat] Socket not connected, cannot send message");
@@ -34,8 +39,8 @@ export const sendMessage = (
 };
 
 export const createChat = (
-	data: { user1Id: string; user2Id: string },
-	callback?: (chat: any) => void,
+	data: CreateChatData,
+	callback?: (chat: Chat) => void,
 ) => {
 	socket.emit("createChat", data);
 	if (callback) {
@@ -43,20 +48,14 @@ export const createChat = (
 	}
 };
 
-export const getChatHistory = (data: any, callback: (history: any) => void) => {
+export const getChatHistory = (data: GetChatHistoryData, callback: (history: ChatListItem[]) => void) => {
 	socket.emit("getChatHistory", data);
 	socket.once("chatHistory", callback);
 };
 
 export const listUserChats = (
-	data: {
-		page?: number;
-		limit?: number;
-		search?: string;
-		sort?: string;
-		filter?: string;
-	} = {},
-	callback: (result: any) => void,
+	data: GetChatHistoryData = {},
+	callback: (result: ChatListItem[]) => void,
 ) => {
 	if (!socket.connected) {
 		return;
@@ -64,27 +63,27 @@ export const listUserChats = (
 
 	socket.emit("listUserChats", data);
 
-	socket.once("userChats", (result: any) => {
+	socket.once("userChats", (result: ChatListItem[]) => {
 		callback(result);
 	});
 };
 
 export const getMessagesByChat = (
-	data: any,
-	callback: (messages: any) => void,
+	data: GetMessagesData,
+	callback: (messages: ChatMessage[]) => void,
 ) => {
 	socket.emit("getMessagesByChat", data);
-	socket.once("messagesByChat", (messages: any) => {
+	socket.once("messagesByChat", (messages: ChatMessage[]) => {
 		callback(messages);
 	});
 };
 
-export const getMessageById = (data: any, callback: (message: any) => void) => {
+export const getMessageById = (data: GetMessageData, callback: (message: ChatMessage) => void) => {
 	socket.emit("getMessageById", data);
 	socket.once("messageById", callback);
 };
 
-export const deleteMessage = (data: any, callback?: (result: any) => void) => {
+export const deleteMessage = (data: DeleteMessageData, callback?: (result: { success: boolean }) => void) => {
 	socket.emit("deleteMessage", data);
 	if (callback) {
 		socket.once("messageDeleted", callback);
@@ -92,8 +91,8 @@ export const deleteMessage = (data: any, callback?: (result: any) => void) => {
 };
 
 export const createChatSocket = (
-	data: { user1Id: string; user2Id: string },
-	callback?: (chat: any) => void,
+	data: CreateChatData,
+	callback?: (chat: Chat) => void,
 ) => {
 	socket.emit("createChat", data);
 	if (callback) {

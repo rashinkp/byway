@@ -1,5 +1,6 @@
 import { ISearchResult, SearchParams } from "@/types/search";
 import { api } from "./api";
+import { ApiError } from "@/types/error";
 
 export async function globalSearch(
 	params: SearchParams,
@@ -9,10 +10,11 @@ export async function globalSearch(
 			params,
 		});
 		return response.data.data;
-	} catch (error: any) {
+	} catch (error: unknown) {
+		const apiError = error as ApiError;
 		throw new Error(
-			error.response?.data?.message ||
-				error.response?.data?.error ||
+			apiError.response?.data?.message ||
+				apiError.response?.data?.error ||
 				"Search failed",
 		);
 	}

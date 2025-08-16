@@ -17,7 +17,11 @@ interface CourseSidebarProps {
   allLessons: LessonWithCompletion[];
   selectedLesson: LessonWithCompletion | null;
   handleLessonSelect: (lesson: LessonWithCompletion) => void;
-  data: any; // Replace with proper type from your hook
+  data: {
+    totalPages: number;
+    page: number;
+    [key: string]: unknown;
+  } | null; // Pagination data
   page: number;
   goToPreviousPage: () => void;
   goToNextPage: () => void;

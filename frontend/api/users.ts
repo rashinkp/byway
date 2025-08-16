@@ -1,54 +1,52 @@
 import { api } from "@/api/api";
-import { PublicUser, User, UserProfileType } from "@/types/user";
+import { ApiResponse, ApiError } from "@/types";
+import { User, PublicUser, UserProfileType } from "@/types/user";
 import { IInstructorWithUserDetails } from "@/types/instructor";
 import { useAuthStore } from "@/stores/auth.store";
-import { ApiResponse, IPaginatedResponse } from "@/types/general";
 
 export const getAllUsers = async ({
 	page = 1,
 	limit = 10,
-	sortBy,
-	sortOrder,
-	includeDeleted,
-	search,
-	filterBy,
+	search = "",
+	sortBy = "createdAt",
+	sortOrder = "desc",
+	filterBy = "All",
 	role,
 }: {
 	page?: number;
 	limit?: number;
-	sortBy?: string;
-	sortOrder?: string;
-	includeDeleted?: boolean;
 	search?: string;
+	sortBy?: string;
+	sortOrder?: "asc" | "desc";
 	filterBy?: string;
-	role?: "USER" | "INSTRUCTOR" | "ADMIN";
-}): Promise<ApiResponse<IPaginatedResponse<User>>> => {
+	role?: string;
+}): Promise<ApiResponse<{ items: User[]; total: number; totalPages: number }>> => {
 	try {
 		const params = new URLSearchParams();
 		params.append("page", page.toString());
 		params.append("limit", limit.toString());
-
-		if (sortBy) params.append("sortBy", sortBy);
-		if (sortOrder) params.append("sortOrder", sortOrder);
-		if (includeDeleted) params.append("includeDeleted", "true");
-		if (search) params.append("search", search);
+		params.append("search", search);
+		params.append("sortBy", sortBy);
+		params.append("sortOrder", sortOrder);
 		if (filterBy) params.append("filterBy", filterBy);
 		if (role) params.append("role", role);
 
 		const response = await api.get(`/user/admin/users?${params.toString()}`);
 		return response.data; // Adjusted to return the full ApiResponse
-	} catch (error: any) {
-		console.error("Error fetching users:", error);
-		throw new Error(error.response?.data?.message || "Failed to fetch users");
+	} catch (error: unknown) {
+		const apiError = error as ApiError;
+		console.error("Error fetching users:", apiError);
+		throw new Error(apiError.response?.data?.message || "Failed to fetch users");
 	}
 };
 
 export const toggleDeleteUser = async (id: string): Promise<void> => {
 	try {
 		await api.patch(`/user/softDelete/${id}`);
-	} catch (error: any) {
+	} catch (error: unknown) {
+		const apiError = error as ApiError;
 		throw new Error(
-			error.response?.data?.message || "Failed to toggle user status",
+			apiError.response?.data?.message || "Failed to toggle user status",
 		);
 	}
 };
@@ -57,8 +55,9 @@ export async function getUserData(): Promise<User> {
 	try {
 		const response = await api.get(`/user/me`);
 		return response.data.data;
-	} catch (error: any) {
-		throw new Error(error.response?.data?.error || "Failed to get user data");
+	} catch (error: unknown) {
+		const apiError = error as ApiError;
+		throw new Error(apiError.response?.data?.error || "Failed to get user data");
 	}
 }
 
@@ -66,8 +65,9 @@ export async function getUserDataById(userId: string): Promise<User> {
 	try {
 		const response = await api.get(`/user/users/${userId}`);
 		return response.data.data;
-	} catch (error: any) {
-		throw new Error(error.response?.data?.error || "Failed to get user data");
+	} catch (error: unknown) {
+		const apiError = error as ApiError;
+		throw new Error(apiError.response?.data?.error || "Failed to get user data");
 	}
 }
 
@@ -87,9 +87,10 @@ export async function updateUser(data: {
 	try {
 		const response = await api.put(`/user/users`, data);
 		return response.data.data; // The backend returns user data directly in data.data
-	} catch (error: any) {
+	} catch (error: unknown) {
+		const apiError = error as ApiError;
 		throw new Error(
-			error.response?.data?.error || "Failed to update user data",
+			apiError.response?.data?.error || "Failed to update user data",
 		);
 	}
 }
@@ -100,9 +101,10 @@ export async function getPublicUser(userId: string): Promise<PublicUser> {
 			`/user/${userId}/public`,
 		);
 		return response.data.data;
-	} catch (error: any) {
+	} catch (error: unknown) {
+		const apiError = error as ApiError;
 		throw new Error(
-			error.response?.data?.message || "Failed to fetch public user data",
+			apiError.response?.data?.message || "Failed to fetch public user data",
 		);
 	}
 }
@@ -113,9 +115,10 @@ export async function getUserAdminDetails(
 	try {
 		const response = await api.get(`/user/admin/${userId}`);
 		return response.data.data;
-	} catch (error: any) {
+	} catch (error: unknown) {
+		const apiError = error as ApiError;
 		throw new Error(
-			error.response?.data?.message || "Failed to fetch user admin details",
+			apiError.response?.data?.message || "Failed to fetch user admin details",
 		);
 	}
 }
@@ -135,11 +138,12 @@ export async function getDetailedUserData(): Promise<UserProfileType> {
 		
 		console.log("getDetailedUserData: Successfully fetched user data");
 		return detailedResponse.data.data;
-	} catch (error: any) {
-		console.error("getDetailedUserData: Error fetching user data:", error);
+	} catch (error: unknown) {
+		const apiError = error as ApiError;
+		console.error("getDetailedUserData: Error fetching user data:", apiError);
 		throw new Error(
-			error.response?.data?.message ||
-				error.response?.data?.error ||
+			apiError.response?.data?.message ||
+				apiError.response?.data?.error ||
 				"Failed to get user data",
 		);
 	}

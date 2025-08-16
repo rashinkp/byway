@@ -100,7 +100,16 @@ export class SendMessageUseCase implements ISendMessageUseCase {
       }
     }
     
-    let enrichedMessage: any = null;
+    let enrichedMessage: { 
+      id: string; 
+      chatId: string; 
+      senderId: string; 
+      content?: string; 
+      imageUrl?: string; 
+      audioUrl?: string; 
+      type: string; 
+      createdAt: Date; 
+    } | null = null;
     try {
       if (!message.id) {
         throw new Error("Message ID is required to send a message");

@@ -53,7 +53,6 @@ export class PrismaAnalyticsRepository implements IRevenueRepository {
         userId: params.userId,
       },
     });
-
     return result;
   }
 

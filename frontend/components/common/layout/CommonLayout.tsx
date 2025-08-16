@@ -13,7 +13,12 @@ interface CommonLayoutProps {
 	children: React.ReactNode;
 	sidebarHeaderTitle: string;
 	sidebarHeaderSubtitle: string;
-	navItems: any[];
+	navItems: Array<{
+		label: string;
+		href: string;
+		icon?: React.ComponentType<{ className?: string }>;
+		children?: Array<{ label: string; href: string }>;
+	}>;
 	role: string;
 	isCollapsible?: boolean;
 	skeleton?: React.ReactNode;

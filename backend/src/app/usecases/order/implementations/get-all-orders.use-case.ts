@@ -22,8 +22,8 @@ export class GetAllOrdersUseCase implements IGetAllOrdersUseCase {
       // Calculate skip for pagination
       const skip = (page - 1) * limit;
 
-      // Build where clause
-      const where: any = { userId };
+      // Build where clause using generic object
+      const where: Record<string, unknown> = { userId };
 
       if (status !== "ALL") {
         where.orderStatus = status;
@@ -38,8 +38,8 @@ export class GetAllOrdersUseCase implements IGetAllOrdersUseCase {
 
       if (minAmount !== undefined || maxAmount !== undefined) {
         where.amount = {};
-        if (minAmount !== undefined) where.amount.gte = minAmount;
-        if (maxAmount !== undefined) where.amount.lte = maxAmount;
+        if (minAmount !== undefined) (where.amount as Record<string, unknown>).gte = minAmount;
+        if (maxAmount !== undefined) (where.amount as Record<string, unknown>).lte = maxAmount;
       }
 
       // Get total count for pagination

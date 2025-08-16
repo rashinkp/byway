@@ -1,6 +1,7 @@
 import { CertificateRepositoryInterface } from "../../app/repositories/certificate-repository.interface";
 import { Certificate } from "../../domain/entities/certificate.entity";
 import { PrismaClient } from "@prisma/client";
+import { CertificateStatus } from "../../domain/enum/certificate-status.enum";
 
 export class PrismaCertificateRepository implements CertificateRepositoryInterface {
   constructor(private readonly prisma: PrismaClient) {}
@@ -107,7 +108,7 @@ export class PrismaCertificateRepository implements CertificateRepositoryInterfa
       search,
     } = options;
 
-    const where: any = { userId };
+    const where: Record<string, unknown> = { userId };
     if (status) where.status = status;
     if (search) {
       where.OR = [
@@ -162,7 +163,7 @@ export class PrismaCertificateRepository implements CertificateRepositoryInterfa
 
   async findCertificatesByStatus(status: string): Promise<Certificate[]> {
     const found = await this.prisma.certificate.findMany({
-      where: { status: status as any },
+      where: { status: status as CertificateStatus },
       orderBy: { createdAt: "desc" },
     });
      return found.map((item) => Certificate.toDomain(item));

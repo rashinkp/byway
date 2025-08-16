@@ -173,7 +173,7 @@ export interface CourseDetailLayoutProps {
 		lessons: boolean;
 		user: boolean;
 	};
-	error: any;
+	error: unknown;
 	sidebarProps: {
 		isCartLoading?: boolean;
 		handleAddToCart?: () => void;
@@ -181,7 +181,7 @@ export interface CourseDetailLayoutProps {
 		userLoading?: boolean;
 		adminActions?: ReactNode;
 		instructorActions?: ReactNode;
-		adminActionsProps?: any;
+		adminActionsProps?: Record<string, unknown>;
 	};
 	tabContent?: {
 		[key: string]: ReactNode;

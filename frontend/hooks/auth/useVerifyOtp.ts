@@ -32,7 +32,7 @@ export function useVerifyOtp(options: UseVerifyOtpOptions = {}) {
 			if (setLocalError) setLocalError(null);
 			if (setRedirecting) setRedirecting(true);
 			if (variables.type === "password-reset") {
-				const resetToken = data?.data?.resetToken;
+				const resetToken = (data?.data as any)?.resetToken;
 				if (resetToken) {
 					sessionStorage.setItem("resetToken", resetToken);
 				}
@@ -49,7 +49,7 @@ export function useVerifyOtp(options: UseVerifyOtpOptions = {}) {
 			}
 			clearAuth();
 		},
-		onError: (error: any) => {
+		onError: (error: Error) => {
 			if (setRedirecting) setRedirecting(false);
 			if (setLocalError) setLocalError(error.message || "The OTP you entered is incorrect.");
 			toast.error("Invalid OTP", {

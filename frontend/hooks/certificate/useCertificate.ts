@@ -13,8 +13,9 @@ export function useCertificate(courseId: string) {
 		try {
 			const cert = await getCertificate(courseId);
 			setCertificate(cert);
-		} catch (err: any) {
-			setError(err.message || "Failed to fetch certificate");
+		} catch (err: unknown) {
+			const error = err as Error;
+			setError(error.message || "Failed to fetch certificate");
 		} finally {
 			setLoading(false);
 		}
@@ -26,8 +27,9 @@ export function useCertificate(courseId: string) {
 		try {
 			const cert = await generateCertificate(courseId);
 			setCertificate(cert);
-		} catch (err: any) {
-			setError(err.message || "Failed to generate certificate");
+		} catch (err: unknown) {
+			const error = err as Error;
+			setError(error.message || "Failed to generate certificate");
 		} finally {
 			setLoading(false);
 		}

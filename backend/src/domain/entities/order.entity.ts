@@ -19,7 +19,12 @@ export interface OrderItem {
   createdBy: string;
   deletedAt: string | null;
   approvalStatus: string;
-  details: any | null;
+  details: {
+    prerequisites: string | null;
+    longDescription: string | null;
+    objectives: string | null;
+    targetAudience: string | null;
+  } | null;
 }
 
 export class Order {
@@ -75,7 +80,7 @@ export class Order {
     return this.items;
   }
 
-  toJSON(): any {
+  toJSON(): Record<string, unknown> {
     return {
       id: this.id,
       userId: this.userId,

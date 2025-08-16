@@ -5,7 +5,14 @@ import { Notification } from '../../../../domain/entities/notification.entity';
 export class CreateNotificationsForUsersUseCase implements CreateNotificationsForUsersUseCaseInterface {
   constructor(private notificationRepository: NotificationRepositoryInterface) {}
 
-  async execute(userIds: string[], notificationData: any): Promise<void> {
+  async execute(userIds: string[], notificationData: {
+    eventType: string;
+    entityType: string;
+    entityId: string;
+    entityName: string;
+    message: string;
+    link?: string;
+  }): Promise<void> {
     for (const userId of userIds) {
       const notification = Notification.create({
         ...notificationData,

@@ -16,7 +16,7 @@ export function useUpdateCategory() {
 			// Update all category queries in cache
 			queryClient.setQueriesData(
 				{ queryKey: ["categories"] },
-				(oldData: any) => {
+				(oldData: { data?: Category[]; items?: Category[]; total?: number; page?: number; limit?: number; totalPages?: number } | undefined) => {
 					if (!oldData) return oldData;
 					
 					// Handle different possible data structures
@@ -46,7 +46,7 @@ export function useUpdateCategory() {
 				description: "The category has been updated successfully.",
 			});
 		},
-		onError: (error: any) => {
+		onError: (error: Error) => {
 			toast.error("Failed to update category", {
 				description: error.message || "Please try again",
 			});

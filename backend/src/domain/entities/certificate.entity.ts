@@ -110,7 +110,7 @@ export class Certificate {
   // Business logic methods
   public generateCertificate(
     pdfUrl: string,
-    metadata?: Record<string, any>
+    metadata?: Record<string, unknown>
   ): void {
     this._status = CertificateStatus.GENERATED;
     this._pdfUrl = pdfUrl;
@@ -161,7 +161,7 @@ export class Certificate {
     issuedAt?: Date | null;
     expiresAt?: Date | null;
     pdfUrl?: string | null;
-    metadata?: any;
+    metadata?: Record<string, unknown>;
     createdAt: Date;
     updatedAt: Date;
   }): Certificate {
@@ -181,7 +181,7 @@ export class Certificate {
     });
   }
 
-  static toPersistence(certificate: Certificate): any {
+  static toPersistence(certificate: Certificate): Record<string, unknown> {
     return {
       id: certificate.id,
       userId: certificate.userId,

@@ -2,6 +2,7 @@ import { EnhancedChatListItem, IChatRepository, PaginatedChatList } from "../../
 import { Chat } from "../../domain/entities/chat.entity";
 import { ChatId } from "../../domain/value-object/ChatId";
 import { UserId } from "../../domain/value-object/UserId";
+import { Timestamp } from "../../domain/value-object/Timestamp";
 
 import { PrismaClient } from "@prisma/client";
 import { Role } from "../../domain/enum/role.enum";
@@ -389,12 +390,17 @@ export class ChatRepository implements IChatRepository {
     return chat ? this.toDomain(chat) : null;
   }
 
-  private toDomain(prismaChat: any): Chat {
+  private toDomain(prismaChat: { 
+    user1Id: string; 
+    user2Id: string; 
+    createdAt: Date; 
+    updatedAt: Date; 
+  }): Chat {
     return new Chat(
       new UserId(prismaChat.user1Id),
       new UserId(prismaChat.user2Id),
-      prismaChat.createdAt,
-      prismaChat.updatedAt,
+      new Timestamp(prismaChat.createdAt),
+      new Timestamp(prismaChat.updatedAt),
     );
   }
 

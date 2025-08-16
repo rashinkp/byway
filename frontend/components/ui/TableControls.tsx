@@ -33,7 +33,7 @@ interface TableControlsProps {
 	setSortBy: (sort: string) => void;
 	sortOrder: "asc" | "desc";
 	setSortOrder: (order: "asc" | "desc") => void;
-	sortOptions: SortOption<any>[];
+	sortOptions: SortOption<unknown>[];   
 	filterTabs?: { value: string; label: string }[];
 }
 

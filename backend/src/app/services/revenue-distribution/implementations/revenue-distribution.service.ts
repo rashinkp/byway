@@ -58,7 +58,12 @@ export class RevenueDistributionService implements IRevenueDistributionService {
     }
   }
 
-  private async distributeRevenueForOrderItem(orderItem: any): Promise<void> {
+  private async distributeRevenueForOrderItem(orderItem: { 
+    id: string; 
+    courseId: string; 
+    coursePrice: string | number; 
+    orderId: string; 
+  }): Promise<void> {
     console.log(
       `Processing order item ${orderItem.id} with price ${orderItem.coursePrice}`
     );
@@ -189,8 +194,8 @@ export class RevenueDistributionService implements IRevenueDistributionService {
   }
 
   private async sendPurchaseNotifications(
-    course: any,
-    orderItem: any,
+    course: { id: string; title: string; createdBy: string },
+    orderItem: { orderId: string },
     instructorShare: number,
     adminShare: number
   ): Promise<void> {

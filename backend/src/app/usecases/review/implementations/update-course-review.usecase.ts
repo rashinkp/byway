@@ -26,7 +26,11 @@ export class UpdateCourseReviewUseCase implements IUpdateCourseReviewUseCase {
     }
 
     // Prepare update data
-    const updateData: any = {};
+    const updateData: {
+      rating?: Rating;
+      title?: string | null;
+      comment?: string | null;
+    } = {};
 
     if (input.rating !== undefined) {
       updateData.rating = new Rating(input.rating);

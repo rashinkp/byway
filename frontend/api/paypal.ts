@@ -1,5 +1,6 @@
 import { api } from "@/api/api";
 import { ApiResponse } from "@/types/general";
+import { ApiError } from "@/types/error";
 import {
   IPaypalOrder,
   IPaypalWallet,
@@ -13,10 +14,11 @@ export const createPaypalOrder = async (
   try {
     const response = await api.post("/paypal/createorder", data);
     return response.data;
-  } catch (error: any) {
-    console.error("Error creating PayPal order:", error);
+  } catch (error: unknown) {
+    const apiError = error as ApiError;
+    console.error("Error creating PayPal order:", apiError);
     throw new Error(
-      error.response?.data?.message || "Failed to create PayPal order"
+      apiError.response?.data?.message || "Failed to create PayPal order"
     );
   }
 };
@@ -27,10 +29,11 @@ export const capturePaypalOrder = async (
   try {
     const response = await api.post("/paypal/captureorder", data);
     return response.data;
-  } catch (error: any) {
-    console.error("Error capturing PayPal order:", error);
+  } catch (error: unknown) {
+    const apiError = error as ApiError;
+    console.error("Error capturing PayPal order:", apiError);
     throw new Error(
-      error.response?.data?.message || "Failed to capture PayPal order"
+      apiError.response?.data?.message || "Failed to capture PayPal order"
     );
   }
 };

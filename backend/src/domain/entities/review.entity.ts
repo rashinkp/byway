@@ -114,7 +114,7 @@ export class CourseReview {
   }
 
   // Serialization
-  toJSON(): any {
+  toJSON(): Record<string, unknown> {
     return {
       id: this._id,
       courseId: this._courseId,
@@ -129,7 +129,17 @@ export class CourseReview {
   }
 
   // Factory method for creating from Prisma data
-  static fromPrisma(data: any): CourseReview {
+  static fromPrisma(data: { 
+    id: string; 
+    courseId: string; 
+    userId: string; 
+    rating: number; 
+    title: string | null; 
+    comment: string | null; 
+    createdAt: Date; 
+    updatedAt: Date; 
+    deletedAt: Date | null; 
+  }): CourseReview {
     return new CourseReview({
       id: data.id,
       courseId: data.courseId,

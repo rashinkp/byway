@@ -472,8 +472,8 @@ export class PaymentService implements IPaymentService {
   }
 
   private async sendPurchaseNotifications(
-    order: any,
-    orderItems: any[]
+    order: { userId: string },
+    orderItems: { courseId: string; coursePrice: string | number }[]
   ): Promise<void> {
     try {
       const io = getSocketIOInstance();

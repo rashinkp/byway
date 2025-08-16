@@ -1,15 +1,12 @@
 import { ITransactionOutputDTO, IUpdateTransactionStatusInputDTO } from "../../../../app/dtos/transaction.dto";
 import { ITransactionRepository } from "../../../repositories/transaction.repository";
 import { IUpdateTransactionStatusUseCase } from "../interfaces/update-transaction-status.usecase.interface";
+import { Transaction } from "../../../../domain/entities/transaction.entity";
 
-export class UpdateTransactionStatusUseCase
-  implements IUpdateTransactionStatusUseCase
-{
+export class UpdateTransactionStatusUseCase implements IUpdateTransactionStatusUseCase {
   constructor(private readonly transactionRepository: ITransactionRepository) {}
 
-  async execute(
-    input: IUpdateTransactionStatusInputDTO
-  ): Promise<ITransactionOutputDTO> {
+  async execute(input: IUpdateTransactionStatusInputDTO): Promise<ITransactionOutputDTO> {
     const transaction = await this.transactionRepository.updateStatus(
       input.id,
       input.status,
@@ -18,7 +15,7 @@ export class UpdateTransactionStatusUseCase
     return this.mapToDTO(transaction);
   }
 
-  private mapToDTO(transaction: any): ITransactionOutputDTO {
+  private mapToDTO(transaction: Transaction): ITransactionOutputDTO {
     return {
       id: transaction.id,
       orderId: transaction.orderId,

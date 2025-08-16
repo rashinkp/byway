@@ -284,10 +284,11 @@ export function CourseFormModal({
 					status: "DRAFT",
 				});
 			}
-		} catch (error: any) {
+		} catch (error: unknown) {
+			const err = error as Error;
 			toast.error("An error occurred", {
 				description:
-					error.message || "Failed to submit the form. Please try again.",
+					err.message || "Failed to submit the form. Please try again.",
 			});
 			setThumbnailUploadStatus(FileUploadStatus.ERROR);
 			setThumbnailUploadProgress(0);

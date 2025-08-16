@@ -94,7 +94,7 @@ export class PrismaInstructorRepository implements IInstructorRepository {
     const { search, sortBy, sortOrder, filterBy, includeDeleted } = options;
 
     // Build where clause
-    const where: any = {
+    const where: Record<string, unknown> = {
       user: {
         deletedAt: includeDeleted ? undefined : null,
       },
@@ -115,7 +115,7 @@ export class PrismaInstructorRepository implements IInstructorRepository {
     }
 
     // Build order by clause
-    let orderBy: any = {};
+    let orderBy: Record<string, unknown> = {};
     if (sortBy) {
       if (sortBy.startsWith("user.")) {
         const field = sortBy.split(".")[1];
@@ -180,7 +180,7 @@ export class PrismaInstructorRepository implements IInstructorRepository {
 
         // Calculate total enrollments across all courses
         const totalEnrollments = instructor.coursesCreated.reduce(
-          (sum: number, course: any) => {
+          (sum: number, course: { enrollments: unknown[] }) => {
             return sum + course.enrollments.length;
           },
           0
@@ -188,7 +188,7 @@ export class PrismaInstructorRepository implements IInstructorRepository {
 
         // Calculate total revenue from completed order items for instructor's courses
         const courseIds = instructor.coursesCreated.map(
-          (course: any) => course.id
+          (course: { id: string }) => course.id
         );
         const completedOrderItems = await this.prisma.orderItem.findMany({
           where: {
@@ -204,7 +204,7 @@ export class PrismaInstructorRepository implements IInstructorRepository {
 
         // Calculate total revenue (instructor gets the remaining amount after admin share)
         const totalRevenue = completedOrderItems.reduce(
-          (sum: number, item: any) => {
+          (sum: number, item: { coursePrice: string | number; adminSharePercentage: string | number }) => {
             const itemPrice = Number(item.coursePrice);
             const adminSharePercentage = Number(item.adminSharePercentage);
             const adminRevenue = itemPrice * (adminSharePercentage / 100);
@@ -230,7 +230,7 @@ export class PrismaInstructorRepository implements IInstructorRepository {
         const averageRating =
           reviews.length > 0
             ? reviews.reduce(
-                (sum: number, review: any) => sum + review.rating,
+                (sum: number, review: { rating: number }) => sum + review.rating,
                 0
               ) / reviews.length
             : 0;

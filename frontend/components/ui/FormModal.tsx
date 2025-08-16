@@ -58,10 +58,10 @@ export interface FormFieldConfig<T> {
 	step?: number;
 }
 
-interface FormModalProps<T extends z.ZodType<any, any>> {
+interface FormModalProps<T extends z.ZodType<unknown, any, unknown>> {
 	open: boolean;
 	onOpenChange: (open: boolean) => void;
-	onSubmit: (data: any) => Promise<void>;
+	onSubmit: (data: z.infer<T>) => Promise<void>;
 	schema: T;
 	initialData?: Partial<z.infer<T>>;
 	title: string;
@@ -71,7 +71,7 @@ interface FormModalProps<T extends z.ZodType<any, any>> {
 	isSubmitting?: boolean;
 }
 
-export function FormModal<T extends z.ZodType<any, any>>({
+export function FormModal<T extends z.ZodType<unknown, any, unknown>>({
 	open,
 	onOpenChange,
 	onSubmit,
@@ -126,10 +126,11 @@ export function FormModal<T extends z.ZodType<any, any>>({
 			setInternalSubmitting(true);
 			await onSubmit(data);
 			form.reset();
-		} catch (error: any) {
+		} catch (error: unknown) {
 			console.error("Error submitting form:", error);
+			const errorMessage = error instanceof Error ? error.message : "Failed to submit the form";
 			form.setError("root", {
-				message: error.message || "Failed to submit the form",
+				message: errorMessage,
 			});
 		} finally {
 			setInternalSubmitting(false);

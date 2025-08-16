@@ -1,5 +1,11 @@
 import { Course } from "@/types/course";
 import { Textarea } from "../ui/textarea";
+import { UseFormReturn } from "react-hook-form";
+
+interface CourseFormData {
+  description: string;
+  [key: string]: unknown;
+}
 
 export const OverviewSection = ({
 	course,
@@ -8,7 +14,7 @@ export const OverviewSection = ({
 }: {
 	course?: Course;
 	isEditing: boolean;
-	form: any;
+	form: UseFormReturn<CourseFormData>;
 }) => (
 	<div className="space-y-4">
 		<h2 className="text-xl font-semibold text-gray-900">Overview</h2>

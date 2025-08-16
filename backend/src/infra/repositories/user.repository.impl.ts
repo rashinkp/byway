@@ -23,7 +23,7 @@ export class UserRepository implements IUserRepository {
     } = input;
     const skip = (page - 1) * limit;
 
-    const where: any = {};
+    const where: Record<string, unknown> = {};
     if (!includeDeleted && filterBy !== "Inactive") {
       where.deletedAt = null;
     }
