@@ -58,7 +58,7 @@ export interface FormFieldConfig<T> {
 	step?: number;
 }
 
-interface FormModalProps<T extends z.ZodType<unknown, any, unknown>> {
+interface FormModalProps<T extends z.ZodType> {
 	open: boolean;
 	onOpenChange: (open: boolean) => void;
 	onSubmit: (data: z.infer<T>) => Promise<void>;
@@ -71,7 +71,7 @@ interface FormModalProps<T extends z.ZodType<unknown, any, unknown>> {
 	isSubmitting?: boolean;
 }
 
-export function FormModal<T extends z.ZodType<unknown, any, unknown>>({
+export function FormModal<T extends z.ZodType>({
 	open,
 	onOpenChange,
 	onSubmit,

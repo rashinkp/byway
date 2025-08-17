@@ -24,6 +24,14 @@ import { Button } from "../ui/button";
 
 //todo: when editing content and all make sure the status update
 
+interface FileUploadInputWithUpload {
+	uploadToS3: (file: File) => Promise<string>;
+}
+
+interface ThumbnailUploadInputWithUpload {
+	uploadToS3: (file: File) => Promise<string>;
+}
+
 interface ContentInputFormProps {
 	lessonId: string;
 	initialData?: LessonContent | null;
@@ -122,7 +130,7 @@ export const ContentInputForm = ({
 		let finalThumbnailUrl = thumbnailUrl;
 		if (file) {
 			try {
-				finalFileUrl = await (FileUploadInput as any).uploadToS3(file);
+				finalFileUrl = await (FileUploadInput as unknown as FileUploadInputWithUpload).uploadToS3(file);
 			} catch {
 				setErrors((prev) => ({
 					...prev,
@@ -133,7 +141,7 @@ export const ContentInputForm = ({
 		}
 		if (thumbnail && type === ContentType.VIDEO) {
 			try {
-				finalThumbnailUrl = await (ThumbnailUploadInput as any).uploadToS3(
+				finalThumbnailUrl = await (ThumbnailUploadInput as unknown as ThumbnailUploadInputWithUpload).uploadToS3(
 					thumbnail,
 				);
 			} catch  {

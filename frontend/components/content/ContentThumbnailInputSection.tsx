@@ -96,8 +96,6 @@ export const ThumbnailUploadInput = ({
 		[setUploadStatus, setUploadProgress, courseId],
 	);
 
-	// Expose uploadToS3 as a static method for ContentInputForm
-	(ThumbnailUploadInput as any).uploadToS3 = uploadToS3;
 
 	return (
 		<div className="space-y-3">

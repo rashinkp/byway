@@ -41,7 +41,7 @@ export default function ChatPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [isMobile, setIsMobile] = useState(false);
   const [isSocketConnected, setIsSocketConnected] = useState(socket.connected);
-  const chatWindowRef = useRef<any>(null);
+  const chatWindowRef = useRef<HTMLDivElement | null>(null);
 
   // Track previous chatId for leave logic
   const previousChatIdRef = React.useRef<string | null>(null);
@@ -205,7 +205,6 @@ export default function ChatPage() {
 
   const handleSelectChat = (chat: EnhancedChatItem) => {
     console.log("[Debug] handleSelectChat called with:", chat);
-    // Leave previous chat room if any
     if (
       previousChatIdRef.current &&
       previousChatIdRef.current !== chat.chatId

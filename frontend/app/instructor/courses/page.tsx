@@ -21,10 +21,10 @@ export default function InstructorCoursesPage() {
 		page,
 		limit: 10,
 		search: searchTerm,
-		sortBy: (["title", "price", "createdAt"] as const).includes(sortBy as any) ? (sortBy as "title" | "price" | "createdAt") : "title",
+		sortBy: (["title", "price", "createdAt"] as const).includes(sortBy as "title" | "price" | "createdAt") ? (sortBy as "title" | "price" | "createdAt") : "title",
 		sortOrder,
-		includeDeleted: filterStatus === "Inactive",
-		filterBy: (["All", "Active", "Inactive", "Approved", "Declined", "Pending", "Published", "Draft", "Archived"] as const).includes(filterStatus as any) ? (filterStatus as "All" | "Active" | "Inactive" | "Approved" | "Declined" | "Pending" | "Published" | "Draft" | "Archived") : "All",
+		includeDeleted: filterStatus === "Inactive" || filterStatus === "All",
+		filterBy: (["All", "Active", "Inactive", "Approved", "Declined", "Pending", "Published", "Draft", "Archived"] as const).includes(filterStatus as "All" | "Active" | "Inactive" | "Approved" | "Declined" | "Pending" | "Published" | "Draft" | "Archived") ? (filterStatus as "All" | "Active" | "Inactive" | "Approved" | "Declined" | "Pending" | "Published" | "Draft" | "Archived") : "All",
 	});
 
 	return (

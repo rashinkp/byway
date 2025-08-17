@@ -16,7 +16,7 @@ export interface ChatWindowProps {
   onBack?: () => void;
 }
 
-export const ChatWindow = forwardRef<any, ChatWindowProps & {
+export const ChatWindow = forwardRef<{ scrollToBottom: () => void }, ChatWindowProps & {
   setPendingImageUrl?: (url: string) => void;
   setPendingAudioUrl?: (url: string) => void;
   isNewChat?: boolean;

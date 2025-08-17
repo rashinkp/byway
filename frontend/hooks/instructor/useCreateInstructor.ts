@@ -6,11 +6,46 @@ import { toast } from "sonner";
 import { ApiResponse } from "@/types/general";
 import { IInstructorWithUserDetails } from "@/types/instructor";
 
+// Interface for the instructor creation response from the backend
+interface InstructorCreationResponse {
+	id: string;
+	userId: string;
+	areaOfExpertise: string;
+	professionalExperience: string;
+	about?: string;
+	website?: string;
+	education: string;
+	certifications: string;
+	cv: string;
+	status: string;
+	totalStudents: number;
+	createdAt: string | Date;
+	updatedAt: string | Date;
+	user: {
+		id: string;
+		name: string;
+		email: string;
+		role: "USER" | "INSTRUCTOR" | "ADMIN";
+		avatar?: string;
+	};
+}
+
+// Interface for API errors
+interface ApiErrorResponse {
+	response?: {
+		status: number;
+		data?: {
+			message?: string;
+		};
+	};
+	message?: string;
+}
+
 export function useCreateInstructor() {
 	const { user } = useAuthStore();
 	const queryClient = useQueryClient();
 
-	return useMutation<ApiResponse<any>, any, InstructorFormData>({
+	return useMutation<ApiResponse<InstructorCreationResponse>, ApiErrorResponse, InstructorFormData>({
 		mutationFn: (data: InstructorFormData) => createInstructor(data),
 		onSuccess: (response) => {
 			// Update the instructor cache directly with the new data
@@ -23,13 +58,20 @@ export function useCreateInstructor() {
 				about: response.data.about,
 				website: response.data.website,
 				education: response.data.education,
-				certifications: response.data.certifications,
+				certifications: response.data.certifications || "",
 				cv: response.data.cv,
 				status: "PENDING",
 				totalStudents: response.data.totalStudents,
-				createdAt: response.data.createdAt,
-				updatedAt: response.data.updatedAt,
-				user: response.data.user,
+				createdAt: response.data.createdAt.toString(),
+				updatedAt: response.data.updatedAt.toString(),
+				user: {
+					id: response.data.user.id,
+					name: response.data.user.name,
+					email: response.data.user.email,
+					role: response.data.user.role,
+					avatar: response.data.user.avatar,
+					createdAt: response.data.createdAt.toString(),
+				},
 			};
 			
 			queryClient.setQueryData(
@@ -41,7 +83,7 @@ export function useCreateInstructor() {
 				description: "Your application is under review.",
 			});
 		},
-		onError: (error) => {
+		onError: (error: ApiErrorResponse) => {
 			console.error(
 				"Instructor creation failed:",
 				JSON.stringify(error, null, 2),

@@ -17,6 +17,10 @@ interface FileUploadInputProps {
 	courseId?: string;
 }
 
+interface FileUploadInputWithUpload extends React.ComponentType<React.PropsWithChildren<{}>> {
+	uploadToS3: (file: File) => Promise<string>;
+}
+
 export const FileUploadInput = ({
 	type,
 	file,
@@ -108,7 +112,7 @@ export const FileUploadInput = ({
 	);
 
 	// Expose uploadToS3 as a static method for ContentInputForm
-	(FileUploadInput as any).uploadToS3 = uploadToS3;
+	(FileUploadInput as FileUploadInputWithUpload).uploadToS3 = uploadToS3;
 
 	return (
 		<div className="space-y-3">

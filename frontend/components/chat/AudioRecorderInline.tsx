@@ -9,6 +9,10 @@ interface ModernAudioRecorderProps {
   maxDuration?: number;
 }
 
+interface WindowWithWebkitAudioContext extends Window {
+	webkitAudioContext?: typeof AudioContext;
+}
+
 export function ModernAudioRecorder({
   onSend,
   onCancel,
@@ -168,7 +172,7 @@ export function ModernAudioRecorder({
 
       // Set up Web Audio API for waveform
       const audioContext = new (window.AudioContext ||
-        (window as any).webkitAudioContext)();
+        (window as WindowWithWebkitAudioContext).webkitAudioContext)();
       analyserRef.current = audioContext.createAnalyser();
       analyserRef.current.fftSize = 2048;
       const source = audioContext.createMediaStreamSource(stream);

@@ -69,7 +69,7 @@ export function CourseCard({ course, className }: CourseCardProps) {
             src={
               (course.instructor &&
                 "profileImage" in course.instructor &&
-                (course.instructor as any).profileImage) ||
+                (course.instructor as { profileImage?: string }).profileImage) ||
               "/UserProfile.jpg"
             }
             alt={course.instructor?.name || "Instructor"}
@@ -84,7 +84,7 @@ export function CourseCard({ course, className }: CourseCardProps) {
             <p className="text-xs text-gray-500 dark:text-gray-400">
               {(course.instructor &&
                 "role" in course.instructor &&
-                (course.instructor as any).role) ||
+                (course.instructor as { role?: string }).role) ||
                 "Instructor"}
             </p>
           </div>

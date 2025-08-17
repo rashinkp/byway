@@ -6,6 +6,11 @@ import { updateUser } from "@/api/users";
 import { toast } from "sonner";
 import { useAuthStore } from "@/stores/auth.store";
 
+// Extend Error interface to include optional code property
+interface ErrorWithCode extends Error {
+	code?: string;
+}
+
 interface UseUpdateUserReturn {
 	mutate: (data: {
 		name?: string;
@@ -101,7 +106,7 @@ export function useUpdateUser(): UseUpdateUserReturn {
 						: "An unexpected error occurred",
 				code:
 					error instanceof Error && "code" in error
-						? (error as any).code
+						? (error as ErrorWithCode).code
 						: undefined,
 			}
 		: null;

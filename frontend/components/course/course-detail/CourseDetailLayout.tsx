@@ -124,9 +124,9 @@ export default function CourseDetailLayout({
 				{/* Instructor */}
 				<div className="flex items-center gap-4">
 					<div className="w-14 h-14 rounded-full overflow-hidden bg-[#f9fafb] dark:bg-[#18181b] border border-gray-200">
-						{instructor && (instructor as any).avatar ? (
+						{instructor && (instructor as { avatar?: string }).avatar ? (
 							<Image
-								src={(instructor as any).avatar}
+								src={(instructor as { avatar?: string }).avatar}
 								alt={instructor.name}
 								width={56}
 								height={56}
@@ -142,8 +142,8 @@ export default function CourseDetailLayout({
 					<div>
 						<div className="text-lg font-semibold text-black dark:text-white">{instructor?.name || 'Anonymous'}</div>
 						<div className="text-sm text-gray-500 dark:text-gray-300">{instructor?.bio || 'No bio available.'}</div>
-						{instructor && (instructor as any).longBio && (
-							<div className="text-gray-500 dark:text-gray-300 text-sm mt-1">{(instructor as any).longBio}</div>
+						{instructor && (instructor as { longBio?: string }).longBio && (
+							<div className="text-gray-500 dark:text-gray-300 text-sm mt-1">{(instructor as { longBio?: string }).longBio}</div>
 						)}
 					</div>
 				</div>

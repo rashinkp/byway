@@ -3,12 +3,19 @@ import autoTable from "jspdf-autotable";
 import { OverallRevenueResponse, CourseRevenueResponse, LatestRevenueResponse } from "@/types/analytics";
 import { format } from "date-fns";
 
+// Extend jsPDF interface to include autoTable properties
+interface jsPDFWithAutoTable extends jsPDF {
+	lastAutoTable?: {
+		finalY: number;
+	};
+}
+
 export function generateRevenueAnalyticsReport(
   overallData: OverallRevenueResponse["data"],
   courseData: CourseRevenueResponse["data"],
   latestData?: LatestRevenueResponse["data"]
 ) {
-  const doc = new jsPDF({ orientation: "landscape" });
+  const doc = new jsPDF({ orientation: "landscape" }) as jsPDFWithAutoTable;
   let y = 20;
 
   // Platform/Report Introduction
@@ -49,7 +56,7 @@ export function generateRevenueAnalyticsReport(
     headStyles: { fillColor: [41, 128, 185], textColor: 255 },
     margin: { left: 14, right: 14 },
   });
-  y = (doc as any).lastAutoTable.finalY + 8;
+  y = doc.lastAutoTable?.finalY + 8 || y + 30;
 
   // Top Courses by Revenue (only if there are courses)
   if (courseData.courses && courseData.courses.length > 0) {
@@ -72,12 +79,12 @@ export function generateRevenueAnalyticsReport(
       headStyles: { fillColor: [41, 128, 185], textColor: 255 },
       margin: { left: 14, right: 14 },
     });
-    y = (doc as any).lastAutoTable.finalY + 8;
+    y = doc.lastAutoTable?.finalY + 8 || y + 30;
   }
 
   // Latest Revenue Transactions (if available)
   if (latestData && latestData.items.length > 0) {
-    const nextY = (doc as any).lastAutoTable?.finalY || y + 30;
+    const nextY = doc.lastAutoTable?.finalY || y + 30;
     doc.setFontSize(13);
     doc.setTextColor(123, 36, 160);
     doc.text("Latest Revenue Transactions", 14, nextY + 10);

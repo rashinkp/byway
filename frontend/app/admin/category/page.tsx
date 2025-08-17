@@ -32,10 +32,10 @@ export default function CategoriesPage() {
 		page,
 		limit: 10,
 		search: searchTerm,
-		sortBy: (["name", "createdAt"] as const).includes(sortBy as any) ? (sortBy as "name" | "createdAt") : "name",
+		sortBy: (["name", "createdAt"] as const).includes(sortBy as "name" | "createdAt") ? (sortBy as "name" | "createdAt") : "name",
 		sortOrder,
 		includeDeleted: filterStatus === "Inactive" || filterStatus === "All",
-		filterBy: (["All", "Active", "Inactive"] as const).includes(filterStatus as any) ? (filterStatus as "All" | "Active" | "Inactive") : "All",
+		filterBy: (["All", "Active", "Inactive"] as const).includes(filterStatus as "All" | "Active" | "Inactive") ? (filterStatus as "All" | "Active" | "Inactive") : "All",
 
 	});
 

@@ -9,13 +9,22 @@ import { useGetAllCourses } from "@/hooks/course/useGetAllCourse";
 import { useSearchParams } from "next/navigation";
 import { Button } from "../ui/button";
 
-
+interface CourseFilters {
+  search: string;
+  category: string;
+  level: string;
+  price: string;
+  rating: string;
+  duration: string;
+  sort: string;
+  status?: string;
+}
 
 export default function MainCourseListing() {
   const searchParams = useSearchParams();
   const itemsPerPage = 20;
   const [currentPage, setCurrentPage] = useState(1);
-  const [filters, setFilters] = useState<Record<string, any>>({
+  const [filters, setFilters] = useState<CourseFilters>({
     search: "",
     category: "all",
     level: "all",
@@ -38,7 +47,7 @@ export default function MainCourseListing() {
     }
   }, [searchParams]);
 
-  const handleFilterChange = (newFilters: Record<string, any>) => {
+  const handleFilterChange = (newFilters: CourseFilters) => {
     setFilters(newFilters);
     setCurrentPage(1);
   };

@@ -11,6 +11,11 @@ interface UseVerifyOtpOptions {
 	setLocalError?: (val: string | null) => void;
 }
 
+// Interface for the reset token response
+interface ResetTokenResponse {
+	resetToken?: string;
+}
+
 export function useVerifyOtp(options: UseVerifyOtpOptions = {}) {
 	const { setRedirecting, setLocalError } = options;
 	const { clearAuth } = useAuthStore();
@@ -32,7 +37,7 @@ export function useVerifyOtp(options: UseVerifyOtpOptions = {}) {
 			if (setLocalError) setLocalError(null);
 			if (setRedirecting) setRedirecting(true);
 			if (variables.type === "password-reset") {
-				const resetToken = (data?.data as any)?.resetToken;
+				const resetToken = (data?.data as ResetTokenResponse)?.resetToken;
 				if (resetToken) {
 					sessionStorage.setItem("resetToken", resetToken);
 				}

@@ -1,20 +1,42 @@
 import { api } from "@/api/api";
 import { ApiResponse } from "@/types/general";
 import { ApiError } from "@/types/error";
-import { User } from "@/types/user";
-import { IInstructorWithUserDetails } from "@/types/instructor";
+import { IInstructorWithUserDetails, IInstructorDetails, InstructorProfile, InstructorCourse } from "@/types/instructor";
 
-export const createInstructor = async (data: {
+interface InstructorCreationResponse {
+	id: string;
+	userId: string;
 	areaOfExpertise: string;
 	professionalExperience: string;
-	about: string;
+	about?: string;
 	website?: string;
 	education: string;
 	certifications: string;
 	cv: string;
-}): Promise<ApiResponse<User>> => {
+	status: string;
+	totalStudents: number;
+	createdAt: string | Date;
+	updatedAt: string | Date;
+	user: {
+		id: string;
+		name: string;
+		email: string;
+		role: string;
+		avatar?: string;
+	};
+}
+
+export const createInstructor = async (data: {
+	areaOfExpertise: string;
+	professionalExperience: string;
+	about?: string;
+	website?: string;
+	education: string;
+	certifications?: string;
+	cv: string;
+}): Promise<ApiResponse<InstructorCreationResponse>> => {
 	try {
-		const response = await api.post<ApiResponse<User>>(
+		const response = await api.post<ApiResponse<InstructorCreationResponse>>(
 			"/instructor/create",
 			data,
 		);
@@ -23,12 +45,9 @@ export const createInstructor = async (data: {
 		const apiError = error as ApiError;
 		console.error("API Error in createInstructor:", apiError);
 
-		// Handle different error scenarios
 		if (apiError.response) {
-			// Server responded with error status
 			const { status, data } = apiError.response;
 
-			// Handle specific status codes
 			if (status === 404) {
 				throw {
 					response: {
@@ -83,14 +102,8 @@ export const createInstructor = async (data: {
 				},
 				message: data?.message || `Request failed with status ${status}`,
 			};
-		} else if (apiError.request) {
-			// Network error
-			throw {
-				response: undefined,
-				message: "Network error. Please check your connection and try again.",
-			};
 		} else {
-			// Other errors
+			// Other errors (network errors, etc.)
 			throw {
 				response: undefined,
 				message: apiError.message || "Failed to create instructor",
@@ -253,9 +266,9 @@ export const getPublicInstructors = async (params?: {
 
 export const getInstructorDetails = async (
 	userId: string,
-): Promise<ApiResponse<any>> => { // Changed from IInstructorDetails to any as IInstructorDetails is not defined
+): Promise<ApiResponse<IInstructorDetails>> => {
 	try {
-		const response = await api.get<ApiResponse<any>>(
+		const response = await api.get<ApiResponse<IInstructorDetails>>(
 			`/instructor/${userId}`,
 		);
 		return response.data;
@@ -274,27 +287,23 @@ export const getInstructorDetails = async (
 	}
 };
 
-
-
-
-
-export const getInstructorProfile = async (userId: string) => {
-  const response = await api.get<any>(`/instructors/${userId}`); // Changed from InstructorProfile to any
+export const getInstructorProfile = async (userId: string): Promise<InstructorProfile> => {
+  const response = await api.get<InstructorProfile>(`/instructors/${userId}`);
   return response.data;
 };
 
 export const updateInstructorProfile = async (
   userId: string,
-  data: Partial<any> // Changed from InstructorProfile to any
-) => {
-  const response = await api.patch<any>(
+  data: Partial<InstructorProfile>
+): Promise<InstructorProfile> => {
+  const response = await api.patch<InstructorProfile>(
     `/instructors/${userId}`,
     data
   );
   return response.data;
 };
 
-export const getInstructorCourses = async () => {
-  const response = await api.get<any[]>("/instructors/courses"); // Changed from InstructorCourse[] to any[]
+export const getInstructorCourses = async (): Promise<InstructorCourse[]> => {
+  const response = await api.get<InstructorCourse[]>("/instructors/courses");
   return response.data;
 };
