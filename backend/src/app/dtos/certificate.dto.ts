@@ -1,15 +1,18 @@
+import { CertificateMetadata } from "../../domain/entities/certificate.entity";
+import { CertificateStatus } from "../../domain/enum/certificate-status.enum";
+
 export interface CertificateDTO {
   id: string;
   userId: string;
   courseId: string;
   enrollmentId: string;
   certificateNumber: string;
-  status: string;
+  status: CertificateStatus;
   issuedAt: Date | null;
   expiresAt: Date | null;
   pdfUrl: string | null;
-  metadata: Record<string, any> | null;
-  createdAt: Date;
+    metadata: CertificateMetadata | null;
+    createdAt: Date;
   updatedAt: Date;
 }
 
@@ -23,7 +26,7 @@ export interface CreateCertificateDTO {
 export interface GenerateCertificateDTO {
   certificateId: string;
   pdfUrl: string;
-  metadata?: Record<string, any>;
+  metadata?: CertificateMetadata;
 }
 
 export interface IssueCertificateDTO {
@@ -46,7 +49,6 @@ export interface CertificateWithDetailsDTO extends CertificateDTO {
   completedLessons?: number;
   averageScore?: number;
 } 
-
 
 export interface GenerateCertificateInputDto {
   userId: string;

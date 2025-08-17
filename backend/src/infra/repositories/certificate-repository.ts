@@ -1,7 +1,10 @@
 import { CertificateRepositoryInterface } from "../../app/repositories/certificate-repository.interface";
-import { Certificate } from "../../domain/entities/certificate.entity";
+import { Certificate, CertificateMetadata } from "../../domain/entities/certificate.entity";
 import { PrismaClient } from "@prisma/client";
 import { CertificateStatus } from "../../domain/enum/certificate-status.enum";
+
+// Type for Prisma JSON operations
+type PrismaJsonValue = string | number | boolean | null | PrismaJsonValue[] | { [key: string]: PrismaJsonValue };
 
 export class PrismaCertificateRepository implements CertificateRepositoryInterface {
   constructor(private readonly prisma: PrismaClient) {}
@@ -17,14 +20,14 @@ export class PrismaCertificateRepository implements CertificateRepositoryInterfa
         issuedAt: certificate.issuedAt,
         expiresAt: certificate.expiresAt,
         pdfUrl: certificate.pdfUrl,
-        metadata: certificate.metadata ?? undefined,
+        metadata: certificate.metadata as PrismaJsonValue ?? undefined,
         createdAt: certificate.createdAt,
         updatedAt: certificate.updatedAt,
       },
     });
     return Certificate.toDomain({
       ...created,
-      metadata: created.metadata as Record<string, unknown> | undefined
+      metadata: created.metadata as CertificateMetadata | undefined
     });
   }
 
@@ -32,7 +35,7 @@ export class PrismaCertificateRepository implements CertificateRepositoryInterfa
     const found = await this.prisma.certificate.findUnique({ where: { id } });
     return found ? Certificate.toDomain({
       ...found,
-      metadata: found.metadata as Record<string, unknown> | undefined
+      metadata: found.metadata as CertificateMetadata | undefined
     }) : null;
   }
 
@@ -44,7 +47,7 @@ export class PrismaCertificateRepository implements CertificateRepositoryInterfa
     });
     return found ? Certificate.toDomain({
       ...found,
-      metadata: found.metadata as Record<string, unknown> | undefined
+      metadata: found.metadata as CertificateMetadata | undefined
     }) : null;
   }
 
@@ -55,7 +58,7 @@ export class PrismaCertificateRepository implements CertificateRepositoryInterfa
     });
     return found.map((item) => Certificate.toDomain({
       ...item,
-      metadata: item.metadata as Record<string, unknown> | undefined
+      metadata: item.metadata as CertificateMetadata | undefined
     }));
   }
 
@@ -66,7 +69,7 @@ export class PrismaCertificateRepository implements CertificateRepositoryInterfa
     });
     return found.map((item) => Certificate.toDomain({
       ...item,
-      metadata: item.metadata as Record<string, unknown> | undefined
+      metadata: item.metadata as CertificateMetadata | undefined
     }));
   }
 
@@ -79,7 +82,7 @@ export class PrismaCertificateRepository implements CertificateRepositoryInterfa
     });
     return found ? Certificate.toDomain({
       ...found,
-      metadata: found.metadata as Record<string, unknown> | undefined
+      metadata: found.metadata as CertificateMetadata | undefined
     }) : null;
   }
 
@@ -91,13 +94,13 @@ export class PrismaCertificateRepository implements CertificateRepositoryInterfa
         issuedAt: certificate.issuedAt,
         expiresAt: certificate.expiresAt,
         pdfUrl: certificate.pdfUrl,
-        metadata: certificate.metadata ?? undefined,
+        metadata: certificate.metadata as PrismaJsonValue ?? undefined,
         updatedAt: certificate.updatedAt,
       },
     });
     return Certificate.toDomain({
       ...updated,
-      metadata: updated.metadata as Record<string, unknown> | undefined
+      metadata: updated.metadata as CertificateMetadata | undefined
     });
   }
 
@@ -181,7 +184,7 @@ export class PrismaCertificateRepository implements CertificateRepositoryInterfa
     });
     return found.map(item => Certificate.toDomain({
       ...item,
-      metadata: item.metadata as Record<string, unknown> | undefined
+      metadata: item.metadata as CertificateMetadata | undefined
     }));
   }
 
@@ -192,7 +195,7 @@ export class PrismaCertificateRepository implements CertificateRepositoryInterfa
     });
      return found.map((item) => Certificate.toDomain({
       ...item,
-      metadata: item.metadata as Record<string, unknown> | undefined
+      metadata: item.metadata as CertificateMetadata | undefined
     }));
   }
 }

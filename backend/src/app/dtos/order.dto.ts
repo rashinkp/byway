@@ -1,5 +1,4 @@
 import { Order } from "../../domain/entities/order.entity";
-import { Transaction } from "../../domain/entities/transaction.entity";
 import { PaymentGateway } from "../../domain/enum/payment-gateway.enum";
 import { ITransactionOutputDTO } from "./transaction.dto";
 
@@ -94,7 +93,7 @@ export interface CreateOrderDto {
 
 export interface RetryOrderResponseDTO {
   order: Order;
-  transaction: Transaction;
+  transaction: ITransactionOutputDTO;
   session: {
     id: string;
     url: string;

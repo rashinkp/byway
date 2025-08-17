@@ -1,17 +1,38 @@
+// Certificate metadata structure - matches backend domain layer
+export interface CertificateMetadata {
+  completionStats?: {
+    completionDate: string;
+    instructorName?: string;
+    totalLessons: number;
+    completedLessons: number;
+    averageScore: number;
+  };
+  generatedAt?: string;
+  [key: string]: unknown; // Allow for future extensibility
+}
+
+// Certificate status enum - matches backend domain layer
+export enum CertificateStatus {
+  PENDING = 'PENDING',
+  GENERATED = 'GENERATED',
+  ISSUED = 'ISSUED',
+  EXPIRED = 'EXPIRED',
+  REVOKED = 'REVOKED'
+}
+
 export interface CertificateDTO {
 	id: string;
 	userId: string;
 	courseId: string;
 	enrollmentId?: string;
 	certificateNumber: string;
-	status: string;
+	status: CertificateStatus;
 	issuedAt: string | null;
 	expiresAt: string | null;
 	pdfUrl: string;
-	metadata?: Record<string, unknown>;
+	metadata?: CertificateMetadata;
 	createdAt: string;
 	updatedAt: string;
-	// Optionally, add courseTitle, userName, userEmail if your backend returns them
 	courseTitle?: string;
 	userName?: string;
 	userEmail?: string;

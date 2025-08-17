@@ -14,6 +14,7 @@ import {
 } from "../../validators/content.validator";
 import { BaseController } from "./base.controller";
 import { HttpError } from "../errors/http-error";
+import { ICreateLessonContentInputDTO, IUpdateLessonContentInputDTO } from "../../../app/dtos/lesson.dto";
 
 export class LessonContentController extends BaseController {
   constructor(
@@ -34,7 +35,7 @@ export class LessonContentController extends BaseController {
         throw new HttpError("Unauthorized", 401);
       }
 
-      const validated = validateCreateLessonContent(request.body as any);
+      const validated = validateCreateLessonContent(request.body as ICreateLessonContentInputDTO);
       const content = await this.createLessonContentUseCase.execute({
         ...validated,
         userId: request.user.id,
@@ -49,8 +50,8 @@ export class LessonContentController extends BaseController {
         throw new HttpError("Content ID is required", 400);
       }
       const validated = validateUpdateLessonContent({
-        ...(request.body as any),
-        contentId: request.params.contentId,
+        ...(request.body as Partial<IUpdateLessonContentInputDTO>),
+        id: request.params.contentId,
       });
       const content = await this.updateLessonContentUseCase.execute(validated);
       return this.success_200(content, "Lesson content updated successfully");

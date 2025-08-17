@@ -5,12 +5,19 @@ import { IResetPasswordUseCase } from "../interfaces/reset-password.usecase.inte
 import { JwtProvider } from "../../../../infra/providers/auth/jwt.provider";
 import { ResetPasswordDto } from "../../../dtos/auth.dto";
 
+// Type for reset password JWT payload
+interface ResetPasswordPayload {
+  email: string;
+  type: string;
+  iat: number;
+}
+
 export class ResetPasswordUseCase implements IResetPasswordUseCase {
   constructor(private authRepository: IAuthRepository) {}
 
   async execute(dto: ResetPasswordDto): Promise<void> {
     const jwtProvider = new JwtProvider();
-    const payload = jwtProvider.verifyAccessToken(dto.resetToken) as any;
+    const payload = jwtProvider.verifyAccessToken(dto.resetToken) as ResetPasswordPayload | null;
     if (!payload) {
       throw new HttpError("Invalid or expired reset token", 400);
     }

@@ -32,7 +32,6 @@ export interface QuizQuestion {
   question: string;
   options: string[];
   correctAnswer: string;
-  // any other quiz question fields you want to add
 }
 
 export interface ILessonContentInput {

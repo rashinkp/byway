@@ -8,6 +8,7 @@ import { PaymentGateway } from "../../../../domain/enum/payment-gateway.enum";
 import { HttpError } from "../../../../presentation/http/errors/http-error";
 import { StatusCodes } from "http-status-codes";
 import { RetryOrderResponseDTO } from "../../../dtos/order.dto";
+import { ITransactionOutputDTO } from "../../../dtos/transaction.dto";
 
 export class RetryOrderUseCase implements IRetryOrderUseCase {
   constructor(
@@ -27,8 +28,6 @@ export class RetryOrderUseCase implements IRetryOrderUseCase {
     if (order.userId !== userId) {
       throw new HttpError("Unauthorized to retry this order", StatusCodes.FORBIDDEN);
     }
-
- 
 
     // Get order items to calculate total amount
     const orderItems = await this.orderRepository.findOrderItems(orderId);
@@ -55,7 +54,7 @@ export class RetryOrderUseCase implements IRetryOrderUseCase {
     }, 0);
 
     // Create new transaction for retry
-    const transaction = await this.createTransactionUseCase.execute({
+    const transaction: ITransactionOutputDTO = await this.createTransactionUseCase.execute({
       orderId: order.id,
       userId,
       amount: totalAmount,
@@ -83,7 +82,7 @@ export class RetryOrderUseCase implements IRetryOrderUseCase {
 
     return {
       order,
-      transaction: transaction as any, // TODO: Fix type conversion
+      transaction,
       session: session.data.session
     };
   }

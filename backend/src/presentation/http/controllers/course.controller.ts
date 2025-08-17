@@ -25,6 +25,7 @@ import {
 import { BaseController } from "./base.controller";
 import { IGetCourseWithDetailsUseCase } from "../../../app/usecases/course/interfaces/get-course-with-details.usecase.interface";
 import { getSocketIOInstance } from "../../socketio";
+import { ICreateCourseInputDTO, IUpdateCourseInputDTO, ICreateEnrollmentInputDTO, IUpdateCourseApprovalInputDTO } from "../../../app/dtos/course.dto";
 
 export class CourseController extends BaseController {
   constructor(
@@ -50,7 +51,7 @@ export class CourseController extends BaseController {
         throw new UnauthorizedError("User not authenticated");
       }
       const validated = createCourseSchemaDef.body!.parse({
-        ...(request.body as any),
+        ...(request.body as ICreateCourseInputDTO),
         createdBy: request.user.id,
       });
       const course = await this.createCourseUseCase.execute({
@@ -67,7 +68,6 @@ export class CourseController extends BaseController {
             type: "COURSE_CREATION",
             courseId: course.id,
             courseTitle: course.title,
-            // ...any other notification data
           });
         });
       }
@@ -120,7 +120,7 @@ export class CourseController extends BaseController {
         throw new BadRequestError("Course ID is required");
       }
       const validated = updateCourseSchemaDef.body!.parse({
-        ...(request.body as any),
+        ...(request.body as Partial<IUpdateCourseInputDTO>),
         createdBy: request.user.id,
       });
 
@@ -166,7 +166,6 @@ export class CourseController extends BaseController {
           type: notificationType,
           courseId: course.id,
           courseTitle: course.title,
-          // ...any other notification data
         });
       }
 
@@ -180,7 +179,6 @@ export class CourseController extends BaseController {
         throw new UnauthorizedError("User not authenticated");
       }
       const validated = getEnrolledCoursesSchemaDef.query!.parse({
-        userId: request.user.id,
         page: request.query?.page ? Number(request.query.page) : 1,
         limit: request.query?.limit ? Number(request.query.limit) : 10,
         sortBy: request.query?.sortBy || "enrolledAt",
@@ -204,11 +202,12 @@ export class CourseController extends BaseController {
       if (!request.user?.id) {
         throw new UnauthorizedError("User not authenticated");
       }
-      if (!(request.body as any)?.courseId) {
+      const body = request.body as IUpdateCourseApprovalInputDTO;
+      if (!body?.courseId) {
         throw new BadRequestError("Course ID is required");
       }
       const course = await this.approveCourseUseCase.execute({
-        courseId: (request.body as any).courseId,
+        courseId: body.courseId,
       });
 
       // Emit real-time notification to the instructor (creator)
@@ -219,7 +218,6 @@ export class CourseController extends BaseController {
           type: "COURSE_APPROVED",
           courseId: course.id,
           courseTitle: course.title,
-          // ...any other notification data
         });
       }
 
@@ -232,11 +230,12 @@ export class CourseController extends BaseController {
       if (!request.user?.id) {
         throw new UnauthorizedError("User not authenticated");
       }
-      if (!(request.body as any)?.courseId) {
+      const body = request.body as IUpdateCourseApprovalInputDTO;
+      if (!body?.courseId) {
         throw new BadRequestError("Course ID is required");
       }
       const course = await this.declineCourseUseCase.execute({
-        courseId: (request.body as any).courseId,
+        courseId: body.courseId,
       });
 
       // Emit real-time notification to the instructor (creator)
@@ -247,7 +246,6 @@ export class CourseController extends BaseController {
           type: "COURSE_DECLINED",
           courseId: course.id,
           courseTitle: course.title,
-          // ...any other notification data
         });
       }
 
@@ -260,8 +258,9 @@ export class CourseController extends BaseController {
       if (!request.user?.id) {
         throw new UnauthorizedError("User not authenticated");
       }
+      const body = request.body as ICreateEnrollmentInputDTO;
       const validated = createEnrollmentSchemaDef.body!.parse({
-        courseIds: (request.body as any).courseIds,
+        courseIds: body.courseIds,
       });
       const enrollments = await this.enrollCourseUseCase.execute({
         userId: request.user.id,

@@ -9,8 +9,6 @@ import { CourseStatus } from "../../../../domain/enum/course-status.enum";
 import { IGetCourseWithDetailsUseCase } from "../interfaces/get-course-with-details.usecase.interface";
 import { UserDTO } from "../../../dtos/general.dto";
 
-
-
 export class GetCourseWithDetailsUseCase
   implements IGetCourseWithDetailsUseCase
 {
@@ -20,9 +18,6 @@ export class GetCourseWithDetailsUseCase
     private courseReviewRepository: ICourseReviewRepository,
     private cartRepository: ICartRepository
   ) { }
-  
-
-  
 
   async execute(
     courseId: string,
@@ -73,7 +68,7 @@ export class GetCourseWithDetailsUseCase
       courseId
     );
 
-    const courseData = course.toJSON() as any;
+    const courseData = course.toJSON();
     return {
       ...courseData,
       isEnrolled,

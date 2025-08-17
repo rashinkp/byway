@@ -245,18 +245,17 @@ export class OrderRepository implements IOrderRepository {
   }
 
   async findMany(params: {
-    where: Record<string, unknown>;
     skip: number;
     take: number;
     orderBy: Record<string, 'asc' | 'desc' | undefined>;
     include?: Record<string, unknown>;
   }): Promise<Order[]> {
-    const orders = await this.prisma.order.findMany(params as any);
+    const orders = await this.prisma.order.findMany(params);
     return orders.map((order) => this.mapToOrderEntity(order));
   }
 
   async count(where: Record<string, unknown>): Promise<number> {
-    return this.prisma.order.count({ where: where as any });
+    return this.prisma.order.count({ where });
   }
 
   async create(order: Order): Promise<Order> {

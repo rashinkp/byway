@@ -25,6 +25,7 @@ import {
 } from "../../validators/course-review.validators";
 
 import { BaseController } from "./base.controller";
+import { CreateCourseReviewDto, UpdateCourseReviewDto } from "../../../app/dtos/review.dto";
 
 export class CourseReviewController extends BaseController {
   constructor(
@@ -48,7 +49,7 @@ export class CourseReviewController extends BaseController {
         throw new UnauthorizedError("User not authenticated");
       }
 
-      const validated = createReviewSchemaDef.body!.parse(request.body as any);
+      const validated = createReviewSchemaDef.body!.parse(request.body as CreateCourseReviewDto);
       const review = await this.createCourseReviewUseCase.execute(
         validated,
         request.user.id
@@ -71,7 +72,7 @@ export class CourseReviewController extends BaseController {
       const validatedParams = updateReviewSchemaDef.params!.parse({
         id: request.params.id,
       });
-      const validatedBody = updateReviewSchemaDef.body!.parse(request.body as any);
+      const validatedBody = updateReviewSchemaDef.body!.parse(request.body as UpdateCourseReviewDto);
 
       const review = await this.updateCourseReviewUseCase.execute(
         validatedParams.id,
@@ -144,6 +145,7 @@ export class CourseReviewController extends BaseController {
       }
 
       const validated = getUserReviewsSchemaDef.query!.parse(request.query);
+
       const result = await this.getUserReviewsUseCase.execute(
         request.user.id,
         validated.page,
@@ -154,9 +156,7 @@ export class CourseReviewController extends BaseController {
     });
   }
 
-  async getCourseReviewStats(
-    httpRequest: IHttpRequest
-  ): Promise<IHttpResponse> {
+  async getReviewStats(httpRequest: IHttpRequest): Promise<IHttpResponse> {
     return this.handleRequest(httpRequest, async (request) => {
       if (!request.params?.courseId) {
         throw new BadRequestError("Course ID is required");
@@ -165,14 +165,12 @@ export class CourseReviewController extends BaseController {
       const validated = getReviewStatsSchemaDef.params!.parse({
         courseId: request.params.courseId,
       });
+
       const stats = await this.getCourseReviewStatsUseCase.execute(
         validated.courseId
       );
 
-      return this.success_200(
-        stats,
-        "Course review stats retrieved successfully"
-      );
+      return this.success_200(stats, "Review statistics retrieved successfully");
     });
   }
 
@@ -189,17 +187,10 @@ export class CourseReviewController extends BaseController {
       const validated = disableReviewSchemaDef.params!.parse({
         id: request.params.id,
       });
-      const result = await this.disableReviewUseCase.execute(
-        validated.id,
-        request.user.id
-      );
 
-      const message =
-        result.action === "disabled"
-          ? "Review disabled successfully"
-          : "Review enabled successfully";
+      await this.disableReviewUseCase.execute(validated.id, request.user.id);
 
-      return this.success_200({ action: result.action }, message);
+      return this.success_200(null, "Review disabled successfully");
     });
   }
 }
