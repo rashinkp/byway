@@ -1,6 +1,5 @@
-import { useState, useCallback } from "react";
+import { useState } from "react";
 import { Upload, File, CheckCircle, XCircle } from "lucide-react";
-import { getPresignedUrl, getCoursePresignedUrl, uploadFileToS3 } from "@/api/file";
 
 interface ThumbnailUploadInputProps {
 	file: File | null;
@@ -22,10 +21,7 @@ export const ThumbnailUploadInput = ({
 	setFileUrl,
 	uploadStatus,
 	uploadProgress,
-	setUploadStatus,
-	setUploadProgress,
 	errors,
-	courseId,
 }: ThumbnailUploadInputProps) => {
 	const [isDragging, setIsDragging] = useState(false);
 
@@ -51,51 +47,6 @@ export const ThumbnailUploadInput = ({
 			setFile(droppedFile);
 		}
 	};
-
-	// S3 upload logic
-	const uploadToS3 = useCallback(
-		async (file: File): Promise<string> => {
-			setUploadStatus("uploading");
-			setUploadProgress(0);
-			try {
-				let uploadUrl: string;
-				let fileUrl: string;
-				
-				if (courseId) {
-					// Use course-specific upload for thumbnail
-					const response = await getCoursePresignedUrl(
-						file.name,
-						file.type,
-						courseId,
-						'thumbnail'
-					);
-					uploadUrl = response.uploadUrl;
-					fileUrl = response.fileUrl;
-				} else {
-					// Fallback to generic upload (for backward compatibility)
-					const response = await getPresignedUrl({
-						fileName: file.name,
-						fileType: file.type,
-						uploadType: 'course',
-						metadata: {
-							contentType: 'thumbnail',
-						},
-					});
-					uploadUrl = response.uploadUrl;
-					fileUrl = response.fileUrl;
-				}
-				
-				await uploadFileToS3(file, uploadUrl, setUploadProgress);
-				setUploadStatus("success");
-				return fileUrl;
-			} catch (error) {
-				setUploadStatus("error");
-				throw error;
-			}
-		},
-		[setUploadStatus, setUploadProgress, courseId],
-	);
-
 
 	return (
 		<div className="space-y-3">

@@ -1,5 +1,5 @@
 import socket from "@/lib/socket";
-import { Notification, NotificationResponse, GetNotificationsData } from "@/types/notification";
+import {  NotificationResponse, GetNotificationsData } from "@/types/notification";
 
 export const getUserNotificationsSocket = (
 	data: GetNotificationsData,
