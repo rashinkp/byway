@@ -29,10 +29,10 @@ const PayPalPayment: FC<PayPalPaymentProps> = memo(
 							onInit={(data) => {
 								console.log("PayPal SDK initialized:", data);
 							}}
-							createOrder={createOrder}
-							onApprove={onApprove}
-							onCancel={onCancel}
-							onError={onError}
+							createOrder={createOrder as any}
+							onApprove={onApprove as any}
+							onCancel={onCancel as any}
+							onError={onError as any}
 							disabled={isPending}
 						/>
 					</PayPalScriptProvider>
