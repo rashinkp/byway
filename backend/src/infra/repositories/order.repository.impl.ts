@@ -8,7 +8,7 @@ import { PaymentGateway } from "../../domain/enum/payment-gateway.enum";
 import { OrderFilters, PaginatedOrderResult, OrderItemCreation, CourseOrderData } from "../../domain/types/order.interface";
 
 export class OrderRepository implements IOrderRepository {
-  constructor(private prisma: PrismaClient) {}
+  constructor(private _prisma: PrismaClient) {}
 
   async findAll(
     userId: string,
@@ -50,7 +50,7 @@ export class OrderRepository implements IOrderRepository {
     } as const;
 
     const [orders, total] = await Promise.all([
-      this.prisma.order.findMany({
+      this._prisma.order.findMany({
         where,
         skip: (page - 1) * limit,
         take: limit,
@@ -63,7 +63,7 @@ export class OrderRepository implements IOrderRepository {
           },
         },
       }),
-      this.prisma.order.count({ where }),
+      this._prisma.order.count({ where }),
     ]);
 
     const totalPages = Math.ceil(total / limit);
@@ -122,7 +122,7 @@ export class OrderRepository implements IOrderRepository {
   }
 
   async findById(id: string): Promise<Order | null> {
-    const order = await this.prisma.order.findUnique({
+    const order = await this._prisma.order.findUnique({
       where: { id },
       include: {
         items: {
@@ -137,7 +137,7 @@ export class OrderRepository implements IOrderRepository {
   }
 
   async getAllOrders(userId: string): Promise<Order[]> {
-    const orders = await this.prisma.order.findMany({
+    const orders = await this._prisma.order.findMany({
       where: { userId },
       include: {
         items: {
@@ -165,7 +165,7 @@ export class OrderRepository implements IOrderRepository {
     );
 
     // Create order with items in a transaction
-    const order = await this.prisma.$transaction(async (prisma) => {
+    const order = await this._prisma.$transaction(async (prisma) => {
       // Create the order
       const newOrder = await prisma.order.create({
         data: {
@@ -217,7 +217,7 @@ export class OrderRepository implements IOrderRepository {
     paymentGateway: PaymentGateway
   ): Promise<void> {
     const paymentStatus = this.mapOrderStatusToPaymentStatus(status);
-    await this.prisma.order.update({
+    await this._prisma.order.update({
       where: { id: orderId },
       data: {
         orderStatus: status,
@@ -250,16 +250,16 @@ export class OrderRepository implements IOrderRepository {
     orderBy: Record<string, 'asc' | 'desc' | undefined>;
     include?: Record<string, unknown>;
   }): Promise<Order[]> {
-    const orders = await this.prisma.order.findMany(params);
+    const orders = await this._prisma.order.findMany(params);
     return orders.map((order) => this.mapToOrderEntity(order));
   }
 
   async count(where: Record<string, unknown>): Promise<number> {
-    return this.prisma.order.count({ where });
+    return this._prisma.order.count({ where });
   }
 
   async create(order: Order): Promise<Order> {
-    const createdOrder = await this.prisma.order.create({
+    const createdOrder = await this._prisma.order.create({
       data: {
         userId: order.userId,
         orderStatus: order.status as "PENDING" | "CONFIRMED" | "CANCELLED",
@@ -292,7 +292,7 @@ export class OrderRepository implements IOrderRepository {
   }
 
   async update(order: Order): Promise<Order> {
-    const updatedOrder = await this.prisma.order.update({
+    const updatedOrder = await this._prisma.order.update({
       where: { id: order.id },
       data: {
         orderStatus: order.status as "PENDING" | "CONFIRMED" | "CANCELLED",
@@ -314,13 +314,13 @@ export class OrderRepository implements IOrderRepository {
   }
 
   async delete(id: string): Promise<void> {
-    await this.prisma.order.delete({
+    await this._prisma.order.delete({
       where: { id },
     });
   }
 
   async findByPaymentId(paymentId: string): Promise<Order | null> {
-    const order = await this.prisma.order.findFirst({
+    const order = await this._prisma.order.findFirst({
       where: { paymentId },
       include: {
         items: {
@@ -340,7 +340,7 @@ export class OrderRepository implements IOrderRepository {
   ): Promise<OrderItemCreation[]> {
     const orderItems = await Promise.all(
       courses.map(async (course) => {
-        const orderItem = await this.prisma.orderItem.create({
+        const orderItem = await this._prisma.orderItem.create({
           data: {
             orderId,
             courseId: course.id,
@@ -361,7 +361,7 @@ export class OrderRepository implements IOrderRepository {
   async findOrderItems(
     orderId: string
   ): Promise<OrderItemCreation[]> {
-    const orderItems = await this.prisma.orderItem.findMany({
+    const orderItems = await this._prisma.orderItem.findMany({
       where: { orderId },
       include: {
         course: true,
@@ -375,7 +375,7 @@ export class OrderRepository implements IOrderRepository {
   }
 
   async findCourseById(courseId: string): Promise<Course | null> {
-    const course = await this.prisma.course.findUnique({
+    const course = await this._prisma.course.findUnique({
       where: { id: courseId },
     });
     return course ? Course.fromPrisma(course) : null;

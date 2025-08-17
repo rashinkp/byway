@@ -9,17 +9,17 @@ import { Enrollment } from "../../../../domain/entities/enrollment.entity";
 
 export class GetInstructorDashboardUseCase implements IGetInstructorDashboardUseCase {
   constructor(
-    private courseRepository: ICourseRepository,
-    private enrollmentRepository: IEnrollmentRepository,
-    private revenueRepository: IRevenueRepository,
-    private userRepository: IUserRepository
+    private _courseRepository: ICourseRepository,
+    private _enrollmentRepository: IEnrollmentRepository,
+    private _revenueRepository: IRevenueRepository,
+    private _userRepository: IUserRepository
   ) {}
 
   async execute(input: DashboardInput): Promise<InstructorDashboardResponse> {
     const { instructorId, limit = 5 } = input;
 
     // Get all courses by this instructor (including deleted courses)
-    const coursesResponse = await this.courseRepository.findAll({
+    const coursesResponse = await this._courseRepository.findAll({
       userId: instructorId,
       includeDeleted: true, // Include deleted courses
       role: "INSTRUCTOR", // Set role to INSTRUCTOR to get correct filtering
@@ -50,7 +50,7 @@ export class GetInstructorDashboardUseCase implements IGetInstructorDashboardUse
     // Get enrollments for these courses using existing method
     const enrollments: Enrollment[] = [];
     for (const courseId of courseIds) {
-      const courseEnrollments = await this.enrollmentRepository.findByCourseId(
+      const courseEnrollments = await this._enrollmentRepository.findByCourseId(
         courseId
       );
       enrollments.push(...courseEnrollments);
@@ -62,7 +62,7 @@ export class GetInstructorDashboardUseCase implements IGetInstructorDashboardUse
     // Get revenue for these courses (using existing method if available)
     let totalRevenue = 0;
     try {
-      totalRevenue = await this.revenueRepository.getTotalRevenue(instructorId);
+      totalRevenue = await this._revenueRepository.getTotalRevenue(instructorId);
     } catch {
       // Fallback: calculate from enrollments if revenue method not available
       // Note: This fallback calculation is simplified since Enrollment entities don't contain order details
@@ -71,7 +71,7 @@ export class GetInstructorDashboardUseCase implements IGetInstructorDashboardUse
 
     // Top courses by enrollments (using existing method)
     const topCoursesResponse =
-      await this.courseRepository.getTopEnrolledCourses({
+      await this._courseRepository.getTopEnrolledCourses({
         userId: instructorId,
         limit,
         role: "INSTRUCTOR",
@@ -100,7 +100,7 @@ export class GetInstructorDashboardUseCase implements IGetInstructorDashboardUse
     );
     const recentStudents: Array<{ id: string; name: string; email: string; deletedAt?: Date }> = [];
     for (const studentId of studentIds.slice(0, limit)) {
-      const student = await this.userRepository.findById(studentId);
+      const student = await this._userRepository.findById(studentId);
       if (student) {
         recentStudents.push({
           id: student.id,

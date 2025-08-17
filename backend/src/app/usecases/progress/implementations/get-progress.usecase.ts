@@ -10,16 +10,16 @@ import { AccessStatus } from "../../../../domain/enum/access-status.enum";
 
 export class GetProgressUseCase implements IGetProgressUseCase {
   constructor(
-    private readonly enrollmentRepository: IEnrollmentRepository,
-    private readonly lessonProgressRepository: ILessonProgressRepository,
-    private readonly lessonRepository: ILessonRepository
+    private readonly _enrollmentRepository: IEnrollmentRepository,
+    private readonly _lessonProgressRepository: ILessonProgressRepository,
+    private readonly _lessonRepository: ILessonRepository
   ) {}
 
   async execute(
     input: GetProgressDto
   ): Promise<ApiResponse<IProgressOutputDTO>> {
     try {
-      const enrollment = await this.enrollmentRepository.findByUserAndCourse(
+      const enrollment = await this._enrollmentRepository.findByUserAndCourse(
         input.userId,
         input.courseId
       );
@@ -30,13 +30,13 @@ export class GetProgressUseCase implements IGetProgressUseCase {
 
       // Get all lesson progress for this enrollment
       const lessonProgress =
-        await this.lessonProgressRepository.findByEnrollment(
+        await this._lessonProgressRepository.findByEnrollment(
           input.userId,
           input.courseId
         );
 
       // Get all lessons in the course
-      const allLessons = await this.lessonRepository.findByCourseId(
+      const allLessons = await this._lessonRepository.findByCourseId(
         input.courseId
       );
 
@@ -65,7 +65,7 @@ export class GetProgressUseCase implements IGetProgressUseCase {
                 );
               }
               const answers =
-                await this.lessonProgressRepository.findQuizAnswers(p.id);
+                await this._lessonProgressRepository.findQuizAnswers(p.id);
               return {
                 lessonId: p.lessonId,
                 completed: p.completed,

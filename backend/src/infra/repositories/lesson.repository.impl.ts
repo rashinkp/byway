@@ -55,7 +55,7 @@ interface QuizQuestionData {
 }
 
 export class LessonRepository implements ILessonRepository {
-  constructor(private readonly prisma: PrismaClient) {}
+  constructor(private readonly _prisma: PrismaClient) {}
 
   async getAllLessons(
     params: IGetAllLessonsInputDTO
@@ -91,14 +91,14 @@ export class LessonRepository implements ILessonRepository {
     };
 
     const [lessons, total] = await Promise.all([
-      this.prisma.lesson.findMany({
+      this._prisma.lesson.findMany({
         where,
         skip,
         take: limit,
         orderBy: { [sortBy]: sortOrder },
         include: { content: { include: { quizQuestions: true } } },
       }),
-      this.prisma.lesson.count({ where }),
+      this._prisma.lesson.count({ where }),
     ]);
 
     return {
@@ -138,7 +138,7 @@ export class LessonRepository implements ILessonRepository {
     };
 
     const [lessons, total] = await Promise.all([
-      this.prisma.lesson.findMany({
+      this._prisma.lesson.findMany({
         where,
         skip,
         take: limit,
@@ -150,7 +150,7 @@ export class LessonRepository implements ILessonRepository {
           order: true,
         },
       }),
-      this.prisma.lesson.count({ where }),
+      this._prisma.lesson.count({ where }),
     ]);
 
     return {
@@ -168,7 +168,7 @@ export class LessonRepository implements ILessonRepository {
   }
 
   async findById(id: string): Promise<Lesson | null> {
-    const lesson = await this.prisma.lesson.findUnique({
+    const lesson = await this._prisma.lesson.findUnique({
       where: { id },
       include: { content: { include: { quizQuestions: true } } },
     });
@@ -184,7 +184,7 @@ export class LessonRepository implements ILessonRepository {
     const lessonData = lesson.toJSON() as unknown as LessonData;
     const contentData = lessonData.content;
 
-    const createdLesson = await this.prisma.lesson.create({
+    const createdLesson = await this._prisma.lesson.create({
       data: {
         course: { connect: { id: lessonData.courseId } },
         title: lessonData.title,
@@ -236,11 +236,11 @@ export class LessonRepository implements ILessonRepository {
     const contentData = lessonData.content;
 
     // Check if LessonContent exists before attempting delete
-    const existingContent = await this.prisma.lessonContent.findUnique({
+    const existingContent = await this._prisma.lessonContent.findUnique({
       where: { lessonId: lessonData.id },
     });
 
-    const updatedLesson = await this.prisma.lesson.update({
+    const updatedLesson = await this._prisma.lesson.update({
       where: { id: lessonData.id },
       data: {
         title: lessonData.title,
@@ -317,14 +317,14 @@ export class LessonRepository implements ILessonRepository {
   }
 
   async delete(id: string): Promise<void> {
-    await this.prisma.lesson.update({
+    await this._prisma.lesson.update({
       where: { id },
       data: { deletedAt: new Date() },
     });
   }
 
   async deletePermanently(id: string): Promise<void> {
-    await this.prisma.$transaction(async (prisma) => {
+    await this._prisma.$transaction(async (prisma) => {
       await prisma.lessonContent.deleteMany({
         where: { lessonId: id },
       });
@@ -421,7 +421,7 @@ export class LessonRepository implements ILessonRepository {
     courseId: string,
     order: number
   ): Promise<Lesson | null> {
-    const lesson = await this.prisma.lesson.findFirst({
+    const lesson = await this._prisma.lesson.findFirst({
       where: {
         courseId,
         order,
@@ -437,7 +437,7 @@ export class LessonRepository implements ILessonRepository {
   }
 
   async hasPublishedLessons(courseId: string): Promise<boolean> {
-    const count = await this.prisma.lesson.count({
+    const count = await this._prisma.lesson.count({
       where: {
         courseId,
         status: LessonStatus.PUBLISHED,
@@ -448,7 +448,7 @@ export class LessonRepository implements ILessonRepository {
   }
 
   async findByCourseId(courseId: string): Promise<Lesson[]> {
-    const lessons = await this.prisma.lesson.findMany({
+    const lessons = await this._prisma.lesson.findMany({
       where: {
         courseId,
         deletedAt: null,

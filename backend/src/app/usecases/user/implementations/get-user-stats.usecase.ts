@@ -3,9 +3,9 @@ import { IUserRepository } from "../../../repositories/user.repository";
 import { IGetUserStatsUseCase } from "../interfaces/get-user-stats.usecase.interface";
 
 export class GetUserStatsUseCase implements IGetUserStatsUseCase {
-  constructor(private readonly userRepository: IUserRepository) {}
+  constructor(private readonly _userRepository: IUserRepository) {}
 
   async execute(input: IGetUserStatsInputDTO): Promise<IUserStatsDTO> {
-    return this.userRepository.getUserStats(input);
+    return this._userRepository.getUserStats(input);
   }
 } 

@@ -4,13 +4,13 @@ import { UserId } from "../../../../domain/value-object/UserId";
 import { ChatResponseDTO } from "../../../dtos/chat.dto";
 
 export class GetChatHistoryUseCase implements IGetChatHistoryUseCase {
-  constructor(private readonly chatRepository: IChatRepository) {}
+  constructor(private readonly _chatRepository: IChatRepository) {}
 
   async execute(
     user1Id: UserId,
     user2Id: UserId
   ): Promise<ChatResponseDTO | null> {
-    const chat = await this.chatRepository.getChatBetweenUsers(
+    const chat = await this._chatRepository.getChatBetweenUsers(
       user1Id,
       user2Id
     );

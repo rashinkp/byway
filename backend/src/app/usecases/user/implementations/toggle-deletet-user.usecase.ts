@@ -8,8 +8,8 @@ import { NotificationEntityType } from "../../../../domain/enum/notification-ent
 
 export class ToggleDeleteUserUseCase implements IToggleDeleteUserUseCase {
   constructor(
-    private userRepository: IUserRepository,
-    private createNotificationsForUsersUseCase: CreateNotificationsForUsersUseCase
+    private _userRepository: IUserRepository,
+    private _createNotificationsForUsersUseCase: CreateNotificationsForUsersUseCase
   ) {}
 
   async execute(
@@ -20,7 +20,7 @@ export class ToggleDeleteUserUseCase implements IToggleDeleteUserUseCase {
       throw new HttpError("Unauthorized: Admin role required", 403);
     }
 
-    const user = await this.userRepository.findById(dto.id);
+    const user = await this._userRepository.findById(dto.id);
     if (!user) {
       throw new HttpError("User not found", 404);
     }
@@ -39,10 +39,10 @@ export class ToggleDeleteUserUseCase implements IToggleDeleteUserUseCase {
         "Your account has been re-enabled. You can now access the platform again.";
     }
 
-    const updatedUser = await this.userRepository.updateUser(user);
+    const updatedUser = await this._userRepository.updateUser(user);
 
     // Send notification to the user
-    await this.createNotificationsForUsersUseCase.execute([user.id], {
+    await this._createNotificationsForUsersUseCase.execute([user.id], {
       eventType,
       entityType: NotificationEntityType.USER,
       entityId: user.id,

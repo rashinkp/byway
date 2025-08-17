@@ -7,10 +7,10 @@ import { ICategoryRepository } from "../../../repositories/category.repository";
 import { IRecoverCategoryUseCase } from "../interfaces/recover-category.usecase.interface";
 
 export class RecoverCategoryUseCase implements IRecoverCategoryUseCase {
-  constructor(private categoryRepository: ICategoryRepository) {}
+  constructor(private _categoryRepository: ICategoryRepository) {}
 
   async execute(input: ICategoryIdInputDTO): Promise<ICategoryOutputDTO> {
-    const category = await this.categoryRepository.findById(input.id);
+    const category = await this._categoryRepository.findById(input.id);
     if (!category) {
       throw new HttpError("Category not found", 404);
     }
@@ -19,7 +19,7 @@ export class RecoverCategoryUseCase implements IRecoverCategoryUseCase {
     }
 
     category.recover();
-    const savedCategory = await this.categoryRepository.save(category);
+    const savedCategory = await this._categoryRepository.save(category);
 
     return {
       id: savedCategory.id,

@@ -5,11 +5,11 @@ import { UserId } from '../../../../domain/value-object/UserId';
 
 export class GetTotalUnreadCountUseCase implements IGetTotalUnreadCountUseCase {
   constructor(
-    private readonly messageRepository: IMessageRepository
+    private readonly _messageRepository: IMessageRepository
   ) {}
 
   async execute(userId: UserId): Promise<UnreadCountResponseDTO> {
-    const count = await this.messageRepository.getTotalUnreadCount(userId);
+    const count = await this._messageRepository.getTotalUnreadCount(userId);
     
     return {
       count: count || 0

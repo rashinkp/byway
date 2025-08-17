@@ -9,7 +9,7 @@ import { StatusCodes } from "http-status-codes";
 import { envConfig } from "../../../presentation/express/configs/env.config";
 
 export class StripePaymentGateway implements PaymentGateway {
-  private stripe: Stripe;
+  private _stripe: Stripe;
 
   constructor() {
     const stripeKey = envConfig.STRIPE_SECRET_KEY;
@@ -17,7 +17,7 @@ export class StripePaymentGateway implements PaymentGateway {
       throw new Error("STRIPE_SECRET_KEY is not defined");
     }
 
-   this.stripe = new Stripe(stripeKey, {
+   this._stripe = new Stripe(stripeKey, {
     apiVersion: "2025-07-30.basil",
   });
   }
@@ -102,7 +102,7 @@ export class StripePaymentGateway implements PaymentGateway {
         }));
       }
 
-      const session = await this.stripe.checkout.sessions.create({
+      const session = await this._stripe.checkout.sessions.create({
         payment_method_types: ["card"],
         line_items: lineItems,
         mode: "payment",

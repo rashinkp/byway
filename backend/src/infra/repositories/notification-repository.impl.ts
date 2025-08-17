@@ -10,7 +10,7 @@ import { PaginatedNotificationList } from "../../domain/types/notification.inter
 export class PrismaNotificationRepository
   implements NotificationRepositoryInterface
 {
-  constructor(private readonly prisma: PrismaClient) {}
+  constructor(private readonly _prisma: PrismaClient) {}
 
   private mapEntityType(
     entityType: NotificationEntityType
@@ -71,7 +71,7 @@ export class PrismaNotificationRepository
   }
 
   async create(notification: Notification): Promise<Notification> {
-    const created = await this.prisma.notification.create({
+    const created = await this._prisma.notification.create({
       data: {
         userId: notification.userId.value,
         eventType: notification.eventType,
@@ -88,12 +88,12 @@ export class PrismaNotificationRepository
   }
 
   async findById(id: string): Promise<Notification | null> {
-    const found = await this.prisma.notification.findUnique({ where: { id } });
+    const found = await this._prisma.notification.findUnique({ where: { id } });
     return found ? this.toDomain(found) : null;
   }
 
   async findByUserId(userId: string): Promise<Notification[]> {
-    const found = await this.prisma.notification.findMany({
+    const found = await this._prisma.notification.findMany({
       where: { userId },
       orderBy: { createdAt: "desc" },
     });
@@ -127,13 +127,13 @@ export class PrismaNotificationRepository
       ];
     }
     const [items, total] = await Promise.all([
-      this.prisma.notification.findMany({
+      this._prisma.notification.findMany({
         where,
         orderBy: { [sortBy]: sortOrder },
         skip,
         take,
       }),
-      this.prisma.notification.count({ where }),
+      this._prisma.notification.count({ where }),
     ]);
     const hasMore = skip + take < total;
     const nextPage = hasMore ? Math.floor(skip / take) + 2 : undefined;
@@ -146,12 +146,12 @@ export class PrismaNotificationRepository
   }
 
   async deleteById(id: string): Promise<void> {
-    await this.prisma.notification.delete({ where: { id } });
+    await this._prisma.notification.delete({ where: { id } });
   }
 
   async deleteExpired(): Promise<number> {
     const now = new Date();
-    const deleted = await this.prisma.notification.deleteMany({
+    const deleted = await this._prisma.notification.deleteMany({
       where: { expiresAt: { lt: now } },
     });
     return deleted.count;

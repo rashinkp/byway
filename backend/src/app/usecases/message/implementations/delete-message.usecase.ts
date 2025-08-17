@@ -4,10 +4,10 @@ import { IDeleteMessageUseCase } from '../interfaces/delete-message.usecase.inte
 import { DeleteMessageResponseDTO } from '../../../dtos/message.dto';
 
 export class DeleteMessageUseCase implements IDeleteMessageUseCase {
-  constructor(private readonly messageRepository: IMessageRepository) {}
+  constructor(private readonly _messageRepository: IMessageRepository) {}
 
   async execute(messageId: MessageId): Promise<DeleteMessageResponseDTO> {
-    await this.messageRepository.delete(messageId);
+    await this._messageRepository.delete(messageId);
     
     return {
       success: true,

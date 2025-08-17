@@ -4,10 +4,10 @@ import { MessageByIdResponseDTO } from "../../../dtos/message.dto";
 import { MessageId } from "../../../../domain/value-object/MessageId";
 
 export class GetMessageByIdUseCase implements IGetMessageByIdUseCase {
-  constructor(private readonly messageRepository: IMessageRepository) {}
+  constructor(private readonly _messageRepository: IMessageRepository) {}
 
   async execute(messageId: MessageId): Promise<MessageByIdResponseDTO | null> {
-    const message = await this.messageRepository.findById(messageId);
+    const message = await this._messageRepository.findById(messageId);
     
     if (!message) {
       return null;

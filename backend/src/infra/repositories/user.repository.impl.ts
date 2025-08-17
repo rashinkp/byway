@@ -8,7 +8,7 @@ import { PaginatedResult, PaginationFilter } from "../../domain/types/pagination
 import { UserStats } from "../../domain/types/user.interface";
 
 export class UserRepository implements IUserRepository {
-  constructor(private prisma: PrismaClient) {}
+  constructor(private _prisma: PrismaClient) {}
 
   async findAll(input: PaginationFilter): Promise<PaginatedResult<User>> {
     const {
@@ -41,14 +41,14 @@ export class UserRepository implements IUserRepository {
     }
 
     const [users, total] = await Promise.all([
-      this.prisma.user.findMany({
+      this._prisma.user.findMany({
         where,
         orderBy: sortBy ? { [sortBy]: sortOrder || "asc" } : undefined,
         skip,
         take: limit,
         include: { userProfile: true },
       }),
-      this.prisma.user.count({ where }),
+      this._prisma.user.count({ where }),
     ]);
 
     return {
@@ -62,7 +62,7 @@ export class UserRepository implements IUserRepository {
   }
 
   async findById(id: string): Promise<User | null> {
-    const user = await this.prisma.user.findUnique({
+    const user = await this._prisma.user.findUnique({
       where: { id },
       include: { userProfile: true },
     });
@@ -71,7 +71,7 @@ export class UserRepository implements IUserRepository {
   }
 
   async updateUser(user: User): Promise<User> {
-    const updated = await this.prisma.user.update({
+    const updated = await this._prisma.user.update({
       where: { id: user.id },
       data: {
         name: user.name,
@@ -92,7 +92,7 @@ export class UserRepository implements IUserRepository {
   }
 
   async updateProfile(profile: UserProfile): Promise<UserProfile> {
-    const updated = await this.prisma.userProfile.update({
+    const updated = await this._prisma.userProfile.update({
       where: { id: profile.id },
       data: {
         bio: profile.bio,
@@ -111,7 +111,7 @@ export class UserRepository implements IUserRepository {
   }
 
   async findProfileByUserId(userId: string): Promise<UserProfile | null> {
-    const profile = await this.prisma.userProfile.findUnique({
+    const profile = await this._prisma.userProfile.findUnique({
       where: { userId },
     });
     if (!profile) return null;
@@ -119,7 +119,7 @@ export class UserRepository implements IUserRepository {
   }
 
   async createProfile(profile: UserProfile): Promise<UserProfile> {
-    const created = await this.prisma.userProfile.create({
+    const created = await this._prisma.userProfile.create({
       data: {
         userId: profile.userId,
         bio: profile.bio,
@@ -147,14 +147,14 @@ export class UserRepository implements IUserRepository {
       activeInstructors,
       inactiveInstructors,
     ] = await Promise.all([
-      this.prisma.user.count(),
-      this.prisma.user.count({ where: { deletedAt: null } }),
-      this.prisma.user.count({ where: { deletedAt: { not: null } } }),
-      this.prisma.user.count({ where: { role: "INSTRUCTOR" } }),
-      this.prisma.user.count({
+      this._prisma.user.count(),
+      this._prisma.user.count({ where: { deletedAt: null } }),
+      this._prisma.user.count({ where: { deletedAt: { not: null } } }),
+      this._prisma.user.count({ where: { role: "INSTRUCTOR" } }),
+      this._prisma.user.count({
         where: { role: "INSTRUCTOR", deletedAt: null },
       }),
-      this.prisma.user.count({
+      this._prisma.user.count({
         where: { role: "INSTRUCTOR", deletedAt: { not: null } },
       }),
     ]);
@@ -170,7 +170,7 @@ export class UserRepository implements IUserRepository {
   }
 
   async findByRole(role: Role): Promise<User[]> {
-    const users = await this.prisma.user.findMany({
+    const users = await this._prisma.user.findMany({
       where: { role },
     });
     return users.map((u) => User.fromPrisma(u));

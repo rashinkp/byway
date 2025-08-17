@@ -13,25 +13,25 @@ import { NotificationEntityType } from "../../../../domain/enum/notification-ent
 
 export class DeclineCourseUseCase implements IDeclineCourseUseCase {
   constructor(
-    private courseRepository: ICourseRepository,
-    private createNotificationsForUsersUseCase: CreateNotificationsForUsersUseCase
+    private _courseRepository: ICourseRepository,
+    private _createNotificationsForUsersUseCase: CreateNotificationsForUsersUseCase
   ) {}
 
   async execute(
     input: IUpdateCourseApprovalInputDTO
   ): Promise<ICourseWithDetailsDTO> {
-    const course = await this.courseRepository.findById(input.courseId);
+    const course = await this._courseRepository.findById(input.courseId);
     if (!course) {
       throw new HttpError("Course not found", 404);
     }
 
     course.setApprovalStatus(APPROVALSTATUS.DECLINED);
-    const updatedCourse = await this.courseRepository.updateApprovalStatus(
+    const updatedCourse = await this._courseRepository.updateApprovalStatus(
       course
     );
 
     // Notify the instructor (creator) that their course was declined
-    await this.createNotificationsForUsersUseCase.execute([course.createdBy], {
+    await this._createNotificationsForUsersUseCase.execute([course.createdBy], {
       eventType: NotificationEventType.COURSE_DECLINED,
       entityType: NotificationEntityType.COURSE,
       entityId: course.id,

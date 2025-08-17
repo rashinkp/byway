@@ -14,9 +14,9 @@ interface PendingNotification {
 }
 
 export class NotificationBatchingService {
-  private pendingNotifications: Map<string, PendingNotification> = new Map();
-  private readonly BATCH_WINDOW_MS = 5 * 60 * 1000; // 5 minutes
-  private readonly MAX_MESSAGE_LENGTH = 50;
+  private _pendingNotifications: Map<string, PendingNotification> = new Map();
+  private readonly _BATCH_WINDOW_MS = 5 * 60 * 1000; // 5 minutes
+  private readonly _MAX_MESSAGE_LENGTH = 50;
 
   constructor(
     private readonly createNotificationsForUsersUseCase: CreateNotificationsForUsersUseCase
@@ -33,7 +33,7 @@ export class NotificationBatchingService {
     const now = new Date();
 
     // Check if we have a pending notification for this sender-receiver pair
-    const existing = this.pendingNotifications.get(key);
+    const existing = this._pendingNotifications.get(key);
 
     if (existing) {
       // Update existing notification
@@ -42,9 +42,9 @@ export class NotificationBatchingService {
       existing.lastMessageTime = now;
 
       // If the batch window has expired, send the notification
-      if (now.getTime() - existing.lastMessageTime.getTime() > this.BATCH_WINDOW_MS) {
+      if (now.getTime() - existing.lastMessageTime.getTime() > this._BATCH_WINDOW_MS) {
         await this.sendBatchedNotification(existing);
-        this.pendingNotifications.delete(key);
+        this._pendingNotifications.delete(key);
       }
     } else {
       // Create new pending notification
@@ -58,16 +58,16 @@ export class NotificationBatchingService {
         lastMessageTime: now
       };
 
-      this.pendingNotifications.set(key, pendingNotification);
+      this._pendingNotifications.set(key, pendingNotification);
 
       // Schedule the notification to be sent after the batch window
       setTimeout(async () => {
-        const notification = this.pendingNotifications.get(key);
+        const notification = this._pendingNotifications.get(key);
         if (notification) {
           await this.sendBatchedNotification(notification);
-          this.pendingNotifications.delete(key);
+          this._pendingNotifications.delete(key);
         }
-      }, this.BATCH_WINDOW_MS);
+      }, this._BATCH_WINDOW_MS);
     }
   }
 
@@ -94,39 +94,39 @@ export class NotificationBatchingService {
   }
 
   private truncateMessage(message: string): string {
-    if (message.length <= this.MAX_MESSAGE_LENGTH) {
+    if (message.length <= this._MAX_MESSAGE_LENGTH) {
       return message;
     }
-    return message.substring(0, this.MAX_MESSAGE_LENGTH) + '...';
+    return message.substring(0, this._MAX_MESSAGE_LENGTH) + '...';
   }
 
   // Method to force send all pending notifications (useful for cleanup)
   async flushAllPendingNotifications(): Promise<void> {
-    const notifications = Array.from(this.pendingNotifications.values());
+    const notifications = Array.from(this._pendingNotifications.values());
     
     for (const notification of notifications) {
       await this.sendBatchedNotification(notification);
     }
     
-    this.pendingNotifications.clear();
+    this._pendingNotifications.clear();
   }
 
   // Method to clear notifications for a specific user (when they start chatting)
   clearNotificationsForUser(userId: string, chatId: string): void {
     const keysToDelete: string[] = [];
     
-    for (const [key, notification] of this.pendingNotifications.entries()) {
+    for (const [key, notification] of this._pendingNotifications.entries()) {
       if (notification.userId === userId && notification.chatId === chatId) {
         keysToDelete.push(key);
       }
     }
     
-    keysToDelete.forEach(key => this.pendingNotifications.delete(key));
+    keysToDelete.forEach(key => this._pendingNotifications.delete(key));
   }
 
   // Method to check if user has pending notifications for a specific chat
   hasPendingNotifications(userId: string, chatId: string): boolean {
-    for (const [, notification] of this.pendingNotifications.entries()) {
+    for (const [, notification] of this._pendingNotifications.entries()) {
       if (notification.userId === userId && notification.chatId === chatId) {
         return true;
       }
@@ -137,7 +137,7 @@ export class NotificationBatchingService {
   // Method to get pending notification count for a user
   getPendingNotificationCount(userId: string): number {
     let count = 0;
-    for (const [, notification] of this.pendingNotifications.entries()) {
+    for (const [, notification] of this._pendingNotifications.entries()) {
       if (notification.userId === userId) {
         count += notification.messageCount;
       }

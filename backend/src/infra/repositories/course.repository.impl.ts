@@ -14,7 +14,7 @@ import { CourseOverallStats, CourseStats } from "../../domain/types/course-stats
 import { CourseStatsInput, CourseWithEnrollment } from "../../domain/types/course.interface";
 import { UserProfile } from "../../domain/entities/user-profile.entity";
 export class CourseRepository implements ICourseRepository {
-  constructor(private prisma: PrismaClient) {}
+  constructor(private _prisma: PrismaClient) {}
 
   private async transformCourseToEnrollmentData(
     course: Course,
@@ -23,13 +23,13 @@ export class CourseRepository implements ICourseRepository {
     const courseData = course.toJSON();
     
     // Get instructor data
-    const instructor = await this.prisma.user.findUnique({
+    const instructor = await this._prisma.user.findUnique({
       where: { id: courseData.createdBy as string },
       select: { id: true, name: true, email: true, userProfile: true }
     });
 
     // Get review stats
-    const reviews = await this.prisma.courseReview.findMany({
+    const reviews = await this._prisma.courseReview.findMany({
       where: { courseId: courseData.id as string, deletedAt: null },
       select: { rating: true }
     });
@@ -39,13 +39,13 @@ export class CourseRepository implements ICourseRepository {
       : 0;
 
     // Check if user is enrolled (if userId is provided)
-    const isEnrolled = userId ? await this.prisma.enrollment.findFirst({
+    const isEnrolled = userId ? await this._prisma.enrollment.findFirst({
       where: { userId, courseId : courseData.id as string }
     }).then(enrollment => !!enrollment) : false;
 
     // Check if course is in cart (if userId is provided)
     const isInCart = userId
-      ? await this.prisma.cart
+      ? await this._prisma.cart
           .findFirst({
             where: { userId, courseId: courseData.id as string },
           })
@@ -128,7 +128,7 @@ export class CourseRepository implements ICourseRepository {
           : undefined,
       };
 
-      const saved = await this.prisma.course.create({
+      const saved = await this._prisma.course.create({
         data,
         include: { details: true },
       });
@@ -166,7 +166,7 @@ export class CourseRepository implements ICourseRepository {
   }
   async findById(id: string): Promise<Course | null> {
     try {
-      const course = await this.prisma.course.findUnique({
+      const course = await this._prisma.course.findUnique({
         where: { id },
         include: {
           details: true,
@@ -212,7 +212,7 @@ export class CourseRepository implements ICourseRepository {
 
   async findByName(title: string): Promise<Course | null> {
     try {
-      const course = await this.prisma.course.findFirst({
+      const course = await this._prisma.course.findFirst({
         where: { title: { equals: title, mode: "insensitive" } },
         include: { details: true },
       });
@@ -322,14 +322,14 @@ export class CourseRepository implements ICourseRepository {
 
     try {
       const [courses, total] = await Promise.all([
-        this.prisma.course.findMany({
+        this._prisma.course.findMany({
           where,
           skip: (page - 1) * limit,
           take: limit,
           orderBy: { [sortBy]: sortOrder },
           include: { details: true },
         }),
-        this.prisma.course.count({ where }),
+        this._prisma.course.count({ where }),
       ]);
 
       const courseEntities = courses.map(
@@ -416,7 +416,7 @@ export class CourseRepository implements ICourseRepository {
           : undefined,
       };
 
-      const updated = await this.prisma.course.update({
+      const updated = await this._prisma.course.update({
         where: { id: course.id },
         data,
         include: { details: true },
@@ -455,7 +455,7 @@ export class CourseRepository implements ICourseRepository {
   }
   async softDelete(course: Course): Promise<Course> {
     try {
-      const updated = await this.prisma.course.update({
+      const updated = await this._prisma.course.update({
         where: { id: course.id },
         data: { deletedAt: course.deletedAt },
         include: { details: true },
@@ -518,7 +518,7 @@ export class CourseRepository implements ICourseRepository {
 
     try {
       const [courses, total] = await Promise.all([
-        this.prisma.course.findMany({
+        this._prisma.course.findMany({
           where,
           skip: (page - 1) * limit,
           take: limit,
@@ -528,7 +528,7 @@ export class CourseRepository implements ICourseRepository {
               : { [sortBy]: sortOrder },
           include: { details: true },
         }),
-        this.prisma.course.count({ where }),
+        this._prisma.course.count({ where }),
       ]);
 
       const courseEntities = courses.map(
@@ -581,7 +581,7 @@ export class CourseRepository implements ICourseRepository {
 
   async updateApprovalStatus(course: Course): Promise<Course> {
     try {
-      const updated = await this.prisma.course.update({
+      const updated = await this._prisma.course.update({
         where: { id: course.id },
         data: { approvalStatus: course.approvalStatus },
         include: { details: true },
@@ -623,7 +623,7 @@ export class CourseRepository implements ICourseRepository {
 
   async findCourseDetails(courseId: string): Promise<CourseDetails | null> {
     try {
-      const details = await this.prisma.courseDetails.findUnique({
+      const details = await this._prisma.courseDetails.findUnique({
         where: { courseId },
       });
 
@@ -646,7 +646,7 @@ export class CourseRepository implements ICourseRepository {
     details: CourseDetails
   ): Promise<CourseDetails> {
     try {
-      const updatedDetails = await this.prisma.courseDetails.upsert({
+      const updatedDetails = await this._prisma.courseDetails.upsert({
         where: { courseId },
         create: {
           courseId,
@@ -718,10 +718,10 @@ export class CourseRepository implements ICourseRepository {
       // Original behavior for non-admin users
       const [totalCourses, activeCourses, inactiveCourses, pendingCourses] =
         await Promise.all([
-          this.prisma.course.count({ where: whereClause }),
-          this.prisma.course.count({ where: activeWhereClause }),
-          this.prisma.course.count({ where: inactiveWhereClause }),
-          this.prisma.course.count({ where: pendingWhereClause }),
+          this._prisma.course.count({ where: whereClause }),
+          this._prisma.course.count({ where: activeWhereClause }),
+          this._prisma.course.count({ where: inactiveWhereClause }),
+          this._prisma.course.count({ where: pendingWhereClause }),
         ]);
 
       return {
@@ -749,37 +749,37 @@ export class CourseRepository implements ICourseRepository {
         archivedCourses,
       ] = await Promise.all([
         // Total courses (including deleted)
-        this.prisma.course.count({}),
+        this._prisma.course.count({}),
 
         // Active courses (not deleted)
-        this.prisma.course.count({ where: { deletedAt: null } }),
+        this._prisma.course.count({ where: { deletedAt: null } }),
 
         // Inactive courses (deleted)
-        this.prisma.course.count({ where: { deletedAt: { not: null } } }),
+        this._prisma.course.count({ where: { deletedAt: { not: null } } }),
 
         // Pending courses
-        this.prisma.course.count({
+        this._prisma.course.count({
           where: { approvalStatus: APPROVALSTATUS.PENDING },
         }),
 
         // Approved courses
-        this.prisma.course.count({
+        this._prisma.course.count({
           where: { approvalStatus: APPROVALSTATUS.APPROVED },
         }),
 
         // Declined courses
-        this.prisma.course.count({
+        this._prisma.course.count({
           where: { approvalStatus: APPROVALSTATUS.DECLINED },
         }),
 
         // Published courses
-        this.prisma.course.count({ where: { status: CourseStatus.PUBLISHED } }),
+        this._prisma.course.count({ where: { status: CourseStatus.PUBLISHED } }),
 
         // Draft courses
-        this.prisma.course.count({ where: { status: CourseStatus.DRAFT } }),
+        this._prisma.course.count({ where: { status: CourseStatus.DRAFT } }),
 
         // Archived courses
-        this.prisma.course.count({ where: { status: CourseStatus.ARCHIVED } }),
+        this._prisma.course.count({ where: { status: CourseStatus.ARCHIVED } }),
       ]);
 
       return {
@@ -801,7 +801,7 @@ export class CourseRepository implements ICourseRepository {
   ): Promise<CourseStats[]> {
     let allCourses;
     if (input.role === "INSTRUCTOR") {
-      allCourses = await this.prisma.course.findMany({
+      allCourses = await this._prisma.course.findMany({
         where: {
           createdBy: input.userId,
         },
@@ -811,7 +811,7 @@ export class CourseRepository implements ICourseRepository {
         },
       });
     } else {
-      allCourses = await this.prisma.course.findMany({
+      allCourses = await this._prisma.course.findMany({
         include: {
           creator: true,
           enrollments: true,
@@ -831,7 +831,7 @@ export class CourseRepository implements ICourseRepository {
     const coursesWithRevenue = await Promise.all(
       topEnrolledCourses.map(async (course) => {
         // Get all completed order items for this course
-        const completedOrderItems = await this.prisma.orderItem.findMany({
+        const completedOrderItems = await this._prisma.orderItem.findMany({
           where: {
             courseId: course.id,
             order: {
@@ -866,7 +866,7 @@ export class CourseRepository implements ICourseRepository {
         }
 
         // Get review stats for this course
-        const reviews = await this.prisma.courseReview.findMany({
+        const reviews = await this._prisma.courseReview.findMany({
           where: {
             courseId: course.id,
             deletedAt: null, // Only include active reviews

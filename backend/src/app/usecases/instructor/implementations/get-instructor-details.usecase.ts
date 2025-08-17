@@ -6,17 +6,17 @@ import { CombinedInstructorDTO } from "../../../dtos/instructor.dto";
 
 export class GetInstructorDetailsUseCaseImpl implements GetInstructorDetailsUseCase {
   constructor(
-    private readonly instructorRepository: IInstructorRepository,
-    private readonly userRepository: IUserRepository
+    private readonly _instructorRepository: IInstructorRepository,
+    private readonly _userRepository: IUserRepository
   ) {}
 
   async execute(userId: string): Promise<CombinedInstructorDTO> {
-    const user = await this.userRepository.findById(userId);
+    const user = await this._userRepository.findById(userId);
     if (!user) {
       throw new HttpError("User not found for instructor", 404);
     }
 
-    const instructor = await this.instructorRepository.findInstructorByUserId(
+    const instructor = await this._instructorRepository.findInstructorByUserId(
       userId
     );
 

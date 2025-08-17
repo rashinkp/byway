@@ -6,8 +6,8 @@ import { EmailProvider } from "../../../app/providers/email.provider.interface";
 
 export class OtpProvider implements IOtpProvider {
   constructor(
-    private authRepository: IAuthRepository,
-    private emailProvider: EmailProvider
+    private _authRepository: IAuthRepository,
+    private _emailProvider: EmailProvider
   ) {}
 
   async generateOtp(email: string, userId: string): Promise<UserVerification> {
@@ -27,10 +27,10 @@ export class OtpProvider implements IOtpProvider {
     });
 
     // Store verification
-    await this.authRepository.createVerification(verification);
+    await this._authRepository.createVerification(verification);
 
     // Send OTP via email using EmailProviderImpl
-    await this.emailProvider.sendOtpEmail(email, otp);
+    await this._emailProvider.sendOtpEmail(email, otp);
 
     return verification;
   }

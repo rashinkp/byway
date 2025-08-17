@@ -6,10 +6,10 @@ import { IGetTopInstructorsInput } from "../../app/usecases/user/interfaces/get-
 import { InstructorStats } from "../../domain/types/instructor.interface";
 
 export class PrismaInstructorRepository implements IInstructorRepository {
-  constructor(private prisma: PrismaClient) { }
+  constructor(private _prisma: PrismaClient) { }
   
   async createInstructor(instructor: Instructor): Promise<Instructor> {
-    const upserted = await this.prisma.instructorDetails.upsert({
+    const upserted = await this._prisma.instructorDetails.upsert({
       where: {
         userId: instructor.userId,
       },
@@ -46,7 +46,7 @@ export class PrismaInstructorRepository implements IInstructorRepository {
   }
 
   async updateInstructor(instructor: Instructor): Promise<Instructor> {
-    const updated = await this.prisma.instructorDetails.update({
+    const updated = await this._prisma.instructorDetails.update({
       where: { id: instructor.id },
       data: {
         areaOfExpertise: instructor.areaOfExpertise,
@@ -65,7 +65,7 @@ export class PrismaInstructorRepository implements IInstructorRepository {
   }
 
   async findInstructorById(id: string): Promise<Instructor | null> {
-    const instructor = await this.prisma.instructorDetails.findUnique({
+    const instructor = await this._prisma.instructorDetails.findUnique({
       where: { id },
     });
     if (!instructor) return null;
@@ -73,7 +73,7 @@ export class PrismaInstructorRepository implements IInstructorRepository {
   }
 
   async findInstructorByUserId(userId: string): Promise<Instructor | null> {
-    const instructor = await this.prisma.instructorDetails.findUnique({
+    const instructor = await this._prisma.instructorDetails.findUnique({
       where: { userId },
     });
     if (!instructor) return null;
@@ -126,10 +126,10 @@ export class PrismaInstructorRepository implements IInstructorRepository {
     }
 
     // Get total count
-    const total = await this.prisma.instructorDetails.count({ where });
+    const total = await this._prisma.instructorDetails.count({ where });
 
     // Get paginated results
-    const instructors = await this.prisma.instructorDetails.findMany({
+    const instructors = await this._prisma.instructorDetails.findMany({
       where,
       orderBy,
       skip: (page - 1) * limit,
@@ -157,7 +157,7 @@ export class PrismaInstructorRepository implements IInstructorRepository {
   async getTopInstructors(
     input: IGetTopInstructorsInput
   ): Promise<InstructorStats[]> {
-    const instructors = await this.prisma.user.findMany({
+    const instructors = await this._prisma.user.findMany({
       where: {
         role: "INSTRUCTOR",
         deletedAt: null,
@@ -190,7 +190,7 @@ export class PrismaInstructorRepository implements IInstructorRepository {
         const courseIds = instructor.coursesCreated.map(
           (course: { id: string }) => course.id
         );
-        const completedOrderItems = await this.prisma.orderItem.findMany({
+        const completedOrderItems = await this._prisma.orderItem.findMany({
           where: {
             courseId: {
               in: courseIds,
@@ -212,7 +212,7 @@ export class PrismaInstructorRepository implements IInstructorRepository {
 
 
         // Calculate average rating from course reviews
-        const reviews = await this.prisma.courseReview.findMany({
+        const reviews = await this._prisma.courseReview.findMany({
           where: {
             courseId: {
               in: courseIds,

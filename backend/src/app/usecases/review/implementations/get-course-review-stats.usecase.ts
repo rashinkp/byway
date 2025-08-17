@@ -6,10 +6,10 @@ export class GetCourseReviewStatsUseCase
   implements IGetCourseReviewStatsUseCase
 {
   constructor(
-    private readonly courseReviewRepository: ICourseReviewRepository
+    private readonly _courseReviewRepository: ICourseReviewRepository
   ) {}
 
   async execute(courseId: string): Promise<CourseReviewSummaryDto> {
-    return await this.courseReviewRepository.getCourseReviewStats(courseId);
+    return await this._courseReviewRepository.getCourseReviewStats(courseId);
   }
 }

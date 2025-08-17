@@ -19,16 +19,16 @@ export class RevenueDistributionService implements IRevenueDistributionService {
   private readonly INSTRUCTOR_SHARE_PERCENTAGE = 80;
 
   constructor(
-    private walletRepository: IWalletRepository,
-    private transactionRepository: ITransactionRepository,
-    private orderRepository: IOrderRepository,
-    private userRepository: IUserRepository,
-    private createNotificationsForUsersUseCase: CreateNotificationsForUsersUseCase
+    private _walletRepository: IWalletRepository,
+    private _transactionRepository: ITransactionRepository,
+    private _orderRepository: IOrderRepository,
+    private _userRepository: IUserRepository,
+    private _createNotificationsForUsersUseCase: CreateNotificationsForUsersUseCase
   ) {}
 
   async distributeRevenue(orderId: string): Promise<void> {
     try {
-      const orderItems = await this.orderRepository.findOrderItems(orderId);
+      const orderItems = await this._orderRepository.findOrderItems(orderId);
 
       if (!orderItems || orderItems.length === 0) {
         throw new HttpError("No order items found", StatusCodes.NOT_FOUND);
@@ -68,7 +68,7 @@ export class RevenueDistributionService implements IRevenueDistributionService {
     );
     
     // Get the course to get the price
-    const course = await this.orderRepository.findCourseById(
+    const course = await this._orderRepository.findCourseById(
       orderItem.courseId
     );
 
@@ -113,7 +113,7 @@ export class RevenueDistributionService implements IRevenueDistributionService {
   }
 
   private async getAdminUserId(): Promise<string> {
-    const { items } = await this.userRepository.findAll({
+    const { items } = await this._userRepository.findAll({
       role: "ADMIN",
       page: 1,
       limit: 1,
@@ -139,26 +139,26 @@ export class RevenueDistributionService implements IRevenueDistributionService {
     const adminId = await this.getAdminUserId();
 
     // Get or create admin wallet
-    let adminWallet = await this.walletRepository.findByUserId(adminId);
+    let adminWallet = await this._walletRepository.findByUserId(adminId);
     if (!adminWallet) {
       console.log("Creating admin wallet");
       adminWallet = Wallet.create(adminId);
-      adminWallet = await this.walletRepository.create(adminWallet);
+      adminWallet = await this._walletRepository.create(adminWallet);
     }
     adminWallet.addAmount(adminShare);
-    await this.walletRepository.update(adminWallet);
+    await this._walletRepository.update(adminWallet);
 
     // Get or create instructor wallet
-    let instructorWallet = await this.walletRepository.findByUserId(
+    let instructorWallet = await this._walletRepository.findByUserId(
       instructorId
     );
     if (!instructorWallet) {
       console.log("Creating instructor wallet for:", instructorId);
       instructorWallet = Wallet.create(instructorId);
-      instructorWallet = await this.walletRepository.create(instructorWallet);
+      instructorWallet = await this._walletRepository.create(instructorWallet);
     }
     instructorWallet.addAmount(instructorShare);
-    await this.walletRepository.update(instructorWallet);
+    await this._walletRepository.update(instructorWallet);
   }
 
   private async createTransactions(
@@ -190,8 +190,8 @@ export class RevenueDistributionService implements IRevenueDistributionService {
       description: `Revenue share from course purchase (${coursePrice})`,
     });
 
-    await this.transactionRepository.create(adminTransaction);
-    await this.transactionRepository.create(instructorTransaction);
+    await this._transactionRepository.create(adminTransaction);
+    await this._transactionRepository.create(instructorTransaction);
   }
 
   private async sendPurchaseNotifications(
@@ -203,7 +203,7 @@ export class RevenueDistributionService implements IRevenueDistributionService {
     try {
       // Get admin user ID and order details
       const adminId = await this.getAdminUserId();
-      const order = await this.orderRepository.findById(orderItem.orderId);
+      const order = await this._orderRepository.findById(orderItem.orderId);
 
       if (!order) {
         console.error("Order not found for notifications");
@@ -211,7 +211,7 @@ export class RevenueDistributionService implements IRevenueDistributionService {
       }
 
       // 1. Notify instructor about revenue earned
-      await this.createNotificationsForUsersUseCase.execute(
+      await this._createNotificationsForUsersUseCase.execute(
         [course.createdBy],
         {
           eventType: NotificationEventType.REVENUE_EARNED,
@@ -226,7 +226,7 @@ export class RevenueDistributionService implements IRevenueDistributionService {
       );
 
       // 2. Notify admin about revenue earned
-      await this.createNotificationsForUsersUseCase.execute([adminId], {
+      await this._createNotificationsForUsersUseCase.execute([adminId], {
         eventType: NotificationEventType.REVENUE_EARNED,
         entityType: NotificationEntityType.PAYMENT,
         entityId: course.id,
@@ -238,7 +238,7 @@ export class RevenueDistributionService implements IRevenueDistributionService {
       });
 
       // 3. Notify purchaser about course purchase completion
-      await this.createNotificationsForUsersUseCase.execute([order.userId], {
+      await this._createNotificationsForUsersUseCase.execute([order.userId], {
         eventType: NotificationEventType.COURSE_PURCHASED,
         entityType: NotificationEntityType.COURSE,
         entityId: course.id,

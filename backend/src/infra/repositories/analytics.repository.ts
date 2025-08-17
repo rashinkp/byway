@@ -6,7 +6,7 @@ import { LatestRevenue } from "../../domain/types/revenue.interface";
 
 
 export class PrismaAnalyticsRepository implements IRevenueRepository {
-  constructor(private readonly prisma: PrismaClient) {}
+  constructor(private readonly _prisma: PrismaClient) {}
 
   async getTransactionAmounts(params: {
     startDate: Date;
@@ -15,7 +15,7 @@ export class PrismaAnalyticsRepository implements IRevenueRepository {
     status: TransactionStatus;
     userId: string;
   }): Promise<{ amount: number }> {
-    const result = await this.prisma.transactionHistory.aggregate({
+    const result = await this._prisma.transactionHistory.aggregate({
       where: {
         createdAt: {
           gte: params.startDate,
@@ -42,7 +42,7 @@ export class PrismaAnalyticsRepository implements IRevenueRepository {
     status?: TransactionStatus;
     userId: string;
   }): Promise<number> {
-    const result = await this.prisma.transactionHistory.count({
+    const result = await this._prisma.transactionHistory.count({
       where: {
         createdAt: {
           gte: params.startDate,
@@ -64,7 +64,7 @@ export class PrismaAnalyticsRepository implements IRevenueRepository {
     userId: string;
     courseId?: string;
   }): Promise<Array<{ courseId: string; amount: number; count: number }>> {
-    const transactions = await this.prisma.transactionHistory.groupBy({
+    const transactions = await this._prisma.transactionHistory.groupBy({
       by: ["courseId"],
       where: {
         createdAt: {
@@ -114,7 +114,7 @@ export class PrismaAnalyticsRepository implements IRevenueRepository {
       return [];
     }
 
-    const courses = await this.prisma.course.findMany({
+    const courses = await this._prisma.course.findMany({
       where: {
         id: {
           in: validCourseIds,
@@ -154,7 +154,7 @@ export class PrismaAnalyticsRepository implements IRevenueRepository {
     userId: string;
     search?: string;
   }): Promise<number> {
-    return this.prisma.course.count({
+    return this._prisma.course.count({
       where: {
         createdAt: {
           gte: params.startDate,
@@ -172,7 +172,7 @@ export class PrismaAnalyticsRepository implements IRevenueRepository {
   }
 
   async getTotalRevenue(userId: string): Promise<number> {
-    const result = await this.prisma.transactionHistory.aggregate({
+    const result = await this._prisma.transactionHistory.aggregate({
       where: {
         userId,
         type: "REVENUE",
@@ -225,13 +225,13 @@ export class PrismaAnalyticsRepository implements IRevenueRepository {
         : { createdAt: "desc" as const };
 
     const [transactions, total] = await Promise.all([
-      this.prisma.transactionHistory.findMany({
+      this._prisma.transactionHistory.findMany({
         where,
         skip,
         take: limit,
         orderBy,
       }),
-      this.prisma.transactionHistory.count({ where }),
+      this._prisma.transactionHistory.count({ where }),
     ]);
 
     // Get course details for the transactions
@@ -241,7 +241,7 @@ export class PrismaAnalyticsRepository implements IRevenueRepository {
 
     const courses =
       courseIds.length > 0
-        ? await this.prisma.course.findMany({
+        ? await this._prisma.course.findMany({
             where: { id: { in: courseIds } },
             include: { creator: true },
           })

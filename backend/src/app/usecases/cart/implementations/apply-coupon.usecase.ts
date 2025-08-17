@@ -5,10 +5,13 @@ import { IApplyCouponUseCase } from "../interfaces/apply-coupon.usecase.interfac
 import { HttpError } from "../../../../presentation/http/errors/http-error";
 
 export class ApplyCouponUseCase implements IApplyCouponUseCase {
-  constructor(private cartRepository: ICartRepository) {}
+  constructor(private _cartRepository: ICartRepository) {}
 
-  async execute(userId: string, data: ApplyCouponDto): Promise<CartResponseDTO> {
-    const cart = await this.cartRepository.findByUserAndCourse(
+  async execute(
+    userId: string,
+    data: ApplyCouponDto
+  ): Promise<CartResponseDTO> {
+    const cart = await this._cartRepository.findByUserAndCourse(
       userId,
       data.courseId
     );
@@ -18,6 +21,6 @@ export class ApplyCouponUseCase implements IApplyCouponUseCase {
     }
 
     cart.applyCoupon(data.couponId);
-    return this.cartRepository.update(cart);
+    return this._cartRepository.update(cart);
   }
 }

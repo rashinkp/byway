@@ -7,12 +7,12 @@ import { VerifyOtpDto } from "../../../dtos/auth.dto";
 import { UserResponseDTO } from "../../../dtos/user.dto";
 
 export class VerifyOtpUseCase implements IVerifyOtpUseCase {
-  constructor(private authRepository: IAuthRepository) {}
+  constructor(private _authRepository: IAuthRepository) {}
 
   async execute(
     dto: VerifyOtpDto
   ): Promise<{ user?: UserResponseDTO; resetToken?: string }> {
-    const verification = await this.authRepository.findVerificationByEmail(
+    const verification = await this._authRepository.findVerificationByEmail(
       dto.email
     );
     if (!verification) {
@@ -28,23 +28,23 @@ export class VerifyOtpUseCase implements IVerifyOtpUseCase {
     } catch (error) {
       if (error instanceof Error && error.message === "Invalid OTP") {
         verification.incrementAttempts();
-        await this.authRepository.updateVerification(verification);
+        await this._authRepository.updateVerification(verification);
       }
       throw error;
     }
 
     // Update verification record
-    await this.authRepository.updateVerification(verification);
+    await this._authRepository.updateVerification(verification);
 
     // Fetch and verify user
-    const user = await this.authRepository.findUserByEmail(dto.email);
+    const user = await this._authRepository.findUserByEmail(dto.email);
     if (!user) {
       throw new HttpError("User not found", 404);
     }
 
     if (dto.type === "signup") {
       user.verifyEmail();
-      await this.authRepository.updateUser(user);
+      await this._authRepository.updateUser(user);
       return { user };
     }
 

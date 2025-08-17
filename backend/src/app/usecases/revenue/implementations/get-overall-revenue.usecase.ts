@@ -4,7 +4,7 @@ import { TransactionType } from "../../../../domain/enum/transaction-type.enum";
 import { TransactionStatus } from "../../../../domain/enum/transaction-status.enum";
 
 export class GetOverallRevenueUseCase implements IGetOverallRevenueUseCase {
-  constructor(private readonly revenueRepository: IRevenueRepository) {}
+  constructor(private readonly _revenueRepository: IRevenueRepository) {}
 
   async execute(params: {
     startDate: Date;
@@ -21,21 +21,21 @@ export class GetOverallRevenueUseCase implements IGetOverallRevenueUseCase {
     };
   }> {
     const [totalRevenue, refundedAmount, coursesSold] = await Promise.all([
-      this.revenueRepository.getTransactionAmounts({
+      this._revenueRepository.getTransactionAmounts({
         startDate: params.startDate,
         endDate: params.endDate,
         type: TransactionType.REVENUE,
         status: TransactionStatus.COMPLETED,
         userId: params.userId,
       }),
-      this.revenueRepository.getTransactionAmounts({
+      this._revenueRepository.getTransactionAmounts({
         startDate: params.startDate,
         endDate: params.endDate,
         type: TransactionType.REFUND,
         status: TransactionStatus.COMPLETED,
         userId: params.userId,
       }),
-      this.revenueRepository.getTransactionCounts({
+      this._revenueRepository.getTransactionCounts({
         startDate: params.startDate,
         endDate: params.endDate,
         type: TransactionType.REVENUE,

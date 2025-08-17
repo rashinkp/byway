@@ -2,9 +2,9 @@ import { DeleteNotificationUseCaseInterface } from '../interfaces/delete-notific
 import { NotificationRepositoryInterface } from '../../../repositories/notification-repository.interface';
 
 export class DeleteNotificationUseCase implements DeleteNotificationUseCaseInterface {
-  constructor(private readonly notificationRepository: NotificationRepositoryInterface) {}
+  constructor(private readonly _notificationRepository: NotificationRepositoryInterface) {}
 
   async execute(id: string): Promise<void> {
-    await this.notificationRepository.deleteById(id);
+    await this._notificationRepository.deleteById(id);
   }
 } 

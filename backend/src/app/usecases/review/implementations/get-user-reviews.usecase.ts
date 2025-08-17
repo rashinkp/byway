@@ -5,7 +5,7 @@ import { IGetUserReviewsUseCase } from "../interfaces/get-user-reviews.usecase.i
 
 export class GetUserReviewsUseCase implements IGetUserReviewsUseCase {
   constructor(
-    private readonly courseReviewRepository: ICourseReviewRepository
+    private readonly _courseReviewRepository: ICourseReviewRepository
   ) {}
 
   async execute(
@@ -17,6 +17,6 @@ export class GetUserReviewsUseCase implements IGetUserReviewsUseCase {
     total: number;
     totalPages: number;
   }> {
-    return await this.courseReviewRepository.findByUserId(userId, page, limit);
+    return await this._courseReviewRepository.findByUserId(userId, page, limit);
   }
 }

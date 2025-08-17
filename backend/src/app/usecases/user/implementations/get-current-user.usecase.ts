@@ -7,14 +7,14 @@ import { UserResponseDTO } from "../../../dtos/user.dto";
 
 export class GetCurrentUserUseCase implements IGetCurrentUserUseCase {
   constructor(
-    private userRepository: IUserRepository,
-    private cartRepository: ICartRepository
+    private _userRepository: IUserRepository,
+    private _cartRepository: ICartRepository
   ) {}
 
   async execute(
     userId: string
   ): Promise<{ user: UserResponseDTO; cartCount: number }> {
-    const user = await this.userRepository.findById(userId);
+    const user = await this._userRepository.findById(userId);
     if (!user) {
       throw new HttpError("User not found", 404);
     }
@@ -22,7 +22,7 @@ export class GetCurrentUserUseCase implements IGetCurrentUserUseCase {
     if (user.deletedAt) {
       throw new HttpError("User account is disabled", 401);
     }
-    const cartCount = await this.cartRepository.countByUserId(userId);
+    const cartCount = await this._cartRepository.countByUserId(userId);
     return { user, cartCount };
   }
 }

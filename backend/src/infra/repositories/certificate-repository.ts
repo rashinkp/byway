@@ -7,10 +7,10 @@ import { CertificateStatus } from "../../domain/enum/certificate-status.enum";
 type PrismaJsonValue = string | number | boolean | null | PrismaJsonValue[] | { [key: string]: PrismaJsonValue };
 
 export class PrismaCertificateRepository implements CertificateRepositoryInterface {
-  constructor(private readonly prisma: PrismaClient) {}
+  constructor(private readonly _prisma: PrismaClient) {}
 
   async create(certificate: Certificate): Promise<Certificate> {
-    const created = await this.prisma.certificate.create({
+    const created = await this._prisma.certificate.create({
       data: {
         userId: certificate.userId,
         courseId: certificate.courseId,
@@ -32,7 +32,7 @@ export class PrismaCertificateRepository implements CertificateRepositoryInterfa
   }
 
   async findById(id: string): Promise<Certificate | null> {
-    const found = await this.prisma.certificate.findUnique({ where: { id } });
+    const found = await this._prisma.certificate.findUnique({ where: { id } });
     return found ? Certificate.toDomain({
       ...found,
       metadata: found.metadata as CertificateMetadata | undefined
@@ -42,7 +42,7 @@ export class PrismaCertificateRepository implements CertificateRepositoryInterfa
   async findByCertificateNumber(
     certificateNumber: string
   ): Promise<Certificate | null> {
-    const found = await this.prisma.certificate.findUnique({
+    const found = await this._prisma.certificate.findUnique({
       where: { certificateNumber },
     });
     return found ? Certificate.toDomain({
@@ -52,7 +52,7 @@ export class PrismaCertificateRepository implements CertificateRepositoryInterfa
   }
 
   async findByUserId(userId: string): Promise<Certificate[]> {
-    const found = await this.prisma.certificate.findMany({
+    const found = await this._prisma.certificate.findMany({
       where: { userId },
       orderBy: { createdAt: "desc" },
     });
@@ -63,7 +63,7 @@ export class PrismaCertificateRepository implements CertificateRepositoryInterfa
   }
 
   async findByCourseId(courseId: string): Promise<Certificate[]> {
-    const found = await this.prisma.certificate.findMany({
+    const found = await this._prisma.certificate.findMany({
       where: { courseId },
       orderBy: { createdAt: "desc" },
     });
@@ -77,7 +77,7 @@ export class PrismaCertificateRepository implements CertificateRepositoryInterfa
     userId: string,
     courseId: string
   ): Promise<Certificate | null> {
-    const found = await this.prisma.certificate.findUnique({
+    const found = await this._prisma.certificate.findUnique({
       where: { userId_courseId: { userId, courseId } },
     });
     return found ? Certificate.toDomain({
@@ -87,7 +87,7 @@ export class PrismaCertificateRepository implements CertificateRepositoryInterfa
   }
 
   async update(certificate: Certificate): Promise<Certificate> {
-    const updated = await this.prisma.certificate.update({
+    const updated = await this._prisma.certificate.update({
       where: { id: certificate.id },
       data: {
         status: certificate.status,
@@ -105,7 +105,7 @@ export class PrismaCertificateRepository implements CertificateRepositoryInterfa
   }
 
   async deleteById(id: string): Promise<void> {
-    await this.prisma.certificate.delete({ where: { id } });
+    await this._prisma.certificate.delete({ where: { id } });
   }
 
   async findManyByUserId(options: {
@@ -141,7 +141,7 @@ export class PrismaCertificateRepository implements CertificateRepositoryInterfa
     }
 
     const [items, total] = await Promise.all([
-      this.prisma.certificate.findMany({
+      this._prisma.certificate.findMany({
         where,
         orderBy: { [sortBy]: sortOrder },
         skip,
@@ -160,7 +160,7 @@ export class PrismaCertificateRepository implements CertificateRepositoryInterfa
           },
         },
       }),
-      this.prisma.certificate.count({ where }),
+      this._prisma.certificate.count({ where }),
     ]);
 
     const hasMore = skip + take < total;
@@ -176,7 +176,7 @@ export class PrismaCertificateRepository implements CertificateRepositoryInterfa
 
   async findExpiredCertificates(): Promise<Certificate[]> {
     const now = new Date();
-    const found = await this.prisma.certificate.findMany({
+    const found = await this._prisma.certificate.findMany({
       where: {
         expiresAt: { lt: now },
         status: { not: "EXPIRED" },
@@ -189,7 +189,7 @@ export class PrismaCertificateRepository implements CertificateRepositoryInterfa
   }
 
   async findCertificatesByStatus(status: string): Promise<Certificate[]> {
-    const found = await this.prisma.certificate.findMany({
+    const found = await this._prisma.certificate.findMany({
       where: { status: status as CertificateStatus },
       orderBy: { createdAt: "desc" },
     });

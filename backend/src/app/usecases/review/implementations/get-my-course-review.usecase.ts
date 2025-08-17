@@ -4,14 +4,14 @@ import { IGetMyCourseReviewUseCase } from "../interfaces/get-my-course-review.us
 
 export class GetMyCourseReviewUseCase implements IGetMyCourseReviewUseCase {
   constructor(
-    private readonly courseReviewRepository: ICourseReviewRepository
+    private readonly _courseReviewRepository: ICourseReviewRepository
   ) {}
 
   async execute(
     courseId: string,
     userId: string
   ): Promise<CourseReviewResponseDto | null> {
-    const review = await this.courseReviewRepository.findByUserAndCourse(
+    const review = await this._courseReviewRepository.findByUserAndCourse(
       userId,
       courseId
     );

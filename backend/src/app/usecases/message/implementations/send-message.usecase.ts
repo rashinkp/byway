@@ -5,7 +5,6 @@ import { ChatId } from "../../../../domain/value-object/ChatId";
 import { UserId } from "../../../../domain/value-object/UserId";
 import { MessageContent } from "../../../../domain/value-object/MessageContent";
 import { Message } from "../../../../domain/entities/message.entity";
-import { MessageId } from "../../../../domain/value-object/MessageId";
 import { Timestamp } from "../../../../domain/value-object/Timestamp";
 import { MessageResponseDTO, SendMessageInputDTO } from "../../../dtos/message.dto";
 import { Chat } from "../../../../domain/entities/chat.entity";
@@ -13,8 +12,8 @@ import { MessageType } from "../../../../domain/enum/Message-type.enum";
 
 export class SendMessageUseCase implements ISendMessageUseCase {
   constructor(
-    private readonly chatRepository: IChatRepository,
-    private readonly messageRepository: IMessageRepository
+    private readonly _chatRepository: IChatRepository,
+    private readonly _messageRepository: IMessageRepository
   ) {}
 
   async execute(input: SendMessageInputDTO): Promise<MessageResponseDTO> {
@@ -24,12 +23,12 @@ export class SendMessageUseCase implements ISendMessageUseCase {
     } else if (input.userId) {
       const senderId = new UserId(input.senderId);
       const recipientId = new UserId(input.userId);
-      let chat = await this.chatRepository.getChatBetweenUsers(
+      let chat = await this._chatRepository.getChatBetweenUsers(
         senderId,
         recipientId
       );
       if (!chat) {
-        chat = await this.chatRepository.create(
+        chat = await this._chatRepository.create(
           new Chat(
             senderId,
             recipientId,
@@ -73,17 +72,17 @@ export class SendMessageUseCase implements ISendMessageUseCase {
     );
     
     try {
-      await this.messageRepository.create(message);
+      await this._messageRepository.create(message);
     } catch {
       throw new Error("Failed to create message");
     }
     
     if (chatId && (input.chatId || input.userId)) {
       let chat = input.chatId
-        ? await this.chatRepository.findById(chatId)
+        ? await this._chatRepository.findById(chatId)
         : null;
       if (!chat) {
-        chat = await this.chatRepository.getChatBetweenUsers(
+        chat = await this._chatRepository.getChatBetweenUsers(
           new UserId(input.senderId),
           new UserId(input.userId!)
         );
@@ -96,7 +95,7 @@ export class SendMessageUseCase implements ISendMessageUseCase {
           new Timestamp(new Date()),
           chat.messages
         );
-        await this.chatRepository.save(updatedChat);
+        await this._chatRepository.save(updatedChat);
       }
     }
     
@@ -115,7 +114,7 @@ export class SendMessageUseCase implements ISendMessageUseCase {
         throw new Error("Message ID is required to send a message");
       }
 
-      enrichedMessage = await this.messageRepository.findByIdWithUserData(
+      enrichedMessage = await this._messageRepository.findByIdWithUserData(
         message.id
       );
     } catch {
@@ -140,7 +139,7 @@ export class SendMessageUseCase implements ISendMessageUseCase {
       };
     }
     
-    const chat = await this.chatRepository.findById(chatId);
+    const chat = await this._chatRepository.findById(chatId);
     if (!chat) {
       // Map enriched message to DTO
       return {

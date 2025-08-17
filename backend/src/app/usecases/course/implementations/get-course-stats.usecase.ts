@@ -3,9 +3,9 @@ import { ICourseRepository } from "../../../repositories/course.repository.inter
 import {  CourseOverallStatsDTO, IGetCourseStatsInput } from "../../../dtos/course.dto";
 
 export class GetCourseStatsUseCase implements IGetCourseStatsUseCase {
-  constructor(private readonly courseRepository: ICourseRepository) {}
+  constructor(private readonly _courseRepository: ICourseRepository) {}
 
   async execute(input: IGetCourseStatsInput): Promise<CourseOverallStatsDTO> {
-    return this.courseRepository.getCourseStats(input);
+    return this._courseRepository.getCourseStats(input);
   }
 } 

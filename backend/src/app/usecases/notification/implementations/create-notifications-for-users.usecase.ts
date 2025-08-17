@@ -5,7 +5,7 @@ import { NotificationEventType } from '../../../../domain/enum/notification-even
 import { NotificationEntityType } from '../../../../domain/enum/notification-entity-type.enum';
 
 export class CreateNotificationsForUsersUseCase implements CreateNotificationsForUsersUseCaseInterface {
-  constructor(private notificationRepository: NotificationRepositoryInterface) {}
+  constructor(private _notificationRepository: NotificationRepositoryInterface) {}
 
   async execute(userIds: string[], notificationData: {
     eventType: NotificationEventType;
@@ -21,7 +21,7 @@ export class CreateNotificationsForUsersUseCase implements CreateNotificationsFo
         userId,
         id: crypto.randomUUID(),
       });
-      await this.notificationRepository.create(notification);
+      await this._notificationRepository.create(notification);
     }
   }
 } 
