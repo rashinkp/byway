@@ -30,7 +30,7 @@ export async function createContent(
 		if (
 			apiError.response?.data &&
 			typeof apiError.response.data === "string" &&
-			apiError.response.data.trim().startsWith("<!DOCTYPE html>")
+			(apiError.response.data as string).trim().startsWith("<!DOCTYPE html>")
 		) {
 			console.error(
 				"Received HTML response instead of JSON:",

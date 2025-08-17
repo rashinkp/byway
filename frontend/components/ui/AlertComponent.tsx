@@ -47,7 +47,7 @@ export function AlertComponent<T = unknown>({
     ) {
       return actions[actionIndex]?.confirmationMessage?.(item) || description;
     }
-    if (typeof description === "function") {
+    if (typeof description === "function" && item !== undefined) {
       return description(item);
     }
     return description;

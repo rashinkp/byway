@@ -2,18 +2,23 @@ export interface ChatMessage {
   id: string;
   chatId: string;
   senderId: string;
+  receiverId?: string;
   content?: string;
   imageUrl?: string;
   audioUrl?: string;
   type: 'text' | 'image' | 'audio';
   isRead: boolean;
   createdAt: string;
+  timestamp?: string;
   sender?: {
     id: string;
     name: string;
     role: string;
   };
 }
+
+// Alias for backward compatibility
+export type Message = ChatMessage;
 
 export interface Chat {
   id: string;
@@ -42,6 +47,9 @@ export interface ChatListItem {
   userId?: string;
   isOnline: boolean;
 }
+
+// Alias for backward compatibility
+export type EnhancedChatItem = ChatListItem;
 
 export interface ChatHistoryResponse {
   items: ChatListItem[];

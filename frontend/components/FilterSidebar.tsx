@@ -11,7 +11,7 @@ import {
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Skeleton } from "./ui/skeleton";
 
-interface FilterValues {
+export interface FilterValues {
   search?: string;
   category?: string;
   level?: string;
@@ -53,7 +53,7 @@ export function FilterSidebar({
         ? (value as FilterValues)
         : { ...currentFilters, [key]: value };
     if (onFilterChange) {
-      onFilterChange(updatedFilters);
+      onFilterChange(updatedFilters as FilterValues);
     }
   };
 
@@ -101,7 +101,7 @@ export function FilterSidebar({
                   "createdAt-desc": "Newest First",
                   "createdAt-asc": "Oldest First",
                 };
-                return sortLabels[currentFilters.sort] || "Sort";
+                return sortLabels[currentFilters.sort || ""] || "Sort";
               })()}
               <span className="ml-2">▾</span>
             </button>

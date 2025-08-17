@@ -10,26 +10,27 @@ const compat = new FlatCompat({
 });
 
 const eslintConfig = [
-	...compat.extends("next/core-web-vitals", "next/typescript"),
+  ...compat.extends("next/core-web-vitals", "next/typescript"),
 
-	{
-		files: ["**/*.ts", "**/*.tsx"],
-		rules: {
-			"@typescript-eslint/no-explicit-any": "off",
-			"react/no-unescaped-entities": "off",
-		},
-	},
+  {
+    files: ["**/*.ts", "**/*.tsx"],
+    languageOptions: {
+      parserOptions: {
+        project: "./tsconfig.json",
+        tsconfigRootDir: __dirname,
+      },
+    },
+    rules: {
+      "react/no-unescaped-entities": "off",
+      "@typescript-eslint/no-unused-vars": "error",
+      "@typescript-eslint/no-explicit-any": "warn",
+    },
+  },
 
-	{
-		ignores: [
-			'.next/',
-			'out/',
-			'build/',
-			'dist/'
-		],
-	},
-
-	
+  {
+    ignores: [".next/", "out/", "build/", "dist/"],
+  },
 ];
+
 
 export default eslintConfig;

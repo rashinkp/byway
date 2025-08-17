@@ -1,5 +1,6 @@
 import { api } from "@/api/api";
-import { ApiResponse, ApiError } from "@/types";
+import { ApiResponse } from "@/types/general";
+import { ApiError } from "@/types/error";
 import { CreateWalletTopUpRequest, IWallet, WalletApiResponse, WalletTopUpResponse } from "@/types/wallet.types";
 
 export const getWallet = async (): Promise<WalletApiResponse<IWallet>> => {

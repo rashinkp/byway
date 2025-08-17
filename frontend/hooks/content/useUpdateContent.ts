@@ -2,7 +2,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { UpdateLessonContentInput, LessonContent } from "@/types/content";
 import { updateContentSchema } from "@/lib/validations/content";
 import { updateContent } from "@/api/content";
-import { Lesson } from "@/types/lesson";
+import { ILesson as Lesson } from "@/types/lesson";
 
 export const useUpdateContent = () => {
   const queryClient = useQueryClient();

@@ -21,9 +21,11 @@ const ErrorDisplay: FC<ErrorDisplayProps> = ({
 	compact = false,
 }) => {
 	const errorMessage =
-		error?.message ||
+		(typeof error === "object" && error !== null && "message" in error ? error.message : null) ||
 		(typeof error === "string" ? error : "An unexpected error occurred");
-	const code = statusCode || error?.status || error?.statusCode;
+	const code = statusCode || 
+		(typeof error === "object" && error !== null && "status" in error ? error.status : null) ||
+		(typeof error === "object" && error !== null && "statusCode" in error ? error.statusCode : null);
 	const errorRef = useRef<HTMLDivElement>(null);
 
 	// Focus error for accessibility

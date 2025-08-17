@@ -7,12 +7,6 @@ interface PayPalOptions {
 	intent?: string;
 }
 
-interface PayPalOrderData {
-	orderID: string;
-	paymentID?: string;
-	payerID?: string;
-}
-
 interface PayPalActions {
 	order: {
 		create: (orderData: { purchase_units: Array<{ amount: { value: string; currency_code: string } }> }) => Promise<string>;
@@ -28,10 +22,10 @@ interface UsePayPalPaymentProps {
 interface UsePayPalPaymentReturn {
 	isPaypalLoading: boolean;
 	setIsPaypalLoading: (loading: boolean) => void;
-	createOrder: (data: PayPalOrderData, actions: PayPalActions) => Promise<string>;
-	onApprove: (data: PayPalOrderData, actions: PayPalActions) => Promise<void>;
-	onCancel: (data: PayPalOrderData) => void;
-	onError: (err: { message: string; [key: string]: unknown }) => void;
+	createOrder: (data: Record<string, unknown>, actions: PayPalActions) => Promise<string>;
+	onApprove: (data: Record<string, unknown>, actions: PayPalActions) => Promise<void>;
+	onCancel: (data: Record<string, unknown>) => void;
+	onError: (err: Record<string, unknown>) => void;
 }
 
 export const usePayPalPayment = ({
@@ -41,7 +35,7 @@ export const usePayPalPayment = ({
 	const [isPaypalLoading, setIsPaypalLoading] = useState(false);
 
 	const createOrder = useCallback(
-		async (data: PayPalOrderData, actions: PayPalActions) => {
+		async (data: Record<string, unknown>, actions: PayPalActions) => {
 			if (finalAmount <= 0) {
 				toast.error("Invalid order amount");
 				throw new Error("Invalid order amount");
@@ -61,7 +55,7 @@ export const usePayPalPayment = ({
 		[finalAmount, paypalOptions.currency],
 	);
 
-	const onApprove = useCallback(async (data: PayPalOrderData, actions: PayPalActions) => {
+	const onApprove = useCallback(async (data: Record<string, unknown>, actions: PayPalActions) => {
 		try {
 			console.log("PayPal order approved:", data);
 			const details = await actions.order?.capture();
@@ -74,12 +68,12 @@ export const usePayPalPayment = ({
 		}
 	}, []);
 
-	const onCancel = useCallback((data: PayPalOrderData) => {
+	const onCancel = useCallback((data: Record<string, unknown>) => {
 		console.log("PayPal payment cancelled:", data);
 		toast.info("PayPal payment was cancelled");
 	}, []);
 
-	const onError = useCallback((err: { message: string; [key: string]: unknown }) => {
+	const onError = useCallback((err: Record<string, unknown>) => {
 		console.error("PayPal button error:", err);
 		toast.error("An error occurred with PayPal. Please try again.");
 	}, []);

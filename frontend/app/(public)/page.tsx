@@ -113,7 +113,6 @@ export default function UserDashboard() {
 					<div className="max-w-7xl mx-auto w-full px-0 sm:px-4 md:px-8">
 						<TopCourses 
 							courses={topCourses} 
-							router={router} 
 							isLoading={isCoursesLoading}
 						/>
 					</div>

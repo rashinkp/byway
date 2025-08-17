@@ -1,8 +1,10 @@
 import { api } from "@/api/api";
-import { ApiResponse, ApiError } from "@/types";
+import { ApiResponse } from "@/types/general";
+import { ApiError } from "@/types/error";
 import { User, PublicUser, UserProfileType } from "@/types/user";
 import { IInstructorWithUserDetails } from "@/types/instructor";
 import { useAuthStore } from "@/stores/auth.store";
+import { IPaginatedResponse } from "@/types/general";
 
 export const getAllUsers = async ({
 	page = 1,
@@ -20,7 +22,7 @@ export const getAllUsers = async ({
 	sortOrder?: "asc" | "desc";
 	filterBy?: string;
 	role?: string;
-}): Promise<ApiResponse<{ items: User[]; total: number; totalPages: number }>> => {
+}): Promise<ApiResponse<IPaginatedResponse<User>>> => {
 	try {
 		const params = new URLSearchParams();
 		params.append("page", page.toString());
@@ -32,7 +34,16 @@ export const getAllUsers = async ({
 		if (role) params.append("role", role);
 
 		const response = await api.get(`/user/admin/users?${params.toString()}`);
-		return response.data; // Adjusted to return the full ApiResponse
+		// Transform the response to include page and limit
+		const responseData = response.data.data;
+		return {
+			...response.data,
+			data: {
+				...responseData,
+				page,
+				limit
+			}
+		};
 	} catch (error: unknown) {
 		const apiError = error as ApiError;
 		console.error("Error fetching users:", apiError);

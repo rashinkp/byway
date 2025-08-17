@@ -3,6 +3,7 @@
 import { FileText} from "lucide-react";
 import { ILesson } from "@/types/lesson";
 import { QuizQuestion } from "@/types/content";
+import type { LessonContent } from "@/types/content";
 import { useState } from "react";
 import { IQuizAnswer } from "@/types/progress";
 import ErrorDisplay from "@/components/ErrorDisplay";
@@ -19,14 +20,7 @@ interface LessonWithCompletion extends ILesson {
 
 interface LessonContentProps {
   selectedLesson: LessonWithCompletion;
-  content: {
-    id: string;
-    lessonId: string;
-    type: string;
-    content: string;
-    quizQuestions?: QuizQuestion[];
-    [key: string]: unknown;
-  } | null; 
+  content?: LessonContent | null; 
   isContentLoading: boolean;
   isContentError: boolean;
   contentError: Error | null;
@@ -62,7 +56,7 @@ export function LessonContent({
   };
 
   const handleQuizSubmit = () => {
-    if (!content.quizQuestions) return;
+    if (!content?.quizQuestions) return;
 
     const answers: IQuizAnswer[] = content.quizQuestions.map((question: QuizQuestion) => {
       const selectedAnswer = selectedAnswers[question.id];
@@ -217,7 +211,7 @@ export function LessonContent({
                       )
                     ) : (
                       <Image
-                        src={content.thumbnailUrl || "/api/placeholder/800/600"}
+                        src={(content.thumbnailUrl as string) || "/api/placeholder/800/600"}
                         alt="Document preview"
                         width={800}
                         height={600}
@@ -236,7 +230,7 @@ export function LessonContent({
             {content.type === "QUIZ" && (
               <div className="">
                 <h3 className="text-xl font-semibold text-black dark:text-white mb-4">
-                  Quiz: {content.title}
+                  Quiz: {content.title || "Untitled Quiz"}
                 </h3>
                 {selectedLesson.completed &&
                   selectedLesson.score !== undefined && (
@@ -261,7 +255,7 @@ export function LessonContent({
                     </div>
                   )}
                 <div className="space-y-6">
-                  {content.quizQuestions.map(
+                  {content.quizQuestions?.map(
                     (question: QuizQuestion, index: number) => {
                       return (
                         <div
@@ -370,7 +364,7 @@ export function LessonContent({
               disabled={
                 selectedLesson.completed ||
                 Object.keys(selectedAnswers).length !==
-                  content.quizQuestions.length
+                  (content.quizQuestions?.length || 0)
               }
             >
               {selectedLesson.completed ? "Completed" : "Submit Quiz"}

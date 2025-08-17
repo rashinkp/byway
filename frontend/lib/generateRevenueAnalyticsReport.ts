@@ -6,7 +6,7 @@ import { format } from "date-fns";
 // Extend jsPDF interface to include autoTable properties
 interface jsPDFWithAutoTable extends jsPDF {
 	lastAutoTable?: {
-		finalY: number;
+		finalY?: number;
 	};
 }
 
@@ -56,7 +56,7 @@ export function generateRevenueAnalyticsReport(
     headStyles: { fillColor: [41, 128, 185], textColor: 255 },
     margin: { left: 14, right: 14 },
   });
-  y = doc.lastAutoTable?.finalY + 8 || y + 30;
+  y = (doc.lastAutoTable?.finalY ?? y) + 8;
 
   // Top Courses by Revenue (only if there are courses)
   if (courseData.courses && courseData.courses.length > 0) {
@@ -79,7 +79,7 @@ export function generateRevenueAnalyticsReport(
       headStyles: { fillColor: [41, 128, 185], textColor: 255 },
       margin: { left: 14, right: 14 },
     });
-    y = doc.lastAutoTable?.finalY + 8 || y + 30;
+    y = (doc.lastAutoTable?.finalY ?? y) + 8;
   }
 
   // Latest Revenue Transactions (if available)

@@ -171,6 +171,7 @@ export interface InstructorDashboardResponse {
   topCourses: InstructorCourseStats[];
   recentStudents: InstructorStudentStats[];
   recentEnrollments: RecentEnrollment[];
+  [key: string]: unknown;
 }
 
 export interface InstructorCardData {

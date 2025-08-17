@@ -17,11 +17,11 @@ interface CourseSidebarProps {
   allLessons: LessonWithCompletion[];
   selectedLesson: LessonWithCompletion | null;
   handleLessonSelect: (lesson: LessonWithCompletion) => void;
-  data: {
+  data?: {
     totalPages: number;
     page: number;
     [key: string]: unknown;
-  } | null; // Pagination data
+  } | null; 
   page: number;
   goToPreviousPage: () => void;
   goToNextPage: () => void;

@@ -2,8 +2,8 @@ import { api } from "@/api/api";
 import { ApiError } from "@/types/error";
 import {
 	ILesson,
-	GetLessonsParams,
-	GetLessonsResponse,
+	GetAllLessonsParams as GetLessonsParams,
+	GetAllLessonsResponse as GetLessonsResponse,
 	GetPublicLessonsParams,
 	GetPublicLessonsResponse,
 } from "@/types/lesson";
@@ -15,7 +15,7 @@ export async function getLessons({
 	sortBy = "order",
 	sortOrder = "asc",
 	search = "",
-	filterBy = "All",
+	filterBy = "ALL",
 	includeDeleted = false,
 }: GetLessonsParams): Promise<GetLessonsResponse> {
 	try {

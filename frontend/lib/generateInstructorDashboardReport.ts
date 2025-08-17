@@ -6,7 +6,7 @@ import { format } from "date-fns";
 // Extend jsPDF interface to include autoTable properties
 interface jsPDFWithAutoTable extends jsPDF {
 	lastAutoTable?: {
-		finalY: number;
+		finalY?: number;
 	};
 }
 
@@ -49,7 +49,7 @@ export function generateInstructorDashboardReport(data: InstructorDashboardRespo
     headStyles: { fillColor: [41, 128, 185], textColor: 255 },
     margin: { left: 14, right: 14 },
   });
-  y = doc.lastAutoTable?.finalY + 8 || y + 30;
+  y = (doc.lastAutoTable?.finalY ?? y) + 8;
 
   // Top Courses by Enrollments
   if (data.topCourses && data.topCourses.length > 0) {
@@ -73,7 +73,7 @@ export function generateInstructorDashboardReport(data: InstructorDashboardRespo
       headStyles: { fillColor: [41, 128, 185], textColor: 255 },
       margin: { left: 14, right: 14 },
     });
-    y = doc.lastAutoTable?.finalY + 8 || y + 30;
+    y = (doc.lastAutoTable?.finalY ?? y) + 8;
   }
 
   // Recent Students

@@ -75,7 +75,6 @@ export function useGetAllUsers(params: GetAllUsersParams): UseUsersReturn {
 				page: params.page,
 				limit: params.limit,
 				search: params.search,
-				includeDeleted: shouldIncludeDeleted,
 				sortOrder: adjustedSortOrder,
 				sortBy: adjustedSortBy,
 				filterBy: params.filterBy,

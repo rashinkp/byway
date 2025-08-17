@@ -23,7 +23,7 @@ import {
 } from "@/components/ui/alert-dialog";
 
 interface AdminActionsProps {
-	course: Course;
+	course?: Course;
 	isApproving: boolean;
 	isDeclining: boolean;
 	isTogglingStatus: boolean;
@@ -41,6 +41,9 @@ export default function AdminActions({
 	onDecline,
 	onToggleStatus,
 }: AdminActionsProps) {
+	if (!course) {
+		return null;
+	}
 	return (
 		<div className="rounded-2xl border border-gray-200 dark:border-[#232323] bg-white/80 dark:bg-[#18181b] p-8 shadow-xl space-y-6">
 			{/* Course Status Section */}

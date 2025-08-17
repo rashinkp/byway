@@ -1,16 +1,42 @@
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
-import { AdminDashboardResponse } from "@/types/analytics";
+
+// Type for the actual data structure being used
+interface AdminDashboardData {
+  stats: {
+    totalUsers: number;
+    totalCourses: number;
+    totalInstructors: number;
+    totalRevenue: number;
+    activeUsers: number;
+    pendingApprovals: number;
+  };
+  topInstructors: Array<{
+    instructorName: string;
+    email: string;
+    courseCount: number;
+    totalEnrollments: number;
+    totalRevenue: number;
+    averageRating: number;
+  }>;
+  recentActivity: Array<{
+    type: string;
+    description: string;
+    userName?: string;
+    createdAt: string;
+    status: string;
+  }>;
+}
 import { format } from "date-fns";
 
 // Extend jsPDF interface to include autoTable properties
 interface jsPDFWithAutoTable extends jsPDF {
 	lastAutoTable?: {
-		finalY: number;
+		finalY?: number;
 	};
 }
 
-export function generateAdminDashboardReport(data: AdminDashboardResponse) {
+export function generateAdminDashboardReport(data: AdminDashboardData) {
   const doc = new jsPDF({ orientation: "landscape" }) as jsPDFWithAutoTable;
   let y = 20;
 
@@ -49,7 +75,7 @@ export function generateAdminDashboardReport(data: AdminDashboardResponse) {
     headStyles: { fillColor: [41, 128, 185], textColor: 255 },
     margin: { left: 14, right: 14 },
   });
-  y = doc.lastAutoTable?.finalY + 8 || y + 30;
+  y = (doc.lastAutoTable?.finalY ?? y) + 8;
 
   // Top Instructors by Performance
   if (data.topInstructors && data.topInstructors.length > 0) {
@@ -60,20 +86,20 @@ export function generateAdminDashboardReport(data: AdminDashboardResponse) {
     autoTable(doc, {
       startY: y + 3,
       head: [["#", "Instructor", "Email", "Courses", "Students", "Revenue", "Rating"]],
-      body: data.topInstructors.map((i, index) => [
+      body: data.topInstructors.map((instructor, index: number) => [
         index + 1,
-        i.instructorName,
-        i.email,
-        i.courseCount,
-        i.totalEnrollments,
-        `$${i.totalRevenue.toFixed(2)}`,
-        i.averageRating.toFixed(2)
+        instructor.instructorName,
+        instructor.email,
+        instructor.courseCount,
+        instructor.totalEnrollments,
+        `$${instructor.totalRevenue.toFixed(2)}`,
+        instructor.averageRating.toFixed(2)
       ]),
       styles: { fontSize: 10 },
       headStyles: { fillColor: [41, 128, 185], textColor: 255 },
       margin: { left: 14, right: 14 },
     });
-    y = doc.lastAutoTable?.finalY + 8 || y + 30;
+    y = (doc.lastAutoTable?.finalY ?? y) + 8;
   }
 
   // Recent Platform Activity

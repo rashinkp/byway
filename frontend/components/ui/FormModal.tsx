@@ -107,7 +107,7 @@ export function FormModal<T extends z.ZodType>({
 	);
 
 	const form = useForm<z.infer<T>>({
-		resolver: zodResolver(schema),
+		resolver: zodResolver(schema as z.ZodSchema<z.infer<T>>),
 		defaultValues: initialData
 			? { ...defaultValues, ...initialData }
 			: defaultValues,

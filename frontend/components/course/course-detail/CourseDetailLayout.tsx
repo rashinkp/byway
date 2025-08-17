@@ -28,6 +28,9 @@ export default function CourseDetailLayout({
 	const isAdmin = userRole === 'ADMIN';
 	const { data: lessonContent, isLoading: isContentLoading, error: contentError } = useGetContentByLessonId(openLessonContentId || "");
 
+	// Default no-op functions for AdminActions
+	const noOp: () => void = () => {};
+
 	if (error) {
 		return (
 			<ErrorDisplay
@@ -92,7 +95,15 @@ export default function CourseDetailLayout({
 										sidebarProps.adminActions ? (
 											sidebarProps.adminActions
 										) : (
-											<AdminActions course={course} {...(sidebarProps.adminActionsProps || {})} />
+											<AdminActions 
+												course={course} 
+												isApproving={Boolean(sidebarProps.adminActionsProps?.isApproving)}
+												isDeclining={Boolean(sidebarProps.adminActionsProps?.isDeclining)}
+												isTogglingStatus={Boolean(sidebarProps.adminActionsProps?.isTogglingStatus)}
+												onApprove={(sidebarProps.adminActionsProps?.onApprove || noOp) as () => void}
+												onDecline={(sidebarProps.adminActionsProps?.onDecline || noOp) as () => void}
+												onToggleStatus={(sidebarProps.adminActionsProps?.onToggleStatus || noOp) as () => void}	
+											/>
 										)
 									) : sidebarProps.isEnrolled ? (
 										<Button variant={'primary'} className="px-6 py-2" onClick={() => window.location.href = `/user/my-courses/${course?.id}`}>Learn Now</Button>
@@ -126,7 +137,7 @@ export default function CourseDetailLayout({
 					<div className="w-14 h-14 rounded-full overflow-hidden bg-[#f9fafb] dark:bg-[#18181b] border border-gray-200">
 						{instructor && (instructor as { avatar?: string }).avatar ? (
 							<Image
-								src={(instructor as { avatar?: string }).avatar}
+								src={(instructor as { avatar?: string }).avatar || ""}
 								alt={instructor.name}
 								width={56}
 								height={56}

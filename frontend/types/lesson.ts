@@ -18,6 +18,9 @@ export interface ILesson {
 	deletedAt?: string | null;
 }
 
+// Alias for backward compatibility
+export type Lesson = ILesson;
+
 export interface GetAllLessonsParams {
 	courseId: string;
 	page?: number;
@@ -35,7 +38,12 @@ export interface GetAllLessonsResponse {
 	page: number;
 	limit: number;
 	totalPages: number;
+	[key: string]: unknown;
 }
+
+// Aliases for backward compatibility
+export type GetLessonsParams = GetAllLessonsParams;
+export type GetLessonsResponse = GetAllLessonsResponse;
 
 export interface ICreateLessonInput {
 	courseId: string;

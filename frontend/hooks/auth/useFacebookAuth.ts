@@ -4,18 +4,6 @@ import { useRoleRedirect } from "../useRoleRedirects";
 import { useAuthStore } from "@/stores/auth.store";
 import { clearAllCache } from "@/lib/utils";
 
-declare global {
-	interface Window {
-		fbAsyncInit?: () => void;
-		FB: {
-			init: (config: { appId: string; cookie: boolean; xfbml: boolean; version: string }) => void;
-			login: (callback: (response: { authResponse?: AuthResponse }) => void, options: { scope: string }) => void;
-			getLoginStatus: (callback: (response: { status: string; authResponse?: AuthResponse }) => void) => void;
-			api: (path: string, callback: (response: FacebookUserData) => void) => void;
-		};
-	}
-}
-
 interface FacebookUserData {
 	id: string;
 	name: string;
@@ -56,7 +44,7 @@ export function useFacebookAuth(): UseFacebookAuthResult {
 	useEffect(() => {
 		window.fbAsyncInit = () => {
 			window.FB.init({
-				appId: process.env.NEXT_PUBLIC_FACEBOOK_APP_ID,
+				appId: process.env.NEXT_PUBLIC_FACEBOOK_APP_ID || "",
 				cookie: true,
 				xfbml: true,
 				version: "v21.0",
@@ -89,7 +77,7 @@ export function useFacebookAuth(): UseFacebookAuthResult {
 			const loginResponse = await new Promise<AuthResponse>(
 				(resolve, reject) => {
 					window.FB.login(
-						(response: { authResponse: AuthResponse | undefined }) => {
+						(response: { authResponse?: AuthResponse | undefined }) => {
 							if (response.authResponse) {
 								resolve(response.authResponse);
 							} else {
@@ -114,7 +102,7 @@ export function useFacebookAuth(): UseFacebookAuthResult {
 							} else {
 								reject(new Error("Failed to fetch user data"));
 							}
-						},
+						}
 					);
 				},
 			);

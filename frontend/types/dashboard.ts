@@ -56,6 +56,14 @@ export interface DashboardResponse {
 	stats: DashboardStats;
 	topEnrolledCourses: TopEnrolledCourse[];
 	topInstructors: TopInstructor[];
+	recentActivity: Array<{
+		type: string;
+		description: string;
+		userName?: string;
+		createdAt: string;
+		status: string;
+	}>;
+	[key: string]: unknown;
 }
 
 

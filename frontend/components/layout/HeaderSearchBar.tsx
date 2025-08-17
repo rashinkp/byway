@@ -7,7 +7,7 @@ import Image from "next/image";
 import { User } from "@/types/user";
 
 interface HeaderSearchBarProps {
-	user: User;
+	user: User | null;
 	searchQuery: string;
 	setSearchQuery: (q: string) => void;
 	showSearchResults: boolean;

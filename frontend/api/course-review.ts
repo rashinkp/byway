@@ -8,6 +8,7 @@ import {
 	CourseReviewApiResponse,
 	CourseReviewStats,
 	GetUserReviewsResponse,
+	DisableReviewResponse,
 } from "@/types/course-review";
 
 export async function createCourseReview(
@@ -126,6 +127,21 @@ export async function getUserReviews(
 		console.error("Failed to fetch user reviews:", apiError);
 		throw new Error(
 			apiError.response?.data?.message || "Failed to fetch user reviews",
+		);
+	}
+}
+
+export async function disableReview(reviewId: string): Promise<DisableReviewResponse> {
+	try {
+		const response = await api.patch<{ data: DisableReviewResponse }>(
+			`/reviews/${reviewId}/disable`,
+		);
+		return response.data.data;
+	} catch (error: unknown) {
+		const apiError = error as ApiError;
+		console.error("Failed to disable review:", apiError);
+		throw new Error(
+			apiError.response?.data?.message || "Failed to disable review",
 		);
 	}
 }

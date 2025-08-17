@@ -21,7 +21,7 @@ interface InstructorCreationResponse {
 		id: string;
 		name: string;
 		email: string;
-		role: string;
+		role: "USER" | "INSTRUCTOR" | "ADMIN";
 		avatar?: string;
 	};
 }

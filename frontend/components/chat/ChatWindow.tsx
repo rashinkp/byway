@@ -66,7 +66,7 @@ export const ChatWindow = forwardRef<{ scrollToBottom: () => void }, ChatWindowP
   const groupedMessages: { date: string; messages: Message[] }[] = [];
   if (Array.isArray(messages)) {
     messages.forEach((msg) => {
-      const dateLabel = getDateLabel(msg.timestamp);
+      const dateLabel = getDateLabel(msg.createdAt);
       if (
         !groupedMessages.length ||
         groupedMessages[groupedMessages.length - 1].date !== dateLabel
@@ -197,7 +197,10 @@ export const ChatWindow = forwardRef<{ scrollToBottom: () => void }, ChatWindowP
               {group.messages.map((msg) => (
                 <MessageComponent
                   key={msg.id}
-                  message={msg}
+                  message={{
+                    ...msg,
+                    timestamp: msg.timestamp || msg.createdAt
+                  }}
                   currentUserId={currentUserId}
                   chat={chat}
                   onDelete={

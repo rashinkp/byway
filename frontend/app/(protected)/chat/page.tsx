@@ -41,7 +41,7 @@ export default function ChatPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [isMobile, setIsMobile] = useState(false);
   const [isSocketConnected, setIsSocketConnected] = useState(socket.connected);
-  const chatWindowRef = useRef<HTMLDivElement | null>(null);
+  const chatWindowRef = useRef<{ scrollToBottom: () => void } | null>(null);
 
   // Track previous chatId for leave logic
   const previousChatIdRef = React.useRef<string | null>(null);
@@ -190,7 +190,7 @@ export default function ChatPage() {
           audioUrl: pendingAudioUrl || undefined,
         },
         () => {
-          getMessagesByChat({ chatId: selectedChat.chatId }, (result: ChatMessage[]) => {
+          getMessagesByChat({ chatId: selectedChat.chatId! }, (result: ChatMessage[]) => {
             const msgs = result;
             // Backend now returns ASC order (oldest first), which matches display expectations
             setMessages(Array.isArray(msgs) ? msgs : []);
@@ -251,7 +251,7 @@ export default function ChatPage() {
 
             // Then refresh messages from server
             getMessagesByChat(
-              { chatId: selectedChat.chatId },
+              { chatId: selectedChat.chatId! },
               (result: ChatMessage[]) => {
                 const msgs = result;
                 setMessages(Array.isArray(msgs) ? msgs : []);
@@ -424,7 +424,7 @@ export default function ChatPage() {
   useEffect(() => {
     if (isMobile && selectedChat && chatWindowRef.current && chatWindowRef.current.scrollToBottom) {
       setTimeout(() => {
-        chatWindowRef.current.scrollToBottom();
+        chatWindowRef.current?.scrollToBottom();
       }, 100); // slight delay to ensure messages are rendered
     }
   }, [selectedChat, isMobile]);
