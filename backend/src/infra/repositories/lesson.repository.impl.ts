@@ -16,7 +16,6 @@ import { ILessonRepository } from "../../app/repositories/lesson.repository";
 import { Lesson } from "../../domain/entities/lesson.entity";
 import {
   LessonContent,
-  QuizQuestion,
 } from "../../domain/entities/content.entity";
 
 // Type definitions for lesson data
