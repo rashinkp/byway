@@ -9,9 +9,9 @@ import {
 export class GetTopEnrolledCoursesUseCase
   implements IGetTopEnrolledCoursesUseCase
 {
-  constructor(private readonly courseRepository: ICourseRepository) {}
+  constructor(private readonly _courseRepository: ICourseRepository) {}
 
   async execute(input: IGetTopEnrolledCoursesInput): Promise<CourseStatsDTO[]> {
-    return this.courseRepository.getTopEnrolledCourses(input);
+    return this._courseRepository.getTopEnrolledCourses(input);
   }
 }

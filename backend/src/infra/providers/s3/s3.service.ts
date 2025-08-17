@@ -8,16 +8,16 @@ import { S3ServiceInterface } from "../../../app/providers/s3.service.interface"
 import { awsConfig } from "../../../infra/config/aws.config";
 
 export class S3Service implements S3ServiceInterface {
-  private readonly s3Client: S3Client;
-  private readonly bucketName: string;
-  private readonly urlExpirationTime = 3600; // 1 hour in seconds
+  private readonly _s3Client: S3Client;
+  private readonly _bucketName: string;
+  private readonly _urlExpirationTime = 3600; // 1 hour in seconds
 
   constructor() {
     if (!awsConfig.bucketName) {
       throw new Error("AWS bucket name is required");
     }
-    this.bucketName = awsConfig.bucketName;
-    this.s3Client = new S3Client({
+    this._bucketName = awsConfig.bucketName;
+    this._s3Client = new S3Client({
       region: awsConfig.region,
       credentials: awsConfig.credentials,
     });
@@ -40,16 +40,16 @@ export class S3Service implements S3ServiceInterface {
     const key = this.generateS3Key(fileName, uploadType, metadata);
 
     const command = new PutObjectCommand({
-      Bucket: this.bucketName,
+      Bucket: this._bucketName,
       Key: key,
       ContentType: fileType,
     });
 
-    const uploadUrl = await getSignedUrl(this.s3Client, command, {
-      expiresIn: this.urlExpirationTime,
+    const uploadUrl = await getSignedUrl(this._s3Client, command, {
+      expiresIn: this._urlExpirationTime,
     });
 
-    const fileUrl = `https://${this.bucketName}.s3.${awsConfig.region}.amazonaws.com/${key}`;
+    const fileUrl = `https://${this._bucketName}.s3.${awsConfig.region}.amazonaws.com/${key}`;
 
     return {
       uploadUrl,
@@ -74,7 +74,7 @@ export class S3Service implements S3ServiceInterface {
       const key = this.generateS3Key(fileName, uploadType, metadata);
 
       const command = new PutObjectCommand({
-        Bucket: this.bucketName,
+        Bucket: this._bucketName,
         Key: key,
         Body: fileBuffer,
         ContentType: fileType,
@@ -82,10 +82,10 @@ export class S3Service implements S3ServiceInterface {
         CacheControl: "public, max-age=31536000", // 1 year cache
       });
 
-      await this.s3Client.send(command);
+      await this._s3Client.send(command);
 
       // Return the public URL
-      const fileUrl = `https://${this.bucketName}.s3.${awsConfig.region}.amazonaws.com/${key}`;
+      const fileUrl = `https://${this._bucketName}.s3.${awsConfig.region}.amazonaws.com/${key}`;
       return fileUrl;
     } catch (error) {
       console.error("Error uploading file to S3:", error);
@@ -158,10 +158,10 @@ export class S3Service implements S3ServiceInterface {
         ? url.pathname.slice(1)
         : url.pathname;
       const command = new DeleteObjectCommand({
-        Bucket: this.bucketName,
+        Bucket: this._bucketName,
         Key: key,
       });
-      await this.s3Client.send(command);
+      await this._s3Client.send(command);
     } catch (error) {
       console.error("Failed to delete file from S3:", error);
       throw new Error("Failed to delete file from S3");

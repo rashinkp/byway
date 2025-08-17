@@ -11,9 +11,9 @@ import { ICourseRepository } from "../../../repositories/course.repository.inter
 
 export class CreateLessonContentUseCase implements ICreateLessonContentUseCase {
   constructor(
-    private readonly contentRepository: ILessonContentRepository,
-    private readonly lessonRepository: ILessonRepository,
-    private readonly courseRepository: ICourseRepository
+    private readonly _contentRepository: ILessonContentRepository,
+    private readonly _lessonRepository: ILessonRepository,
+    private readonly _courseRepository: ICourseRepository
   ) {}
 
   async execute(
@@ -21,13 +21,13 @@ export class CreateLessonContentUseCase implements ICreateLessonContentUseCase {
   ): Promise<ILessonContentOutputDTO> {
     try {
       // Get the lesson to find the course ID
-      const lesson = await this.lessonRepository.findById(dto.lessonId);
+      const lesson = await this._lessonRepository.findById(dto.lessonId);
       if (!lesson) {
         throw new HttpError("Lesson not found", 404);
       }
 
       // Get the course to verify instructor
-      const course = await this.courseRepository.findById(lesson.courseId);
+      const course = await this._courseRepository.findById(lesson.courseId);
       if (!course) {
         throw new HttpError("Course not found", 404);
       }
@@ -41,7 +41,7 @@ export class CreateLessonContentUseCase implements ICreateLessonContentUseCase {
       }
 
       const content = LessonContent.create(dto);
-      const createdContent = await this.contentRepository.create(content);
+      const createdContent = await this._contentRepository.create(content);
       return createdContent.toJSON() as unknown as ILessonContentOutputDTO;
     } catch (error) {
       if (error instanceof HttpError) {

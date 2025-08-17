@@ -3,15 +3,14 @@ import { Chat } from "../../domain/entities/chat.entity";
 import { ChatId } from "../../domain/value-object/ChatId";
 import { UserId } from "../../domain/value-object/UserId";
 import { Timestamp } from "../../domain/value-object/Timestamp";
-
 import { PrismaClient } from "@prisma/client";
 import { Role } from "../../domain/enum/role.enum";
 
-const prisma = new PrismaClient();
-
 export class ChatRepository implements IChatRepository {
+  constructor(private _prisma: PrismaClient) { }
+  
   async findById(id: ChatId): Promise<Chat | null> {
-    const chat = await prisma.chat.findUnique({
+    const chat = await this._prisma.chat.findUnique({
       where: { id: id.value },
       include: { messages: true },
     });
@@ -20,7 +19,7 @@ export class ChatRepository implements IChatRepository {
   }
 
   async findByUser(userId: UserId): Promise<Chat[]> {
-    const chats = await prisma.chat.findMany({
+    const chats = await this._prisma.chat.findMany({
       where: {
         OR: [{ user1Id: userId.value }, { user2Id: userId.value }],
       },
@@ -49,7 +48,7 @@ export class ChatRepository implements IChatRepository {
       const roleSearch = roleMap[normalizedSearch] || undefined;
 
       // Find chats where the other user's name or role matches
-      const nameOrRoleMatchChats = await prisma.chat.findMany({
+      const nameOrRoleMatchChats = await this._prisma.chat.findMany({
         where: {
           OR: [
             {
@@ -106,7 +105,7 @@ export class ChatRepository implements IChatRepository {
       const nameOrRoleMatchIds = new Set(
         nameOrRoleMatchChats.map((chat) => chat.id)
       );
-      const messageMatchChats = await prisma.chat.findMany({
+      const messageMatchChats = await this._prisma.chat.findMany({
         where: {
           OR: [{ user1Id: userId.value }, { user2Id: userId.value }],
           messages: {
@@ -145,7 +144,7 @@ export class ChatRepository implements IChatRepository {
             : undefined;
           const lastMessage = chat.messages && chat.messages[0];
           // Count unread messages for this user in this chat
-          const unreadCount = await prisma.message.count({
+          const unreadCount = await this._prisma.message.count({
             where: {
               chatId: chat.id,
               senderId: { not: userId.value },
@@ -181,7 +180,7 @@ export class ChatRepository implements IChatRepository {
       );
     } else {
       // Default: get user's existing chats with latest messages
-      const existingChats = await prisma.chat.findMany({
+      const existingChats = await this._prisma.chat.findMany({
         where: {
           OR: [{ user1Id: userId.value }, { user2Id: userId.value }],
         },
@@ -227,7 +226,7 @@ export class ChatRepository implements IChatRepository {
             : undefined;
           const lastMessage = chat.messages && chat.messages[0];
           // Count unread messages for this user in this chat
-          const unreadCount = await prisma.message.count({
+          const unreadCount = await this._prisma.message.count({
             where: {
               chatId: chat.id,
               senderId: { not: userId.value },
@@ -269,7 +268,9 @@ export class ChatRepository implements IChatRepository {
       const remainingSlots = limit - chatItems.length;
       const existingUserIds = new Set([
         userId.value,
-        ...chatItems.map((chat) => chat.userId).filter((id): id is string => id !== undefined),
+        ...chatItems
+          .map((chat) => chat.userId)
+          .filter((id): id is string => id !== undefined),
       ]);
       // Build user where clause for search
       const userWhere: Record<string, unknown> = {
@@ -289,7 +290,7 @@ export class ChatRepository implements IChatRepository {
           ...(roleSearch ? [{ role: roleSearch as Role }] : []),
         ];
       }
-      const otherUsers = await prisma.user.findMany({
+      const otherUsers = await this._prisma.user.findMany({
         where: userWhere,
         select: {
           id: true,
@@ -317,13 +318,13 @@ export class ChatRepository implements IChatRepository {
     }
 
     // Get total count for pagination
-    const totalChats = await prisma.chat.count({
+    const totalChats = await this._prisma.chat.count({
       where: {
         OR: [{ user1Id: userId.value }, { user2Id: userId.value }],
       },
     });
 
-    const totalUsers = await prisma.user.count({
+    const totalUsers = await this._prisma.user.count({
       where: {
         id: { not: userId.value },
         deletedAt: null,
@@ -347,7 +348,7 @@ export class ChatRepository implements IChatRepository {
       chat.user1Id.value,
       chat.user2Id.value
     );
-    const created = await prisma.chat.create({
+    const created = await this._prisma.chat.create({
       data: {
         user1Id: chat.user1Id.value,
         user2Id: chat.user2Id.value,
@@ -360,7 +361,7 @@ export class ChatRepository implements IChatRepository {
   }
 
   async save(chat: Chat): Promise<void> {
-    await prisma.chat.update({
+    await this._prisma.chat.update({
       where: { id: chat?.id?.value },
       data: {
         updatedAt: chat.updatedAt?.toString(),
@@ -377,7 +378,7 @@ export class ChatRepository implements IChatRepository {
       user1Id.value,
       user2Id.value
     );
-    const chat = await prisma.chat.findFirst({
+    const chat = await this._prisma.chat.findFirst({
       where: {
         OR: [
           { user1Id: user1Id.value, user2Id: user2Id.value },
@@ -386,21 +387,21 @@ export class ChatRepository implements IChatRepository {
       },
       include: { messages: true },
     });
-    
+
     return chat ? this.toDomain(chat) : null;
   }
 
-  private toDomain(prismaChat: { 
-    user1Id: string; 
-    user2Id: string; 
-    createdAt: Date; 
-    updatedAt: Date; 
+  private toDomain(prismaChat: {
+    user1Id: string;
+    user2Id: string;
+    createdAt: Date;
+    updatedAt: Date;
   }): Chat {
     return new Chat(
       new UserId(prismaChat.user1Id),
       new UserId(prismaChat.user2Id),
       new Timestamp(prismaChat.createdAt),
-      new Timestamp(prismaChat.updatedAt),
+      new Timestamp(prismaChat.updatedAt)
     );
   }
 

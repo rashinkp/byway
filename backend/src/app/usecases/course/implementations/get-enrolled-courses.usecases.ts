@@ -11,37 +11,37 @@ import { IGetEnrolledCoursesUseCase } from "../interfaces/get-enrolled-courses.u
 
 export class GetEnrolledCoursesUseCase implements IGetEnrolledCoursesUseCase {
   constructor(
-    private courseRepository: ICourseRepository,
-    private userRepository: IUserRepository,
-    private courseReviewRepository: ICourseReviewRepository,
-    private lessonRepository: ILessonRepository
+    private _courseRepository: ICourseRepository,
+    private _userRepository: IUserRepository,
+    private _courseReviewRepository: ICourseReviewRepository,
+    private _lessonRepository: ILessonRepository
   ) {}
 
   async execute(
     input: IGetEnrolledCoursesInputDTO
   ): Promise<ICourseListResponseDTO> {
-    const user = await this.userRepository.findById(input.userId);
+    const user = await this._userRepository.findById(input.userId);
     if (!user) {
       throw new HttpError("User not found", 404);
     }
 
     try {
-      const result = await this.courseRepository.findEnrolledCourses(input);
+      const result = await this._courseRepository.findEnrolledCourses(input);
 
       // Enhance courses with additional data
       const enhancedCourses = await Promise.all(
         result.items.map(async (course) => {
           // Get instructor details
-          const instructor = await this.userRepository.findById(
+          const instructor = await this._userRepository.findById(
             course.createdBy
           );
 
           // Get review stats
           const reviewStats =
-            await this.courseReviewRepository.getCourseReviewStats(course.id);
+            await this._courseReviewRepository.getCourseReviewStats(course.id);
 
           // Get lesson count
-          const lessons = await this.lessonRepository.findByCourseId(course.id);
+          const lessons = await this._lessonRepository.findByCourseId(course.id);
           const lessonCount = lessons.length;
 
           return {

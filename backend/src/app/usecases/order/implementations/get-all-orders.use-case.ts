@@ -3,7 +3,7 @@ import { IGetAllOrdersUseCase } from "../interfaces/get-all-orders.usecase.inter
 import { OrdersResponseDto, OrderDto, GetAllOrdersDto } from "../../../dtos/order.dto";
 
 export class GetAllOrdersUseCase implements IGetAllOrdersUseCase {
-  constructor(private orderRepository: IOrderRepository) {}
+  constructor(private _orderRepository: IOrderRepository) {}
 
   async execute(userId: string, filters: GetAllOrdersDto): Promise<OrdersResponseDto> {
     try {
@@ -43,10 +43,10 @@ export class GetAllOrdersUseCase implements IGetAllOrdersUseCase {
       }
 
       // Get total count for pagination
-      const total = await this.orderRepository.count(where);
+      const total = await this._orderRepository.count(where);
 
       // Get paginated orders
-      const orders = await this.orderRepository.findMany({
+      const orders = await this._orderRepository.findMany({
         where,
         skip,
         take: limit,

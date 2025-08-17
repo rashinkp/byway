@@ -6,7 +6,7 @@ export class GetUserNotificationsUseCase
   implements GetUserNotificationsUseCaseInterface
 {
   constructor(
-    private readonly notificationRepository: NotificationRepositoryInterface
+    private readonly _notificationRepository: NotificationRepositoryInterface
   ) {}
 
   async execute(options: {
@@ -18,7 +18,7 @@ export class GetUserNotificationsUseCase
     eventType?: string;
     search?: string;
   }): Promise<PaginatedNotificationListDTO> {
-    const result = await this.notificationRepository.findManyByUserId(options);
+    const result = await this._notificationRepository.findManyByUserId(options);
     return {
       items: result.items.map((n) => ({
         id: n.id,

@@ -10,13 +10,13 @@ import { UserResponseDTO } from "../../../dtos/user.dto";
 
 export class RegisterUseCase implements IRegisterUseCase {
   constructor(
-    private authRepository: IAuthRepository,
-    private otpProvider: IOtpProvider,
-    private passwordHasher: IPasswordHasher
+    private _authRepository: IAuthRepository,
+    private _otpProvider: IOtpProvider,
+    private _passwordHasher: IPasswordHasher
   ) {}
 
   async execute(dto: RegisterDto): Promise<UserResponseDTO> {
-    let user = await this.authRepository.findUserByEmail(dto.email);
+    let user = await this._authRepository.findUserByEmail(dto.email);
 
     try {
       if (user && user.isVerified) {
@@ -27,7 +27,7 @@ export class RegisterUseCase implements IRegisterUseCase {
         throw new HttpError("Password is required", 400);
       }
 
-      const hashedPassword = await this.passwordHasher.hash(dto.password);
+      const hashedPassword = await this._passwordHasher.hash(dto.password);
 
       if (!user) {
         // Create new user
@@ -38,17 +38,17 @@ export class RegisterUseCase implements IRegisterUseCase {
           role: dto.role,
           authProvider: AuthProvider.EMAIL_PASSWORD,
         });
-        user = await this.authRepository.createUser(user);
+        user = await this._authRepository.createUser(user);
       } else {
         // Update existing unverified user
         user = User.update(user, {
           name: dto.name,
           password: hashedPassword,
         });
-        user = await this.authRepository.updateUser(user);
+        user = await this._authRepository.updateUser(user);
       }
 
-      await this.otpProvider.generateOtp(user.email, user.id);
+      await this._otpProvider.generateOtp(user.email, user.id);
 
       return user;
     } catch (error) {

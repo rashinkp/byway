@@ -11,9 +11,9 @@ import { UserDTO } from "../../../dtos/general.dto";
 
 export class DeclineInstructorUseCase implements IDeclineInstructorUseCase {
   constructor(
-    private instructorRepository: IInstructorRepository,
-    private userRepository: IUserRepository,
-    private createNotificationsForUsersUseCase: CreateNotificationsForUsersUseCase
+    private _instructorRepository: IInstructorRepository,
+    private _userRepository: IUserRepository,
+    private _createNotificationsForUsersUseCase: CreateNotificationsForUsersUseCase
   ) {}
 
   async execute(
@@ -24,7 +24,7 @@ export class DeclineInstructorUseCase implements IDeclineInstructorUseCase {
       throw new HttpError("Unauthorized: Admin access required", 403);
     }
 
-    const instructor = await this.instructorRepository.findInstructorById(
+    const instructor = await this._instructorRepository.findInstructorById(
       dto.instructorId
     );
     if (!instructor) {
@@ -32,15 +32,15 @@ export class DeclineInstructorUseCase implements IDeclineInstructorUseCase {
     }
 
     instructor.decline();
-    const updatedInstructor = await this.instructorRepository.updateInstructor(
+    const updatedInstructor = await this._instructorRepository.updateInstructor(
       instructor
     );
 
     // Get user details for notification
-    const user = await this.userRepository.findById(instructor.userId);
+    const user = await this._userRepository.findById(instructor.userId);
     if (user) {
       // Send notification to the instructor about decline
-      await this.createNotificationsForUsersUseCase.execute(
+      await this._createNotificationsForUsersUseCase.execute(
         [instructor.userId],
         {
           eventType: NotificationEventType.INSTRUCTOR_DECLINED,

@@ -6,13 +6,13 @@ import { ILessonContentOutputDTO } from "../../../dtos/lesson.dto";
 
 export class DeleteLessonContentUseCase implements IDeleteLessonContentUseCase {
   constructor(
-    private readonly contentRepository: ILessonContentRepository,
-    private readonly s3Service: S3ServiceInterface
+    private readonly _contentRepository: ILessonContentRepository,
+    private readonly _s3Service: S3ServiceInterface
   ) {}
 
   async execute(id: string): Promise<void> {
     try {
-      const content = await this.contentRepository.findById(id);
+      const content = await this._contentRepository.findById(id);
       if (!content) {
         throw new HttpError("Content not found", 404);
       }
@@ -23,7 +23,7 @@ export class DeleteLessonContentUseCase implements IDeleteLessonContentUseCase {
       // Delete main file if it exists
       if (contentData.fileUrl) {
         try {
-          await this.s3Service.deleteFile(contentData.fileUrl);
+          await this._s3Service.deleteFile(contentData.fileUrl);
         } catch (error) {
           console.error("Failed to delete main file from S3:", error);
           // Continue with deletion even if S3 deletion fails
@@ -33,7 +33,7 @@ export class DeleteLessonContentUseCase implements IDeleteLessonContentUseCase {
       // Delete thumbnail if it exists
       if (contentData.thumbnailUrl) {
         try {
-          await this.s3Service.deleteFile(contentData.thumbnailUrl);
+          await this._s3Service.deleteFile(contentData.thumbnailUrl);
         } catch (error) {
           console.error("Failed to delete thumbnail from S3:", error);
           // Continue with deletion even if S3 deletion fails
@@ -41,7 +41,7 @@ export class DeleteLessonContentUseCase implements IDeleteLessonContentUseCase {
       }
 
       // Delete from database
-      await this.contentRepository.delete(id);
+      await this._contentRepository.delete(id);
     } catch (error) {
       if (error instanceof Error) {
         throw new HttpError(

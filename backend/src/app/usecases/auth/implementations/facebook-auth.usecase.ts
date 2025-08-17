@@ -8,7 +8,7 @@ import { IUpdateUserRequestDTO, UserResponseDTO } from "../../../dtos/user.dto";
 import { FacebookAuthDto } from "../../../dtos/auth.dto";
 
 export class FacebookAuthUseCase implements IFacebookAuthUseCase {
-  constructor(private authRepository: IAuthRepository) {}
+  constructor(private _authRepository: IAuthRepository) {}
 
   async execute(dto: FacebookAuthDto): Promise<UserResponseDTO> {
     const { userId, name, email, picture } = dto;
@@ -16,7 +16,7 @@ export class FacebookAuthUseCase implements IFacebookAuthUseCase {
     // Use email if provided, otherwise generate a placeholder
     const userEmail = email || `${userId}@facebook.com`;
 
-    let user = await this.authRepository.findUserByEmail(userEmail);
+    let user = await this._authRepository.findUserByEmail(userEmail);
 
     try {
       if (!user) {
@@ -30,7 +30,7 @@ export class FacebookAuthUseCase implements IFacebookAuthUseCase {
           avatar: picture,
         });
         user.verifyEmail(); // Facebook users are verified by default
-        return await this.authRepository.createUser(user);
+        return await this._authRepository.createUser(user);
       }
 
       const updates: IUpdateUserRequestDTO = {
@@ -43,7 +43,7 @@ export class FacebookAuthUseCase implements IFacebookAuthUseCase {
         updates.name = name;
       }
       user = User.update(user, updates);
-      return await this.authRepository.updateUser(user);
+      return await this._authRepository.updateUser(user);
     } catch (error) {
       if (error instanceof Error) {
         throw new HttpError(error.message, 400);

@@ -11,12 +11,12 @@ import { IDashboardResponseDTO, IGetDashboardInputDTO } from "../../../dtos/dash
 
 export class GetDashboardUseCase implements IGetDashboardUseCase {
   constructor(
-    private readonly getCourseStatsUseCase: IGetCourseStatsUseCase,
-    private readonly getTopEnrolledCoursesUseCase: IGetTopEnrolledCoursesUseCase,
-    private readonly getUserStatsUseCase: IGetUserStatsUseCase,
-    private readonly getTopInstructorsUseCase: IGetTopInstructorsUseCase,
-    private readonly getEnrollmentStatsUseCase: IGetEnrollmentStatsUseCase,
-    private readonly revenueRepository: IRevenueRepository
+    private readonly _getCourseStatsUseCase: IGetCourseStatsUseCase,
+    private readonly _getTopEnrolledCoursesUseCase: IGetTopEnrolledCoursesUseCase,
+    private readonly _getUserStatsUseCase: IGetUserStatsUseCase,
+    private readonly _getTopInstructorsUseCase: IGetTopInstructorsUseCase,
+    private readonly _getEnrollmentStatsUseCase: IGetEnrollmentStatsUseCase,
+    private readonly _revenueRepository: IRevenueRepository
   ) {}
 
   async execute(input: IGetDashboardInputDTO): Promise<IDashboardResponseDTO> {
@@ -28,16 +28,16 @@ export class GetDashboardUseCase implements IGetDashboardUseCase {
       enrollmentStats,
       totalRevenue,
     ] = await Promise.all([
-      this.getCourseStatsUseCase.execute({}),
-      this.getTopEnrolledCoursesUseCase.execute({
+      this._getCourseStatsUseCase.execute({}),
+      this._getTopEnrolledCoursesUseCase.execute({
         userId: input.userId,
         limit: 5,
         role: "ADMIN",
       }),
-      this.getUserStatsUseCase.execute({}),
-      this.getTopInstructorsUseCase.execute({ limit: 5 }),
-      this.getEnrollmentStatsUseCase.execute({}),
-      this.revenueRepository.getTotalRevenue(input.userId),
+      this._getUserStatsUseCase.execute({}),
+      this._getTopInstructorsUseCase.execute({ limit: 5 }),
+      this._getEnrollmentStatsUseCase.execute({}),
+      this._revenueRepository.getTotalRevenue(input.userId),
     ]);
 
     return {

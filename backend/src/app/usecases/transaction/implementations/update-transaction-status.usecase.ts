@@ -4,10 +4,10 @@ import { IUpdateTransactionStatusUseCase } from "../interfaces/update-transactio
 import { Transaction } from "../../../../domain/entities/transaction.entity";
 
 export class UpdateTransactionStatusUseCase implements IUpdateTransactionStatusUseCase {
-  constructor(private readonly transactionRepository: ITransactionRepository) {}
+  constructor(private readonly _transactionRepository: ITransactionRepository) {}
 
   async execute(input: IUpdateTransactionStatusInputDTO): Promise<ITransactionOutputDTO> {
-    const transaction = await this.transactionRepository.updateStatus(
+    const transaction = await this._transactionRepository.updateStatus(
       input.id,
       input.status,
       input.metadata

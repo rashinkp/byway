@@ -3,7 +3,7 @@ import { ISearchRepository } from "../../app/repositories/search.repository";
 import { ISearchResult } from "../../domain/types/search.interface";
 
 export class SearchRepository implements ISearchRepository {
-  constructor(private prisma: PrismaClient) {}
+  constructor(private _prisma: PrismaClient) {}
 
   async search(
     params: {
@@ -41,7 +41,7 @@ export class SearchRepository implements ISearchRepository {
 
   private async searchInstructors(query: string, skip: number, limit: number) {
     const [items, total] = await Promise.all([
-      this.prisma.user.findMany({
+      this._prisma.user.findMany({
         where: {
           AND: [
             {
@@ -73,7 +73,7 @@ export class SearchRepository implements ISearchRepository {
         skip,
         take: limit,
       }),
-      this.prisma.user.count({
+      this._prisma.user.count({
         where: {
           AND: [
             {
@@ -110,7 +110,7 @@ export class SearchRepository implements ISearchRepository {
 
   private async searchCourses(query: string, skip: number, limit: number) {
     const [items, total] = await Promise.all([
-      this.prisma.course.findMany({
+      this._prisma.course.findMany({
         where: {
           AND: [
             {
@@ -136,7 +136,7 @@ export class SearchRepository implements ISearchRepository {
         skip,
         take: limit,
       }),
-      this.prisma.course.count({
+      this._prisma.course.count({
         where: {
           AND: [
             {
@@ -171,7 +171,7 @@ export class SearchRepository implements ISearchRepository {
 
   private async searchCategories(query: string, skip: number, limit: number) {
     const [items, total] = await Promise.all([
-      this.prisma.category.findMany({
+      this._prisma.category.findMany({
         where: {
           AND: [
             {
@@ -193,7 +193,7 @@ export class SearchRepository implements ISearchRepository {
         skip,
         take: limit,
       }),
-      this.prisma.category.count({
+      this._prisma.category.count({
         where: {
           AND: [
             {
@@ -246,7 +246,7 @@ export class SearchRepository implements ISearchRepository {
     };
     // Debug log
     const [items, total] = await Promise.all([
-      this.prisma.certificate.findMany({
+      this._prisma.certificate.findMany({
         where,
         include: {
           course: { select: { title: true } },
@@ -255,7 +255,7 @@ export class SearchRepository implements ISearchRepository {
         skip,
         take: limit,
       }),
-      this.prisma.certificate.count({ where }),
+      this._prisma.certificate.count({ where }),
     ]);
 
     return {

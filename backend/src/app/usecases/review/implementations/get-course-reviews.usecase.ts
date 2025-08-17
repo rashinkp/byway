@@ -5,7 +5,7 @@ import { IGetCourseReviewsUseCase } from "../interfaces/get-course-reviews.useca
 
 export class GetCourseReviewsUseCase implements IGetCourseReviewsUseCase {
   constructor(
-    private readonly courseReviewRepository: ICourseReviewRepository
+    private readonly _courseReviewRepository: ICourseReviewRepository
   ) {}
 
   async execute(
@@ -34,7 +34,7 @@ export class GetCourseReviewsUseCase implements IGetCourseReviewsUseCase {
     }
 
     // Get reviews from repository
-    return await this.courseReviewRepository.findByCourseId(
+    return await this._courseReviewRepository.findByCourseId(
       query.courseId,
       query,
       userId

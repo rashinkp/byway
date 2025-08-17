@@ -4,10 +4,10 @@ import { IGetTransactionsByOrderUseCase } from "../interfaces/get-transactions-b
 import { Transaction } from "../../../../domain/entities/transaction.entity";
 
 export class GetTransactionsByOrderUseCase implements IGetTransactionsByOrderUseCase {
-  constructor(private readonly transactionRepository: ITransactionRepository) {}
+  constructor(private readonly _transactionRepository: ITransactionRepository) {}
 
   async execute(input: IGetTransactionsByOrderInputDTO): Promise<ITransactionOutputDTO[]> {
-    const transaction = await this.transactionRepository.findByOrderId(input.orderId);
+    const transaction = await this._transactionRepository.findByOrderId(input.orderId);
     if (!transaction) {
       return [];
     }

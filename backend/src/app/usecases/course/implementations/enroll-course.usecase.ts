@@ -8,22 +8,22 @@ import { ICreateEnrollmentInput, IEnrollmentWithDetails } from "../../../../doma
 
 export class EnrollCourseUseCase implements IEnrollCourseUseCase {
   constructor(
-    private courseRepository: ICourseRepository,
-    private enrollmentRepository: IEnrollmentRepository,
-    private userRepository: IUserRepository
+    private _courseRepository: ICourseRepository,
+    private _enrollmentRepository: IEnrollmentRepository,
+    private _userRepository: IUserRepository
   ) {}
 
   async execute(
     input: ICreateEnrollmentInput
   ): Promise<IEnrollmentWithDetails[]> {
-    const user = await this.userRepository.findById(input.userId);
+    const user = await this._userRepository.findById(input.userId);
     if (!user) {
       throw new HttpError("User not found", 404);
     }
 
     const enrollments: IEnrollmentWithDetails[] = [];
     for (const courseId of input.courseIds) {
-      const course = await this.courseRepository.findById(courseId);
+      const course = await this._courseRepository.findById(courseId);
       if (
         !course ||
         course.deletedAt ||
@@ -36,7 +36,7 @@ export class EnrollCourseUseCase implements IEnrollCourseUseCase {
       }
 
       const existingEnrollment =
-        await this.enrollmentRepository.findByUserAndCourse(
+        await this._enrollmentRepository.findByUserAndCourse(
           input.userId,
           courseId
         );
@@ -44,7 +44,7 @@ export class EnrollCourseUseCase implements IEnrollCourseUseCase {
         continue; // Skip already enrolled courses
       }
 
-      const newEnrollments = await this.enrollmentRepository.create({
+      const newEnrollments = await this._enrollmentRepository.create({
         userId: input.userId,
         courseIds: [courseId],
         orderItemId: input.orderItemId,

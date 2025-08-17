@@ -13,38 +13,38 @@ import { IGetAllCoursesUseCase } from "../interfaces/get-all-courses.usecase.int
 
 export class GetAllCoursesUseCase implements IGetAllCoursesUseCase {
   constructor(
-    private courseRepository: ICourseRepository,
-    private enrollmentRepository: IEnrollmentRepository,
-    private cartRepository: ICartRepository,
-    private userRepository: IUserRepository,
-    private courseReviewRepository: ICourseReviewRepository,
-    private lessonRepository: ILessonRepository
+    private _courseRepository: ICourseRepository,
+    private _enrollmentRepository: IEnrollmentRepository,
+    private _cartRepository: ICartRepository,
+    private _userRepository: IUserRepository,
+    private _courseReviewRepository: ICourseReviewRepository,
+    private _lessonRepository: ILessonRepository
   ) {}
 
   async execute(
     input: IGetAllCoursesInputDTO
   ): Promise<ICourseListResponseDTO> {
     try {
-      const result = await this.courseRepository.findAll(input);
+      const result = await this._courseRepository.findAll(input);
 
       // Enhance courses with additional data
       const enhancedCourses = await Promise.all(
         result.items.map(async (course) => {
           // Get instructor details
-          const instructor = await this.userRepository.findById(
+          const instructor = await this._userRepository.findById(
             course.createdBy
           );
           // Get review stats
           const reviewStats =
-            await this.courseReviewRepository.getCourseReviewStats(course.id);
+            await this._courseReviewRepository.getCourseReviewStats(course.id);
           // Get lesson count
-          const lessons = await this.lessonRepository.findByCourseId(course.id);
+          const lessons = await this._lessonRepository.findByCourseId(course.id);
           const lessonCount = lessons.length;
           // Check enrollment status
           let isEnrolled = false;
           if (input.userId) {
             const enrollment =
-              await this.enrollmentRepository.findByUserAndCourse(
+              await this._enrollmentRepository.findByUserAndCourse(
                 input.userId,
                 course.id
               );
@@ -53,7 +53,7 @@ export class GetAllCoursesUseCase implements IGetAllCoursesUseCase {
           // Check cart status
           let isInCart = false;
           if (input.userId) {
-            const cartItem = await this.cartRepository.findByUserAndCourse(
+            const cartItem = await this._cartRepository.findByUserAndCourse(
               input.userId,
               course.id
             );

@@ -30,10 +30,10 @@ interface QuizQuestionData {
 }
 
 export class LessonContentRepository implements ILessonContentRepository {
-  constructor(private readonly prisma: PrismaClient) {}
+  constructor(private readonly _prisma: PrismaClient) {}
 
   async findById(id: string): Promise<LessonContent | null> {
-    const content = await this.prisma.lessonContent.findUnique({
+    const content = await this._prisma.lessonContent.findUnique({
       where: { id, deletedAt: null }, // Only return non-soft-deleted content
       include: { quizQuestions: true },
     });
@@ -66,7 +66,7 @@ export class LessonContentRepository implements ILessonContentRepository {
   }
 
   async findByLessonId(lessonId: string): Promise<LessonContent | null> {
-    const content = await this.prisma.lessonContent.findUnique({
+    const content = await this._prisma.lessonContent.findUnique({
       where: { lessonId },
       include: { quizQuestions: true },
     });
@@ -101,7 +101,7 @@ export class LessonContentRepository implements ILessonContentRepository {
   async create(content: LessonContent): Promise<LessonContent> {
     const contentData = content.toJSON() as unknown as ContentData;
 
-    const createdContent = await this.prisma.lessonContent.create({
+    const createdContent = await this._prisma.lessonContent.create({
       data: {
         lessonId: contentData.lessonId,
         type: contentData.type,
@@ -155,7 +155,7 @@ export class LessonContentRepository implements ILessonContentRepository {
   async update(content: LessonContent): Promise<LessonContent> {
     const contentData = content.toJSON() as unknown as ContentData;
 
-    const updatedContent = await this.prisma.lessonContent.update({
+    const updatedContent = await this._prisma.lessonContent.update({
       where: { id: contentData.id },
       data: {
         type: contentData.type,
@@ -207,7 +207,7 @@ export class LessonContentRepository implements ILessonContentRepository {
   }
 
   async delete(id: string): Promise<void> {
-    await this.prisma.lessonContent.delete({
+    await this._prisma.lessonContent.delete({
       where: { id },
     });
   }

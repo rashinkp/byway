@@ -6,13 +6,13 @@ import { ILessonOutputDTO } from "../../../dtos/lesson.dto";
 
 export class DeleteLessonUseCase implements IDeleteLessonUseCase {
   constructor(
-    private readonly lessonRepository: ILessonRepository,
-    private readonly s3Service: S3ServiceInterface
+    private readonly _lessonRepository: ILessonRepository,
+    private readonly _s3Service: S3ServiceInterface
   ) {}
 
   async execute(id: string): Promise<void> {
     try {
-      const lesson = await this.lessonRepository.findById(id);
+      const lesson = await this._lessonRepository.findById(id);
       if (!lesson) {
         throw new HttpError("Lesson not found", 404);
       }
@@ -25,7 +25,7 @@ export class DeleteLessonUseCase implements IDeleteLessonUseCase {
         // Delete main file if it exists
         if (contentData.fileUrl) {
           try {
-            await this.s3Service.deleteFile(contentData.fileUrl);
+            await this._s3Service.deleteFile(contentData.fileUrl);
           } catch (error) {
             console.error("Failed to delete main file from S3:", error);
             // Continue with deletion even if S3 deletion fails
@@ -35,7 +35,7 @@ export class DeleteLessonUseCase implements IDeleteLessonUseCase {
         // Delete thumbnail if it exists
         if (contentData.thumbnailUrl) {
           try {
-            await this.s3Service.deleteFile(contentData.thumbnailUrl);
+            await this._s3Service.deleteFile(contentData.thumbnailUrl);
           } catch (error) {
             console.error("Failed to delete thumbnail from S3:", error);
             // Continue with deletion even if S3 deletion fails
@@ -44,7 +44,7 @@ export class DeleteLessonUseCase implements IDeleteLessonUseCase {
       }
 
       // Delete from database
-      await this.lessonRepository.deletePermanently(id);
+      await this._lessonRepository.deletePermanently(id);
     } catch (error) {
       if (error instanceof Error) {
         throw new HttpError(

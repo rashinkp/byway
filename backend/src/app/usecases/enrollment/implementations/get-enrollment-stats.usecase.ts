@@ -3,9 +3,9 @@ import { IEnrollmentRepository } from "../../../repositories/enrollment.reposito
 import { IGetEnrollmentStatsUseCase } from "../interfaces/get-enrollment-stats.usecase.interface";
 
 export class GetEnrollmentStatsUseCase implements IGetEnrollmentStatsUseCase {
-  constructor(private readonly enrollmentRepository: IEnrollmentRepository) {}
+  constructor(private readonly _enrollmentRepository: IEnrollmentRepository) {}
 
   async execute(input: IGetEnrollmentStatsInputDTO): Promise<IEnrollmentStatsDTO> {
-    return this.enrollmentRepository.getEnrollmentStats(input);
+    return this._enrollmentRepository.getEnrollmentStats(input);
   }
 } 

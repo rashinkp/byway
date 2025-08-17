@@ -11,20 +11,20 @@ import { LessonStatus } from "../../../../domain/enum/lesson.enum";
 
 export class UpdateLessonUseCase implements IUpdateLessonUseCase {
   constructor(
-    private readonly lessonRepository: ILessonRepository,
-    private readonly contentRepository: ILessonContentRepository
+    private readonly _lessonRepository: ILessonRepository,
+    private readonly _contentRepository: ILessonContentRepository
   ) {}
 
   async execute(dto: IUpdateLessonInputDTO): Promise<ILessonOutputDTO> {
     try {
-      const lesson = await this.lessonRepository.findById(dto.lessonId);
+      const lesson = await this._lessonRepository.findById(dto.lessonId);
       if (!lesson || !lesson.isActive()) {
         throw new HttpError("Lesson not found or deleted", 404);
       }
 
       // Check if content exists when publishing
       if (dto.status === LessonStatus.PUBLISHED) {
-        const content = await this.contentRepository.findByLessonId(
+        const content = await this._contentRepository.findByLessonId(
           dto.lessonId
         );
         if (!content) {
@@ -33,7 +33,7 @@ export class UpdateLessonUseCase implements IUpdateLessonUseCase {
       }
 
       const updatedLesson = Lesson.update(lesson, dto);
-      const savedLesson = await this.lessonRepository.update(updatedLesson);
+      const savedLesson = await this._lessonRepository.update(updatedLesson);
       return savedLesson.toJSON() as unknown as ILessonOutputDTO;
     } catch (error) {
       if (error instanceof Error) {

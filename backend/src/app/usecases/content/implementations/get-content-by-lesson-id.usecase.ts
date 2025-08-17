@@ -10,10 +10,10 @@ export class GetContentByLessonIdUseCase
   implements IGetContentByLessonIdUseCase
 {
   constructor(
-    private readonly contentRepository: ILessonContentRepository,
-    private readonly lessonRepository: ILessonRepository,
-    private readonly enrollmentRepository: IEnrollmentRepository,
-    private readonly courseRepository: ICourseRepository
+    private readonly _contentRepository: ILessonContentRepository,
+    private readonly _lessonRepository: ILessonRepository,
+    private readonly _enrollmentRepository: IEnrollmentRepository,
+    private readonly _courseRepository: ICourseRepository
   ) {}
 
   async execute(
@@ -22,31 +22,31 @@ export class GetContentByLessonIdUseCase
   ): Promise<ILessonContentOutputDTO | null> {
     try {
       // Get lesson to find courseId
-      const lesson = await this.lessonRepository.findById(lessonId);
+      const lesson = await this._lessonRepository.findById(lessonId);
       if (!lesson) {
         throw new HttpError("Lesson not found", 404);
       }
 
       // Get course to check if user is instructor or admin
-      const course = await this.courseRepository.findById(lesson.courseId);
+      const course = await this._courseRepository.findById(lesson.courseId);
       if (!course) {
         throw new HttpError("Course not found", 404);
       }
 
       // If user is admin, allow access
       if (user.role === "ADMIN") {
-        const content = await this.contentRepository.findByLessonId(lessonId);
+        const content = await this._contentRepository.findByLessonId(lessonId);
         return content && content.isActive() ? content.toJSON() as unknown as ILessonContentOutputDTO : null;
       }
 
       // If user is the course instructor, allow access without enrollment check
       if (course.createdBy === user.id) {
-        const content = await this.contentRepository.findByLessonId(lessonId);
+        const content = await this._contentRepository.findByLessonId(lessonId);
         return content && content.isActive() ? content.toJSON() as unknown as ILessonContentOutputDTO : null;
       }
 
       // For non-instructors, check enrollment
-      const enrollment = await this.enrollmentRepository.findByUserAndCourse(
+      const enrollment = await this._enrollmentRepository.findByUserAndCourse(
         user.id,
         lesson.courseId
       );
@@ -58,7 +58,7 @@ export class GetContentByLessonIdUseCase
         throw new HttpError("Your enrollment is not active", 403);
       }
 
-      const content = await this.contentRepository.findByLessonId(lessonId);
+      const content = await this._contentRepository.findByLessonId(lessonId);
       return content && content.isActive() ? content.toJSON() as unknown as ILessonContentOutputDTO : null;
     } catch (error) {
       if (error instanceof HttpError) {

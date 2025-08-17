@@ -3,12 +3,12 @@ import { IDeleteReviewUseCase } from "../interfaces/delete-review.usecase.interf
 
 export class DeleteReviewUseCase implements IDeleteReviewUseCase {
   constructor(
-    private readonly courseReviewRepository: ICourseReviewRepository
+    private readonly _courseReviewRepository: ICourseReviewRepository
   ) {}
 
   async execute(reviewId: string, userId: string): Promise<void> {
     // Find the review
-    const review = await this.courseReviewRepository.findById(reviewId);
+    const review = await this._courseReviewRepository.findById(reviewId);
     if (!review) {
       throw new Error("Review not found");
     }
@@ -16,6 +16,6 @@ export class DeleteReviewUseCase implements IDeleteReviewUseCase {
     if (review.userId !== userId) {
       throw new Error("You can only delete your own reviews");
     }
-    await this.courseReviewRepository.delete(reviewId);
+    await this._courseReviewRepository.delete(reviewId);
   }
 } 

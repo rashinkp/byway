@@ -7,7 +7,7 @@ import { StatusCodes } from "http-status-codes";
 import { envConfig } from "../../../presentation/express/configs/env.config";
 
 export class StripeWebhookGateway implements WebhookGateway {
-  private stripe: Stripe;
+  private _stripe: Stripe;
 
   constructor() {
     const stripeKey = envConfig.STRIPE_SECRET_KEY;
@@ -15,7 +15,7 @@ export class StripeWebhookGateway implements WebhookGateway {
       throw new Error("STRIPE_SECRET_KEY is not defined");
     }
 
-    this.stripe = new Stripe(stripeKey, {
+    this._stripe = new Stripe(stripeKey, {
       apiVersion: "2025-07-30.basil",
     });
   }
@@ -33,7 +33,7 @@ export class StripeWebhookGateway implements WebhookGateway {
     }
 
     try {
-      const constructedEvent = this.stripe.webhooks.constructEvent(
+      const constructedEvent = this._stripe.webhooks.constructEvent(
         event,
         signature,
         webhookSecret
@@ -115,20 +115,20 @@ export class StripeWebhookGateway implements WebhookGateway {
   ): Promise<WebhookMetadata> {
     try {
       // First try to get the payment intent to get the latest charge
-      const paymentIntent = await this.stripe.paymentIntents.retrieve(
+      const paymentIntent = await this._stripe.paymentIntents.retrieve(
         paymentIntentId
       );
       const latestCharge = paymentIntent.latest_charge;
 
       // Try to find session using the payment intent
-      const sessions = await this.stripe.checkout.sessions.list({
+      const sessions = await this._stripe.checkout.sessions.list({
         payment_intent: paymentIntentId,
         limit: 1,
       });
 
       // If no session found, try to find it using the charge
       if (!sessions.data.length && latestCharge) {
-        const charge = await this.stripe.charges.retrieve(
+        const charge = await this._stripe.charges.retrieve(
           latestCharge as string
         );
         if (charge.metadata?.orderId) {

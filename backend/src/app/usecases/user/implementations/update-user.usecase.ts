@@ -9,15 +9,15 @@ import { S3ServiceInterface } from "../../../providers/s3.service.interface";
 
 export class UpdateUserUseCase implements IUpdateUserUseCase {
   constructor(
-    private userRepository: IUserRepository,
-    private s3Service: S3ServiceInterface
+    private _userRepository: IUserRepository,
+    private _s3Service: S3ServiceInterface
   ) {}
 
   async execute(
     dto: UpdateUserDto,
     userId: string
   ): Promise<{ user: UserResponseDTO; profile: ProfileDTO | null }> {
-    const user = await this.userRepository.findById(userId);
+    const user = await this._userRepository.findById(userId);
     if (!user) {
       throw new HttpError("User not found", 404);
     }
@@ -29,7 +29,7 @@ export class UpdateUserUseCase implements IUpdateUserUseCase {
       user.avatar.includes(".s3.")
     ) {
       try {
-        await this.s3Service.deleteFile(user.avatar);
+        await this._s3Service.deleteFile(user.avatar);
         console.log("[Deleted] deleted old avatar");
       } catch (err) {
         console.error("Failed to delete old avatar from S3:", err);
@@ -42,7 +42,7 @@ export class UpdateUserUseCase implements IUpdateUserUseCase {
       role: dto.role as Role,
     });
 
-    let profile = await this.userRepository.findProfileByUserId(userId);
+    let profile = await this._userRepository.findProfileByUserId(userId);
 
     if (!profile) {
       profile = UserProfile.create(userId, {
@@ -57,7 +57,7 @@ export class UpdateUserUseCase implements IUpdateUserUseCase {
         dateOfBirth: dto.dateOfBirth ? new Date(dto.dateOfBirth) : undefined,
         gender: dto.gender,
       });
-      profile = await this.userRepository.createProfile(profile);
+      profile = await this._userRepository.createProfile(profile);
     } else {
       profile = UserProfile.update(profile, {
         // no id passed here, update only uses changes object
@@ -71,10 +71,10 @@ export class UpdateUserUseCase implements IUpdateUserUseCase {
         dateOfBirth: dto.dateOfBirth ? new Date(dto.dateOfBirth) : undefined,
         gender: dto.gender,
       });
-      profile = await this.userRepository.updateProfile(profile);
+      profile = await this._userRepository.updateProfile(profile);
     }
 
-    const savedUser = await this.userRepository.updateUser(updatedUser);
+    const savedUser = await this._userRepository.updateUser(updatedUser);
 
     return { user: savedUser, profile };
   }

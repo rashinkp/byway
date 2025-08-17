@@ -4,10 +4,10 @@ import { Wallet } from "../../domain/entities/wallet.entity";
 import { Money } from "../../domain/value-object/money.value-object";
 
 export class WalletRepository implements IWalletRepository {
-  constructor(private readonly prisma: PrismaClient) {}
+  constructor(private readonly _prisma: PrismaClient) {}
 
   async findByUserId(userId: string): Promise<Wallet | null> {
-    const wallet = await this.prisma.wallet.findUnique({
+    const wallet = await this._prisma.wallet.findUnique({
       where: { userId },
     });
 
@@ -23,7 +23,7 @@ export class WalletRepository implements IWalletRepository {
   }
 
   async create(wallet: Wallet): Promise<Wallet> {
-    const createdWallet = await this.prisma.wallet.create({
+    const createdWallet = await this._prisma.wallet.create({
       data: {
         id: wallet.id,
         userId: wallet.userId,
@@ -43,7 +43,7 @@ export class WalletRepository implements IWalletRepository {
   }
 
   async update(wallet: Wallet): Promise<Wallet> {
-    const updatedWallet = await this.prisma.wallet.update({
+    const updatedWallet = await this._prisma.wallet.update({
       where: { id: wallet.id },
       data: {
         balance: wallet.balance.amount,
@@ -61,7 +61,7 @@ export class WalletRepository implements IWalletRepository {
   }
 
   async findById(id: string): Promise<Wallet | null> {
-    const wallet = await this.prisma.wallet.findUnique({
+    const wallet = await this._prisma.wallet.findUnique({
       where: { id },
     });
 

@@ -7,8 +7,8 @@ import { InstructorResponseDTO } from "../../../dtos/instructor.dto";
 
 export class GetUserAdminDetailsUseCase implements IGetUserAdminDetailsUseCase {
   constructor(
-    private userRepository: IUserRepository,
-    private instructorRepository: IInstructorRepository
+    private _userRepository: IUserRepository,
+    private _instructorRepository: IInstructorRepository
   ) {}
 
   async execute(dto: GetUserDto): Promise<{
@@ -16,15 +16,15 @@ export class GetUserAdminDetailsUseCase implements IGetUserAdminDetailsUseCase {
     profile: ProfileDTO | null;
     instructor: InstructorResponseDTO | null;
   }> {
-    const user = await this.userRepository.findById(dto.userId);
+    const user = await this._userRepository.findById(dto.userId);
     if (!user) {
       throw new HttpError("User not found", 404);
     }
 
-    const profile = await this.userRepository.findProfileByUserId(dto.userId);
+    const profile = await this._userRepository.findProfileByUserId(dto.userId);
     let instructor = null;
 
-    instructor = await this.instructorRepository.findInstructorByUserId(
+    instructor = await this._instructorRepository.findInstructorByUserId(
       dto.userId
     );
 

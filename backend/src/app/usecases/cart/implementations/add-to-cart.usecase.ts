@@ -7,13 +7,13 @@ import { HttpError } from "../../../../presentation/http/errors/http-error";
 
 export class AddToCartUseCase implements IAddToCartUseCase {
   constructor(
-    private cartRepository: ICartRepository,
-    private enrollmentRepository: IEnrollmentRepository
+    private _cartRepository: ICartRepository,
+    private _enrollmentRepository: IEnrollmentRepository
   ) {}
 
   async execute(userId: string, data: AddToCartDto): Promise<CartResponseDTO> {
     // Restrict cart size
-    const cartCount = await this.cartRepository.countByUserId(userId);
+    const cartCount = await this._cartRepository.countByUserId(userId);
     const MAX_CART_ITEMS = 5;
     if (cartCount >= MAX_CART_ITEMS) {
       throw new HttpError(
@@ -23,7 +23,7 @@ export class AddToCartUseCase implements IAddToCartUseCase {
     }
 
     // Check if course is already in cart
-    const existingCart = await this.cartRepository.findByUserAndCourse(
+    const existingCart = await this._cartRepository.findByUserAndCourse(
       userId,
       data.courseId
     );
@@ -34,7 +34,7 @@ export class AddToCartUseCase implements IAddToCartUseCase {
 
     // Check if user is already enrolled in the course
     const existingEnrollment =
-      await this.enrollmentRepository.findByUserAndCourse(
+      await this._enrollmentRepository.findByUserAndCourse(
         userId,
         data.courseId
       );
@@ -51,6 +51,6 @@ export class AddToCartUseCase implements IAddToCartUseCase {
     });
 
     // Save to database
-    return this.cartRepository.create(cart);
+    return this._cartRepository.create(cart);
   }
 }

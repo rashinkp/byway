@@ -8,11 +8,11 @@ import { ILessonRepository } from "../../../repositories/lesson.repository";
 import { ICreateLessonUseCase } from "../interfaces/create-lesson.usecase.interface";
 
 export class CreateLessonUseCase implements ICreateLessonUseCase {
-  constructor(private readonly lessonRepository: ILessonRepository) {}
+  constructor(private readonly _lessonRepository: ILessonRepository) {}
 
   async execute(dto: ICreateLessonInputDTO): Promise<ILessonOutputDTO> {
     try {
-      const existingLesson = await this.lessonRepository.findByCourseIdAndOrder(
+      const existingLesson = await this._lessonRepository.findByCourseIdAndOrder(
         dto.courseId,
         dto.order
       );
@@ -24,7 +24,7 @@ export class CreateLessonUseCase implements ICreateLessonUseCase {
       }
 
       const lesson = Lesson.create(dto);
-      const createdLesson = await this.lessonRepository.create(lesson);
+      const createdLesson = await this._lessonRepository.create(lesson);
       return createdLesson.toJSON() as unknown as ILessonOutputDTO;
     } catch (error) {
       if (error instanceof Error) {

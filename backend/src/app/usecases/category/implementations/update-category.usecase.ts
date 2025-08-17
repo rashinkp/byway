@@ -8,16 +8,16 @@ import {
 import { Category } from "../../../../domain/entities/category.entity";
 
 export class UpdateCategoryUseCase implements IUpdateCategoryUseCase {
-  constructor(private categoryRepository: ICategoryRepository) {}
+  constructor(private _categoryRepository: ICategoryRepository) {}
 
   async execute(input: IUpdateCategoryInputDTO): Promise<ICategoryOutputDTO> {
-    const category = await this.categoryRepository.findById(input.id);
+    const category = await this._categoryRepository.findById(input.id);
     if (!category) {
       throw new HttpError("Category not found", 404);
     }
 
     if (input.name) {
-      const existingCategory = await this.categoryRepository.findByName(
+      const existingCategory = await this._categoryRepository.findByName(
         input.name
       );
       if (
@@ -35,7 +35,7 @@ export class UpdateCategoryUseCase implements IUpdateCategoryUseCase {
       input.description
     );
 
-    const savedCategory = await this.categoryRepository.save(updatedCategory);
+    const savedCategory = await this._categoryRepository.save(updatedCategory);
 
     return {
       id: savedCategory.id,

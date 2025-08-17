@@ -3,7 +3,7 @@ import { IRevenueRepository } from "../../../repositories/revenue.repository";
 import { GetLatestRevenueParamsDTO, GetLatestRevenueResultDTO } from "../../../dtos/revenue.dto";
 
 export class GetLatestRevenueUseCase implements IGetLatestRevenueUseCase {
-  constructor(private readonly revenueRepository: IRevenueRepository) {}
+  constructor(private readonly _revenueRepository: IRevenueRepository) {}
 
   async execute(
     params: GetLatestRevenueParamsDTO
@@ -11,7 +11,7 @@ export class GetLatestRevenueUseCase implements IGetLatestRevenueUseCase {
     const { page = 1, limit = 10 } = params;
 
     // Get latest revenue data from repository
-    const { items, total } = await this.revenueRepository.getLatestRevenue(
+    const { items, total } = await this._revenueRepository.getLatestRevenue(
       params
     );
 

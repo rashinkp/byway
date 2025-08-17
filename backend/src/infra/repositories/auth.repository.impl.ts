@@ -4,28 +4,28 @@ import { UserVerification } from "../../domain/entities/user-verification.entity
 import { IAuthRepository } from "../../app/repositories/auth.repository";
 
 export class AuthRepository implements IAuthRepository {
-  constructor(private prisma: PrismaClient) {}
+  constructor(private _prisma: PrismaClient) {}
 
   async findUserByEmail(email: string): Promise<User | null> {
-    const user = await this.prisma.user.findUnique({ where: { email } });
+    const user = await this._prisma.user.findUnique({ where: { email } });
     if (!user) return null;
     return User.fromPrisma(user);
   }
 
   async findUserByGoogleId(googleId: string): Promise<User | null> {
-    const user = await this.prisma.user.findUnique({ where: { googleId } });
+    const user = await this._prisma.user.findUnique({ where: { googleId } });
     if (!user) return null;
     return User.fromPrisma(user);
   }
 
   async findUserByFacebookId(facebookId: string): Promise<User | null> {
-    const user = await this.prisma.user.findUnique({ where: { facebookId } });
+    const user = await this._prisma.user.findUnique({ where: { facebookId } });
     if (!user) return null;
     return User.fromPrisma(user);
   }
 
   async createUser(user: User): Promise<User> {
-    const created = await this.prisma.user.create({
+    const created = await this._prisma.user.create({
       data: {
         name: user.name,
         email: user.email,
@@ -47,7 +47,7 @@ export class AuthRepository implements IAuthRepository {
   async createVerification(
     verification: UserVerification
   ): Promise<UserVerification> {
-    const created = await this.prisma.userVerification.upsert({
+    const created = await this._prisma.userVerification.upsert({
       where: { email: verification.email },
       update: {
         id: verification.id,
@@ -75,7 +75,7 @@ export class AuthRepository implements IAuthRepository {
   async findVerificationByEmail(
     email: string
   ): Promise<UserVerification | null> {
-    const verification = await this.prisma.userVerification.findUnique({
+    const verification = await this._prisma.userVerification.findUnique({
       where: { email },
     });
 
@@ -86,7 +86,7 @@ export class AuthRepository implements IAuthRepository {
   async updateVerification(
     verification: UserVerification
   ): Promise<UserVerification> {
-    const updated = await this.prisma.userVerification.update({
+    const updated = await this._prisma.userVerification.update({
       where: { id: verification.id },
       data: {
         userId: verification.userId,
@@ -102,7 +102,7 @@ export class AuthRepository implements IAuthRepository {
   }
 
   async updateUser(user: User): Promise<User> {
-    const updated = await this.prisma.user.update({
+    const updated = await this._prisma.user.update({
       where: { id: user.id },
       data: {
         name: user.name,

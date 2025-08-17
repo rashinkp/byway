@@ -66,10 +66,10 @@ function toCourseReviewWithUser(data: {
 }
 
 export class CourseReviewRepository implements ICourseReviewRepository {
-  constructor(private prisma: PrismaClient) {}
+  constructor(private _prisma: PrismaClient) {}
 
   async save(review: CourseReview): Promise<CourseReview> {
-    const created = await this.prisma.courseReview.create({
+    const created = await this._prisma.courseReview.create({
       data: {
         courseId: review.courseId,
         userId: review.userId,
@@ -85,12 +85,12 @@ export class CourseReviewRepository implements ICourseReviewRepository {
   }
 
   async findById(id: string): Promise<CourseReview | null> {
-    const found = await this.prisma.courseReview.findUnique({ where: { id } });
+    const found = await this._prisma.courseReview.findUnique({ where: { id } });
     return found ? toCourseReviewEntity(found) : null;
   }
 
   async update(review: CourseReview): Promise<CourseReview> {
-    const updated = await this.prisma.courseReview.update({
+    const updated = await this._prisma.courseReview.update({
       where: { id: review.id },
       data: {
         rating: review.rating.value,
@@ -103,7 +103,7 @@ export class CourseReviewRepository implements ICourseReviewRepository {
   }
 
   async softDelete(review: CourseReview): Promise<CourseReview> {
-    const deleted = await this.prisma.courseReview.update({
+    const deleted = await this._prisma.courseReview.update({
       where: { id: review.id },
       data: {
         deletedAt: new Date(),
@@ -114,7 +114,7 @@ export class CourseReviewRepository implements ICourseReviewRepository {
   }
 
   async restore(review: CourseReview): Promise<CourseReview> {
-    const restored = await this.prisma.courseReview.update({
+    const restored = await this._prisma.courseReview.update({
       where: { id: review.id },
       data: {
         deletedAt: null,
@@ -125,7 +125,7 @@ export class CourseReviewRepository implements ICourseReviewRepository {
   }
 
   async delete(id: string): Promise<void> {
-    await this.prisma.courseReview.delete({
+    await this._prisma.courseReview.delete({
       where: { id },
     });
   }
@@ -162,9 +162,9 @@ export class CourseReviewRepository implements ICourseReviewRepository {
       orderBy.createdAt = query.sortOrder || "desc";
     }
 
-    const [total, reviews] = await this.prisma.$transaction([
-      this.prisma.courseReview.count({ where }),
-      this.prisma.courseReview.findMany({
+    const [total, reviews] = await this._prisma.$transaction([
+      this._prisma.courseReview.count({ where }),
+      this._prisma.courseReview.findMany({
         where,
         orderBy,
         skip,
@@ -188,9 +188,9 @@ export class CourseReviewRepository implements ICourseReviewRepository {
     const skip = (page - 1) * limit;
     const where = { userId, deletedAt: null };
 
-    const [total, reviews] = await this.prisma.$transaction([
-      this.prisma.courseReview.count({ where }),
-      this.prisma.courseReview.findMany({
+    const [total, reviews] = await this._prisma.$transaction([
+      this._prisma.courseReview.count({ where }),
+      this._prisma.courseReview.findMany({
         where,
         orderBy: { createdAt: "desc" },
         skip,
@@ -210,7 +210,7 @@ export class CourseReviewRepository implements ICourseReviewRepository {
     userId: string,
     courseId: string
   ): Promise<CourseReview | null> {
-    const found = await this.prisma.courseReview.findFirst({
+    const found = await this._prisma.courseReview.findFirst({
       where: { userId, courseId, deletedAt: null },
     });
     return found ? toCourseReviewEntity(found) : null;
@@ -220,21 +220,21 @@ export class CourseReviewRepository implements ICourseReviewRepository {
     courseId: string
   ): Promise<ICourseReviewSummary> {
     const [average, total, distribution, recentReviews] =
-      await this.prisma.$transaction([
-        this.prisma.courseReview.aggregate({
+      await this._prisma.$transaction([
+        this._prisma.courseReview.aggregate({
           where: { courseId, deletedAt: null },
           _avg: { rating: true },
         }),
-        this.prisma.courseReview.count({
+        this._prisma.courseReview.count({
           where: { courseId, deletedAt: null },
         }),
-        this.prisma.courseReview.groupBy({
+        this._prisma.courseReview.groupBy({
           by: ["rating"],
           where: { courseId, deletedAt: null },
           orderBy: [],
           _count: { rating: true },
         }),
-        this.prisma.courseReview.findMany({
+        this._prisma.courseReview.findMany({
           where: { courseId, deletedAt: null },
           orderBy: { createdAt: "desc" },
           take: 5,

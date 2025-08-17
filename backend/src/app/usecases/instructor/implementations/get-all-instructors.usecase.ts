@@ -10,8 +10,8 @@ import { IGetAllInstructorsUseCase } from "../interfaces/get-all-instructors.use
 
 export class GetAllInstructorsUseCase implements IGetAllInstructorsUseCase {
   constructor(
-    private instructorRepository: IInstructorRepository,
-    private userRepository: IUserRepository
+    private _instructorRepository: IInstructorRepository,
+    private _userRepository: IUserRepository
   ) {}
 
   async execute(dto: GetAllInstructorsRequestDTO): Promise<{
@@ -20,7 +20,7 @@ export class GetAllInstructorsUseCase implements IGetAllInstructorsUseCase {
     totalPages: number;
   }> {
     const { items, total, totalPages } =
-      await this.instructorRepository.findAllInstructors(
+      await this._instructorRepository.findAllInstructors(
         dto.page || 1,
         dto.limit || 10,
         {
@@ -34,7 +34,7 @@ export class GetAllInstructorsUseCase implements IGetAllInstructorsUseCase {
 
     const instructorResponses: InstructorWithUserDTO[] = [];
     for (const instructor of items) {
-      const user = await this.userRepository.findById(instructor.userId);
+      const user = await this._userRepository.findById(instructor.userId);
       if (user) {
         instructorResponses.push({
           id: instructor.id,

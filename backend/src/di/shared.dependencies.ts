@@ -47,6 +47,10 @@ import { GetEnrollmentStatsUseCase } from "../app/usecases/enrollment/implementa
 import { IUserRepository } from "../app/repositories/user.repository";
 import { IPasswordHasher } from "../app/providers/password-hasher.interface";
 import { BcryptPasswordHasher } from "../infra/providers/password-hasher.ts";
+import { ChatRepository } from "../infra/repositories/chat.repository.impl";
+import { IChatRepository } from "../app/repositories/chat.repository.interface";
+import { IMessageRepository } from "../app/repositories/message.repository.interface";
+import { MessageRepository } from "../infra/repositories/message.repository.impl";
 
 export interface SharedDependencies {
   prisma: typeof prismaClient;
@@ -78,6 +82,8 @@ export interface SharedDependencies {
   emailProvider: EmailProviderImpl;
   getEnrollmentStatsUseCase: GetEnrollmentStatsUseCase;
   passwordHasher: IPasswordHasher;
+  chatRepository: IChatRepository;
+  messageRepository: IMessageRepository;
 }
 
 export function createSharedDependencies(): SharedDependencies {
@@ -101,6 +107,8 @@ export function createSharedDependencies(): SharedDependencies {
   const paymentGateway = new StripePaymentGateway();
   const webhookGateway = new StripeWebhookGateway();
   const passwordHasher = new BcryptPasswordHasher();
+  const chatRepository = new ChatRepository(prismaClient);
+  const messageRepository = new MessageRepository(prismaClient);
 
   // Create a temporary mock revenue distribution service
   // This will be replaced with the real one in app.dependencies.ts
@@ -164,5 +172,7 @@ export function createSharedDependencies(): SharedDependencies {
     emailProvider,
     getEnrollmentStatsUseCase,
     passwordHasher,
+    chatRepository,
+    messageRepository
   };
 }

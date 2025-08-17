@@ -5,14 +5,14 @@ import { Enrollment } from "../../domain/entities/enrollment.entity";
 import { IEnrollmentWithDetails, ICreateEnrollmentInput, IEnrollmentStats, IGetEnrollmentStatsInput } from "../../domain/types/enrollment.interface";
 
 export class EnrollmentRepository implements IEnrollmentRepository {
-  constructor(private prisma: PrismaClient) {}
+  constructor(private _prisma: PrismaClient) {}
 
   async findByUserAndCourse(
     userId: string,
     courseId: string
   ): Promise<IEnrollmentWithDetails | null> {
     try {
-      const enrollment = await this.prisma.enrollment.findFirst({
+      const enrollment = await this._prisma.enrollment.findFirst({
         where: { userId, courseId },
       });
       if (!enrollment) return null;
@@ -37,7 +37,7 @@ export class EnrollmentRepository implements IEnrollmentRepository {
       input.courseIds.map(async (courseId) => {
         console.log("Creating enrollment for course:", courseId);
         try {
-          const enrollment = await this.prisma.enrollment.create({
+          const enrollment = await this._prisma.enrollment.create({
             data: {
               userId: input.userId,
               courseId,
@@ -69,7 +69,7 @@ export class EnrollmentRepository implements IEnrollmentRepository {
     courseId: string,
     status: "ACTIVE" | "BLOCKED" | "EXPIRED"
   ): Promise<void> {
-    await this.prisma.enrollment.update({
+    await this._prisma.enrollment.update({
       where: {
         userId_courseId: {
           userId,
@@ -86,7 +86,7 @@ export class EnrollmentRepository implements IEnrollmentRepository {
     userId: string,
     courseIds: string[]
   ): Promise<Enrollment[]> {
-    const enrollments = await this.prisma.enrollment.findMany({
+    const enrollments = await this._prisma.enrollment.findMany({
       where: {
         userId,
         courseId: { in: courseIds },
@@ -106,7 +106,7 @@ export class EnrollmentRepository implements IEnrollmentRepository {
   }
 
   async findByUserId(userId: string): Promise<Enrollment[]> {
-    const enrollments = await this.prisma.enrollment.findMany({
+    const enrollments = await this._prisma.enrollment.findMany({
       where: { userId },
     });
     return enrollments.map(
@@ -123,7 +123,7 @@ export class EnrollmentRepository implements IEnrollmentRepository {
   }
 
   async findByCourseId(courseId: string): Promise<Enrollment[]> {
-    const enrollments = await this.prisma.enrollment.findMany({
+    const enrollments = await this._prisma.enrollment.findMany({
       where: { courseId },
       include: {
         orderItem: {
@@ -147,7 +147,7 @@ export class EnrollmentRepository implements IEnrollmentRepository {
   }
 
   async delete(userId: string, courseId: string): Promise<void> {
-    await this.prisma.enrollment.delete({
+    await this._prisma.enrollment.delete({
       where: {
         userId_courseId: {
           userId,
@@ -158,7 +158,7 @@ export class EnrollmentRepository implements IEnrollmentRepository {
   }
 
   async getEnrollmentStats(input: IGetEnrollmentStatsInput): Promise<IEnrollmentStats> {
-    const totalEnrollments = await this.prisma.enrollment.count();
+    const totalEnrollments = await this._prisma.enrollment.count();
     return {
       totalEnrollments,
     };

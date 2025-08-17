@@ -14,9 +14,9 @@ import { CreateOrderDto } from "../../../dtos/order.dto";
 
 export class CreateOrderUseCase implements ICreateOrderUseCase {
   constructor(
-    private readonly orderRepository: IOrderRepository,
-    private readonly paymentService: IPaymentService,
-    private readonly createTransactionUseCase: ICreateTransactionUseCase
+    private readonly _orderRepository: IOrderRepository,
+    private readonly _paymentService: IPaymentService,
+    private readonly _createTransactionUseCase: ICreateTransactionUseCase
   ) {}
 
   async execute(userId: string, input: CreateOrderDto) {
@@ -66,7 +66,7 @@ export class CreateOrderUseCase implements ICreateOrderUseCase {
     }
 
     // Persist order
-    const persistedOrder = await this.orderRepository.createOrder(
+    const persistedOrder = await this._orderRepository.createOrder(
       userId,
       courses,
       paymentMethod as PaymentGateway,
@@ -79,7 +79,7 @@ export class CreateOrderUseCase implements ICreateOrderUseCase {
     // Handle payment based on method
     if (paymentMethod === "WALLET") {
       // Process wallet payment
-      const paymentResult = await this.paymentService.handleWalletPayment(
+      const paymentResult = await this._paymentService.handleWalletPayment(
         userId,
         order.id!,
         totalAmount
@@ -91,7 +91,7 @@ export class CreateOrderUseCase implements ICreateOrderUseCase {
       };
     } else if (paymentMethod === "STRIPE") {
       // Create transaction for Stripe payment
-      const transaction = await this.createTransactionUseCase.execute({
+      const transaction = await this._createTransactionUseCase.execute({
         orderId: order.id!,
         userId,
         amount: totalAmount,
@@ -102,7 +102,7 @@ export class CreateOrderUseCase implements ICreateOrderUseCase {
       });
 
       // Create Stripe checkout session
-      const session = await this.paymentService.createStripeCheckoutSession(
+      const session = await this._paymentService.createStripeCheckoutSession(
         userId,
         order.id!,
         {

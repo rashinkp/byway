@@ -10,12 +10,12 @@ import { UserResponseDTO } from "../../../dtos/user.dto";
 
 export class LoginUseCase implements ILoginUseCase {
   constructor(
-    private authRepository: IAuthRepository,
-    private cartRepository: ICartRepository
+    private _authRepository: IAuthRepository,
+    private _cartRepository: ICartRepository
   ) {}
 
   async execute(dto: LoginDto): Promise<{ user: UserResponseDTO; cartCount: number }> {
-    const user = await this.authRepository.findUserByEmail(dto.email);
+    const user = await this._authRepository.findUserByEmail(dto.email);
     if (!user) {
       throw new HttpError("Invalid credentials", 401);
     }
@@ -49,7 +49,7 @@ export class LoginUseCase implements ILoginUseCase {
         throw new HttpError("User account is disabled", 401);
       }
 
-      const cartCount = await this.cartRepository.countByUserId(user.id);
+      const cartCount = await this._cartRepository.countByUserId(user.id);
 
       return {
         user,
