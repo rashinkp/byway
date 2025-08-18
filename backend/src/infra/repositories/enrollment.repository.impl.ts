@@ -89,16 +89,14 @@ export class EnrollmentRepository implements IEnrollmentRepository {
         courseId: { in: courseIds },
       },
     });
-    return enrollments.map(
-      (enrollment) =>
-        new Enrollment(
-          `${enrollment.userId}-${enrollment.courseId}`,
-          enrollment.userId,
-          enrollment.courseId,
-          enrollment.enrolledAt,
-          enrollment.orderItemId || undefined,
-          enrollment.accessStatus
-        )
+    return enrollments.map((enrollment) =>
+      Enrollment.fromPersistence({
+        userId: enrollment.userId,
+        courseId: enrollment.courseId,
+        enrolledAt: enrollment.enrolledAt,
+        orderItemId: enrollment.orderItemId,
+        accessStatus: enrollment.accessStatus,
+      })
     );
   }
 
@@ -106,16 +104,14 @@ export class EnrollmentRepository implements IEnrollmentRepository {
     const enrollments = await this._prisma.enrollment.findMany({
       where: { userId },
     });
-    return enrollments.map(
-      (enrollment) =>
-        new Enrollment(
-          `${enrollment.userId}-${enrollment.courseId}`,
-          enrollment.userId,
-          enrollment.courseId,
-          enrollment.enrolledAt,
-          enrollment.orderItemId || undefined,
-          enrollment.accessStatus
-        )
+    return enrollments.map((enrollment) =>
+      Enrollment.fromPersistence({
+        userId: enrollment.userId,
+        courseId: enrollment.courseId,
+        enrolledAt: enrollment.enrolledAt,
+        orderItemId: enrollment.orderItemId,
+        accessStatus: enrollment.accessStatus,
+      })
     );
   }
 
@@ -130,16 +126,14 @@ export class EnrollmentRepository implements IEnrollmentRepository {
         },
       },
     });
-    return enrollments.map(
-      (enrollment) =>
-        new Enrollment(
-          `${enrollment.userId}-${enrollment.courseId}`,
-          enrollment.userId,
-          enrollment.courseId,
-          enrollment.enrolledAt,
-          enrollment.orderItemId || undefined,
-          enrollment.accessStatus
-        )
+    return enrollments.map((enrollment) =>
+      Enrollment.fromPersistence({
+        userId: enrollment.userId,
+        courseId: enrollment.courseId,
+        enrolledAt: enrollment.enrolledAt,
+        orderItemId: enrollment.orderItemId,
+        accessStatus: enrollment.accessStatus,
+      })
     );
   }
 

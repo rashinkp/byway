@@ -25,7 +25,7 @@ export class PrismaCertificateRepository implements CertificateRepositoryInterfa
         updatedAt: certificate.updatedAt,
       },
     });
-    return Certificate.toDomain({
+    return Certificate.fromPersistence({
       ...created,
       metadata: created.metadata as CertificateMetadata | undefined
     });
@@ -33,7 +33,7 @@ export class PrismaCertificateRepository implements CertificateRepositoryInterfa
 
   async findById(id: string): Promise<Certificate | null> {
     const found = await this._prisma.certificate.findUnique({ where: { id } });
-    return found ? Certificate.toDomain({
+    return found ? Certificate.fromPersistence({
       ...found,
       metadata: found.metadata as CertificateMetadata | undefined
     }) : null;
@@ -45,7 +45,7 @@ export class PrismaCertificateRepository implements CertificateRepositoryInterfa
     const found = await this._prisma.certificate.findUnique({
       where: { certificateNumber },
     });
-    return found ? Certificate.toDomain({
+    return found ? Certificate.fromPersistence({
       ...found,
       metadata: found.metadata as CertificateMetadata | undefined
     }) : null;
@@ -56,7 +56,7 @@ export class PrismaCertificateRepository implements CertificateRepositoryInterfa
       where: { userId },
       orderBy: { createdAt: "desc" },
     });
-    return found.map((item) => Certificate.toDomain({
+    return found.map((item) => Certificate.fromPersistence({
       ...item,
       metadata: item.metadata as CertificateMetadata | undefined
     }));
@@ -67,7 +67,7 @@ export class PrismaCertificateRepository implements CertificateRepositoryInterfa
       where: { courseId },
       orderBy: { createdAt: "desc" },
     });
-    return found.map((item) => Certificate.toDomain({
+    return found.map((item) => Certificate.fromPersistence({
       ...item,
       metadata: item.metadata as CertificateMetadata | undefined
     }));
@@ -80,7 +80,7 @@ export class PrismaCertificateRepository implements CertificateRepositoryInterfa
     const found = await this._prisma.certificate.findUnique({
       where: { userId_courseId: { userId, courseId } },
     });
-    return found ? Certificate.toDomain({
+    return found ? Certificate.fromPersistence({
       ...found,
       metadata: found.metadata as CertificateMetadata | undefined
     }) : null;
@@ -98,7 +98,7 @@ export class PrismaCertificateRepository implements CertificateRepositoryInterfa
         updatedAt: certificate.updatedAt,
       },
     });
-    return Certificate.toDomain({
+    return Certificate.fromPersistence({
       ...updated,
       metadata: updated.metadata as CertificateMetadata | undefined
     });
@@ -182,7 +182,7 @@ export class PrismaCertificateRepository implements CertificateRepositoryInterfa
         status: { not: "EXPIRED" },
       },
     });
-    return found.map(item => Certificate.toDomain({
+    return found.map(item => Certificate.fromPersistence({
       ...item,
       metadata: item.metadata as CertificateMetadata | undefined
     }));
@@ -193,7 +193,7 @@ export class PrismaCertificateRepository implements CertificateRepositoryInterfa
       where: { status: status as CertificateStatus },
       orderBy: { createdAt: "desc" },
     });
-     return found.map((item) => Certificate.toDomain({
+     return found.map((item) => Certificate.fromPersistence({
       ...item,
       metadata: item.metadata as CertificateMetadata | undefined
     }));

@@ -378,6 +378,6 @@ export class OrderRepository implements IOrderRepository {
     const course = await this._prisma.course.findUnique({
       where: { id: courseId },
     });
-    return course ? Course.fromPrisma(course) : null;
+    return course ? Course.fromPersistence(course) : null;
   }
 }

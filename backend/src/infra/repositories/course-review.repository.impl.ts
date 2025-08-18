@@ -1,33 +1,8 @@
 import { PrismaClient } from "@prisma/client";
 import { CourseReview } from "../../domain/entities/review.entity";
-
 import { ICourseReviewRepository } from "../../app/repositories/course-review.repository.interface";
-import { Rating } from "../../domain/value-object/rating";
 import { ICourseReviewWithUser, ICourseReviewSummary, ICourseReviewQuery, ICourseReviewPaginatedResult } from "../../domain/types/review.interface";
 
-function toCourseReviewEntity(data: {
-  id: string;
-  courseId: string;
-  userId: string;
-  rating: number;
-  title: string | null;
-  comment: string | null;
-  createdAt: Date;
-  updatedAt: Date;
-  deletedAt: Date | null;
-}): CourseReview {
-  return new CourseReview({
-    id: data.id,
-    courseId: data.courseId,
-    userId: data.userId,
-    rating: new Rating(data.rating),
-    title: data.title,
-    comment: data.comment,
-    createdAt: data.createdAt,
-    updatedAt: data.updatedAt,
-    deletedAt: data.deletedAt,
-  });
-}
 
 function toCourseReviewWithUser(data: {
   id: string;
@@ -81,12 +56,12 @@ export class CourseReviewRepository implements ICourseReviewRepository {
         deletedAt: review.deletedAt,
       },
     });
-    return toCourseReviewEntity(created);
+    return CourseReview.fromPersistence(created);
   }
 
   async findById(id: string): Promise<CourseReview | null> {
     const found = await this._prisma.courseReview.findUnique({ where: { id } });
-    return found ? toCourseReviewEntity(found) : null;
+    return found ? CourseReview.fromPersistence(found) : null;
   }
 
   async update(review: CourseReview): Promise<CourseReview> {
@@ -99,7 +74,7 @@ export class CourseReviewRepository implements ICourseReviewRepository {
         updatedAt: new Date(),
       },
     });
-    return toCourseReviewEntity(updated);
+    return CourseReview.fromPersistence(updated);
   }
 
   async softDelete(review: CourseReview): Promise<CourseReview> {
@@ -110,7 +85,7 @@ export class CourseReviewRepository implements ICourseReviewRepository {
         updatedAt: new Date(),
       },
     });
-    return toCourseReviewEntity(deleted);
+    return CourseReview.fromPersistence(deleted);
   }
 
   async restore(review: CourseReview): Promise<CourseReview> {
@@ -121,7 +96,7 @@ export class CourseReviewRepository implements ICourseReviewRepository {
         updatedAt: new Date(),
       },
     });
-    return toCourseReviewEntity(restored);
+    return CourseReview.fromPersistence(restored);
   }
 
   async delete(id: string): Promise<void> {
@@ -213,7 +188,7 @@ export class CourseReviewRepository implements ICourseReviewRepository {
     const found = await this._prisma.courseReview.findFirst({
       where: { userId, courseId, deletedAt: null },
     });
-    return found ? toCourseReviewEntity(found) : null;
+    return found ? CourseReview.fromPersistence(found) : null;
   }
 
   async getCourseReviewStats(

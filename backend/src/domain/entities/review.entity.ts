@@ -128,8 +128,8 @@ export class CourseReview {
     };
   }
 
-  // Factory method for creating from Prisma data
-  static fromPrisma(data: { 
+  // Factory method for creating from persisted data
+  static fromPersistence(data: { 
     id: string; 
     courseId: string; 
     userId: string; 

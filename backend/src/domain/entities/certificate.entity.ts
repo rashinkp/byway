@@ -164,7 +164,7 @@ export class Certificate {
     return this._status === CertificateStatus.GENERATED && !this.isExpired();
   }
 
-  public static toDomain(raw: {
+  public static fromPersistence(raw: {
     id: string;
     userId: string;
     courseId: string;

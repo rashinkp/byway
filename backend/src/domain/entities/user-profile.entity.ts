@@ -119,7 +119,7 @@ export class UserProfile {
     return new UserProfile(updatedProps);
   }
 
-  static fromPrisma(data: {
+  static fromPersistence(data: {
     id: string;
     userId: string;
     bio?: string | null;

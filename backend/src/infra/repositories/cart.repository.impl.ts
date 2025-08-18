@@ -13,7 +13,7 @@ export class CartRepository implements ICartRepository {
       },
     });
     if (!cart) return null;
-    return Cart.fromPrisma({
+    return Cart.fromPersistence({
       ...cart,
       discount: Number(cart.discount),
     });
@@ -33,7 +33,7 @@ export class CartRepository implements ICartRepository {
       },
     });
     return carts.map((cart) =>
-      Cart.fromPrisma({
+      Cart.fromPersistence({
         ...cart,
         discount: Number(cart.discount),
       })
@@ -54,7 +54,7 @@ export class CartRepository implements ICartRepository {
       },
     });
     return carts.map((cart) =>
-      Cart.fromPrisma({
+      Cart.fromPersistence({
         ...cart,
         discount: Number(cart.discount),
       })
@@ -75,7 +75,7 @@ export class CartRepository implements ICartRepository {
       },
     });
     if (!cart) return null;
-    return Cart.fromPrisma({
+    return Cart.fromPersistence({
       ...cart,
       discount: Number(cart.discount),
     });
@@ -96,7 +96,7 @@ export class CartRepository implements ICartRepository {
         course: true,
       },
     });
-    return Cart.fromPrisma({
+    return Cart.fromPersistence({
       ...created,
       discount: Number(created.discount),
     });
@@ -117,7 +117,7 @@ export class CartRepository implements ICartRepository {
         course: true,
       },
     });
-    return Cart.fromPrisma({
+    return Cart.fromPersistence({
       ...updated,
       discount: Number(updated.discount),
     });

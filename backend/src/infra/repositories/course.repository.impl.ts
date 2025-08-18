@@ -79,7 +79,7 @@ export class CourseRepository implements ICourseRepository {
             name: instructor.name,
             email: instructor.email,
             profile: instructor.userProfile
-              ? UserProfile.fromPrisma(instructor.userProfile)
+              ? UserProfile.fromPersistence(instructor.userProfile)
               : null,
           }
         : null,

@@ -17,7 +17,18 @@ export class MessageRepository implements IMessageRepository {
       where: { id: id.value },
     });
     if (!message) return null;
-    return this.toDomain(message);
+
+    return Message.fromPersistence(message as unknown as {
+      chatId: string;
+      senderId: string;
+      content: string | null;
+      imageUrl: string | null;
+      audioUrl: string | null;
+      type: string;
+      isRead: boolean;
+      createdAt: Date;
+      id?: string;
+    });
   }
 
   async findByChat(chatId: ChatId): Promise<Message[]> {
@@ -25,7 +36,19 @@ export class MessageRepository implements IMessageRepository {
       where: { chatId: chatId.value },
       orderBy: { createdAt: "asc" },
     });
-    return messages.map((msg) => this.toDomain(msg));
+    return messages.map((msg) =>
+      Message.fromPersistence(msg as unknown as {
+        chatId: string;
+        senderId: string;
+        content: string | null;
+        imageUrl: string | null;
+        audioUrl: string | null;
+        type: string;
+        isRead: boolean;
+        createdAt: Date;
+        id?: string;
+      })
+    );
   }
 
   async findByChatWithUserData(
@@ -173,25 +196,5 @@ export class MessageRepository implements IMessageRepository {
     return count;
   }
 
-  private toDomain(prismaMessage: { 
-    chatId: string; 
-    senderId: string; 
-    content: string | null; 
-    imageUrl: string | null; 
-    audioUrl: string | null; 
-    type: string; 
-    isRead: boolean; 
-    createdAt: Date; 
-  }): Message {
-    return new Message(
-      new ChatId(prismaMessage.chatId),
-      new UserId(prismaMessage.senderId),
-      prismaMessage.content ? new MessageContent(prismaMessage.content) : null,
-      prismaMessage.imageUrl ?? null,
-      prismaMessage.audioUrl ?? null,
-      DomainMessageType[prismaMessage.type as keyof typeof DomainMessageType],
-      prismaMessage.isRead,
-      new Timestamp(prismaMessage.createdAt)
-    );
-  }
+  // Conversion handled by Message.fromPersistence
 }

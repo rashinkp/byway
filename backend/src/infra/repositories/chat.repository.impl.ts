@@ -2,7 +2,6 @@ import { EnhancedChatListItem, IChatRepository, PaginatedChatList } from "../../
 import { Chat } from "../../domain/entities/chat.entity";
 import { ChatId } from "../../domain/value-object/ChatId";
 import { UserId } from "../../domain/value-object/UserId";
-import { Timestamp } from "../../domain/value-object/Timestamp";
 import { PrismaClient } from "@prisma/client";
 import { Role } from "../../domain/enum/role.enum";
 
@@ -15,7 +14,7 @@ export class ChatRepository implements IChatRepository {
       include: { messages: true },
     });
     if (!chat) return null;
-    return this.toDomain(chat);
+    return Chat.fromPersistence(chat);
   }
 
   async findByUser(userId: UserId): Promise<Chat[]> {
@@ -25,7 +24,7 @@ export class ChatRepository implements IChatRepository {
       },
       include: { messages: true },
     });
-    return chats.map(this.toDomain);
+    return chats.map((c) => Chat.fromPersistence(c));
   }
 
   async findEnhancedChatList(
@@ -101,7 +100,6 @@ export class ChatRepository implements IChatRepository {
         take: limit,
       });
 
-      // Find chats where the last message matches (but not already in nameOrRoleMatchChats)
       const nameOrRoleMatchIds = new Set(
         nameOrRoleMatchChats.map((chat) => chat.id)
       );
@@ -352,7 +350,7 @@ export class ChatRepository implements IChatRepository {
         updatedAt: chat.updatedAt?.toString(),
       },
     });
-    return this.toDomain(created);
+    return Chat.fromPersistence(created);
   }
 
   async save(chat: Chat): Promise<void> {
@@ -378,22 +376,10 @@ export class ChatRepository implements IChatRepository {
       include: { messages: true },
     });
 
-    return chat ? this.toDomain(chat) : null;
+    return chat ? Chat.fromPersistence(chat) : null;
   }
 
-  private toDomain(prismaChat: {
-    user1Id: string;
-    user2Id: string;
-    createdAt: Date;
-    updatedAt: Date;
-  }): Chat {
-    return new Chat(
-      new UserId(prismaChat.user1Id),
-      new UserId(prismaChat.user2Id),
-      new Timestamp(prismaChat.createdAt),
-      new Timestamp(prismaChat.updatedAt)
-    );
-  }
+  // Conversion handled by Chat.fromPersistence
 
   private formatTime(date: Date): string {
     const now = new Date();

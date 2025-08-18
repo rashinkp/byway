@@ -303,7 +303,7 @@ export class Course {
     };
   }
 
-  static fromPrisma(data: {
+  static fromPersistence(data: {
     id: string;
     title: string;
     description: string | null;

@@ -42,7 +42,7 @@ export class PrismaInstructorRepository implements IInstructorRepository {
       },
     });
 
-    return Instructor.fromPrisma(upserted);
+    return Instructor.fromPersistence(upserted);
   }
 
   async updateInstructor(instructor: Instructor): Promise<Instructor> {
@@ -61,7 +61,7 @@ export class PrismaInstructorRepository implements IInstructorRepository {
         updatedAt: instructor.updatedAt,
       },
     });
-    return Instructor.fromPrisma(updated);
+    return Instructor.fromPersistence(updated);
   }
 
   async findInstructorById(id: string): Promise<Instructor | null> {
@@ -69,7 +69,7 @@ export class PrismaInstructorRepository implements IInstructorRepository {
       where: { id },
     });
     if (!instructor) return null;
-    return Instructor.fromPrisma(instructor);
+    return Instructor.fromPersistence(instructor);
   }
 
   async findInstructorByUserId(userId: string): Promise<Instructor | null> {
@@ -77,7 +77,7 @@ export class PrismaInstructorRepository implements IInstructorRepository {
       where: { userId },
     });
     if (!instructor) return null;
-    return Instructor.fromPrisma(instructor);
+    return Instructor.fromPersistence(instructor);
   }
 
   async findAllInstructors(
@@ -148,7 +148,7 @@ export class PrismaInstructorRepository implements IInstructorRepository {
     });
 
     return {
-      items: instructors.map((instructor) => Instructor.fromPrisma(instructor)),
+      items: instructors.map((instructor) => Instructor.fromPersistence(instructor)),
       total,
       totalPages: Math.ceil(total / limit),
     };

@@ -32,16 +32,20 @@ interface QuizQuestionData {
 export class LessonContentRepository implements ILessonContentRepository {
   constructor(private readonly _prisma: PrismaClient) {}
 
-  async findById(id: string): Promise<LessonContent | null> {
-    const content = await this._prisma.lessonContent.findUnique({
-      where: { id, deletedAt: null }, // Only return non-soft-deleted content
-      include: { quizQuestions: true },
-    });
-
-    if (!content) {
-      return null;
-    }
-
+  private mapToLessonContentEntity(content: {
+    id: string;
+    lessonId: string;
+    type: string;
+    status: string;
+    title: string | null;
+    description: string | null;
+    fileUrl: string | null;
+    thumbnailUrl: string | null;
+    quizQuestions?: Array<{ id: string; question: string; options: string[]; correctAnswer: string }> | null;
+    createdAt: Date;
+    updatedAt: Date;
+    deletedAt: Date | null;
+  }): LessonContent {
     return LessonContent.fromPersistence({
       id: content.id,
       lessonId: content.lessonId,
@@ -65,6 +69,19 @@ export class LessonContentRepository implements ILessonContentRepository {
     });
   }
 
+  async findById(id: string): Promise<LessonContent | null> {
+    const content = await this._prisma.lessonContent.findUnique({
+      where: { id, deletedAt: null }, // Only return non-soft-deleted content
+      include: { quizQuestions: true },
+    });
+
+    if (!content) {
+      return null;
+    }
+
+    return this.mapToLessonContentEntity(content);
+  }
+
   async findByLessonId(lessonId: string): Promise<LessonContent | null> {
     const content = await this._prisma.lessonContent.findUnique({
       where: { lessonId },
@@ -75,27 +92,7 @@ export class LessonContentRepository implements ILessonContentRepository {
       return null;
     }
 
-    return LessonContent.fromPersistence({
-      id: content.id,
-      lessonId: content.lessonId,
-      type: content.type as ContentType,
-      status: content.status as ContentStatus,
-      title: content.title,
-      description: content.description,
-      fileUrl: content.fileUrl,
-      thumbnailUrl: content.thumbnailUrl,
-      quizQuestions: content.quizQuestions
-        ? content.quizQuestions.map((q) => ({
-            id: q.id,
-            question: q.question,
-            options: q.options,
-            correctAnswer: q.correctAnswer,
-          }))
-        : null,
-      createdAt: content.createdAt,
-      updatedAt: content.updatedAt,
-      deletedAt: content.deletedAt,
-    });
+    return this.mapToLessonContentEntity(content);
   }
 
   async create(content: LessonContent): Promise<LessonContent> {
@@ -129,27 +126,7 @@ export class LessonContentRepository implements ILessonContentRepository {
       include: { quizQuestions: true },
     });
 
-    return LessonContent.fromPersistence({
-      id: createdContent.id,
-      lessonId: createdContent.lessonId,
-      type: createdContent.type as ContentType,
-      status: createdContent.status as ContentStatus,
-      title: createdContent.title,
-      description: createdContent.description,
-      fileUrl: createdContent.fileUrl,
-      thumbnailUrl: createdContent.thumbnailUrl,
-      quizQuestions: createdContent.quizQuestions
-        ? createdContent.quizQuestions.map((q) => ({
-            id: q.id,
-            question: q.question,
-            options: q.options,
-            correctAnswer: q.correctAnswer,
-          }))
-        : null,
-      createdAt: createdContent.createdAt,
-      updatedAt: createdContent.updatedAt,
-      deletedAt: createdContent.deletedAt,
-    });
+    return this.mapToLessonContentEntity(createdContent);
   }
 
   async update(content: LessonContent): Promise<LessonContent> {
@@ -183,27 +160,7 @@ export class LessonContentRepository implements ILessonContentRepository {
       include: { quizQuestions: true },
     });
 
-    return LessonContent.fromPersistence({
-      id: updatedContent.id,
-      lessonId: updatedContent.lessonId,
-      type: updatedContent.type as ContentType,
-      status: updatedContent.status as ContentStatus,
-      title: updatedContent.title,
-      description: updatedContent.description,
-      fileUrl: updatedContent.fileUrl,
-      thumbnailUrl: updatedContent.thumbnailUrl,
-      quizQuestions: updatedContent.quizQuestions
-        ? updatedContent.quizQuestions.map((q) => ({
-            id: q.id,
-            question: q.question,
-            options: q.options,
-            correctAnswer: q.correctAnswer,
-          }))
-        : null,
-      createdAt: updatedContent.createdAt,
-      updatedAt: updatedContent.updatedAt,
-      deletedAt: updatedContent.deletedAt,
-    });
+    return this.mapToLessonContentEntity(updatedContent);
   }
 
   async delete(id: string): Promise<void> {
