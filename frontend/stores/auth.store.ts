@@ -68,13 +68,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 	email: null,
 	isHydrating: false,
 	setUser: (user) => {
-		const currentUser = get().user;
-		const userIdChanged = currentUser?.id !== user?.id;
-		
-		// Save to localStorage
 		saveUserToStorage(user);
-		
-		// Clear cache when user state changes
 		clearAllCache();
 		
 

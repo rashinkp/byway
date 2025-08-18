@@ -83,9 +83,8 @@ export default function CommonLayout({
 					setIsLoggingOut(false);
 					router.replace("/login");
 				},
-				onError:  => {
+				onError: () => {
 					setIsLoggingOut(false);
-					// Even if logout fails, redirect to login page
 					router.replace("/login");
 				},
 			});
