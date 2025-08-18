@@ -80,8 +80,7 @@ export class CertificatePdfService implements CertificatePdfServiceInterface {
       // Save PDF as buffer
       const pdfBytes = await pdfDoc.save();
       return Buffer.from(pdfBytes);
-    } catch (error) {
-      console.error("Error generating certificate PDF:", error);
+    } catch {
       throw new Error("Failed to generate certificate PDF");
     }
   }

@@ -224,8 +224,7 @@ export class LessonProgressRepository implements ILessonProgressRepository {
       }
 
       return Math.round((completedLessons / totalLessons) * 100);
-    } catch (error) {
-      console.error("Error calculating course progress:", error);
+    } catch  {
       throw new HttpError("Failed to calculate course progress", 500);
     }
   }

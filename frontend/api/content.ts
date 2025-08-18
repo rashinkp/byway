@@ -30,10 +30,6 @@ export async function createContent(
 			typeof apiError.response.data === "string" &&
 			(apiError.response.data as string).trim().startsWith("<!DOCTYPE html>")
 		) {
-			console.error(
-				"Received HTML response instead of JSON:",
-				apiError.response.data,
-			);
 			throw new Error(
 				"Server returned an HTML error page. Please check the API configuration.",
 			);
@@ -57,11 +53,6 @@ export async function updateContent(
 		return response.data.data;
 	} catch (error: unknown) {
 		const apiError = error as ApiError;
-		console.error("Content update error:", {
-			status: apiError.response?.status,
-			data: apiError.response?.data,
-			message: apiError.message,
-		});
 
 		if (apiError.response?.status === 403) {
 			throw new Error("You don't have permission to update content.");
@@ -108,11 +99,6 @@ export async function deleteContent(contentId: string): Promise<void> {
 		await api.delete(`/content/${contentId}`);
 	} catch (error: unknown) {
 		const apiError = error as ApiError;
-		console.error("Content deletion error:", {
-			status: apiError.response?.status,
-			data: apiError.response?.data,
-			message: apiError.message,
-		});
 
 		if (apiError.response?.status === 403) {
 			throw new Error("You don't have permission to delete this content.");

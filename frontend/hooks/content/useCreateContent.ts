@@ -14,7 +14,6 @@ export const useCreateContent = () => {
 				const validatedData = createContentSchema.parse(data);
 				return await createContent(validatedData);
 			} catch (error) {
-				console.error("Content creation error:", error);
 				if (error instanceof z.ZodError) {
 					const errorMessage = error.errors.map((e) => e.message).join(", ");
 					throw new Error(`Validation error: ${errorMessage}`);
@@ -31,7 +30,6 @@ export const useCreateContent = () => {
 			toast.success("Content created successfully");
 		},
 		onError: (error) => {
-			console.error("Create content error:", error);
 			toast.error(error.message || "Failed to create content");
 		},
 	});

@@ -79,7 +79,6 @@ export function useApproveCourse(): UseCourseApprovalReturn {
 			toast.success("Course approved successfully!");
 		},
 		onError: (err) => {
-			console.error("Course approval failed:", err);
 			toast.error("Failed to approve course", {
 				description: err.message || "Please try again",
 			});
@@ -162,7 +161,6 @@ export function useDeclineCourse(): UseCourseApprovalReturn {
 			toast.success("Course declined successfully!");
 		},
 		onError: (err) => {
-			console.error("Course decline failed:", err);
 			toast.error("Failed to decline course", {
 				description: err.message || "Please try again",
 			});

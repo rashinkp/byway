@@ -63,7 +63,6 @@ export async function getAllCourses({
 		return response.data.data;
 	} catch (error: unknown) {
 		const apiError = error as ApiError;
-		console.error("Failed to fetch courses:", apiError);
 		throw new Error(apiError.response?.data?.message || "Failed to fetch courses");
 	}
 }
@@ -76,7 +75,6 @@ export async function createCourse(
 		return response.data.data;
 	} catch (error: unknown) {
 		const apiError = error as ApiError;
-		console.error("Failed to create course:", apiError);
 		throw new Error(apiError.response?.data?.message || "Failed to create course");
 	}
 }
@@ -140,7 +138,6 @@ export async function getEnrolledCourses({
 		return response.data.data;
 	} catch (error: unknown) {
 		const apiError = error as ApiError;
-		console.error("Failed to fetch enrolled courses:", apiError);
 		throw new Error(
 			apiError.response?.data?.message || "Failed to fetch enrolled courses",
 		);
@@ -157,7 +154,6 @@ export async function approveCourse({
 		return response.data.data;
 	} catch (error: unknown) {
 		const apiError = error as ApiError;
-		console.error("Failed to approve course:", apiError);
 		throw new Error(
 			apiError.response?.data?.message || "Failed to approve course",
 		);
@@ -174,7 +170,6 @@ export async function declineCourse({
 		return response.data.data;
 	} catch (error: unknown) {
 		const apiError = error as ApiError;
-		console.error("Failed to decline course:", apiError);
 		throw new Error(
 			apiError.response?.data?.message || "Failed to decline course",
 		);
@@ -187,7 +182,6 @@ export async function getCourseStats(): Promise<CourseStats> {
 		return response.data.data;
 	} catch (error: unknown) {
 		const apiError = error as ApiError;
-		console.error("Failed to fetch course stats:", apiError);
 		throw new Error(
 			apiError.response?.data?.message || "Failed to fetch course stats",
 		);

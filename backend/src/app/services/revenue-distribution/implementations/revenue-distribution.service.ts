@@ -39,15 +39,10 @@ export class RevenueDistributionService implements IRevenueDistributionService {
         try {
           await this.distributeRevenueForOrderItem(orderItem);
         } catch (error) {
-          console.error(
-            `Error distributing revenue for order item ${orderItem.id}:`,
-            error
-          );
           throw error; 
         }
       }
     } catch (error) {
-      console.error("Error distributing revenue:", error);
       throw new HttpError(
         error instanceof Error ? error.message : "Error distributing revenue",
         StatusCodes.INTERNAL_SERVER_ERROR
@@ -189,7 +184,6 @@ export class RevenueDistributionService implements IRevenueDistributionService {
     instructorShare: number,
     adminShare: number
   ): Promise<void> {
-    try {
       // Get admin user ID and order details
       const adminId = await this.getAdminUserId();
       const order = await this._orderRepository.findById(orderItem.orderId);
@@ -234,8 +228,6 @@ export class RevenueDistributionService implements IRevenueDistributionService {
         message: `Course "${course.title}" purchase completed! You're ready to start learning.`,
         link: `/user/my-courses`,
       });
-    } catch (error) {
-      console.error("Error sending purchase notifications:", error);
-    }
+    
   }
 }

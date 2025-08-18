@@ -149,8 +149,7 @@ socket.on(
       io.to(data.chatId).emit("messagesRead", { chatId: data.chatId, userId: data.userId });
 
 
-    } catch (err) {
-      console.error("[SocketIO] Error marking messages as read:", err);
+    } catch {
       socket.emit("error", { message: "Failed to mark messages as read" });
     }
   });

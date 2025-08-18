@@ -16,8 +16,5 @@ export const useDeleteContent = (lessonId: string) => {
 			queryClient.invalidateQueries({ queryKey: ["content", lessonId] });
 			queryClient.invalidateQueries({ queryKey: ["lesson", lessonId] });
 		},
-		onError: (error) => {
-			console.error("Delete content error:", error.message);
-		},
 	});
 };

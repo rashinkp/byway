@@ -81,7 +81,6 @@ export function useDeclineInstructor() {
 			});
 		},
 		onError: (error) => {
-			console.error("Instructor decline failed:", error.message);
 			toast.error("Instructor Decline Failed", {
 				description: error.message || "Something went wrong while declining",
 			});

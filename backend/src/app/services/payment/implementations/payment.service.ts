@@ -105,11 +105,6 @@ export class PaymentService implements IPaymentService {
           orderItemId: item.id,
         });
       } catch (error) {
-        console.error(
-          "Error creating enrollment for course:",
-          item.courseId,
-          error
-        );
         throw new HttpError(
           `Failed to create enrollment for course ${item.courseId}`,
           StatusCodes.INTERNAL_SERVER_ERROR
@@ -121,7 +116,6 @@ export class PaymentService implements IPaymentService {
     try {
       await this._revenueDistributionService.distributeRevenue(orderId);
     } catch (error) {
-      console.error("Error during revenue distribution:", error);
       throw new HttpError(
         "Failed to distribute revenue",
         StatusCodes.INTERNAL_SERVER_ERROR
@@ -263,7 +257,6 @@ export class PaymentService implements IPaymentService {
             // Update order status
             const order = await this._orderRepository.findById(orderId);
             if (!order) {
-              console.error("Order not found:", orderId);
               throw new HttpError("Order not found", StatusCodes.NOT_FOUND);
             }
 
@@ -279,7 +272,6 @@ export class PaymentService implements IPaymentService {
             );
 
             if (!orderItems || orderItems.length === 0) {
-              console.error("No order items found for order:", orderId);
               throw new HttpError(
                 "No order items found",
                 StatusCodes.NOT_FOUND
@@ -306,11 +298,6 @@ export class PaymentService implements IPaymentService {
                   orderItemId: item.id,
                 });
               } catch (error) {
-                console.error(
-                  "Error creating enrollment for course:",
-                  item.courseId,
-                  error
-                );
                 throw error;
               }
             }
@@ -318,23 +305,16 @@ export class PaymentService implements IPaymentService {
             try {
               await this._revenueDistributionService.distributeRevenue(orderId);
             } catch (error) {
-              console.error("Error during revenue distribution:", error);
               throw error;
             }
 
-            // Clear cart items for purchased courses
-            try {
+           
               for (const item of orderItems) {
                 await this._cartRepository.deleteByUserAndCourse(
                   order.userId,
                   item.courseId
                 );
               }
-            } catch (error) {
-              console.error("Error clearing cart items:", error);
-              // Don't throw error here as the purchase was successful
-              // Cart clearing is a cleanup operation
-            }
 
             // Send real-time notifications via Socket.IO
             const orderItemsWithPrices = await Promise.all(
@@ -382,7 +362,6 @@ export class PaymentService implements IPaymentService {
         const orderId = metadata.orderId;
 
         if (!orderId) {
-          console.error("No order ID found in metadata");
           throw new HttpError(
             "No order ID found in session metadata",
             StatusCodes.BAD_REQUEST
@@ -402,7 +381,6 @@ export class PaymentService implements IPaymentService {
 
         const order = await this._orderRepository.findById(orderId);
         if (!order) {
-          console.error("Order not found:", orderId);
           throw new HttpError("Order not found", StatusCodes.NOT_FOUND);
         }
 
@@ -438,7 +416,6 @@ export class PaymentService implements IPaymentService {
     order: { userId: string },
     orderItems: { courseId: string; coursePrice: string | number }[]
   ): Promise<void> {
-    try {
       const io = getSocketIOInstance();
       if (!io) {
         return;
@@ -456,7 +433,6 @@ export class PaymentService implements IPaymentService {
       });
 
       if (!admins || admins.length === 0) {
-        console.error("Admin user not found for notifications");
         return;
       }
       const adminId = admins[0].id;
@@ -465,7 +441,6 @@ export class PaymentService implements IPaymentService {
       for (const item of orderItems) {
         const course = await this._orderRepository.findCourseById(item.courseId);
         if (!course) {
-          console.error("Course not found for notifications:", item.courseId);
           continue;
         }
 
@@ -504,12 +479,6 @@ export class PaymentService implements IPaymentService {
           courseTitle: course.title,
         });
       }
-    } catch (error) {
-      console.error(
-        "Error sending purchase notifications via Socket.IO:",
-        error
-      );
-      // Don't throw error to avoid breaking the payment process
-    }
+    } 
   }
-}
+

@@ -27,21 +27,16 @@ export class WebhookMetadata {
     // Parse course IDs if they exist
     let courseIds: string[] | undefined;
     if (metadata.courseIds) {
-      try {
+
         courseIds = JSON.parse(metadata.courseIds);
-      } catch (error) {
-        console.error('Error parsing course IDs from metadata:', error);
-      }
+      
     }
 
     // Parse courses if they exist (for backward compatibility)
     let courses: Record<string, unknown>[] | undefined;
     if (metadata.courses) {
-      try {
         courses = JSON.parse(metadata.courses);
-      } catch (error) {
-        console.error('Error parsing courses from metadata:', error);
-      }
+      
     }
 
     return new WebhookMetadata(

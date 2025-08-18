@@ -13,11 +13,6 @@ export const corsConfig = {
     if (!origin || allowedOrigins.includes(origin)) {
       callback(null, true);
     } else {
-      console.error(
-        `CORS blocked for origin: ${origin}. Allowed origins: ${allowedOrigins.join(
-          ", "
-        )}`
-      );
       callback(new Error(`CORS policy: Origin ${origin} not allowed`));
     }
   },

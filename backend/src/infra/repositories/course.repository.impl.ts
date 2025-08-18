@@ -159,8 +159,7 @@ export class CourseRepository implements ICourseRepository {
             })
           : null,
       });
-    } catch (error) {
-      console.error("Error saving course in repository", { error, course });
+    } catch {
       throw new HttpError("Failed to save course", 500);
     }
   }
@@ -201,11 +200,8 @@ export class CourseRepository implements ICourseRepository {
             })
           : null,
       });
-    } catch (error) {
-      console.error("Error retrieving course by ID in repository", {
-        error,
-        id,
-      });
+    } catch {
+   
       throw new HttpError("Failed to retrieve course", 500);
     }
   }
@@ -244,11 +240,8 @@ export class CourseRepository implements ICourseRepository {
             })
           : null,
       });
-    } catch (error) {
-      console.error("Error retrieving course by name in repository", {
-        error,
-        title,
-      });
+    } catch {
+    
       throw new HttpError("Failed to retrieve course", 500);
     }
   }
@@ -371,8 +364,7 @@ export class CourseRepository implements ICourseRepository {
         total,
         totalPage: Math.ceil(total / limit),
       };
-    } catch (error) {
-      console.error("Error retrieving courses in repository", { error, input });
+    } catch  {
       throw new HttpError("Failed to retrieve courses", 500);
     }
   }
@@ -448,8 +440,7 @@ export class CourseRepository implements ICourseRepository {
             })
           : null,
       });
-    } catch (error) {
-      console.error("Error updating course in repository", { error, course });
+    } catch  {
       throw new HttpError("Failed to update course", 500);
     }
   }
@@ -486,11 +477,8 @@ export class CourseRepository implements ICourseRepository {
             })
           : null,
       });
-    } catch (error) {
-      console.error("Error soft deleting course in repository", {
-        error,
-        course,
-      });
+    } catch  {
+    
       throw new HttpError("Failed to soft delete course", 500);
     }
   }
@@ -570,11 +558,8 @@ export class CourseRepository implements ICourseRepository {
         total,
         totalPage: Math.ceil(total / limit),
       };
-    } catch (error) {
-      console.error("Error retrieving enrolled courses in repository", {
-        error,
-        input,
-      });
+    } catch {
+
       throw new HttpError("Failed to retrieve enrolled courses", 500);
     }
   }
@@ -612,11 +597,8 @@ export class CourseRepository implements ICourseRepository {
             })
           : null,
       });
-    } catch (error) {
-      console.error("Error updating course approval status in repository", {
-        error,
-        course,
-      });
+    } catch {
+   
       throw new HttpError("Failed to update course approval status", 500);
     }
   }
@@ -635,8 +617,7 @@ export class CourseRepository implements ICourseRepository {
         objectives: details.objectives,
         targetAudience: details.targetAudience,
       });
-    } catch (error) {
-      console.error("Error retrieving course details", { error, courseId });
+    } catch  {
       throw new HttpError("Failed to retrieve course details", 500);
     }
   }
@@ -669,12 +650,7 @@ export class CourseRepository implements ICourseRepository {
         objectives: updatedDetails.objectives,
         targetAudience: updatedDetails.targetAudience,
       });
-    } catch (error) {
-      console.error("Error updating course details", {
-        error,
-        courseId,
-        details,
-      });
+    } catch  {
       throw new HttpError("Failed to update course details", 500);
     }
   }
