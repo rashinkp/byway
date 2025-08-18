@@ -13,7 +13,7 @@ const startServer = async (): Promise<void> => {
   try {
     await databaseProvider.connect();
     const deps = createAppDependencies();
-    const app = createApp(deps);
+    const app = createApp(deps, logger);
     const server = http.createServer(app);
 
     const PORT = envConfig.PORT || 5001;

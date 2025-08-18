@@ -6,13 +6,16 @@ import {
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { S3ServiceInterface } from "../../../app/providers/s3.service.interface";
 import { awsConfig } from "../../../infra/config/aws.config";
+import { ILogger } from "../../../app/providers/logger-provider.interface";
 
 export class S3Service implements S3ServiceInterface {
   private readonly _s3Client: S3Client;
   private readonly _bucketName: string;
   private readonly _urlExpirationTime = 3600; // 1 hour in seconds
+  private readonly _logger: ILogger;
 
-  constructor() {
+  constructor(logger: ILogger) {
+    this._logger = logger;
     if (!awsConfig.bucketName) {
       throw new Error("AWS bucket name is required");
     }
@@ -88,7 +91,7 @@ export class S3Service implements S3ServiceInterface {
       const fileUrl = `https://${this._bucketName}.s3.${awsConfig.region}.amazonaws.com/${key}`;
       return fileUrl;
     } catch (error) {
-      console.error("Error uploading file to S3:", error);
+      this._logger.error("Error uploading file to S3:", error);
       throw new Error("Failed to upload file to cloud storage");
     }
   }
@@ -163,7 +166,7 @@ export class S3Service implements S3ServiceInterface {
       });
       await this._s3Client.send(command);
     } catch (error) {
-      console.error("Failed to delete file from S3:", error);
+      this._logger.error("Failed to delete file from S3:", error);
       throw new Error("Failed to delete file from S3");
     }
   }

@@ -6,11 +6,13 @@ import { HttpError } from "../../../../presentation/http/errors/http-error";
 import { IUserRepository } from "../../../repositories/user.repository";
 import { IUpdateUserUseCase } from "../interfaces/update-user.usecase.interface";
 import { S3ServiceInterface } from "../../../providers/s3.service.interface";
+import { ILogger } from "../../../providers/logger-provider.interface";
 
 export class UpdateUserUseCase implements IUpdateUserUseCase {
   constructor(
     private _userRepository: IUserRepository,
-    private _s3Service: S3ServiceInterface
+    private _s3Service: S3ServiceInterface,
+    private _logger: ILogger
   ) {}
 
   async execute(
@@ -30,9 +32,10 @@ export class UpdateUserUseCase implements IUpdateUserUseCase {
     ) {
       try {
         await this._s3Service.deleteFile(user.avatar);
-        console.log("[Deleted] deleted old avatar");
       } catch (err) {
-        console.error("Failed to delete old avatar from S3:", err);
+        // Log this error since it's not critical to the main operation
+        // and we want to track S3 cleanup issues
+        this._logger.warn(`Failed to delete old avatar from S3: ${err}`);
       }
     }
 

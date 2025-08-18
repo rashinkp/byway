@@ -81,19 +81,14 @@ export const authenticate = async (req: Request, res: Response, next: NextFuncti
 
   // 3. Access token is expired/invalid, try refresh token
   if (refreshToken) {
-    console.log("[Auth] Access token expired/invalid, attempting refresh token");
     
     // Check if refresh token was already used
     if (usedRefreshTokens.has(refreshToken)) {
-      console.log("[Auth] Refresh token already used:", refreshToken.substring(0, 10) + "...");
       
       // Check if we have recently issued tokens for this refresh token
       const recentTokens = getRecentlyIssuedTokens(refreshToken);
       if (recentTokens) {
-        console.log("[Auth] Using recently issued tokens for already used refresh token");
         
-        // Set the recently issued tokens
-        console.log("[CookieService] Setting recently issued tokens");
         CookieUtils.setAuthCookies(res, recentTokens.accessToken, recentTokens.refreshToken);
         
         req.user = recentTokens.user;
@@ -111,7 +106,6 @@ export const authenticate = async (req: Request, res: Response, next: NextFuncti
       "email" in refreshPayload &&
       "role" in refreshPayload
     ) {
-      console.log("[Auth] Refresh token valid, creating new tokens");
       
       try {
         // Check if there's already an ongoing refresh for this token
@@ -126,27 +120,20 @@ export const authenticate = async (req: Request, res: Response, next: NextFuncti
           refreshPromise.finally(() => {
             ongoingRefreshes.delete(refreshToken);
           });
-        } else {
-          console.log("[Auth] Waiting for ongoing refresh operation");
-        }
+        } 
         
         // Wait for the refresh operation to complete
         const { accessToken: newAccessToken, refreshToken: newRefreshToken, user } = await refreshPromise;
         
-        // Set new cookies
-        console.log("[CookieService] Setting new tokens");
         CookieUtils.setAuthCookies(res, newAccessToken, newRefreshToken);
         
-        console.log("[Auth] New tokens created and set successfully");
         
         req.user = user;
         return next();
       } catch (error) {
-        console.error("[Auth] Error creating new tokens:", error);
         return next(new HttpError("Failed to refresh tokens", 500));
       }
     } else {
-      console.log("[Auth] Invalid refresh token");
       return next(new HttpError("Invalid refresh token", 401));
     }
   }
@@ -172,20 +159,13 @@ export const restrictTo =
       if (payload && payload.id && payload.email && payload.role) {
         req.user = payload;
       } else if (refreshToken) {
-        // 3. Access token is expired/invalid, try refresh token
-        console.log("[Auth] Access token expired/invalid, attempting refresh token (restrictTo)");
         
         // Check if refresh token was already used
         if (usedRefreshTokens.has(refreshToken)) {
-          console.log("[Auth] Refresh token already used (restrictTo):", refreshToken.substring(0, 10) + "...");
           
           // Check if we have recently issued tokens for this refresh token
           const recentTokens = getRecentlyIssuedTokens(refreshToken);
           if (recentTokens) {
-            console.log("[Auth] Using recently issued tokens for already used refresh token (restrictTo)");
-            
-            // Set the recently issued tokens
-            console.log("[CookieService] Setting recently issued tokens");
             CookieUtils.setAuthCookies(res, recentTokens.accessToken, recentTokens.refreshToken);
             
             req.user = recentTokens.user;
@@ -201,7 +181,6 @@ export const restrictTo =
             "email" in refreshPayload &&
             "role" in refreshPayload
           ) {
-            console.log("[Auth] Refresh token valid, creating new tokens (restrictTo)");
             
             try {
               // Check if there's already an ongoing refresh for this token
@@ -216,26 +195,17 @@ export const restrictTo =
                 refreshPromise.finally(() => {
                   ongoingRefreshes.delete(refreshToken);
                 });
-              } else {
-                console.log("[Auth] Waiting for ongoing refresh operation (restrictTo)");
-              }
-              
+              } 
               // Wait for the refresh operation to complete
               const { accessToken: newAccessToken, refreshToken: newRefreshToken, user } = await refreshPromise;
               
-              // Set new cookies
-              console.log("[CookieService] Setting new tokens");
               CookieUtils.setAuthCookies(res, newAccessToken, newRefreshToken);
-              
-              console.log("[Auth] New tokens created and set successfully (restrictTo)");
               
               req.user = user;
             } catch (error) {
-              console.error("[Auth] Error creating new tokens (restrictTo):", error);
               return next(new HttpError("Failed to refresh tokens", 500));
             }
           } else {
-            console.log("[Auth] Invalid refresh token (restrictTo)");
             return next(new HttpError("Invalid refresh token", 401));
           }
         }
@@ -248,7 +218,6 @@ export const restrictTo =
         const { checkUserActiveUseCase } = getAppDependencies();
         await checkUserActiveUseCase.execute(req.user.id);
       } catch (err) {
-        console.log("[restrictTo] Passing error to next:", err);
         return next(err);
       }
       // --- END NEW ---
@@ -284,10 +253,8 @@ export const optionalAuth = async (
   next();
 };
 
-// Clean up used refresh tokens, ongoing refreshes, and recently issued tokens periodically (every hour)
 setInterval(() => {
   usedRefreshTokens.clear();
   ongoingRefreshes.clear();
   recentlyIssuedTokens.clear();
-  console.log("[Auth] Cleared used refresh tokens cache, ongoing refreshes, and recently issued tokens");
 }, 60 * 60 * 1000);

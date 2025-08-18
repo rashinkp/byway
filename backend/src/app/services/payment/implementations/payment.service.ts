@@ -95,10 +95,7 @@ export class PaymentService implements IPaymentService {
           );
 
         if (existingEnrollment) {
-          console.log(
-            `User ${userId} is already enrolled in course ${item.courseId}, skipping enrollment creation`
-          );
-          continue; // Skip creating duplicate enrollment
+          continue; 
         }
 
         // Create new enrollment
@@ -107,9 +104,6 @@ export class PaymentService implements IPaymentService {
           courseIds: [item.courseId],
           orderItemId: item.id,
         });
-        console.log(
-          `Successfully created enrollment for course ${item.courseId}`
-        );
       } catch (error) {
         console.error(
           "Error creating enrollment for course:",

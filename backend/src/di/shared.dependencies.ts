@@ -51,6 +51,8 @@ import { ChatRepository } from "../infra/repositories/chat.repository.impl";
 import { IChatRepository } from "../app/repositories/chat.repository.interface";
 import { IMessageRepository } from "../app/repositories/message.repository.interface";
 import { MessageRepository } from "../infra/repositories/message.repository.impl";
+import { WinstonLogger } from "../infra/providers/logging/winston.logger";
+import { ILogger } from "../app/providers/logger-provider.interface";
 
 export interface SharedDependencies {
   prisma: typeof prismaClient;
@@ -84,6 +86,7 @@ export interface SharedDependencies {
   passwordHasher: IPasswordHasher;
   chatRepository: IChatRepository;
   messageRepository: IMessageRepository;
+  logger: ILogger;
 }
 
 export function createSharedDependencies(): SharedDependencies {
@@ -99,7 +102,8 @@ export function createSharedDependencies(): SharedDependencies {
   const orderRepository = new OrderRepository(prismaClient);
   const transactionRepository = new TransactionRepository(prismaClient);
   const courseReviewRepository = new CourseReviewRepository(prismaClient);
-  const s3Service = new S3Service();
+  const logger = new WinstonLogger();
+  const s3Service = new S3Service(logger);
   const emailProvider = new EmailProviderImpl();
   const otpProvider = new OtpProvider(authRepository, emailProvider);
   const googleAuthProvider = new GoogleAuthProvider(envConfig.GOOGLE_CLIENT_ID);
@@ -110,11 +114,9 @@ export function createSharedDependencies(): SharedDependencies {
   const chatRepository = new ChatRepository(prismaClient);
   const messageRepository = new MessageRepository(prismaClient);
 
-  // Create a temporary mock revenue distribution service
-  // This will be replaced with the real one in app.dependencies.ts
   const mockRevenueDistributionService: IRevenueDistributionService = {
     distributeRevenue: async () => {
-      console.warn("Revenue distribution service not properly initialized");
+      // Mock service - will be replaced with real implementation
     },
   };
 
@@ -173,6 +175,7 @@ export function createSharedDependencies(): SharedDependencies {
     getEnrollmentStatsUseCase,
     passwordHasher,
     chatRepository,
-    messageRepository
+    messageRepository,
+    logger
   };
 }

@@ -34,7 +34,8 @@ export function createUserDependencies(
   const getUserByIdUseCase = new GetUserByIdUseCase(userRepository);
   const updateUserUseCase = new UpdateUserUseCase(
     userRepository,
-    deps.s3Service
+    deps.s3Service,
+    deps.logger
   );
   const getPublicUserUseCase = new GetPublicUserUseCase(userRepository);
   const getUserAdminDetailsUseCase = new GetUserAdminDetailsUseCase(

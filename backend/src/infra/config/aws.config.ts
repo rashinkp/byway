@@ -13,11 +13,6 @@ export const awsConfig = {
   bucketName: envConfig.AWS_BUCKET_NAME,
 };
 
-if (!awsConfig.credentials.accessKeyId || !awsConfig.credentials.secretAccessKey || !awsConfig.bucketName) {
-  console.log('AWS Configuration:', awsConfig)
-  throw new Error('Missing required AWS configuration in .env file');
-}
-
 export const s3Client = new S3Client({
   credentials: awsConfig.credentials,
   region: awsConfig.region,
