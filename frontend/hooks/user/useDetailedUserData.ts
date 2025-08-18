@@ -8,14 +8,7 @@ import { useAuthStore } from "@/stores/auth.store";
 export function useDetailedUserData() {
 	const { user, isInitialized, isLoading: authLoading, isHydrating } = useAuthStore();
 
-	console.log("useDetailedUserData: Hook state:", {
-		hasUser: !!user,
-		userId: user?.id,
-		isInitialized,
-		authLoading,
-		isHydrating,
-		enabled: !!user?.id && isInitialized && !authLoading && !isHydrating
-	});
+
 
 	return useQuery<UserProfileType>({
 		queryKey: ["detailedUserData", user?.id],

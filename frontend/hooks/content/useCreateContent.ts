@@ -11,9 +11,7 @@ export const useCreateContent = () => {
 	return useMutation<LessonContent, Error, CreateLessonContentInput>({
 		mutationFn: async (data) => {
 			try {
-				console.log("Validating content data:", data);
 				const validatedData = createContentSchema.parse(data);
-				console.log("Content data validated successfully");
 				return await createContent(validatedData);
 			} catch (error) {
 				console.error("Content creation error:", error);
@@ -28,7 +26,6 @@ export const useCreateContent = () => {
 			}
 		},
 		onSuccess: (data) => {
-			console.log("Content created successfully:", data);
 			queryClient.invalidateQueries({ queryKey: ["content", data.lessonId] });
 			queryClient.invalidateQueries({ queryKey: ["lesson", data.lessonId] });
 			toast.success("Content created successfully");

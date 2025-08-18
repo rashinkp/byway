@@ -132,7 +132,6 @@ export default function ChatPage() {
   // Listen for new incoming messages
 		useEffect(() => {
 			const handleMessage = (msg: Message) => {
-				console.log("[SocketIO] New message received:", msg);
 				if (msg.chatId === selectedChat?.chatId) {
 					setMessages((prev) =>
 						prev.some((m) => m.id === msg.id) ? prev : [...prev, msg]
@@ -156,11 +155,9 @@ export default function ChatPage() {
 
   // Debug wrappers for pending media setters
   const debugSetPendingImageUrl = (url: string) => {
-    console.log("[Debug] setPendingImageUrl called with:", url);
     setPendingImageUrl(url);
   };
   const debugSetPendingAudioUrl = (url: string) => {
-    console.log("[Debug] setPendingAudioUrl called with:", url);
     setPendingAudioUrl(url);
 	};
 	
@@ -174,13 +171,7 @@ export default function ChatPage() {
       selectedChat.type === "chat" &&
       selectedChat.chatId
     ) {
-      console.log("[Debug] About to send message:", {
-        pendingMessage,
-        pendingImageUrl,
-        pendingAudioUrl,
-        chatId: selectedChat.chatId,
-        userId: selectedChat.userId,
-      });
+     
       sendMessageSocket(
         {
           chatId: selectedChat.chatId,
@@ -204,7 +195,7 @@ export default function ChatPage() {
   }, [pendingMessage, pendingImageUrl, pendingAudioUrl, selectedChat, user]);
 
   const handleSelectChat = (chat: EnhancedChatItem) => {
-    console.log("[Debug] handleSelectChat called with:", chat);
+  
     if (
       previousChatIdRef.current &&
       previousChatIdRef.current !== chat.chatId
@@ -226,14 +217,10 @@ export default function ChatPage() {
   const handleDeleteMessage = useCallback(
     (messageId: string) => {
       if (!messageId || !selectedChat?.chatId) {
-        console.error("Missing messageId or chatId for deletion");
         return;
       }
 
-      console.log("[Frontend] Requesting message deletion:", {
-        messageId,
-        chatId: selectedChat.chatId,
-      });
+     
 
       // Emit delete message event
       socket.emit(
@@ -243,7 +230,7 @@ export default function ChatPage() {
           chatId: selectedChat.chatId,
         },
         (response: { success?: boolean }) => {
-          console.log("[Frontend] Delete message response:", response);
+        
 
           if (response?.success) {
             // Remove the message locally first for immediate feedback
@@ -270,10 +257,7 @@ export default function ChatPage() {
                 }
               }
             );
-          } else {
-            console.error("[Frontend] Failed to delete message:", response);
-            // You might want to show an error toast/alert here
-          }
+          } 
         }
       );
     },
@@ -282,9 +266,7 @@ export default function ChatPage() {
 
   useEffect(() => {
     function handleChatListUpdated() {
-      console.log(
-        "[Frontend] Received chatListUpdated event, refetching chat list..."
-      );
+    
       listUserChats(
         { page: 1, limit: 10, search: searchQuery },
         (result: ChatListItem[]) => {
@@ -306,12 +288,7 @@ export default function ChatPage() {
   // Restore handleSendMessage function
   const handleSendMessage = useCallback(
     (content: string, imageUrl?: string, audioUrl?: string) => {
-      console.log("[Debug] handleSendMessage called with:", {
-        content,
-        imageUrl,
-        audioUrl,
-        selectedChat,
-      });
+    
       if (!user || !selectedChat) return;
       if (selectedChat.type === "user") {
         sendMessageSocket(
@@ -379,7 +356,7 @@ export default function ChatPage() {
         imageUrl,
         audioUrl,
       };
-      console.log("[Debug] Sending payload to sendMessageSocket:", payload);
+     
       sendMessageSocket(
         payload,
         (msg: Message) => {
@@ -399,7 +376,7 @@ export default function ChatPage() {
   useEffect(() => {
     if (!user) return;
     const handleConnect = () => {
-      console.log("[Frontend] Joining userId room:", user.id);
+     
       socket.emit("join", user.id);
     };
     socket.on("connect", handleConnect);
@@ -431,22 +408,21 @@ export default function ChatPage() {
 
   useEffect(() => {
     function handleMessagesRead({ chatId }: { chatId: string }) {
-      console.log("[SocketIO] messagesRead event received:", chatId);
+     
       if (selectedChat?.chatId === chatId) {
-        console.log("[SocketIO] Refetching messages for chat:", chatId);
+      
         getMessagesByChat({ chatId }, (result: ChatMessage[]) => {
           const msgs = result;
-          console.log("[SocketIO] Updated messages:", msgs);
+      
           setMessages(Array.isArray(msgs) ? msgs : []);
         });
       }
-      // Always refresh chat list to update unread counts
-      console.log("[SocketIO] Refetching chat list after messagesRead");
+   
       listUserChats(
         { page: 1, limit: 10, search: searchQuery },
         (result: ChatListItem[]) => {
           const chatData = result;
-          console.log("[SocketIO] Updated chat list:", chatData);
+         
           if (chatData && Array.isArray(chatData)) {
             setChatItems(chatData);
             setHasMore(chatData.length === 10);

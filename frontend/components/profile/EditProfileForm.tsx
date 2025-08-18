@@ -28,8 +28,7 @@ export default function EditProfileForm({
 				);
 				await uploadFileToS3(data.avatar, uploadUrl);
 				avatarUrl = fileUrl; // Set the S3 URL
-			} catch (error) {
-				console.error("Failed to upload avatar to S3:", error);
+			} catch {
 				throw new Error("Failed to upload profile picture");
 			}
 		} else {
@@ -54,9 +53,8 @@ export default function EditProfileForm({
 			await updateUserAsync(transformedData);
 			// Close the modal only after successful update
 			onOpenChange(false);
-		} catch (error) {
+		} catch {
 			// Error is already handled in the mutation's onError callback
-			console.error("Profile update failed:", error);
 		}
 	};
 

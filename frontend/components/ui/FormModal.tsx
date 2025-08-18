@@ -127,7 +127,6 @@ export function FormModal<T extends z.ZodType>({
 			await onSubmit(data);
 			form.reset();
 		} catch (error: unknown) {
-			console.error("Error submitting form:", error);
 			const errorMessage = error instanceof Error ? error.message : "Failed to submit the form";
 			form.setError("root", {
 				message: errorMessage,

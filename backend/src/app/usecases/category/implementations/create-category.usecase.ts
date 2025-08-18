@@ -40,7 +40,6 @@ export class CreateCategoryUseCase implements ICreateCategoryUseCase {
       input.createdBy
     );
 
-    console.log("category ", category);
 
     // Persist category
     const savedCategory = await this._categoryRepository.save(category);

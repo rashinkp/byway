@@ -37,7 +37,6 @@ export class CategoryController extends BaseController {
         ...(request.body || {}),
         createdBy: request.user?.id,
       });
-      console.log(validated)
       const category = await this.createCategoryUseCase.execute(validated);
       return this.success_201(category, "Category created successfully");
     });

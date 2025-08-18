@@ -38,15 +38,6 @@ export class Transaction {
     updatedAt?: Date;
     description?: string;
   }) {
-    console.log("Creating Transaction entity with params:", {
-      orderId: params.orderId,
-      userId: params.userId,
-      amount: params.amount,
-      type: params.type,
-      status: params.status,
-      paymentGateway: params.paymentGateway,
-      transactionId: params.transactionId,
-    });
 
     this._id = params.id || crypto.randomUUID();
     this._orderId = params.orderId;
@@ -65,12 +56,6 @@ export class Transaction {
     this._updatedAt = params.updatedAt || new Date();
     this._description = params.description;
 
-    console.log("Transaction entity created:", {
-      id: this._id,
-      orderId: this._orderId,
-      amount: this._amount,
-      status: this._status,
-    });
   }
 
   get id(): string {

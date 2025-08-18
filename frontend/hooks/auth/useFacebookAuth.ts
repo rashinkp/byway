@@ -115,7 +115,6 @@ export function useFacebookAuth(): UseFacebookAuthResult {
 				picture: userData.picture?.data.url,
 			});
 
-			console.log(backendResponse.data);
 
 			// Clear all cache to ensure fresh data for the logged-in user
 			clearAllCache();

@@ -30,9 +30,6 @@ export class GenerateCertificateUseCase implements IGenerateCertificateUseCase {
   ): Promise<GenerateCertificateOutputDto> {
     try {
       const { userId, courseId } = request;
-      console.log(
-        `[Certificate] Searching for enrollment: userId=${userId}, courseId=${courseId}`
-      );
 
       // 1. Check if user is enrolled in the course
       const enrollment = await this._enrollmentRepository.findByUserAndCourse(
@@ -40,19 +37,12 @@ export class GenerateCertificateUseCase implements IGenerateCertificateUseCase {
         courseId
       );
       if (!enrollment) {
-        console.log(
-          `[Certificate] Enrollment not found for userId=${userId}, courseId=${courseId}`
-        );
         return {
           success: false,
           error: "User is not enrolled in this course",
         };
       }
 
-      // 2. Check if certificate already exists
-      console.log(
-        `[Certificate] Checking for existing certificate: userId=${userId}, courseId=${courseId}`
-      );
       const existingCertificate =
         await this._certificateRepository.findByUserIdAndCourseId(
           userId,
@@ -77,59 +67,33 @@ export class GenerateCertificateUseCase implements IGenerateCertificateUseCase {
         }
         // Delete from S3 if pdfUrl exists
         if (existingCertificate.pdfUrl) {
-          try {
             await this._s3Service.deleteFile(existingCertificate.pdfUrl);
-            console.log(
-              `[Certificate] Deleted old certificate PDF from S3: ${existingCertificate.pdfUrl}`
-            );
-          } catch (err) {
-            console.error(
-              `[Certificate] Failed to delete old certificate PDF from S3:`,
-              err
-            );
-          }
         }
         // Prepare to update existing certificate
         isUpdate = true;
         oldCertificateId = existingCertificate.id;
       }
 
-      // 3. Check if course is completed
-      console.log(
-        `[Certificate] Checking course completion for userId=${userId}, courseId=${courseId}`
-      );
       const isCompleted = await this.checkCourseCompletion(userId, courseId);
       if (!isCompleted) {
-        console.log(
-          `[Certificate] Course not completed for userId=${userId}, courseId=${courseId}`
-        );
+      
         return {
           success: false,
           error: "Course is not completed yet",
         };
       }
 
-      // 4. Get course and user details
-      console.log(
-        `[Certificate] Fetching course and user details: userId=${userId}, courseId=${courseId}`
-      );
       const course = await this._courseRepository.findById(courseId);
       const user = await this._userRepository.findById(userId);
 
       if (!course || !user) {
-        console.log(
-          `[Certificate] Course or user not found: userId=${userId}, courseId=${courseId}`
-        );
+      
         return {
           success: false,
           error: "Course or user not found",
         };
       }
 
-      // 5. Get completion statistics
-      console.log(
-        `[Certificate] Calculating completion statistics: userId=${userId}, courseId=${courseId}`
-      );
       const completionStats = await this.getCompletionStatistics(
         userId,
         courseId
@@ -137,9 +101,7 @@ export class GenerateCertificateUseCase implements IGenerateCertificateUseCase {
 
       // 6. Generate certificate number
       const certificateNumber = this.generateCertificateNumber();
-      console.log(
-        `[Certificate] Generating certificate: certificateNumber=${certificateNumber}`
-      );
+  
 
       // 7. Create or update certificate entity
       certificate = Certificate.create({
@@ -165,10 +127,7 @@ export class GenerateCertificateUseCase implements IGenerateCertificateUseCase {
         });
       }
 
-      // 8. Generate PDF
-      console.log(
-        `[Certificate] Generating PDF for certificateNumber=${certificateNumber}`
-      );
+   
       const pdfData = {
         certificateNumber,
         studentName: user.name,
@@ -183,10 +142,6 @@ export class GenerateCertificateUseCase implements IGenerateCertificateUseCase {
 
       const pdfBuffer = await this._pdfService.generateCertificatePDF(pdfData);
 
-      // 9. Upload PDF to cloud storage
-      console.log(
-        `[Certificate] Uploading PDF to cloud for certificateNumber=${certificateNumber}`
-      );
       let pdfUrl = "";
       try {
         pdfUrl = await this._s3Service.uploadFile(
@@ -196,12 +151,7 @@ export class GenerateCertificateUseCase implements IGenerateCertificateUseCase {
           "certificate",
           { courseId, certificateId: certificateNumber }
         );
-        console.log(`[Certificate] PDF uploaded successfully: url=${pdfUrl}`);
       } catch (err) {
-        console.error(
-          `[Certificate] PDF upload failed for certificateNumber=${certificateNumber}:`,
-          err
-        );
         return {
           success: false,
           error: "Failed to upload certificate PDF to cloud storage",
@@ -218,14 +168,10 @@ export class GenerateCertificateUseCase implements IGenerateCertificateUseCase {
       let savedCertificate;
       if (isUpdate && oldCertificateId) {
         savedCertificate = await this._certificateRepository.update(certificate);
-        console.log(
-          `[Certificate] Certificate updated in database: certificateNumber=${certificateNumber}`
-        );
+
       } else {
         savedCertificate = await this._certificateRepository.create(certificate);
-        console.log(
-          `[Certificate] Certificate generation completed: certificateNumber=${certificateNumber}`
-        );
+
       }
 
       return {
@@ -233,7 +179,6 @@ export class GenerateCertificateUseCase implements IGenerateCertificateUseCase {
         certificate: savedCertificate,
       };
     } catch (error) {
-      console.error("[Certificate] Error generating certificate:", error);
       return {
         success: false,
         error: "Failed to generate certificate",
@@ -276,7 +221,6 @@ export class GenerateCertificateUseCase implements IGenerateCertificateUseCase {
       const completionPercentage = (completedLessons / totalLessons) * 100;
       return completionPercentage >= 90;
     } catch (error) {
-      console.error("Error checking course completion:", error);
       return false;
     }
   }
@@ -350,7 +294,6 @@ export class GenerateCertificateUseCase implements IGenerateCertificateUseCase {
         const instructor = await this._userRepository.findById(course.createdBy);
         instructorName = instructor?.name;
       } catch (error) {
-        console.error("Error fetching instructor:", error);
       }
     }
 

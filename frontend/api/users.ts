@@ -46,7 +46,6 @@ export const getAllUsers = async ({
 		};
 	} catch (error: unknown) {
 		const apiError = error as ApiError;
-		console.error("Error fetching users:", apiError);
 		throw new Error(apiError.response?.data?.message || "Failed to fetch users");
 	}
 };
@@ -138,20 +137,16 @@ export async function getDetailedUserData(): Promise<UserProfileType> {
 	try {
 		const userId = useAuthStore.getState().user?.id;
 		if (!userId) {
-			console.error("getDetailedUserData: No user ID available");
 			throw new Error("User not authenticated");
 		}
 
-		console.log("getDetailedUserData: Fetching data for user:", userId);
 		const detailedResponse = await api.get<{ data: UserProfileType }>(
 			`/user/${userId}`,
 		);
 		
-		console.log("getDetailedUserData: Successfully fetched user data");
 		return detailedResponse.data.data;
 	} catch (error: unknown) {
 		const apiError = error as ApiError;
-		console.error("getDetailedUserData: Error fetching user data:", apiError);
 		throw new Error(
 			apiError.response?.data?.message ||
 				apiError.response?.data?.error ||

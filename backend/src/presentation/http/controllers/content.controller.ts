@@ -29,7 +29,6 @@ export class LessonContentController extends BaseController {
   }
 
   async createLessonContent(httpRequest: IHttpRequest): Promise<IHttpResponse> {
-    console.log("Creating lesson content with data:", httpRequest.body);
     return this.handleRequest(httpRequest, async (request) => {
       if (!request.user?.id) {
         throw new HttpError("Unauthorized", 401);

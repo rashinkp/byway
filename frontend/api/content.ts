@@ -10,9 +10,7 @@ export async function createContent(
 	data: CreateLessonContentInput,
 ): Promise<LessonContent> {
 	try {
-		console.log("Creating content with data:", data);
 		const response = await api.post<{ data: LessonContent }>("/content", data);
-		console.log("Content creation response:", response.data);
 		return response.data.data;
 	} catch (error: unknown) {
 		const apiError = error as ApiError;
@@ -52,12 +50,10 @@ export async function updateContent(
 	data: UpdateLessonContentInput,
 ): Promise<LessonContent> {
 	try {
-		console.log("Updating content with data:", data);
 		const response = await api.put<{ data: LessonContent }>(
 			`/content/${data.id}`,
 			data,
 		);
-		console.log("Content update response:", response.data);
 		return response.data.data;
 	} catch (error: unknown) {
 		const apiError = error as ApiError;
@@ -86,11 +82,9 @@ export async function getContentByLessonId(
 	lessonId: string,
 ): Promise<LessonContent | null> {
 	try {
-		console.log("Fetching content for lesson:", lessonId);
 		const response = await api.get<{ data: LessonContent | null }>(
 			`/content/${lessonId}`,
 		);
-		console.log("Content fetch response:", response.data);
 		return response.data.data;
 	} catch (error: unknown) {
 		const apiError = error as ApiError;
@@ -111,9 +105,7 @@ export async function getContentByLessonId(
 
 export async function deleteContent(contentId: string): Promise<void> {
 	try {
-		console.log("Deleting content:", contentId);
 		await api.delete(`/content/${contentId}`);
-		console.log("Content deleted successfully");
 	} catch (error: unknown) {
 		const apiError = error as ApiError;
 		console.error("Content deletion error:", {

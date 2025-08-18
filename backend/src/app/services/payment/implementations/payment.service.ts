@@ -130,15 +130,11 @@ export class PaymentService implements IPaymentService {
 
     // Clear cart items for purchased courses
     try {
-      console.log("Clearing cart items for purchased courses");
       for (const item of orderItems) {
         await this._cartRepository.deleteByUserAndCourse(userId, item.courseId);
       }
-      console.log("Cart items cleared successfully");
-    } catch (error) {
-      console.error("Error clearing cart items:", error);
-      // Don't throw error here as the purchase was successful
-      // Cart clearing is a cleanup operation
+    } catch {
+
     }
 
     // Send real-time notifications via Socket.IO
@@ -183,7 +179,6 @@ export class PaymentService implements IPaymentService {
     const courseIds = input.courses?.map(c => c.id) || [];
     const isEnrolled = await this._enrollmentRepository.findByUserIdAndCourseIds(userId, courseIds);
 
-    console.log(isEnrolled , 'courseneroleled -=-==============>')
     
     if (isEnrolled && isEnrolled.length > 0) {
       throw new HttpError("User already enrolled in this course", 400);
@@ -221,18 +216,12 @@ export class PaymentService implements IPaymentService {
     try {
       // Handle successful payments
       if (event.type === "checkout.session.completed") {
-        console.log("=== Processing Successful Payment ===");
         const session = event.data.object as Stripe.Checkout.Session;
-        console.log("Session Data:", JSON.stringify(session, null, 2));
 
         const orderId = session.metadata?.orderId;
         const isWalletTopUp = session.metadata?.isWalletTopUp === "true";
 
-        console.log("Order ID:", orderId);
-        console.log("Is Wallet Top Up:", isWalletTopUp);
-
         if (!orderId) {
-          console.error("No order ID found in session metadata");
           throw new HttpError(
             "No order ID found in session metadata",
             StatusCodes.BAD_REQUEST
@@ -242,32 +231,25 @@ export class PaymentService implements IPaymentService {
         let transaction = await this._transactionRepository.findByOrderId(
           orderId
         );
-        console.log("Found transaction:", transaction);
 
         if (!transaction && isWalletTopUp) {
-          console.log("Looking for transaction by ID for wallet top up");
           transaction = await this._transactionRepository.findById(orderId);
         }
 
         if (!transaction) {
-          console.error("Transaction not found for order:", orderId);
           throw new HttpError("Transaction not found", StatusCodes.NOT_FOUND);
         }
 
-        // Update transaction status first
-        console.log("Updating transaction status to COMPLETED");
         await this._transactionRepository.updateStatus(
           transaction.id,
           TransactionStatus.COMPLETED
         );
 
         if (isWalletTopUp) {
-          console.log("Processing wallet top up");
           const wallet = await this._walletRepository.findByUserId(
             transaction.userId
           );
           if (!wallet) {
-            console.error("Wallet not found for user:", transaction.userId);
             throw new HttpError("Wallet not found", StatusCodes.NOT_FOUND);
           }
           wallet.addAmount(transaction.amount);
@@ -278,7 +260,6 @@ export class PaymentService implements IPaymentService {
           };
         } else {
           try {
-            console.log("=== Processing Course Purchase ===");
             // Update order status
             const order = await this._orderRepository.findById(orderId);
             if (!order) {
@@ -286,7 +267,6 @@ export class PaymentService implements IPaymentService {
               throw new HttpError("Order not found", StatusCodes.NOT_FOUND);
             }
 
-            console.log("Updating order status to COMPLETED");
             await this._orderRepository.updateOrderStatus(
               orderId,
               OrderStatus.COMPLETED,
@@ -294,12 +274,9 @@ export class PaymentService implements IPaymentService {
               PaymentGatewayEnum.STRIPE
             );
 
-            // Create enrollments
-            console.log("Fetching order items");
             const orderItems = await this._orderRepository.findOrderItems(
               orderId
             );
-            console.log("Found order items:", orderItems);
 
             if (!orderItems || orderItems.length === 0) {
               console.error("No order items found for order:", orderId);
@@ -309,9 +286,7 @@ export class PaymentService implements IPaymentService {
               );
             }
 
-            console.log("Creating enrollments for", orderItems.length, "items");
             for (const item of orderItems) {
-              console.log("Creating enrollment for course:", item.courseId);
               try {
                 // Check if user is already enrolled in this course
                 const existingEnrollment =
@@ -321,9 +296,6 @@ export class PaymentService implements IPaymentService {
                   );
 
                 if (existingEnrollment) {
-                  console.log(
-                    `User ${order.userId} is already enrolled in course ${item.courseId}, skipping enrollment creation`
-                  );
                   continue; // Skip creating duplicate enrollment
                 }
 
@@ -333,10 +305,6 @@ export class PaymentService implements IPaymentService {
                   courseIds: [item.courseId],
                   orderItemId: item.id,
                 });
-                console.log(
-                  "Successfully created enrollment for course:",
-                  item.courseId
-                );
               } catch (error) {
                 console.error(
                   "Error creating enrollment for course:",
@@ -347,11 +315,8 @@ export class PaymentService implements IPaymentService {
               }
             }
 
-            // Distribute revenue
-            console.log("Starting revenue distribution");
             try {
               await this._revenueDistributionService.distributeRevenue(orderId);
-              console.log("Revenue distribution completed successfully");
             } catch (error) {
               console.error("Error during revenue distribution:", error);
               throw error;
@@ -359,14 +324,12 @@ export class PaymentService implements IPaymentService {
 
             // Clear cart items for purchased courses
             try {
-              console.log("Clearing cart items for purchased courses");
               for (const item of orderItems) {
                 await this._cartRepository.deleteByUserAndCourse(
                   order.userId,
                   item.courseId
                 );
               }
-              console.log("Cart items cleared successfully");
             } catch (error) {
               console.error("Error clearing cart items:", error);
               // Don't throw error here as the purchase was successful
@@ -390,9 +353,6 @@ export class PaymentService implements IPaymentService {
               message: "Payment completed successfully",
             };
           } catch (error) {
-            console.error("Error processing successful payment:", error);
-            // Revert transaction status if enrollment or revenue distribution fails
-            console.log("Reverting transaction status to FAILED");
             await this._transactionRepository.updateStatus(
               transaction.id,
               TransactionStatus.FAILED
@@ -412,18 +372,14 @@ export class PaymentService implements IPaymentService {
         event.type === "payment_intent.payment_failed" ||
         event.type === "charge.failed"
       ) {
-        console.log("Processing payment failure event");
         const paymentIntentId =
           event.data.object.payment_intent || event.data.object.id;
-        console.log("Payment Intent ID:", paymentIntentId);
 
         const metadata = await this._webhookGateway.getCheckoutSessionMetadata(
           paymentIntentId
         );
-        console.log("Session Metadata:", metadata);
 
         const orderId = metadata.orderId;
-        console.log("Order ID from metadata:", orderId);
 
         if (!orderId) {
           console.error("No order ID found in metadata");
@@ -436,10 +392,8 @@ export class PaymentService implements IPaymentService {
         const transaction = await this._transactionRepository.findByOrderId(
           orderId
         );
-        console.log("Found transaction:", transaction);
 
         if (transaction) {
-          console.log("Updating transaction status to FAILED");
           await this._transactionRepository.updateStatus(
             transaction.id,
             TransactionStatus.FAILED
@@ -452,7 +406,6 @@ export class PaymentService implements IPaymentService {
           throw new HttpError("Order not found", StatusCodes.NOT_FOUND);
         }
 
-        console.log("Updating order status to FAILED");
         await this._orderRepository.updateOrderStatus(
           orderId,
           OrderStatus.FAILED,
@@ -469,14 +422,11 @@ export class PaymentService implements IPaymentService {
          };
       }
 
-      console.log("=== Webhook Processing End ===");
       return {
         data: {},
         message: "Webhook processed successfully",
       };
     } catch (error) {
-      console.error("=== Webhook Processing Error ===");
-      console.error("Error details:", error);
       throw new HttpError(
         error instanceof Error ? error.message : "Error processing webhook",
         StatusCodes.INTERNAL_SERVER_ERROR
@@ -491,7 +441,6 @@ export class PaymentService implements IPaymentService {
     try {
       const io = getSocketIOInstance();
       if (!io) {
-        console.log("Socket.IO not available for notifications");
         return;
       }
 

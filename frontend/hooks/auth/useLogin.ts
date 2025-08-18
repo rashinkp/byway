@@ -11,7 +11,6 @@ export function useLogin() {
 		mutationFn: ({ email, password }: { email: string; password: string }) =>
 			login(email, password),
 		onSuccess: (user) => {
-			console.log("Login success, user:", user);
 
 			loginUser(user);
 

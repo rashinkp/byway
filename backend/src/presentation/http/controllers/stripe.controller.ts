@@ -46,9 +46,6 @@ export class StripeController extends BaseController {
 
   async handleWebhook(httpRequest: IHttpRequest): Promise<IHttpResponse> {
     return this.handleRequest(httpRequest, async (request) => {
-      console.log("=== Webhook Controller ===");
-      console.log("Request Body:", request.body);
-      console.log("Request Headers:", request.headers);
 
       const signature = request.headers?.["stripe-signature"] as string;
       if (!signature) {
@@ -74,7 +71,6 @@ export class StripeController extends BaseController {
       });
 
       if (isEnrolled) {
-        console.log(`⚠️ User ${userId} already enrolled in ${courseId}`);
         return this.success_200(null, "Already enrolled");
       }
 

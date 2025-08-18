@@ -23,15 +23,11 @@ export default function SocketProvider() {
 	const { user } = useAuth();
 
 	useEffect(() => {
-		// Reference socket to ensure it's not tree-shaken
-		if (socket) {
-			console.log("[SocketProvider] Socket instance:", socket);
-		}
+
 	}, []);
 
 	useEffect(() => {
 		if (user?.id) {
-			console.log("[SocketProvider] User authenticated, attempting socket connection");
 			// Add a small delay to ensure cookies are available
 			const timer = setTimeout(() => {
 				safeSocketConnect();
@@ -39,7 +35,6 @@ export default function SocketProvider() {
 			
 			return () => clearTimeout(timer);
 		} else {
-			console.log("[SocketProvider] No user, disconnecting socket");
 			if (socket.connected) {
 				socket.disconnect();
 			}
@@ -50,19 +45,12 @@ export default function SocketProvider() {
 		if (!user?.id) return;
 
 		const handleNewNotification = (notification: SocketNotification) => {
-			// Get the notification type from either 'type' or 'eventType' field
 			const notificationType = notification.type || notification.eventType;
 
-			// Skip if no type is provided
 			if (!notificationType) {
-				console.warn(
-					"[SocketProvider] Received notification without type:",
-					notification,
-				);
 				return;
 			}
 
-			// Create custom toast that matches notification modal design
 			const toastContent = (
 				<div className="flex gap-4 p-4">
 					{/* Avatar */}

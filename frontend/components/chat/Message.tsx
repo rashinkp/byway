@@ -478,10 +478,9 @@ function AudioMessage({
       if (currentTime >= duration) {
         audioRef.current.currentTime = 0;
       }
-      audioRef.current.play().catch((err) => {
-        console.error("Play failed:", err);
+      audioRef.current.play().catch(() => {
         setAudioError(true);
-        setErrorMessage("Failed to play audio");
+        setErrorMessage("Failed to play audio" );
       });
     }
   };

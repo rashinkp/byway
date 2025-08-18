@@ -43,7 +43,6 @@ export const createInstructor = async (data: {
 		return response.data;
 	} catch (error: unknown) {
 		const apiError = error as ApiError;
-		console.error("API Error in createInstructor:", apiError);
 
 		if (apiError.response) {
 			const { status, data } = apiError.response;
@@ -122,7 +121,6 @@ export const approveInstructor = async (
 		return response.data;
 	} catch (error: unknown) {
 		const apiError = error as ApiError;
-		console.error("Error approving instructor:", apiError);
 		throw new Error(
 			apiError.response?.data?.message || "Failed to approve instructor",
 		);
@@ -139,7 +137,6 @@ export const declineInstructor = async (
 		return response.data;
 	} catch (error: unknown) {
 		const apiError = error as ApiError;
-		console.error("Error declining instructor:", apiError);
 		throw new Error(
 			apiError.response?.data?.message || "Failed to decline instructor",
 		);
@@ -175,8 +172,6 @@ export const getAllInstructors = async (params?: {
 				}
 			});
 		}
-		console.log("[Instructor API] Making request to:", `/instructor/instructors?${queryParams.toString()}`);
-		console.log("[Instructor API] API base URL:", process.env.NEXT_PUBLIC_API_URL);
 		const response = await api.get<
 			ApiResponse<{
 				items: IInstructorWithUserDetails[];
@@ -187,7 +182,6 @@ export const getAllInstructors = async (params?: {
 		return response.data;
 	} catch (error: unknown) {
 		const apiError = error as ApiError;
-		console.error("Error fetching instructors:", apiError);
 		throw new Error(
 			apiError.response?.data?.message || "Failed to fetch instructors",
 		);
@@ -205,7 +199,6 @@ export const getInstructorByUserId = async (): Promise<
 		return response.data;
 	} catch (error: unknown) {
 		const apiError = error as ApiError;
-		console.error("Error fetching instructor by user ID:", apiError);
 
 		// Handle 404 errors gracefully - user might not have an instructor record yet
 		if (apiError.response?.status === 404) {
@@ -257,7 +250,6 @@ export const getPublicInstructors = async (params?: {
 		return response.data;
 	} catch (error: unknown) {
 		const apiError = error as ApiError;
-		console.error("Error fetching public instructors:", apiError);
 		throw new Error(
 			apiError.response?.data?.message || "Failed to fetch instructors",
 		);

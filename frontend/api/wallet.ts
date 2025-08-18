@@ -9,7 +9,6 @@ export const getWallet = async (): Promise<WalletApiResponse<IWallet>> => {
 		return response.data;
 	} catch (error: unknown) {
 		const apiError = error as ApiError;
-		console.error("Error fetching wallet:", apiError);
 		throw new Error(apiError.response?.data?.message || "Failed to fetch wallet");
 	}
 };
@@ -22,7 +21,6 @@ export const createWalletTopUp = async (
     return response.data;
   } catch (error: unknown) {
     const apiError = error as ApiError;
-    console.error("Error creating wallet top-up:", apiError);
     throw new Error(
       apiError.response?.data?.message || "Failed to create wallet top-up"
     );

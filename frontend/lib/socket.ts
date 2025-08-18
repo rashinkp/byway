@@ -18,27 +18,17 @@ const socket = io(process.env.NEXT_PUBLIC_SOCKET_URL || "", {
 	// 	token: getToken(),
 	// },
 });
-socket.on("connect", () => {
-	console.log("[Socket] Connected:", socket.id);
-});
 
-socket.on("disconnect", () => {
-	console.log("[Socket] Disconnected");
-});
 
 socket.on("connect_error", (err: Error) => {
 	console.error("[Socket] Connection error:", err);
 	console.error("[Socket] Error message:", err.message);
 });
 
-// Enhanced: Helper to safely connect
 export const safeSocketConnect = () => {
 	if (!socket.connected) {
-		console.log("[Socket] Attempting to connect");
 		socket.connect();
-	} else {
-		console.log("[Socket] Already connected");
-	}
+	} 
 };
 
 export default socket;

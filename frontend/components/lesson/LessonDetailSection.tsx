@@ -60,8 +60,7 @@ export function LessonDetailSection({
 			lessonSchema.parse(data);
 			onUpdateLesson(data);
 			setIsLessonModalOpen(false);
-		} catch (err) {
-			console.error(err);
+		} catch  {
 			toast.error("Failed to update lesson");
 		} finally {
 			setIsSubmitting(false);
@@ -81,8 +80,8 @@ export function LessonDetailSection({
 			};
 			lessonSchema.parse(data);
 			onUpdateLesson(data);
-		} catch (err) {
-			console.error("Error updating lesson status:", err);
+		} catch  {
+		
 		} finally {
 			setIsPublishing(false);
 		}
@@ -100,8 +99,8 @@ export function LessonDetailSection({
 		try {
 			await deleteLesson(lesson.id);
 			router.replace(`/instructor/courses/${courseId}`);
-		} catch (err) {
-			console.error("Error deleting lesson:", err);
+		} catch  {
+			
 		} finally {
 			setIsSubmitting(false);
 			setConfirmOpen(false);

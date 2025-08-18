@@ -21,12 +21,10 @@ export const sendMessage = (
 	onError?: (error: { message: string }) => void,
 ) => {
 	if (!socket.connected) {
-		console.warn("[SocketChat] Socket not connected, cannot send message");
 		if (onError) onError({ message: "Socket not connected" });
 		return;
 	}
 
-	console.log("[SocketChat] Sending message with data:", data);
 	socket.emit("sendMessage", data);
 
 	if (onSuccess) {

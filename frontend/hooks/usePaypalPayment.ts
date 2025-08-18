@@ -57,24 +57,20 @@ export const usePayPalPayment = ({
 
 	const onApprove = useCallback(async (data: Record<string, unknown>, actions: PayPalActions) => {
 		try {
-			console.log("PayPal order approved:", data);
 			const details = await actions.order?.capture();
 			toast.success("Payment completed successfully!", {
 				description: JSON.stringify(details),
 			});
-		} catch (error) {
-			console.error("Error in onApprove:", error);
+		} catch  {
 			toast.error("Failed to complete PayPal payment");
 		}
 	}, []);
 
-	const onCancel = useCallback((data: Record<string, unknown>) => {
-		console.log("PayPal payment cancelled:", data);
+	const onCancel = useCallback(() => {
 		toast.info("PayPal payment was cancelled");
 	}, []);
 
-	const onError = useCallback((err: Record<string, unknown>) => {
-		console.error("PayPal button error:", err);
+	const onError = useCallback(() => {
 		toast.error("An error occurred with PayPal. Please try again.");
 	}, []);
 

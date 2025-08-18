@@ -15,14 +15,6 @@ export class SearchRepository implements ISearchRepository {
   ): Promise<ISearchResult> {
     const { query, page = 1, limit = 10, userId } = params;
     const skip = (page - 1) * limit;
-    console.log(
-      "[SearchRepository] Received limit:",
-      limit,
-      "skip:",
-      skip,
-      "page:",
-      page
-    );
 
     const [instructors, courses, categories, certificates] = await Promise.all([
       this.searchInstructors(query, skip, limit),

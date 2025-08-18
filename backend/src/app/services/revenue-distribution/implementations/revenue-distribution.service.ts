@@ -34,9 +34,6 @@ export class RevenueDistributionService implements IRevenueDistributionService {
         throw new HttpError("No order items found", StatusCodes.NOT_FOUND);
       }
 
-      console.log(
-        `Distributing revenue for order ${orderId} with ${orderItems.length} items`
-      );
 
       for (const orderItem of orderItems) {
         try {
@@ -63,9 +60,6 @@ export class RevenueDistributionService implements IRevenueDistributionService {
     courseId: string; 
     orderId: string; 
   }): Promise<void> {
-    console.log(
-      `Processing order item ${orderItem.id}`
-    );
     
     // Get the course to get the price
     const course = await this._orderRepository.findCourseById(
@@ -80,9 +74,6 @@ export class RevenueDistributionService implements IRevenueDistributionService {
     const instructorId = course.createdBy;
     const { adminShare, instructorShare } = this.calculateShares(coursePrice);
 
-    console.log(
-      `Calculated shares - Admin: ${adminShare}, Instructor: ${instructorShare}`
-    );
 
     await this.updateWallets(instructorId, adminShare, instructorShare);
     await this.createTransactions(
@@ -141,7 +132,6 @@ export class RevenueDistributionService implements IRevenueDistributionService {
     // Get or create admin wallet
     let adminWallet = await this._walletRepository.findByUserId(adminId);
     if (!adminWallet) {
-      console.log("Creating admin wallet");
       adminWallet = Wallet.create(adminId);
       adminWallet = await this._walletRepository.create(adminWallet);
     }
@@ -153,7 +143,6 @@ export class RevenueDistributionService implements IRevenueDistributionService {
       instructorId
     );
     if (!instructorWallet) {
-      console.log("Creating instructor wallet for:", instructorId);
       instructorWallet = Wallet.create(instructorId);
       instructorWallet = await this._walletRepository.create(instructorWallet);
     }
@@ -206,7 +195,6 @@ export class RevenueDistributionService implements IRevenueDistributionService {
       const order = await this._orderRepository.findById(orderItem.orderId);
 
       if (!order) {
-        console.error("Order not found for notifications");
         return;
       }
 

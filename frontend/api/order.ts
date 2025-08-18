@@ -11,7 +11,6 @@ export const createOrder = async (
 		return response.data;
 	} catch (error: unknown) {
 		const apiError = error as ApiError;
-		console.error("Error creating order:", apiError);
 		throw new Error(apiError.response?.data?.message || "Failed to create order");
 	}
 };
@@ -27,7 +26,6 @@ export const updateOrderStatus = async (data: {
 		return response.data;
 	} catch (error: unknown) {
 		const apiError = error as ApiError;
-		console.error("Error updating order status:", apiError);
 		throw new Error(
 			apiError.response?.data?.message || "Failed to update order status",
 		);
