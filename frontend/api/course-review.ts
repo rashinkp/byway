@@ -22,7 +22,6 @@ export async function createCourseReview(
 		return response.data.data;
 	} catch (error: unknown) {
 		const apiError = error as ApiError;
-		console.error("Failed to create review:", apiError);
 		throw new Error(apiError.response?.data?.message || "Failed to create review");
 	}
 }
@@ -39,7 +38,6 @@ export async function updateCourseReview(
 		return response.data.data;
 	} catch (error: unknown) {
 		const apiError = error as ApiError;
-		console.error("Failed to update review:", apiError);
 		throw new Error(apiError.response?.data?.message || "Failed to update review");
 	}
 }
@@ -49,7 +47,6 @@ export async function deleteCourseReview(id: string): Promise<void> {
 		await api.delete(`/reviews/${id}`);
 	} catch (error: unknown) {
 		const apiError = error as ApiError;
-		console.error("Failed to delete review:", apiError);
 		throw new Error(apiError.response?.data?.message || "Failed to delete review");
 	}
 }
@@ -81,7 +78,6 @@ export async function getCourseReviews(
 		return response.data.data;
 	} catch (error: unknown) {
 		const apiError = error as ApiError;
-		console.error("Failed to fetch course reviews:", apiError);
 		throw new Error(
 			apiError.response?.data?.message || "Failed to fetch course reviews",
 		);
@@ -98,7 +94,6 @@ export async function getCourseReviewStats(
 		return response.data.data;
 	} catch (error: unknown) {
 		const apiError = error as ApiError;
-		console.error("Failed to fetch course review stats:", apiError);
 		throw new Error(
 			apiError.response?.data?.message || "Failed to fetch course review stats",
 		);
@@ -124,7 +119,6 @@ export async function getUserReviews(
 		return response.data.data;
 	} catch (error: unknown) {
 		const apiError = error as ApiError;
-		console.error("Failed to fetch user reviews:", apiError);
 		throw new Error(
 			apiError.response?.data?.message || "Failed to fetch user reviews",
 		);
@@ -139,7 +133,6 @@ export async function disableReview(reviewId: string): Promise<DisableReviewResp
 		return response.data.data;
 	} catch (error: unknown) {
 		const apiError = error as ApiError;
-		console.error("Failed to disable review:", apiError);
 		throw new Error(
 			apiError.response?.data?.message || "Failed to disable review",
 		);

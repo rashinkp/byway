@@ -14,11 +14,6 @@ export async function getPresignedUrl(
 		return response.data.data;
 	} catch (error: unknown) {
 		const apiError = error as ApiError;
-		console.error("Get presigned URL error:", {
-			status: apiError.response?.status,
-			data: apiError.response?.data,
-			message: apiError.message,
-		});
 		throw new Error(
 			apiError.response?.data?.message ||
 				apiError.response?.data?.error ||

@@ -18,7 +18,6 @@ export const createTransaction = async (data: {
 		return response.data;
 	} catch (error: unknown) {
 		const apiError = error as ApiError;
-		console.error("Error creating transaction:", apiError);
 		throw new Error(
 			apiError.response?.data?.message || "Failed to create transaction",
 		);
@@ -33,7 +32,6 @@ export const getTransactionById = async (
 		return response.data;
 	} catch (error: unknown) {
 		const apiError = error as ApiError;
-		console.error("Error fetching transaction:", apiError);
 		throw new Error(
 			apiError.response?.data?.message || "Failed to fetch transaction",
 		);
@@ -48,7 +46,6 @@ export const getTransactionsByOrder = async (
 		return response.data;
 	} catch (error: unknown) {
 		const apiError = error as ApiError;
-		console.error("Error fetching transactions by order:", apiError);
 		throw new Error(
 			apiError.response?.data?.message || "Failed to fetch transactions",
 		);
@@ -63,7 +60,6 @@ export const getTransactionsByUser = async (page = 1, limit = 10) => {
 		return response.data;
 	} catch (error: unknown) {
 		const apiError = error as ApiError;
-		console.error("Error fetching transactions by user:", apiError);
 		throw new Error(
 			apiError.response?.data?.message || "Failed to fetch transactions",
 		);
@@ -80,7 +76,6 @@ export const updateTransactionStatus = async (data: {
 		return response.data;
 	} catch (error: unknown) {
 		const apiError = error as ApiError;
-		console.error("Error updating transaction status:", apiError);
 		throw new Error(
 			apiError.response?.data?.message || "Failed to update transaction status",
 		);

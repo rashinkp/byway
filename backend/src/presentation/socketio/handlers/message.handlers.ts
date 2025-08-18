@@ -49,7 +49,6 @@ socket.on(
     "deleteMessage",
     socketHandler<DeleteMessageData>(async (data) => {
       try {
-        console.log("[SocketIO] deleteMessage event received:", data);
 
         // Validate required data
         if (!data || !data.messageId || !data.chatId) {
@@ -79,11 +78,6 @@ socket.on(
           data.chatId
         );
         if (participants) {
-          console.log(
-            "[SocketIO] Emitting chatListUpdated after deleteMessage to:",
-            participants.user1Id,
-            participants.user2Id
-          );
 
           // Emit to chat room first
           io.to(data.chatId).emit("messageDeleted", {
@@ -95,10 +89,6 @@ socket.on(
           io.to(participants.user1Id).emit("chatListUpdated");
           io.to(participants.user2Id).emit("chatListUpdated");
         } else {
-          console.log(
-            "[SocketIO] No participants found for chat:",
-            data.chatId
-          );
         }
 
         return {
@@ -107,8 +97,6 @@ socket.on(
           chatId: data.chatId,
         };
       } catch (error) {
-        console.error("[SocketIO] Error in deleteMessage:", error);
-        // Throw error to be handled by socketHandler wrapper
         throw error;
       }
     }, "messageDeleted")
@@ -116,7 +104,6 @@ socket.on(
 
   // Handle when user joins a chat (to clear pending notifications)
   socket.on("joinChat", async (data: JoinChatData) => {
-    try {
       const userId = socket.data.user?.id;
       if (userId && data.chatId) {
         // Join the chat room
@@ -128,29 +115,14 @@ socket.on(
         // Emit updated unread count to the user
         const unreadCount = await chatController.getTotalUnreadCount(userId);
         io.to(userId).emit("unreadMessageCount", { count: unreadCount });
-        console.log("unread message count ----------> ", unreadCount);
 
         // Emit updated chat list to the user
         io.to(userId).emit("chatListUpdated");
-
-        // Emit messagesRead event to the user
-        console.log(
-          "[SocketIO] Emitting messagesRead to user:",
-          userId,
-          "for chat:",
-          data.chatId
-        );
         io.to(userId).emit("messagesRead", { chatId: data.chatId, userId });
         // Also notify all participants in the chat room
         io.to(data.chatId).emit("messagesRead", { chatId: data.chatId, userId });
-
-        console.log(
-          `[SocketIO] User ${userId} joined chat ${data.chatId} and messages marked as read`
-        );
       }
-    } catch (err) {
-      console.log("[SocketIO] Error in joinChat:", err);
-    }
+   
   });
 
   // Handle marking messages as read
@@ -176,11 +148,8 @@ socket.on(
       // Emit messagesRead event to all participants in the chat
       io.to(data.chatId).emit("messagesRead", { chatId: data.chatId, userId: data.userId });
 
-      console.log(
-        `[SocketIO] Messages marked as read for user ${data.userId} in chat ${data.chatId}`
-      );
-    } catch (err) {
-      console.error("[SocketIO] Error marking messages as read:", err);
+
+    } catch {
       socket.emit("error", { message: "Failed to mark messages as read" });
     }
   });
@@ -189,11 +158,8 @@ socket.on(
     "sendMessage",
     async (data: SendMessageData) => {
       try {
-        console.log("[SocketIO] sendMessage event received:", data);
         const senderId = socket.data.user?.id;
-        console.log("[SocketIO] senderId:", senderId);
         if (!senderId) {
-          console.log("[SocketIO] No senderId, emitting error");
           socket.emit("error", {
             message: "Authentication required to send messages.",
           });
@@ -207,12 +173,7 @@ socket.on(
           imageUrl: data.imageUrl,
           audioUrl: data.audioUrl,
         });
-        console.log(
-          "[SocketIO] message result from handleNewMessage:",
-          message
-        );
         if (!message) {
-          console.log("[SocketIO] No message returned, emitting error");
           socket.emit("error", { message: "Failed to send message." });
           return;
         }
@@ -243,11 +204,7 @@ socket.on(
           targetChatId
         );
         if (participants) {
-          console.log(
-            "[SocketIO] Emitting chatListUpdated after sendMessage to:",
-            participants.user1Id,
-            participants.user2Id
-          );
+    
           io.to(participants.user1Id).emit("chatListUpdated");
           io.to(participants.user2Id).emit("chatListUpdated");
           // Emit unreadMessageCount to the recipient
@@ -261,7 +218,6 @@ socket.on(
           io.to(recipientId).emit("unreadMessageCount", { count: unreadCount });
         }
       } catch (err) {
-        console.log("[SocketIO] Caught error in sendMessage:", err);
         socket.emit("error", { message: "Failed to send message." });
       }
     }

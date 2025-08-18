@@ -22,22 +22,14 @@ export class DeleteLessonContentUseCase implements IDeleteLessonContentUseCase {
       
       // Delete main file if it exists
       if (contentData.fileUrl) {
-        try {
           await this._s3Service.deleteFile(contentData.fileUrl);
-        } catch (error) {
-          console.error("Failed to delete main file from S3:", error);
-          // Continue with deletion even if S3 deletion fails
-        }
+       
       }
 
       // Delete thumbnail if it exists
       if (contentData.thumbnailUrl) {
-        try {
           await this._s3Service.deleteFile(contentData.thumbnailUrl);
-        } catch (error) {
-          console.error("Failed to delete thumbnail from S3:", error);
-          // Continue with deletion even if S3 deletion fails
-        }
+        
       }
 
       // Delete from database

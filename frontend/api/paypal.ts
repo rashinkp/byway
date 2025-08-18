@@ -16,7 +16,6 @@ export const createPaypalOrder = async (
     return response.data;
   } catch (error: unknown) {
     const apiError = error as ApiError;
-    console.error("Error creating PayPal order:", apiError);
     throw new Error(
       apiError.response?.data?.message || "Failed to create PayPal order"
     );
@@ -31,7 +30,6 @@ export const capturePaypalOrder = async (
     return response.data;
   } catch (error: unknown) {
     const apiError = error as ApiError;
-    console.error("Error capturing PayPal order:", apiError);
     throw new Error(
       apiError.response?.data?.message || "Failed to capture PayPal order"
     );

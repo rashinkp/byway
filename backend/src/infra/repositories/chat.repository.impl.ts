@@ -343,11 +343,7 @@ export class ChatRepository implements IChatRepository {
   }
 
   async create(chat: Chat): Promise<Chat> {
-    console.log(
-      "[ChatRepository] Creating chat:",
-      chat.user1Id.value,
-      chat.user2Id.value
-    );
+
     const created = await this._prisma.chat.create({
       data: {
         user1Id: chat.user1Id.value,
@@ -356,7 +352,6 @@ export class ChatRepository implements IChatRepository {
         updatedAt: chat.updatedAt?.toString(),
       },
     });
-    console.log("[ChatRepository] Chat created in DB:", created.id);
     return this.toDomain(created);
   }
 
@@ -373,11 +368,6 @@ export class ChatRepository implements IChatRepository {
     user1Id: UserId,
     user2Id: UserId
   ): Promise<Chat | null> {
-    console.log(
-      "[ChatRepository] getChatBetweenUsers:",
-      user1Id.value,
-      user2Id.value
-    );
     const chat = await this._prisma.chat.findFirst({
       where: {
         OR: [

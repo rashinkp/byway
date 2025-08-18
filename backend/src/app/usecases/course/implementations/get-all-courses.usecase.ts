@@ -88,8 +88,7 @@ export class GetAllCoursesUseCase implements IGetAllCoursesUseCase {
         ...result,
         courses: enhancedCourses,
       };
-    } catch (error) {
-      console.error("GetAllCoursesUseCase error:", error);
+    } catch {
       throw new HttpError("Failed to retrieve courses", 500);
     }
   }

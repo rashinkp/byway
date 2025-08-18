@@ -34,23 +34,15 @@ export class RevenueDistributionService implements IRevenueDistributionService {
         throw new HttpError("No order items found", StatusCodes.NOT_FOUND);
       }
 
-      console.log(
-        `Distributing revenue for order ${orderId} with ${orderItems.length} items`
-      );
 
       for (const orderItem of orderItems) {
         try {
           await this.distributeRevenueForOrderItem(orderItem);
         } catch (error) {
-          console.error(
-            `Error distributing revenue for order item ${orderItem.id}:`,
-            error
-          );
           throw error; 
         }
       }
     } catch (error) {
-      console.error("Error distributing revenue:", error);
       throw new HttpError(
         error instanceof Error ? error.message : "Error distributing revenue",
         StatusCodes.INTERNAL_SERVER_ERROR
@@ -63,9 +55,6 @@ export class RevenueDistributionService implements IRevenueDistributionService {
     courseId: string; 
     orderId: string; 
   }): Promise<void> {
-    console.log(
-      `Processing order item ${orderItem.id}`
-    );
     
     // Get the course to get the price
     const course = await this._orderRepository.findCourseById(
@@ -80,9 +69,6 @@ export class RevenueDistributionService implements IRevenueDistributionService {
     const instructorId = course.createdBy;
     const { adminShare, instructorShare } = this.calculateShares(coursePrice);
 
-    console.log(
-      `Calculated shares - Admin: ${adminShare}, Instructor: ${instructorShare}`
-    );
 
     await this.updateWallets(instructorId, adminShare, instructorShare);
     await this.createTransactions(
@@ -141,7 +127,6 @@ export class RevenueDistributionService implements IRevenueDistributionService {
     // Get or create admin wallet
     let adminWallet = await this._walletRepository.findByUserId(adminId);
     if (!adminWallet) {
-      console.log("Creating admin wallet");
       adminWallet = Wallet.create(adminId);
       adminWallet = await this._walletRepository.create(adminWallet);
     }
@@ -153,7 +138,6 @@ export class RevenueDistributionService implements IRevenueDistributionService {
       instructorId
     );
     if (!instructorWallet) {
-      console.log("Creating instructor wallet for:", instructorId);
       instructorWallet = Wallet.create(instructorId);
       instructorWallet = await this._walletRepository.create(instructorWallet);
     }
@@ -200,13 +184,11 @@ export class RevenueDistributionService implements IRevenueDistributionService {
     instructorShare: number,
     adminShare: number
   ): Promise<void> {
-    try {
       // Get admin user ID and order details
       const adminId = await this.getAdminUserId();
       const order = await this._orderRepository.findById(orderItem.orderId);
 
       if (!order) {
-        console.error("Order not found for notifications");
         return;
       }
 
@@ -246,8 +228,6 @@ export class RevenueDistributionService implements IRevenueDistributionService {
         message: `Course "${course.title}" purchase completed! You're ready to start learning.`,
         link: `/user/my-courses`,
       });
-    } catch (error) {
-      console.error("Error sending purchase notifications:", error);
-    }
+    
   }
 }

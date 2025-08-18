@@ -28,7 +28,6 @@ export async function login(email: string, password: string) {
 		const user = response.data.data;
 		if (typeof window !== "undefined") {
 			localStorage.setItem("auth_user", JSON.stringify(user));
-			console.log("[auth.ts] Stored user in localStorage after login");
 		}
 		useAuthStore.getState().setUser(user);
 		return user;
@@ -52,7 +51,6 @@ export async function googleAuth(
 		const user = response.data.data;
 		if (typeof window !== "undefined") {
 			localStorage.setItem("auth_user", JSON.stringify(user));
-			console.log("[auth.ts] Stored user in localStorage after Google auth");
 		}
 		useAuthStore.getState().setUser(user);
 		return response.data;
@@ -139,7 +137,6 @@ export async function getCurrentUser(): Promise<User | null> {
 		const user = response.data.data;
 		if (typeof window !== "undefined") {
 			localStorage.setItem("auth_user", JSON.stringify(user));
-			console.log("[auth.ts] Stored user in localStorage after getCurrentUser");
 		}
 		useAuthStore.getState().setUser(user);
 		return user;
@@ -165,7 +162,6 @@ export async function logout(): Promise<void> {
 		if (typeof window !== "undefined") {
 			localStorage.removeItem("auth_user");
 			localStorage.removeItem("auth_email");
-			console.log("[auth.ts] Cleared user and email from localStorage on logout");
 		}
 		useAuthStore.getState().clearAuth();
 	} catch (error: unknown) {
@@ -209,17 +205,11 @@ export async function facebookAuth(
 		const user = response.data.data;
 		if (typeof window !== "undefined") {
 			localStorage.setItem("auth_user", JSON.stringify(user));
-			console.log("[auth.ts] Stored user in localStorage after Facebook auth");
 		}
 		useAuthStore.getState().setUser(user);
 		return response.data;
 	} catch (error: unknown) {
 		const apiError = error as ApiError;
-		console.error("Facebook auth error:", {
-			status: apiError.response?.status,
-			data: apiError.response?.data,
-			message: apiError.message,
-		});
 		throw new Error(
 			apiError.response?.data?.message ||
 				apiError.response?.data?.error ||
@@ -239,7 +229,6 @@ export async function getVerificationStatus(email: string): Promise<{
 		return response.data.data;
 	} catch (error: unknown) {
 		const apiError = error as ApiError;
-		console.error("Get verification status error:", apiError);
 		throw new Error(
 			apiError.response?.data?.message || "Failed to get verification status",
 		);

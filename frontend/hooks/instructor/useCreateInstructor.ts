@@ -84,10 +84,7 @@ export function useCreateInstructor() {
 			});
 		},
 		onError: (error: ApiErrorResponse) => {
-			console.error(
-				"Instructor creation failed:",
-				JSON.stringify(error, null, 2),
-			);
+
 
 			// Handle different error types
 			let errorMessage = "Something went wrong while applying";

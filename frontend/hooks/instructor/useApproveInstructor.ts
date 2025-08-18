@@ -81,7 +81,6 @@ export function useApproveInstructor() {
 			});
 		},
 		onError: (error) => {
-			console.error("Instructor approval failed:", error.message);
 			toast.error("Instructor Approval Failed", {
 				description: error.message || "Something went wrong while approving",
 			});

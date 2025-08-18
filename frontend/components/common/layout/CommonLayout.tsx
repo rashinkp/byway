@@ -48,7 +48,6 @@ export default function CommonLayout({
 		}
 	}, [isInitialized, initializeAuth]);
 
-	console.log("isInitialized", isInitialized, user);
 
 	// Handle screen size for collapsible sidebar
 	useEffect(() => {
@@ -84,16 +83,13 @@ export default function CommonLayout({
 					setIsLoggingOut(false);
 					router.replace("/login");
 				},
-				onError: (error) => {
+				onError: () => {
 					setIsLoggingOut(false);
-					console.error("Logout failed:", error);
-					// Even if logout fails, redirect to login page
 					router.replace("/login");
 				},
 			});
-		} catch (error) {
+		} catch  {
 			setIsLoggingOut(false);
-			console.error("Logout failed:", error);
 			router.replace("/login");
 		}
 	};

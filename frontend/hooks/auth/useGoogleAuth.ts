@@ -63,7 +63,6 @@ export function useGoogleAuth(): UseGoogleAuthResult {
 					: "Google authentication failed";
 			setError(message);
 			toast.error(message);
-			console.error("Google auth error:", error);
 		},
 		flow: "implicit",
 		scope: "openid email profile", // Ensures id_token is returned

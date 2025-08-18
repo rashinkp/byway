@@ -67,7 +67,6 @@ export function useUpdateUser(): UseUpdateUserReturn {
 		onSuccess: (updatedUser) => {
 			// Safety check: ensure updatedUser exists
 			if (!updatedUser) {
-				console.error("Update user response is undefined");
 				toast.error("Error", {
 					description: "Failed to update profile. Please try again.",
 				});

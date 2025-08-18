@@ -74,8 +74,7 @@ export class StripeWebhookGateway implements WebhookGateway {
         }
       }
       return WebhookMetadata.create(stringifiedMetadata);
-    } catch (error) {
-      console.error("Error parsing webhook metadata:", error);
+    } catch {
       throw new HttpError(
         "Failed to parse webhook metadata",
         StatusCodes.BAD_REQUEST
@@ -150,8 +149,7 @@ export class StripeWebhookGateway implements WebhookGateway {
       return this.parseMetadata(
         sessions.data[0].metadata as Record<string, string>
       );
-    } catch (error) {
-      console.error("Error fetching checkout session metadata:", error);
+    } catch  {
       return WebhookMetadata.create({
         paymentIntentId,
         status: "failed",

@@ -75,7 +75,6 @@ export const useUpdateCourse = () => {
 			toast.success("Course updated!", {
 				description: "The course has been updated successfully.",
 			});
-			console.log("Course updated successfully:", data);
 		},
 		onError: (
 			error: Error,
@@ -92,7 +91,6 @@ export const useUpdateCourse = () => {
 				["course", variables.id],
 				context?.previousCourse,
 			);
-			console.log("error", error);
 
 			toast.error("Course updation failed!", {
 				description:

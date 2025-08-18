@@ -13,7 +13,7 @@ const startServer = async (): Promise<void> => {
   try {
     await databaseProvider.connect();
     const deps = createAppDependencies();
-    const app = createApp(deps);
+    const app = createApp(deps, logger);
     const server = http.createServer(app);
 
     const PORT = envConfig.PORT || 5001;
@@ -27,7 +27,7 @@ const startServer = async (): Promise<void> => {
     });
 
     server.on("error", (error) => {
-      logger.error("Server error", error);
+      logger.error("Server error", {error});
     });
 
     process.on("SIGTERM", async () => {
@@ -39,7 +39,7 @@ const startServer = async (): Promise<void> => {
       });
     });
   } catch (error) {
-    logger.error("Failed to start server", error);
+    logger.error("Failed to start server", {error});
     process.exit(1);
   }
 };

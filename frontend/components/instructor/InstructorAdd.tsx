@@ -81,7 +81,6 @@ export function InstructorFormModal({
 	}, [instructorData]);
 
 	const handleSubmit = async (data: InstructorFormData) => {
-		try {
 			// Upload the CV file first using the new CV upload functionality
 			const fileUrl = await uploadFile(
 				data.cv,
@@ -97,10 +96,7 @@ export function InstructorFormModal({
 				...data,
 				cv: fileUrl,
 			});
-		} catch (error: unknown) {
-			const err = error as Error;
-			console.error("Error submitting form:", err);
-		}
+		
 	};
 
 	if (user?.role === "ADMIN") {

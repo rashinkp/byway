@@ -11,7 +11,6 @@ export function useLogin() {
 		mutationFn: ({ email, password }: { email: string; password: string }) =>
 			login(email, password),
 		onSuccess: (user) => {
-			console.log("Login success, user:", user);
 
 			loginUser(user);
 
@@ -23,8 +22,6 @@ export function useLogin() {
 						: "/";
 			router.push(redirectPath);
 		},
-		onError: (error: Error) => {
-			console.error("Login failed:", error.message);
-		},
+
 	});
 }

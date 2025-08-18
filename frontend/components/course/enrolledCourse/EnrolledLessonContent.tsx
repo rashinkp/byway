@@ -186,9 +186,6 @@ export function LessonContent({
                             src={content.fileUrl}
                             className="w-full h-[600px] rounded mb-4"
                             title="Document preview"
-                            onError={(e) => {
-                              console.error("Iframe load error:", e);
-                            }}
                           />
                           <p className="text-gray-500 dark:text-gray-300 text-sm mt-2">
                             If the PDF doesn't load, use the download button

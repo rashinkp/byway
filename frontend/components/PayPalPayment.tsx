@@ -26,9 +26,6 @@ const PayPalPayment: FC<PayPalPaymentProps> = memo(
 					<PayPalScriptProvider options={paypalOptions}>
 						<PayPalButtons
 							style={{ layout: "vertical" }}
-							onInit={(data) => {
-								console.log("PayPal SDK initialized:", data);
-							}}
 							createOrder={createOrder as any}
 							onApprove={onApprove as any}
 							onCancel={onCancel as any}

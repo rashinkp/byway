@@ -1,5 +1,6 @@
 import { Router } from "express";
 import { AppDependencies } from "../../../di/app.dependencies";
+import { ILogger } from "../../../app/providers/logger-provider.interface";
 import authRouter from "./auth.router";
 import { userRouter } from "./user.router";
 import { instructorRouter } from "./instructor.router";
@@ -17,7 +18,7 @@ import { walletRouter } from "./wallet.router";
 import { revenueRouter } from "./revenue.router";
 import { certificateRouter } from "./certificate.router";
 
-export const createRouter = (deps: AppDependencies): Router => {
+export const createRouter = (deps: AppDependencies, logger: ILogger): Router => {
   const router = Router();
 
   router.use("/auth", authRouter(deps.authController));

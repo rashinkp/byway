@@ -28,26 +28,22 @@ export function setupSocketIO(
   io.use(socketAuthMiddleware);
 
   io.on("connection", async (socket) => {
-    console.log("Socket connected: ", socket.id);
+     logger.info(`Socket connected: ${socket.id}`);
 
     const userId = socket.data.user?.id;
-    console.log("[SocketIO] userId on connection:", userId);
     if (userId) {
       socket.join(userId);
       const unreadCount = await chatController.getTotalUnreadCount(userId);
-      console.log('starting socket io total unread count')
       socket.emit("unreadMessageCount", { count: unreadCount });
-      console.log('over socket io total unread count' , unreadCount)
     }
 
-    // Register modular handlers
     registerRoomHandlers(socket);
     registerChatHandlers(socket, io, chatController);
     registerMessageHandlers(socket, io, chatController);
     registerNotificationHandlers(socket, io, notificationController);
 
     socket.on("disconnect", () => {
-      // No logs here
+        logger.info(`Socket disconnected: ${socket.id}`);
     });
   });
 }

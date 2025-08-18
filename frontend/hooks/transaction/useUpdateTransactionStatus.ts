@@ -29,8 +29,5 @@ export const useUpdateTransactionStatus = () => {
         queryKey: ["transactions", "user", data.userId],
       });
     },
-    onError: (error) => {
-      console.error("Update transaction status error:", error.message);
-    },
   });
 };

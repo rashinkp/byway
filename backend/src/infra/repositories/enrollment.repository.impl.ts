@@ -24,7 +24,6 @@ export class EnrollmentRepository implements IEnrollmentRepository {
         accessStatus: enrollment.accessStatus,
       };
     } catch (error) {
-      console.error("Error finding enrollment", { error, userId, courseId });
       throw new HttpError("Failed to find enrollment", 500);
     }
   }
@@ -32,10 +31,9 @@ export class EnrollmentRepository implements IEnrollmentRepository {
   async create(
     input: ICreateEnrollmentInput
   ): Promise<IEnrollmentWithDetails[]> {
-    console.log("Creating enrollments with input:", input);
     const enrollments = await Promise.all(
       input.courseIds.map(async (courseId) => {
-        console.log("Creating enrollment for course:", courseId);
+       
         try {
           const enrollment = await this._prisma.enrollment.create({
             data: {
@@ -46,7 +44,7 @@ export class EnrollmentRepository implements IEnrollmentRepository {
               accessStatus: "ACTIVE",
             },
           });
-          console.log("Enrollment created successfully:", enrollment);
+         
           return {
             userId: enrollment.userId,
             courseId: enrollment.courseId,
@@ -55,12 +53,11 @@ export class EnrollmentRepository implements IEnrollmentRepository {
             accessStatus: enrollment.accessStatus,
           };
         } catch (error) {
-          console.error("Error creating enrollment:", error);
+         
           throw error;
         }
       })
     );
-    console.log("All enrollments created:", enrollments);
     return enrollments;
   }
 

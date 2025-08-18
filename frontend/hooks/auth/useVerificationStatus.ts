@@ -22,7 +22,6 @@ export function useVerificationStatus({
 					setResendCooldown(response.cooldownTime);
 				})
 				.catch((error) => {
-					console.error("Failed to get verification status:", error);
 					onError?.(error);
 				})
 				.finally(() => {
@@ -58,7 +57,6 @@ export function useVerificationStatus({
 			const response = await getVerificationStatus(email);
 			setResendCooldown(response.cooldownTime);
 		} catch (error) {
-			console.error("Failed to refresh verification status:", error);
 			onError?.(error as Error);
 		} finally {
 			setIsLoading(false);

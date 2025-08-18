@@ -29,8 +29,5 @@ export const useUpdateContent = () => {
         };
       });
     },
-    onError: (error) => {
-      console.error("Update content error:", error.message);
-    },
   });
 };

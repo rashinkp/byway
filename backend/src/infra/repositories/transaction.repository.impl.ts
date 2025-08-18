@@ -73,7 +73,7 @@ export class TransactionRepository implements ITransactionRepository {
         updatedAt: createdTransaction.updatedAt,
       });
     } catch (error) {
-      console.error("Error creating transaction:", error);
+    
       throw error;
     }
   }

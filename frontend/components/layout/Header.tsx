@@ -87,7 +87,6 @@ export function Header(
 	useUnreadMessageCount();
 
 
-	console.log("Header rendered with user:", unreadCount);
 
 	// Sync initial cart count from user data
 	useEffect(() => {
