@@ -2,6 +2,7 @@ import { PrismaClient } from "@prisma/client";
 import { User } from "../../domain/entities/user.entity";
 import { UserVerification } from "../../domain/entities/user-verification.entity";
 import { IAuthRepository } from "../../app/repositories/auth.repository";
+import { AuthProvider, Role } from "@prisma/client";
 
 export class AuthRepository implements IAuthRepository {
   constructor(private _prisma: PrismaClient) {}
@@ -9,19 +10,61 @@ export class AuthRepository implements IAuthRepository {
   async findUserByEmail(email: string): Promise<User | null> {
     const user = await this._prisma.user.findUnique({ where: { email } });
     if (!user) return null;
-    return User.fromPrisma(user);
+    return User.fromPersistence({
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      password: user.password ?? undefined,
+      googleId: user.googleId ?? undefined,
+      facebookId: user.facebookId ?? undefined,
+      role: user.role as any,
+      authProvider: user.authProvider as any,
+      isVerified: user.isVerified,
+      avatar: user.avatar ?? undefined,
+      deletedAt: user.deletedAt ?? undefined,
+      createdAt: user.createdAt,
+      updatedAt: user.updatedAt,
+    });
   }
 
   async findUserByGoogleId(googleId: string): Promise<User | null> {
     const user = await this._prisma.user.findUnique({ where: { googleId } });
     if (!user) return null;
-    return User.fromPrisma(user);
+    return User.fromPersistence({
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      password: user.password ?? undefined,
+      googleId: user.googleId ?? undefined,
+      facebookId: user.facebookId ?? undefined,
+      role: user.role as any,
+      authProvider: user.authProvider as any,
+      isVerified: user.isVerified,
+      avatar: user.avatar ?? undefined,
+      deletedAt: user.deletedAt ?? undefined,
+      createdAt: user.createdAt,
+      updatedAt: user.updatedAt,
+    });
   }
 
   async findUserByFacebookId(facebookId: string): Promise<User | null> {
     const user = await this._prisma.user.findUnique({ where: { facebookId } });
     if (!user) return null;
-    return User.fromPrisma(user);
+    return User.fromPersistence({
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      password: user.password ?? undefined,
+      googleId: user.googleId ?? undefined,
+      facebookId: user.facebookId ?? undefined,
+      role: user.role as any,
+      authProvider: user.authProvider as any,
+      isVerified: user.isVerified,
+      avatar: user.avatar ?? undefined,
+      deletedAt: user.deletedAt ?? undefined,
+      createdAt: user.createdAt,
+      updatedAt: user.updatedAt,
+    });
   }
 
   async createUser(user: User): Promise<User> {
@@ -29,19 +72,33 @@ export class AuthRepository implements IAuthRepository {
       data: {
         name: user.name,
         email: user.email,
-        password: user.password,
-        googleId: user.googleId,
-        facebookId: user.facebookId,
-        role: user.role,
-        authProvider: user.authProvider,
+        password: user.password ?? null,
+        googleId: user.googleId ?? null,
+        facebookId: user.facebookId ?? null,
+        role: user.role as any,
+        authProvider: user.authProvider as any,
         isVerified: user.isVerified,
-        avatar: user.avatar,
-        deletedAt: user.deletedAt,
+        avatar: user.avatar ?? null,
+        deletedAt: user.deletedAt ?? null,
         createdAt: user.createdAt,
         updatedAt: user.updatedAt,
       },
     });
-    return User.fromPrisma(created);
+    return User.fromPersistence({
+      id: created.id,
+      name: created.name,
+      email: created.email,
+      password: created.password ?? undefined,
+      googleId: created.googleId ?? undefined,
+      facebookId: created.facebookId ?? undefined,
+      role: created.role as any,
+      authProvider: created.authProvider as any,
+      isVerified: created.isVerified,
+      avatar: created.avatar ?? undefined,
+      deletedAt: created.deletedAt ?? undefined,
+      createdAt: created.createdAt,
+      updatedAt: created.updatedAt,
+    });
   }
 
   async createVerification(
@@ -69,7 +126,7 @@ export class AuthRepository implements IAuthRepository {
         createdAt: verification.createdAt,
       },
     });
-    return UserVerification.fromPrisma(created);
+    return UserVerification.fromPersistence(created);
   }
 
   async findVerificationByEmail(
@@ -80,7 +137,7 @@ export class AuthRepository implements IAuthRepository {
     });
 
     if (!verification) return null;
-    return UserVerification.fromPrisma(verification);
+    return UserVerification.fromPersistence(verification);
   }
 
   async updateVerification(
@@ -98,7 +155,7 @@ export class AuthRepository implements IAuthRepository {
         createdAt: verification.createdAt,
       },
     });
-    return UserVerification.fromPrisma(updated);
+    return UserVerification.fromPersistence(updated);
   }
 
   async updateUser(user: User): Promise<User> {
@@ -107,17 +164,31 @@ export class AuthRepository implements IAuthRepository {
       data: {
         name: user.name,
         email: user.email,
-        password: user.password,
-        googleId: user.googleId,
-        facebookId: user.facebookId,
-        role: user.role,
-        authProvider: user.authProvider,
+        password: user.password ?? null,
+        googleId: user.googleId ?? null,
+        facebookId: user.facebookId ?? null,
+        role: user.role as any,
+        authProvider: user.authProvider as any,
         isVerified: user.isVerified,
-        avatar: user.avatar,
-        deletedAt: user.deletedAt,
+        avatar: user.avatar ?? null,
+        deletedAt: user.deletedAt ?? null,
         updatedAt: user.updatedAt,
       },
     });
-    return User.fromPrisma(updated);
+    return User.fromPersistence({
+      id: updated.id,
+      name: updated.name,
+      email: updated.email,
+      password: updated.password ?? undefined,
+      googleId: updated.googleId ?? undefined,
+      facebookId: updated.facebookId ?? undefined,
+      role: updated.role as any,
+      authProvider: updated.authProvider as any,
+      isVerified: updated.isVerified,
+      avatar: updated.avatar ?? undefined,
+      deletedAt: updated.deletedAt ?? undefined,
+      createdAt: updated.createdAt,
+      updatedAt: updated.updatedAt,
+    });
   }
 }

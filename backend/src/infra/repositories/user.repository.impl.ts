@@ -1,4 +1,4 @@
-import { PrismaClient, Gender, Role } from "@prisma/client";
+import { PrismaClient, Gender, Role as PrismaRole } from "@prisma/client";
 import { User } from "../../domain/entities/user.entity";
 import { UserProfile } from "../../domain/entities/user-profile.entity";
 import {
@@ -6,6 +6,7 @@ import {
 } from "../../app/repositories/user.repository";
 import { PaginatedResult, PaginationFilter } from "../../domain/types/pagination-filter.interface";
 import { UserStats } from "../../domain/types/user.interface";
+import { Role as DomainRole } from "../../domain/enum/role.enum";
 
 export class UserRepository implements IUserRepository {
   constructor(private _prisma: PrismaClient) {}
@@ -52,10 +53,23 @@ export class UserRepository implements IUserRepository {
     ]);
 
     return {
-      items: users.map((u) => {
-        const user = User.fromPrisma(u);
-        return user;
-      }),
+      items: users.map((u) =>
+        User.fromPersistence({
+          id: u.id,
+          name: u.name,
+          email: u.email,
+          password: u.password ?? undefined,
+          googleId: u.googleId ?? undefined,
+          facebookId: u.facebookId ?? undefined,
+          role: u.role as DomainRole,
+          authProvider: u.authProvider as any,
+          isVerified: u.isVerified,
+          avatar: u.avatar ?? undefined,
+          deletedAt: u.deletedAt ?? undefined,
+          createdAt: u.createdAt,
+          updatedAt: u.updatedAt,
+        })
+      ),
       total,
       totalPage: Math.ceil(total / limit),
     };
@@ -67,7 +81,21 @@ export class UserRepository implements IUserRepository {
       include: { userProfile: true },
     });
     if (!user) return null;
-    return User.fromPrisma(user);
+    return User.fromPersistence({
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      password: user.password ?? undefined,
+      googleId: user.googleId ?? undefined,
+      facebookId: user.facebookId ?? undefined,
+      role: user.role as DomainRole,
+      authProvider: user.authProvider as any,
+      isVerified: user.isVerified,
+      avatar: user.avatar ?? undefined,
+      deletedAt: user.deletedAt ?? undefined,
+      createdAt: user.createdAt,
+      updatedAt: user.updatedAt,
+    });
   }
 
   async updateUser(user: User): Promise<User> {
@@ -76,19 +104,33 @@ export class UserRepository implements IUserRepository {
       data: {
         name: user.name,
         email: user.email,
-        password: user.password,
-        googleId: user.googleId,
-        facebookId: user.facebookId,
-        role: user.role,
-        authProvider: user.authProvider,
+        password: user.password ?? null,
+        googleId: user.googleId ?? null,
+        facebookId: user.facebookId ?? null,
+        role: user.role as any,
+        authProvider: user.authProvider as any,
         isVerified: user.isVerified,
-        avatar: user.avatar,
-        deletedAt: user.deletedAt ? user.deletedAt : null,
+        avatar: user.avatar ?? null,
+        deletedAt: user.deletedAt ?? null,
         updatedAt: user.updatedAt,
       },
       include: { userProfile: true },
     });
-    return User.fromPrisma(updated);
+    return User.fromPersistence({
+      id: updated.id,
+      name: updated.name,
+      email: updated.email,
+      password: updated.password ?? undefined,
+      googleId: updated.googleId ?? undefined,
+      facebookId: updated.facebookId ?? undefined,
+      role: updated.role as DomainRole,
+      authProvider: updated.authProvider as any,
+      isVerified: updated.isVerified,
+      avatar: updated.avatar ?? undefined,
+      deletedAt: updated.deletedAt ?? undefined,
+      createdAt: updated.createdAt,
+      updatedAt: updated.updatedAt,
+    });
   }
 
   async updateProfile(profile: UserProfile): Promise<UserProfile> {
@@ -107,7 +149,7 @@ export class UserRepository implements IUserRepository {
         updatedAt: profile.updatedAt,
       },
     });
-    return UserProfile.fromPrisma(updated);
+    return UserProfile.fromPersistence(updated);
   }
 
   async findProfileByUserId(userId: string): Promise<UserProfile | null> {
@@ -115,7 +157,7 @@ export class UserRepository implements IUserRepository {
       where: { userId },
     });
     if (!profile) return null;
-    return UserProfile.fromPrisma(profile);
+    return UserProfile.fromPersistence(profile);
   }
 
   async createProfile(profile: UserProfile): Promise<UserProfile> {
@@ -135,7 +177,7 @@ export class UserRepository implements IUserRepository {
         updatedAt: profile.updatedAt,
       },
     });
-    return UserProfile.fromPrisma(created);
+    return UserProfile.fromPersistence(created);
   }
 
   async getUserStats(): Promise<UserStats> {
@@ -169,10 +211,26 @@ export class UserRepository implements IUserRepository {
     };
   }
 
-  async findByRole(role: Role): Promise<User[]> {
+  async findByRole(role: DomainRole): Promise<User[]> {
     const users = await this._prisma.user.findMany({
-      where: { role },
+      where: { role: role as unknown as PrismaRole },
     });
-    return users.map((u) => User.fromPrisma(u));
+    return users.map((u) =>
+      User.fromPersistence({
+        id: u.id,
+        name: u.name,
+        email: u.email,
+        password: u.password ?? undefined,
+        googleId: u.googleId ?? undefined,
+        facebookId: u.facebookId ?? undefined,
+        role: u.role as DomainRole,
+        authProvider: u.authProvider as any,
+        isVerified: u.isVerified,
+        avatar: u.avatar ?? undefined,
+        deletedAt: u.deletedAt ?? undefined,
+        createdAt: u.createdAt,
+        updatedAt: u.updatedAt,
+      })
+    );
   }
 }

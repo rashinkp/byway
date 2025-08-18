@@ -44,31 +44,7 @@ export class PrismaNotificationRepository
     }
   }
 
-  private toDomain(row: { 
-    id: string; 
-    userId: string; 
-    eventType: string; 
-    entityType: string; 
-    entityId: string; 
-    entityName: string; 
-    message: string; 
-    link: string | null; 
-    createdAt: Date; 
-    expiresAt: Date; 
-  }): Notification {
-    return new Notification(
-      row.id,
-      new UserId(row.userId),
-      row.eventType as NotificationEventType,
-      row.entityType as NotificationEntityType,
-      row.entityId,
-      row.entityName,
-      row.message,
-      row.link,
-      new Timestamp(row.createdAt),
-      new Timestamp(row.expiresAt)
-    );
-  }
+  // Conversion handled by Notification.fromPersistence
 
   async create(notification: Notification): Promise<Notification> {
     const created = await this._prisma.notification.create({
@@ -84,12 +60,12 @@ export class PrismaNotificationRepository
         expiresAt: notification.expiresAt.value,
       },
     });
-    return this.toDomain(created);
+    return Notification.fromPersistence(created);
   }
 
   async findById(id: string): Promise<Notification | null> {
     const found = await this._prisma.notification.findUnique({ where: { id } });
-    return found ? this.toDomain(found) : null;
+    return found ? Notification.fromPersistence(found) : null;
   }
 
   async findByUserId(userId: string): Promise<Notification[]> {
@@ -97,7 +73,7 @@ export class PrismaNotificationRepository
       where: { userId },
       orderBy: { createdAt: "desc" },
     });
-    return found.map((n) => this.toDomain(n));
+    return found.map((n) => Notification.fromPersistence(n));
   }
 
   async findManyByUserId(options: {
@@ -138,7 +114,7 @@ export class PrismaNotificationRepository
     const hasMore = skip + take < total;
     const nextPage = hasMore ? Math.floor(skip / take) + 2 : undefined;
     return {
-      items: items.map((n) => this.toDomain(n)),
+      items: items.map((n) => Notification.fromPersistence(n)),
       total,
       hasMore,
       nextPage,

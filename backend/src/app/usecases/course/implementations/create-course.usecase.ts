@@ -8,6 +8,7 @@ import { ICategoryRepository } from "../../../repositories/category.repository";
 import { ICourseRepository } from "../../../repositories/course.repository.interface";
 import { IUserRepository } from "../../../repositories/user.repository";
 import { ICreateCourseUseCase } from "../interfaces/create-course.usecase.interface";
+import { Role } from "../../../../domain/enum/role.enum";
 import { NotificationEventType } from "../../../../domain/enum/notification-event-type.enum";
 import { NotificationEntityType } from "../../../../domain/enum/notification-entity-type.enum";
 import { Price } from "../../../../domain/value-object/price";
@@ -92,7 +93,7 @@ export class CreateCourseUseCase implements ICreateCourseUseCase {
     const savedCourse = await this._courseRepository.save(course);
 
     // Notify all admins using the notification use case
-    const admins = await this._userRepository.findByRole("ADMIN");
+    const admins = await this._userRepository.findByRole(Role.ADMIN);
     const adminIds = admins.map((a) => a.id);
     await this._createNotificationsForUsersUseCase.execute(adminIds, {
       eventType: NotificationEventType.COURSE_CREATION,

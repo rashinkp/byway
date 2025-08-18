@@ -48,7 +48,7 @@ export class Cart {
     });
   }
 
-  static fromPrisma(data: {
+  static fromPersistence(data: {
     id: string;
     userId: string;
     courseId: string;
