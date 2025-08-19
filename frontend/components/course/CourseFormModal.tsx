@@ -223,7 +223,7 @@ export function CourseFormModal({
 			return;
 		}
 
-		let finalThumbnailUrl: string | undefined;
+		let finalThumbnailKey: string | undefined;
 
 		try {
 			// Handle thumbnail upload to S3
@@ -233,7 +233,7 @@ export function CourseFormModal({
 				// For new courses, we'll use a temporary courseId that will be updated after creation
 				const tempCourseId = isEditing && initialData?.id ? initialData.id : `temp-${Date.now()}`;
 				
-				const { uploadUrl, fileUrl } = await getCoursePresignedUrl(
+				const { uploadUrl, key } = await getCoursePresignedUrl(
 					data.thumbnail.name,
 					data.thumbnail.type,
 					tempCourseId,
@@ -243,7 +243,7 @@ export function CourseFormModal({
 					setThumbnailUploadProgress(progress);
 				});
 				setThumbnailUploadStatus(FileUploadStatus.SUCCESS);
-				finalThumbnailUrl = fileUrl;
+				finalThumbnailKey = key;
 			}
 
 			// Prepare data for submission
@@ -252,7 +252,7 @@ export function CourseFormModal({
 				description: data.description,
 				level: data.level,
 				price: data.price,
-				thumbnail: finalThumbnailUrl,
+				thumbnail: finalThumbnailKey,
 				duration: data.duration,
 				offer: data.offer,
 				categoryId: data.categoryId,
