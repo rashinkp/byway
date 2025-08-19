@@ -1,4 +1,4 @@
-import { PrismaClient, Gender, Role as PrismaRole } from "@prisma/client";
+import { PrismaClient, Gender, Role as PrismaRole, AuthProvider as PrismaAuthProvider } from "@prisma/client";
 import { User } from "../../domain/entities/user.entity";
 import { UserProfile } from "../../domain/entities/user-profile.entity";
 import {
@@ -7,6 +7,7 @@ import {
 import { PaginatedResult, PaginationFilter } from "../../domain/types/pagination-filter.interface";
 import { UserStats } from "../../domain/types/user.interface";
 import { Role as DomainRole } from "../../domain/enum/role.enum";
+import { AuthProvider as DomainAuthProvider } from "../../domain/enum/auth-provider.enum";
 
 export class UserRepository implements IUserRepository {
   constructor(private _prisma: PrismaClient) {}
@@ -61,8 +62,8 @@ export class UserRepository implements IUserRepository {
           password: u.password ?? undefined,
           googleId: u.googleId ?? undefined,
           facebookId: u.facebookId ?? undefined,
-          role: u.role as DomainRole,
-          authProvider: u.authProvider as any,
+          role: u.role as unknown as DomainRole,
+          authProvider: u.authProvider as unknown as DomainAuthProvider,
           isVerified: u.isVerified,
           avatar: u.avatar ?? undefined,
           deletedAt: u.deletedAt ?? undefined,
@@ -75,6 +76,8 @@ export class UserRepository implements IUserRepository {
     };
   }
 
+
+  
   async findById(id: string): Promise<User | null> {
     const user = await this._prisma.user.findUnique({
       where: { id },
@@ -88,8 +91,8 @@ export class UserRepository implements IUserRepository {
       password: user.password ?? undefined,
       googleId: user.googleId ?? undefined,
       facebookId: user.facebookId ?? undefined,
-      role: user.role as DomainRole,
-      authProvider: user.authProvider as any,
+      role: user.role as unknown as DomainRole,
+      authProvider: user.authProvider as unknown as DomainAuthProvider,
       isVerified: user.isVerified,
       avatar: user.avatar ?? undefined,
       deletedAt: user.deletedAt ?? undefined,
@@ -107,8 +110,8 @@ export class UserRepository implements IUserRepository {
         password: user.password ?? null,
         googleId: user.googleId ?? null,
         facebookId: user.facebookId ?? null,
-        role: user.role as any,
-        authProvider: user.authProvider as any,
+        role: user.role as unknown as PrismaRole,
+        authProvider: user.authProvider as unknown as PrismaAuthProvider,
         isVerified: user.isVerified,
         avatar: user.avatar ?? null,
         deletedAt: user.deletedAt ?? null,
@@ -123,8 +126,8 @@ export class UserRepository implements IUserRepository {
       password: updated.password ?? undefined,
       googleId: updated.googleId ?? undefined,
       facebookId: updated.facebookId ?? undefined,
-      role: updated.role as DomainRole,
-      authProvider: updated.authProvider as any,
+      role: updated.role as unknown as DomainRole,
+      authProvider: updated.authProvider as unknown as DomainAuthProvider,
       isVerified: updated.isVerified,
       avatar: updated.avatar ?? undefined,
       deletedAt: updated.deletedAt ?? undefined,
@@ -223,8 +226,8 @@ export class UserRepository implements IUserRepository {
         password: u.password ?? undefined,
         googleId: u.googleId ?? undefined,
         facebookId: u.facebookId ?? undefined,
-        role: u.role as DomainRole,
-        authProvider: u.authProvider as any,
+        role: u.role as unknown as DomainRole,
+        authProvider: u.authProvider as unknown as DomainAuthProvider,
         isVerified: u.isVerified,
         avatar: u.avatar ?? undefined,
         deletedAt: u.deletedAt ?? undefined,

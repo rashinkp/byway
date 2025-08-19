@@ -1,0 +1,4001 @@
+[33mcommit cfedc6c81b8f55dd938bd33f4049b093cbaa3d4b[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mdev[m[33m)[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Tue Aug 19 17:49:01 2025 +0530
+
+    fixed few bugs in the type any usage
+
+[33mcommit bbf735a2589ac3eb6157c18409f7343ee6bf1b7d[m
+Merge: e59430b9 04500649
+Author: Rashin KP <71252208+rashinkp@users.noreply.github.com>
+Date:   Mon Aug 18 20:31:19 2025 +0530
+
+    Merge pull request #6 from rashinkp/fix/mapping
+    
+    added mapping proplerly
+
+[33mcommit 04500649a8c78f38d849cbb5cf84ccd1d08825ee[m[33m ([m[1;31morigin/fix/mapping[m[33m, [m[1;32mfix/mapping[m[33m)[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Mon Aug 18 20:09:44 2025 +0530
+
+    added mapping proplerly
+
+[33mcommit e59430b9475c4c3d45b5afedefdc6d21288bd84d[m
+Merge: 66ea241b 4cccf762
+Author: Rashin KP <71252208+rashinkp@users.noreply.github.com>
+Date:   Mon Aug 18 10:45:06 2025 +0530
+
+    Merge pull request #5 from rashinkp/fix/logger
+    
+    Fix/logger
+
+[33mcommit 4cccf762ec92afd3035c09f8cfba5d63a6514a02[m[33m ([m[1;31morigin/fix/logger[m[33m, [m[1;32mfix/logger[m[33m)[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Mon Aug 18 10:43:45 2025 +0530
+
+    fixed all issues related to this now going to merge to dev
+
+[33mcommit d3754cc25785c4974eca14f542f967b4790e33a1[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Mon Aug 18 10:40:51 2025 +0530
+
+    fixed all console.errors too now need to check for type errors
+
+[33mcommit 9a2c01758595199f02b07fe6a574bb3e4732b1f6[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Mon Aug 18 10:30:50 2025 +0530
+
+    fixed all console logs and moved added winston logger where necessory
+
+[33mcommit 5f9147c8681eedc47299fbd9e1165b0beec06aab[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Mon Aug 18 10:09:08 2025 +0530
+
+    changed few console logs to winston logger now stable need little more to change
+
+[33mcommit fe8f3a4fca38b4dc4037cdf9055babbac6feabd1[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Mon Aug 18 09:38:31 2025 +0530
+
+    started fixing logger in pending goign good
+
+[33mcommit 66ea241bf5cf201c6386f306d4c246a7fa6499ee[m
+Merge: 80311bce 736e2ce3
+Author: Rashin KP <71252208+rashinkp@users.noreply.github.com>
+Date:   Sun Aug 17 21:43:53 2025 +0530
+
+    Merge pull request #4 from rashinkp/fix/private_variables
+    
+    Fix/private variables
+
+[33mcommit 736e2ce302e898db47bcca5cb910876f323c0969[m[33m ([m[1;31morigin/fix/private_variables[m[33m, [m[1;32mfix/private_variables[m[33m)[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Sun Aug 17 21:13:19 2025 +0530
+
+    fixed few type errors from it
+
+[33mcommit f4bb5f8fb638e00e9c17a14980e267c6e06eb229[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Sun Aug 17 21:06:19 2025 +0530
+
+    fixed few things in repository issues like constructing prisma
+
+[33mcommit f74a4d35e7404518ceaeed09004d31c23e8b89bc[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Sun Aug 17 20:49:10 2025 +0530
+
+    fixed most of the private usage with undsercore starting
+
+[33mcommit 80311bcebd4302f7677a85d2d1c50755cb5f78cd[m[33m ([m[1;31morigin/fix/removing-any[m[33m, [m[1;32mfix/removing-any[m[33m)[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Sun Aug 17 20:03:18 2025 +0530
+
+    fixed all errors and removed all anyies
+
+[33mcommit 3183b2f19418ed06849c7ee31a1a1afc7f905456[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Sun Aug 17 19:58:59 2025 +0530
+
+    fixed all errors and removed all anyies
+
+[33mcommit cd54c36e0b256b7f6598a0d98d6469736956b89c[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Sun Aug 17 15:55:37 2025 +0530
+
+    fixed all type errors after removing any no more any's fixed ready to merge
+
+[33mcommit fa27b77e26a1abb6963a6b4a37135c8ab9a09ff1[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Sun Aug 17 15:51:54 2025 +0530
+
+    fixed all any problems in frontend need to fix some type errors now
+
+[33mcommit af69b55554f62bcc502baa5a91d16a9305dd4473[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Sun Aug 17 15:21:30 2025 +0530
+
+    backend any and related errors all competed
+
+[33mcommit 1d1a585147f22d38477e4a5933e8a4e8edb904a4[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Sat Aug 16 21:57:43 2025 +0530
+
+    fixing necessory things that is needed proper now no more errors
+
+[33mcommit 6b2c5a021ff17e8174f0af6a6de31cf16d1d89db[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Sat Aug 16 21:43:46 2025 +0530
+
+    fixing things properly on controller type errors
+
+[33mcommit db29527e0337b7ea844105b43c1001676db1c577[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Sat Aug 16 18:23:32 2025 +0530
+
+    ts errors in repo and uscase manged onow to controller
+
+[33mcommit bb49009f12a6c921cbf2e454eda083e6e84e3159[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Sat Aug 16 09:50:37 2025 +0530
+
+    fixed backend usage any almost
+
+[33mcommit 28ea6b2cc630f727f2b12cd472a4bb1f1bcc864c[m[33m ([m[1;31morigin/master[m[33m, [m[1;32mmaster[m[33m)[m
+Merge: de3dc843 ac9e299f
+Author: Rashin KP <71252208+rashinkp@users.noreply.github.com>
+Date:   Thu Aug 14 09:27:41 2025 +0530
+
+    Merge pull request #3 from rashinkp/fix/dto-mapping
+    
+    Fix/dto mapping
+
+[33mcommit ac9e299f2a12a1982e0c0a2ab0d5ec8a7670c5f4[m[33m ([m[1;31morigin/fix/dto-mapping[m[33m, [m[1;32mfix/dto-mapping[m[33m)[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Thu Aug 14 09:26:52 2025 +0530
+
+    fixed almost problem to this concern pushing pr request
+
+[33mcommit aa6e54644a788986fe0c3e72f3fcf99774ab38b2[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Wed Aug 13 21:20:17 2025 +0530
+
+    dto problems almost compelted
+
+[33mcommit 76e466084d2d76e8eb1caf58e7b01d83e29617c3[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Wed Aug 13 21:15:07 2025 +0530
+
+    fixed user repository usage
+
+[33mcommit e70b25222b77954cb0ea555cbb7f53a18285cae1[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Wed Aug 13 21:02:54 2025 +0530
+
+    fixed user usecase to return dtos
+
+[33mcommit daea41134d717ac7269fa667f92dc2891ef2985d[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Wed Aug 13 20:15:25 2025 +0530
+
+    fixed search module
+
+[33mcommit 3903918f39da59a5ef4f3d2bf06aed681391bed6[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Wed Aug 13 19:58:40 2025 +0530
+
+    fixed revenue module
+
+[33mcommit b3e409268ff83f3f3bbcc1940c1951d983f98eeb[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Wed Aug 13 19:39:53 2025 +0530
+
+    fixed order status
+
+[33mcommit 7db4e5293a1a52ac55396f75c82707458324ad2c[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Wed Aug 13 15:36:43 2025 +0530
+
+    fixed order moduled for dtos and domain returuing
+
+[33mcommit cc2564911692d0dc1e78092a385ff8bc345e64bf[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Wed Aug 13 15:33:01 2025 +0530
+
+    fixed notification module dtos and entity
+
+[33mcommit 225dd438ab19970cbd9a5dedddfd1674e5dd82c1[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Wed Aug 13 15:25:02 2025 +0530
+
+    fixed message module dtos and entity
+
+[33mcommit fee297ff73e7a7748d33d3876bdef54e3db5839d[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Wed Aug 13 12:05:08 2025 +0530
+
+    fixed leeson related dtos and domain
+
+[33mcommit 06064b393aebb8f0b95832641b924d54660d7392[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Wed Aug 13 10:36:24 2025 +0530
+
+    instructor module completed
+
+[33mcommit d8ce99c50afad0762abae27b3bd6d6381da6b1fa[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Wed Aug 13 10:28:30 2025 +0530
+
+    fixed instructor related usecases dtos
+
+[33mcommit f3f090e3a41d738c7c6ec30404b41008c6cae562[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Wed Aug 13 09:58:38 2025 +0530
+
+    fixing jwt payload usage evedrywhere
+
+[33mcommit 80723d7178305430df6fcc3498528e1f55b75d8d[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Tue Aug 12 21:52:27 2025 +0530
+
+    enrollment module and dashboard realted dtos completely changed and manged
+
+[33mcommit 9ff0e7bfcd6d26be31ef22401f6a73e875aa0769[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Tue Aug 12 21:22:07 2025 +0530
+
+    course review module fixed
+
+[33mcommit 71a7b68c1ce61ac1a4cbfb97de1dd16fd17dd9f9[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Tue Aug 12 20:31:22 2025 +0530
+
+    fixed dtos completely in course module
+
+[33mcommit ed0f0ea1b166aa6fe9982d9cafca14a822078abd[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Tue Aug 12 20:28:27 2025 +0530
+
+    course module dtos almost fixed
+
+[33mcommit 93d3151b9fa3929861413c051695c9fe9a4b71f0[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Tue Aug 12 15:25:24 2025 +0530
+
+    fixing dtos in course still working on it good stil
+
+[33mcommit 0f0aace4154890ba4aeb5490ea636f9c8ef60353[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Mon Aug 11 16:38:53 2025 +0530
+
+    fix-chat problems in dto
+
+[33mcommit cfd77e0e2ef662477b58d84c83acfd82b5c55db3[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Mon Aug 11 15:33:32 2025 +0530
+
+    fix-chat dto
+
+[33mcommit 143992f308e31c26ff7ab23a776cc9c7398e94d4[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Mon Aug 11 15:13:26 2025 +0530
+
+    fix-certificate dto completed
+
+[33mcommit 197bcd549e8d26673c475977c724f3443fbcec70[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Mon Aug 11 12:17:31 2025 +0530
+
+    fixed category dto mapping in all places moving to next
+
+[33mcommit eded13e69be3c5224f94be5cc4f6cd8d2a596dc0[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Mon Aug 11 12:00:15 2025 +0530
+
+    onworking rephasing user repo
+
+[33mcommit 595d2e930fc22254a4b1b5d916ee71df72767f34[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Mon Aug 11 11:30:36 2025 +0530
+
+    fix-just added dtos and things
+
+[33mcommit de3dc843b66d042cd19169343d90cfed60c4e5f4[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Sat Aug 9 12:49:04 2025 +0530
+
+    category adding problem fixed
+
+[33mcommit 6bfed2895a9c0d9388e3fa33cbd20a86e030daae[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Sat Aug 9 12:29:43 2025 +0530
+
+    added public to dockert
+
+[33mcommit d5798cced5bb792f40465c640cc6cc4f9d1e0676[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Sat Aug 9 12:15:43 2025 +0530
+
+    fix-id in repo
+
+[33mcommit 9236a392fb16eab50712479201c40b7df74b1f48[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Sat Aug 9 11:18:02 2025 +0530
+
+    prisma error on the generating course fixed
+
+[33mcommit 2dfbe02f59a9addf82ed192bc8676b96cee78829[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Sat Aug 9 11:05:42 2025 +0530
+
+    fixed checking if enrolled then don't go there
+
+[33mcommit a431e42e9ee9d2d1a9f591aec40a80df7fe0c880[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Sat Aug 9 10:43:34 2025 +0530
+
+    fixed types erorrs
+
+[33mcommit 82bc5afc34820252b652a44281bb65c2127f3119[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Sat Aug 9 10:31:34 2025 +0530
+
+    fixed error while sending data to order
+
+[33mcommit f3f5126488e401c34b3d90ee07ba952b8df983b1[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Sat Aug 9 09:06:36 2025 +0530
+
+    fix-docker iamge error : moved from alpine to base in node
+
+[33mcommit e9d01d28cce16d08dc40f9a3d6d25981cbf91f87[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Fri Aug 8 22:00:31 2025 +0530
+
+    fix-types erorrs
+
+[33mcommit 9b46974993b535460204ea843c0429d8a9945553[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Fri Aug 8 21:03:57 2025 +0530
+
+    reinstalled propelry
+
+[33mcommit a1dbc42e5c556b8d527fa945d3ccaa82779b0c71[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Fri Aug 8 20:56:41 2025 +0530
+
+    reinstalled propelry
+
+[33mcommit a32b757129166753f575d0028e475e80dc39d8f2[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Fri Aug 8 20:44:28 2025 +0530
+
+    reinstalled propelry
+
+[33mcommit ce164621f681ff9cf7032ffb669d60514e95f301[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Fri Aug 8 20:37:32 2025 +0530
+
+    reinstalled propelry
+
+[33mcommit 58e6e192a1e1b3b4655266c89d0631cd7a6d5e99[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Fri Aug 8 20:24:37 2025 +0530
+
+    fixed docker problem
+
+[33mcommit abe4e8d016887f9cf64fc0d5a846b31fa823e338[m
+Merge: 6d7994bc ad3fe2aa
+Author: Rashin KP <71252208+rashinkp@users.noreply.github.com>
+Date:   Fri Aug 8 19:49:50 2025 +0530
+
+    Merge pull request #2 from rashinkp/fix/updating-clean
+    
+    Fix/updating clean
+
+[33mcommit ad3fe2aa81ee5a280e8550dc34f78fdfcbd3a5e4[m[33m ([m[1;31morigin/fix/updating-clean[m[33m, [m[1;32mfix/updating-clean[m[33m)[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Fri Aug 8 19:03:04 2025 +0530
+
+    fix-playing-completed
+
+[33mcommit 9c78e4f89007824d7521b05c244ea0ab55a9a77b[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Fri Aug 8 15:06:30 2025 +0530
+
+    final problems fixed in this branch
+
+[33mcommit 98bc337d3986a9684c485b62a3d55e652240fbd0[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Fri Aug 8 14:53:22 2025 +0530
+
+    fix-finalproblems in backend: type problems fixed
+
+[33mcommit 35031ca4299834fcac73a5fa9402682726e5ad95[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Fri Aug 8 12:09:49 2025 +0530
+
+    fix:ranamign: renamted few app/providers
+
+[33mcommit 703eac7bd1ca4c56aa43c176fcd3ae54689c9a37[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Fri Aug 8 12:08:02 2025 +0530
+
+    fix-dto , fix-provider: auth dto moved and password ahsher  seperated
+
+[33mcommit 7cae2597897892e73ae2c2877fd120fcd22e998b[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Fri Aug 8 11:02:31 2025 +0530
+
+    fix-dto: updated import modules
+
+[33mcommit a48c646b752333c83190cd74b6eda08566819e5a[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Fri Aug 8 10:13:55 2025 +0530
+
+    fix-dto only auth left
+
+[33mcommit c01d7d16402f1064d02bbc4db1b42fc98f3dc4b5[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Fri Aug 8 10:02:29 2025 +0530
+
+    fix-dto: order ,revenue dtos updatesd
+
+[33mcommit 34bd7fbf6bf8dec8d67f8b236a6694adce7d6980[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Fri Aug 8 09:49:39 2025 +0530
+
+    fix-dto: dashboard related dtos updsated
+
+[33mcommit 3dabfbe056aa84ca76eb568de8fe132852b1234b[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Thu Aug 7 22:01:35 2025 +0530
+
+    fix-dto: transaction dto
+
+[33mcommit 732aa228b7f5776d353623e47e4169505afcc0fb[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Thu Aug 7 19:29:15 2025 +0530
+
+    fix-dto: 5 more dto files upldsated
+
+[33mcommit 05f8c04213af77b66451ae9b68b619d994333095[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Thu Aug 7 19:18:18 2025 +0530
+
+    fix-dto: dto problems completely fixed on certificate
+
+[33mcommit b2e7a63e6da773914838dbaad16c856a21104209[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Thu Aug 7 19:10:01 2025 +0530
+
+    fix-dto: wallet dtos completed
+
+[33mcommit b29552f6453caa1548a7aeb3cd3264c025518b1f[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Thu Aug 7 19:04:28 2025 +0530
+
+    fix-entity: uuid remvoed from course entity
+
+[33mcommit 73c9b8b04cc0ef570bd4f8ece3d7d0d2a5b6c013[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Thu Aug 7 18:51:59 2025 +0530
+
+    fix-entity: removed uuid from all
+
+[33mcommit 4eb25f6189c203e05c03c166ec276418d83d62a5[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Thu Aug 7 18:37:44 2025 +0530
+
+    fix-entity: almost completed few more checks
+
+[33mcommit b3a95672d2b40b3b52785a37e298ba6a1a95adf5[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Thu Aug 7 18:21:41 2025 +0530
+
+    fix-entity: working almost done
+
+[33mcommit 241be5ed65dcfdaeb4b45fc4d439e6fa8cc77ef4[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Thu Aug 7 18:12:18 2025 +0530
+
+    fix-entity: updateed user profile user verificastion
+
+[33mcommit dd55c060f3885b52380093fa05f45033688f152d[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Thu Aug 7 18:05:13 2025 +0530
+
+    fix-entity: content instuctor lesson progress review all fixed
+
+[33mcommit d923588cb05b060e98c1dd063cd4e24f45136847[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Thu Aug 7 17:55:44 2025 +0530
+
+    fix-entity: category completed
+
+[33mcommit 213dc82b1b59669d14e0fab81cf1f89b949dd33f[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Thu Aug 7 17:43:37 2025 +0530
+
+    working on stable branch
+
+[33mcommit b58bbe8a6fc738a8b46190529fba916c3104b027[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Thu Aug 7 14:25:00 2025 +0530
+
+    fix:updated schema for unique enrollment
+
+[33mcommit 6d7994bc9a9d3533c41f724a2e267982d424104c[m
+Merge: c251ea5e c71cdc92
+Author: Rashin KP <71252208+rashinkp@users.noreply.github.com>
+Date:   Sun Aug 3 14:42:18 2025 +0530
+
+    Merge pull request #1 from rashinkp/fix/final-edits
+    
+    Fix/final edits
+
+[33mcommit c71cdc923f050708d1b8db6f3b7d10b7de15f654[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Sun Aug 3 14:39:09 2025 +0530
+
+    fix: moved dtos to the application layer
+
+[33mcommit 7e902d3f5dc823232568971c4939a67870fb46dc[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Sat Aug 2 20:52:03 2025 +0530
+
+    fix: removed command to docker volume as db has been migrated
+
+[33mcommit 643a140e5383aad1db85ab85267e54f20f3d7713[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Sat Aug 2 20:13:52 2025 +0530
+
+    fix:laoding state properly managed while adding course
+
+[33mcommit 698b32ac7278df5dcc3f3cc5f5122ccb34e1a46e[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Sat Aug 2 19:58:12 2025 +0530
+
+    fix:updated contenet and lesson updating this invalidation of query client
+
+[33mcommit 93ce3f4480859379bec80344572f634d2acb0f38[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Sat Aug 2 15:18:24 2025 +0530
+
+    fix:updated while editing deleting content
+
+[33mcommit dcae78d82a1136be3c8c5198cf2e1b6faaa9bb80[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Sat Aug 2 11:28:58 2025 +0530
+
+    fix:course adding extra details not stroing problem solved
+
+[33mcommit b02a32c6fd501aed2493be7a9ef3d2da8d35c109[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Sat Aug 2 11:09:54 2025 +0530
+
+    fix:course adding and updating refetchilng and bug while adding updated
+
+[33mcommit 0e4cbdce117b1876b24cca6ccbe162a4d4b9c90c[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Sat Aug 2 09:46:14 2025 +0530
+
+    fix:loading skeleton coloring
+
+[33mcommit 9550fb148ef42696393b7b2aa4a53355ec3c2f68[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Sat Aug 2 09:38:59 2025 +0530
+
+    updated usage of redeclining course and approval to don't refetch data working fine
+
+[33mcommit 5229e105af6a4b205a9928d70f4af699023ec102[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Fri Aug 1 22:05:14 2025 +0530
+
+    fix:approval and decline course on working
+
+[33mcommit 052c30e973943c64c32527951ea7139ecd2fc244[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Fri Aug 1 21:28:05 2025 +0530
+
+    fix:instructor decline and approval refetching updated
+
+[33mcommit 402aa80eec113056a09ac699d800bbdca207b3d3[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Fri Aug 1 21:16:06 2025 +0530
+
+    fix:refetching while deleting user working
+
+[33mcommit 07e13e84d7488709105082394d55546857824fb5[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Fri Aug 1 10:44:02 2025 +0530
+
+    fix:debounce time updated
+
+[33mcommit 5038ab031c9988a87e789ca14b444cc047a70992[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Fri Aug 1 10:17:05 2025 +0530
+
+    fix:refetching on admin delete user updated efficiently updating
+
+[33mcommit 6aa49d723f535c4d0bb63ccffdaf725b724cb329[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Fri Aug 1 10:12:29 2025 +0530
+
+    fix:category page all optilmized
+
+[33mcommit 3daf591b6a130aebef0f8dc0dec074c8d490ad25[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Thu Jul 31 22:07:24 2025 +0530
+
+    fix:category update refetching problem fixed
+
+[33mcommit da85664a6e48750a7fab7901e6842c32769e947e[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Thu Jul 31 22:01:19 2025 +0530
+
+    fix:updated category deleting mutation refetching
+
+[33mcommit 175314abfbd1e60477ac1a723bb8aac69db6f1bb[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Thu Jul 31 11:23:13 2025 +0530
+
+    fix:category under admin form ux updated
+
+[33mcommit 9799ab270a913cc7c12fd4fabd28702e95802050[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Wed Jul 30 15:43:00 2025 +0530
+
+    fix:admin panel fallback ui added on dashboard and analytics page
+
+[33mcommit a30b031ecaeb46dfbecc6900539b10120072960e[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Wed Jul 30 15:28:56 2025 +0530
+
+    fix:instructor apply form state updating refetching removed
+
+[33mcommit 2cc213ef954aa7b756d41ada2df09b1a7e38dbdf[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Wed Jul 30 15:07:16 2025 +0530
+
+    fix:updated refetching and reassinning to user problem fixed
+
+[33mcommit 110c3aa14582a402260e8619b124a6d309855a69[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Wed Jul 30 14:17:45 2025 +0530
+
+    fix:moved zode and some valdiation related thigns in profile compoenent to lib
+
+[33mcommit 273dc23b04ffb8db6e01e910a282335e7de012cc[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Wed Jul 30 14:04:39 2025 +0530
+
+    fix:fallback on landing page when no data
+
+[33mcommit b65876fa8cf3595faf474494e9e521a4fab7f34f[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Tue Jul 29 21:51:18 2025 +0530
+
+    typles moved to types folder
+
+[33mcommit a626de233ffd8a2f5451fe89301ed3d8016847a1[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Tue Jul 29 12:06:02 2025 +0530
+
+    types problems changed form the frontend almost
+
+[33mcommit 4286582d6ea3dce0a0e5fb994778257f1d74c081[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Mon Jul 28 16:00:25 2025 +0530
+
+    profile update made no invalidate tag
+
+[33mcommit c251ea5e2d67711188847a067b927da56b21f190[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Sat Jul 26 19:22:57 2025 +0530
+
+    few changes added
+
+[33mcommit b25f5732c058f083c5263b4434e2a4e4b92367b4[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Sat Jul 26 12:53:52 2025 +0530
+
+    problem solved on instructor approval
+
+[33mcommit e7191a3f00c4eb7fa3096917b133a657f9625e6f[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Sat Jul 26 12:09:41 2025 +0530
+
+    updated new things profile managemewnt in admin panel
+
+[33mcommit a14d222bec5022aebe0acaef117ea097118d3255[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Sat Jul 26 12:05:53 2025 +0530
+
+    updated instructor approval status modals
+
+[33mcommit af129699a6999139a7b139149b3b04bbc71cce16[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Sat Jul 26 10:56:26 2025 +0530
+
+    stripe metadata problem fixed
+
+[33mcommit c322392847f9b999db0815ff3d2fcf6cfd122d1d[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Sat Jul 26 10:28:42 2025 +0530
+
+    fix made for ts errros
+
+[33mcommit 80080248e38033c9191d383f72436a2fdd3fa83e[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Sat Jul 26 10:25:08 2025 +0530
+
+    few fixes made
+
+[33mcommit 7be1a78df2565337f476922fe13bc0ad2b4320f4[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Sat Jul 26 10:04:24 2025 +0530
+
+    updated few ui things and working properly
+
+[33mcommit 07500470752e549446880e1a7db2d11ff19a142a[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Sat Jul 26 09:41:20 2025 +0530
+
+    updated few bugs
+
+[33mcommit d1e88269493b4316e851a613000f90a39354c879[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Fri Jul 25 22:09:00 2025 +0530
+
+    fix
+
+[33mcommit d0536f4103666a261f676e02d39ba3dbbc6bfaa0[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Fri Jul 25 22:03:23 2025 +0530
+
+    working propelry comlpletting
+
+[33mcommit 4f3d8c721b22c94c3028f0328e196938c79fd24b[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Fri Jul 25 21:52:45 2025 +0530
+
+    issue:lesson content responsiveness issue fixed
+
+[33mcommit 1cd1356d0adae36ee563389256f3c1a4452af06d[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Fri Jul 25 21:38:04 2025 +0530
+
+    notification modal error fixed
+
+[33mcommit 764ae26d937a4fd9db7519902d28a2ec1c3aad83[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Fri Jul 25 21:33:23 2025 +0530
+
+    updating all responsiveness issue almost completed
+
+[33mcommit b7fbdc088f9226088907c3d2a15e1a095655b741[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Fri Jul 25 18:44:24 2025 +0530
+
+    updated aws env files
+
+[33mcommit 396d723e001713f330c7c86dbca6dd4f15c678af[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Fri Jul 25 16:49:22 2025 +0530
+
+    all errors fixed
+
+[33mcommit f1c92d55b3e703089ccd7d8f1df7323d03161f11[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Fri Jul 25 16:04:10 2025 +0530
+
+    fix:ts error in frontend
+
+[33mcommit 33041fa531ed6d2e305d587e4738d3791530d157[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Fri Jul 25 16:00:51 2025 +0530
+
+    fix:ts error in frontend
+
+[33mcommit e7adff504e2a612fed4536112cd10f13b46a0acc[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Fri Jul 25 15:58:24 2025 +0530
+
+    ts error in frontend
+
+[33mcommit 1077c31fb46abb34f788f4aa78184199b398fedd[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Fri Jul 25 15:55:27 2025 +0530
+
+    forwared ref managing problem fixed
+
+[33mcommit 0a3dfe417d439b9027d9aa541542409f11900988[m[33m ([m[1;31morigin/feature/webrtc[m[33m, [m[1;32mfeature/webrtc[m[33m)[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Fri Jul 25 15:51:45 2025 +0530
+
+    updated docker config
+
+[33mcommit b951a555ae69f41c26938e979a21cd67ee02c8c2[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Fri Jul 25 15:30:55 2025 +0530
+
+    updated required things to make it into production
+
+[33mcommit dd03c1fc7aeef4a1e4add62bbd482ccf61d95d16[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Fri Jul 25 15:29:47 2025 +0530
+
+    updated all problems to chat scrolling auto
+
+[33mcommit 411d3cde2a6d3eef06ebb9938d0f91c0a5c07d29[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Fri Jul 25 15:25:45 2025 +0530
+
+    alsmost finished
+
+[33mcommit 03f3a719e39c83772f2bff81e72dc6d78a104c74[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Fri Jul 25 12:27:56 2025 +0530
+
+    loading state added b/w pages
+
+[33mcommit 3215b7cf24a2a0fd6a52f45dd8b3f134b3eb9042[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Fri Jul 25 01:29:19 2025 +0530
+
+    404 page added
+
+[33mcommit f3f3d6d829a40bba0797b316499cdda126ea0dd0[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Thu Jul 24 21:45:07 2025 +0530
+
+    message thigns updsated
+
+[33mcommit e52ea8dde4ce090ac47a90df5ce5af2ef666b862[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Thu Jul 24 21:21:40 2025 +0530
+
+    insturctor pages redesigning completed
+
+[33mcommit d7393f30f82d878df7b0c51fa55bfdbc1e4e61fc[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Thu Jul 24 20:00:00 2025 +0530
+
+    instructor page basic designs changed
+
+[33mcommit c9b798cdabdd286b0891e6f9583b871eeb4a8349[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Thu Jul 24 14:58:40 2025 +0530
+
+    Untracked byway-key.pem and added to .gitignore
+
+[33mcommit e81f09888837f6738fe02b7d2746fb674409b1a1[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Thu Jul 24 10:00:58 2025 +0530
+
+    updateing the course detail section category page copmleted properly
+
+[33mcommit e78d66ab7bcddc4b726a0ac19cb6463a63a320df[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Wed Jul 23 22:01:43 2025 +0530
+
+    loading spinner ui updated
+
+[33mcommit fbe581a5920c9421a213ee6139133300b3ab9afe[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Wed Jul 23 21:35:47 2025 +0530
+
+    loading shilmmer effect and things implemented
+
+[33mcommit 17ff3a95c21b7a627508d5ab370f15fa7b09622b[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Wed Jul 23 21:14:47 2025 +0530
+
+    admin basic pages copmleted
+
+[33mcommit 42f04f6c963ec8d26e5e4045bd5b35a18316ce63[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Wed Jul 23 20:46:36 2025 +0530
+
+    updated wallet
+
+[33mcommit 2bf553d856c371cdc68934087bb2bee3b25afd50[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Tue Jul 22 20:54:27 2025 +0530
+
+    redesigning admin panel progress completed landing page
+
+[33mcommit da0081d0cb4d8d576e2d2c1ad7f377ddaad23ae8[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Tue Jul 22 20:12:57 2025 +0530
+
+    unncessory cleanup removed
+
+[33mcommit 25d45bb6c064c83fcbae1b948a2ff57967309c43[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Tue Jul 22 19:29:54 2025 +0530
+
+    marking read while in the same chat bug fixedf
+
+[33mcommit f08acd057e9fc41e002b9b295f931cb36faec2c2[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Tue Jul 22 15:52:14 2025 +0530
+
+    chat working properly
+
+[33mcommit 30f502368eb4c43927f40dec2bcc445ec4be98df[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Tue Jul 22 15:36:53 2025 +0530
+
+    aduio player problem alomst solved
+
+[33mcommit d5bd50430a2f5ba11133898ac90667c037446b67[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Tue Jul 22 11:45:32 2025 +0530
+
+    audio recording bug fixedf
+
+[33mcommit 13c9a7f74b3bc45bd388350e43d12728afeb6b47[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Tue Jul 22 10:55:13 2025 +0530
+
+    chat componetnts redesigning in progress
+
+[33mcommit b25789782870d3b9fea7f95be13bba3c8a7c82ae[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Mon Jul 21 22:01:30 2025 +0530
+
+    updated teh edesign tf instructor side
+
+[33mcommit d3fa3029c89edff50563242e41915b56b1ecd097[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Mon Jul 21 21:45:53 2025 +0530
+
+    profile section work copmelted
+
+[33mcommit 399c01e8f1bc31ab4f952bc96701faddfb3d518a[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Mon Jul 21 17:42:37 2025 +0530
+
+    category listing page updated
+
+[33mcommit 9baca3b3256e20e901386ca6476cd08fad1f6d27[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Mon Jul 21 17:29:42 2025 +0530
+
+    course leawrning page redesigning completed
+
+[33mcommit e7ac8cd005b83b15c5521ebbbadce8b2696f48f2[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Mon Jul 21 15:48:01 2025 +0530
+
+    updating course detail layout on admin side copmleted
+
+[33mcommit 20f45c52f8ead84a4f7e1cb9cd30c8f332da6724[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Mon Jul 21 14:50:06 2025 +0530
+
+    course detail page on userside copmlete
+
+[33mcommit 171790f521586d0b3c7e0fa1b8003a001cc508cc[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Sun Jul 20 21:51:32 2025 +0530
+
+    course dettails page redesigngin
+
+[33mcommit 64679cf10b739f1ffe6afec71a45a8315b4f4256[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Sun Jul 20 21:05:15 2025 +0530
+
+    checkout page design copmleted
+
+[33mcommit bfec6bf188b47f6de5fcec4901240724814895c0[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Sun Jul 20 20:00:39 2025 +0530
+
+    cart page redesignging completed
+
+[33mcommit 7ab5b1986d602eac629946182a6dd7cf264fc749[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Sun Jul 20 16:53:00 2025 +0530
+
+    cart page redesigned
+
+[33mcommit 8a38f3f9145f181a94fd0a5f470d3ec25de5c692[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Sun Jul 20 16:18:27 2025 +0530
+
+    notification redesigned
+
+[33mcommit 0f38596d7a2c1fb7d4389e6f27ffbab2221b98d0[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Sun Jul 20 16:03:32 2025 +0530
+
+    form modal redesigning completed
+
+[33mcommit e56a534548ee269b4722d2c6fe9d38f5c1352767[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Sun Jul 20 14:27:46 2025 +0530
+
+    search bar redesigning completed
+
+[33mcommit 433fffeda2b51b5bdfe623bf12be25ca90a2411e[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Sun Jul 20 14:17:19 2025 +0530
+
+    search option on mobiles phone implemented
+
+[33mcommit ad9c128a65a5239dc1b751cb2113c3b4baff885f[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Sun Jul 20 13:52:33 2025 +0530
+
+    theme page addeed on mobile navigation
+
+[33mcommit 78eb5056439256fd132cc54350d7fb552a8a95a9[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Sun Jul 20 13:06:56 2025 +0530
+
+    fitler sidebar mobile problem fixed
+
+[33mcommit 491abda7a319c1c03675e7ec90632d763b985ab4[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Sun Jul 20 12:54:07 2025 +0530
+
+    course listing page updateing
+
+[33mcommit 9e451a437d6a900a1ecc9aa8101355740d57805e[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Sat Jul 19 21:36:51 2025 +0530
+
+    working on redesigning on course details page
+
+[33mcommit 1672ccc057f7a11fc07e72317c180cf496eafd5f[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Sat Jul 19 21:05:40 2025 +0530
+
+    redirection issue fixed
+
+[33mcommit 5271b9632d98d6c62d290d710e307b1a664f88bf[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Sat Jul 19 19:47:28 2025 +0530
+
+    completed auth page and landing page designs
+
+[33mcommit bcf604db38342beb638ae51d18c08ce83f4d59de[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Sat Jul 19 16:37:56 2025 +0530
+
+    ladning page almost completed
+
+[33mcommit 183b51cc47f16366f85c06625d5703ff6845f669[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Sat Jul 19 14:01:06 2025 +0530
+
+    landing page redesigned
+
+[33mcommit ea0c4b7a64f48ce19ffc0bf6d2b10e44bb73b45f[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Fri Jul 18 14:30:31 2025 +0530
+
+    implmenetd dark mode also and its wokring right now
+
+[33mcommit 437e8ff57aa7b2a2751aa75fbfddf38e412f2b8e[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Fri Jul 18 10:25:50 2025 +0530
+
+    updating things properly for design
+
+[33mcommit eeb167988e8a94697d5eacb01d341bed25d9709f[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Thu Jul 17 22:02:03 2025 +0530
+
+    changing navbar style
+
+[33mcommit 3569b48cdc8ac5be7e4d07154093530a1c82389a[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Thu Jul 17 15:01:30 2025 +0530
+
+    updating few things needed before stqarting
+
+[33mcommit ec0fe0d9b8e155aaaac1107be347c6e46567c237[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Tue Jul 15 19:35:09 2025 +0530
+
+    updated next.config.js file
+
+[33mcommit 47d66049b91f3f1b46291533122e62fff9482531[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Tue Jul 15 15:51:27 2025 +0530
+
+    just repushed
+
+[33mcommit 099bb6ea7823cef6dd02414b870fa0bdfd4617b9[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Tue Jul 15 13:05:41 2025 +0530
+
+    socket io runtime error solved
+
+[33mcommit 6a83ea516772c2a19943b8825dfb3f570cfecef5[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Tue Jul 15 12:37:59 2025 +0530
+
+    fix:token setting for socket io
+
+[33mcommit 22b77d2202a1fecf3b459a01cf33eb66115914a0[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Tue Jul 15 11:45:39 2025 +0530
+
+    next config file manually added because of an issue and update
+
+[33mcommit ea750f5d3b9dd4791859e4d16dd4e11235391e65[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Tue Jul 15 11:23:34 2025 +0530
+
+    updated cofig files
+
+[33mcommit 4bfe41bdf2c6d362b1bbc0afb994be13648a3ea7[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Tue Jul 15 11:06:35 2025 +0530
+
+    cleaning up thinlgs properly
+
+[33mcommit eb0ec362f76bab75979fea0677ab9cf41e3c075d[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Tue Jul 15 10:58:06 2025 +0530
+
+    cleaning up command aded in deploy.yml
+
+[33mcommit ca6505b8cd087b6c34e56865949cd5e72af42797[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Tue Jul 15 10:35:49 2025 +0530
+
+    added converting ts files to js
+
+[33mcommit 900480f819d42554c37bdb892c52d34a49f2742d[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Tue Jul 15 10:29:39 2025 +0530
+
+    update to allow images and inclueded next.config.js
+
+[33mcommit 5ae7a44025fabddbb73f5e82e21a14bca95734ea[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Tue Jul 15 10:03:18 2025 +0530
+
+    update image config in nginx and optimizing frontend
+
+[33mcommit 25188dffe4b6511bbe080f9bff2cec78345e1f12[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Mon Jul 14 20:10:25 2025 +0530
+
+    update ed things little
+
+[33mcommit f6573bb5971ffbd0ba0b7bbea5fb2c229673a8f9[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Mon Jul 14 17:42:47 2025 +0530
+
+    this is not properly managed
+
+[33mcommit 64855b27f7bbe80cab0ec33b459843178e7ab71a[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Mon Jul 14 16:55:25 2025 +0530
+
+    update things aobut storing and all
+
+[33mcommit 5a418c2102ad7506e6f374f349c9c39e5882351c[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Mon Jul 14 15:50:17 2025 +0530
+
+    clearing properly
+
+[33mcommit ad58d09e6ac551ca7ad04479784ec96c82b4e042[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Mon Jul 14 15:41:48 2025 +0530
+
+    removed alpine versions completed
+
+[33mcommit ccf90b4feaf8ca983d4e5fdfca2024567baec568[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Mon Jul 14 15:35:08 2025 +0530
+
+    nodeversion changed on docker file
+
+[33mcommit 56bc453b0d568c2ffc309f96f2511554b8cd43a0[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Mon Jul 14 15:30:25 2025 +0530
+
+    fix: add dompurify and html2canvas dependencies, clean install
+
+[33mcommit 95a42a6a808fbad7daaeee5c03586b82cc9e7fff[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Mon Jul 14 15:22:26 2025 +0530
+
+    fix: add dompurify dependency
+
+[33mcommit 2b7dac2a7603ed655573576ff54500b903fe2ae2[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Mon Jul 14 15:19:02 2025 +0530
+
+    frontend dynamic image pulling error fixed
+
+[33mcommit 5c6922b5407784800072659d883527e4620b7752[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Mon Jul 14 15:05:20 2025 +0530
+
+    packge problem resolved
+
+[33mcommit 1d47f4de8d4da415abd3f73738e23b034466144f[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Mon Jul 14 14:56:25 2025 +0530
+
+    changed docker files
+
+[33mcommit c63e8b5235421928ac9dc4f54de22b0cc3bd87ad[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Mon Jul 14 14:24:24 2025 +0530
+
+    docker cofig changed
+
+[33mcommit aacc9a75d14ae697f39c2bf9459b61e9780da276[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Mon Jul 14 14:07:18 2025 +0530
+
+    storage cleaning things added to doply.yml
+
+[33mcommit 88c9121bcf9fc2e31423a18646ae6e4ea6254161[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Sat Jul 12 10:28:17 2025 +0530
+
+    updatea a chaNGE
+
+[33mcommit e6ee535e4f562d75b8afd0e1c821bdfdef61b7bb[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Sat Jul 12 09:34:18 2025 +0530
+
+    disck space issue and socketio issue trying to resolve
+
+[33mcommit 05a05eb436a0ca1f8338d55a0fc0443d421d0b2d[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Sat Jul 12 09:26:40 2025 +0530
+
+    cidc confing error fixed
+
+[33mcommit 4c18014b38c10f77f51819f0d50470c89bc6fc1d[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Sat Jul 12 09:13:22 2025 +0530
+
+    logout redirection and false page loading fixed
+
+[33mcommit 47bed3e1c24a33c8901bf56066c9a876d779c676[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Sat Jul 12 04:19:23 2025 +0530
+
+    updated docker version on ec2
+
+[33mcommit 67bb27f1fd15f1a5dd7f655180000edc8107b5d4[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Sat Jul 12 04:01:34 2025 +0530
+
+    removed envs as its ignored by git
+
+[33mcommit 20f2684f481ad78005c5542e571053cf7fc6546f[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Sat Jul 12 03:49:19 2025 +0530
+
+    solved the env destination problem
+
+[33mcommit 215357a48efbe984de2af619d0f8721e04e43343[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Sat Jul 12 03:37:19 2025 +0530
+
+    updated env problem in dlplyyml fiel
+
+[33mcommit 20c0c8c8d857cd2a80f0db24f3ac26fc9dfd7886[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Sat Jul 12 03:26:12 2025 +0530
+
+    fixed uppercase problems in ci/cd intergration now testing
+
+[33mcommit 432065ec455c629abed369cf3b387f3094a69746[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Sat Jul 12 03:20:13 2025 +0530
+
+    checking ci/cd again after update branch name
+
+[33mcommit 80d48721875752f274b6c99922032a2ebdeef642[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Sat Jul 12 03:18:03 2025 +0530
+
+    checking if cicd working
+
+[33mcommit 21b429fae26872f47209ad56b1466c20618f610c[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Sat Jul 12 00:32:10 2025 +0530
+
+    almost hosted wihtout any issue in ec2
+
+[33mcommit ac8ebbd8a283ca46a5a0cea8630860da611f3a2c[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Fri Jul 11 21:21:06 2025 +0530
+
+    add github actions workflow
+
+[33mcommit f9335830b11f4152d6907f8da1e2467a05d5afb6[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Fri Jul 11 19:55:26 2025 +0530
+
+    restored docker files
+
+[33mcommit 5edcde3adf86a378f9eb275c485274802f8890c8[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Fri Jul 11 18:29:33 2025 +0530
+
+    docker forntend build problem fixed
+
+[33mcommit 4fb35fc1f7ff7b4905c04aaab2d1b82133d51377[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Fri Jul 11 11:50:51 2025 +0530
+
+    just lunching to ec2
+
+[33mcommit 0e19b7425ff73e70655f82cfbb3d5449438c3a69[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Fri Jul 11 09:21:10 2025 +0530
+
+    global search bug fixed
+
+[33mcommit cc94e38892d925cf9be95fd8b170d93ca9768176[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Thu Jul 10 19:57:05 2025 +0530
+
+    all env error in docker fixed
+
+[33mcommit 13b6cc627cc217031b0ee9533e6b225dc567a1b5[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Thu Jul 10 09:40:26 2025 +0530
+
+    backend errors fixed
+
+[33mcommit 2ae08ac796afbbcf971f04a632b5873ce7d93af9[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Wed Jul 9 19:54:17 2025 +0530
+
+    useSearchParams completely removed from app/
+
+[33mcommit f0d0fd1732771d3913071304fa69b216a68bf022[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Wed Jul 9 19:45:12 2025 +0530
+
+    updated using suspence where using useParams
+
+[33mcommit 6d95f72811a0f0c34aa528719c0ae68e2691ab07[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Wed Jul 9 18:22:28 2025 +0530
+
+    lint adn ts errors fixed
+
+[33mcommit 5cd7faff139c0a2b22b561c490c8d0baf73b7869[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Wed Jul 9 16:44:12 2025 +0530
+
+    fixed issue
+
+[33mcommit 4792831d5e62dd689dd6d5cfef403bfbbe49c038[m[33m ([m[1;31morigin/fix/final-bug-fixing[m[33m, [m[1;32mfix/final-bug-fixing[m[33m)[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Wed Jul 9 15:57:17 2025 +0530
+
+    completing
+
+[33mcommit 7305a48088b16f30f863ab928209662715b7fc68[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Tue Jul 8 21:26:09 2025 +0530
+
+    chat counting things completed
+
+[33mcommit d06aac243d5db0dbdb67dcb87a75a3ac1c8c4fbd[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Tue Jul 8 14:30:41 2025 +0530
+
+    showing lesson contents on admin side
+
+[33mcommit 5a48f98696d0e09bd74cf0784638e66f8a876f53[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Tue Jul 8 12:45:07 2025 +0530
+
+    admin panel sidebar layout changed
+
+[33mcommit 2b683b037553443a7d0a890ad7d62ffad27aee73[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Tue Jul 8 11:42:45 2025 +0530
+
+    things completed properly for admin side
+
+[33mcommit 3ab66efe70c0ede11aa05015cfb4012e1d53d09e[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Mon Jul 7 19:43:13 2025 +0530
+
+    auth part working fine right now
+
+[33mcommit 3959e2a1a0bb10a9fde5af8764e0ba529d48f95c[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Mon Jul 7 10:29:49 2025 +0530
+
+    updating the otp auth page security problems and its working right now
+
+[33mcommit d1877ee6ca607e347e18332ed2f1d34e8e078e2b[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Mon Jul 7 09:59:19 2025 +0530
+
+    things are working properly fixing bugs in auth pages
+
+[33mcommit 98a7f81a78d183b0e042f4bae7a4e7a517d2586c[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Sun Jul 6 20:48:15 2025 +0530
+
+    env config set up
+
+[33mcommit e86fdb7a3b5601f356f5379c90a9dc2122ed493e[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Sun Jul 6 19:32:01 2025 +0530
+
+    evn config and profile updation made through s3
+
+[33mcommit 1d0ea22d635d95171365848b28fd83ebfe03ce42[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Sun Jul 6 19:04:51 2025 +0530
+
+    certificate genration issue and deleting completed
+
+[33mcommit 0d05c70fead6c8b84b5ac65ddcb447c6327503b7[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Sun Jul 6 15:22:57 2025 +0530
+
+    profile page reloading issue fixed
+
+[33mcommit b5c20e618cef3c7f45d42b3d24a59bd1d5af6e17[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Sun Jul 6 15:03:57 2025 +0530
+
+    soved problem that blocked user restricting from req
+
+[33mcommit 14203b360e36366bc29934005c05578de43d9429[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Sun Jul 6 14:14:02 2025 +0530
+
+    currently thing all are working
+
+[33mcommit 1db11d01078b1cfdee7747042900926d959f4aa9[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Sun Jul 6 13:08:34 2025 +0530
+
+    thing almost working stable condetion
+
+[33mcommit 2d1fba7bd10d096bba4e869d10eb3f11fca0de92[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Sat Jul 5 16:08:43 2025 +0530
+
+    chat problems fixed
+
+[33mcommit 93d8a6e4e018aee5b5c2c01e2d986eb91e98ef04[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Sat Jul 5 15:49:49 2025 +0530
+
+    local storage persisting implemented
+
+[33mcommit 6aae5a93c4c4217e266286b175eff5f10ed430e4[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Sat Jul 5 10:01:23 2025 +0530
+
+    backend handles refresh token used condetion even if there multiple things coming
+
+[33mcommit 719ac45c4d098ce9b7ea613aef84bb95d5a69924[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Sat Jul 5 09:47:16 2025 +0530
+
+    refresh token implemented
+
+[33mcommit 7d1bd9043bd9f6c60aeb4755e74853e8d0d23bd8[m[33m ([m[1;31morigin/fix/ui-upgrading[m[33m, [m[1;32mfix/ui-upgrading[m[33m)[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Fri Jul 4 15:47:59 2025 +0530
+
+    eslint errors fixed both sides
+
+[33mcommit b06f6aaa3eb8dee98f0eb19bd75b0e3de3239b96[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Thu Jul 3 21:04:17 2025 +0530
+
+    color themeing added
+
+[33mcommit 59327819408c793af693968cda82217580921916[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Thu Jul 3 16:42:20 2025 +0530
+
+    message ui updated
+
+[33mcommit 733e7871c15a405ac884d381eb5711c1949f73d1[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Thu Jul 3 15:35:06 2025 +0530
+
+    lote pages changed
+
+[33mcommit a5774ef3bbe75c8077312453d16681559ec89a1c[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Thu Jul 3 13:51:04 2025 +0530
+
+    checkout page redesigned
+
+[33mcommit 07eb2569c6d0a13314d56513d259914933b9b14f[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Wed Jul 2 20:30:02 2025 +0530
+
+    working on cart
+
+[33mcommit ea868654afaff93a5a08b28cd385a5983e5098f2[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Wed Jul 2 19:41:28 2025 +0530
+
+    profile section updasted
+
+[33mcommit 5011fdceaba681f231162aac47a346c9f978e4cd[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Wed Jul 2 14:57:09 2025 +0530
+
+    public pages redesigning compoleted
+
+[33mcommit e83b76050551e498d2e492f211923a3fc08c9d2e[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Wed Jul 2 11:27:56 2025 +0530
+
+    updated categories apges completed
+
+[33mcommit de464bef1f80131035a8245323c4caaea504dafe[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Wed Jul 2 10:26:42 2025 +0530
+
+    restructuing for better user experiance
+
+[33mcommit 85b007fd940447ec02cc6b4af63427c05ecb6573[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Tue Jul 1 20:46:36 2025 +0530
+
+    almost finished landing page completedly
+
+[33mcommit ac0c5b1beda47c8a921a583b3b4e2c64070eadc8[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Tue Jul 1 19:43:17 2025 +0530
+
+    almost completing the landing page
+
+[33mcommit c44234203907f31d3f1f71251b268dfd184e01c3[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Tue Jul 1 15:31:27 2025 +0530
+
+    ui redesignging
+
+[33mcommit 976fa19891b748ee7fa150391934a21ee3171dcb[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Tue Jul 1 13:26:51 2025 +0530
+
+    redesigned to normal style
+
+[33mcommit 15b29ae078f7335b4f6bafb34962767595a7d496[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Mon Jun 30 19:16:44 2025 +0530
+
+    landing page updating
+
+[33mcommit 55bffab40640869c663a6295dd49a97357857b7c[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Mon Jun 30 18:27:12 2025 +0530
+
+    few other themes added
+
+[33mcommit 8de0dcf0a765498e213339f1c1005af43cce3d2b[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Mon Jun 30 17:53:49 2025 +0530
+
+    login page designing completed
+
+[33mcommit 132396cd91048a51359dfbd9c4c5eb92ec01205c[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Mon Jun 30 17:22:04 2025 +0530
+
+    redeesigning 5
+
+[33mcommit 137e6eac2b57e44321286637ac893fb19b1d61b1[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Mon Jun 30 14:38:18 2025 +0530
+
+    working on theme
+
+[33mcommit 4e7a6dc5c0cde7da21bc13dc96b0b9f3aa730f33[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Sun Jun 29 21:05:09 2025 +0530
+
+    reinstallilng node modules for a reason
+
+[33mcommit d32e17860573e05afe30b77dc252f1b0c8b0279b[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Sun Jun 29 20:28:27 2025 +0530
+
+    color theming changed
+
+[33mcommit 1ed605ad80912458d2e513ae48f5f0b50304c4e1[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Sun Jun 29 19:04:52 2025 +0530
+
+    color theme set using shadcn
+
+[33mcommit c95fb64edb1d1a984c0d6572e859cc195647dc41[m[33m ([m[1;31morigin/fix/fixing-final-bugs[m[33m, [m[1;32mfix/fixing-final-bugs[m[33m)[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Sun Jun 29 13:32:06 2025 +0530
+
+    alsmost completed
+
+[33mcommit 93cdbc05fe677e2a1751a63284f470ca3c488c6f[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Sat Jun 28 20:40:01 2025 +0530
+
+    audio sending and getting and iamge problems solved
+
+[33mcommit cf2db5af82e848a56d6cfeeb14a3004112e1a03b[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Fri Jun 27 15:10:39 2025 +0530
+
+    chart read and unread working while taking new chat but not working on current selected chat
+
+[33mcommit 5a7b333fbb3f28d51746c6b50af4d66c3d960966[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Fri Jun 27 11:51:31 2025 +0530
+
+    for chat enhancement backend safely implemented
+
+[33mcommit baa3a217c046970050e1ae1093fe065c8154cf7c[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Fri Jun 27 10:55:38 2025 +0530
+
+    creating backend for message expanding and its currently working good ui completed
+
+[33mcommit cf8153ed6434deb9644741590b16898191d6a3f1[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Thu Jun 26 21:47:29 2025 +0530
+
+    notification load more bug fixed
+
+[33mcommit f308c745a0df8b4be040570df14116245904b165[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Thu Jun 26 21:30:14 2025 +0530
+
+    cart count managed properly and working fine
+
+[33mcommit c0c29515b97e8c800ff4bb7b329f071d147953a2[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Thu Jun 26 21:23:11 2025 +0530
+
+    cart count is showing properly
+
+[33mcommit 4a46d5675628bc9d84cb3559886837eb38096ade[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Thu Jun 26 12:36:56 2025 +0530
+
+    few responsive ness issue fixed
+
+[33mcommit 3d99cf7a649b2f7d671b81c7c1c418c193a8da09[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Thu Jun 26 11:03:57 2025 +0530
+
+    few footer updates done
+
+[33mcommit 063423f879513ec10475abad8b64dcc61e23331c[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Thu Jun 26 10:35:23 2025 +0530
+
+    few loading state changed especially in authentication pages
+
+[33mcommit b63d02a79a37dfc31e1247f13c70ed04fcdc24fd[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Thu Jun 26 10:10:29 2025 +0530
+
+    chnaged all cloudinary usage and moved to s3
+
+[33mcommit 9ef534adbf8af2cbb5e6b480c991325caaf50de4[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Thu Jun 26 09:56:26 2025 +0530
+
+    almost completed the loading skeleton everywhere
+
+[33mcommit f4b8ad27fc255686b9ec82c8f485834d20b72481[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Wed Jun 25 18:12:05 2025 +0530
+
+    working on the design part it good to go
+
+[33mcommit 7978da47b094a13009bfc161a9b6397fa1ed1f6d[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Wed Jun 25 16:22:19 2025 +0530
+
+    added common error handling component instead of code duplicaiotn
+
+[33mcommit db6f8c7565b53a67440bcf1aadd35ebe4320f7c8[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Wed Jun 25 16:08:18 2025 +0530
+
+    profile page redesigning completed now working on error
+
+[33mcommit 48e38dfa715c47c16ee97163bd5fa470297ee1f3[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Mon Jun 23 23:14:29 2025 +0530
+
+    chat pagination issue also updated
+
+[33mcommit 2a6523262a98baf98b8e87b4781a716a9c84e9c6[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Mon Jun 23 22:31:19 2025 +0530
+
+    few pagination bugs fixed
+
+[33mcommit 479030928949fc119a21b6ad0ac920b306c130ab[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Sat Jun 21 21:47:12 2025 +0530
+
+    solved all course listing problem in admin side
+
+[33mcommit f13b404e905138e6d0dde3df933a35e4f857b079[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Fri Jun 20 14:26:39 2025 +0530
+
+    refund errors solved
+
+[33mcommit 1d828fa1acdfe65bda063c70710f714b3d972102[m[33m ([m[1;31morigin/fix/coures-resource-storage[m[33m, [m[1;32mfix/coures-resource-storage[m[33m)[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Fri Jun 20 13:47:20 2025 +0530
+
+    almost got things getting pdf also correctly
+
+[33mcommit 8b67feef0ae344d14654b6250a66681594f51d86[m[33m ([m[1;31morigin/feature/certification[m[33m, [m[1;32mfeature/certification[m[33m)[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Fri Jun 20 13:31:42 2025 +0530
+
+    certificate listing also completed now all are ok
+
+[33mcommit a917afbf49a2aa3efada2ade1879c47c2de7575c[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Fri Jun 20 13:27:29 2025 +0530
+
+    completed certificate related things
+
+[33mcommit 588e8775b0bead6d6a63d676687713228b6ec2a3[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Fri Jun 20 12:30:47 2025 +0530
+
+    got certificate
+
+[33mcommit a23d162c6c12eb810913540280551b7065f291a9[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Fri Jun 20 12:03:14 2025 +0530
+
+    certificate getting and doing thigns ok
+
+[33mcommit ec648e54daabe1d6835471c8a3a611b9072cb765[m[33m ([m[1;31morigin/feature/notification-impl[m[33m, [m[1;32mfeature/notification-impl[m[33m)[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Fri Jun 20 04:55:14 2025 +0530
+
+    going for certificate
+
+[33mcommit d703198c045736076f764702160b85f64c9bf434[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Fri Jun 20 04:27:44 2025 +0530
+
+    almost done things in notification
+
+[33mcommit 30b4f34a42f14ae3513c778ad8c51c89e30d3be5[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Fri Jun 20 03:56:57 2025 +0530
+
+    almost everything working
+
+[33mcommit 2dbd7617bac8d43dd9d732a608c1b1d987d1f456[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Fri Jun 20 03:26:25 2025 +0530
+
+    notification redesinged
+
+[33mcommit ef59ccaeb9c3a88d4d9b8e34cc93ae745002ec63[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Fri Jun 20 02:32:11 2025 +0530
+
+    course notification wokring need to add notification while doing task thats all
+
+[33mcommit 265f731b0592a8e44800634c1b5483951a075a9d[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Fri Jun 20 02:06:54 2025 +0530
+
+    alomst implemnted notificaiton
+
+[33mcommit 92625e1b0125c3eac4d33df098bffdaa1d6c200d[m[33m ([m[1;31morigin/feature/chat-impl[m[33m, [m[1;32mfeature/chat-impl[m[33m)[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Thu Jun 19 23:11:31 2025 +0530
+
+    completed chat only code base redesinging left
+
+[33mcommit 350aea5e41b4fbe86759dd57796d66f6d0ff2b67[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Thu Jun 19 20:02:40 2025 +0530
+
+    done almost things seperating moduels
+
+[33mcommit 5bfb0889529ac0342055fe50f1e2587fff6e4a1b[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Thu Jun 19 18:44:33 2025 +0530
+
+    almost got chat stable version
+
+[33mcommit 7015f0224761cb7439ebf8b16644b4f43653ee51[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Thu Jun 19 18:31:57 2025 +0530
+
+    working oin a bug
+
+[33mcommit 03da07d55b3bacf63aa45af150b1946047664d41[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Thu Jun 19 17:21:19 2025 +0530
+
+    searching in chat also implemented
+
+[33mcommit 99d4d2675bf34c903f3b3f66a3a0fb482c49cbba[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Thu Jun 19 14:24:05 2025 +0530
+
+    sc roll ui bug fixing
+
+[33mcommit c369a273954430dd76a3722cf8229eac201b84d5[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Thu Jun 19 14:16:48 2025 +0530
+
+    almost chat ui updates completed
+
+[33mcommit 0b4829066453f4e10dec0bd27d4eb6b1d0bff5a7[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Thu Jun 19 02:25:10 2025 +0530
+
+    chat almost working need few ui ulpdates
+
+[33mcommit ba77461e868a7e5c6e12a3e761a79bf86548aa98[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Thu Jun 19 01:56:28 2025 +0530
+
+    chat almost there sending messages currently woring on
+
+[33mcommit 9d52518d23f0d27d5e85c50a818c5312f71e9b7b[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Wed Jun 18 23:03:43 2025 +0530
+
+    almost got things got the chat list properly now going for messages
+
+[33mcommit 3f139b8f99922fcb58ee64ce17560e0ca60b3d8c[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Wed Jun 18 17:16:35 2025 +0530
+
+    socket io connecting working right now
+
+[33mcommit e931ddaac62437454f45ed130710f3606b8d68aa[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Wed Jun 18 17:02:36 2025 +0530
+
+    socket io backend is almost created
+
+[33mcommit f7d39538105a10a0b86544db2e160621be29981f[m[33m ([m[1;31morigin/feature/review-module[m[33m, [m[1;32mfeature/review-module[m[33m)[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Wed Jun 18 11:29:36 2025 +0530
+
+    review section over
+
+[33mcommit 08d9813923b23de98bb84246a5dafaeab7efd520[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Wed Jun 18 00:34:48 2025 +0530
+
+    almost updated admin side course details page
+
+[33mcommit 84d4059963d8b266b76f06eb06dd5693f0ee661b[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Tue Jun 17 22:47:47 2025 +0530
+
+    few more cache bug fixed
+
+[33mcommit 4673587998d3d600901577b4b629be4212a59174[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Tue Jun 17 22:41:39 2025 +0530
+
+    few caching bugs fixed on frontend
+
+[33mcommit 5ed73800a3c76b51251ce74c8e7d641d5af77ebe[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Tue Jun 17 18:34:25 2025 +0530
+
+    almost done things working on reviews just need to make few uis
+
+[33mcommit 2a0ae5ba0d80d8a5bfb7e84d1236f7af4945f536[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Tue Jun 17 17:17:57 2025 +0530
+
+    course review alomost implemented
+
+[33mcommit d8052412ac131c50e00f3f183a570d1be88d8a8b[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Tue Jun 17 16:20:44 2025 +0530
+
+    review realted backend created
+
+[33mcommit ff644cda9e26fe60f6598f912e85aa2f1b9a3719[m[33m ([m[1;31morigin/feature/dashboards-creation[m[33m, [m[1;32mfeature/dashboards-creation[m[33m)[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Tue Jun 17 15:17:32 2025 +0530
+
+    almost compeleted
+
+[33mcommit e9da8e08a51b7568b0fbbbed930a22a2290f2082[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Mon Jun 16 23:06:40 2025 +0530
+
+    course moduel restructring for best practices
+
+[33mcommit 161d55d950ea3b2b5f1d2c5de09a2e2fab485fa6[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Mon Jun 16 21:18:21 2025 +0530
+
+    paymente gateway dummy ui updated
+
+[33mcommit 2b59a1bf0dee796f35665a5af8135cf6b150aed6[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Mon Jun 16 21:11:44 2025 +0530
+
+    few major bugs fixed
+
+[33mcommit 233072e824194029403bd5565b9f5d2f987e2360[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Mon Jun 16 09:44:32 2025 +0530
+
+    instructor dashboard completed
+
+[33mcommit c93b9f4f98e28268d8ebe9ef383799582e1c23d3[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Mon Jun 16 00:38:13 2025 +0530
+
+    admin dashboard completed moving instructor one
+
+[33mcommit 043f3b658f6eb39cf7fdbc98e59914effa1ef29a[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Mon Jun 16 00:18:50 2025 +0530
+
+    almost got the admin dashboard
+
+[33mcommit 831eb212466b9ba1b0f5acffb279770e4516d75d[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Sun Jun 15 16:55:00 2025 +0530
+
+    analytics page seperated and made reusable for admin and instructor. also analytics completed
+
+[33mcommit 62c0e16be51f0b8a941496abfee64551123f517f[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Sun Jun 15 16:39:16 2025 +0530
+
+    admin analytics completed
+
+[33mcommit 5983abd76755b63e0e92ef848e949eac8e551f40[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Sun Jun 15 13:25:07 2025 +0530
+
+    just got overall data
+
+[33mcommit dfd0f3f2052ca64c00f7c4ee8841b2b63a026448[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Sat Jun 14 16:28:32 2025 +0530
+
+    testing things added working on analatycs on testing few configs and things updated checkpoint
+
+[33mcommit 002a779dd34239604ff2ef5aeba9a10b032a3df0[m[33m ([m[1;31morigin/feature/wallet-and-transfers[m[33m, [m[1;32mfeature/wallet-and-transfers[m[33m)[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Fri Jun 13 20:49:42 2025 +0530
+
+    completed
+
+[33mcommit 92961deabeb82f34235a388822a843e5db033902[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Fri Jun 13 20:07:25 2025 +0530
+
+    disable enable bug fixed on user side
+
+[33mcommit 7fdd018593da1d38cd0a846d3c677712fc337766[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Fri Jun 13 12:34:21 2025 +0530
+
+    searching bug fixed on course and instructor showing deleted one also
+
+[33mcommit d0689e09eb2a2af3f4ae74e5a5b3cacb50b3e24f[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Thu Jun 12 13:46:35 2025 +0530
+
+    course updating bug fixed
+
+[33mcommit f7ce4e937e1615e405900893be41a119d92e9a87[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Thu Jun 12 13:38:01 2025 +0530
+
+    course updation bug on course details fixed
+
+[33mcommit 864d27edaf741a45ce356a5c775659c03cfe58e9[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Thu Jun 12 11:42:15 2025 +0530
+
+    course details page bug while no token fixed
+
+[33mcommit 90bf6fda2afad102422995405c05c7ac72d82ee5[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Thu Jun 12 11:28:02 2025 +0530
+
+    instructor and course listing in landing page completed
+
+[33mcommit 9b4a03125dc7b34b030f1a78625432202b6d2fef[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Wed Jun 11 20:49:14 2025 +0530
+
+    category stated listing on user page
+
+[33mcommit 2c7eb24797db43cab341109092db94e7ed387077[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Wed Jun 11 20:41:30 2025 +0530
+
+    course lesson listing while not logged in solved
+
+[33mcommit 5764d3f31eb26f3bddbb69a95d1346d46221afc2[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Wed Jun 11 20:39:04 2025 +0530
+
+    course detial page in user side redesinged
+
+[33mcommit a96cae6dbf040f7828d36599cedcc9c341e53494[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Wed Jun 11 17:03:16 2025 +0530
+
+    revenue sharing logic  all working now properly
+
+[33mcommit 93ee729fb8b8cf3c56bb600fd4a18a0c15615391[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Wed Jun 11 16:55:40 2025 +0530
+
+    wallet payment bug fixed
+
+[33mcommit 267ad4428de9f834ce194663d35e7d86022d6395[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Wed Jun 11 16:29:14 2025 +0530
+
+    revenue shareing logic added
+
+[33mcommit 1a3726a3821e7cc7b6014d5c8409731f96718e95[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Wed Jun 11 12:09:33 2025 +0530
+
+    cart and checkout page desing loading state and all updated
+
+[33mcommit 5edfd0750daa4347cf417a305d13312c60f59f9e[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Wed Jun 11 11:52:10 2025 +0530
+
+    checkout page ui changed
+
+[33mcommit ccecbffbe6e88311707faf6e97cc0b2199555624[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Wed Jun 11 11:18:08 2025 +0530
+
+    all things are working properly right now
+
+[33mcommit 5f8cda8291cd210e3b67d8cbe2bbe9350b750965[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Tue Jun 10 17:47:27 2025 +0530
+
+    pricen and offer misleading thing updated
+
+[33mcommit dcfd8218e9fc2ef1ba8dee2388739b240131f87e[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Tue Jun 10 17:42:37 2025 +0530
+
+    everything working properly and things are correct right now
+
+[33mcommit 7467a7512a639b17bb6a37f2918a3a492c4efd54[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Tue Jun 10 17:28:10 2025 +0530
+
+    stripe order creation and wallet are working properly right now
+
+[33mcommit 2758c09700fd0639fbc06ff24810805b4163a12b[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Tue Jun 10 17:16:16 2025 +0530
+
+    wallet topup working resturctuing on going
+
+[33mcommit f25851a133edb806ba0d47377339aebc7162c8e8[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Tue Jun 10 01:27:02 2025 +0530
+
+    restructuing order module to follow solid pinci
+
+[33mcommit 4994ea163f21050c75ca473733630d3c44e49eab[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Sun Jun 8 23:09:19 2025 +0530
+
+    admin share showing on the instructor side
+
+[33mcommit c413cbe339f9d306080b3d02e8cfdd88004bc2c3[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Fri Jun 6 15:56:55 2025 +0530
+
+    storing admin percentage successfull neeed to show that proerplry
+
+[33mcommit cb82f3e6834855947f10681ec4b99b9ab1a9fb7c[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Thu Jun 5 10:43:42 2025 +0530
+
+    project on stable stage al things are working properly
+
+[33mcommit 2b368fc1c38eb6ca71489f9d4fc3afa1835ac7c0[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Thu Jun 5 10:29:20 2025 +0530
+
+    all roles profile and wallet things implemented
+
+[33mcommit 9adcff217cf991c7705243bb18de267d24a46365[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Thu Jun 5 09:02:08 2025 +0530
+
+    almost wallet things done
+
+[33mcommit c9ff19a22900fce5fa7e8eb8620d5ec64150b3ec[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Wed Jun 4 23:27:54 2025 +0530
+
+    wallet paymetn and its things are working properly
+
+[33mcommit 1c811a3c10771f6680d4a0bacee4b0bfa4c38e49[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Wed Jun 4 23:22:20 2025 +0530
+
+    wallet money adding is working right now things are ok going good
+
+[33mcommit 83b0fb52c20516bd3ec7e2b69f61795d8ed9db99[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Wed Jun 4 21:04:54 2025 +0530
+
+    just created enpoints for wallet basic operations going for stripe things
+
+[33mcommit 170a1976ae356767b30e1addbb989eb40c5517c2[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Wed Jun 4 15:57:54 2025 +0530
+
+    profile upldated
+
+[33mcommit a35162eddfba6112a51b89a6f0c9a55eb0207f33[m[33m ([m[1;31morigin/feature/global-search-imp[m[33m, [m[1;32mfeature/global-search-imp[m[33m)[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Wed Jun 4 14:22:53 2025 +0500
+
+    almost search completed
+
+[33mcommit 04321e0600e34ae8d3a6ff79506a105c089d2e1d[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Wed Jun 4 14:07:43 2025 +0500
+
+    searching ui and things are working properly and updated misleading id sedning from instructor its also getting well right now
+
+[33mcommit 2e5518250a5a2393cf20abbc880099ad0770bbc1[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Wed Jun 4 13:51:34 2025 +0500
+
+    all global searching is wokring properly need some ui things
+
+[33mcommit ec8e9bf717d9c050b5a03a6ffb96247cced2490e[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Wed Jun 4 13:29:31 2025 +0500
+
+    instructor details showing correctly now moving to global searching
+
+[33mcommit aee21dc07b10013dd9bde66eaa9e7e82c8e18bfc[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Tue Jun 3 21:53:05 2025 +0530
+
+    did the instructor detail getting enpoint
+
+[33mcommit 392fce4f0af62b2d2858e47c6938d1683bb14cb7[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Tue Jun 3 21:37:25 2025 +0530
+
+    instructor details shwoing page creating on going
+
+[33mcommit d74d49efd78b86d358c703da00d5832c2648bcf1[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Tue Jun 3 20:47:31 2025 +0530
+
+    showing instructors in user side implemented
+
+[33mcommit 91de766d05f4bca5c32afa4ad52dbb5626092d92[m[33m ([m[1;31morigin/feature/lesson-progress[m[33m, [m[1;32mfeature/lesson-progress[m[33m)[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Tue Jun 3 20:25:26 2025 +0530
+
+    listing category and moving from there to course listing page completed
+
+[33mcommit d3f04540880bff97684b20cee830a500490ab63c[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Tue Jun 3 20:22:49 2025 +0530
+
+    category moving from category page and filtering also completed
+
+[33mcommit 8ca8d241a34655cebb7ecba83fdc13bbfc0b44c4[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Tue Jun 3 20:18:42 2025 +0530
+
+    almost category filtering working in course listing page
+
+[33mcommit ae78457494ca8d57885149646213cc4ea61b1c21[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Tue Jun 3 18:29:48 2025 +0530
+
+    quiz handling worked properly
+
+[33mcommit 180e539d6811ad9e72689af57c2ffebe85e8c532[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Tue Jun 3 10:45:22 2025 +0530
+
+    loading skeleton made up
+
+[33mcommit 0f6e3a648cd642b72284d885a4174cb935eeb07a[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Mon Jun 2 21:42:30 2025 +0530
+
+    almost all bugs fixed related to course lesson progress and all
+
+[33mcommit 788f643a9527746c1ea2f3906c2ee90b505497da[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Mon Jun 2 21:23:34 2025 +0530
+
+    course progress tracking working
+
+[33mcommit 24a7dfaf466018536185aad805e34558faece9bd[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Mon Jun 2 19:51:41 2025 +0530
+
+    content adding bug fixed
+
+[33mcommit a794c713fde1ebca94cb2872f4224eab904ee881[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Mon Jun 2 16:04:49 2025 +0530
+
+    category related bugs all are fixed
+
+[33mcommit d714c6ef6b04a20e923f5268a265bb5cb78e0ec3[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Mon Jun 2 15:56:52 2025 +0530
+
+    category createing and gettting bug fixed
+
+[33mcommit f3f8f23bebc426c8b4a3ba02fc7633cf70346be5[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Mon Jun 2 15:40:10 2025 +0530
+
+    instructor getting route bug fixed
+
+[33mcommit 9807cd5156d57e18a8f63f509d425623fd0510ce[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Sun Jun 1 17:58:20 2025 +0530
+
+    lesson progress making is working right now
+
+[33mcommit 579a851a0bbbacd1351e91dae294717c11e41b48[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Sun Jun 1 17:42:25 2025 +0530
+
+    progress api enpoints added
+
+[33mcommit 56bd343515ef47bd0d4d2e6da9f9fd70b103f591[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Sun Jun 1 17:32:48 2025 +0530
+
+    bug while enrolling course fixed
+
+[33mcommit 0ed832851ac570b67861cc9675b4565123349b95[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Sun Jun 1 15:39:08 2025 +0530
+
+    managing not enrolled courses in ui and backend
+
+[33mcommit 108f133d34f869bf6f60c997cdcb129d313aff0d[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Sun Jun 1 15:02:17 2025 +0530
+
+    middleware redirection validation added for resetpassword
+
+[33mcommit d06b879a0264851473d9a9fe8f985e0db423dad8[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Sun Jun 1 14:24:49 2025 +0530
+
+    laoding state management and few bugs fixed
+
+[33mcommit a84707c7369f050a12cd75ab7d36d8cab6ebcc0e[m[33m ([m[1;31morigin/feature/handle-user-disable-logout[m[33m, [m[1;32mfeature/handle-user-disable-logout[m[33m)[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Sun Jun 1 14:15:43 2025 +0530
+
+    auth bug fixed and now things are stable
+
+[33mcommit 50f04e573d14fae17773000bc876ab12d7c051a5[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Sat May 31 21:40:39 2025 +0530
+
+    sovled token not removing problem now owkring properly
+
+[33mcommit 86578e6e82b9c613985e3b234635e625b851a479[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Sat May 31 13:23:16 2025 +0530
+
+    no major changes
+
+[33mcommit 5d1bec7652187165a83d2086d16af7ef4798acd2[m[33m ([m[1;31morigin/feature/converting-to-clean[m[33m, [m[1;32mfeature/converting-to-clean[m[33m)[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Sat May 31 10:46:01 2025 +0530
+
+    changed to clean completely
+
+[33mcommit 4ed9e230aeb19f5a428812b5abb369665f229881[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Wed May 28 11:41:11 2025 +0530
+
+    almost things are working
+
+[33mcommit 08f418a2a05f6fdb90d2f1f8fb0afb13771b5136[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Wed May 28 11:32:06 2025 +0530
+
+    everything alomost working need to test properly
+
+[33mcommit 9727a8245747f69b33cb8efde958c2a755c6d57b[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Wed May 28 09:52:17 2025 +0530
+
+    things are working properly in listing page for course and instructor
+
+[33mcommit a094dc219530145117cf3bb9623f4ad34b9d6af1[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Wed May 28 09:25:06 2025 +0530
+
+    listing instructors with their approval and all showing
+
+[33mcommit dd49a9d80cebcfa66ef6d782acc430c3f80e5810[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Tue May 27 21:52:10 2025 +0530
+
+    declining and approving refetchign while that everythning in working condetion now
+
+[33mcommit 65bc43c41781cbbc5868fcb5fde8c5ae1d395993[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Tue May 27 21:24:01 2025 +0530
+
+    almost user detail page completed
+
+[33mcommit 4f1e609459dcbb6cd0b6314ea727b021c495987f[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Tue May 27 17:48:36 2025 +0530
+
+    designed instructor detail page
+
+[33mcommit 932142aab0fddfa8e41c2e10150cf87587ffeab4[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Tue May 27 14:14:53 2025 +0530
+
+    not working condetion but no runtime error
+
+[33mcommit 81ea10f1813a8428ef166fbc72621caedb5e1362[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Tue May 27 13:57:24 2025 +0530
+
+    instructor reuploading working on it
+
+[33mcommit 279ebcb9c8c211e535fcac26af6ab2c5442433c9[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Mon May 26 20:58:03 2025 +0530
+
+    retry payment bug fixed
+
+[33mcommit 057ed360e03dbd9eaebf3f935598b042ad95306f[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Mon May 26 20:53:56 2025 +0530
+
+    transaction listing working properly also order
+
+[33mcommit 97962e26fe99b1ad7e7c22b28de15e593561c220[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Mon May 26 20:23:58 2025 +0530
+
+    transactions showing properly
+
+[33mcommit 8b555ba1009be856fa743843fdffe199149d481e[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Mon May 26 16:24:55 2025 +0530
+
+    order failure showing in my orders
+
+[33mcommit 98952d99246b9ef9caa108c6e85a0adc4f48dbfe[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Mon May 26 15:45:31 2025 +0530
+
+    payment failure handling working on it not yet working. successfull payment is ok
+
+[33mcommit f32c86ea86ab2a868c79222dcaeffb4363bfa1a3[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Mon May 26 13:10:33 2025 +0530
+
+    payment logic added to payment gateway thing now its working properly 100
+
+[33mcommit aa6b367a195ce76e0481898192cb11e5bebffc43[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Mon May 26 12:37:28 2025 +0530
+
+    payment logic added to payment gateway thing now its working properly
+
+[33mcommit 01553a9c237d3ae58dc3911135009665069729d8[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Mon May 26 09:58:30 2025 +0530
+
+    order listing is ok now
+
+[33mcommit 1fddf17c799b46f76587f99608d9a4631d2c7c60[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Mon May 26 00:36:05 2025 +0530
+
+    getting order listing almost working
+
+[33mcommit 6b40f71b9a059268773fa5e16414aa9f0bf98761[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Sun May 25 21:42:18 2025 +0500
+
+    almost completed what have already done
+
+[33mcommit 3fff8622d72735d1e6299d63aecf75fe9e18289f[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Sun May 25 20:27:49 2025 +0500
+
+    payment and enrolled course showing almost completed
+
+[33mcommit 6dc0d5abd88e2bc3a96b2926cd8ccc2cbd6b4bcd[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Sun May 25 16:19:57 2025 +0500
+
+    payment half of things completed and working now fine without webhook need to do it later
+
+[33mcommit 54f804f7f8fed105f42d0b75de97f5aa39f2ebeb[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Sat May 24 14:47:23 2025 +0530
+
+    cart things are working properly
+
+[33mcommit e591d6d88c9f4c62bd0d634df6c4bd2502cc19ef[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Sat May 24 14:29:09 2025 +0530
+
+    cart data showing properly
+
+[33mcommit 91ab110a597cba55c6f10729b5b3ac818ee13040[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Sat May 24 09:55:03 2025 +0530
+
+    otp timer bug fixed
+
+[33mcommit 2299be3393c07bc0aff0469e6f0bbd5564c23dde[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Fri May 23 22:04:12 2025 +0530
+
+    create instructor
+
+[33mcommit e82a1b27f84a109d29322fcb9034807405d077c1[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Fri May 23 20:58:54 2025 +0530
+
+    getting course details to user side working properly
+
+[33mcommit b50a670ee7cf255c233ef0818f5d910e1d42341d[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Fri May 23 20:53:50 2025 +0530
+
+    showing unwanted courses in all role changes
+
+[33mcommit 7cd8982ae283e6757295177631cb94e9580110ca[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Fri May 23 20:45:13 2025 +0530
+
+    course validation fixed
+
+[33mcommit 6f2824b4d59cb21844d3112f579c022d087bb28c[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Fri May 23 20:09:43 2025 +0530
+
+    lesson and course validation almost completed
+
+[33mcommit 9755aafe4fdc0c728bbd4c3cbda4401c2fb7ecf7[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Fri May 23 19:14:12 2025 +0530
+
+    unautherized user management completed
+
+[33mcommit 6d4da99e2822c91d545e33ab9f746d125a5245df[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Fri May 23 14:55:21 2025 +0530
+
+    some validation issue resolved
+
+[33mcommit 088d86bc36b70d45fe958959eb04b4d176f7f473[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Fri May 23 11:22:58 2025 +0530
+
+    course updation error resolved
+
+[33mcommit 6364f71280edc39548e587368c27209373826cb8[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Fri May 23 10:38:08 2025 +0530
+
+    lesson content edit getting are ok now
+
+[33mcommit 960491c8994d09a9a0eebff9668313840c129ff5[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Fri May 23 10:07:21 2025 +0530
+
+    few ui bugs and frontend  bugs fixed
+
+[33mcommit 5f785fd379f1dd7b2dd02d409b0deacb5946275a[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Thu May 22 21:23:05 2025 +0530
+
+    almost bugs fixed
+
+[33mcommit 0cdf6a525422289529ac9ba617aebef18d0258a0[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Thu May 22 21:00:14 2025 +0530
+
+    lesson listing problem fixed
+
+[33mcommit dd9ae4186f46278984c05fa084b64d29c69682c4[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Thu May 22 20:54:19 2025 +0530
+
+    listing user and dashboard ui bug fixed
+
+[33mcommit 38fed96ee4e2a33ff59b144522b057076256d17d[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Thu May 22 20:38:14 2025 +0530
+
+    all bugs related to auth fixed
+
+[33mcommit c08e523176eff0e3a647d1c4e6757cdd35c80406[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Thu May 22 13:36:49 2025 +0530
+
+    error in backend handled properly
+
+[33mcommit 9408ea25aa76e20bdd225f176c2d734a8115a08d[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Thu May 22 12:15:36 2025 +0530
+
+    frotnend api calling mismatch soled
+
+[33mcommit 4c864a6e4daaf8166f70a4534c11a13ebfa7499b[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Wed May 21 20:53:10 2025 +0530
+
+    lesson crud operations working
+
+[33mcommit 026d5b5627712871e977d56fd583b5bc4f8e4fca[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Wed May 21 20:30:31 2025 +0530
+
+    lesson and content module added no runtime errors now. not teste
+
+[33mcommit 11d37fd0649c3695ecf8382b316c4db674e738bc[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Wed May 21 14:37:41 2025 +0530
+
+    validators made uniformal
+
+[33mcommit fd9896cf5889db4ddcc5a215596c87ebcb5f6c31[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Wed May 21 13:46:42 2025 +0530
+
+    few bugs fixed in frontend
+
+[33mcommit 499292a8bba69790e5b71460ad920c9ae4e06139[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Wed May 21 10:40:00 2025 +0530
+
+    making clean stage 2
+
+[33mcommit de5d3fe9e2db27a8a00b67400d63034170a43138[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Tue May 20 21:38:38 2025 +0530
+
+    almost making this clean adapters needed to handle properly
+
+[33mcommit cb27bd86e8bcb11445f6b169e6f4c3711d2e03ab[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Tue May 20 20:59:17 2025 +0530
+
+    di cleaned
+
+[33mcommit 25bdede5e8be00ee8bfe7f5b3efe6bc67c472583[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Tue May 20 20:00:05 2025 +0530
+
+    course softdeleting and approving and things are working propelry
+
+[33mcommit 4e97c9c222d8a81938b72ac979107293bce4162b[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Tue May 20 19:33:19 2025 +0530
+
+    course adding editing working proplery
+
+[33mcommit 5429abf2104ce1a8c621a2874c9a75a8f712cf95[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Tue May 20 18:27:21 2025 +0530
+
+    getting course is working going good
+
+[33mcommit cafa4604046c73094e62fd6b2b789a5da683f810[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Tue May 20 18:09:45 2025 +0530
+
+    course module backend added
+
+[33mcommit 8f1880e79e09f52c2b1e0c97dc77dab0c80b72d3[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Mon May 19 21:15:11 2025 +0530
+
+    category module completed
+
+[33mcommit 6dfbd8a66b4a3dddfbea202195a2c73395be136a[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Mon May 19 18:39:13 2025 +0530
+
+    category module all layers created no runtime errors working not tested
+
+[33mcommit 18c9e2e9cf90ff068916b9696884c7d7c42c0ce2[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Mon May 19 16:28:30 2025 +0530
+
+    authentication storing in local storage things changed now working properly
+
+[33mcommit edb7766cbb16c7c004cf99077db7035c90ada3ef[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Mon May 19 15:48:27 2025 +0530
+
+    almost got all things untile instructor working properly
+
+[33mcommit aa5a04166136949a448636ea96785a6c7bea7d11[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Mon May 19 15:40:12 2025 +0530
+
+    instructor approval working properly
+
+[33mcommit 51fcd6d43c04c03076fe8b17ad6b99ae0022e190[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Mon May 19 14:52:01 2025 +0530
+
+    error message mis leading things removed correct
+
+[33mcommit abff90f8fd542fd9e76c235bbff1c24d25aa5f42[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Mon May 19 14:20:54 2025 +0530
+
+    instructor adding error solved in backend
+
+[33mcommit 1fb9ee3a20037f796ff09a8a20b798bd8e935111[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Mon May 19 14:09:17 2025 +0530
+
+    instructor usecase modulazided
+
+[33mcommit d44f2d643709920db8de91fd68ee9305bf4a52fe[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Mon May 19 13:53:27 2025 +0530
+
+    listing of requested teachers problem solved
+
+[33mcommit fdad3aad2ed72b542ce56374f2f6a28eb4f3a872[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Sat May 17 14:56:35 2025 +0530
+
+    instructor module backend completed without further due no runtime error
+
+[33mcommit 7ba2c68fed9611214afb9beced99714867072098[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Sat May 17 12:33:08 2025 +0530
+
+    user validation and listing user on admin side working properly
+
+[33mcommit 370dd9b8397942afc829f77a470d3cceb9fbcedc[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Sat May 17 09:38:22 2025 +0530
+
+    userr profile updating bugs fixed and dob validation completed
+
+[33mcommit 677971ed575418177a076bade5e4faa2d4024674[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Sat May 17 09:32:21 2025 +0530
+
+    user data showing in profile
+
+[33mcommit ff74d9ea8799054f2297b4fde46422a398426919[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Fri May 16 21:49:39 2025 +0530
+
+    just got user data
+
+[33mcommit e3852dd8aed04dc675f1558659403471f1b21c1c[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Fri May 16 21:31:47 2025 +0530
+
+    user module backend completed no runtime errors
+
+[33mcommit 6b45a519a711abf7f7775361341ed5b4f10ae7c6[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Fri May 16 20:14:06 2025 +0530
+
+    auth restructure completed working properly
+
+[33mcommit d72b9652869de9fab04eee4fc07dcb507f54e131[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Fri May 16 17:41:44 2025 +0530
+
+    restructured clean architecture
+
+[33mcommit 78b178af63a13d6390814626c0fb39b616b84b91[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Fri May 16 14:14:06 2025 +0530
+
+    role changed
+
+[33mcommit f87158152c7faef231c66e03bd88a29182c6d71a[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Fri May 16 10:31:48 2025 +0530
+
+    google and facebook auth are working properly
+
+[33mcommit 7fcb80312baf12a4b0a94de915bd853a8e7d6ddc[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Fri May 16 10:13:10 2025 +0530
+
+    google auth working
+
+[33mcommit 67a96f14ef9856d6049d6ae1599b06aa2b77be5c[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Fri May 16 09:43:28 2025 +0530
+
+    forgot password and resend password are working properly
+
+[33mcommit 75b5f817f376188136dcd15b4485b09729e01a55[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Fri May 16 09:33:52 2025 +0530
+
+    login and logout and otp things are woriknig now need to find out the way to manage forgotpassword adn all
+
+[33mcommit 29cbf47e1dbb903738da92581f06891e3958ad89[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Thu May 15 21:41:28 2025 +0530
+
+    frontend
+
+[33mcommit 9e8053bac91e0f5172b52c5fc79439607d4cb85c[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Thu May 15 21:18:37 2025 +0530
+
+    auth almost completed
+
+[33mcommit ce3071c5844e787bc657dfaa5cab8c96f2f4403b[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Thu May 15 20:31:56 2025 +0530
+
+    logout and things are working need to work on forgot password and all
+
+[33mcommit cc208c8efc378bb9841704bad6ca587e1beef655[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Thu May 15 19:48:48 2025 +0530
+
+    setting cookie on http only setup and auth almost working and going good
+
+[33mcommit 313701ca87182e8e58d38ae191ec25a1b0128a74[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Thu May 15 19:31:55 2025 +0530
+
+    auth almost working
+
+[33mcommit 58d0fb02e9651d59765747ec4804aa0866d76210[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Thu May 15 19:20:51 2025 +0530
+
+    creating user working
+
+[33mcommit 215697e3ad08b7c93225eaf018df7a77e0cf087e[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Thu May 15 17:30:18 2025 +0530
+
+    coverting to clean first step remove old
+
+[33mcommit 6b498d7b77833124174ddad1ea2b0fcbe68ee161[m[33m ([m[1;31morigin/feature/course-requests[m[33m, [m[1;32mfeature/course-requests[m[33m)[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Wed May 14 09:50:38 2025 +0530
+
+    loading state added while rendering
+
+[33mcommit 4be4d613e7ebc49283fe38c3af9be23a40b24f06[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Wed May 14 09:39:36 2025 +0530
+
+    everything on working stage nothing are pending or bug
+
+[33mcommit c0779952917297222e03d9adc0d353d474548067[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Wed May 14 09:15:50 2025 +0530
+
+    footer problem fixed
+
+[33mcommit 57e702ded9c6f660bca92659833bd31c583e2055[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Wed May 14 09:04:43 2025 +0530
+
+    listing peinding course and approving things are working properly
+
+[33mcommit e4762e1ca0f5bfc4a8f9662d9b29de3326939196[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Wed May 14 08:41:30 2025 +0530
+
+    course approval listing almost completed
+
+[33mcommit 5b8545bdc5892b8a401095579df69ea1ca07bb7a[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Wed May 14 00:54:08 2025 +0530
+
+    updated backend for course approval
+
+[33mcommit 35cd7e8f430da95430d930001936d429ed8144ab[m[33m ([m[1;31morigin/feature/wallet-transactions[m[33m, [m[1;32mfeature/wallet-transactions[m[33m)[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Wed May 14 00:06:29 2025 +0530
+
+    requested instructors list showing and working things properly
+
+[33mcommit 7a3e5da9667a2d7ac8a196586f4ce30620a7a15b[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Tue May 13 23:41:42 2025 +0530
+
+    instructor application button hiding and showing according to the data
+
+[33mcommit ecce6516ea6bffc84739a47ae45e3f5829e4dd1d[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Tue May 13 22:03:26 2025 +0530
+
+    instructon request sending
+
+[33mcommit cade4286734f26958a1cfc019fd686371ea940c7[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Tue May 13 21:31:01 2025 +0530
+
+    getting instructor request and approving working properly
+
+[33mcommit 123456dce205b092e0fba3fd12d243748832a681[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Tue May 13 20:49:19 2025 +0530
+
+    user listing page bug fixed
+
+[33mcommit d3eee66601b357ffbdabfe3e0e70ce046b5a42d6[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Tue May 13 20:08:24 2025 +0530
+
+    done things with transaction and working properly
+
+[33mcommit e73e1cd7cb0327bf5053ab17ec672e8280d6ec8e[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Tue May 13 18:30:10 2025 +0530
+
+    instructor adding bug fixed
+
+[33mcommit f2df6dca3d17175716aed873a84fbd26b540bcf4[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Tue May 13 17:04:36 2025 +0530
+
+    tried to render pdf from cloudinary. failed. if any problem to uploading file just go back previouse commmit
+
+[33mcommit d2e3962a3d1e8343c7a8d0a9e5eb4356052595fb[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Tue May 13 15:40:58 2025 +0530
+
+    enrolled course detail page almost completed working
+
+[33mcommit 52923d98f38568f3c418987133652414a5ff6049[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Tue May 13 15:32:54 2025 +0530
+
+    dividing course enroll
+
+[33mcommit 7f1f587af9f33fa803b7920ae4844e3780cca84e[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Tue May 13 14:38:36 2025 +0530
+
+    showing my-courses properly need some ui redesigning
+
+[33mcommit 907a748e029aa4acd8bba7d3abb8a8475bc17c0e[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Tue May 13 14:30:19 2025 +0530
+
+    course enrollement checking todo solved
+
+[33mcommit 1b12a7ba07cfed2b7fed16b080013ac6825194f9[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Tue May 13 12:30:52 2025 +0530
+
+    lesson getting properly
+
+[33mcommit 53a314038b4c67724a90850faec77b80d564177f[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Tue May 13 12:06:39 2025 +0530
+
+    designed course view page
+
+[33mcommit 2718cc6ccbe76878c066ada9a6a47fd91ba6587c[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Tue May 13 10:16:41 2025 +0530
+
+    in course detail page showing learn instead enroll for enrolled course
+
+[33mcommit c9b0ebf9436b971deae255a69e7c16643231f06e[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Tue May 13 10:08:07 2025 +0530
+
+    added enrollment status in getting course id
+
+[33mcommit d49b45f0ee348bb0bf0d5c1bfc05f1b41ea326e9[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Tue May 13 09:35:40 2025 +0530
+
+    updated few bugs while listing transactions
+
+[33mcommit e2740e4cc1fb1d9423933371fed6d37ddd891179[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Tue May 13 09:30:39 2025 +0530
+
+    transactions list is showing properly
+
+[33mcommit 2d2b1542e6115c39719836e207527b4fddb9f2ad[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Mon May 12 20:38:28 2025 +0530
+
+    transaction listing error solved
+
+[33mcommit 09f803adcf82c1ab16a82c52dae764296bdd893f[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Mon May 12 20:03:16 2025 +0530
+
+    wallet page redesigned
+
+[33mcommit 21526b26e01ccb97c82b64991391595dc5d0bc09[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Mon May 12 19:49:34 2025 +0530
+
+    few bugs  changed
+
+[33mcommit ccffa971f885b0d2d4a46f496cdef8b046e6dd79[m[33m ([m[1;31morigin/feature/stripe-implementation[m[33m, [m[1;32mfeature/stripe-implementation[m[33m)[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Mon May 12 19:45:22 2025 +0530
+
+    redesigned mycourse
+
+[33mcommit f68ccadee6a77abf0c087640fbc3bab99bc27bc8[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Mon May 12 16:49:24 2025 +0530
+
+    footer added and navbar on login page
+
+[33mcommit 01287fe60ec7da9070ed49f315ef20cc61e51001[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Mon May 12 15:23:51 2025 +0530
+
+    getting enrolled courses successfull
+
+[33mcommit 9f4899fb68b78531637f9da2db6a6b91dc6141a4[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Mon May 12 11:17:52 2025 +0530
+
+    get enrolled courses endpoint created not tested
+
+[33mcommit c8ffcb917ec296344510aef9be06d82b73aef90f[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Mon May 12 09:57:00 2025 +0530
+
+    wallet and transaction page designed
+
+[33mcommit c0012be2a2e43ef2717505ab72e686b39e9c7fe4[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Sun May 11 21:20:02 2025 +0530
+
+    course transaction also storing
+
+[33mcommit 8aa8e8322b5e6556b7da56f5eef0e875608a6d20[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Sun May 11 21:07:36 2025 +0530
+
+    course enrollment storing completed
+
+[33mcommit 06514f558d20f2149ba042840010a1c2db477ec4[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Sun May 11 17:56:13 2025 +0530
+
+    got into successs page
+
+[33mcommit 83afc08cb92cf03b56e4fb921914d4238b5ba476[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Sun May 11 16:55:18 2025 +0530
+
+    stripe/webhook confirmation working properly soloved few bugs also
+
+[33mcommit d4161c09c13701688da3d5cd2522c2cfef607add[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Sun May 11 14:11:45 2025 +0530
+
+    storing order details partially
+
+[33mcommit 3265414815c1fd9a0180b96c7efa19a1906cbaad[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Sun May 11 13:12:31 2025 +0530
+
+    stripe correct data started sending to backend
+
+[33mcommit 48f7204df1b09e74b69ea9a86c6b67d2cc882ef8[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Sat May 10 21:00:57 2025 +0530
+
+    stripe almost implemented
+
+[33mcommit e3c0f5f899b40c75ad4cb4bb19bcd49ebece9960[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Sat May 10 20:19:50 2025 +0530
+
+    backend for stripe completed
+
+[33mcommit fc925b71fb0dd9f05821d066e257c1d76d7532f9[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Sat May 10 16:45:28 2025 +0530
+
+    stripe backend endpoints and things configured correctly
+
+[33mcommit 156914461ec9d3b1378221ff16e55109dda8ae6d[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Fri May 9 19:25:01 2025 +0530
+
+    cart bug fixed
+
+[33mcommit 92eec5bbe00f890781d8e4364c34fcbdce78c591[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Fri May 9 19:19:31 2025 +0530
+
+    paypal integration seperated from checkout component for smooth integration of other gateways
+
+[33mcommit a0ba910ef1dc726740cc774b390495ecc207aadd[m[33m ([m[1;31morigin/feature/payment-checkout[m[33m, [m[1;32mfeature/payment-checkout[m[33m)[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Fri May 9 19:10:27 2025 +0530
+
+    paypal working but payment can't be completed
+
+[33mcommit 16fbe2c695e9b0e8fe1e9e08098be43e1d9b720c[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Fri May 9 11:40:34 2025 +0530
+
+    course filtering frontend integrated
+
+[33mcommit 94749968c1ace8160c1bb726100eabb34fd81c82[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Fri May 9 11:16:33 2025 +0530
+
+    course filtering backend enhanced
+
+[33mcommit db9bf8409f8ddab55ac682c5d1944f2f158f133b[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Fri May 9 10:31:17 2025 +0530
+
+    profile image uploading commpleted
+
+[33mcommit d6b8cbc9c331355d33a0682fb29043ff93c832ca[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Fri May 9 10:12:05 2025 +0530
+
+    amount is reaching to paypal correctly
+
+[33mcommit 235b9c867a205b5b1e01a636e07cde61d3b27ccb[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Fri May 9 10:03:15 2025 +0530
+
+    payment ui integration
+
+[33mcommit cf5f7c9ebb3169b9ad946adc72f6def515c1f985[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Fri May 9 01:10:15 2025 +0530
+
+    small bug in paypal related module fixed
+
+[33mcommit bfb5bd004de4674e449defb3f9d7cc876ae4eaa9[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Fri May 9 01:08:15 2025 +0530
+
+    payment paypal backend setted up
+
+[33mcommit 7d4f24150ee54d7c9803c31e1cdfaa75dd59c89e[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Fri May 9 00:02:26 2025 +0530
+
+    backend few bugs fixed now stable code v1
+
+[33mcommit c34e5eba8e293b0f8dde18c41ea0d743d42ede57[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Thu May 8 21:42:12 2025 +0530
+
+    checkout page modulaized
+
+[33mcommit 9fcce4ef5ce7b3943f946c31812ca92962752f77[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Thu May 8 20:34:53 2025 +0530
+
+    cart page modulaized
+
+[33mcommit d04d20837b699676408e8f03207ec95c1b88eb9b[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Thu May 8 20:06:30 2025 +0530
+
+    checkout fixing
+
+[33mcommit 95517a9012fa7f00daa95d29684d513176988304[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Thu May 8 18:43:57 2025 +0530
+
+    course successfully shown in checkout
+
+[33mcommit 55538b86b7dc801fac747d2c283cfe3b1b47f18a[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Thu May 8 18:36:09 2025 +0530
+
+    checkout page data getting successfully
+
+[33mcommit dd4cffea7c61cd60e5bf94d65ed98cc3aae3aed9[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Thu May 8 17:23:35 2025 +0530
+
+    api services in frontend completed
+
+[33mcommit 886884f4e31dae61d563d31bb259162dddb1cb47[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Thu May 8 16:04:55 2025 +0530
+
+    order module renamed from misleading name payment
+
+[33mcommit c9e9d8ee901845517dba24896c4976134f4c6e27[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Thu May 8 15:48:30 2025 +0530
+
+    transaction module added
+
+[33mcommit 1254c3e0a43458f58e75a3cc32071a89dc79dc2c[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Thu May 8 15:24:47 2025 +0530
+
+    circular dependancy error and few errors that made in new modules changed
+
+[33mcommit 7bfde7064577c05e8197262879abc083bce9b463[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Thu May 8 12:06:15 2025 +0530
+
+    enrollment enpoint created not tested yet
+
+[33mcommit 2e8baf1a248d5ff270032420af30b798f6adb4e2[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Thu May 8 11:10:31 2025 +0530
+
+    init and changed db added necessory tables
+
+[33mcommit 8aa4d8e1c24abdd62d1c308f926ae5892f808d0e[m[33m ([m[1;31morigin/feature/user-side[m[33m, [m[1;32mfeature/user-side[m[33m)[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Thu May 8 10:47:08 2025 +0530
+
+    cart bug in backend
+
+[33mcommit 1a6630097b121e0135261a04a9d2d234d6dc8753[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Wed May 7 20:20:32 2025 +0530
+
+    modulazide course detail page
+
+[33mcommit 1b35053d8693136c93fa1b7ee8d02a97c2587ae8[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Wed May 7 16:50:45 2025 +0530
+
+    course details page getting data and all are ok working well
+
+[33mcommit d42ec6d5870fce4a47b036a097681ddb9856110a[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Wed May 7 15:44:10 2025 +0530
+
+    user data getting public enpoint created
+
+[33mcommit 400af64e3f4b3e4482f23e44ff2b8996e468259b[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Wed May 7 15:16:48 2025 +0530
+
+    almost completed course details section 2
+
+[33mcommit cbe791728124ad778d1871effed44653faf78c4e[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Wed May 7 15:03:56 2025 +0530
+
+    endpoint for getting lesson details in course public route created
+
+[33mcommit ab9c6f214e7db26fc36a4b181f987317ca45e5a8[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Wed May 7 14:47:16 2025 +0530
+
+    course details page working 1
+
+[33mcommit 57ba5adf095abebc462ba4523a738df501427d0d[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Wed May 7 12:35:17 2025 +0530
+
+    course details apge designed
+
+[33mcommit f9ab51e292b70f88801fbf55db498e712087845f[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Tue May 6 21:37:22 2025 +0530
+
+    cart bug fixed
+
+[33mcommit f9a495e2753b10bb85ba1563d3318e0ba88c04c0[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Tue May 6 21:19:15 2025 +0530
+
+    cart backend enpoint created not tested
+
+[33mcommit b1fe3ecb9f1688dc0fefe1867cd2512d4d2b6a89[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Tue May 6 20:41:35 2025 +0530
+
+    cart and checkout designed using dummy data
+
+[33mcommit ce3cccfcf19554f2ad6f4cfadbfc322ec0e09ae0[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Tue May 6 18:40:33 2025 +0530
+
+    few bugs in ui and frontend middlware completed
+
+[33mcommit 25603a59b69771b271a9869d305edc89c9b4d255[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Tue May 6 17:21:07 2025 +0530
+
+    user profile data showing correctily now
+
+[33mcommit 918b52b6d075e58f6cb7c2ca8f7d29d10f01ce83[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Tue May 6 16:44:28 2025 +0530
+
+    user profile ui updated
+
+[33mcommit 87723252938223bffaa40b51efe4ae2d12671b89[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Tue May 6 14:46:09 2025 +0530
+
+    user profile update still woorking on it updating happens
+
+[33mcommit 00d3c784aff54d545d6bc3a01c5e41b34b268d7a[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Tue May 6 13:52:17 2025 +0530
+
+    user profile data retrived
+
+[33mcommit e50938372259b602f6e22ea88cca52e9e76c0301[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Tue May 6 13:00:00 2025 +0530
+
+    removed few bugs and card listing in user side completed
+
+[33mcommit 956fe9d396d459293951642ebbf017601d29adc8[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Mon May 5 20:44:09 2025 +0530
+
+    course card listing almost completeed
+
+[33mcommit fc74ccaaad5489692a0c0449a437ed082df819a8[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Mon May 5 16:15:50 2025 +0530
+
+    first commit in user side
+
+[33mcommit 2d8fcd133b121e40a3984b6e9087a60398f79e10[m[33m ([m[1;31morigin/fix/admin-instructor-ui[m[33m, [m[1;32mfix/admin-instructor-ui[m[33m)[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Mon May 5 10:02:21 2025 +0530
+
+    video thumbnail size bug fixed
+
+[33mcommit 14bb81917d38ecc040a22d3dbd4339ff7c886c68[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Sun May 4 23:07:45 2025 +0530
+
+    no big deals edit and add course is almost working
+
+[33mcommit 285872452e322c1d082d9c86bc755874a591123e[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Sun May 4 22:49:36 2025 +0530
+
+    almost working
+
+[33mcommit 1e69b96588c0388dcbce7d292119003793d1c130[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Sun May 4 21:07:19 2025 +0530
+
+    course details data fetching and showing course details are working now
+
+[33mcommit 579b23924aa5cebeb27469c1891af6682af7219d[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Sun May 4 19:22:49 2025 +0530
+
+    course add from redesigned
+
+[33mcommit 7ba64c89e7f0ed6bedeb23df28d1ae509bbdc8b2[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Sun May 4 13:29:12 2025 +0530
+
+    updateing cateogry and course details to start clean user
+
+[33mcommit 2d53a04f476a9138453f5ee4d1bc26206801e131[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Sat May 3 16:24:29 2025 +0530
+
+    bug fixed while course content deleting or updating
+
+[33mcommit 039741664f5778acce2078b0e5324444978c88dd[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Sat May 3 15:32:45 2025 +0530
+
+    ui of lesson management updated
+
+[33mcommit 44c709da4081a9d5c0728f51d1cfa2e9126e1fdd[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Fri May 2 21:47:31 2025 +0530
+
+    redesigned ui
+
+[33mcommit 38cc4e3f3a619b3cb28fd828047a5fda8693e6eb[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Fri May 2 14:28:18 2025 +0530
+
+    redesigned the course detail page
+
+[33mcommit 204c5a4298df9167c197b43884c7ca7033c32b8e[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Thu May 1 21:35:30 2025 +0530
+
+    made reusable component for all listing pagees
+
+[33mcommit 25b61bb128d42a6487ed948e48b4553a8e6dbd32[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Thu May 1 19:38:20 2025 +0530
+
+    made reusable error component and updated in existing pages
+
+[33mcommit a583f4ecda81a9633c17d7f3d131d21d82972186[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Thu May 1 18:12:19 2025 +0530
+
+    navbar collapsing issue fixed
+
+[33mcommit b0b3bb8c10f9d55aef19560a8cb467f9ffe60e6f[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Thu May 1 16:00:53 2025 +0530
+
+    side bar made reusable
+
+[33mcommit 813db0dad03b27a59a37cd11d7ebfb23e12c4ee8[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Wed Apr 30 18:43:54 2025 +0530
+
+    password resetting loading state bug fixed
+
+[33mcommit 53af2364cfecb1a19f3a6758f6ef94bb33060bb4[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Wed Apr 30 18:24:46 2025 +0530
+
+    facebook button added on signulpl
+
+[33mcommit c0babb5eabaabda1b2b12ea8739bc3b7456f141f[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Wed Apr 30 18:11:07 2025 +0530
+
+    interface moved to seperate file
+
+[33mcommit 61842e25134a351c91868f4a8119b29f92aa4816[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Wed Apr 30 17:43:47 2025 +0530
+
+    solved few bugs
+
+[33mcommit 8753c2e22769ee7fb2ea08358dafcf29c1aa9e3f[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Wed Apr 30 13:43:47 2025 +0530
+
+    redirection of google also done
+
+[33mcommit 8f98d5eddaf725ed2e9174fc8f65ae7dfe579300[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Wed Apr 30 12:39:50 2025 +0530
+
+    facebook auth almost competled redirection issue
+
+[33mcommit 0826ba39288caebed461e7a2a686027b0873d121[m[33m ([m[1;31morigin/feature/lesson-resource-management[m[33m, [m[1;32mfeature/lesson-resource-management[m[33m)[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Tue Apr 29 21:53:38 2025 +0530
+
+    migration error resolved
+
+[33mcommit a0c0c02e77eaf97aa180f8830fc1b62f3810101a[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Tue Apr 29 20:58:34 2025 +0530
+
+    image uploading thumbnail of course completed
+
+[33mcommit 7fbe75a2b4d0667b0fc0a617113ea6358f1a5fb8[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Tue Apr 29 17:45:12 2025 +0530
+
+    course publishing completed
+
+[33mcommit 40da967455c29360eda239f2f5dc96955b36ed20[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Tue Apr 29 10:31:53 2025 +0530
+
+    lesson publishing also completed
+
+[33mcommit b6209479482d42d0b0a0e4e8df2d04099db99bd0[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Tue Apr 29 09:45:39 2025 +0530
+
+    google auth bug fixed
+
+[33mcommit bfc28b37f3300dc6ea0d7c3d3e4c95b57db90f0e[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Tue Apr 29 09:41:19 2025 +0530
+
+    lesson and content backend code structured
+
+[33mcommit b8d3e1de7689a6adf911596c98b8b4526327f707[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Mon Apr 28 21:45:45 2025 +0530
+
+    lesson order updating bug fixed
+
+[33mcommit 628029e4f7a77ead8f8a5e116b4590ef524496b3[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Mon Apr 28 21:06:32 2025 +0530
+
+    deleting lesson also completed
+
+[33mcommit dd3db5c4bbbd438a0e913b429568c961106b4a52[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Mon Apr 28 19:56:32 2025 +0530
+
+    deleting content asking for alert also completed
+
+[33mcommit 523b58872a111719305151308bd9b7deaab38cfa[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Mon Apr 28 19:23:20 2025 +0530
+
+    deleting content is working need to ask for alert
+
+[33mcommit 3cab5f70dedf1dcb9249b71b8f0fa999228bcbf9[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Mon Apr 28 17:28:49 2025 +0530
+
+    lesson content editing almost completed
+
+[33mcommit bdffc7384e34624898018b3b93d34baacaeec76b[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Mon Apr 28 17:09:14 2025 +0530
+
+    loading skeleton updated also removed disabling lesson and course from instructor panel
+
+[33mcommit e67274f4b8d73fc796049c4c7ff71453bcc62d6b[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Mon Apr 28 12:57:59 2025 +0530
+
+    updation almost complete
+
+[33mcommit 53df7360f82ca698ee8f142177a755d91142acc2[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Mon Apr 28 12:28:48 2025 +0530
+
+    content quiz validation made strong
+
+[33mcommit b3fb3da90470e789f7b12f1408cbbd210f6e356c[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Mon Apr 28 11:43:19 2025 +0530
+
+    content adding good to go
+
+[33mcommit 9e8d30d6c7ed2fd17585b9dbff831b99ad546032[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Mon Apr 28 10:42:43 2025 +0530
+
+    restructured lesson content and backned completed need to change frontend
+
+[33mcommit 0b53b3c6eae552256418d3fee4e9f757d2ae2f85[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Mon Apr 28 09:16:41 2025 +0530
+
+    document and video uploading almost completed
+
+[33mcommit 06eaf6a0d00e4c28ec9c3c74fc6d58968a8b4e73[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Sun Apr 27 19:57:15 2025 +0530
+
+    video uploadng alomst completed
+
+[33mcommit e6d8260c4b4bebae8e4e2f2cacf965ebe3e75871[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Sun Apr 27 18:46:28 2025 +0530
+
+    cloudinary set up almost done still working on string lesson content
+
+[33mcommit 4deb5dbb2c399c0144eeaa4e4d80cda85b9da9e6[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Sun Apr 27 16:52:25 2025 +0530
+
+    solving bugs stage 1 backend completed
+
+[33mcommit 1aa2704e4ac65f724acf8527840eec7e78f67ffc[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Sun Apr 27 15:09:22 2025 +0530
+
+    content module added in backned no errors now. need to test
+
+[33mcommit 026e78aad2aadfa7a1dbcd996987621c3fff04e4[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Sat Apr 26 19:54:39 2025 +0530
+
+    lesson content ui set up did
+
+[33mcommit 67f6c348579e7c592fad48c1ab68a2a96ab98937[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Sat Apr 26 17:07:50 2025 +0530
+
+    fixed a bug on lesson delete
+
+[33mcommit 713874069583fe7e94df340fac613a8ebb9839db[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Sat Apr 26 14:30:45 2025 +0530
+
+    few bugs fixed in prisma and lesson module
+
+[33mcommit 51bd91e4c45b7c6ea1698b62d84bd4455c35ddd2[m[33m ([m[1;31morigin/fix/instructor-panel-bugs[m[33m, [m[1;32mfix/instructor-panel-bugs[m[33m)[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Fri Apr 25 21:51:50 2025 +0530
+
+    validation also almost completted
+
+[33mcommit 98720eedd2b1972c3c601c632ee3bd205de44597[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Fri Apr 25 21:25:08 2025 +0530
+
+    handled if user disabled during he logged in and working properly
+
+[33mcommit 803ab3e8965c98f137d2521bec493342de2f5f52[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Fri Apr 25 20:40:02 2025 +0530
+
+    lesson disable enable warning pop up implemented; backend prisma migration about lesson status
+
+[33mcommit cf4e7a79a85f8e7195a200c000dd39e55498c71a[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Fri Apr 25 20:09:30 2025 +0530
+
+    lesson management bugs fixed in lesson listing
+
+[33mcommit a30cb081a6fdf54b736c9bb4e57502a7373690d0[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Fri Apr 25 19:41:35 2025 +0530
+
+    course detail page completed. thumbnain and status left to update it listed in todo
+
+[33mcommit 021895c43e924ccd1c5c540b162246dac9347c13[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Fri Apr 25 15:07:28 2025 +0530
+
+    course editing working properly
+
+[33mcommit 66f43666a09a0a4f47e26ba1b840e975a51e20dc[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Fri Apr 25 14:28:15 2025 +0530
+
+    alert reusable component implemented and added in few places
+
+[33mcommit 9853610347c6a3fdae13ac634d232eaea7642f58[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Fri Apr 25 12:16:30 2025 +0530
+
+    soft deleting implemented and changed naming convention of useSoftDelete to useSoftDeleteCourse for better uderstanding
+
+[33mcommit c8fbeb7a32bd2243d4bbea32ed1b8c12991201a9[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Fri Apr 25 12:02:46 2025 +0530
+
+    course detail page modulaization completed next disable and enable course in details page
+
+[33mcommit dbc28855c542a0a0d64ef0e4bdfb1250e6601a78[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Fri Apr 25 11:57:10 2025 +0530
+
+    course details ui redesigned and ok now trying to modulaize
+
+[33mcommit 0392335d577891b333326926be95390c045d1302[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Fri Apr 25 09:11:17 2025 +0530
+
+    instructor panel fixing. course listing page completed
+
+[33mcommit ab991def65911096e2008120dda60dde34a1b473[m[33m ([m[1;31morigin/feature/google-auth[m[33m, [m[1;32mfeature/google-auth[m[33m)[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Thu Apr 24 21:33:37 2025 +0530
+
+    service cleaned axios calling for google auth
+
+[33mcommit 178cbc7bf1d75e3dd8db70efc6cb535b8a80f1cc[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Thu Apr 24 21:11:10 2025 +0530
+
+    Update .gitignore to ignore app.log
+
+[33mcommit ea498245e461473664c391b3163a5d32f6860952[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Thu Apr 24 20:36:46 2025 +0530
+
+    Stop tracking app.log and ignore it
+
+[33mcommit d72f6fbfe97c0d6b829bad099e23b870a77c455f[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Thu Apr 24 20:28:26 2025 +0530
+
+    secure things removed again commiting
+
+[33mcommit 6e6b00485adaa3660323d450816bdfc927056004[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Thu Apr 24 20:25:22 2025 +0530
+
+    git secret violation updated and recommit failed one
+
+[33mcommit 4ce13d65f38650d55ed47c37ac8cb31ca3b68543[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Thu Apr 24 19:58:05 2025 +0530
+
+    google oauth almost completed and working backend code organization left
+
+[33mcommit 6665675b0859c007143095c2c3b2b4d9b9add90f[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Thu Apr 24 19:44:32 2025 +0530
+
+    google auth almost implemented
+
+[33mcommit f26e3e9f729e6192ec860d3f4e0d5b2f60db11fd[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Wed Apr 23 22:06:06 2025 +0530
+
+    google oauth implementing started on working backend almost completed
+
+[33mcommit f212bd01048349ab278b1509884e56af82b7b609[m[33m ([m[1;31morigin/fix/admin-panel-issues[m[33m, [m[1;32mfix/admin-panel-issues[m[33m)[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Wed Apr 23 21:27:03 2025 +0530
+
+    backend middleware bug fixed
+
+[33mcommit 6c9a46805306c9c0a2d4b8c7d3d8e304b3e6fcbc[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Wed Apr 23 21:10:21 2025 +0530
+
+    course side updated in admin module
+
+[33mcommit c782684254056317579cef811fdf6beb39353255[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Wed Apr 23 17:28:50 2025 +0530
+
+    instructor section updated on admin panel
+
+[33mcommit 975e3fc7e5c30f6b6e99bb91954727e04cf64875[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Wed Apr 23 16:56:01 2025 +0530
+
+    student page completed with sorting and searching and loading state in admin panel
+
+[33mcommit a73989a7e7b66e62fb5cc3036195c4591246dc2d[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Wed Apr 23 15:25:45 2025 +0530
+
+    category ui updated
+
+[33mcommit 0c923f40e3a5787261bd2636e7bf5c5b325c7dac[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Wed Apr 23 15:14:27 2025 +0530
+
+    admin category management completed everything and perfect
+
+[33mcommit f3bd7c3a5005d9b02317d7d7210645555531ac34[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Wed Apr 23 10:33:46 2025 +0530
+
+    search in admin panel completed
+
+[33mcommit c22bc850f8d98d2cfdaf02de5c0f6e52836df17c[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Tue Apr 22 20:50:39 2025 +0530
+
+    skelton loading almost completed in admin side
+
+[33mcommit 7e63b2c9438ca8f3e789bad292438baf99ecaf7c[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Tue Apr 22 20:06:20 2025 +0530
+
+    ui improving
+
+[33mcommit e3cb7236472e455274ee0388d215993fcc83cdce[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Tue Apr 22 19:36:05 2025 +0530
+
+    naming convention changed in interfaces to repository
+
+[33mcommit 53ed716222c6c7bbdf19d39d41e9ac39f0c93a38[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Tue Apr 22 12:33:34 2025 +0530
+
+    category toggle delete bug fixed
+
+[33mcommit cf15aacf73effe971aa2a385f1539ba257b71606[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Tue Apr 22 12:21:43 2025 +0530
+
+    frontend protected route middleware management completed
+
+[33mcommit 8a2e027424f160fae8c791f658f45778a14d4550[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Tue Apr 22 12:04:04 2025 +0530
+
+    lesson detail page getting lesson data completed
+
+[33mcommit 37eab98c6a6255443088fc882c4b393e2e4967a6[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Tue Apr 22 11:26:13 2025 +0530
+
+    course lesson page designing
+
+[33mcommit 6b9f0fe808ef79406e241c49b4ef295e2276ef77[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Tue Apr 22 09:55:59 2025 +0530
+
+    lesson toggle delete impolemented
+
+[33mcommit 945c1f423da8101f9a9fba7c5c387bc7637f0441[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Tue Apr 22 02:40:14 2025 +0530
+
+    lesson on working getting lesson
+
+[33mcommit 2c0ef330410ceba6762f070a7f84005fe0ddc699[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Tue Apr 22 01:49:33 2025 +0530
+
+    course detail page getting course specific dta is ok
+
+[33mcommit 2de0191f1b96659acc738eae84d8ed540c6eb677[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Tue Apr 22 00:50:34 2025 +0530
+
+    course listing completed
+
+[33mcommit aaa949374febc548602045d96c68ee852dfb1307[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Mon Apr 21 21:59:27 2025 +0530
+
+    course on working status
+
+[33mcommit 98b31c035f12a90131ca1f82d8a41cbeaa7ec6d7[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Mon Apr 21 18:07:29 2025 +0530
+
+    listing all instructors
+
+[33mcommit a3432b25e2812c36e65b1216fb2638a370312c12[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Mon Apr 21 16:46:22 2025 +0530
+
+    forgotpassword bug fixed
+
+[33mcommit 69b0ad49ca1472478443e0ef0ef782fe924facb4[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Mon Apr 21 12:59:01 2025 +0530
+
+    user management completed
+
+[33mcommit 49459a1ba4d677638f3c36ff833b21a9a7721ad0[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Sun Apr 20 22:00:58 2025 +0530
+
+    sorting and pagination in catgory module almost completed
+
+[33mcommit 57d483ec4987548e043ea2b059e02ce492471c9e[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Sun Apr 20 20:57:09 2025 +0530
+
+    category almost completed
+
+[33mcommit ef3a911b495f1baceec06950385cd7d4eed14021[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Sun Apr 20 17:24:40 2025 +0530
+
+    auth almost ok
+
+[33mcommit 601957f04e6f832b275221595f8265f5eb9e0be0[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Sun Apr 20 15:23:40 2025 +0530
+
+    login and signup otp verification problems almost solved
+
+[33mcommit 3c45a7962c63f3055667602f7ba1596ef623de06[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Sat Apr 19 22:00:29 2025 +0530
+
+    frontend changing into tanstack query almost complete few bugs to fixs
+
+[33mcommit 34999292b2f7aaeeadd177dda165b2e32546547e[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Fri Apr 18 19:47:30 2025 +0530
+
+    updated course module
+
+[33mcommit 7edeed9be4e29809cf97ec4f48c84f97ed1bdfe7[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Fri Apr 18 17:45:48 2025 +0530
+
+    category module updated
+
+[33mcommit 9b2e715c74d00eeeb41c2447de891fba598ad11b[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Fri Apr 18 15:48:45 2025 +0530
+
+    instructor module changed to accurate clean architecture
+
+[33mcommit af71338ff6bbf18530390eed5d1ca8d33219a028[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Fri Apr 18 14:27:23 2025 +0530
+
+    otp, user , auth modules updadated with clean architecture
+
+[33mcommit 88b16ee73a73e3784bb5f61692cece084765ea29[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Thu Apr 17 22:23:02 2025 +0530
+
+    backend restructuring auth and otp completed
+
+[33mcommit fa134db8db8205b3ec8023e3aa88f0be4b811507[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Thu Apr 17 14:02:59 2025 +0530
+
+    backend modulaizing and keeping standards updated dependacy injectino
+
+[33mcommit bfb866856254db80110c79cfe46dd75842937a79[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Wed Apr 16 21:22:20 2025 +0530
+
+    added better side bar ui
+
+[33mcommit 186dd305e9fac623de7ec32c0fa6d57c09e19fb7[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Wed Apr 16 21:13:44 2025 +0530
+
+    category crud frontend completed. pagination and searching only left
+
+[33mcommit 4bed9f877b32d0c1409ebdc2f6f12a18b513396d[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Tue Apr 15 14:52:44 2025 +0530
+
+    category adding almost completed fewe ui bugs left
+
+[33mcommit 5a5e9f76ea99a8e50147cec36f740826df9f0adb[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Tue Apr 15 12:46:17 2025 +0530
+
+    authentication almost completed no major issues or todos
+
+[33mcommit 2a2f706fdbeec85e89b0a05240d14c5fa8983673[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Tue Apr 15 10:49:08 2025 +0530
+
+    auth/me enpoint added
+
+[33mcommit 283119e9411de071fa5d039eacf81ad545422426[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Mon Apr 14 23:36:05 2025 +0530
+
+    ui updating still progress
+
+[33mcommit 8a4fac7dca35b11be5156fed14ac0a302a0e1a44[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Mon Apr 14 20:08:26 2025 +0530
+
+    authentication almost done on working stage
+
+[33mcommit 9d3b51dea3ea0937b9d5f0b8cc3ec565927783ab[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Mon Apr 14 18:42:20 2025 +0530
+
+    auth login and signup just connected
+
+[33mcommit 7f746ec292591f2f3eb4f317217b8c92ec35a98d[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Mon Apr 14 11:29:28 2025 +0530
+
+    lesson module added content things remaining to do
+
+[33mcommit 998a6deb586bac912cc8a2f55aa2a32f7a41864b[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Sat Apr 12 00:25:26 2025 +0530
+
+    course crud o/p completed
+
+[33mcommit 93ba81a3467726dfe83912abeabeb1946448e2ca[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Fri Apr 11 17:44:48 2025 +0530
+
+    category management api completed
+
+[33mcommit 69e2fe947c4cc64d211808f1ab132ec31242449c[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Thu Apr 10 21:10:50 2025 +0530
+
+    user update endpoint for admin and list all users based on roles implemented
+
+[33mcommit 07ee90f95b0208f1859cf73795e8dd314eceabd8[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Thu Apr 10 15:17:54 2025 +0530
+
+    bugs fixed in resend and forgot email
+
+[33mcommit d7735266c13ff2ed6860fb9a0dd449d3599f09a3[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Wed Apr 9 21:14:51 2025 +0530
+
+    implemented forgot password and otps no much errors till now
+
+[33mcommit 39c0217f71ea2fdb812346e2c612c43a43171a39[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Wed Apr 9 11:02:35 2025 +0530
+
+    user profile updating merged with user update to smae endpoint no major bugs found
+
+[33mcommit 03b408f9bcd21e40bf659bce9be772ecb2709dc1[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Tue Apr 8 12:19:26 2025 +0530
+
+    user update and few bugs in authentication and instructor creation resolved
+
+[33mcommit 910ca846a101f651d89f7ab213f263666694ba45[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Mon Apr 7 14:08:32 2025 +0530
+
+    converting to instructor adding completed nothing more
+
+[33mcommit 35b2b05bb6e66277a9bb1573a5d432b35512a37c[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Sun Apr 6 19:35:47 2025 +0530
+
+    user registration backend also completed
+
+[33mcommit d4eb393cc43f68e0581b13c675003c166357ae86[m
+Author: Admin <rashinkp001@gmail.com>
+Date:   Sun Apr 6 14:59:35 2025 +0530
+
+    first commit completed admin registration
