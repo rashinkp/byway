@@ -17,12 +17,12 @@ export class DisableReviewUseCase implements IDisableReviewUseCase {
     if (review.isDeleted()) {
       // Enable the review (restore)
       review.restore();
-      await this._courseReviewRepository.restore(review);
+      await this._courseReviewRepository.update(review.id!, review);
       return { action: 'enabled' };
     } else {
       // Disable the review
       review.softDelete();
-      await this._courseReviewRepository.softDelete(review);
+      await this._courseReviewRepository.update(review.id!, review);
       return { action: 'disabled' };
     }
   }

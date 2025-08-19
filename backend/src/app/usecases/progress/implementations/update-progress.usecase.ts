@@ -84,7 +84,10 @@ export class UpdateProgressUseCase implements IUpdateProgressUseCase {
         if (input.totalQuestions !== undefined) {
           progress.updateTotalQuestions(input.totalQuestions);
         }
-        progress = await this._lessonProgressRepository.update(progress);
+        if (!progress.id) {
+          throw new HttpError("Progress ID is required", StatusCodes.INTERNAL_SERVER_ERROR);
+        }
+        progress = await this._lessonProgressRepository.update(progress.id, progress);
       }
 
       // Handle quiz answers if provided

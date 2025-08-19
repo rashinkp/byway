@@ -15,7 +15,7 @@ export class AddMoneyUseCase implements IAddMoneyUseCase {
     }
 
     wallet.addAmount(data.amount, data.currency);
-    const updatedWallet = await this._walletRepository.update(wallet);
+    const updatedWallet = await this._walletRepository.update(wallet.id , wallet);
     return updatedWallet.toResponse();
   }
 }

@@ -7,7 +7,7 @@ export class DeleteMessageUseCase implements IDeleteMessageUseCase {
   constructor(private readonly _messageRepository: IMessageRepository) {}
 
   async execute(messageId: MessageId): Promise<DeleteMessageResponseDTO> {
-    await this._messageRepository.delete(messageId);
+    await this._messageRepository.delete(messageId.value);
     
     return {
       success: true,

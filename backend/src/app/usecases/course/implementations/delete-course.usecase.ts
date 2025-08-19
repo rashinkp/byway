@@ -33,7 +33,7 @@ export class DeleteCourseUseCase implements IDeleteCourseUseCase {
     const isCurrentlyDeleted = course.isDeleted();
 
     course.softDelete();
-    const updatedCourse = await this._courseRepository.softDelete(course);
+    const updatedCourse = await this._courseRepository.softDelete(course.id);
 
     // Determine the action and notify the instructor
     const eventType = isCurrentlyDeleted

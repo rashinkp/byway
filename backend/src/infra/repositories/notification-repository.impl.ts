@@ -2,9 +2,6 @@ import { NotificationRepositoryInterface } from "../../app/repositories/notifica
 import { Notification } from "../../domain/entities/notification.entity";
 import { PrismaClient } from "@prisma/client";
 import { NotificationEntityType } from "../../domain/enum/notification-entity-type.enum";
-import { NotificationEventType } from "../../domain/enum/notification-event-type.enum";
-import { UserId } from "../../domain/value-object/UserId";
-import { Timestamp } from "../../domain/value-object/Timestamp";
 import { PaginatedNotificationList } from "../../domain/types/notification.interface";
 import { GenericRepository } from "./base/generic.repository";
 
@@ -67,13 +64,11 @@ export class PrismaNotificationRepository
       case NotificationEntityType.REVIEW:
         return "REVIEW";
       case NotificationEntityType.INSTRUCTOR:
-        return "USER"; // Map INSTRUCTOR to USER since Prisma doesn't have INSTRUCTOR
+        return "USER"; 
       default:
         return "GENERAL";
     }
   }
-
-  // Conversion handled by Notification.fromPersistence
 
   async create(notification: Notification): Promise<Notification> {
     const created = await this._prisma.notification.create({
@@ -94,6 +89,30 @@ export class PrismaNotificationRepository
 
   async findById(id: string): Promise<Notification | null> {
     return this.findByIdGeneric(id);
+  }
+
+  async find(filter?: any): Promise<Notification[]> {
+    return this.findGeneric(filter);
+  }
+
+  async update(id: string, notification: Notification): Promise<Notification> {
+    return this.updateGeneric(id, notification);
+  }
+
+  async delete(id: string): Promise<void> {
+    return this.deleteGeneric(id);
+  }
+
+  async softDelete(id: string): Promise<Notification> {
+    const updated = await this._prisma.notification.update({
+      where: { id },
+      data: { expiresAt: new Date() },
+    });
+    return this.mapToEntity(updated);
+  }
+
+  async count(filter?: any): Promise<number> {
+    return this.countGeneric(filter);
   }
 
   async findByUserId(userId: string): Promise<Notification[]> {

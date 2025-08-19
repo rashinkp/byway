@@ -49,7 +49,7 @@ export class TopUpWalletUseCase implements ITopUpWalletUseCase {
         throw new HttpError("Wallet not found", StatusCodes.NOT_FOUND);
       }
       wallet.addAmount(amount);
-      await this._walletRepository.update(wallet);
+      await this._walletRepository.update(wallet.id , wallet);
       await this._transactionRepository.updateStatus(
         transaction.id,
         TransactionStatus.COMPLETED

@@ -7,7 +7,7 @@ export class GetMessageByIdUseCase implements IGetMessageByIdUseCase {
   constructor(private readonly _messageRepository: IMessageRepository) {}
 
   async execute(messageId: MessageId): Promise<MessageByIdResponseDTO | null> {
-    const message = await this._messageRepository.findById(messageId);
+    const message = await this._messageRepository.findById(messageId.value);
     
     if (!message) {
       return null;

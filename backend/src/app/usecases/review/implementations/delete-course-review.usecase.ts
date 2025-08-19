@@ -22,6 +22,6 @@ export class DeleteCourseReviewUseCase implements IDeleteCourseReviewUseCase {
     review.softDelete();
 
     // Save to repository
-    await this._courseReviewRepository.softDelete(review);
+    await this._courseReviewRepository.softDelete(review.id);
   }
 } 

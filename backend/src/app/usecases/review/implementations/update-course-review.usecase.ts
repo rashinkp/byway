@@ -46,7 +46,7 @@ export class UpdateCourseReviewUseCase implements IUpdateCourseReviewUseCase {
     review.updateReview(updateData);
 
     // Save to repository
-    const updatedReview = await this._courseReviewRepository.update(review);
+    const updatedReview = await this._courseReviewRepository.update(review.id, review);
 
     // Return response DTO
     return {

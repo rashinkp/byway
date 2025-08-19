@@ -44,7 +44,7 @@ export class EnrollCourseUseCase implements IEnrollCourseUseCase {
         continue; // Skip already enrolled courses
       }
 
-      const newEnrollments = await this._enrollmentRepository.create({
+      const newEnrollments = await this._enrollmentRepository.createEnrollments({
         userId: input.userId,
         courseIds: [courseId],
         orderItemId: input.orderItemId,

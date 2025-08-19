@@ -16,7 +16,7 @@ export class ReduceMoneyUseCase implements IReduceMoneyUseCase {
     }
 
     wallet.reduceAmount(data.amount, data.currency);
-    const updatedWallet = await this._walletRepository.update(wallet);
+    const updatedWallet = await this._walletRepository.update(wallet.id , wallet);
     return updatedWallet.toResponse();
   }
 }

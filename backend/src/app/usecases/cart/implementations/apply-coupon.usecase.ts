@@ -21,6 +21,6 @@ export class ApplyCouponUseCase implements IApplyCouponUseCase {
     }
 
     cart.applyCoupon(data.couponId);
-    return this._cartRepository.update(cart);
+    return this._cartRepository.update(cart.id , cart);
   }
 }

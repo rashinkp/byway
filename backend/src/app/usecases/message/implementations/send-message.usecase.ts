@@ -79,7 +79,7 @@ export class SendMessageUseCase implements ISendMessageUseCase {
     
     if (chatId && (input.chatId || input.userId)) {
       let chat = input.chatId
-        ? await this._chatRepository.findById(chatId)
+        ? await this._chatRepository.findById(chatId.value)
         : null;
       if (!chat) {
         chat = await this._chatRepository.getChatBetweenUsers(
@@ -139,7 +139,7 @@ export class SendMessageUseCase implements ISendMessageUseCase {
       };
     }
     
-    const chat = await this._chatRepository.findById(chatId);
+    const chat = await this._chatRepository.findById(chatId.value);
     if (!chat) {
       // Map enriched message to DTO
       return {

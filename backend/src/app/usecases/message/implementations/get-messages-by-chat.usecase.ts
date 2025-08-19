@@ -20,7 +20,7 @@ export class GetMessagesByChatUseCase implements IGetMessagesByChatUseCase {
       limit,
       beforeMessageId
     );
-    const chat = await this._chatRepository.findById(chatId);
+    const chat = await this._chatRepository.findById(chatId.value);
     if (!chat) return [];
     return messages.map((msg) => {
       // Infer receiverId: the other participant in the chat

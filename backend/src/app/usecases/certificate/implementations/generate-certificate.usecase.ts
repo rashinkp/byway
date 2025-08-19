@@ -167,7 +167,7 @@ export class GenerateCertificateUseCase implements IGenerateCertificateUseCase {
       // 11. Save certificate to database (update if exists, create if not)
       let savedCertificate;
       if (isUpdate && oldCertificateId) {
-        savedCertificate = await this._certificateRepository.update(certificate);
+        savedCertificate = await this._certificateRepository.update(certificate.id , certificate);
 
       } else {
         savedCertificate = await this._certificateRepository.create(certificate);

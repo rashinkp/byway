@@ -27,7 +27,7 @@ export class ListUserChatsUseCase implements IListUserChatsUseCase {
   async getChatParticipantsById(
     chatId: string
   ): Promise<{ user1Id: string; user2Id: string } | null> {
-    const chat = await this._chatRepository.findById({ value: chatId });
+    const chat = await this._chatRepository.findById(chatId);
     if (!chat) return null;
     return { user1Id: chat.user1Id.value, user2Id: chat.user2Id.value };
   }

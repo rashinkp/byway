@@ -21,8 +21,7 @@ export class UpdateLessonUseCase implements IUpdateLessonUseCase {
       if (!lesson || !lesson.isActive()) {
         throw new HttpError("Lesson not found or deleted", 404);
       }
-
-      // Check if content exists when publishing
+0
       if (dto.status === LessonStatus.PUBLISHED) {
         const content = await this._contentRepository.findByLessonId(
           dto.lessonId
@@ -33,7 +32,7 @@ export class UpdateLessonUseCase implements IUpdateLessonUseCase {
       }
 
       const updatedLesson = Lesson.update(lesson, dto);
-      const savedLesson = await this._lessonRepository.update(updatedLesson);
+      const savedLesson = await this._lessonRepository.update(updatedLesson.id , updatedLesson);
       return savedLesson.toJSON() as unknown as ILessonOutputDTO;
     } catch (error) {
       if (error instanceof Error) {
