@@ -1,14 +1,11 @@
 import { CourseReview } from "../../domain/entities/review.entity";
 import {  ICourseReviewSummary, ICourseReviewQuery, ICourseReviewPaginatedResult } from "../../domain/types/review.interface";
+import { IGenericRepository } from "./base/generic-repository.interface";
 
-export interface ICourseReviewRepository {
+export interface ICourseReviewRepository extends IGenericRepository<CourseReview> {
   // Basic CRUD operations
   save(review: CourseReview): Promise<CourseReview>;
-  findById(id: string): Promise<CourseReview | null>;
-  update(review: CourseReview): Promise<CourseReview>;
-  softDelete(review: CourseReview): Promise<CourseReview>;
-  restore(review: CourseReview): Promise<CourseReview>;
-  delete(id: string): Promise<void>;
+  restoreReview(review: CourseReview): Promise<CourseReview>;
 
   // Query operations
   findByCourseId(

@@ -99,6 +99,41 @@ export class PrismaInstructorRepository extends GenericRepository<Instructor> im
     return this.findByIdGeneric(id);
   }
 
+  // Generic repository methods
+  async create(instructor: Instructor): Promise<Instructor> {
+    return this.createGeneric(instructor);
+  }
+
+  async findById(id: string): Promise<Instructor | null> {
+    return this.findByIdGeneric(id);
+  }
+
+  async find(filter?: any): Promise<Instructor[]> {
+    return this.findGeneric(filter);
+  }
+
+  async update(id: string, instructor: Instructor): Promise<Instructor> {
+    return this.updateGeneric(id, instructor);
+  }
+
+  async delete(id: string): Promise<void> {
+    return this.deleteGeneric(id);
+  }
+
+  async softDelete(id: string): Promise<Instructor> {
+    const deleted = await this._prisma.instructorDetails.update({
+      where: { id },
+      data: {
+        updatedAt: new Date(),
+      },
+    });
+    return this.mapToEntity(deleted);
+  }
+
+  async count(filter?: any): Promise<number> {
+    return this.countGeneric(filter);
+  }
+
   async findInstructorByUserId(userId: string): Promise<Instructor | null> {
     const instructor = await this._prisma.instructorDetails.findUnique({
       where: { userId },

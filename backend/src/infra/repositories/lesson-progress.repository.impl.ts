@@ -58,6 +58,41 @@ export class LessonProgressRepository extends GenericRepository<LessonProgress> 
     return entity;
   }
 
+  // Generic repository methods
+  async create(progress: LessonProgress): Promise<LessonProgress> {
+    return this.createGeneric(progress);
+  }
+
+  async findById(id: string): Promise<LessonProgress | null> {
+    return this.findByIdGeneric(id);
+  }
+
+  async find(filter?: any): Promise<LessonProgress[]> {
+    return this.findGeneric(filter);
+  }
+
+  async update(id: string, progress: LessonProgress): Promise<LessonProgress> {
+    return this.updateGeneric(id, progress);
+  }
+
+  async delete(id: string): Promise<void> {
+    return this.deleteGeneric(id);
+  }
+
+  async softDelete(id: string): Promise<LessonProgress> {
+    const deleted = await this._prisma.lessonProgress.update({
+      where: { id },
+      data: {
+        updatedAt: new Date(),
+      },
+    });
+    return this.mapToEntity(deleted);
+  }
+
+  async count(filter?: any): Promise<number> {
+    return this.countGeneric(filter);
+  }
+
   async save(progress: LessonProgress): Promise<LessonProgress> {
     const data = progress.toJSON();
     const created = await this._prisma.lessonProgress.create({
@@ -202,7 +237,7 @@ export class LessonProgressRepository extends GenericRepository<LessonProgress> 
     );
   }
 
-  async update(progress: LessonProgress): Promise<LessonProgress> {
+  async updateProgress(progress: LessonProgress): Promise<LessonProgress> {
     const data = progress.toJSON();
     const updated = await this._prisma.lessonProgress.update({
       where: {

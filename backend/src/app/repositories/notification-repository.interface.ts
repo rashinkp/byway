@@ -1,9 +1,8 @@
 import { Notification } from "../../domain/entities/notification.entity";
 import { PaginatedNotificationList } from "../../domain/types/notification.interface";
+import { IGenericRepository } from "./base/generic-repository.interface";
 
-export interface NotificationRepositoryInterface {
-	create(notification: Notification): Promise<Notification>;
-	findById(id: string): Promise<Notification | null>;
+export interface NotificationRepositoryInterface extends IGenericRepository<Notification> {
 	findByUserId(userId: string): Promise<Notification[]>;
 	deleteById(id: string): Promise<void>;
 	deleteExpired(): Promise<number>; // returns number of deleted

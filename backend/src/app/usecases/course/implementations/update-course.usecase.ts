@@ -47,7 +47,7 @@ export class UpdateCourseUseCase implements IUpdateCourseUseCase {
         });
       }
 
-      const updatedCourse = await this._courseRepository.update(course);
+      const updatedCourse = await this._courseRepository.update(course.id, course);
       return updatedCourse.toJSON() as unknown as ICourseWithDetailsDTO;
     } catch (error) {
       throw new HttpError("Failed to update course", 500);

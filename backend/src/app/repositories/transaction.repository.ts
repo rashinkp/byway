@@ -1,9 +1,8 @@
 import { Transaction } from "../../domain/entities/transaction.entity";
 import { TransactionStatus } from "../../domain/enum/transaction-status.enum";
+import { IGenericRepository } from "./base/generic-repository.interface";
 
-export interface ITransactionRepository {
-  create(transaction: Transaction): Promise<Transaction>;
-  findById(id: string): Promise<Transaction | null>;
+export interface ITransactionRepository extends IGenericRepository<Transaction> {
   findByOrderId(orderId: string): Promise<Transaction | null>;
   findByUserId(
     userId: string,

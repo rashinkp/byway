@@ -57,7 +57,7 @@ export class PaymentService implements IPaymentService {
 
     // Deduct from wallet
     wallet.reduceAmount(amount);
-    await this._walletRepository.update(wallet);
+    await this._walletRepository.update(wallet.id, wallet);
 
     // Create transaction
     const transaction = new Transaction({
@@ -99,7 +99,7 @@ export class PaymentService implements IPaymentService {
         }
 
         // Create new enrollment
-        await this._enrollmentRepository.create({
+        await this._enrollmentRepository.createEnrollments({
           userId,
           courseIds: [item.courseId],
           orderItemId: item.id,
@@ -247,7 +247,7 @@ export class PaymentService implements IPaymentService {
             throw new HttpError("Wallet not found", StatusCodes.NOT_FOUND);
           }
           wallet.addAmount(transaction.amount);
-          await this._walletRepository.update(wallet);
+          await this._walletRepository.update(wallet.id, wallet);
           return {
             data: { transaction },
             message: "Wallet top-up completed successfully",
@@ -292,7 +292,7 @@ export class PaymentService implements IPaymentService {
                 }
 
                 // Create new enrollment
-                await this._enrollmentRepository.create({
+                await this._enrollmentRepository.createEnrollments({
                   userId: order.userId,
                   courseIds: [item.courseId],
                   orderItemId: item.id,

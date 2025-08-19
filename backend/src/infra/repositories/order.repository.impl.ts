@@ -319,7 +319,7 @@ export class OrderRepository extends GenericRepository<Order> implements IOrderR
     return order;
   }
 
-  async update(order: Order): Promise<Order> {
+  async update(id: string, order: Order): Promise<Order> {
     const updatedOrder = await this._prisma.order.update({
       where: { id: order.id },
       data: {
@@ -342,9 +342,22 @@ export class OrderRepository extends GenericRepository<Order> implements IOrderR
   }
 
   async delete(id: string): Promise<void> {
-    await this._prisma.order.delete({
+    return this.deleteGeneric(id);
+  }
+
+  // Additional generic methods
+  async find(filter?: any): Promise<Order[]> {
+    return this.findGeneric(filter);
+  }
+
+  async softDelete(id: string): Promise<Order> {
+    const deleted = await this._prisma.order.update({
       where: { id },
+      data: {
+        updatedAt: new Date(),
+      },
     });
+    return this.mapToEntity(deleted);
   }
 
   async findByPaymentId(paymentId: string): Promise<Order | null> {

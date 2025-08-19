@@ -128,15 +128,15 @@ export class CartRepository extends GenericRepository<Cart> implements ICartRepo
     });
   }
 
-  async update(cart: Cart): Promise<Cart> {
+  async update(id: string, cart: Cart): Promise<Cart> { 
     const updated = await this._prisma.cart.update({
-      where: { id: cart.id },
+      where: { id },
       data: {
         userId: cart.userId,
         courseId: cart.courseId,
         couponId: cart.couponId,
         discount: new Prisma.Decimal(cart.discount ?? 0),
-        updatedAt: cart.updatedAt,
+        updatedAt: new Date(),
         deletedAt: cart.deletedAt,
       },
       include: {
@@ -147,6 +147,29 @@ export class CartRepository extends GenericRepository<Cart> implements ICartRepo
       ...updated,
       discount: Number(updated.discount),
     });
+  }
+
+  // Additional generic methods
+  async find(filter?: any): Promise<Cart[]> {
+    return this.findGeneric(filter);
+  }
+
+  async softDelete(id: string): Promise<Cart> {
+    const deleted = await this._prisma.cart.update({
+      where: { id },
+      data: {
+        deletedAt: new Date(),
+        updatedAt: new Date(),
+      },
+      include: {
+        course: true,
+      },
+    });
+    return this.mapToEntity(deleted);
+  }
+
+  async count(filter?: any): Promise<number> {
+    return this.countGeneric(filter);
   }
 
   async delete(id: string): Promise<void> {

@@ -146,6 +146,22 @@ export class CourseRepository extends GenericRepository<Course> implements ICour
     }
   }
 
+  async create(course: Course): Promise<Course> {
+    return this.createGeneric(course);
+  }
+
+  async find(filter?: any): Promise<Course[]> {
+    return this.findGeneric(filter);
+  }
+
+  async delete(id: string): Promise<void> {
+    return this.deleteGeneric(id);
+  }
+
+  async count(filter?: any): Promise<number> {
+    return this.countGeneric(filter);
+  }
+
   async findByName(title: string): Promise<Course | null> {
     try {
       const course = await this._prisma.course.findFirst({
@@ -283,7 +299,7 @@ export class CourseRepository extends GenericRepository<Course> implements ICour
     }
   }
 
-  async update(course: Course): Promise<Course> {
+  async update(id: string, course: Course): Promise<Course> {
     try {
       const data: Prisma.CourseUpdateInput = {
         title: course.title,
@@ -323,7 +339,7 @@ export class CourseRepository extends GenericRepository<Course> implements ICour
       };
 
       const updated = await this._prisma.course.update({
-        where: { id: course.id },
+        where: { id },
         data,
         include: { details: true },
       });
@@ -358,11 +374,11 @@ export class CourseRepository extends GenericRepository<Course> implements ICour
       throw new HttpError("Failed to update course", 500);
     }
   }
-  async softDelete(course: Course): Promise<Course> {
+  async softDelete(id: string): Promise<Course> {
     try {
       const updated = await this._prisma.course.update({
-        where: { id: course.id },
-        data: { deletedAt: course.deletedAt },
+        where: { id },
+        data: { deletedAt: new Date() },
         include: { details: true },
       });
 

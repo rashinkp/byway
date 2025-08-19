@@ -3,11 +3,10 @@ import { UserProfile } from "../../domain/entities/user-profile.entity";
 import { PaginatedResult, PaginationFilter } from "../../domain/types/pagination-filter.interface";
 import { UserStats } from "../../domain/types/user.interface";
 import { Role } from "../../domain/enum/role.enum";
+import { IGenericRepository } from "./base/generic-repository.interface";
 
-
-export interface IUserRepository {
+export interface IUserRepository extends IGenericRepository<User> {
   findAll(input: PaginationFilter): Promise<PaginatedResult<User>>;
-  findById(id: string): Promise<User | null>;
   updateUser(user: User): Promise<User>;
   updateProfile(profile: UserProfile): Promise<UserProfile>;
   findProfileByUserId(userId: string): Promise<UserProfile | null>;

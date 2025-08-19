@@ -130,16 +130,7 @@ export class LessonContentRepository extends GenericRepository<LessonContent> im
   }
 
   async findById(id: string): Promise<LessonContent | null> {
-    const content = await this._prisma.lessonContent.findUnique({
-      where: { id, deletedAt: null }, // Only return non-soft-deleted content
-      include: { quizQuestions: true },
-    });
-
-    if (!content) {
-      return null;
-    }
-
-    return this.mapToLessonContentEntity(content);
+    return this.findByIdGeneric(id);
   }
 
   async findByLessonId(lessonId: string): Promise<LessonContent | null> {
@@ -156,6 +147,10 @@ export class LessonContentRepository extends GenericRepository<LessonContent> im
   }
 
   async create(content: LessonContent): Promise<LessonContent> {
+    return this.createGeneric(content);
+  }
+
+  async createContent(content: LessonContent): Promise<LessonContent> {
     const contentData = content.toJSON() as unknown as ContentData;
 
     const createdContent = await this._prisma.lessonContent.create({
@@ -189,7 +184,11 @@ export class LessonContentRepository extends GenericRepository<LessonContent> im
     return this.mapToLessonContentEntity(createdContent);
   }
 
-  async update(content: LessonContent): Promise<LessonContent> {
+  async update(id: string, content: LessonContent): Promise<LessonContent> {
+    return this.updateGeneric(id, content);
+  }
+
+  async updateContent(content: LessonContent): Promise<LessonContent> {
     const contentData = content.toJSON() as unknown as ContentData;
 
     const updatedContent = await this._prisma.lessonContent.update({
@@ -224,8 +223,27 @@ export class LessonContentRepository extends GenericRepository<LessonContent> im
   }
 
   async delete(id: string): Promise<void> {
-    await this._prisma.lessonContent.delete({
+    return this.deleteGeneric(id);
+  }
+
+  // Additional generic methods
+  async find(filter?: any): Promise<LessonContent[]> {
+    return this.findGeneric(filter);
+  }
+
+  async softDelete(id: string): Promise<LessonContent> {
+    const deleted = await this._prisma.lessonContent.update({
       where: { id },
+      data: {
+        deletedAt: new Date(),
+        updatedAt: new Date(),
+      },
+      include: { quizQuestions: true },
     });
+    return this.mapToEntity(deleted);
+  }
+
+  async count(filter?: any): Promise<number> {
+    return this.countGeneric(filter);
   }
 }

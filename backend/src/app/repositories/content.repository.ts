@@ -1,9 +1,6 @@
 import { LessonContent } from "../../domain/entities/content.entity";
+import { IGenericRepository } from "./base/generic-repository.interface";
 
-export interface ILessonContentRepository {
-  findById(id: string): Promise<LessonContent | null>;
+export interface ILessonContentRepository extends IGenericRepository<LessonContent> {
   findByLessonId(lessonId: string): Promise<LessonContent | null>;
-  create(content: LessonContent): Promise<LessonContent>;
-  update(content: LessonContent): Promise<LessonContent>;
-  delete(id: string): Promise<void>;
 }

@@ -90,9 +90,32 @@ export class CourseReviewRepository extends GenericRepository<CourseReview> impl
     return this.findByIdGeneric(id);
   }
 
-  async update(review: CourseReview): Promise<CourseReview> {
+  async create(review: CourseReview): Promise<CourseReview> {
+    return this.createGeneric(review);
+  }
+
+  async find(filter?: any): Promise<CourseReview[]> {
+    return this.findGeneric(filter);
+  }
+
+  async softDelete(id: string): Promise<CourseReview> {
+    const deleted = await this._prisma.courseReview.update({
+      where: { id },
+      data: {
+        deletedAt: new Date(),
+        updatedAt: new Date(),
+      },
+    });
+    return CourseReview.fromPersistence(deleted);
+  }
+
+  async count(filter?: any): Promise<number> {
+    return this.countGeneric(filter);
+  }
+
+  async update(id: string, review: CourseReview): Promise<CourseReview> {
     const updated = await this._prisma.courseReview.update({
-      where: { id: review.id },
+      where: { id },
       data: {
         rating: review.rating.value,
         title: review.title,
@@ -103,18 +126,7 @@ export class CourseReviewRepository extends GenericRepository<CourseReview> impl
     return CourseReview.fromPersistence(updated);
   }
 
-  async softDelete(review: CourseReview): Promise<CourseReview> {
-    const deleted = await this._prisma.courseReview.update({
-      where: { id: review.id },
-      data: {
-        deletedAt: new Date(),
-        updatedAt: new Date(),
-      },
-    });
-    return CourseReview.fromPersistence(deleted);
-  }
-
-  async restore(review: CourseReview): Promise<CourseReview> {
+  async restoreReview(review: CourseReview): Promise<CourseReview> {
     const restored = await this._prisma.courseReview.update({
       where: { id: review.id },
       data: {

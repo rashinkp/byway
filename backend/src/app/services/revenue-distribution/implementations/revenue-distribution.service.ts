@@ -131,7 +131,7 @@ export class RevenueDistributionService implements IRevenueDistributionService {
       adminWallet = await this._walletRepository.create(adminWallet);
     }
     adminWallet.addAmount(adminShare);
-    await this._walletRepository.update(adminWallet);
+    await this._walletRepository.update(adminWallet.id, adminWallet);
 
     // Get or create instructor wallet
     let instructorWallet = await this._walletRepository.findByUserId(
@@ -142,7 +142,7 @@ export class RevenueDistributionService implements IRevenueDistributionService {
       instructorWallet = await this._walletRepository.create(instructorWallet);
     }
     instructorWallet.addAmount(instructorShare);
-    await this._walletRepository.update(instructorWallet);
+    await this._walletRepository.update(instructorWallet.id, instructorWallet);
   }
 
   private async createTransactions(

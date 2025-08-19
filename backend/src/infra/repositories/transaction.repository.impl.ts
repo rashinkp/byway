@@ -75,8 +75,6 @@ export class TransactionRepository extends GenericRepository<Transaction> implem
     });
   }
 
-
-
   private mapToPrismaTransactionStatus(
     status: TransactionStatus
   ): PrismaTransactionStatus {
@@ -116,13 +114,39 @@ export class TransactionRepository extends GenericRepository<Transaction> implem
         updatedAt: createdTransaction.updatedAt,
       });
     } catch (error) {
-    
       throw error;
     }
   }
 
   async findById(id: string): Promise<Transaction | null> {
     return this.findByIdGeneric(id);
+  }
+
+  // Additional generic methods
+  async find(filter?: any): Promise<Transaction[]> {
+    return this.findGeneric(filter);
+  }
+
+  async update(id: string, transaction: Transaction): Promise<Transaction> {
+    return this.updateGeneric(id, transaction);
+  }
+
+  async delete(id: string): Promise<void> {
+    return this.deleteGeneric(id);
+  }
+
+  async softDelete(id: string): Promise<Transaction> {
+    const deleted = await this._prisma.transactionHistory.update({
+      where: { id },
+      data: {
+        updatedAt: new Date(),
+      },
+    });
+    return this.mapToEntity(deleted);
+  }
+
+  async count(filter?: any): Promise<number> {
+    return this.countGeneric(filter);
   }
 
   async findByOrderId(orderId: string): Promise<Transaction | null> {
@@ -166,6 +190,4 @@ export class TransactionRepository extends GenericRepository<Transaction> implem
   async countByUserId(userId: string): Promise<number> {
     return this._prisma.transactionHistory.count({ where: { userId } });
   }
-
-  
 }

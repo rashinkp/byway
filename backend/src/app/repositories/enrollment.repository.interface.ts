@@ -1,9 +1,8 @@
 import { Enrollment } from "../../domain/entities/enrollment.entity";
 import { IEnrollmentWithDetails, ICreateEnrollmentInput, IEnrollmentStats, IGetEnrollmentStatsInput } from "../../domain/types/enrollment.interface";
 
-
 export interface IEnrollmentRepository {
-  create(input: ICreateEnrollmentInput): Promise<IEnrollmentWithDetails[]>;
+  createEnrollments(input: ICreateEnrollmentInput): Promise<IEnrollmentWithDetails[]>;
   findByUserAndCourse(
     userId: string,
     courseId: string

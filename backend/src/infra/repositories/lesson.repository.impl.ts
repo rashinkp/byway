@@ -258,7 +258,7 @@ export class LessonRepository extends GenericRepository<Lesson> implements ILess
     return this.mapToEntity(createdLesson);
   }
 
-  async update(lesson: Lesson): Promise<Lesson> {
+  async update(id: string, lesson: Lesson): Promise<Lesson> {
     const lessonData = lesson.toJSON() as unknown as LessonData;
     const contentData = lessonData.content;
 
@@ -344,10 +344,27 @@ export class LessonRepository extends GenericRepository<Lesson> implements ILess
   }
 
   async delete(id: string): Promise<void> {
-    await this._prisma.lesson.update({
+    return this.deleteGeneric(id);
+  }
+
+  // Additional generic methods
+  async find(filter?: any): Promise<Lesson[]> {
+    return this.findGeneric(filter);
+  }
+
+  async softDelete(id: string): Promise<Lesson> {
+    const deleted = await this._prisma.lesson.update({
       where: { id },
-      data: { deletedAt: new Date() },
+      data: {
+        deletedAt: new Date(),
+        updatedAt: new Date(),
+      },
     });
+    return this.mapToEntity(deleted);
+  }
+
+  async count(filter?: any): Promise<number> {
+    return this.countGeneric(filter);
   }
 
   async deletePermanently(id: string): Promise<void> {

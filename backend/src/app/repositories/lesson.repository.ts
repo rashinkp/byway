@@ -5,20 +5,18 @@ import {
   IPublicLessonFilterOptions,
   IPublicLessonListResponse,
 } from "../../domain/types/lesson.interface";
+import { IGenericRepository } from "./base/generic-repository.interface";
 
-export interface ILessonRepository {
+export interface ILessonRepository extends IGenericRepository<Lesson> {
   getAllLessons(params: ILessonFilterOptions): Promise<ILessonListResponse>;
   getPublicLessons(
     params: IPublicLessonFilterOptions
   ): Promise<IPublicLessonListResponse>;
-  findById(id: string): Promise<Lesson | null>;
   findByCourseIdAndOrder(
     courseId: string,
     order: number
   ): Promise<Lesson | null>;
   findByCourseId(courseId: string): Promise<Lesson[]>;
-  create(lesson: Lesson): Promise<Lesson>;
-  update(lesson: Lesson): Promise<Lesson>;
   deletePermanently(id: string): Promise<void>;
   hasPublishedLessons(courseId: string): Promise<boolean>;
 }

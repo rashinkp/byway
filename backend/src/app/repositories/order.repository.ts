@@ -3,13 +3,13 @@ import { PaymentGateway } from "../../domain/enum/payment-gateway.enum";
 import { Course } from "../../domain/entities/course.entity";
 import { OrderStatus } from "../../domain/enum/order-status.enum";
 import { OrderFilters, PaginatedOrderResult, OrderItemCreation, CourseOrderData } from "../../domain/types/order.interface";
+import { IGenericRepository } from "./base/generic-repository.interface";
 
-export interface IOrderRepository {
+export interface IOrderRepository extends IGenericRepository<Order> {
   findAll(
     userId: string,
     filters: OrderFilters
   ): Promise<PaginatedOrderResult>;
-  findById(id: string): Promise<Order | null>;
   findByPaymentId(paymentId: string): Promise<Order | null>;
   getAllOrders(userId: string): Promise<Order[]>;
   createOrder(
@@ -32,9 +32,6 @@ export interface IOrderRepository {
     include?: Record<string, unknown>;
   }): Promise<Order[]>;
   count(where: Record<string, unknown>): Promise<number>;
-  create(order: Order): Promise<Order>;
-  update(order: Order): Promise<Order>;
-  delete(id: string): Promise<void>;
   createOrderItems(
     orderId: string,
     courses: CourseOrderData[]

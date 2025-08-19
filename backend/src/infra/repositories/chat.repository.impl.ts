@@ -31,7 +31,14 @@ export class ChatRepository extends GenericRepository<Chat> implements IChatRepo
     return entity;
   }
   
-  async findById(id: ChatId): Promise<Chat | null> {
+  // Generic repository method
+  async findById(id: string): Promise<Chat | null> {
+    const chatId = new ChatId(id);  
+    return this.findByIdWithChatId(chatId);
+  }
+
+  // Original method with ChatId
+  async findByIdWithChatId(id: ChatId): Promise<Chat | null> {
     const chat = await this._prisma.chat.findUnique({
       where: { id: id.value },
       include: { messages: true },
@@ -365,6 +372,33 @@ export class ChatRepository extends GenericRepository<Chat> implements IChatRepo
 
   async create(chat: Chat): Promise<Chat> {
     return this.createGeneric(chat);
+  }
+
+  // Additional generic methods
+  async find(filter?: any): Promise<Chat[]> {
+    return this.findGeneric(filter);
+  }
+
+  async update(id: string, chat: Chat): Promise<Chat> {
+    return this.updateGeneric(id, chat);
+  }
+
+  async delete(id: string): Promise<void> {
+    return this.deleteGeneric(id);
+  }
+
+  async softDelete(id: string): Promise<Chat> {
+    const deleted = await this._prisma.chat.update({
+      where: { id },
+      data: {
+        updatedAt: new Date(),
+      },
+    });
+    return this.mapToEntity(deleted);
+  }
+
+  async count(filter?: any): Promise<number> {
+    return this.countGeneric(filter);
   }
 
   async save(chat: Chat): Promise<void> {

@@ -72,9 +72,9 @@ export class WalletRepository extends GenericRepository<Wallet> implements IWall
     );
   }
 
-  async update(wallet: Wallet): Promise<Wallet> {
+  async update(id: string, wallet: Wallet): Promise<Wallet> {
     const updatedWallet = await this._prisma.wallet.update({
-      where: { id: wallet.id },
+      where: { id },
       data: {
         balance: wallet.balance.amount,
         updatedAt: new Date(),
@@ -88,6 +88,29 @@ export class WalletRepository extends GenericRepository<Wallet> implements IWall
       updatedWallet.createdAt,
       updatedWallet.updatedAt
     );
+  }
+
+  // Additional generic methods
+  async find(filter?: any): Promise<Wallet[]> {
+    return this.findGeneric(filter);
+  }
+
+  async delete(id: string): Promise<void> {
+    return this.deleteGeneric(id);
+  }
+
+  async softDelete(id: string): Promise<Wallet> {
+    const deleted = await this._prisma.wallet.update({
+      where: { id },
+      data: {
+        updatedAt: new Date(),
+      },
+    });
+    return this.mapToEntity(deleted);
+  }
+
+  async count(filter?: any): Promise<number> {
+    return this.countGeneric(filter);
   }
 
   async findById(id: string): Promise<Wallet | null> {

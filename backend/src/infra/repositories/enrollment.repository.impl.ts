@@ -3,18 +3,11 @@ import { IEnrollmentRepository } from "../../app/repositories/enrollment.reposit
 import { HttpError } from "../../presentation/http/errors/http-error";
 import { Enrollment } from "../../domain/entities/enrollment.entity";
 import { IEnrollmentWithDetails, ICreateEnrollmentInput, IEnrollmentStats, IGetEnrollmentStatsInput } from "../../domain/types/enrollment.interface";
-import { GenericRepository } from "./base/generic.repository";
 
-export class EnrollmentRepository extends GenericRepository<Enrollment> implements IEnrollmentRepository {
-  constructor(private _prisma: PrismaClient) {
-    super(_prisma, 'enrollment');
-  }
+export class EnrollmentRepository implements IEnrollmentRepository {
+  constructor(private _prisma: PrismaClient) {}
 
-  protected getPrismaModel() {
-    return this._prisma.enrollment;
-  }
-
-  protected mapToEntity(enrollment: any): Enrollment {
+  private mapToEntity(enrollment: any): Enrollment {
     return Enrollment.fromPersistence({
       userId: enrollment.userId,
       courseId: enrollment.courseId,
@@ -22,19 +15,6 @@ export class EnrollmentRepository extends GenericRepository<Enrollment> implemen
       orderItemId: enrollment.orderItemId,
       accessStatus: enrollment.accessStatus,
     });
-  }
-
-  protected mapToPrismaData(entity: any): any {
-    if (entity instanceof Enrollment) {
-      return {
-        userId: entity.userId,
-        courseId: entity.courseId,
-        enrolledAt: entity.enrolledAt,
-        orderItemId: entity.orderItemId,
-        accessStatus: entity.accessStatus,
-      };
-    }
-    return entity;
   }
 
   async findByUserAndCourse(
@@ -58,7 +38,7 @@ export class EnrollmentRepository extends GenericRepository<Enrollment> implemen
     }
   }
 
-  async create(
+  async createEnrollments(
     input: ICreateEnrollmentInput
   ): Promise<IEnrollmentWithDetails[]> {
     const enrollments = await Promise.all(
@@ -90,6 +70,8 @@ export class EnrollmentRepository extends GenericRepository<Enrollment> implemen
     );
     return enrollments;
   }
+
+
 
   async updateAccessStatus(
     userId: string,

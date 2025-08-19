@@ -56,6 +56,47 @@ export class UserRepository extends GenericRepository<User> implements IUserRepo
     return entity;
   }
 
+  // Generic repository methods required by IUserRepository (extends IGenericRepository<User>)
+  async create(user: User): Promise<User> {
+    return this.createGeneric(user);
+  }
+
+  async findById(id: string): Promise<User | null> {
+    const user = await this._prisma.user.findUnique({
+      where: { id },
+      include: { userProfile: true },
+    });
+    if (!user) return null;
+    return this.mapToEntity(user);
+  }
+
+  async find(filter?: any): Promise<User[]> {
+    return this.findGeneric(filter);
+  }
+
+  async update(id: string, user: User): Promise<User> {
+    return this.updateGeneric(id, user);
+  }
+
+  async delete(id: string): Promise<void> {
+    return this.deleteGeneric(id);
+  }
+
+  async softDelete(id: string): Promise<User> {
+    const deleted = await this._prisma.user.update({
+      where: { id },
+      data: {
+        deletedAt: new Date(),
+        updatedAt: new Date(),
+      },
+    });
+    return this.mapToEntity(deleted);
+  }
+
+  async count(filter?: any): Promise<number> {
+    return this.countGeneric(filter);
+  }
+
   async findAll(input: PaginationFilter): Promise<PaginatedResult<User>> {
     const {
       page = 1,
@@ -102,15 +143,6 @@ export class UserRepository extends GenericRepository<User> implements IUserRepo
       total,
       totalPage: Math.ceil(total / limit),
     };
-  }
-
-  async findById(id: string): Promise<User | null> {
-    const user = await this._prisma.user.findUnique({
-      where: { id },
-      include: { userProfile: true },
-    });
-    if (!user) return null;
-    return this.mapToEntity(user);
   }
 
   async updateUser(user: User): Promise<User> {

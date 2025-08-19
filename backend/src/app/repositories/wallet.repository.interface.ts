@@ -1,8 +1,6 @@
 import { Wallet } from "../../domain/entities/wallet.entity";
+import { IGenericRepository } from "./base/generic-repository.interface";
 
-export interface IWalletRepository {
+export interface IWalletRepository extends IGenericRepository<Wallet> {
   findByUserId(userId: string): Promise<Wallet | null>;
-  create(wallet: Wallet): Promise<Wallet>;
-  update(wallet: Wallet): Promise<Wallet>;
-  findById(id: string): Promise<Wallet | null>;
 } 

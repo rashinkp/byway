@@ -1,10 +1,9 @@
 import { Certificate } from "../../domain/entities/certificate.entity";
 import { Course } from "../../domain/entities/course.entity";
 import { User } from "../../domain/entities/user.entity";
+import { IGenericRepository } from "./base/generic-repository.interface";
 
-export interface CertificateRepositoryInterface {
-  create(certificate: Certificate): Promise<Certificate>;
-  findById(id: string): Promise<Certificate | null>;
+export interface CertificateRepositoryInterface extends IGenericRepository<Certificate> {
   findByCertificateNumber(
     certificateNumber: string
   ): Promise<Certificate | null>;
@@ -14,7 +13,6 @@ export interface CertificateRepositoryInterface {
     userId: string,
     courseId: string
   ): Promise<Certificate | null>;
-  update(certificate: Certificate): Promise<Certificate>;
   deleteById(id: string): Promise<void>;
   findManyByUserId(options: {
     userId: string;

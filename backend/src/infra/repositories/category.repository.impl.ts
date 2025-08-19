@@ -36,6 +36,38 @@ export class CategoryRepository extends GenericRepository<Category> implements I
     return this.findByIdGeneric(id);
   }
 
+  // Generic repository methods
+  async create(category: Category): Promise<Category> {
+    return this.createGeneric(category);
+  }
+
+  async find(filter?: any): Promise<Category[]> {
+    return this.findGeneric(filter);
+  }
+
+  async update(id: string, category: Category): Promise<Category> {
+    return this.updateGeneric(id, category);
+  }
+
+  async delete(id: string): Promise<void> {
+    return this.deleteGeneric(id);
+  }
+
+  async softDelete(id: string): Promise<Category> {
+    const deleted = await this._prisma.category.update({
+      where: { id },
+      data: {
+        deletedAt: new Date(),
+        updatedAt: new Date(),
+      },
+    });
+    return this.mapToEntity(deleted);
+  }
+
+  async count(filter?: any): Promise<number> {
+    return this.countGeneric(filter);
+  }
+
   async save(category: Category): Promise<Category> {
     const data = {
       id: category.id,

@@ -2,7 +2,6 @@ import { PrismaClient } from "@prisma/client";
 import { User } from "../../domain/entities/user.entity";
 import { UserVerification } from "../../domain/entities/user-verification.entity";
 import { IAuthRepository } from "../../app/repositories/auth.repository";
-import { AuthProvider, Role } from "@prisma/client";
 import { GenericRepository } from "./base/generic.repository";
 
 export class AuthRepository extends GenericRepository<User> implements IAuthRepository {
@@ -72,6 +71,42 @@ export class AuthRepository extends GenericRepository<User> implements IAuthRepo
 
   async createUser(user: User): Promise<User> {
     return this.createGeneric(user);
+  }
+
+  // Generic repository methods
+  async create(user: User): Promise<User> {
+    return this.createGeneric(user);
+  }
+
+  async findById(id: string): Promise<User | null> {
+    return this.findByIdGeneric(id);
+  }
+
+  async find(filter?: any): Promise<User[]> {
+    return this.findGeneric(filter);
+  }
+
+  async update(id: string, user: User): Promise<User> {
+    return this.updateGeneric(id, user);
+  }
+
+  async delete(id: string): Promise<void> {
+    return this.deleteGeneric(id);
+  }
+
+  async softDelete(id: string): Promise<User> {
+    const deleted = await this._prisma.user.update({
+      where: { id },
+      data: {
+        deletedAt: new Date(),
+        updatedAt: new Date(),
+      },
+    });
+    return this.mapToEntity(deleted);
+  }
+
+  async count(filter?: any): Promise<number> {
+    return this.countGeneric(filter);
   }
 
   async createVerification(

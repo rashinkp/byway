@@ -49,7 +49,14 @@ export class MessageRepository extends GenericRepository<Message> implements IMe
     return entity;
   }
   
-  async findById(id: MessageId): Promise<Message | null> {
+  // Generic repository method
+  async findById(id: string): Promise<Message | null> {
+    const messageId = new MessageId(id);
+    return this.findByIdWithMessageId(messageId);
+  }
+
+  // Original method with MessageId
+  async findByIdWithMessageId(id: MessageId): Promise<Message | null> {
     const message = await this._prisma.message.findUnique({
       where: { id: id.value },
     });
@@ -175,8 +182,8 @@ export class MessageRepository extends GenericRepository<Message> implements IMe
     };
   }
 
-  async create(message: Message): Promise<void> {
-    await this._prisma.message.create({
+  async create(message: Message): Promise<Message> {
+    const created = await this._prisma.message.create({
       data: {
         chatId: message.chatId.value,
         senderId: message.senderId.value,
@@ -188,6 +195,7 @@ export class MessageRepository extends GenericRepository<Message> implements IMe
         createdAt: message.createdAt.value,
       },
     });
+    return this.mapToEntity(created);
   }
 
   async save(message: Message): Promise<void> {
@@ -203,8 +211,34 @@ export class MessageRepository extends GenericRepository<Message> implements IMe
     });
   }
 
-  async delete(id: MessageId): Promise<void> {
+  async delete(id: string): Promise<void> {
+    return this.deleteGeneric(id);
+  }
+
+  async deleteWithMessageId(id: MessageId): Promise<void> {
     await this._prisma.message.delete({ where: { id: id.value } });
+  }
+
+  // Additional generic methods
+  async find(filter?: any): Promise<Message[]> {
+    return this.findGeneric(filter);
+  }
+
+  async update(id: string, message: Message): Promise<Message> {
+    return this.updateGeneric(id, message);
+  }
+
+  async softDelete(id: string): Promise<Message> {
+    // Messages don't have soft delete, so we'll just return the message
+    const message = await this._prisma.message.findUnique({
+      where: { id },
+    });
+    if (!message) throw new Error('Message not found');
+    return this.mapToEntity(message);
+  }
+
+  async count(filter?: any): Promise<number> {
+    return this.countGeneric(filter);
   }
 
   async markAllAsRead(chatId: ChatId, userId: UserId): Promise<number> {

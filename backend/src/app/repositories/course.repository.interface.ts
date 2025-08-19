@@ -4,14 +4,12 @@ import { IGetTopEnrolledCoursesInput } from "../usecases/course/interfaces/top-e
 import { CourseOverallStats, CourseStats } from "../../domain/types/course-stats.interface";
 import { CourseStatsInput, CourseWithEnrollment } from "../../domain/types/course.interface";
 import { FilterCourse, PaginatedResult } from "../../domain/types/pagination-filter.interface";
+import { IGenericRepository } from "./base/generic-repository.interface";
 
-export interface ICourseRepository {
+export interface ICourseRepository extends IGenericRepository<Course> {
   save(course: Course): Promise<Course>;
-  findById(id: string): Promise<Course | null>;
   findByName(title: string): Promise<Course | null>;
   findAll(input: FilterCourse): Promise<PaginatedResult<CourseWithEnrollment>>;
-  update(course: Course): Promise<Course>;
-  softDelete(course: Course): Promise<Course>;
   findEnrolledCourses(
     input: FilterCourse
   ): Promise<PaginatedResult<CourseWithEnrollment>>;

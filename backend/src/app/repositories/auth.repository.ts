@@ -1,7 +1,8 @@
 import { UserVerification } from "../../domain/entities/user-verification.entity";
 import { User } from "../../domain/entities/user.entity";
+import { IGenericRepository } from "./base/generic-repository.interface";
 
-export interface IAuthRepository {
+export interface IAuthRepository extends IGenericRepository<User> {
   findUserByEmail(email: string): Promise<User | null>;
   findUserByGoogleId(googleId: string): Promise<User | null>;
   findUserByFacebookId(facebookId: string): Promise<User | null>;
