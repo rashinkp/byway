@@ -8,7 +8,7 @@ import { cn } from "@/utils/cn";
 import ErrorDisplay from "@/components/ErrorDisplay";
 
 interface FileUploadProps {
-	onUploadComplete: (fileUrl: string) => void;
+	onUploadComplete: (key: string) => void;
 	onUploadError?: (error: string) => void;
 	accept?: string;
 	maxSize?: number; // in bytes
@@ -36,7 +36,6 @@ export function FileUpload({
 			const file = event.target.files?.[0];
 			if (!file) return;
 
-			// Validate file size
 			if (file.size > maxSize) {
 				const errorMessage = `File size exceeds ${maxSize / (1024 * 1024)}MB limit`;
 				onUploadError?.(errorMessage);
@@ -44,8 +43,8 @@ export function FileUpload({
 			}
 
 			try {
-				const fileUrl = await uploadFile(file);
-				onUploadComplete(fileUrl);
+				const key = await uploadFile(file);
+				onUploadComplete(key);
 			} catch (err) {
 				onUploadError?.(err instanceof Error ? err.message : "Upload failed");
 			}

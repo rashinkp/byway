@@ -27,8 +27,7 @@ export class UpdateUserUseCase implements IUpdateUserUseCase {
     if (
       dto.avatar &&
       user.avatar &&
-      dto.avatar !== user.avatar &&
-      user.avatar.includes(".s3.")
+      dto.avatar !== user.avatar
     ) {
       try {
         await this._s3Service.deleteFile(user.avatar);

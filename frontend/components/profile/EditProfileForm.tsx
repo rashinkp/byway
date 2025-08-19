@@ -16,29 +16,29 @@ export default function EditProfileForm({
 
 	const handleSubmit = async (data: z.infer<typeof profileSchema>) => {
 		if (isUpdating) return; // Prevent double submission
-		let avatarUrl: string | undefined;
+		let avatarKey: string | undefined;
 
 		// If avatar is a File, upload to S3
 		if (data.avatar instanceof File) {
 			try {
-				const { uploadUrl, fileUrl } = await getProfilePresignedUrl(
+				const { uploadUrl, key } = await getProfilePresignedUrl(
 					data.avatar.name,
 					data.avatar.type,
 					user?.id || '',
 				);
 				await uploadFileToS3(data.avatar, uploadUrl);
-				avatarUrl = fileUrl; // Set the S3 URL
+				avatarKey = key; // Store the S3 key
 			} catch {
 				throw new Error("Failed to upload profile picture");
 			}
 		} else {
-			// If avatar is a string (URL or empty), use it directly
-			avatarUrl = typeof data.avatar === "string" ? data.avatar : undefined;
+			// If avatar is a string (existing key or empty), use it directly
+			avatarKey = typeof data.avatar === "string" ? data.avatar : undefined;
 		}
 
 		const transformedData = {
 			...data,
-			avatar: avatarUrl, // Ensure avatar is string | undefined
+			avatar: avatarKey, // Ensure avatar stores the key
 			skills:
 				typeof data.skills === "string" && data.skills
 					? data.skills

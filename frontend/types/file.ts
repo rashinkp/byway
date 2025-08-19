@@ -1,6 +1,6 @@
-export interface PresignedUrlResponse {
+export interface PresignedPutResponse {
   uploadUrl: string;
-  fileUrl: string;
+  key: string;
 }
 
 export interface GeneratePresignedUrlParams {
@@ -13,4 +13,9 @@ export interface GeneratePresignedUrlParams {
     certificateId?: string;
     contentType?: 'thumbnail' | 'video' | 'document' | 'avatar' | 'cv';
   };
+  fileSize?: number;
+}
+
+export interface PresignedGetResponse {
+  signedUrl: string;
 }
