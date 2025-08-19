@@ -1,4 +1,4 @@
-import { PrismaClient, Order as PrismaOrder, OrderItem as PrismaOrderItem, Course as PrismaCourse } from "@prisma/client";
+import { PrismaClient } from "@prisma/client";
 import { IOrderRepository } from "../../app/repositories/order.repository";
 import { Order } from "../../domain/entities/order.entity";
 import { Course } from "../../domain/entities/course.entity";
@@ -6,9 +6,37 @@ import { OrderStatus } from "../../domain/enum/order-status.enum";
 import { PaymentStatus } from "../../domain/enum/payment-status.enum";
 import { PaymentGateway } from "../../domain/enum/payment-gateway.enum";
 import { OrderFilters, PaginatedOrderResult, OrderItemCreation, CourseOrderData } from "../../domain/types/order.interface";
+import { GenericRepository } from "./base/generic.repository";
 
-export class OrderRepository implements IOrderRepository {
-  constructor(private _prisma: PrismaClient) {}
+export class OrderRepository extends GenericRepository<Order> implements IOrderRepository {
+  constructor(private _prisma: PrismaClient) {
+    super(_prisma, 'order');
+  }
+
+  protected getPrismaModel() {
+    return this._prisma.order;
+  }
+
+  protected mapToEntity(order: any): Order {
+    return this.mapToOrderEntity(order);
+  }
+
+  protected mapToPrismaData(entity: any): any {
+    if (entity instanceof Order) {
+      return {
+        userId: entity.userId,
+        orderStatus: entity.status,
+        paymentStatus: entity.paymentStatus,
+        paymentId: entity.paymentIntentId,
+        paymentGateway: entity.paymentGateway,
+        amount: entity.totalAmount,
+        couponCode: entity.couponCode,
+        createdAt: entity.createdAt,
+        updatedAt: entity.updatedAt,
+      };
+    }
+    return entity;
+  }
 
   async findAll(
     userId: string,

@@ -13,8 +13,44 @@ import { IGetTopEnrolledCoursesInput } from "../../app/usecases/course/interface
 import { CourseOverallStats, CourseStats } from "../../domain/types/course-stats.interface";import { FilterCourse, PaginatedResult } from "../../domain/types/pagination-filter.interface";
 import { CourseStatsInput, CourseWithEnrollment } from "../../domain/types/course.interface";
 import { UserProfile } from "../../domain/entities/user-profile.entity";
-export class CourseRepository implements ICourseRepository {
-  constructor(private _prisma: PrismaClient) {}
+import { GenericRepository } from "./base/generic.repository";
+export class CourseRepository extends GenericRepository<Course> implements ICourseRepository {
+  constructor(private _prisma: PrismaClient) {
+    super(_prisma, 'course');
+  }
+
+  protected getPrismaModel() {
+    return this._prisma.course;
+  }
+
+  protected mapToEntity(course: any): Course {
+    return Course.fromPersistence(course);
+  }
+
+  protected mapToPrismaData(entity: any): any {
+    if (entity instanceof Course) {
+      return {
+        id: entity.id,
+        title: entity.title,
+        description: entity.description,
+        level: entity.level,
+        price: entity.price?.getValue(),
+        thumbnail: entity.thumbnail,
+        duration: entity.duration?.getValue(),
+        offer: entity.offer?.getValue(),
+        status: entity.status,
+        categoryId: entity.categoryId,
+        createdBy: entity.createdBy,
+        createdAt: entity.createdAt,
+        updatedAt: entity.updatedAt,
+        deletedAt: entity.deletedAt,
+        approvalStatus: entity.approvalStatus,
+        adminSharePercentage: entity.adminSharePercentage,
+        details: entity.details,
+      };
+    }
+    return entity;
+  }
 
   private async transformCourseToEnrollmentData(
     course: Course,
@@ -92,76 +128,7 @@ export class CourseRepository implements ICourseRepository {
   }
 
   async save(course: Course): Promise<Course> {
-    try {
-      const data: Prisma.CourseCreateInput = {
-        id: course.id,
-        title: course.title,
-        description: course.description,
-        level: course.level,
-        price: course.price?.getValue(),
-        thumbnail: course.thumbnail,
-        duration: course.duration?.getValue()
-          ? Number(course.duration.getValue())
-          : null,
-        offer: course.offer?.getValue(),
-        status: course.status,
-        adminSharePercentage: course.adminSharePercentage,
-        category: {
-          connect: { id: course.categoryId },
-        },
-        creator: {
-          connect: { id: course.createdBy },
-        },
-        createdAt: course.createdAt,
-        updatedAt: course.updatedAt,
-        deletedAt: course.deletedAt,
-        approvalStatus: course.approvalStatus,
-        details: course.details
-          ? {
-              create: {
-                prerequisites: course.details.prerequisites,
-                longDescription: course.details.longDescription,
-                objectives: course.details.objectives,
-                targetAudience: course.details.targetAudience,
-              },
-            }
-          : undefined,
-      };
-
-      const saved = await this._prisma.course.create({
-        data,
-        include: { details: true },
-      });
-
-      return new Course({
-        id: saved.id,
-        title: saved.title,
-        description: saved.description,
-        level: saved.level as CourseLevel,
-        price: saved.price ? Price.create(saved.price.toNumber()) : null,
-        thumbnail: saved.thumbnail,
-        duration: saved.duration ? Duration.create(saved.duration) : null,
-        offer: saved.offer ? Offer.create(saved.offer.toNumber()) : null,
-        status: saved.status as CourseStatus,
-        categoryId: saved.categoryId,
-        createdBy: saved.createdBy,
-        createdAt: saved.createdAt,
-        updatedAt: saved.updatedAt,
-        deletedAt: saved.deletedAt,
-        approvalStatus: saved.approvalStatus as APPROVALSTATUS,
-        adminSharePercentage: saved.adminSharePercentage.toNumber(),
-        details: saved.details
-          ? new CourseDetails({
-              prerequisites: saved.details.prerequisites,
-              longDescription: saved.details.longDescription,
-              objectives: saved.details.objectives,
-              targetAudience: saved.details.targetAudience,
-            })
-          : null,
-      });
-    } catch {
-      throw new HttpError("Failed to save course", 500);
-    }
+    return this.createGeneric(course);
   }
   async findById(id: string): Promise<Course | null> {
     try {
@@ -173,35 +140,8 @@ export class CourseRepository implements ICourseRepository {
       });
 
       if (!course) return null;
-
-      return new Course({
-        id: course.id,
-        title: course.title,
-        description: course.description,
-        level: course.level as CourseLevel,
-        price: course.price ? Price.create(course.price.toNumber()) : null,
-        thumbnail: course.thumbnail,
-        duration: course.duration ? Duration.create(course.duration) : null,
-        offer: course.offer ? Offer.create(course.offer.toNumber()) : null,
-        status: course.status as CourseStatus,
-        categoryId: course.categoryId,
-        createdBy: course.createdBy,
-        createdAt: course.createdAt,
-        updatedAt: course.updatedAt,
-        deletedAt: course.deletedAt,
-        approvalStatus: course.approvalStatus as APPROVALSTATUS,
-        adminSharePercentage: course.adminSharePercentage.toNumber(),
-        details: course.details
-          ? new CourseDetails({
-              prerequisites: course.details.prerequisites,
-              longDescription: course.details.longDescription,
-              objectives: course.details.objectives,
-              targetAudience: course.details.targetAudience,
-            })
-          : null,
-      });
+      return this.mapToEntity(course);
     } catch {
-   
       throw new HttpError("Failed to retrieve course", 500);
     }
   }
@@ -214,34 +154,8 @@ export class CourseRepository implements ICourseRepository {
       });
 
       if (!course) return null;
-
-      return new Course({
-        id: course.id,
-        title: course.title,
-        description: course.description,
-        level: course.level as CourseLevel,
-        price: course.price ? Price.create(course.price.toNumber()) : null,
-        thumbnail: course.thumbnail,
-        duration: course.duration ? Duration.create(course.duration) : null,
-        offer: course.offer ? Offer.create(course.offer.toNumber()) : null,
-        status: course.status as CourseStatus,
-        categoryId: course.categoryId,
-        createdBy: course.createdBy,
-        createdAt: course.createdAt,
-        updatedAt: course.updatedAt,
-        deletedAt: course.deletedAt,
-        approvalStatus: course.approvalStatus as APPROVALSTATUS,
-        details: course.details
-          ? new CourseDetails({
-              prerequisites: course.details.prerequisites,
-              longDescription: course.details.longDescription,
-              objectives: course.details.objectives,
-              targetAudience: course.details.targetAudience,
-            })
-          : null,
-      });
+      return this.mapToEntity(course);
     } catch {
-    
       throw new HttpError("Failed to retrieve course", 500);
     }
   }

@@ -2,6 +2,7 @@ import { PrismaClient } from "@prisma/client";
 import { CourseReview } from "../../domain/entities/review.entity";
 import { ICourseReviewRepository } from "../../app/repositories/course-review.repository.interface";
 import { ICourseReviewWithUser, ICourseReviewSummary, ICourseReviewQuery, ICourseReviewPaginatedResult } from "../../domain/types/review.interface";
+import { GenericRepository } from "./base/generic.repository";
 
 
 function toCourseReviewWithUser(data: {
@@ -40,8 +41,34 @@ function toCourseReviewWithUser(data: {
   };
 }
 
-export class CourseReviewRepository implements ICourseReviewRepository {
-  constructor(private _prisma: PrismaClient) {}
+export class CourseReviewRepository extends GenericRepository<CourseReview> implements ICourseReviewRepository {
+  constructor(private _prisma: PrismaClient) {
+    super(_prisma, 'courseReview');
+  }
+
+  protected getPrismaModel() {
+    return this._prisma.courseReview;
+  }
+
+  protected mapToEntity(review: any): CourseReview {
+    return CourseReview.fromPersistence(review);
+  }
+
+  protected mapToPrismaData(entity: any): any {
+    if (entity instanceof CourseReview) {
+      return {
+        courseId: entity.courseId,
+        userId: entity.userId,
+        rating: entity.rating.value,
+        title: entity.title,
+        comment: entity.comment,
+        createdAt: entity.createdAt,
+        updatedAt: entity.updatedAt,
+        deletedAt: entity.deletedAt,
+      };
+    }
+    return entity;
+  }
 
   async save(review: CourseReview): Promise<CourseReview> {
     const created = await this._prisma.courseReview.create({
@@ -60,8 +87,7 @@ export class CourseReviewRepository implements ICourseReviewRepository {
   }
 
   async findById(id: string): Promise<CourseReview | null> {
-    const found = await this._prisma.courseReview.findUnique({ where: { id } });
-    return found ? CourseReview.fromPersistence(found) : null;
+    return this.findByIdGeneric(id);
   }
 
   async update(review: CourseReview): Promise<CourseReview> {

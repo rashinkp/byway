@@ -3,9 +3,60 @@ import { LessonProgress } from "../../domain/entities/progress.entity";
 import { ILessonProgressRepository } from "../../app/repositories/lesson-progress.repository.interface";
 import { HttpError } from "../../presentation/http/errors/http-error";
 import { QuizAnswer } from "../../domain/entities/quiz-answer.entity";
+import { GenericRepository } from "./base/generic.repository";
 
-export class LessonProgressRepository implements ILessonProgressRepository {
-  constructor(private readonly _prisma: PrismaClient) {}
+export class LessonProgressRepository extends GenericRepository<LessonProgress> implements ILessonProgressRepository {
+  constructor(private readonly _prisma: PrismaClient) {
+    super(_prisma, 'lessonProgress');
+  }
+
+  protected getPrismaModel() {
+    return this._prisma.lessonProgress;
+  }
+
+  protected mapToEntity(progress: any): LessonProgress {
+    return LessonProgress.fromPersistence({
+      id: progress.id,
+      enrollmentId: progress.enrollmentId,
+      courseId: progress.courseId,
+      lessonId: progress.lessonId,
+      completed: progress.completed,
+      completedAt: progress.completedAt,
+      score: progress.score ?? undefined,
+      totalQuestions: progress.totalQuestions ?? undefined,
+      answers: progress.answers?.map((answer: any) =>
+        QuizAnswer.fromPersistence({
+          id: answer.id,
+          lessonProgressId: answer.lessonProgressId,
+          quizQuestionId: answer.quizQuestionId,
+          selectedAnswer: answer.selectedAnswer,
+          isCorrect: answer.isCorrect,
+          createdAt: answer.createdAt,
+          updatedAt: answer.updatedAt,
+        })
+      ) || [],
+      createdAt: progress.createdAt,
+      updatedAt: progress.updatedAt,
+    });
+  }
+
+  protected mapToPrismaData(entity: any): any {
+    if (entity instanceof LessonProgress) {
+      const data = entity.toJSON();
+      return {
+        enrollmentId: data.enrollmentId,
+        courseId: data.courseId,
+        lessonId: data.lessonId,
+        completed: data.completed,
+        completedAt: data.completedAt,
+        score: data.score ?? undefined,
+        totalQuestions: data.totalQuestions ?? undefined,
+        createdAt: data.createdAt,
+        updatedAt: data.updatedAt,
+      };
+    }
+    return entity;
+  }
 
   async save(progress: LessonProgress): Promise<LessonProgress> {
     const data = progress.toJSON();

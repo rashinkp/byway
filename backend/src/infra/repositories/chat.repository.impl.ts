@@ -4,9 +4,32 @@ import { ChatId } from "../../domain/value-object/ChatId";
 import { UserId } from "../../domain/value-object/UserId";
 import { PrismaClient } from "@prisma/client";
 import { Role } from "../../domain/enum/role.enum";
+import { GenericRepository } from "./base/generic.repository";
 
-export class ChatRepository implements IChatRepository {
-  constructor(private _prisma: PrismaClient) { }
+export class ChatRepository extends GenericRepository<Chat> implements IChatRepository {
+  constructor(private _prisma: PrismaClient) {
+    super(_prisma, 'chat');
+  }
+
+  protected getPrismaModel() {
+    return this._prisma.chat;
+  }
+
+  protected mapToEntity(chat: any): Chat {
+    return Chat.fromPersistence(chat);
+  }
+
+  protected mapToPrismaData(entity: any): any {
+    if (entity instanceof Chat) {
+      return {
+        user1Id: entity.user1Id.value,
+        user2Id: entity.user2Id.value,
+        createdAt: entity.createdAt?.toString(),
+        updatedAt: entity.updatedAt?.toString(),
+      };
+    }
+    return entity;
+  }
   
   async findById(id: ChatId): Promise<Chat | null> {
     const chat = await this._prisma.chat.findUnique({
@@ -14,7 +37,7 @@ export class ChatRepository implements IChatRepository {
       include: { messages: true },
     });
     if (!chat) return null;
-    return Chat.fromPersistence(chat);
+    return this.mapToEntity(chat);
   }
 
   async findByUser(userId: UserId): Promise<Chat[]> {
@@ -24,7 +47,7 @@ export class ChatRepository implements IChatRepository {
       },
       include: { messages: true },
     });
-    return chats.map((c) => Chat.fromPersistence(c));
+    return chats.map((c) => this.mapToEntity(c));
   }
 
   async findEnhancedChatList(
@@ -341,16 +364,7 @@ export class ChatRepository implements IChatRepository {
   }
 
   async create(chat: Chat): Promise<Chat> {
-
-    const created = await this._prisma.chat.create({
-      data: {
-        user1Id: chat.user1Id.value,
-        user2Id: chat.user2Id.value,
-        createdAt: chat.createdAt?.toString(),
-        updatedAt: chat.updatedAt?.toString(),
-      },
-    });
-    return Chat.fromPersistence(created);
+    return this.createGeneric(chat);
   }
 
   async save(chat: Chat): Promise<void> {
@@ -376,7 +390,7 @@ export class ChatRepository implements IChatRepository {
       include: { messages: true },
     });
 
-    return chat ? Chat.fromPersistence(chat) : null;
+    return chat ? this.mapToEntity(chat) : null;
   }
 
   // Conversion handled by Chat.fromPersistence

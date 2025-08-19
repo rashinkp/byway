@@ -8,9 +8,46 @@ import { Timestamp } from "../../domain/value-object/Timestamp";
 import { IMessageWithUserData } from "../../domain/types/message.interface";
 import { MessageType as DomainMessageType, MessageType } from "../../domain/enum/Message-type.enum";
 import { MessageType as PrismaMessageType, PrismaClient } from "@prisma/client";
+import { GenericRepository } from "./base/generic.repository";
 
-export class MessageRepository implements IMessageRepository {
-  constructor(private _prisma: PrismaClient) { }
+export class MessageRepository extends GenericRepository<Message> implements IMessageRepository {
+  constructor(private _prisma: PrismaClient) {
+    super(_prisma, 'message');
+  }
+
+  protected getPrismaModel() {
+    return this._prisma.message;
+  }
+
+  protected mapToEntity(message: any): Message {
+    return Message.fromPersistence(message as unknown as {
+      chatId: string;
+      senderId: string;
+      content: string | null;
+      imageUrl: string | null;
+      audioUrl: string | null;
+      type: string;
+      isRead: boolean;
+      createdAt: Date;
+      id?: string;
+    });
+  }
+
+  protected mapToPrismaData(entity: any): any {
+    if (entity instanceof Message) {
+      return {
+        chatId: entity.chatId,
+        senderId: entity.senderId,
+        content: entity.content || null,
+        imageUrl: entity.imageUrl || null,
+        audioUrl: entity.audioUrl || null,
+        type: entity.type as PrismaMessageType,
+        isRead: entity.isRead,
+        createdAt: entity.createdAt,
+      };
+    }
+    return entity;
+  }
   
   async findById(id: MessageId): Promise<Message | null> {
     const message = await this._prisma.message.findUnique({

@@ -2,12 +2,11 @@ import { PrismaClient } from "@prisma/client";
 import { ContentStatus, ContentType } from "../../domain/enum/content.enum";
 import {
   LessonContent,
-  QuizQuestion,
 } from "../../domain/entities/content.entity";
 import { ILessonContentRepository } from "../../app/repositories/content.repository";
+import { GenericRepository } from "./base/generic.repository";
 
-// Type definitions for content data
-interface ContentData {
+export interface ContentData {
   id?: string;
   lessonId: string;
   type: ContentType;
@@ -22,15 +21,76 @@ interface ContentData {
   deletedAt: string | Date | null;
 }
 
-interface QuizQuestionData {
+export interface QuizQuestionData {
   id?: string;
   question: string;
   options: string[];
   correctAnswer: string;
 }
 
-export class LessonContentRepository implements ILessonContentRepository {
-  constructor(private readonly _prisma: PrismaClient) {}
+export class LessonContentRepository extends GenericRepository<LessonContent> implements ILessonContentRepository {
+  constructor(private readonly _prisma: PrismaClient) {
+    super(_prisma, 'lessonContent');
+  }
+
+  protected getPrismaModel() {
+    return this._prisma.lessonContent;
+  }
+
+  protected mapToEntity(content: any): LessonContent {
+    return LessonContent.fromPersistence({
+      id: content.id,
+      lessonId: content.lessonId,
+      type: content.type as ContentType,
+      status: content.status as ContentStatus,
+      title: content.title,
+      description: content.description,
+      fileUrl: content.fileUrl,
+      thumbnailUrl: content.thumbnailUrl,
+      quizQuestions: content.quizQuestions
+        ? content.quizQuestions.map((q: any) => ({
+            id: q.id,
+            question: q.question,
+            options: q.options,
+            correctAnswer: q.correctAnswer,
+          }))
+        : null,
+      createdAt: content.createdAt,
+      updatedAt: content.updatedAt,
+      deletedAt: content.deletedAt,
+    });
+  }
+
+  protected mapToPrismaData(entity: any): any {
+    if (entity instanceof LessonContent) {
+      const contentData = entity.toJSON() as unknown as ContentData;
+      return {
+        lessonId: contentData.lessonId,
+        type: contentData.type,
+        status: contentData.status,
+        title: contentData.title,
+        description: contentData.description,
+        fileUrl: contentData.fileUrl,
+        thumbnailUrl: contentData.thumbnailUrl,
+        quizQuestions: contentData.quizQuestions
+          ? {
+              create: contentData.quizQuestions.map((q: QuizQuestionData) => ({
+                id: q.id || undefined,
+                question: q.question,
+                options: q.options,
+                correctAnswer: q.correctAnswer,
+              })),
+            }
+          : undefined,
+        createdAt: new Date(contentData.createdAt),
+        updatedAt: new Date(contentData.updatedAt),
+        deletedAt: contentData.deletedAt
+          ? new Date(contentData.deletedAt)
+          : null,
+      };
+    }
+    return entity;
+  }
 
   private mapToLessonContentEntity(content: {
     id: string;

@@ -2,12 +2,45 @@ import { CertificateRepositoryInterface } from "../../app/repositories/certifica
 import { Certificate, CertificateMetadata } from "../../domain/entities/certificate.entity";
 import { PrismaClient } from "@prisma/client";
 import { CertificateStatus } from "../../domain/enum/certificate-status.enum";
+import { GenericRepository } from "./base/generic.repository";
 
 // Type for Prisma JSON operations
 type PrismaJsonValue = string | number | boolean | null | PrismaJsonValue[] | { [key: string]: PrismaJsonValue };
 
-export class PrismaCertificateRepository implements CertificateRepositoryInterface {
-  constructor(private readonly _prisma: PrismaClient) {}
+export class PrismaCertificateRepository extends GenericRepository<Certificate> implements CertificateRepositoryInterface {
+  constructor(private readonly _prisma: PrismaClient) {
+    super(_prisma, 'certificate');
+  }
+
+  protected getPrismaModel() {
+    return this._prisma.certificate;
+  }
+
+  protected mapToEntity(certificate: any): Certificate {
+    return Certificate.fromPersistence({
+      ...certificate,
+      metadata: certificate.metadata as CertificateMetadata | undefined
+    });
+  }
+
+  protected mapToPrismaData(entity: any): any {
+    if (entity instanceof Certificate) {
+      return {
+        userId: entity.userId,
+        courseId: entity.courseId,
+        enrollmentId: entity.enrollmentId,
+        certificateNumber: entity.certificateNumber,
+        status: entity.status,
+        issuedAt: entity.issuedAt,
+        expiresAt: entity.expiresAt,
+        pdfUrl: entity.pdfUrl,
+        metadata: entity.metadata as PrismaJsonValue ?? undefined,
+        createdAt: entity.createdAt,
+        updatedAt: entity.updatedAt,
+      };
+    }
+    return entity;
+  }
 
   async create(certificate: Certificate): Promise<Certificate> {
     const created = await this._prisma.certificate.create({
@@ -32,11 +65,7 @@ export class PrismaCertificateRepository implements CertificateRepositoryInterfa
   }
 
   async findById(id: string): Promise<Certificate | null> {
-    const found = await this._prisma.certificate.findUnique({ where: { id } });
-    return found ? Certificate.fromPersistence({
-      ...found,
-      metadata: found.metadata as CertificateMetadata | undefined
-    }) : null;
+    return this.findByIdGeneric(id);
   }
 
   async findByCertificateNumber(
@@ -56,10 +85,7 @@ export class PrismaCertificateRepository implements CertificateRepositoryInterfa
       where: { userId },
       orderBy: { createdAt: "desc" },
     });
-    return found.map((item) => Certificate.fromPersistence({
-      ...item,
-      metadata: item.metadata as CertificateMetadata | undefined
-    }));
+    return found.map((item) => this.mapToEntity(item));
   }
 
   async findByCourseId(courseId: string): Promise<Certificate[]> {
@@ -67,10 +93,7 @@ export class PrismaCertificateRepository implements CertificateRepositoryInterfa
       where: { courseId },
       orderBy: { createdAt: "desc" },
     });
-    return found.map((item) => Certificate.fromPersistence({
-      ...item,
-      metadata: item.metadata as CertificateMetadata | undefined
-    }));
+    return found.map((item) => this.mapToEntity(item));
   }
 
   async findByUserIdAndCourseId(

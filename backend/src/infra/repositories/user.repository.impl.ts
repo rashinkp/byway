@@ -7,9 +7,54 @@ import {
 import { PaginatedResult, PaginationFilter } from "../../domain/types/pagination-filter.interface";
 import { UserStats } from "../../domain/types/user.interface";
 import { Role as DomainRole } from "../../domain/enum/role.enum";
+import { GenericRepository } from "./base/generic.repository";
 
-export class UserRepository implements IUserRepository {
-  constructor(private _prisma: PrismaClient) {}
+export class UserRepository extends GenericRepository<User> implements IUserRepository {
+  constructor(private _prisma: PrismaClient) {
+    super(_prisma, 'user');
+  }
+
+  protected getPrismaModel() {
+    return this._prisma.user;
+  }
+
+  protected mapToEntity(user: any): User {
+    return User.fromPersistence({
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      password: user.password ?? undefined,
+      googleId: user.googleId ?? undefined,
+      facebookId: user.facebookId ?? undefined,
+      role: user.role as DomainRole,
+      authProvider: user.authProvider as any,
+      isVerified: user.isVerified,
+      avatar: user.avatar ?? undefined,
+      deletedAt: user.deletedAt ?? undefined,
+      createdAt: user.createdAt,
+      updatedAt: user.updatedAt,
+    });
+  }
+
+  protected mapToPrismaData(entity: any): any {
+    if (entity instanceof User) {
+      return {
+        name: entity.name,
+        email: entity.email,
+        password: entity.password ?? null,
+        googleId: entity.googleId ?? null,
+        facebookId: entity.facebookId ?? null,
+        role: entity.role as PrismaRole,
+        authProvider: entity.authProvider as any,
+        isVerified: entity.isVerified,
+        avatar: entity.avatar ?? null,
+        deletedAt: entity.deletedAt ?? null,
+        createdAt: entity.createdAt,
+        updatedAt: entity.updatedAt,
+      };
+    }
+    return entity;
+  }
 
   async findAll(input: PaginationFilter): Promise<PaginatedResult<User>> {
     const {
@@ -53,23 +98,7 @@ export class UserRepository implements IUserRepository {
     ]);
 
     return {
-      items: users.map((u) =>
-        User.fromPersistence({
-          id: u.id,
-          name: u.name,
-          email: u.email,
-          password: u.password ?? undefined,
-          googleId: u.googleId ?? undefined,
-          facebookId: u.facebookId ?? undefined,
-          role: u.role as DomainRole,
-          authProvider: u.authProvider as any,
-          isVerified: u.isVerified,
-          avatar: u.avatar ?? undefined,
-          deletedAt: u.deletedAt ?? undefined,
-          createdAt: u.createdAt,
-          updatedAt: u.updatedAt,
-        })
-      ),
+      items: users.map((u) => this.mapToEntity(u)),
       total,
       totalPage: Math.ceil(total / limit),
     };
@@ -81,21 +110,7 @@ export class UserRepository implements IUserRepository {
       include: { userProfile: true },
     });
     if (!user) return null;
-    return User.fromPersistence({
-      id: user.id,
-      name: user.name,
-      email: user.email,
-      password: user.password ?? undefined,
-      googleId: user.googleId ?? undefined,
-      facebookId: user.facebookId ?? undefined,
-      role: user.role as DomainRole,
-      authProvider: user.authProvider as any,
-      isVerified: user.isVerified,
-      avatar: user.avatar ?? undefined,
-      deletedAt: user.deletedAt ?? undefined,
-      createdAt: user.createdAt,
-      updatedAt: user.updatedAt,
-    });
+    return this.mapToEntity(user);
   }
 
   async updateUser(user: User): Promise<User> {

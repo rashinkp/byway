@@ -2,10 +2,39 @@ import { PrismaClient } from "@prisma/client";
 import { Category } from "../../domain/entities/category.entity";
 import { ICategoryRepository } from "../../app/repositories/category.repository";
 import { PaginationFilter } from "../../domain/types/pagination-filter.interface";
+import { GenericRepository } from "./base/generic.repository";
 
+export class CategoryRepository extends GenericRepository<Category> implements ICategoryRepository {
+  constructor(private _prisma: PrismaClient) {
+    super(_prisma, 'category');
+  }
 
-export class CategoryRepository implements ICategoryRepository {
-  constructor(private _prisma: PrismaClient) {}
+  protected getPrismaModel() {
+    return this._prisma.category;
+  }
+
+  protected mapToEntity(data: any): Category {
+    return Category.fromPersistence(data);
+  }
+
+  protected mapToPrismaData(entity: any): any {
+    if (entity instanceof Category) {
+      return {
+        id: entity.id,
+        name: entity.name,
+        description: entity.description,
+        createdBy: entity.createdBy,
+        createdAt: entity.createdAt,
+        updatedAt: entity.updatedAt,
+        deletedAt: entity.deletedAt,
+      };
+    }
+    return entity;
+  }
+
+  async findById(id: string): Promise<Category | null> {
+    return this.findByIdGeneric(id);
+  }
 
   async save(category: Category): Promise<Category> {
     const data = {
@@ -25,12 +54,6 @@ export class CategoryRepository implements ICategoryRepository {
     });
 
     return Category.fromPersistence(saved);
-  }
-
-  async findById(id: string): Promise<Category | null> {
-    const category = await this._prisma.category.findUnique({ where: { id } });
-    if (!category) return null;
-    return Category.fromPersistence(category);
   }
 
   async findByName(name: string): Promise<Category | null> {

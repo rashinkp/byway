@@ -3,9 +3,39 @@ import { IEnrollmentRepository } from "../../app/repositories/enrollment.reposit
 import { HttpError } from "../../presentation/http/errors/http-error";
 import { Enrollment } from "../../domain/entities/enrollment.entity";
 import { IEnrollmentWithDetails, ICreateEnrollmentInput, IEnrollmentStats, IGetEnrollmentStatsInput } from "../../domain/types/enrollment.interface";
+import { GenericRepository } from "./base/generic.repository";
 
-export class EnrollmentRepository implements IEnrollmentRepository {
-  constructor(private _prisma: PrismaClient) {}
+export class EnrollmentRepository extends GenericRepository<Enrollment> implements IEnrollmentRepository {
+  constructor(private _prisma: PrismaClient) {
+    super(_prisma, 'enrollment');
+  }
+
+  protected getPrismaModel() {
+    return this._prisma.enrollment;
+  }
+
+  protected mapToEntity(enrollment: any): Enrollment {
+    return Enrollment.fromPersistence({
+      userId: enrollment.userId,
+      courseId: enrollment.courseId,
+      enrolledAt: enrollment.enrolledAt,
+      orderItemId: enrollment.orderItemId,
+      accessStatus: enrollment.accessStatus,
+    });
+  }
+
+  protected mapToPrismaData(entity: any): any {
+    if (entity instanceof Enrollment) {
+      return {
+        userId: entity.userId,
+        courseId: entity.courseId,
+        enrolledAt: entity.enrolledAt,
+        orderItemId: entity.orderItemId,
+        accessStatus: entity.accessStatus,
+      };
+    }
+    return entity;
+  }
 
   async findByUserAndCourse(
     userId: string,
@@ -89,30 +119,14 @@ export class EnrollmentRepository implements IEnrollmentRepository {
         courseId: { in: courseIds },
       },
     });
-    return enrollments.map((enrollment) =>
-      Enrollment.fromPersistence({
-        userId: enrollment.userId,
-        courseId: enrollment.courseId,
-        enrolledAt: enrollment.enrolledAt,
-        orderItemId: enrollment.orderItemId,
-        accessStatus: enrollment.accessStatus,
-      })
-    );
+    return enrollments.map((enrollment) => this.mapToEntity(enrollment));
   }
 
   async findByUserId(userId: string): Promise<Enrollment[]> {
     const enrollments = await this._prisma.enrollment.findMany({
       where: { userId },
     });
-    return enrollments.map((enrollment) =>
-      Enrollment.fromPersistence({
-        userId: enrollment.userId,
-        courseId: enrollment.courseId,
-        enrolledAt: enrollment.enrolledAt,
-        orderItemId: enrollment.orderItemId,
-        accessStatus: enrollment.accessStatus,
-      })
-    );
+    return enrollments.map((enrollment) => this.mapToEntity(enrollment));
   }
 
   async findByCourseId(courseId: string): Promise<Enrollment[]> {
@@ -126,15 +140,7 @@ export class EnrollmentRepository implements IEnrollmentRepository {
         },
       },
     });
-    return enrollments.map((enrollment) =>
-      Enrollment.fromPersistence({
-        userId: enrollment.userId,
-        courseId: enrollment.courseId,
-        enrolledAt: enrollment.enrolledAt,
-        orderItemId: enrollment.orderItemId,
-        accessStatus: enrollment.accessStatus,
-      })
-    );
+    return enrollments.map((enrollment) => this.mapToEntity(enrollment));
   }
 
   async delete(userId: string, courseId: string): Promise<void> {

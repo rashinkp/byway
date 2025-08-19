@@ -17,6 +17,7 @@ import { Lesson } from "../../domain/entities/lesson.entity";
 import {
   LessonContent,
 } from "../../domain/entities/content.entity";
+import { GenericRepository } from "./base/generic.repository";
 
 // Type definitions for lesson data
 interface LessonData {
@@ -53,8 +54,35 @@ interface QuizQuestionData {
   correctAnswer: string;
 }
 
-export class LessonRepository implements ILessonRepository {
-  constructor(private readonly _prisma: PrismaClient) {}
+export class LessonRepository extends GenericRepository<Lesson> implements ILessonRepository {
+  constructor(private readonly _prisma: PrismaClient) {
+    super(_prisma, 'lesson');
+  }
+
+  protected getPrismaModel() {
+    return this._prisma.lesson;
+  }
+
+  protected mapToEntity(lesson: any): Lesson {
+    return Lesson.fromPersistence(lesson);
+  }
+
+  protected mapToPrismaData(entity: any): any {
+    if (entity instanceof Lesson) {
+      return {
+        id: entity.id,
+        courseId: entity.courseId,
+        title: entity.title,
+        description: entity.description,
+        order: entity.order,
+        status: entity.status,
+        createdAt: entity.createdAt,
+        updatedAt: entity.updatedAt,
+        deletedAt: entity.deletedAt,
+      };
+    }
+    return entity;
+  }
 
   async getAllLessons(
     params: IGetAllLessonsInputDTO
@@ -176,7 +204,7 @@ export class LessonRepository implements ILessonRepository {
       return null;
     }
 
-    return this.mapToLessonEntity(lesson);
+    return this.mapToEntity(lesson);
   }
 
   async create(lesson: Lesson): Promise<Lesson> {
@@ -227,7 +255,7 @@ export class LessonRepository implements ILessonRepository {
       include: { content: { include: { quizQuestions: true } } },
     });
 
-    return this.mapToLessonEntity(createdLesson);
+    return this.mapToEntity(createdLesson);
   }
 
   async update(lesson: Lesson): Promise<Lesson> {

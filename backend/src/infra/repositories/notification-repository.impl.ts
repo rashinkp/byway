@@ -6,11 +6,40 @@ import { NotificationEventType } from "../../domain/enum/notification-event-type
 import { UserId } from "../../domain/value-object/UserId";
 import { Timestamp } from "../../domain/value-object/Timestamp";
 import { PaginatedNotificationList } from "../../domain/types/notification.interface";
+import { GenericRepository } from "./base/generic.repository";
 
 export class PrismaNotificationRepository
+  extends GenericRepository<Notification>
   implements NotificationRepositoryInterface
 {
-  constructor(private readonly _prisma: PrismaClient) {}
+  constructor(private readonly _prisma: PrismaClient) {
+    super(_prisma, 'notification');
+  }
+
+  protected getPrismaModel() {
+    return this._prisma.notification;
+  }
+
+  protected mapToEntity(notification: any): Notification {
+    return Notification.fromPersistence(notification);
+  }
+
+  protected mapToPrismaData(entity: any): any {
+    if (entity instanceof Notification) {
+      return {
+        userId: entity.userId.value,
+        eventType: entity.eventType,
+        entityType: this.mapEntityType(entity.entityType),
+        entityId: entity.entityId,
+        entityName: entity.entityName,
+        message: entity.message,
+        link: entity.link,
+        createdAt: entity.createdAt.value,
+        expiresAt: entity.expiresAt.value,
+      };
+    }
+    return entity;
+  }
 
   private mapEntityType(
     entityType: NotificationEntityType
@@ -64,8 +93,7 @@ export class PrismaNotificationRepository
   }
 
   async findById(id: string): Promise<Notification | null> {
-    const found = await this._prisma.notification.findUnique({ where: { id } });
-    return found ? Notification.fromPersistence(found) : null;
+    return this.findByIdGeneric(id);
   }
 
   async findByUserId(userId: string): Promise<Notification[]> {
@@ -73,7 +101,7 @@ export class PrismaNotificationRepository
       where: { userId },
       orderBy: { createdAt: "desc" },
     });
-    return found.map((n) => Notification.fromPersistence(n));
+    return found.map((n) => this.mapToEntity(n));
   }
 
   async findManyByUserId(options: {
@@ -122,7 +150,7 @@ export class PrismaNotificationRepository
   }
 
   async deleteById(id: string): Promise<void> {
-    await this._prisma.notification.delete({ where: { id } });
+    return this.deleteGeneric(id);
   }
 
   async deleteExpired(): Promise<number> {

@@ -4,9 +4,40 @@ import { APPROVALSTATUS } from "../../domain/enum/approval-status.enum";
 import { IInstructorRepository } from "../../app/repositories/instructor.repository";
 import { IGetTopInstructorsInput } from "../../app/usecases/user/interfaces/get-top-instructors.usecase.interface";
 import { InstructorStats } from "../../domain/types/instructor.interface";
+import { GenericRepository } from "./base/generic.repository";
 
-export class PrismaInstructorRepository implements IInstructorRepository {
-  constructor(private _prisma: PrismaClient) { }
+export class PrismaInstructorRepository extends GenericRepository<Instructor> implements IInstructorRepository {
+  constructor(private _prisma: PrismaClient) {
+    super(_prisma, 'instructorDetails');
+  }
+
+  protected getPrismaModel() {
+    return this._prisma.instructorDetails;
+  }
+
+  protected mapToEntity(instructor: any): Instructor {
+    return Instructor.fromPersistence(instructor);
+  }
+
+  protected mapToPrismaData(entity: any): any {
+    if (entity instanceof Instructor) {
+      return {
+        userId: entity.userId,
+        areaOfExpertise: entity.areaOfExpertise,
+        professionalExperience: entity.professionalExperience,
+        about: entity.about,
+        website: entity.website,
+        education: entity.education,
+        certifications: entity.certifications,
+        cv: entity.cv,
+        status: entity.status,
+        totalStudents: entity.totalStudents,
+        createdAt: entity.createdAt,
+        updatedAt: entity.updatedAt,
+      };
+    }
+    return entity;
+  }
   
   async createInstructor(instructor: Instructor): Promise<Instructor> {
     const upserted = await this._prisma.instructorDetails.upsert({
@@ -65,11 +96,7 @@ export class PrismaInstructorRepository implements IInstructorRepository {
   }
 
   async findInstructorById(id: string): Promise<Instructor | null> {
-    const instructor = await this._prisma.instructorDetails.findUnique({
-      where: { id },
-    });
-    if (!instructor) return null;
-    return Instructor.fromPersistence(instructor);
+    return this.findByIdGeneric(id);
   }
 
   async findInstructorByUserId(userId: string): Promise<Instructor | null> {
@@ -77,7 +104,7 @@ export class PrismaInstructorRepository implements IInstructorRepository {
       where: { userId },
     });
     if (!instructor) return null;
-    return Instructor.fromPersistence(instructor);
+    return this.mapToEntity(instructor);
   }
 
   async findAllInstructors(

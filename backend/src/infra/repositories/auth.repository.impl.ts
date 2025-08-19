@@ -3,13 +3,18 @@ import { User } from "../../domain/entities/user.entity";
 import { UserVerification } from "../../domain/entities/user-verification.entity";
 import { IAuthRepository } from "../../app/repositories/auth.repository";
 import { AuthProvider, Role } from "@prisma/client";
+import { GenericRepository } from "./base/generic.repository";
 
-export class AuthRepository implements IAuthRepository {
-  constructor(private _prisma: PrismaClient) {}
+export class AuthRepository extends GenericRepository<User> implements IAuthRepository {
+  constructor(private _prisma: PrismaClient) {
+    super(_prisma, 'user');
+  }
 
-  async findUserByEmail(email: string): Promise<User | null> {
-    const user = await this._prisma.user.findUnique({ where: { email } });
-    if (!user) return null;
+  protected getPrismaModel() {
+    return this._prisma.user;
+  }
+
+  protected mapToEntity(user: any): User {
     return User.fromPersistence({
       id: user.id,
       name: user.name,
@@ -25,80 +30,48 @@ export class AuthRepository implements IAuthRepository {
       createdAt: user.createdAt,
       updatedAt: user.updatedAt,
     });
+  }
+
+  protected mapToPrismaData(entity: any): any {
+    if (entity instanceof User) {
+      return {
+        name: entity.name,
+        email: entity.email,
+        password: entity.password ?? null,
+        googleId: entity.googleId ?? null,
+        facebookId: entity.facebookId ?? null,
+        role: entity.role as any,
+        authProvider: entity.authProvider as any,
+        isVerified: entity.isVerified,
+        avatar: entity.avatar ?? null,
+        deletedAt: entity.deletedAt ?? null,
+        createdAt: entity.createdAt,
+        updatedAt: entity.updatedAt,
+      };
+    }
+    return entity;
+  }
+
+  async findUserByEmail(email: string): Promise<User | null> {
+    const user = await this._prisma.user.findUnique({ where: { email } });
+    if (!user) return null;
+    return this.mapToEntity(user);
   }
 
   async findUserByGoogleId(googleId: string): Promise<User | null> {
     const user = await this._prisma.user.findUnique({ where: { googleId } });
     if (!user) return null;
-    return User.fromPersistence({
-      id: user.id,
-      name: user.name,
-      email: user.email,
-      password: user.password ?? undefined,
-      googleId: user.googleId ?? undefined,
-      facebookId: user.facebookId ?? undefined,
-      role: user.role as any,
-      authProvider: user.authProvider as any,
-      isVerified: user.isVerified,
-      avatar: user.avatar ?? undefined,
-      deletedAt: user.deletedAt ?? undefined,
-      createdAt: user.createdAt,
-      updatedAt: user.updatedAt,
-    });
+    return this.mapToEntity(user);
   }
 
   async findUserByFacebookId(facebookId: string): Promise<User | null> {
     const user = await this._prisma.user.findUnique({ where: { facebookId } });
     if (!user) return null;
-    return User.fromPersistence({
-      id: user.id,
-      name: user.name,
-      email: user.email,
-      password: user.password ?? undefined,
-      googleId: user.googleId ?? undefined,
-      facebookId: user.facebookId ?? undefined,
-      role: user.role as any,
-      authProvider: user.authProvider as any,
-      isVerified: user.isVerified,
-      avatar: user.avatar ?? undefined,
-      deletedAt: user.deletedAt ?? undefined,
-      createdAt: user.createdAt,
-      updatedAt: user.updatedAt,
-    });
+    return this.mapToEntity(user);
   }
 
   async createUser(user: User): Promise<User> {
-    const created = await this._prisma.user.create({
-      data: {
-        name: user.name,
-        email: user.email,
-        password: user.password ?? null,
-        googleId: user.googleId ?? null,
-        facebookId: user.facebookId ?? null,
-        role: user.role as any,
-        authProvider: user.authProvider as any,
-        isVerified: user.isVerified,
-        avatar: user.avatar ?? null,
-        deletedAt: user.deletedAt ?? null,
-        createdAt: user.createdAt,
-        updatedAt: user.updatedAt,
-      },
-    });
-    return User.fromPersistence({
-      id: created.id,
-      name: created.name,
-      email: created.email,
-      password: created.password ?? undefined,
-      googleId: created.googleId ?? undefined,
-      facebookId: created.facebookId ?? undefined,
-      role: created.role as any,
-      authProvider: created.authProvider as any,
-      isVerified: created.isVerified,
-      avatar: created.avatar ?? undefined,
-      deletedAt: created.deletedAt ?? undefined,
-      createdAt: created.createdAt,
-      updatedAt: created.updatedAt,
-    });
+    return this.createGeneric(user);
   }
 
   async createVerification(
@@ -159,36 +132,6 @@ export class AuthRepository implements IAuthRepository {
   }
 
   async updateUser(user: User): Promise<User> {
-    const updated = await this._prisma.user.update({
-      where: { id: user.id },
-      data: {
-        name: user.name,
-        email: user.email,
-        password: user.password ?? null,
-        googleId: user.googleId ?? null,
-        facebookId: user.facebookId ?? null,
-        role: user.role as any,
-        authProvider: user.authProvider as any,
-        isVerified: user.isVerified,
-        avatar: user.avatar ?? null,
-        deletedAt: user.deletedAt ?? null,
-        updatedAt: user.updatedAt,
-      },
-    });
-    return User.fromPersistence({
-      id: updated.id,
-      name: updated.name,
-      email: updated.email,
-      password: updated.password ?? undefined,
-      googleId: updated.googleId ?? undefined,
-      facebookId: updated.facebookId ?? undefined,
-      role: updated.role as any,
-      authProvider: updated.authProvider as any,
-      isVerified: updated.isVerified,
-      avatar: updated.avatar ?? undefined,
-      deletedAt: updated.deletedAt ?? undefined,
-      createdAt: updated.createdAt,
-      updatedAt: updated.updatedAt,
-    });
+    return this.updateGeneric(user.id, user);
   }
 }

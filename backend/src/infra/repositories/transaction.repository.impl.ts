@@ -11,9 +11,52 @@ import { Transaction } from "../../domain/entities/transaction.entity";
 import { TransactionStatus } from "../../domain/enum/transaction-status.enum";
 import { PaymentGateway } from "../../domain/enum/payment-gateway.enum";
 import { TransactionType } from "../../domain/enum/transaction-type.enum";
+import { GenericRepository } from "./base/generic.repository";
 
-export class TransactionRepository implements ITransactionRepository {
-  constructor(private _prisma: PrismaClient) {}
+export class TransactionRepository extends GenericRepository<Transaction> implements ITransactionRepository {
+  constructor(private _prisma: PrismaClient) {
+    super(_prisma, 'transactionHistory');
+  }
+
+  protected getPrismaModel() {
+    return this._prisma.transactionHistory;
+  }
+
+  protected mapToEntity(transaction: any): Transaction {
+    return new Transaction({
+      id: transaction.id,
+      orderId: transaction.orderId || undefined,
+      userId: transaction.userId,
+      amount: Number(transaction.amount),
+      type: transaction.type as TransactionType,
+      status: transaction.status as TransactionStatus,
+      paymentGateway: transaction.paymentGateway as PaymentGateway,
+      courseId: transaction.courseId || undefined,
+      transactionId: transaction.transactionId || undefined,
+      walletId: transaction.walletId || undefined,
+      createdAt: transaction.createdAt,
+      updatedAt: transaction.updatedAt,
+    });
+  }
+
+  protected mapToPrismaData(entity: any): any {
+    if (entity instanceof Transaction) {
+      return {
+        userId: entity.userId,
+        amount: entity.amount,
+        type: entity.type as PrismaTransactionType,
+        status: entity.status as PrismaTransactionStatus,
+        paymentGateway: entity.paymentGateway as PrismaPaymentGateway,
+        paymentMethod: entity.paymentMethod,
+        paymentDetails: entity.paymentDetails ? (entity.paymentDetails as Prisma.InputJsonValue) : undefined,
+        courseId: entity.courseId,
+        transactionId: entity.transactionId,
+        metadata: entity.metadata ? (entity.metadata as Prisma.InputJsonValue) : undefined,
+        orderId: entity.orderId,
+      };
+    }
+    return entity;
+  }
 
   private mapToTransaction(prismaTransaction: TransactionHistory): Transaction {
     return new Transaction({
@@ -79,10 +122,7 @@ export class TransactionRepository implements ITransactionRepository {
   }
 
   async findById(id: string): Promise<Transaction | null> {
-    const transaction = await this._prisma.transactionHistory.findUnique({
-      where: { id },
-    });
-    return transaction ? this.mapToTransaction(transaction) : null;
+    return this.findByIdGeneric(id);
   }
 
   async findByOrderId(orderId: string): Promise<Transaction | null> {
@@ -104,7 +144,7 @@ export class TransactionRepository implements ITransactionRepository {
       take: limit,
       orderBy: { createdAt: "desc" },
     });
-    return transactions.map((t) => this.mapToTransaction(t));
+    return transactions.map((t) => this.mapToEntity(t));
   }
 
   async updateStatus(

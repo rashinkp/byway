@@ -2,9 +2,39 @@ import { PrismaClient } from "@prisma/client";
 import { IWalletRepository } from "../../app/repositories/wallet.repository.interface";
 import { Wallet } from "../../domain/entities/wallet.entity";
 import { Money } from "../../domain/value-object/money.value-object";
+import { GenericRepository } from "./base/generic.repository";
 
-export class WalletRepository implements IWalletRepository {
-  constructor(private readonly _prisma: PrismaClient) {}
+export class WalletRepository extends GenericRepository<Wallet> implements IWalletRepository {
+  constructor(private readonly _prisma: PrismaClient) {
+    super(_prisma, 'wallet');
+  }
+
+  protected getPrismaModel() {
+    return this._prisma.wallet;
+  }
+
+  protected mapToEntity(wallet: any): Wallet {
+    return new Wallet(
+      wallet.id,
+      wallet.userId,
+      Money.create(Number(wallet.balance)),
+      wallet.createdAt,
+      wallet.updatedAt
+    );
+  }
+
+  protected mapToPrismaData(entity: any): any {
+    if (entity instanceof Wallet) {
+      return {
+        id: entity.id,
+        userId: entity.userId,
+        balance: entity.balance.amount,
+        createdAt: entity.createdAt,
+        updatedAt: entity.updatedAt,
+      };
+    }
+    return entity;
+  }
 
   async findByUserId(userId: string): Promise<Wallet | null> {
     const wallet = await this._prisma.wallet.findUnique({
@@ -61,18 +91,6 @@ export class WalletRepository implements IWalletRepository {
   }
 
   async findById(id: string): Promise<Wallet | null> {
-    const wallet = await this._prisma.wallet.findUnique({
-      where: { id },
-    });
-
-    if (!wallet) return null;
-
-    return new Wallet(
-      wallet.id,
-      wallet.userId,
-      Money.create(Number(wallet.balance)),
-      wallet.createdAt,
-      wallet.updatedAt
-    );
+    return this.findByIdGeneric(id);
   }
 }
