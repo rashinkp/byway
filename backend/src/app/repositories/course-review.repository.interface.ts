@@ -1,8 +1,13 @@
 import { CourseReview } from "../../domain/entities/review.entity";
-import {  ICourseReviewSummary, ICourseReviewQuery, ICourseReviewPaginatedResult } from "../../domain/types/review.interface";
-import { IGenericRepository } from "./base/generic-repository.interface";
+import {
+  ICourseReviewSummary,
+  ICourseReviewQuery,
+  ICourseReviewPaginatedResult,
+} from "../../domain/types/review.interface";
+import { IGenericRepository } from "./generic-repository.interface";
 
-export interface ICourseReviewRepository extends IGenericRepository<CourseReview> {
+export interface ICourseReviewRepository
+  extends IGenericRepository<CourseReview> {
   // Basic CRUD operations
   save(review: CourseReview): Promise<CourseReview>;
   restoreReview(review: CourseReview): Promise<CourseReview>;

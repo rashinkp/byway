@@ -1,9 +1,13 @@
 import { PrismaClient } from "@prisma/client";
 import { CourseReview } from "../../domain/entities/review.entity";
 import { ICourseReviewRepository } from "../../app/repositories/course-review.repository.interface";
-import { ICourseReviewWithUser, ICourseReviewSummary, ICourseReviewQuery, ICourseReviewPaginatedResult } from "../../domain/types/review.interface";
-import { GenericRepository } from "./base/generic.repository";
-
+import {
+  ICourseReviewWithUser,
+  ICourseReviewSummary,
+  ICourseReviewQuery,
+  ICourseReviewPaginatedResult,
+} from "../../domain/types/review.interface";
+import { GenericRepository } from "./generic.repository";
 
 function toCourseReviewWithUser(data: {
   id: string;
@@ -41,9 +45,12 @@ function toCourseReviewWithUser(data: {
   };
 }
 
-export class CourseReviewRepository extends GenericRepository<CourseReview> implements ICourseReviewRepository {
+export class CourseReviewRepository
+  extends GenericRepository<CourseReview>
+  implements ICourseReviewRepository
+{
   constructor(private _prisma: PrismaClient) {
-    super(_prisma, 'courseReview');
+    super(_prisma, "courseReview");
   }
 
   protected getPrismaModel() {
@@ -168,7 +175,7 @@ export class CourseReviewRepository extends GenericRepository<CourseReview> impl
       where.rating = query.rating;
     }
 
-    const orderBy: Record<string, 'asc' | 'desc'> = {};
+    const orderBy: Record<string, "asc" | "desc"> = {};
     if (query.sortBy === "rating") {
       orderBy.rating = query.sortOrder || "desc";
     } else {
@@ -229,9 +236,7 @@ export class CourseReviewRepository extends GenericRepository<CourseReview> impl
     return found ? CourseReview.fromPersistence(found) : null;
   }
 
-  async getCourseReviewStats(
-    courseId: string
-  ): Promise<ICourseReviewSummary> {
+  async getCourseReviewStats(courseId: string): Promise<ICourseReviewSummary> {
     const [average, total, distribution, recentReviews] =
       await this._prisma.$transaction([
         this._prisma.courseReview.aggregate({

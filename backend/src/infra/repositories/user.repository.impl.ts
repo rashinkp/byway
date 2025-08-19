@@ -1,17 +1,21 @@
 import { PrismaClient, Gender, Role as PrismaRole } from "@prisma/client";
 import { User } from "../../domain/entities/user.entity";
 import { UserProfile } from "../../domain/entities/user-profile.entity";
+import { IUserRepository } from "../../app/repositories/user.repository";
 import {
-  IUserRepository,
-} from "../../app/repositories/user.repository";
-import { PaginatedResult, PaginationFilter } from "../../domain/types/pagination-filter.interface";
+  PaginatedResult,
+  PaginationFilter,
+} from "../../domain/types/pagination-filter.interface";
 import { UserStats } from "../../domain/types/user.interface";
 import { Role as DomainRole } from "../../domain/enum/role.enum";
-import { GenericRepository } from "./base/generic.repository";
+import { GenericRepository } from "./generic.repository";
 
-export class UserRepository extends GenericRepository<User> implements IUserRepository {
+export class UserRepository
+  extends GenericRepository<User>
+  implements IUserRepository
+{
   constructor(private _prisma: PrismaClient) {
-    super(_prisma, 'user');
+    super(_prisma, "user");
   }
 
   protected getPrismaModel() {
@@ -56,11 +60,6 @@ export class UserRepository extends GenericRepository<User> implements IUserRepo
     return entity;
   }
 
-  // Generic repository methods required by IUserRepository (extends IGenericRepository<User>)
-  async create(user: User): Promise<User> {
-    return this.createGeneric(user);
-  }
-
   async findById(id: string): Promise<User | null> {
     const user = await this._prisma.user.findUnique({
       where: { id },
@@ -68,33 +67,6 @@ export class UserRepository extends GenericRepository<User> implements IUserRepo
     });
     if (!user) return null;
     return this.mapToEntity(user);
-  }
-
-  async find(filter?: any): Promise<User[]> {
-    return this.findGeneric(filter);
-  }
-
-  async update(id: string, user: User): Promise<User> {
-    return this.updateGeneric(id, user);
-  }
-
-  async delete(id: string): Promise<void> {
-    return this.deleteGeneric(id);
-  }
-
-  async softDelete(id: string): Promise<User> {
-    const deleted = await this._prisma.user.update({
-      where: { id },
-      data: {
-        deletedAt: new Date(),
-        updatedAt: new Date(),
-      },
-    });
-    return this.mapToEntity(deleted);
-  }
-
-  async count(filter?: any): Promise<number> {
-    return this.countGeneric(filter);
   }
 
   async findAll(input: PaginationFilter): Promise<PaginatedResult<User>> {

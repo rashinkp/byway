@@ -1,10 +1,9 @@
-
 import { Message } from "../../domain/entities/message.entity";
 import { ChatId } from "../../domain/value-object/ChatId";
 import { MessageId } from "../../domain/value-object/MessageId";
 import { UserId } from "../../domain/value-object/UserId";
 import { IMessageWithUserData } from "../../domain/types/message.interface";
-import { IGenericRepository } from "./base/generic-repository.interface";
+import { IGenericRepository } from "./generic-repository.interface";
 
 export interface IMessageRepository extends IGenericRepository<Message> {
   findByChat(chatId: ChatId): Promise<Message[]>;

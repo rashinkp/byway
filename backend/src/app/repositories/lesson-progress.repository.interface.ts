@@ -1,8 +1,9 @@
 import { LessonProgress } from "../../domain/entities/progress.entity";
 import { QuizAnswer } from "../../domain/entities/quiz-answer.entity";
-import { IGenericRepository } from "./base/generic-repository.interface";
+import { IGenericRepository } from "./generic-repository.interface";
 
-export interface ILessonProgressRepository extends IGenericRepository<LessonProgress> {
+export interface ILessonProgressRepository
+  extends IGenericRepository<LessonProgress> {
   save(progress: LessonProgress): Promise<LessonProgress>;
   findByEnrollmentAndLesson(
     enrollmentId: string,

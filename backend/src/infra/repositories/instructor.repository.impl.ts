@@ -4,11 +4,14 @@ import { APPROVALSTATUS } from "../../domain/enum/approval-status.enum";
 import { IInstructorRepository } from "../../app/repositories/instructor.repository";
 import { IGetTopInstructorsInput } from "../../app/usecases/user/interfaces/get-top-instructors.usecase.interface";
 import { InstructorStats } from "../../domain/types/instructor.interface";
-import { GenericRepository } from "./base/generic.repository";
+import { GenericRepository } from "./generic.repository";
 
-export class PrismaInstructorRepository extends GenericRepository<Instructor> implements IInstructorRepository {
+export class PrismaInstructorRepository
+  extends GenericRepository<Instructor>
+  implements IInstructorRepository
+{
   constructor(private _prisma: PrismaClient) {
-    super(_prisma, 'instructorDetails');
+    super(_prisma, "instructorDetails");
   }
 
   protected getPrismaModel() {
@@ -38,7 +41,7 @@ export class PrismaInstructorRepository extends GenericRepository<Instructor> im
     }
     return entity;
   }
-  
+
   async createInstructor(instructor: Instructor): Promise<Instructor> {
     const upserted = await this._prisma.instructorDetails.upsert({
       where: {
@@ -210,7 +213,9 @@ export class PrismaInstructorRepository extends GenericRepository<Instructor> im
     });
 
     return {
-      items: instructors.map((instructor) => Instructor.fromPersistence(instructor)),
+      items: instructors.map((instructor) =>
+        Instructor.fromPersistence(instructor)
+      ),
       total,
       totalPages: Math.ceil(total / limit),
     };
@@ -264,14 +269,13 @@ export class PrismaInstructorRepository extends GenericRepository<Instructor> im
           },
         });
 
-    const totalRevenue = completedOrderItems.reduce((sum, item) => {
-      const itemPrice = Number(item.coursePrice); // Decimal is converted
-      const adminSharePercentage = Number(item.adminSharePercentage);
-      const adminRevenue = itemPrice * (adminSharePercentage / 100);
-      const instructorRevenue = itemPrice - adminRevenue;
-      return sum + instructorRevenue;
-    }, 0);
-
+        const totalRevenue = completedOrderItems.reduce((sum, item) => {
+          const itemPrice = Number(item.coursePrice); // Decimal is converted
+          const adminSharePercentage = Number(item.adminSharePercentage);
+          const adminRevenue = itemPrice * (adminSharePercentage / 100);
+          const instructorRevenue = itemPrice - adminRevenue;
+          return sum + instructorRevenue;
+        }, 0);
 
         // Calculate average rating from course reviews
         const reviews = await this._prisma.courseReview.findMany({
@@ -289,7 +293,8 @@ export class PrismaInstructorRepository extends GenericRepository<Instructor> im
         const averageRating =
           reviews.length > 0
             ? reviews.reduce(
-                (sum: number, review: { rating: number }) => sum + review.rating,
+                (sum: number, review: { rating: number }) =>
+                  sum + review.rating,
                 0
               ) / reviews.length
             : 0;

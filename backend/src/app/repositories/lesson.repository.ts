@@ -5,7 +5,7 @@ import {
   IPublicLessonFilterOptions,
   IPublicLessonListResponse,
 } from "../../domain/types/lesson.interface";
-import { IGenericRepository } from "./base/generic-repository.interface";
+import { IGenericRepository } from "./generic-repository.interface";
 
 export interface ILessonRepository extends IGenericRepository<Lesson> {
   getAllLessons(params: ILessonFilterOptions): Promise<ILessonListResponse>;

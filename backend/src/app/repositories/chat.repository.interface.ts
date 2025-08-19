@@ -1,20 +1,20 @@
 import { Chat } from "../../domain/entities/chat.entity";
 import { ChatId } from "../../domain/value-object/ChatId";
 import { UserId } from "../../domain/value-object/UserId";
-import { IGenericRepository } from "./base/generic-repository.interface";
+import { IGenericRepository } from "./generic-repository.interface";
 
 export class EnhancedChatListItem {
-  id!: string; 
-  type!: "chat" | "user"; 
-  displayName!: string; 
-  avatar?: string; 
-  role!: string; 
+  id!: string;
+  type!: "chat" | "user";
+  displayName!: string;
+  avatar?: string;
+  role!: string;
   lastMessage?: {
-    content?: string; 
-    imageUrl?: string; 
-    audioUrl?: string; 
+    content?: string;
+    imageUrl?: string;
+    audioUrl?: string;
     type: "text" | "image" | "audio"; // Type of the last message
-  }; 
+  };
   lastMessageTime?: string; // ISO string for the last message's timestamp
   unreadCount?: number; // Number of unread messages in the chat
   userId?: string; // For user items, the other user's ID
@@ -27,7 +27,7 @@ export class PaginatedChatList {
   totalCount!: number;
   hasMore!: boolean;
   nextPage?: number;
-} 
+}
 
 export interface IChatRepository extends IGenericRepository<Chat> {
   findByUser(userId: UserId): Promise<Chat[]>;

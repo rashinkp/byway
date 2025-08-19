@@ -1,7 +1,7 @@
 import { Instructor } from "../../domain/entities/instructor.entity";
 import { InstructorStats } from "../../domain/types/instructor.interface";
 import { IGetTopInstructorsInput } from "../usecases/user/interfaces/get-top-instructors.usecase.interface";
-import { IGenericRepository } from "./base/generic-repository.interface";
+import { IGenericRepository } from "./generic-repository.interface";
 
 export interface IInstructorRepository extends IGenericRepository<Instructor> {
   createInstructor(instructor: Instructor): Promise<Instructor>;

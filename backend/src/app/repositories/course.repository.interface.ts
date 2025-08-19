@@ -1,10 +1,19 @@
 import { Course } from "../../domain/entities/course.entity";
 import { CourseDetails } from "../../domain/entities/course.entity";
 import { IGetTopEnrolledCoursesInput } from "../usecases/course/interfaces/top-enrolled-courses.usecase.interface";
-import { CourseOverallStats, CourseStats } from "../../domain/types/course-stats.interface";
-import { CourseStatsInput, CourseWithEnrollment } from "../../domain/types/course.interface";
-import { FilterCourse, PaginatedResult } from "../../domain/types/pagination-filter.interface";
-import { IGenericRepository } from "./base/generic-repository.interface";
+import {
+  CourseOverallStats,
+  CourseStats,
+} from "../../domain/types/course-stats.interface";
+import {
+  CourseStatsInput,
+  CourseWithEnrollment,
+} from "../../domain/types/course.interface";
+import {
+  FilterCourse,
+  PaginatedResult,
+} from "../../domain/types/pagination-filter.interface";
+import { IGenericRepository } from "./generic-repository.interface";
 
 export interface ICourseRepository extends IGenericRepository<Course> {
   save(course: Course): Promise<Course>;

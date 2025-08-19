@@ -1,10 +1,8 @@
 import { PrismaClient } from "@prisma/client";
 import { ContentStatus, ContentType } from "../../domain/enum/content.enum";
-import {
-  LessonContent,
-} from "../../domain/entities/content.entity";
+import { LessonContent } from "../../domain/entities/content.entity";
 import { ILessonContentRepository } from "../../app/repositories/content.repository";
-import { GenericRepository } from "./base/generic.repository";
+import { GenericRepository } from "./generic.repository";
 
 export interface ContentData {
   id?: string;
@@ -28,9 +26,12 @@ export interface QuizQuestionData {
   correctAnswer: string;
 }
 
-export class LessonContentRepository extends GenericRepository<LessonContent> implements ILessonContentRepository {
+export class LessonContentRepository
+  extends GenericRepository<LessonContent>
+  implements ILessonContentRepository
+{
   constructor(private readonly _prisma: PrismaClient) {
-    super(_prisma, 'lessonContent');
+    super(_prisma, "lessonContent");
   }
 
   protected getPrismaModel() {
@@ -101,7 +102,12 @@ export class LessonContentRepository extends GenericRepository<LessonContent> im
     description: string | null;
     fileUrl: string | null;
     thumbnailUrl: string | null;
-    quizQuestions?: Array<{ id: string; question: string; options: string[]; correctAnswer: string }> | null;
+    quizQuestions?: Array<{
+      id: string;
+      question: string;
+      options: string[];
+      correctAnswer: string;
+    }> | null;
     createdAt: Date;
     updatedAt: Date;
     deletedAt: Date | null;

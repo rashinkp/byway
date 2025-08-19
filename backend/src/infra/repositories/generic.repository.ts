@@ -17,6 +17,7 @@ export abstract class GenericRepository<T> {
   protected abstract mapToEntity(data: any): T;
   protected abstract mapToPrismaData(entity: any): any;
 
+  // ===== Protected generic ops (core) =====
   protected async findByIdGeneric(id: string): Promise<T | null> {
     const found = await this.getPrismaModel().findUnique({
       where: { id, deletedAt: null },
@@ -108,5 +109,39 @@ export abstract class GenericRepository<T> {
         [field]: { contains: search, mode: 'insensitive' as const }
       }))
     };
+  }
+
+  // ===== Public CRUD wrappers (inherited by concrete repos) =====
+  public async create(entity: T): Promise<T> {
+    return this.createGeneric(entity);
+  }
+
+  public async findById(id: string): Promise<T | null> {
+    return this.findByIdGeneric(id);
+  }
+
+  public async find(filter?: any): Promise<T[]> {
+    return this.findGeneric(filter);
+  }
+
+  public async update(id: string, entity: T): Promise<T> {
+    return this.updateGeneric(id, entity);
+  }
+
+  public async delete(id: string): Promise<void> {
+    return this.deleteGeneric(id);
+  }
+
+  public async softDelete(id: string): Promise<T> {
+    await this.softDeleteGeneric(id);
+    const raw = await this.getPrismaModel().findUnique({ where: { id } });
+    if (!raw) {
+      throw new Error(`Entity not found after soft delete: ${this.modelName} ${id}`);
+    }
+    return this.mapToEntity(raw);
+  }
+
+  public async count(filter?: any): Promise<number> {
+    return this.countGeneric(filter);
   }
 }

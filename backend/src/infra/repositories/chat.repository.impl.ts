@@ -1,14 +1,21 @@
-import { EnhancedChatListItem, IChatRepository, PaginatedChatList } from "../../app/repositories/chat.repository.interface";
+import {
+  EnhancedChatListItem,
+  IChatRepository,
+  PaginatedChatList,
+} from "../../app/repositories/chat.repository.interface";
 import { Chat } from "../../domain/entities/chat.entity";
 import { ChatId } from "../../domain/value-object/ChatId";
 import { UserId } from "../../domain/value-object/UserId";
 import { PrismaClient } from "@prisma/client";
 import { Role } from "../../domain/enum/role.enum";
-import { GenericRepository } from "./base/generic.repository";
+import { GenericRepository } from "./generic.repository";
 
-export class ChatRepository extends GenericRepository<Chat> implements IChatRepository {
+export class ChatRepository
+  extends GenericRepository<Chat>
+  implements IChatRepository
+{
   constructor(private _prisma: PrismaClient) {
-    super(_prisma, 'chat');
+    super(_prisma, "chat");
   }
 
   protected getPrismaModel() {
@@ -30,10 +37,10 @@ export class ChatRepository extends GenericRepository<Chat> implements IChatRepo
     }
     return entity;
   }
-  
+
   // Generic repository method
   async findById(id: string): Promise<Chat | null> {
-    const chatId = new ChatId(id);  
+    const chatId = new ChatId(id);
     return this.findByIdWithChatId(chatId);
   }
 

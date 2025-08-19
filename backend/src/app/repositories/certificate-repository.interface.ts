@@ -1,9 +1,10 @@
 import { Certificate } from "../../domain/entities/certificate.entity";
 import { Course } from "../../domain/entities/course.entity";
 import { User } from "../../domain/entities/user.entity";
-import { IGenericRepository } from "./base/generic-repository.interface";
+import { IGenericRepository } from "./generic-repository.interface";
 
-export interface CertificateRepositoryInterface extends IGenericRepository<Certificate> {
+export interface CertificateRepositoryInterface
+  extends IGenericRepository<Certificate> {
   findByCertificateNumber(
     certificateNumber: string
   ): Promise<Certificate | null>;
@@ -23,7 +24,10 @@ export interface CertificateRepositoryInterface extends IGenericRepository<Certi
     status?: string;
     search?: string;
   }): Promise<{
-    items:{ user: {name:string , email:string}; course: {title:string }; }[]
+    items: {
+      user: { name: string; email: string };
+      course: { title: string };
+    }[];
     total: number;
     hasMore: boolean;
     nextPage?: number;

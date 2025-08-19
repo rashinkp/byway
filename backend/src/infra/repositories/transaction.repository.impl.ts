@@ -11,11 +11,14 @@ import { Transaction } from "../../domain/entities/transaction.entity";
 import { TransactionStatus } from "../../domain/enum/transaction-status.enum";
 import { PaymentGateway } from "../../domain/enum/payment-gateway.enum";
 import { TransactionType } from "../../domain/enum/transaction-type.enum";
-import { GenericRepository } from "./base/generic.repository";
+import { GenericRepository } from "./generic.repository";
 
-export class TransactionRepository extends GenericRepository<Transaction> implements ITransactionRepository {
+export class TransactionRepository
+  extends GenericRepository<Transaction>
+  implements ITransactionRepository
+{
   constructor(private _prisma: PrismaClient) {
-    super(_prisma, 'transactionHistory');
+    super(_prisma, "transactionHistory");
   }
 
   protected getPrismaModel() {
@@ -48,10 +51,14 @@ export class TransactionRepository extends GenericRepository<Transaction> implem
         status: entity.status as PrismaTransactionStatus,
         paymentGateway: entity.paymentGateway as PrismaPaymentGateway,
         paymentMethod: entity.paymentMethod,
-        paymentDetails: entity.paymentDetails ? (entity.paymentDetails as Prisma.InputJsonValue) : undefined,
+        paymentDetails: entity.paymentDetails
+          ? (entity.paymentDetails as Prisma.InputJsonValue)
+          : undefined,
         courseId: entity.courseId,
         transactionId: entity.transactionId,
-        metadata: entity.metadata ? (entity.metadata as Prisma.InputJsonValue) : undefined,
+        metadata: entity.metadata
+          ? (entity.metadata as Prisma.InputJsonValue)
+          : undefined,
         orderId: entity.orderId,
       };
     }
@@ -91,10 +98,14 @@ export class TransactionRepository extends GenericRepository<Transaction> implem
           status: transaction.status as PrismaTransactionStatus,
           paymentGateway: transaction.paymentGateway as PrismaPaymentGateway,
           paymentMethod: transaction.paymentMethod,
-          paymentDetails: transaction.paymentDetails ? (transaction.paymentDetails as Prisma.InputJsonValue) : undefined,
+          paymentDetails: transaction.paymentDetails
+            ? (transaction.paymentDetails as Prisma.InputJsonValue)
+            : undefined,
           courseId: transaction.courseId,
           transactionId: transaction.transactionId,
-          metadata: transaction.metadata ? (transaction.metadata as Prisma.InputJsonValue) : undefined,
+          metadata: transaction.metadata
+            ? (transaction.metadata as Prisma.InputJsonValue)
+            : undefined,
           orderId: transaction.orderId,
         },
       });

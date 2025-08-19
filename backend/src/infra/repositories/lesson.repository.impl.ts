@@ -14,10 +14,8 @@ import { LessonStatus } from "../../domain/enum/lesson.enum";
 import { ContentStatus, ContentType } from "../../domain/enum/content.enum";
 import { ILessonRepository } from "../../app/repositories/lesson.repository";
 import { Lesson } from "../../domain/entities/lesson.entity";
-import {
-  LessonContent,
-} from "../../domain/entities/content.entity";
-import { GenericRepository } from "./base/generic.repository";
+import { LessonContent } from "../../domain/entities/content.entity";
+import { GenericRepository } from "./generic.repository";
 
 // Type definitions for lesson data
 interface LessonData {
@@ -54,9 +52,12 @@ interface QuizQuestionData {
   correctAnswer: string;
 }
 
-export class LessonRepository extends GenericRepository<Lesson> implements ILessonRepository {
+export class LessonRepository
+  extends GenericRepository<Lesson>
+  implements ILessonRepository
+{
   constructor(private readonly _prisma: PrismaClient) {
-    super(_prisma, 'lesson');
+    super(_prisma, "lesson");
   }
 
   protected getPrismaModel() {
@@ -381,7 +382,16 @@ export class LessonRepository extends GenericRepository<Lesson> implements ILess
 
   private mapToLessonEntity(
     lesson: PrismaLesson & {
-      content?: (PrismaLessonContent & { quizQuestions: Array<{ id: string; question: string; options: string[]; correctAnswer: string }> }) | null;
+      content?:
+        | (PrismaLessonContent & {
+            quizQuestions: Array<{
+              id: string;
+              question: string;
+              options: string[];
+              correctAnswer: string;
+            }>;
+          })
+        | null;
     }
   ): Lesson {
     return Lesson.fromPersistence({
@@ -422,7 +432,16 @@ export class LessonRepository extends GenericRepository<Lesson> implements ILess
 
   private mapToLessonOutputDTO(
     lesson: PrismaLesson & {
-      content?: (PrismaLessonContent & { quizQuestions: Array<{ id: string; question: string; options: string[]; correctAnswer: string }> }) | null;
+      content?:
+        | (PrismaLessonContent & {
+            quizQuestions: Array<{
+              id: string;
+              question: string;
+              options: string[];
+              correctAnswer: string;
+            }>;
+          })
+        | null;
     }
   ): ILessonOutputDTO {
     return {

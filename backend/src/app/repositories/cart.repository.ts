@@ -1,5 +1,5 @@
 import { Cart } from "../../domain/entities/cart.entity";
-import { IGenericRepository } from "./base/generic-repository.interface";
+import { IGenericRepository } from "./generic-repository.interface";
 
 export interface ICartRepository extends IGenericRepository<Cart> {
   findByUserId(userId: string, includeDeleted?: boolean): Promise<Cart[]>;
@@ -9,4 +9,4 @@ export interface ICartRepository extends IGenericRepository<Cart> {
   deleteByUserAndCourse(userId: string, courseId: string): Promise<void>;
   deleteByUserId(userId: string): Promise<void>;
   countByUserId(userId: string): Promise<number>;
-} 
+}

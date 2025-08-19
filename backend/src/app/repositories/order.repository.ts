@@ -2,14 +2,16 @@ import { Order } from "../../domain/entities/order.entity";
 import { PaymentGateway } from "../../domain/enum/payment-gateway.enum";
 import { Course } from "../../domain/entities/course.entity";
 import { OrderStatus } from "../../domain/enum/order-status.enum";
-import { OrderFilters, PaginatedOrderResult, OrderItemCreation, CourseOrderData } from "../../domain/types/order.interface";
-import { IGenericRepository } from "./base/generic-repository.interface";
+import {
+  OrderFilters,
+  PaginatedOrderResult,
+  OrderItemCreation,
+  CourseOrderData,
+} from "../../domain/types/order.interface";
+import { IGenericRepository } from "./generic-repository.interface";
 
 export interface IOrderRepository extends IGenericRepository<Order> {
-  findAll(
-    userId: string,
-    filters: OrderFilters
-  ): Promise<PaginatedOrderResult>;
+  findAll(userId: string, filters: OrderFilters): Promise<PaginatedOrderResult>;
   findByPaymentId(paymentId: string): Promise<Order | null>;
   getAllOrders(userId: string): Promise<Order[]>;
   createOrder(
@@ -28,7 +30,7 @@ export interface IOrderRepository extends IGenericRepository<Order> {
     where: Record<string, unknown>;
     skip: number;
     take: number;
-    orderBy: Record<string, 'asc' | 'desc' | undefined>;
+    orderBy: Record<string, "asc" | "desc" | undefined>;
     include?: Record<string, unknown>;
   }): Promise<Order[]>;
   count(where: Record<string, unknown>): Promise<number>;
@@ -36,8 +38,6 @@ export interface IOrderRepository extends IGenericRepository<Order> {
     orderId: string,
     courses: CourseOrderData[]
   ): Promise<OrderItemCreation[]>;
-  findOrderItems(
-    orderId: string
-  ): Promise<OrderItemCreation[]>;
+  findOrderItems(orderId: string): Promise<OrderItemCreation[]>;
   findCourseById(courseId: string): Promise<Course | null>;
 }

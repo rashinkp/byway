@@ -6,13 +6,19 @@ import { UserId } from "../../domain/value-object/UserId";
 import { MessageContent } from "../../domain/value-object/MessageContent";
 import { Timestamp } from "../../domain/value-object/Timestamp";
 import { IMessageWithUserData } from "../../domain/types/message.interface";
-import { MessageType as DomainMessageType, MessageType } from "../../domain/enum/Message-type.enum";
+import {
+  MessageType as DomainMessageType,
+  MessageType,
+} from "../../domain/enum/Message-type.enum";
 import { MessageType as PrismaMessageType, PrismaClient } from "@prisma/client";
-import { GenericRepository } from "./base/generic.repository";
+import { GenericRepository } from "./generic.repository";
 
-export class MessageRepository extends GenericRepository<Message> implements IMessageRepository {
+export class MessageRepository
+  extends GenericRepository<Message>
+  implements IMessageRepository
+{
   constructor(private _prisma: PrismaClient) {
-    super(_prisma, 'message');
+    super(_prisma, "message");
   }
 
   protected getPrismaModel() {
@@ -20,17 +26,19 @@ export class MessageRepository extends GenericRepository<Message> implements IMe
   }
 
   protected mapToEntity(message: any): Message {
-    return Message.fromPersistence(message as unknown as {
-      chatId: string;
-      senderId: string;
-      content: string | null;
-      imageUrl: string | null;
-      audioUrl: string | null;
-      type: string;
-      isRead: boolean;
-      createdAt: Date;
-      id?: string;
-    });
+    return Message.fromPersistence(
+      message as unknown as {
+        chatId: string;
+        senderId: string;
+        content: string | null;
+        imageUrl: string | null;
+        audioUrl: string | null;
+        type: string;
+        isRead: boolean;
+        createdAt: Date;
+        id?: string;
+      }
+    );
   }
 
   protected mapToPrismaData(entity: any): any {
@@ -48,7 +56,7 @@ export class MessageRepository extends GenericRepository<Message> implements IMe
     }
     return entity;
   }
-  
+
   // Generic repository method
   async findById(id: string): Promise<Message | null> {
     const messageId = new MessageId(id);
@@ -62,26 +70,8 @@ export class MessageRepository extends GenericRepository<Message> implements IMe
     });
     if (!message) return null;
 
-    return Message.fromPersistence(message as unknown as {
-      chatId: string;
-      senderId: string;
-      content: string | null;
-      imageUrl: string | null;
-      audioUrl: string | null;
-      type: string;
-      isRead: boolean;
-      createdAt: Date;
-      id?: string;
-    });
-  }
-
-  async findByChat(chatId: ChatId): Promise<Message[]> {
-    const messages = await this._prisma.message.findMany({
-      where: { chatId: chatId.value },
-      orderBy: { createdAt: "asc" },
-    });
-    return messages.map((msg) =>
-      Message.fromPersistence(msg as unknown as {
+    return Message.fromPersistence(
+      message as unknown as {
         chatId: string;
         senderId: string;
         content: string | null;
@@ -91,7 +81,29 @@ export class MessageRepository extends GenericRepository<Message> implements IMe
         isRead: boolean;
         createdAt: Date;
         id?: string;
-      })
+      }
+    );
+  }
+
+  async findByChat(chatId: ChatId): Promise<Message[]> {
+    const messages = await this._prisma.message.findMany({
+      where: { chatId: chatId.value },
+      orderBy: { createdAt: "asc" },
+    });
+    return messages.map((msg) =>
+      Message.fromPersistence(
+        msg as unknown as {
+          chatId: string;
+          senderId: string;
+          content: string | null;
+          imageUrl: string | null;
+          audioUrl: string | null;
+          type: string;
+          isRead: boolean;
+          createdAt: Date;
+          id?: string;
+        }
+      )
     );
   }
 
@@ -233,7 +245,7 @@ export class MessageRepository extends GenericRepository<Message> implements IMe
     const message = await this._prisma.message.findUnique({
       where: { id },
     });
-    if (!message) throw new Error('Message not found');
+    if (!message) throw new Error("Message not found");
     return this.mapToEntity(message);
   }
 

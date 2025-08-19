@@ -19,8 +19,6 @@ export interface IEnrollmentRepository {
     courseId: string,
     status: "ACTIVE" | "BLOCKED" | "EXPIRED"
   ): Promise<void>;
-
-  // Enrollment stats method
   getEnrollmentStats(
     input: IGetEnrollmentStatsInput
   ): Promise<IEnrollmentStats>;

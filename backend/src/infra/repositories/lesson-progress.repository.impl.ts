@@ -3,11 +3,14 @@ import { LessonProgress } from "../../domain/entities/progress.entity";
 import { ILessonProgressRepository } from "../../app/repositories/lesson-progress.repository.interface";
 import { HttpError } from "../../presentation/http/errors/http-error";
 import { QuizAnswer } from "../../domain/entities/quiz-answer.entity";
-import { GenericRepository } from "./base/generic.repository";
+import { GenericRepository } from "./generic.repository";
 
-export class LessonProgressRepository extends GenericRepository<LessonProgress> implements ILessonProgressRepository {
+export class LessonProgressRepository
+  extends GenericRepository<LessonProgress>
+  implements ILessonProgressRepository
+{
   constructor(private readonly _prisma: PrismaClient) {
-    super(_prisma, 'lessonProgress');
+    super(_prisma, "lessonProgress");
   }
 
   protected getPrismaModel() {
@@ -24,17 +27,18 @@ export class LessonProgressRepository extends GenericRepository<LessonProgress> 
       completedAt: progress.completedAt,
       score: progress.score ?? undefined,
       totalQuestions: progress.totalQuestions ?? undefined,
-      answers: progress.answers?.map((answer: any) =>
-        QuizAnswer.fromPersistence({
-          id: answer.id,
-          lessonProgressId: answer.lessonProgressId,
-          quizQuestionId: answer.quizQuestionId,
-          selectedAnswer: answer.selectedAnswer,
-          isCorrect: answer.isCorrect,
-          createdAt: answer.createdAt,
-          updatedAt: answer.updatedAt,
-        })
-      ) || [],
+      answers:
+        progress.answers?.map((answer: any) =>
+          QuizAnswer.fromPersistence({
+            id: answer.id,
+            lessonProgressId: answer.lessonProgressId,
+            quizQuestionId: answer.quizQuestionId,
+            selectedAnswer: answer.selectedAnswer,
+            isCorrect: answer.isCorrect,
+            createdAt: answer.createdAt,
+            updatedAt: answer.updatedAt,
+          })
+        ) || [],
       createdAt: progress.createdAt,
       updatedAt: progress.updatedAt,
     });
@@ -310,7 +314,7 @@ export class LessonProgressRepository extends GenericRepository<LessonProgress> 
       }
 
       return Math.round((completedLessons / totalLessons) * 100);
-    } catch  {
+    } catch {
       throw new HttpError("Failed to calculate course progress", 500);
     }
   }

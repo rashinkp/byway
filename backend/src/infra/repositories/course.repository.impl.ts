@@ -10,13 +10,26 @@ import { APPROVALSTATUS } from "../../domain/enum/approval-status.enum";
 import { ICourseRepository } from "../../app/repositories/course.repository.interface";
 import { HttpError } from "../../presentation/http/errors/http-error";
 import { IGetTopEnrolledCoursesInput } from "../../app/usecases/course/interfaces/top-enrolled-courses.usecase.interface";
-import { CourseOverallStats, CourseStats } from "../../domain/types/course-stats.interface";import { FilterCourse, PaginatedResult } from "../../domain/types/pagination-filter.interface";
-import { CourseStatsInput, CourseWithEnrollment } from "../../domain/types/course.interface";
+import {
+  CourseOverallStats,
+  CourseStats,
+} from "../../domain/types/course-stats.interface";
+import {
+  FilterCourse,
+  PaginatedResult,
+} from "../../domain/types/pagination-filter.interface";
+import {
+  CourseStatsInput,
+  CourseWithEnrollment,
+} from "../../domain/types/course.interface";
 import { UserProfile } from "../../domain/entities/user-profile.entity";
-import { GenericRepository } from "./base/generic.repository";
-export class CourseRepository extends GenericRepository<Course> implements ICourseRepository {
+import { GenericRepository } from "./generic.repository";
+export class CourseRepository
+  extends GenericRepository<Course>
+  implements ICourseRepository
+{
   constructor(private _prisma: PrismaClient) {
-    super(_prisma, 'course');
+    super(_prisma, "course");
   }
 
   protected getPrismaModel() {
@@ -57,27 +70,33 @@ export class CourseRepository extends GenericRepository<Course> implements ICour
     userId?: string
   ): Promise<CourseWithEnrollment> {
     const courseData = course.toJSON();
-    
+
     // Get instructor data
     const instructor = await this._prisma.user.findUnique({
       where: { id: courseData.createdBy as string },
-      select: { id: true, name: true, email: true, userProfile: true }
+      select: { id: true, name: true, email: true, userProfile: true },
     });
 
     // Get review stats
     const reviews = await this._prisma.courseReview.findMany({
       where: { courseId: courseData.id as string, deletedAt: null },
-      select: { rating: true }
+      select: { rating: true },
     });
 
-    const rating = reviews.length > 0 
-      ? reviews.reduce((sum, review) => sum + review.rating, 0) / reviews.length 
-      : 0;
+    const rating =
+      reviews.length > 0
+        ? reviews.reduce((sum, review) => sum + review.rating, 0) /
+          reviews.length
+        : 0;
 
     // Check if user is enrolled (if userId is provided)
-    const isEnrolled = userId ? await this._prisma.enrollment.findFirst({
-      where: { userId, courseId : courseData.id as string }
-    }).then(enrollment => !!enrollment) : false;
+    const isEnrolled = userId
+      ? await this._prisma.enrollment
+          .findFirst({
+            where: { userId, courseId: courseData.id as string },
+          })
+          .then((enrollment) => !!enrollment)
+      : false;
 
     // Check if course is in cart (if userId is provided)
     const isInCart = userId
@@ -124,7 +143,6 @@ export class CourseRepository extends GenericRepository<Course> implements ICour
         reviewCount: reviews.length,
       },
     };
-
   }
 
   async save(course: Course): Promise<Course> {
@@ -286,7 +304,9 @@ export class CourseRepository extends GenericRepository<Course> implements ICour
 
       // Transform courses to include enrollment and additional data
       const coursesWithEnrollment = await Promise.all(
-        courseEntities.map(course => this.transformCourseToEnrollmentData(course, input.userId))
+        courseEntities.map((course) =>
+          this.transformCourseToEnrollmentData(course, input.userId)
+        )
       );
 
       return {
@@ -294,7 +314,7 @@ export class CourseRepository extends GenericRepository<Course> implements ICour
         total,
         totalPage: Math.ceil(total / limit),
       };
-    } catch  {
+    } catch {
       throw new HttpError("Failed to retrieve courses", 500);
     }
   }
@@ -370,7 +390,7 @@ export class CourseRepository extends GenericRepository<Course> implements ICour
             })
           : null,
       });
-    } catch  {
+    } catch {
       throw new HttpError("Failed to update course", 500);
     }
   }
@@ -407,8 +427,7 @@ export class CourseRepository extends GenericRepository<Course> implements ICour
             })
           : null,
       });
-    } catch  {
-    
+    } catch {
       throw new HttpError("Failed to soft delete course", 500);
     }
   }
@@ -480,7 +499,9 @@ export class CourseRepository extends GenericRepository<Course> implements ICour
 
       // Transform courses to include enrollment and additional data
       const coursesWithEnrollment = await Promise.all(
-        courseEntities.map(course => this.transformCourseToEnrollmentData(course, input.userId))
+        courseEntities.map((course) =>
+          this.transformCourseToEnrollmentData(course, input.userId)
+        )
       );
 
       return {
@@ -489,7 +510,6 @@ export class CourseRepository extends GenericRepository<Course> implements ICour
         totalPage: Math.ceil(total / limit),
       };
     } catch {
-
       throw new HttpError("Failed to retrieve enrolled courses", 500);
     }
   }
@@ -528,7 +548,6 @@ export class CourseRepository extends GenericRepository<Course> implements ICour
           : null,
       });
     } catch {
-   
       throw new HttpError("Failed to update course approval status", 500);
     }
   }
@@ -547,7 +566,7 @@ export class CourseRepository extends GenericRepository<Course> implements ICour
         objectives: details.objectives,
         targetAudience: details.targetAudience,
       });
-    } catch  {
+    } catch {
       throw new HttpError("Failed to retrieve course details", 500);
     }
   }
@@ -580,7 +599,7 @@ export class CourseRepository extends GenericRepository<Course> implements ICour
         objectives: updatedDetails.objectives,
         targetAudience: updatedDetails.targetAudience,
       });
-    } catch  {
+    } catch {
       throw new HttpError("Failed to update course details", 500);
     }
   }
@@ -679,7 +698,9 @@ export class CourseRepository extends GenericRepository<Course> implements ICour
         }),
 
         // Published courses
-        this._prisma.course.count({ where: { status: CourseStatus.PUBLISHED } }),
+        this._prisma.course.count({
+          where: { status: CourseStatus.PUBLISHED },
+        }),
 
         // Draft courses
         this._prisma.course.count({ where: { status: CourseStatus.DRAFT } }),
@@ -785,7 +806,8 @@ export class CourseRepository extends GenericRepository<Course> implements ICour
         const rating =
           reviews.length > 0
             ? reviews.reduce(
-                (sum: number, review: { rating: number }) => sum + review.rating,
+                (sum: number, review: { rating: number }) =>
+                  sum + review.rating,
                 0
               ) / reviews.length
             : 0;

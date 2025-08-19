@@ -2,7 +2,7 @@ import { PrismaClient } from "@prisma/client";
 import { User } from "../../domain/entities/user.entity";
 import { UserVerification } from "../../domain/entities/user-verification.entity";
 import { IAuthRepository } from "../../app/repositories/auth.repository";
-import { GenericRepository } from "./base/generic.repository";
+import { GenericRepository } from "./generic.repository";
 
 export class AuthRepository extends GenericRepository<User> implements IAuthRepository {
   constructor(private _prisma: PrismaClient) {
@@ -70,43 +70,7 @@ export class AuthRepository extends GenericRepository<User> implements IAuthRepo
   }
 
   async createUser(user: User): Promise<User> {
-    return this.createGeneric(user);
-  }
-
-  // Generic repository methods
-  async create(user: User): Promise<User> {
-    return this.createGeneric(user);
-  }
-
-  async findById(id: string): Promise<User | null> {
-    return this.findByIdGeneric(id);
-  }
-
-  async find(filter?: any): Promise<User[]> {
-    return this.findGeneric(filter);
-  }
-
-  async update(id: string, user: User): Promise<User> {
-    return this.updateGeneric(id, user);
-  }
-
-  async delete(id: string): Promise<void> {
-    return this.deleteGeneric(id);
-  }
-
-  async softDelete(id: string): Promise<User> {
-    const deleted = await this._prisma.user.update({
-      where: { id },
-      data: {
-        deletedAt: new Date(),
-        updatedAt: new Date(),
-      },
-    });
-    return this.mapToEntity(deleted);
-  }
-
-  async count(filter?: any): Promise<number> {
-    return this.countGeneric(filter);
+    return this.create(user);
   }
 
   async createVerification(
@@ -121,52 +85,46 @@ export class AuthRepository extends GenericRepository<User> implements IAuthRepo
         expiresAt: verification.expiresAt,
         attemptCount: verification.attempts,
         isUsed: verification.isUsed,
-        createdAt: verification.createdAt,
       },
       create: {
         id: verification.id,
-        userId: verification.userId,
         email: verification.email,
+        userId: verification.userId,
         otp: verification.otp,
         expiresAt: verification.expiresAt,
         attemptCount: verification.attempts,
         isUsed: verification.isUsed,
-        createdAt: verification.createdAt,
       },
     });
+
     return UserVerification.fromPersistence(created);
   }
 
-  async findVerificationByEmail(
-    email: string
-  ): Promise<UserVerification | null> {
-    const verification = await this._prisma.userVerification.findUnique({
-      where: { email },
-    });
-
-    if (!verification) return null;
-    return UserVerification.fromPersistence(verification);
+  async findVerificationByEmail(email: string): Promise<UserVerification | null> {
+    const ver = await this._prisma.userVerification.findUnique({ where: { email } });
+    return ver ? UserVerification.fromPersistence(ver) : null;
   }
 
-  async updateVerification(
-    verification: UserVerification
-  ): Promise<UserVerification> {
+  async updateVerification(verification: UserVerification): Promise<UserVerification> {
     const updated = await this._prisma.userVerification.update({
-      where: { id: verification.id },
+      where: { email: verification.email },
       data: {
+        id: verification.id,
         userId: verification.userId,
-        email: verification.email,
         otp: verification.otp,
         expiresAt: verification.expiresAt,
         attemptCount: verification.attempts,
         isUsed: verification.isUsed,
-        createdAt: verification.createdAt,
       },
     });
     return UserVerification.fromPersistence(updated);
   }
 
   async updateUser(user: User): Promise<User> {
-    return this.updateGeneric(user.id, user);
+    const updated = await this._prisma.user.update({
+      where: { id: user.id },
+      data: this.mapToPrismaData(user),
+    });
+    return this.mapToEntity(updated);
   }
 }

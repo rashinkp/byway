@@ -2,11 +2,14 @@ import { PrismaClient } from "@prisma/client";
 import { IWalletRepository } from "../../app/repositories/wallet.repository.interface";
 import { Wallet } from "../../domain/entities/wallet.entity";
 import { Money } from "../../domain/value-object/money.value-object";
-import { GenericRepository } from "./base/generic.repository";
+import { GenericRepository } from "./generic.repository";
 
-export class WalletRepository extends GenericRepository<Wallet> implements IWalletRepository {
+export class WalletRepository
+  extends GenericRepository<Wallet>
+  implements IWalletRepository
+{
   constructor(private readonly _prisma: PrismaClient) {
-    super(_prisma, 'wallet');
+    super(_prisma, "wallet");
   }
 
   protected getPrismaModel() {

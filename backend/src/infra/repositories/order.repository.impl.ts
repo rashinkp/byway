@@ -5,12 +5,20 @@ import { Course } from "../../domain/entities/course.entity";
 import { OrderStatus } from "../../domain/enum/order-status.enum";
 import { PaymentStatus } from "../../domain/enum/payment-status.enum";
 import { PaymentGateway } from "../../domain/enum/payment-gateway.enum";
-import { OrderFilters, PaginatedOrderResult, OrderItemCreation, CourseOrderData } from "../../domain/types/order.interface";
-import { GenericRepository } from "./base/generic.repository";
+import {
+  OrderFilters,
+  PaginatedOrderResult,
+  OrderItemCreation,
+  CourseOrderData,
+} from "../../domain/types/order.interface";
+import { GenericRepository } from "./generic.repository";
 
-export class OrderRepository extends GenericRepository<Order> implements IOrderRepository {
+export class OrderRepository
+  extends GenericRepository<Order>
+  implements IOrderRepository
+{
   constructor(private _prisma: PrismaClient) {
-    super(_prisma, 'order');
+    super(_prisma, "order");
   }
 
   protected getPrismaModel() {
@@ -112,35 +120,99 @@ export class OrderRepository extends GenericRepository<Order> implements IOrderR
       order.paymentStatus as PaymentStatus,
       order.paymentId as string | null,
       order.paymentGateway as PaymentGateway,
-      typeof order.amount === 'number' ? order.amount : (order.amount as { toNumber(): number }).toNumber(),
+      typeof order.amount === "number"
+        ? order.amount
+        : (order.amount as { toNumber(): number }).toNumber(),
       order.couponCode as string | null,
       (order.items as Array<Record<string, unknown>>).map((item) => ({
         orderId: item.orderId as string,
         courseId: item.courseId as string,
-        courseTitle: (item.courseTitle as string) || (item.course as Record<string, unknown>)?.title as string || "Unknown Course",
-        coursePrice: typeof item.coursePrice === 'number' ? item.coursePrice : (item.coursePrice as { toNumber(): number }).toNumber(),
-        discount: item.discount ? (typeof item.discount === 'number' ? item.discount : (item.discount as { toNumber(): number }).toNumber()) : null,
-        couponId: item.couponId as string | null,
-        title: (item.course as Record<string, unknown>)?.title as string || (item.courseTitle as string) || "Unknown Course",
-        description: (item.course as Record<string, unknown>)?.description as string || "No description available",
-        level: (item.course as Record<string, unknown>)?.level as string || "BEGINNER",
-        price: (item.course as Record<string, unknown>)?.price
-          ? (typeof (item.course as Record<string, unknown>).price === 'number' ? (item.course as Record<string, unknown>).price as number : ((item.course as Record<string, unknown>).price as { toNumber(): number }).toNumber())
-          : (typeof item.coursePrice === 'number' ? item.coursePrice : (item.coursePrice as { toNumber(): number }).toNumber()),
-        thumbnail: (item.course as Record<string, unknown>)?.thumbnail as string | null,
-        status: (item.course as Record<string, unknown>)?.status as string || "ACTIVE",
-        categoryId: (item.course as Record<string, unknown>)?.categoryId as string || "",
-        createdBy: (item.course as Record<string, unknown>)?.createdBy as string || "",
-        deletedAt: (item.course as Record<string, unknown>)?.deletedAt
-          ? new Date((item.course as Record<string, unknown>).deletedAt as Date).toISOString()
+        courseTitle:
+          (item.courseTitle as string) ||
+          ((item.course as Record<string, unknown>)?.title as string) ||
+          "Unknown Course",
+        coursePrice:
+          typeof item.coursePrice === "number"
+            ? item.coursePrice
+            : (item.coursePrice as { toNumber(): number }).toNumber(),
+        discount: item.discount
+          ? typeof item.discount === "number"
+            ? item.discount
+            : (item.discount as { toNumber(): number }).toNumber()
           : null,
-        approvalStatus: (item.course as Record<string, unknown>)?.approvalStatus as string || "PENDING",
-        details: (item.course as Record<string, unknown>)?.details ? {
-          prerequisites: ((item.course as Record<string, unknown>)?.details as Record<string, unknown>)?.prerequisites as string | null || null,
-          longDescription: ((item.course as Record<string, unknown>)?.details as Record<string, unknown>)?.longDescription as string | null || null,
-          objectives: ((item.course as Record<string, unknown>)?.details as Record<string, unknown>)?.objectives as string | null || null,
-          targetAudience: ((item.course as Record<string, unknown>)?.details as Record<string, unknown>)?.targetAudience as string | null || null,
-        } : null,
+        couponId: item.couponId as string | null,
+        title:
+          ((item.course as Record<string, unknown>)?.title as string) ||
+          (item.courseTitle as string) ||
+          "Unknown Course",
+        description:
+          ((item.course as Record<string, unknown>)?.description as string) ||
+          "No description available",
+        level:
+          ((item.course as Record<string, unknown>)?.level as string) ||
+          "BEGINNER",
+        price: (item.course as Record<string, unknown>)?.price
+          ? typeof (item.course as Record<string, unknown>).price === "number"
+            ? ((item.course as Record<string, unknown>).price as number)
+            : (
+                (item.course as Record<string, unknown>).price as {
+                  toNumber(): number;
+                }
+              ).toNumber()
+          : typeof item.coursePrice === "number"
+          ? item.coursePrice
+          : (item.coursePrice as { toNumber(): number }).toNumber(),
+        thumbnail: (item.course as Record<string, unknown>)?.thumbnail as
+          | string
+          | null,
+        status:
+          ((item.course as Record<string, unknown>)?.status as string) ||
+          "ACTIVE",
+        categoryId:
+          ((item.course as Record<string, unknown>)?.categoryId as string) ||
+          "",
+        createdBy:
+          ((item.course as Record<string, unknown>)?.createdBy as string) || "",
+        deletedAt: (item.course as Record<string, unknown>)?.deletedAt
+          ? new Date(
+              (item.course as Record<string, unknown>).deletedAt as Date
+            ).toISOString()
+          : null,
+        approvalStatus:
+          ((item.course as Record<string, unknown>)
+            ?.approvalStatus as string) || "PENDING",
+        details: (item.course as Record<string, unknown>)?.details
+          ? {
+              prerequisites:
+                ((
+                  (item.course as Record<string, unknown>)?.details as Record<
+                    string,
+                    unknown
+                  >
+                )?.prerequisites as string | null) || null,
+              longDescription:
+                ((
+                  (item.course as Record<string, unknown>)?.details as Record<
+                    string,
+                    unknown
+                  >
+                )?.longDescription as string | null) || null,
+              objectives:
+                ((
+                  (item.course as Record<string, unknown>)?.details as Record<
+                    string,
+                    unknown
+                  >
+                )?.objectives as string | null) || null,
+              targetAudience:
+                ((
+                  (item.course as Record<string, unknown>)?.details as Record<
+                    string,
+                    unknown
+                  >
+                )?.targetAudience as string | null) || null,
+            }
+          : null,
       }))
     );
     mappedOrder.id = order.id as string;
@@ -275,7 +347,7 @@ export class OrderRepository extends GenericRepository<Order> implements IOrderR
   async findMany(params: {
     skip: number;
     take: number;
-    orderBy: Record<string, 'asc' | 'desc' | undefined>;
+    orderBy: Record<string, "asc" | "desc" | undefined>;
     include?: Record<string, unknown>;
   }): Promise<Order[]> {
     const orders = await this._prisma.order.findMany(params);
@@ -399,9 +471,7 @@ export class OrderRepository extends GenericRepository<Order> implements IOrderR
     return orderItems;
   }
 
-  async findOrderItems(
-    orderId: string
-  ): Promise<OrderItemCreation[]> {
+  async findOrderItems(orderId: string): Promise<OrderItemCreation[]> {
     const orderItems = await this._prisma.orderItem.findMany({
       where: { orderId },
       include: {

@@ -2,7 +2,7 @@ import { PrismaClient } from "@prisma/client";
 import { Category } from "../../domain/entities/category.entity";
 import { ICategoryRepository } from "../../app/repositories/category.repository";
 import { PaginationFilter } from "../../domain/types/pagination-filter.interface";
-import { GenericRepository } from "./base/generic.repository";
+import { GenericRepository } from "./generic.repository";
 
 export class CategoryRepository extends GenericRepository<Category> implements ICategoryRepository {
   constructor(private _prisma: PrismaClient) {
@@ -30,42 +30,6 @@ export class CategoryRepository extends GenericRepository<Category> implements I
       };
     }
     return entity;
-  }
-
-  async findById(id: string): Promise<Category | null> {
-    return this.findByIdGeneric(id);
-  }
-
-  // Generic repository methods
-  async create(category: Category): Promise<Category> {
-    return this.createGeneric(category);
-  }
-
-  async find(filter?: any): Promise<Category[]> {
-    return this.findGeneric(filter);
-  }
-
-  async update(id: string, category: Category): Promise<Category> {
-    return this.updateGeneric(id, category);
-  }
-
-  async delete(id: string): Promise<void> {
-    return this.deleteGeneric(id);
-  }
-
-  async softDelete(id: string): Promise<Category> {
-    const deleted = await this._prisma.category.update({
-      where: { id },
-      data: {
-        deletedAt: new Date(),
-        updatedAt: new Date(),
-      },
-    });
-    return this.mapToEntity(deleted);
-  }
-
-  async count(filter?: any): Promise<number> {
-    return this.countGeneric(filter);
   }
 
   async save(category: Category): Promise<Category> {
@@ -132,9 +96,7 @@ export class CategoryRepository extends GenericRepository<Category> implements I
     ]);
 
     return {
-      categories: categories.map((category) =>
-        Category.fromPersistence(category)
-      ),
+      categories: categories.map((c) => Category.fromPersistence(c)),
       total,
     };
   }

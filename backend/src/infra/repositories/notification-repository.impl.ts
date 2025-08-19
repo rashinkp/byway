@@ -3,14 +3,14 @@ import { Notification } from "../../domain/entities/notification.entity";
 import { PrismaClient } from "@prisma/client";
 import { NotificationEntityType } from "../../domain/enum/notification-entity-type.enum";
 import { PaginatedNotificationList } from "../../domain/types/notification.interface";
-import { GenericRepository } from "./base/generic.repository";
+import { GenericRepository } from "./generic.repository";
 
 export class PrismaNotificationRepository
   extends GenericRepository<Notification>
   implements NotificationRepositoryInterface
 {
   constructor(private readonly _prisma: PrismaClient) {
-    super(_prisma, 'notification');
+    super(_prisma, "notification");
   }
 
   protected getPrismaModel() {
@@ -64,7 +64,7 @@ export class PrismaNotificationRepository
       case NotificationEntityType.REVIEW:
         return "REVIEW";
       case NotificationEntityType.INSTRUCTOR:
-        return "USER"; 
+        return "USER";
       default:
         return "GENERAL";
     }
