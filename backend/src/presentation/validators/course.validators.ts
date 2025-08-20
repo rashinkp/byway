@@ -41,7 +41,11 @@ const courseFieldsSchema = z.object({
     .nullable(),
   duration: z.number().optional().nullable(),
   level: z.enum(courseLevelValues),
-  thumbnail: z.string().url("Invalid URL").optional().nullable(),
+  // Accept either a full URL or an S3 key (non-empty string)
+  thumbnail: z
+    .union([z.string().url("Invalid URL"), z.string().min(1)])
+    .optional()
+    .nullable(),
   offer: z
     .number()
     .min(0, "Offer must be non-negative")

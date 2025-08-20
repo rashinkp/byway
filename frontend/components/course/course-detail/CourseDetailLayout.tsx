@@ -11,6 +11,7 @@ import { AlertCircle } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useGetContentByLessonId } from "@/hooks/content/useGetContentByLessonId";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useSignedUrl } from "@/hooks/file/useSignedUrl";
 
 
 export default function CourseDetailLayout({
@@ -27,6 +28,13 @@ export default function CourseDetailLayout({
 	const [openLessonContentId, setOpenLessonContentId] = React.useState<string | null>(null);
 	const isAdmin = userRole === 'ADMIN';
 	const { data: lessonContent, isLoading: isContentLoading, error: contentError } = useGetContentByLessonId(openLessonContentId || "");
+
+	// Resolve signed URLs for course thumbnail and instructor avatar when they are S3 keys
+	const courseThumbIsKey = typeof course?.thumbnail === 'string' && !!course?.thumbnail && !/^https?:\/\//.test(course.thumbnail) && !course.thumbnail.startsWith('/');
+	const { url: courseThumbUrl } = useSignedUrl(courseThumbIsKey ? course?.thumbnail : null);
+	const instructorAvatar = (instructor as { avatar?: string })?.avatar;
+	const avatarIsKey = typeof instructorAvatar === 'string' && !!instructorAvatar && !/^https?:\/\//.test(instructorAvatar) && !instructorAvatar.startsWith('/');
+	const { url: instructorAvatarUrl } = useSignedUrl(avatarIsKey ? instructorAvatar : null);
 
 	// Default no-op functions for AdminActions
 	const noOp: () => void = () => {};
@@ -52,7 +60,7 @@ export default function CourseDetailLayout({
 				<div className="flex flex-col sm:flex-row gap-6 items-center">
 					<div className="w-40 h-40 rounded-xl overflow-hidden flex-shrink-0 bg-[#f9fafb] dark:bg-[#18181b] border border-gray-200">
 						<Image
-							src={course?.thumbnail || '/placeholder-course.jpg'}
+							src={courseThumbUrl || course?.thumbnail || '/placeholder-course.jpg'}
 							alt={course?.title || 'Course Thumbnail'}
 							width={160}
 							height={160}
@@ -137,7 +145,7 @@ export default function CourseDetailLayout({
 					<div className="w-14 h-14 rounded-full overflow-hidden bg-[#f9fafb] dark:bg-[#18181b] border border-gray-200">
 						{instructor && (instructor as { avatar?: string }).avatar ? (
 							<Image
-								src={(instructor as { avatar?: string }).avatar || ""}
+								src={instructorAvatarUrl || (instructor as { avatar?: string }).avatar || ""}
 								alt={instructor.name}
 								width={56}
 								height={56}

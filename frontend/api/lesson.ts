@@ -20,7 +20,7 @@ export async function getLessons({
 }: GetLessonsParams): Promise<GetLessonsResponse> {
 	try {
 		const response = await api.get<{ data: GetLessonsResponse }>(
-			`/lessons/${courseId}`,
+			`/lessons/${courseId}/lessons`,
 			{
 				params: {
 					page,
