@@ -16,6 +16,8 @@ import {
 } from "lucide-react";
 import { UserProfileType } from "@/types/user";
 import Image from 'next/image';
+import { useSignedUrl } from "@/hooks/file/useSignedUrl";
+import { useEffect } from "react";
 
 interface ProfileSectionProps {
   user: UserProfileType;
@@ -27,6 +29,16 @@ export default function ProfileSection({
   user,
   setIsModalOpen,
 }: ProfileSectionProps) {
+  // Get signed URL for avatar
+  const { url: avatarUrl, isLoading: avatarLoading, error: avatarError, refresh } = useSignedUrl(user.avatar);
+  
+  // Refresh signed URL when profile updates (e.g., after saving), even if key stays same
+  useEffect(() => {
+    if (user?.updatedAt) {
+      void refresh();
+    }
+  }, [user?.updatedAt, refresh]);
+
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString("en-US", {
       year: "numeric",
@@ -62,7 +74,19 @@ export default function ProfileSection({
         {/* Avatar/Initial */}
         <div className="flex-shrink-0 flex flex-col items-center gap-2 relative">
           {user.avatar ? (
-            <Image src={user.avatar} alt={`${user.name}'s avatar`} width={200} height={200} className="w-24 h-24 rounded-full object-cover border-4 border-gray-200 dark:border-gray-700 shadow-md bg-white dark:bg-[#232326]" />
+            avatarLoading ? (
+              <div className="w-24 h-24 rounded-full bg-gray-200 dark:bg-gray-700 animate-pulse border-4 border-gray-200 dark:border-gray-700 shadow-md" />
+            ) : avatarUrl ? (
+              <img 
+                src={avatarUrl} 
+                alt={`${user.name}'s avatar`} 
+                className="w-24 h-24 rounded-full object-cover border-4 border-gray-200 dark:border-gray-700 shadow-md bg-white dark:bg-[#232326]" 
+              />
+            ) : (
+              <div className="w-24 h-24 rounded-full flex items-center justify-center text-4xl font-bold bg-gray-200 dark:bg-gray-700 text-white border-4 border-gray-200 dark:border-gray-700 shadow-md">
+                {user.name ? getInitials(user.name) : "U"}
+              </div>
+            )
           ) : (
             <div className="w-24 h-24 rounded-full flex items-center justify-center text-4xl font-bold bg-gray-200 dark:bg-gray-700 text-white border-4 border-gray-200 dark:border-gray-700 shadow-md">
               {user.name ? getInitials(user.name) : "U"}
