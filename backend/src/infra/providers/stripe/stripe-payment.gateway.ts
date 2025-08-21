@@ -87,7 +87,11 @@ export class StripePaymentGateway implements PaymentGateway {
             product_data: {
               name: course.title,
               description: course.description || undefined,
-              images: course.thumbnail ? [course.thumbnail] : undefined,
+              // Stripe requires absolute URLs for images; only pass if thumbnail looks like a URL
+              images:
+                course.thumbnail && (course.thumbnail.startsWith("http://") || course.thumbnail.startsWith("https://"))
+                  ? [course.thumbnail]
+                  : undefined,
               metadata: {
                 courseId: course.id,
                 ...(course.duration && { duration: course.duration }),

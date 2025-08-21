@@ -20,6 +20,7 @@ import {
 	X,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useSignedUrl } from "@/hooks/file/useSignedUrl";
 
 interface ContentSectionProps {
 	lessonId: string;
@@ -32,6 +33,21 @@ export const ContentSection = ({ lessonId }: ContentSectionProps) => {
 	const [isEditing, setIsEditing] = useState(false);
 	const [isAlertOpen, setIsAlertOpen] = useState(false);
 	const [deleteContentId, setDeleteContentId] = useState<string | null>(null);
+
+	// Always compute signed URLs hooks in a consistent order to satisfy Rules of Hooks
+	const isAbsoluteUrl = (val?: string | null) => !!val && (val.startsWith("http://") || val.startsWith("https://"));
+	const fileKey = content?.fileUrl ?? null;
+	const thumbKey = content?.thumbnailUrl ?? null;
+	const isVideo = content?.type === ContentType.VIDEO;
+	const isDocument = content?.type === ContentType.DOCUMENT;
+
+	const shouldSignVideo = !!fileKey && isVideo && !isAbsoluteUrl(fileKey);
+	const shouldSignDoc = !!fileKey && isDocument && !isAbsoluteUrl(fileKey);
+	const shouldSignThumb = !!thumbKey && !isAbsoluteUrl(thumbKey);
+
+	const { url: signedVideoUrl } = useSignedUrl(shouldSignVideo ? fileKey : null, 3600, false);
+	const { url: signedDocUrl } = useSignedUrl(shouldSignDoc ? fileKey : null, 600, false);
+	const { url: signedThumbUrl } = useSignedUrl(shouldSignThumb ? thumbKey : null, 3600, false);
 
 	const handleDelete = (contentId: string) => {
 		setDeleteContentId(contentId);
@@ -111,6 +127,11 @@ export const ContentSection = ({ lessonId }: ContentSectionProps) => {
 		);
 	}
 
+	// Compute final URLs
+	const finalVideoSrc = shouldSignVideo ? signedVideoUrl : (content.fileUrl || "");
+	const finalDocSrc = shouldSignDoc ? signedDocUrl : (content.fileUrl || "");
+	const finalPoster = shouldSignThumb ? signedThumbUrl : (content.thumbnailUrl || undefined);
+
 	return (
 		<div className="bg-white dark:bg-[#232323] rounded-2xl shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
 			{/* Content header */}
@@ -154,10 +175,10 @@ export const ContentSection = ({ lessonId }: ContentSectionProps) => {
 							style={{ paddingTop: "56.25%" /* 16:9 aspect ratio */ }}
 						>
 							<video
-								src={content.fileUrl}
+								src={finalVideoSrc}
 								controls
 								className="absolute top-0 left-0 w-full h-full object-contain bg-black"
-								poster={content.thumbnailUrl || undefined}
+								poster={finalPoster}
 							/>
 						</div>
 					</div>
@@ -169,7 +190,7 @@ export const ContentSection = ({ lessonId }: ContentSectionProps) => {
 						<div>
 							<h3 className="text-black dark:text-white font-medium">Document</h3>
 							<a
-								href={content.fileUrl}
+								href={finalDocSrc}
 								target="_blank"
 								rel="noopener noreferrer"
 								className="text-[#facc15] hover:text-black dark:hover:text-white flex items-center mt-1 group"
@@ -210,13 +231,13 @@ export const ContentSection = ({ lessonId }: ContentSectionProps) => {
 												className={`${
 													opt === q.correctAnswer
 														? "text-black dark:text-[#18181b] font-medium"
-														: "text-black dark:text-white"
-												}`}
+													: "text-black dark:text-white"
+											}`}
 											>
 												{opt}
 											</span>
 											{opt === q.correctAnswer && (
-												<span className="ml-auto text-xs bg-[#facc15] text-black dark:bg-[#facc15] dark:text-[#18181b] px-2 py-1 rounded">
+												<span className="ml-auto text-xs bg-[#facc15] text:black dark:bg-[#facc15] dark:text-[#18181b] px-2 py-1 rounded">
 													Correct Answer
 												</span>
 											)}

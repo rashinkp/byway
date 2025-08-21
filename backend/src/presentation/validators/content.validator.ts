@@ -28,9 +28,9 @@ const createLessonContentSchema = z.object({
   status: z.enum([ContentStatus.DRAFT, ContentStatus.PUBLISHED]).optional(),
   title: z.string().nullish(),
   description: z.string().nullish(),
-  // Accept either a full URL or an S3 key
-  fileUrl: z.union([z.string().url(), z.string().min(1)]).nullish(),
-  thumbnailUrl: z.union([z.string().url(), z.string().min(1)]).nullish(),
+  // Accept S3 key or any non-empty path string
+  fileUrl: z.string().min(1).nullish(),
+  thumbnailUrl: z.string().min(1).nullish(),
   quizQuestions: z.array(quizQuestionSchema).nullish(),
 });
 
@@ -45,9 +45,9 @@ const updateLessonContentSchema = z.object({
   status: z.enum([ContentStatus.DRAFT, ContentStatus.PUBLISHED]).optional(),
   title: z.string().nullish(),
   description: z.string().nullish(),
-  // Accept either a full URL or an S3 key
-  fileUrl: z.union([z.string().url(), z.string().min(1)]).nullish(),
-  thumbnailUrl: z.union([z.string().url(), z.string().min(1)]).nullish(),
+  // Accept S3 key or any non-empty path string
+  fileUrl: z.string().min(1).nullish(),
+  thumbnailUrl: z.string().min(1).nullish(),
   quizQuestions: z.array(quizQuestionSchema).nullish(),
 });
 

@@ -10,7 +10,7 @@ export const validateCreateCheckoutSession = {
       price: z.number().positive(),
       offer: z.number().positive().optional(),
       // Accept either a full URL or an S3 key
-      thumbnail: z.union([z.string().url(), z.string().min(1)]).optional(),
+      thumbnail: z.union([z.string(), z.string().min(1)]).optional(),
       duration: z.string().optional(),
       level: z.string().optional()
     })),

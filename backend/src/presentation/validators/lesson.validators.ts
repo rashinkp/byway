@@ -34,9 +34,9 @@ const lessonContentSchema = z.object({
   }),
   title: z.string().nullish(),
   description: z.string().nullish(),
-  // Accept either a full URL or an S3 key
-  fileUrl: z.union([z.string().url(), z.string().min(1)]).nullish(),
-  thumbnailUrl: z.union([z.string().url(), z.string().min(1)]).nullish(),
+  // Accept S3 key or any non-empty path string
+  fileUrl: z.string().min(1).nullish(),
+  thumbnailUrl: z.string().min(1).nullish(),
   quizQuestions: z.array(quizQuestionSchema).nullish(),
   createdAt: z.string().datetime().optional(),
   updatedAt: z.string().datetime().optional(),
@@ -51,8 +51,8 @@ const createLessonSchema = z.object({
   order: z.number().int().min(1, "Order must be a positive integer"),
   status: z.enum([LessonStatus.DRAFT, LessonStatus.PUBLISHED]).optional(),
   content: lessonContentSchema.nullish(),
-  // Accept either a full URL or an S3 key
-  thumbnail: z.union([z.string().url(), z.string().min(1)]).nullish(),
+  // Accept S3 key or any non-empty path string
+  thumbnail: z.string().min(1).nullish(),
   duration: z.number().int().min(0).nullish(),
 });
 
@@ -64,8 +64,8 @@ const updateLessonSchema = z.object({
   order: z.number().int().min(1, "Order must be a positive integer").optional(),
   status: z.enum([LessonStatus.DRAFT, LessonStatus.PUBLISHED]).optional(),
   content: lessonContentSchema.nullish(),
-  // Accept either a full URL or an S3 key
-  thumbnail: z.union([z.string().url(), z.string().min(1)]).nullish(),
+  // Accept S3 key or any non-empty path string
+  thumbnail: z.string().min(1).nullish(),
   duration: z.number().int().min(0).nullish(),
 });
 
