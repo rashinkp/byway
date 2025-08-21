@@ -35,26 +35,14 @@ const baseContentSchema = z.object({
 		.nullable(),
 	fileUrl: z
 		.string()
-		.url("Invalid URL")
+		.min(1, "File URL must not be empty")
 		.optional()
-		.refine(
-			(val) => {
-				if (!val) return true;
-				return val.startsWith("https://") || val.startsWith("http");
-			},
-			{ message: "Invalid file URL" },
-		),
+		.nullable(),
 	thumbnailUrl: z
 		.string()
-		.url("Invalid URL")
+		.min(1, "Thumbnail URL must not be empty")
 		.optional()
-		.refine(
-			(val) => {
-				if (!val) return true;
-				return val.startsWith("https://") || val.startsWith("http");
-			},
-			{ message: "Invalid thumbnail URL" },
-		),
+		.nullable(),
 	quizQuestions: z.array(quizQuestionSchema).optional(),
 });
 

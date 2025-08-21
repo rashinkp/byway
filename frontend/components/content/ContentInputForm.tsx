@@ -1,5 +1,4 @@
 "use client";
-
 import { useState } from "react";
 import {
 	ContentType,
@@ -11,26 +10,15 @@ import {
 import { useCreateContent } from "@/hooks/content/useCreateContent";
 import { useUpdateContent } from "@/hooks/content/useUpdateContent";
 import { useGetLessonById } from "@/hooks/lesson/useGetLessonById";
+import { getCoursePresignedUrl, uploadFileToS3 } from "@/api/file";
 import { validateForm } from "./ContentValidation";
 import { ContentTypeSelector } from "./ContentTypeSelector";
 import { TitleInput } from "./ContentTitleInput";
 import { DescriptionInput } from "./ContentDescriptionInput";
 import { QuizInput } from "./ContentQuizInput";
 import { ThumbnailUploadInput } from "./ContentThumbnailInputSection";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { AlertTriangle } from "lucide-react";
 import { FileUploadInput } from "./ContentFileUploadInput";
 import { Button } from "../ui/button";
-
-//todo: when editing content and all make sure the status update
-
-interface FileUploadInputWithUpload {
-	uploadToS3: (file: File) => Promise<string>;
-}
-
-interface ThumbnailUploadInputWithUpload {
-	uploadToS3: (file: File) => Promise<string>;
-}
 
 interface ContentInputFormProps {
 	lessonId: string;
@@ -86,12 +74,6 @@ export const ContentInputForm = ({
 	const isSubmitting = isCreating || isUpdating || isUploading;
 
 	const isEditing = !!initialData?.id;
-	const isTypeChanged = isEditing && type !== initialData?.type;
-	const isFileChanged =
-		isEditing &&
-		file !== null &&
-		(type === ContentType.VIDEO || type === ContentType.DOCUMENT);
-	const showAlert = isEditing && (isTypeChanged || isFileChanged);
 
 	const handleCancel = () => {
 		setType(initialData?.type || ContentType.VIDEO);
@@ -128,10 +110,25 @@ export const ContentInputForm = ({
 
 		let finalFileUrl = fileUrl;
 		let finalThumbnailUrl = thumbnailUrl;
-		if (file) {
+		
+		// Upload file if provided
+		if (file && lesson?.courseId) {
 			try {
-				finalFileUrl = await (FileUploadInput as unknown as FileUploadInputWithUpload).uploadToS3(file);
+				setUploadStatus("uploading");
+				const contentType = type === ContentType.VIDEO ? 'video' : 'document';
+				const { uploadUrl, key } = await getCoursePresignedUrl(
+					file.name,
+					file.type,
+					lesson.courseId,
+					contentType
+				);
+				await uploadFileToS3(file, uploadUrl, (progress) => {
+					setUploadProgress(progress);
+				});
+				finalFileUrl = key;
+				setUploadStatus("success");
 			} catch {
+				setUploadStatus("error");
 				setErrors((prev) => ({
 					...prev,
 					file: "Failed to upload file",
@@ -139,12 +136,24 @@ export const ContentInputForm = ({
 				return;
 			}
 		}
-		if (thumbnail && type === ContentType.VIDEO) {
+		
+		// Upload thumbnail if provided
+		if (thumbnail && type === ContentType.VIDEO && lesson?.courseId) {
 			try {
-				finalThumbnailUrl = await (ThumbnailUploadInput as unknown as ThumbnailUploadInputWithUpload).uploadToS3(
-					thumbnail,
+				setThumbnailUploadStatus("uploading");
+				const { uploadUrl, key } = await getCoursePresignedUrl(
+					thumbnail.name,
+					thumbnail.type,
+					lesson.courseId,
+					'thumbnail'
 				);
+				await uploadFileToS3(thumbnail, uploadUrl, (progress) => {
+					setThumbnailUploadProgress(progress);
+				});
+				finalThumbnailUrl = key;
+				setThumbnailUploadStatus("success");
 			} catch  {
+				setThumbnailUploadStatus("error");
 				setErrors((prev) => ({
 					...prev,
 					thumbnail: "Failed to upload thumbnail",
@@ -261,25 +270,7 @@ export const ContentInputForm = ({
 				/>
 			)}
 
-			{showAlert && (
-				<Alert
-					variant="destructive"
-					className="bg-red-50 border border-red-200 rounded-xl"
-				>
-					<AlertTriangle className="h-5 w-5 text-red-500" />
-					<AlertTitle className="text-red-600 font-medium">
-						Warning: Potential Data Loss
-					</AlertTitle>
-					<AlertDescription className="text-red-500">
-						{isTypeChanged && isFileChanged
-							? "Changing the content type or updating the file may cause data loss (e.g., existing files or quiz questions). You will need to re-upload any new files."
-							: isTypeChanged
-								? "Changing the content type may cause data loss (e.g., existing files or quiz questions). You will need to re-upload any new files."
-								: "Updating the file will replace the existing file. You will need to re-upload the new file."}
-					</AlertDescription>
-				</Alert>
-			)}
-
+			
 			<div className="flex space-x-6 pt-4">
 				<Button
 					type="submit"

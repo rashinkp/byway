@@ -141,7 +141,7 @@ export class CourseController extends BaseController {
       if (!request.params?.id) {
         throw new BadRequestError("Course ID is required");
       }
-      const validated = deleteCourseSchemaDef.params!.parse({
+        const validated = deleteCourseSchemaDef.params!.parse({
         id: request.params.id,
       });
       const course = await this.deleteCourseUseCase.execute(

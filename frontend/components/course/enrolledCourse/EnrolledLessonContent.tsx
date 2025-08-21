@@ -9,6 +9,7 @@ import { IQuizAnswer } from "@/types/progress";
 import ErrorDisplay from "@/components/ErrorDisplay";
 import Image from 'next/image';
 import { Button } from "@/components/ui/button";
+import { useSignedUrl } from "@/hooks/file/useSignedUrl";
 
 interface LessonWithCompletion extends ILesson {
   completed: boolean;
@@ -80,6 +81,20 @@ export function LessonContent({
     });
   };
 
+  // Resolve S3 keys to signed URLs for secure playback and downloads
+  const isAbsoluteUrl = (v?: string | null) => !!v && (v.startsWith("http://") || v.startsWith("https://"));
+  const shouldSignVideo = content?.type === "VIDEO" && content.fileUrl && !isAbsoluteUrl(content.fileUrl);
+  const shouldSignThumb = content?.type === "VIDEO" && content.thumbnailUrl && !isAbsoluteUrl(content.thumbnailUrl);
+  const shouldSignDoc = content?.type === "DOCUMENT" && content.fileUrl && !isAbsoluteUrl(content.fileUrl);
+
+  const { url: signedVideoUrl } = useSignedUrl(shouldSignVideo ? (content!.fileUrl as string) : null, 3600, false);
+  const { url: signedThumbUrl } = useSignedUrl(shouldSignThumb ? (content!.thumbnailUrl as string) : null, 3600, false);
+  const { url: signedDocUrl } = useSignedUrl(shouldSignDoc ? (content!.fileUrl as string) : null, 600, false);
+
+  const finalVideoSrc = shouldSignVideo ? signedVideoUrl : (content?.fileUrl || undefined);
+  const finalPoster = shouldSignThumb ? signedThumbUrl : (content?.thumbnailUrl || undefined);
+  const finalDocHref = shouldSignDoc ? signedDocUrl : (content?.fileUrl || "");
+
   // Helper to detect file type based on URL extension
   const getFileType = (url: string) => {
     const extension = url.split(".").pop()?.toLowerCase();
@@ -143,12 +158,12 @@ export function LessonContent({
                 >
                   <video
                     controls
-                    poster={content.thumbnailUrl || "/api/placeholder/800/450"}
+                    poster={finalPoster || "/api/placeholder/800/450"}
                     className="w-full h-full rounded-lg object-cover"
                     style={{ objectFit: "cover" }}
                   >
                     <source
-                      src={content.fileUrl ?? undefined}
+                      src={finalVideoSrc}
                       type="video/mp4"
                     />
                     Your browser does not support the video tag.
@@ -166,12 +181,12 @@ export function LessonContent({
                   </div>
                   {content.fileUrl && (
                     <a
-                      href={content.fileUrl}
+                      href={finalDocHref}
                       download
                       className=" text-white dark:text-black rounded-lg  transition-colors"
                     >
                       Download{" "}
-                      {getFileType(content.fileUrl) === "pdf"
+                      {getFileType(finalDocHref) === "pdf"
                         ? "PDF"
                         : "Document"}
                     </a>
@@ -180,10 +195,10 @@ export function LessonContent({
                 <div className=" mt-5">
                   <div className=" rounded-lg min-h-64">
                     {content.fileUrl ? (
-                      getFileType(content.fileUrl) === "pdf" ? (
+                      getFileType(finalDocHref) === "pdf" ? (
                         <>
                           <iframe
-                            src={content.fileUrl}
+                            src={finalDocHref}
                             className="w-full h-[600px] rounded mb-4"
                             title="Document preview"
                           />

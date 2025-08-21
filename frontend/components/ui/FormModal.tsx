@@ -354,13 +354,22 @@ export function FormModal<T extends z.ZodType>({
 												{typeof formField.value === "string" &&
 													formField.value && (
 														<div className="mb-4">
-															<Image
-																src={formField.value}
-																alt={`${field.label} preview`}
-																className="w-32 h-32 object-cover rounded-md border-[#facc15] dark:border-[#facc15]"
-																width={128}
-																height={128}
-															/>
+															{formField.value.startsWith('http') ? (
+																<Image
+																	src={formField.value}
+																	alt={`${field.label} preview`}
+																	className="w-32 h-32 object-cover rounded-md border-[#facc15] dark:border-[#facc15]"
+																	width={128}
+																	height={128}
+																/>
+															) : (
+																// Handle S3 keys - show a placeholder or try to construct a basic preview
+																<div className="w-32 h-32 bg-gray-200 dark:bg-gray-700 rounded-md border-[#facc15] dark:border-[#facc15] flex items-center justify-center">
+																	<span className="text-xs text-gray-500 dark:text-gray-400 text-center px-2">
+																		Current file: {formField.value.split('/').pop() || 'Unknown'}
+																	</span>
+																</div>
+															)}
 														</div>
 													)}
 												<FormControl>
