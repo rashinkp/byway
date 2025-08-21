@@ -1,5 +1,4 @@
 "use client";
-
 import { useState } from "react";
 import {
 	ContentType,
@@ -75,12 +74,6 @@ export const ContentInputForm = ({
 	const isSubmitting = isCreating || isUpdating || isUploading;
 
 	const isEditing = !!initialData?.id;
-	const isTypeChanged = isEditing && type !== initialData?.type;
-	const isFileChanged =
-		isEditing &&
-		file !== null &&
-		(type === ContentType.VIDEO || type === ContentType.DOCUMENT);
-	const showAlert = isEditing && (isTypeChanged || isFileChanged);
 
 	const handleCancel = () => {
 		setType(initialData?.type || ContentType.VIDEO);

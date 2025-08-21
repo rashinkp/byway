@@ -45,8 +45,8 @@ export const ContentSection = ({ lessonId }: ContentSectionProps) => {
 	const shouldSignDoc = !!fileKey && isDocument && !isAbsoluteUrl(fileKey);
 	const shouldSignThumb = !!thumbKey && !isAbsoluteUrl(thumbKey);
 
-	const { url: signedVideoUrl } = useSignedUrl(shouldSignVideo ? fileKey : null, 3600, false);
-	const { url: signedDocUrl } = useSignedUrl(shouldSignDoc ? fileKey : null, 600, false);
+	const { url: signedVideoUrl, isLoading: videoLoading } = useSignedUrl(shouldSignVideo ? fileKey : null, 3600, false);
+	const { url: signedDocUrl, isLoading: docLoading } = useSignedUrl(shouldSignDoc ? fileKey : null, 600, false);
 	const { url: signedThumbUrl } = useSignedUrl(shouldSignThumb ? thumbKey : null, 3600, false);
 
 	const handleDelete = (contentId: string) => {
@@ -127,10 +127,10 @@ export const ContentSection = ({ lessonId }: ContentSectionProps) => {
 		);
 	}
 
-	// Compute final URLs
-	const finalVideoSrc = shouldSignVideo ? signedVideoUrl : (content.fileUrl || "");
-	const finalDocSrc = shouldSignDoc ? signedDocUrl : (content.fileUrl || "");
-	const finalPoster = shouldSignThumb ? signedThumbUrl : (content.thumbnailUrl || undefined);
+	// Compute final URLs, avoiding empty strings
+	const finalVideoSrc = shouldSignVideo ? (signedVideoUrl || undefined) : (content.fileUrl || undefined);
+	const finalDocSrc = shouldSignDoc ? (signedDocUrl || undefined) : (content.fileUrl || undefined);
+	const finalPoster = shouldSignThumb ? (signedThumbUrl || undefined) : (content.thumbnailUrl || undefined);
 
 	return (
 		<div className="bg-white dark:bg-[#232323] rounded-2xl shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
@@ -174,12 +174,16 @@ export const ContentSection = ({ lessonId }: ContentSectionProps) => {
 							className="relative w-full"
 							style={{ paddingTop: "56.25%" /* 16:9 aspect ratio */ }}
 						>
-							<video
-								src={finalVideoSrc}
-								controls
-								className="absolute top-0 left-0 w-full h-full object-contain bg-black"
-								poster={finalPoster}
-							/>
+							{shouldSignVideo && (videoLoading || !signedVideoUrl) ? (
+								<div className="absolute top-0 left-0 w-full h-full flex items-center justify-center bg-black text-white text-sm">Loading video…</div>
+							) : (
+								<video
+									src={finalVideoSrc}
+									controls
+									className="absolute top-0 left-0 w-full h-full object-contain bg-black"
+									poster={finalPoster}
+								/>
+							)}
 						</div>
 					</div>
 				)}
@@ -189,15 +193,19 @@ export const ContentSection = ({ lessonId }: ContentSectionProps) => {
 						<FileText className="w-10 h-10 text-yellow-500 mr-4" />
 						<div>
 							<h3 className="text-black dark:text-white font-medium">Document</h3>
-							<a
-								href={finalDocSrc}
-								target="_blank"
-								rel="noopener noreferrer"
-								className="text-[#facc15] hover:text-black dark:hover:text-white flex items-center mt-1 group"
-							>
-								View Document
-								<ChevronRight className="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform" />
-							</a>
+							{finalDocSrc ? (
+								<a
+									href={finalDocSrc}
+									target="_blank"
+									rel="noopener noreferrer"
+									className="text-[#facc15] hover:text-black dark:hover:text-white flex items-center mt-1 group"
+								>
+									View Document
+									<ChevronRight className="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform" />
+								</a>
+							) : (
+								<span className="text-gray-500 dark:text-gray-400 text-sm">Preparing link…</span>
+							)}
 						</div>
 					</div>
 				)}
@@ -237,7 +245,7 @@ export const ContentSection = ({ lessonId }: ContentSectionProps) => {
 												{opt}
 											</span>
 											{opt === q.correctAnswer && (
-												<span className="ml-auto text-xs bg-[#facc15] text:black dark:bg-[#facc15] dark:text-[#18181b] px-2 py-1 rounded">
+												<span className="ml-auto text-xs bg-[#facc15] text-black dark:bg-[#facc15] dark:text-[#18181b] px-2 py-1 rounded">
 													Correct Answer
 												</span>
 											)}
