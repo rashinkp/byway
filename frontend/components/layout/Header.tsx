@@ -690,7 +690,7 @@ export function Header(
                         <div className="w-12 h-8 rounded-md bg-[#facc15]/10 flex items-center justify-center shadow-sm overflow-hidden">
                           {course.thumbnail ? (
                             <Image
-                              src={course.thumbnail}
+                              src={course.thumbnail.startsWith('http') ? course.thumbnail : "/placeHolder.jpg"}
                               alt={course.title}
                               width={48}
                               height={32}
@@ -698,7 +698,7 @@ export function Header(
                               unoptimized
                             />
                           ) : (
-                            <svg className="w-5 h-5 text-[#facc15]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 20l9-5-9-5-9 5 9 5z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 12V4m0 0L3 9m9-5l9 5" /></svg>
+                            <svg className="w-5 h-5 text-[#facc15]" fill="none" stroke="currentColor" viewBox="0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 20l9-5-9-5-9 5 9 5z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 12V4m0 0L3 9m9-5l9 5" /></svg>
                           )}
                         </div>
                         <div className="flex-1 min-w-0">

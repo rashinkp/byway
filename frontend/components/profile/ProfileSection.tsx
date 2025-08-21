@@ -39,6 +39,8 @@ export default function ProfileSection({
     }
   }, [user?.updatedAt, refresh]);
 
+
+
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString("en-US", {
       year: "numeric",
@@ -77,10 +79,13 @@ export default function ProfileSection({
             avatarLoading ? (
               <div className="w-24 h-24 rounded-full bg-gray-200 dark:bg-gray-700 animate-pulse border-4 border-gray-200 dark:border-gray-700 shadow-md" />
             ) : avatarUrl ? (
-              <img 
+              <Image 
                 src={avatarUrl} 
                 alt={`${user.name}'s avatar`} 
                 className="w-24 h-24 rounded-full object-cover border-4 border-gray-200 dark:border-gray-700 shadow-md bg-white dark:bg-[#232326]" 
+                width={96}
+                height={96}
+                priority
               />
             ) : (
               <div className="w-24 h-24 rounded-full flex items-center justify-center text-4xl font-bold bg-gray-200 dark:bg-gray-700 text-white border-4 border-gray-200 dark:border-gray-700 shadow-md">

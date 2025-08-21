@@ -31,17 +31,25 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "@/components/ui/select";
+import {
+	DropdownMenu,
+	DropdownMenuTrigger,
+	DropdownMenuContent,
+	DropdownMenuCheckboxItem,
+	DropdownMenuSeparator,
+} from "@/components/ui/dropdown-menu";
 import { X, Save, Loader2 } from "lucide-react";
 import { Path } from "react-hook-form";
 import FileUploadComponent, {
 	FileUploadStatus,
 } from "@/components/FileUploadComponent";
 import Image from "next/image";
+import MultiSelect from "@/components/ui/multi-select";
 
 export interface FormFieldConfig<T> {
 	name: keyof T;
 	label: string;
-	type: "input" | "textarea" | "select" | "checkbox" | "radio" | "file";
+	type: "input" | "textarea" | "select" | "checkbox" | "radio" | "file" | "multiselect";
 	fieldType?: "text" | "number" | "email" | "password" | "file" | "date";
 	placeholder?: string;
 	description?: string;
@@ -56,6 +64,7 @@ export interface FormFieldConfig<T> {
 	min?: number;
 	max?: number;
 	step?: number;
+	showPreview?: boolean;
 }
 
 interface FormModalProps<T extends z.ZodType> {
@@ -95,7 +104,7 @@ export function FormModal<T extends z.ZodType>({
 							? undefined
 							: field.type === "input" && field.fieldType === "date"
 								? undefined
-								: field.type === "input" || field.type === "textarea"
+								: field.type === "input" || field.type === "textarea" || field.type === "multiselect"
 									? ""
 									: field.fieldType === "file"
 										? undefined
@@ -143,7 +152,8 @@ export function FormModal<T extends z.ZodType>({
 				(field.fieldType === "text" ||
 					field.fieldType === "number" ||
 					field.fieldType === "date")) ||
-			field.type === "select",
+			field.type === "select" ||
+			field.type === "multiselect",
 	);
 	const textareaFields = fields.filter((field) => field.type === "textarea");
 	const fileFields = fields.filter(
@@ -289,6 +299,14 @@ export function FormModal<T extends z.ZodType>({
 																		))}
 																	</SelectContent>
 																</Select>
+															) : field.type === "multiselect" && field.options ? (
+																<MultiSelect
+																	value={(formField.value as string) || ""}
+																	onChange={formField.onChange}
+																	options={field.options}
+																	placeholder={field.placeholder}
+																	disabled={isSubmitting || field.disabled}
+																/>
 															) : null}
 														</FormControl>
 														{field.description && (
@@ -352,7 +370,7 @@ export function FormModal<T extends z.ZodType>({
 													{field.label}
 												</FormLabel>
 												{typeof formField.value === "string" &&
-													formField.value && (
+													formField.value && field.showPreview !== false && (
 														<div className="mb-4">
 															{formField.value.startsWith('http') ? (
 																<Image

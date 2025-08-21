@@ -12,12 +12,8 @@ export const profileSchema = z.object({
     .refine((name) => !/^[^a-zA-Z]*$/.test(name), "Name must contain at least one letter"),
   avatar: z
     .union([
-      z.instanceof(File), // Allow File objects
-      z
-        .string()
-        .url("Invalid URL")
-        .optional(), // Allow valid URLs or empty
-      z.literal(""), // Allow empty string
+      z.instanceof(File),
+      z.string(),
     ])
     .optional(),
   bio: z.string()
@@ -32,7 +28,7 @@ export const profileSchema = z.object({
   skills: z
     .string()
     .max(200, "Skills must be less than 200 characters")
-    .refine((val) => !val || /^[a-zA-Z\s,]+$/.test(val), "Skills can only contain letters, spaces, and commas")
+    .refine((val) => !val || /^[a-zA-Z0-9+\-#\s,]+$/.test(val), "Skills can only contain letters, numbers, +, -, #, spaces, and commas")
     .optional(),
   phoneNumber: z
     .string()
@@ -58,7 +54,7 @@ export const profileSchema = z.object({
     .refine(
       (date) => {
         const today = new Date();
-        today.setHours(0, 0, 0, 0); // Reset time to start of day for comparison
+        today.setHours(0, 0, 0, 0);
         return date < today;
       },
       {
@@ -69,7 +65,7 @@ export const profileSchema = z.object({
     .optional(),
   gender: z.enum(["MALE", "FEMALE", "OTHER"]).optional(),
 });
-// Form field configurations (unchanged)
+// Form field configurations (skills switched to multiselect)
 export const formFields: FormFieldConfig<z.infer<typeof profileSchema>>[] = [
   {
     name: "name",
@@ -88,6 +84,7 @@ export const formFields: FormFieldConfig<z.infer<typeof profileSchema>>[] = [
     maxSize: 5 * 1024 * 1024,
     fileTypeLabel: "image",
     description: "Upload a profile picture (max 5MB)",
+    showPreview: false,
   },
   {
     name: "bio",
@@ -107,10 +104,28 @@ export const formFields: FormFieldConfig<z.infer<typeof profileSchema>>[] = [
   {
     name: "skills",
     label: "Skills",
-    type: "input",
-    fieldType: "text",
-    placeholder: "Comma-separated skills",
-    description: "List your professional skills (e.g., JavaScript, Python)",
+    type: "multiselect",
+    placeholder: "Select skills",
+    description: "Pick your professional skills",
+    options: [
+      { value: "JavaScript", label: "JavaScript" },
+      { value: "TypeScript", label: "TypeScript" },
+      { value: "React", label: "React" },
+      { value: "Next.js", label: "Next.js" },
+      { value: "Node.js", label: "Node.js" },
+      { value: "Express", label: "Express" },
+      { value: "MongoDB", label: "MongoDB" },
+      { value: "PostgreSQL", label: "PostgreSQL" },
+      { value: "Python", label: "Python" },
+      { value: "Django", label: "Django" },
+      { value: "Java", label: "Java" },
+      { value: "Spring", label: "Spring" },
+      { value: "AWS", label: "AWS" },
+      { value: "Docker", label: "Docker" },
+      { value: "Kubernetes", label: "Kubernetes" },
+      { value: "TailwindCSS", label: "TailwindCSS" },
+      { value: "Git", label: "Git" },
+    ],
   },
   {
     name: "phoneNumber",
