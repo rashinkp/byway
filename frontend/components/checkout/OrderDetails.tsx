@@ -2,7 +2,22 @@ import { BookOpen, Clock, Users, Award } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import Image from 'next/image';
 import { OrderDetailsProps } from "@/types/checkout";
+import { useSignedUrl } from "@/hooks/file/useSignedUrl";
 
+// Helper component to handle signed URL for course thumbnail
+function CourseThumbnail({ thumbnail, title }: { thumbnail: string | null; title: string }) {
+  const { url: thumbnailUrl } = useSignedUrl(thumbnail || null);
+  
+  return (
+    <Image 
+      src={thumbnailUrl || "/placeholder-course.jpg"} 
+      alt={title} 
+      width={200} 
+      height={200} 
+      className="w-full h-full object-cover" 
+    />
+  );
+}
 
 export default function OrderDetails({ courseDetails }: OrderDetailsProps) {
   const formatPrice = (price: number | string | undefined) => {
@@ -22,7 +37,7 @@ return (
         {courseDetails.map((course) => (
           <div key={course.id} className="flex gap-4">
             <div className="w-24 h-24 rounded-lg overflow-hidden bg-[var(--color-background)]">
-              <Image src={course.thumbnail || "/placeholder-course.jpg"} alt={course.title} width={200} height={200} className="w-full h-full object-cover" />
+              <CourseThumbnail thumbnail={course.thumbnail} title={course.title} />
             </div>
             <div className="flex-1">
               <h3 className="font-medium text-[var(--color-primary-dark)]">{course.title}</h3>

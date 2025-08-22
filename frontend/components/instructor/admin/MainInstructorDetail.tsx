@@ -10,6 +10,7 @@ import { AdminInstructorDetail } from "@/components/instructor/AdminInstructorDe
 import InstructorDetailSkeleton from "@/components/skeleton/InstructorDetailSkeleton";
 import { useGetAllCourses } from "@/hooks/course/useGetAllCourse";
 import ErrorDisplay from "@/components/ErrorDisplay";
+import { getPresignedGetUrl } from "@/api/file";
 
 const MainInstructorDetail: React.FC = () => {
   const params = useParams();
@@ -57,9 +58,16 @@ const MainInstructorDetail: React.FC = () => {
     toggleDeleteUser(instructor.userId);
   };
 
-  const handleDownloadCV = () => {
+  const handleDownloadCV = async () => {
     if (instructor.cv && instructor.cv !== "No CV provided") {
-      window.open(instructor.cv, "_blank");
+      try {
+        // Get presigned URL for CV download
+        const signedUrl = await getPresignedGetUrl(instructor.cv, 300); // 5 minutes expiry
+        window.open(signedUrl, "_blank");
+      } catch (error) {
+        console.error("Error getting CV presigned URL:", error);
+        toast.error("Failed to download CV. Please try again.");
+      }
     } else {
       toast.error("No CV available for download");
     }

@@ -2,11 +2,14 @@ import type { CartItemProps } from "@/types/cart";
 import { Award, BookOpen, Clock, Trash2 } from "lucide-react";
 import { motion } from "framer-motion";
 import Image from "next/image";
+import { useSignedUrl } from "@/hooks/file/useSignedUrl";
 
 
 
 export function CartItem({ item, isRemoving, onRemove }: CartItemProps) {
 	const course = item.course;
+	const { url: thumbnailUrl } = useSignedUrl(course?.thumbnail);
+	
 	if (!course) return null;
 
 	const offerPrice =
@@ -36,7 +39,7 @@ export function CartItem({ item, isRemoving, onRemove }: CartItemProps) {
 			className="flex flex-col sm:flex-row gap-4 p-4  bg-white dark:bg-[#232323] dark:border-none border-b border-gray-300 rounded-lg transition-all duration-300"
 		>
 			<Image
-				src={course.thumbnail}
+				src={thumbnailUrl || "/placeHolder.jpg"}
 				alt={course.title}
 				className="w-full h-full sm:w-32 sm:h-20 object-cover rounded bg-[#f9fafb] dark:bg-[#18181b] flex-shrink-0"
 				width={128}
