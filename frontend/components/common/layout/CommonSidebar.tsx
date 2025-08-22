@@ -67,7 +67,7 @@ export function CommonSidebar({
     >
       <div className="flex flex-col h-full">
         <SidebarHeader
-          collapsed={collapsed && !mobileMenuOpen} // Show expanded header when mobile menu is open
+          collapsed={collapsed && !mobileMenuOpen}
           toggleCollapse={toggleCollapse}
           title={headerTitle}
           subtitle={headerSubtitle}

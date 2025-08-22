@@ -123,7 +123,7 @@ export default function CommonLayout({
 	}
 
 	return (
-    <div className="flex min-h-screen bg-gray-50 dark:bg-[#18181b]">
+    <div className="flex min-h-screen bg-gray-50 dark:bg-[#18181b] overflow-x-hidden">
       {/* Sidebar */}
       <CommonSidebar
         collapsed={collapsed}
@@ -148,9 +148,9 @@ export default function CommonLayout({
       />
       
       {/* Main Content Area */}
-      <div className="flex-1 flex flex-col min-h-screen bg-gray-50 dark:bg-[#18181b]">
+      <div className="flex-1 flex flex-col min-h-screen bg-gray-50 dark:bg-[#18181b] overflow-x-hidden">
         <main
-          className={`flex-1 transition-all duration-300 ease-in-out ${
+          className={`flex-1 transition-all duration-300 ease-in-out overflow-x-hidden ${
             isCollapsible
               ? collapsed
                 ? "ml-20 lg:ml-20" // Give space for collapsed sidebar on mobile and desktop
@@ -159,7 +159,7 @@ export default function CommonLayout({
           }`}
         >
           <div className="p-4 lg:p-6">
-            <div className="max-w-7xl mx-auto text-gray-900 dark:text-gray-100">{children}</div>
+            <div className="w-full max-w-full sm:max-w-7xl mx-auto text-gray-900 dark:text-gray-100 overflow-x-hidden">{children}</div>
           </div>
         </main>
         
@@ -168,7 +168,7 @@ export default function CommonLayout({
           className={`${
             isCollapsible
               ? collapsed
-                ? "ml-20 lg:ml-20" // Give space for collapsed sidebar on mobile and desktop
+                ? "ml-20 lg:ml-20" 
                 : "lg:ml-64"
               : "lg:ml-64 lg:[&@media(min-width:1024px)]:ml-[80px] xl:ml-64"
           }`}

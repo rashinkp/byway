@@ -276,7 +276,7 @@ export default function AdminDashboard() {
 												</span>
 											</div>
 											<div className="flex-1 space-y-2">
-												<div className="flex items-center gap-2">
+												<div className="flex flex-wrap items-center gap-2">
 													<span className="text-sm font-medium text-gray-500">
 														#{index + 1}
 													</span>
@@ -287,7 +287,7 @@ export default function AdminDashboard() {
 														{instructor.email}
 													</span>
 													<span
-														className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${
+														className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium mt-1 sm:mt-0 sm:ml-auto ${
 															instructor.isActive
 																? "bg-green-50 text-green-700 border border-green-200 dark:bg-green-900 dark:text-green-300 dark:border-green-700"
 																: "bg-red-50 text-red-700 border border-red-200 dark:bg-red-900 dark:text-red-300 dark:border-red-700"
