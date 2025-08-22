@@ -91,12 +91,9 @@ export class CertificatePdfService implements CertificatePdfServiceInterface {
 
   private getTemplatePath(): string {
     // Path to your certificate template image
+    // Use process.cwd() for more reliable path resolution
     return path.join(
-      __dirname,
-      "..",
-      "..",
-      "..",
-      "..",
+      process.cwd(),
       "public",
       "certificate_template.png"
     );

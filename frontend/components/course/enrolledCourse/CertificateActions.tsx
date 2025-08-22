@@ -1,9 +1,23 @@
 import React, { useState, useMemo, useEffect } from "react";
 import { useCertificate } from "@/hooks/certificate/useCertificate";
+import { useSignedUrl } from "@/hooks/file/useSignedUrl";
 
 export function CertificateActions({ courseId }: { courseId: string }) {
   const { certificate, loading: certLoading, fetchCertificate, createCertificate } = useCertificate(courseId);
   const [regenError, setRegenError] = useState<string | null>(null);
+
+  // Debug logging
+  console.log("Certificate data:", certificate);
+  console.log("Certificate pdfUrl:", certificate?.pdfUrl);
+  console.log("Certificate status:", certificate?.status);
+
+  // Get signed URL for certificate PDF if it exists
+  const isPdfKey = certificate?.pdfUrl && !certificate.pdfUrl.startsWith('http');
+  const { url: signedPdfUrl, isLoading: pdfUrlLoading } = useSignedUrl(
+    isPdfKey ? certificate.pdfUrl : null,
+    3600, // 1 hour expiry
+    false // No auto-refresh
+  );
 
   // Fetch certificate on mount
   useEffect(() => {
@@ -43,16 +57,36 @@ export function CertificateActions({ courseId }: { courseId: string }) {
 
       {/* Certificate Actions Only */}
       <div className="flex flex-col items-center gap-4">
+      
+
         {certificate?.pdfUrl && (
           <a
-            href={certificate.pdfUrl}
+            href={signedPdfUrl || certificate.pdfUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center justify-center px-8 py-4 bg-yellow-400 dark:bg-yellow-500 text-black font-semibold rounded-xl hover:bg-yellow-500 dark:hover:bg-yellow-600 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+            className={`inline-flex items-center justify-center px-8 py-4 font-semibold rounded-xl transition-colors duration-200 ${
+              pdfUrlLoading 
+                ? "bg-gray-400 text-white cursor-not-allowed" 
+                : "bg-yellow-400 dark:bg-yellow-500 text-black hover:bg-yellow-500 dark:hover:bg-yellow-600"
+            }`}
           >
             <span className="mr-2 text-lg">📄</span>
-            View & Download Certificate
+            {pdfUrlLoading ? "Preparing Certificate..." : "View & Download Certificate"}
           </a>
+        )}
+        
+        {/* Show certificate info even if no PDF URL */}
+        {certificate && !certificate.pdfUrl && (
+          <div className="text-center p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+            <div className="text-blue-800 dark:text-blue-200 font-medium">
+              Certificate Status: {certificate.status}
+            </div>
+            <div className="text-sm text-blue-600 dark:text-blue-300 mt-1">
+              {certificate.status === 'PENDING' ? 'Certificate is being prepared...' : 
+               certificate.status === 'GENERATED' ? 'Certificate generated but PDF not ready' :
+               'Certificate status: ' + certificate.status}
+            </div>
+          </div>
         )}
         <button
           onClick={async () => {

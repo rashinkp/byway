@@ -77,8 +77,8 @@ export class PrismaCertificateRepository implements CertificateRepositoryInterfa
     userId: string,
     courseId: string
   ): Promise<Certificate | null> {
-    const found = await this._prisma.certificate.findUnique({
-      where: { userId_courseId: { userId, courseId } },
+    const found = await this._prisma.certificate.findFirst({
+      where: { userId, courseId },
     });
     return found ? Certificate.fromPersistence({
       ...found,

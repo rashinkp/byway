@@ -1,6 +1,6 @@
 import dotenv from "dotenv";
 
-dotenv.config({ path: '.env.production' });
+dotenv.config({ path: '.env.development' });
 
 export const envConfig = {
   // Server configuration
