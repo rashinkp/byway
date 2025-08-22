@@ -12,6 +12,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { useGetContentByLessonId } from "@/hooks/content/useGetContentByLessonId";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useSignedUrl } from "@/hooks/file/useSignedUrl";
+import { useEffect, useState } from "react";
 
 
 export default function CourseDetailLayout({
@@ -47,6 +48,25 @@ export default function CourseDetailLayout({
 	const isPdfDoc = typeof resolvedDocUrl === 'string'
 		? resolvedDocUrl.split('?')[0].toLowerCase().endsWith('.pdf')
 		: false;
+
+	// Media loading state management
+	const [videoLoading, setVideoLoading] = useState(true);
+	const [docLoading, setDocLoading] = useState(true);
+
+	useEffect(() => {
+		// Reset loading when a different lesson is opened
+		setVideoLoading(true);
+		setDocLoading(true);
+	}, [openLessonContentId]);
+
+	useEffect(() => {
+		// When the resolved URLs change, assume loading until media reports ready
+		setVideoLoading(true);
+	}, [resolvedVideoUrl]);
+
+	useEffect(() => {
+		setDocLoading(true);
+	}, [resolvedDocUrl]);
 
 	// Resolve signed URLs for course thumbnail and instructor avatar when they are S3 keys
 	const courseThumbIsKey = typeof course?.thumbnail === 'string' && !!course?.thumbnail && !/^https?:\/\//.test(course.thumbnail) && !course.thumbnail.startsWith('/');
@@ -255,22 +275,28 @@ export default function CourseDetailLayout({
 									)}
 									{lessonContent.type === 'VIDEO' && (
 										resolvedVideoUrl ? (
-											<video
-												key={resolvedVideoUrl}
-												controls
-												playsInline
-												preload="metadata"
-												poster={resolvedPosterUrl || "/api/placeholder/800/450"}
-												src={resolvedVideoUrl}
-												className="w-full max-w-2xl rounded-lg object-cover mb-4"
-												style={{ maxHeight: 400 }}
-											>
-												Your browser does not support the video tag.
-											</video>
-										) : (
-											<div className="w-full max-w-2xl h-64 rounded-lg border border-gray-200 dark:border-gray-700 flex items-center justify-center text-gray-500 dark:text-gray-300">
-												Preparing video link...
+											<div className="w-full max-w-2xl">
+												{videoLoading && (
+													<Skeleton className="w-full h-64 max-h-[400px] rounded-lg bg-gray-200 dark:bg-gray-700 animate-pulse mb-2" />
+												)}
+												<video
+													key={resolvedVideoUrl}
+													controls
+													playsInline
+													preload="metadata"
+													poster={resolvedPosterUrl || "/api/placeholder/800/450"}
+													src={resolvedVideoUrl}
+													onLoadedData={() => setVideoLoading(false)}
+													onCanPlay={() => setVideoLoading(false)}
+													onError={() => setVideoLoading(false)}
+													className={`${videoLoading ? 'hidden' : ''} w-full max-w-2xl rounded-lg object-cover mb-4`}
+													style={{ maxHeight: 400 }}
+												>
+													Your browser does not support the video tag.
+												</video>
 											</div>
+										) : (
+											<Skeleton className="w-full max-w-2xl h-64 rounded-lg bg-gray-200 dark:bg-gray-700 animate-pulse" />
 										)
 									)}
 									{lessonContent.type === 'DOCUMENT' && resolvedDocUrl && (
@@ -283,11 +309,17 @@ export default function CourseDetailLayout({
 												Download Document
 											</a>
 											{isPdfDoc ? (
-												<iframe
-													src={resolvedDocUrl}
-													className="w-full h-[400px] rounded border border-gray-200 dark:border-gray-700"
-													title="Document preview"
-												/>
+												<div className="w-full">
+													{docLoading && (
+														<Skeleton className="w-full h-[400px] rounded bg-gray-200 dark:bg-gray-700 animate-pulse" />
+													)}
+													<iframe
+														src={resolvedDocUrl}
+														className={`${docLoading ? 'hidden' : ''} w-full h-[400px] rounded border border-gray-200 dark:border-gray-700`}
+														title="Document preview"
+														onLoad={() => setDocLoading(false)}
+													/>
+												</div>
 											) : (
 												<div className="text-gray-500 dark:text-gray-300">Preview not available for this document type.</div>
 											)}
