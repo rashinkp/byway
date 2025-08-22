@@ -105,20 +105,22 @@ export default function MainCourseDetails() {
 
       <Tabs defaultValue="overview" className="w-full">
         <div className="relative mb-6">
-          <TabsList className="flex justify-center md:justify-start gap-1 p-1 bg-[#f9fafb] dark:bg-[#232323] rounded-xl overflow-x-auto no-scrollbar border border-[#facc15]">
-            {tabItems.map((tab) => (
-              <TabsTrigger
-                key={tab.id}
-                value={tab.id}
-                className="flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-black dark:text-white rounded-lg transition-all \
-                data-[state=active]:bg-[#facc15] data-[state=active]:text-black data-[state=active]:shadow-sm
-                hover:bg-[#facc15]/20 hover:text-black dark:hover:text-[#facc15]"
-              >
-                <tab.icon className="h-4 w-4" />
-                {tab.label}
-              </TabsTrigger>
-            ))}
-          </TabsList>
+          <div className="relative overflow-x-auto no-scrollbar -mx-1 px-1">
+            <TabsList className="inline-flex min-w-max whitespace-nowrap gap-1 p-1 bg-[#f9fafb] dark:bg-[#232323] rounded-xl border border-[#facc15] scroll-smooth">
+              {tabItems.map((tab) => (
+                <TabsTrigger
+                  key={tab.id}
+                  value={tab.id}
+                  className="flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-black dark:text-white rounded-lg transition-all data-[state=active]:bg-[#facc15] data-[state=active]:text-black data-[state=active]:shadow-sm hover:bg-[#facc15]/20 hover:text-black dark:hover:text-[#facc15]"
+                >
+                  <tab.icon className="h-4 w-4" />
+                  {tab.label}
+                </TabsTrigger>
+              ))}
+            </TabsList>
+            {/* Right gradient fade as scroll cue */}
+            <div className="pointer-events-none absolute right-0 top-0 h-full w-8 bg-gradient-to-l from-[#f9fafb] dark:from-[#232323] to-transparent" />
+          </div>
         </div>
 
         <TabsContent value="overview" className="mt-0">

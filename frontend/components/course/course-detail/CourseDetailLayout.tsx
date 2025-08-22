@@ -94,9 +94,9 @@ export default function CourseDetailLayout({
 
 	return (
 		<div className="min-h-screen p-4 sm:p-8 bg-white dark:bg-[#18181b] flex justify-center">
-			<div className="w-full max-w-5xl p-6 space-y-8">
+			<div className={`w-full max-w-5xl ${isAdmin ? 'p-4 space-y-6' : 'p-6 space-y-8'}`}>
 				{/* Header: Thumbnail, Title, Meta, Price, Purchase/Enroll */}
-				<div className="flex flex-col sm:flex-row gap-6 items-center">
+				<div className={`flex flex-col sm:flex-row ${isAdmin ? 'gap-4' : 'gap-6'} items-center`}>
 					<div className="w-40 h-40 rounded-xl overflow-hidden flex-shrink-0 bg-[#f9fafb] dark:bg-[#18181b] border border-gray-200">
 						<Image
 							src={courseThumbIsKey ? (courseThumbUrl || '/placeholder-course.jpg') : (course?.thumbnail || '/placeholder-course.jpg')}
@@ -128,7 +128,7 @@ export default function CourseDetailLayout({
 								</span>
 							</div>
 						)}
-						<div className="flex flex-wrap gap-3 items-center justify-center sm:justify-start mt-2">
+						<div className={`flex flex-wrap ${isAdmin ? 'gap-2' : 'gap-3'} items-center justify-center sm:justify-start mt-2`}>
 							{userRole !== 'ADMIN' && course?.price && (
 								<span className="text-2xl font-bold text-[#facc15]">${Number(course?.offer ?? course?.price).toFixed(2)}</span>
 							)}
@@ -180,7 +180,7 @@ export default function CourseDetailLayout({
 				</div>
 
 				{/* Instructor */}
-				<div className="flex items-center gap-4">
+				<div className={`flex items-center ${isAdmin ? 'gap-3' : 'gap-4'}`}>
 					<div className="w-14 h-14 rounded-full overflow-hidden bg-[#f9fafb] dark:bg-[#18181b] border border-gray-200">
 						{instructor && (instructor as { avatar?: string }).avatar ? (
 							<Image
