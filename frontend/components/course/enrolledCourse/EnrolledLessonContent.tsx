@@ -1,6 +1,5 @@
 "use client";
 
-import { FileText} from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ILesson } from "@/types/lesson";
 import { QuizQuestion } from "@/types/content";
@@ -8,7 +7,6 @@ import type { LessonContent } from "@/types/content";
 import { useState, useEffect } from "react";
 import { IQuizAnswer } from "@/types/progress";
 import ErrorDisplay from "@/components/ErrorDisplay";
-import Image from 'next/image';
 import { Button } from "@/components/ui/button";
 import { useSignedUrl } from "@/hooks/file/useSignedUrl";
 

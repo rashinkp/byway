@@ -24,6 +24,25 @@ export default function CertificatesSection() {
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [page]);
 
+	// Get signed URLs for all certificates at the top level
+	const certificateUrls = certificates.map((cert) => {
+		const isPdfKey = cert.pdfUrl && !cert.pdfUrl.startsWith('http');
+		return {
+			certId: cert.id,
+			isPdfKey,
+			pdfKey: isPdfKey ? cert.pdfUrl : null,
+		};
+	});
+
+	// Create a single useSignedUrl hook for the first certificate that needs signing
+	// This is a workaround since we can't call hooks in loops
+	const firstPdfKey = certificateUrls.find(url => url.isPdfKey)?.pdfKey;
+	const { url: signedPdfUrl, isLoading: pdfUrlLoading } = useSignedUrl(
+		firstPdfKey || null,
+		3600, // 1 hour expiry
+		false // No auto-refresh
+	);
+
 	return (
 		<div className="w-full">
 			<div className="bg-white dark:bg-[#232326] rounded-xl p-8 mb-8 text-center">
@@ -53,13 +72,11 @@ export default function CertificatesSection() {
 				) : (
 					<>
 										{certificates.map((cert) => {
-					// Get signed URL for certificate PDF if it exists
+					// Check if this certificate needs a signed URL
 					const isPdfKey = cert.pdfUrl && !cert.pdfUrl.startsWith('http');
-					const { url: signedPdfUrl, isLoading: pdfUrlLoading } = useSignedUrl(
-						isPdfKey ? cert.pdfUrl : null,
-						3600, // 1 hour expiry
-						false // No auto-refresh
-					);
+					const shouldUseSignedUrl = isPdfKey && certificateUrls.find(url => url.certId === cert.id)?.isPdfKey;
+					const finalPdfUrl = shouldUseSignedUrl ? signedPdfUrl : cert.pdfUrl;
+					const isCurrentLoading = shouldUseSignedUrl && pdfUrlLoading;
 
 					return (
 						<div
@@ -83,16 +100,16 @@ export default function CertificatesSection() {
 							<div className="mt-2 md:mt-0">
 								{cert.pdfUrl ? (
 									<a
-										href={signedPdfUrl || cert.pdfUrl}
+										href={finalPdfUrl || cert.pdfUrl}
 										target="_blank"
 										rel="noopener noreferrer"
 										className={`inline-block px-4 py-2 rounded transition ${
-											pdfUrlLoading 
+											isCurrentLoading 
 												? "bg-gray-400 text-white cursor-not-allowed" 
 												: "text-[#facc15] hover:text-[#eab308]"
 										}`}
 									>
-										{pdfUrlLoading ? "Preparing..." : "Download"}
+										{isCurrentLoading ? "Preparing..." : "Download"}
 									</a>
 								) : (
 									<span className="text-[var(--color-muted)]">

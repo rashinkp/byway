@@ -3,7 +3,7 @@ import { useCertificate } from "@/hooks/certificate/useCertificate";
 import { useSignedUrl } from "@/hooks/file/useSignedUrl";
 
 export function CertificateActions({ courseId }: { courseId: string }) {
-  const { certificate, loading: certLoading, error: certError, fetchCertificate, createCertificate } = useCertificate(courseId);
+  const { certificate, loading: certLoading, fetchCertificate, createCertificate } = useCertificate(courseId);
   const [regenError, setRegenError] = useState<string | null>(null);
 
   // Debug logging
