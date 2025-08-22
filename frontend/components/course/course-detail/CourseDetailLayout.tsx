@@ -29,6 +29,25 @@ export default function CourseDetailLayout({
 	const isAdmin = userRole === 'ADMIN';
 	const { data: lessonContent, isLoading: isContentLoading, error: contentError } = useGetContentByLessonId(openLessonContentId || "");
 
+	// Resolve signed URLs for lesson content (video/document) when fileUrl/thumbnailUrl are S3 keys
+	const lessonFileIsKey = typeof lessonContent?.fileUrl === 'string' && !!lessonContent?.fileUrl && !/^https?:\/\//.test(lessonContent.fileUrl) && !lessonContent.fileUrl.startsWith('/');
+	const { url: lessonFileUrl } = useSignedUrl(lessonFileIsKey ? (lessonContent?.fileUrl as string) : null);
+	const lessonThumbIsKey = typeof lessonContent?.thumbnailUrl === 'string' && !!lessonContent?.thumbnailUrl && !/^https?:\/\//.test(lessonContent.thumbnailUrl) && !lessonContent.thumbnailUrl.startsWith('/');
+	const { url: lessonThumbUrl } = useSignedUrl(lessonThumbIsKey ? (lessonContent?.thumbnailUrl as string) : null);
+
+	const resolvedVideoUrl = lessonContent?.fileUrl
+		? (lessonFileIsKey ? lessonFileUrl : lessonContent.fileUrl)
+		: undefined;
+	const resolvedPosterUrl = lessonContent?.thumbnailUrl
+		? (lessonThumbIsKey ? lessonThumbUrl : lessonContent.thumbnailUrl)
+		: undefined;
+	const resolvedDocUrl = lessonContent?.fileUrl
+		? (lessonFileIsKey ? lessonFileUrl : lessonContent.fileUrl)
+		: undefined;
+	const isPdfDoc = typeof resolvedDocUrl === 'string'
+		? resolvedDocUrl.split('?')[0].toLowerCase().endsWith('.pdf')
+		: false;
+
 	// Resolve signed URLs for course thumbnail and instructor avatar when they are S3 keys
 	const courseThumbIsKey = typeof course?.thumbnail === 'string' && !!course?.thumbnail && !/^https?:\/\//.test(course.thumbnail) && !course.thumbnail.startsWith('/');
 	const { url: courseThumbUrl } = useSignedUrl(courseThumbIsKey ? course?.thumbnail : null);
@@ -234,29 +253,38 @@ export default function CourseDetailLayout({
 									{lessonContent.description && (
 										<p className="text-gray-700 dark:text-gray-300 mb-4 whitespace-pre-line">{lessonContent.description}</p>
 									)}
-									{lessonContent.type === 'VIDEO' && lessonContent.fileUrl && (
-										<video
-											controls
-											poster={lessonContent.thumbnailUrl || "/api/placeholder/800/450"}
-											className="w-full max-w-2xl rounded-lg object-cover mb-4"
-											style={{ maxHeight: 400 }}
-										>
-											<source src={lessonContent.fileUrl} type="video/mp4" />
-											Your browser does not support the video tag.
-										</video>
+									{lessonContent.type === 'VIDEO' && (
+										resolvedVideoUrl ? (
+											<video
+												key={resolvedVideoUrl}
+												controls
+												playsInline
+												preload="metadata"
+												poster={resolvedPosterUrl || "/api/placeholder/800/450"}
+												src={resolvedVideoUrl}
+												className="w-full max-w-2xl rounded-lg object-cover mb-4"
+												style={{ maxHeight: 400 }}
+											>
+												Your browser does not support the video tag.
+											</video>
+										) : (
+											<div className="w-full max-w-2xl h-64 rounded-lg border border-gray-200 dark:border-gray-700 flex items-center justify-center text-gray-500 dark:text-gray-300">
+												Preparing video link...
+											</div>
+										)
 									)}
-									{lessonContent.type === 'DOCUMENT' && lessonContent.fileUrl && (
+									{lessonContent.type === 'DOCUMENT' && resolvedDocUrl && (
 										<div className="space-y-2">
 											<a
-												href={lessonContent.fileUrl}
+												href={resolvedDocUrl}
 												download
 												className="inline-block px-4 py-2 bg-[#facc15] text-black dark:bg-[#facc15] dark:text-[#18181b] rounded font-semibold hover:bg-yellow-400 dark:hover:bg-yellow-400 transition-colors mb-2"
 											>
 												Download Document
 											</a>
-											{lessonContent.fileUrl.endsWith('.pdf') ? (
+											{isPdfDoc ? (
 												<iframe
-													src={lessonContent.fileUrl}
+													src={resolvedDocUrl}
 													className="w-full h-[400px] rounded border border-gray-200 dark:border-gray-700"
 													title="Document preview"
 												/>
