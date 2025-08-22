@@ -192,7 +192,8 @@ export function createAppDependencies(): AppDependencies {
     shared.enrollmentRepository,
     shared.courseRepository,
     shared.userRepository,
-    shared.lessonProgressRepository
+    shared.lessonProgressRepository,
+    shared.lessonRepository
   );
 
   return {

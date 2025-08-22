@@ -5,6 +5,7 @@ import { BaseController } from "./base.controller";
 import { IHttpErrors } from "../interfaces/http-errors.interface";
 import { IHttpSuccess } from "../interfaces/http-success.interface";
 import { CertificateRepositoryInterface } from "../../../app/repositories/certificate-repository.interface";
+import { Certificate } from "../../../domain/entities/certificate.entity";
 
 export class CertificateController extends BaseController {
   constructor(
@@ -63,7 +64,7 @@ export class CertificateController extends BaseController {
         return this.httpErrors.error_404("Certificate not found");
       }
 
-      return this.success_200(certificate, "Certificate found");
+      return this.success_200(Certificate.toPersistence(certificate), "Certificate found");
     });
   };
 

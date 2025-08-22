@@ -5,6 +5,7 @@ import { useCertificateList } from "@/hooks/certificate/useCertificateList";
 import { Pagination } from "@/components/ui/Pagination";
 import ErrorDisplay from "@/components/ErrorDisplay";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useSignedUrl } from "@/hooks/file/useSignedUrl";
 
 export default function CertificatesSection() {
 	const {
@@ -51,43 +52,57 @@ export default function CertificatesSection() {
 					<div className="text-gray-500">No certificates found.</div>
 				) : (
 					<>
-						{certificates.map((cert) => (
-							<div
-								key={cert.id}
-								className="flex flex-col md:flex-row md:items-center justify-between bg-white dark:bg-[#232326] rounded-lg p-4 mb-4"
-							>
-								<div className="space-y-2">
-									<div className="font-semibold text-[var(--color-primary-dark)]">
-										{cert.courseTitle || cert.courseId}
-									</div>
-									<div className="text-sm text-[var(--color-muted)]">
-										Issued:{" "}
-										{cert.metadata?.generatedAt
-											? new Date(cert.metadata.generatedAt).toLocaleDateString()
-											: "-"}
-									</div>
-									<div className="text-xs text-[var(--color-muted)]">
-										Certificate #: {cert.certificateNumber}
-									</div>
+										{certificates.map((cert) => {
+					// Get signed URL for certificate PDF if it exists
+					const isPdfKey = cert.pdfUrl && !cert.pdfUrl.startsWith('http');
+					const { url: signedPdfUrl, isLoading: pdfUrlLoading } = useSignedUrl(
+						isPdfKey ? cert.pdfUrl : null,
+						3600, // 1 hour expiry
+						false // No auto-refresh
+					);
+
+					return (
+						<div
+							key={cert.id}
+							className="flex flex-col md:flex-row md:items-center justify-between bg-white dark:bg-[#232326] rounded-lg p-4 mb-4"
+						>
+							<div className="space-y-2">
+								<div className="font-semibold text-[var(--color-primary-dark)]">
+									{cert.courseTitle || cert.courseId}
 								</div>
-								<div className="mt-2 md:mt-0">
-									{cert.pdfUrl ? (
-										<a
-											href={cert.pdfUrl}
-											target="_blank"
-											rel="noopener noreferrer"
-											className="inline-block px-4 py-2 text-[#facc15] rounded transition"
-										>
-											Download
-										</a>
-									) : (
-										<span className="text-[var(--color-muted)]">
-											Not available
-										</span>
-									)}
+								<div className="text-sm text-[var(--color-muted)]">
+									Issued:{" "}
+									{cert.metadata?.generatedAt
+										? new Date(cert.metadata.generatedAt).toLocaleDateString()
+										: "-"}
+								</div>
+								<div className="text-xs text-[var(--color-muted)]">
+									Certificate #: {cert.certificateNumber}
 								</div>
 							</div>
-						))}
+							<div className="mt-2 md:mt-0">
+								{cert.pdfUrl ? (
+									<a
+										href={signedPdfUrl || cert.pdfUrl}
+										target="_blank"
+										rel="noopener noreferrer"
+										className={`inline-block px-4 py-2 rounded transition ${
+											pdfUrlLoading 
+												? "bg-gray-400 text-white cursor-not-allowed" 
+												: "text-[#facc15] hover:text-[#eab308]"
+										}`}
+									>
+										{pdfUrlLoading ? "Preparing..." : "Download"}
+									</a>
+								) : (
+									<span className="text-[var(--color-muted)]">
+										Not available
+									</span>
+								)}
+							</div>
+						</div>
+					);
+				})}
 						{totalPages > 1 && (
 							<div className="mt-8 flex justify-center">
 								<Pagination

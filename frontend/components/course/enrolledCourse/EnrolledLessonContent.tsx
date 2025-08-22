@@ -1,10 +1,11 @@
 "use client";
 
 import { FileText} from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
 import { ILesson } from "@/types/lesson";
 import { QuizQuestion } from "@/types/content";
 import type { LessonContent } from "@/types/content";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { IQuizAnswer } from "@/types/progress";
 import ErrorDisplay from "@/components/ErrorDisplay";
 import Image from 'next/image';
@@ -48,6 +49,7 @@ export function LessonContent({
   markLessonComplete,
 }: LessonContentProps) {
   const [selectedAnswers, setSelectedAnswers] = useState<Record<string, string>>({});
+  const [iframeLoaded, setIframeLoaded] = useState(false);
 
   const handleAnswerSelect = (questionId: string, answer: string) => {
     setSelectedAnswers(prev => ({
@@ -93,15 +95,17 @@ export function LessonContent({
 
   const finalVideoSrc = shouldSignVideo ? signedVideoUrl : (content?.fileUrl || undefined);
   const finalPoster = shouldSignThumb ? signedThumbUrl : (content?.thumbnailUrl || undefined);
-  const finalDocHref = shouldSignDoc ? signedDocUrl : (content?.fileUrl || "");
+  const resolvedDocUrl = shouldSignDoc ? signedDocUrl : (content?.fileUrl || undefined);
+  
+  // PDF detection - exactly like admin version
+  const isPdfDoc = typeof resolvedDocUrl === 'string'
+    ? resolvedDocUrl.split('?')[0].toLowerCase().endsWith('.pdf')
+    : false;
 
-  // Helper to detect file type based on URL extension
-  const getFileType = (url: string) => {
-    const extension = url.split(".").pop()?.toLowerCase();
-    if (extension === "pdf") return "pdf";
-    if (extension === "doc" || extension === "docx") return "doc";
-    return "unknown";
-  };
+  // Reset loading state when content changes
+  useEffect(() => {
+    setIframeLoaded(false);
+  }, [content?.id, resolvedDocUrl]);
 
   return (
     <>
@@ -147,98 +151,69 @@ export function LessonContent({
           </div>
         ) : (
           <>
-            {content.type === "VIDEO" && (
-              <div className="relative w-full  mx-auto">
-                <div
-                  className="relative"
-                  style={{
-                    width: "1000px",
-                    height: "550px",
-                  }}
-                >
-                  <video
-                    controls
-                    poster={finalPoster || "/api/placeholder/800/450"}
-                    className="w-full h-full rounded-lg object-cover"
-                    style={{ objectFit: "cover" }}
-                  >
-                    <source
-                      src={finalVideoSrc}
-                      type="video/mp4"
-                    />
-                    Your browser does not support the video tag.
-                  </video>
-                </div>
-              </div>
-            )}
-            {content.type === "DOCUMENT" && (
-              <div className="">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center">
-                    <span className="font-semibold text-black dark:text-white">
-                      Document
-                    </span>
-                  </div>
-                  {content.fileUrl && (
-                    <a
-                      href={finalDocHref}
-                      download
-                      className=" text-white dark:text-black rounded-lg  transition-colors"
-                    >
-                      Download{" "}
-                      {getFileType(finalDocHref) === "pdf"
-                        ? "PDF"
-                        : "Document"}
-                    </a>
-                  )}
-                </div>
-                <div className=" mt-5">
-                  <div className=" rounded-lg min-h-64">
-                    {content.fileUrl ? (
-                      getFileType(finalDocHref) === "pdf" ? (
-                        <>
-                          <iframe
-                            src={finalDocHref}
-                            className="w-full h-[600px] rounded mb-4"
-                            title="Document preview"
-                          />
-                          <p className="text-gray-500 dark:text-gray-300 text-sm mt-2">
-                            If the PDF doesn't load, use the download button
-                            above.
-                          </p>
-                        </>
-                      ) : (
-                        <div className="text-center py-8">
-                          <FileText
-                            size={48}
-                            className="text-gray-500 dark:text-gray-300 mx-auto mb-4"
-                          />
-                          <p className="text-black dark:text-white font-medium">
-                            Word documents cannot be previewed in the browser.
-                          </p>
-                          <p className="text-gray-500 dark:text-gray-300 text-sm mt-2">
-                            Please download the document to view it.
-                          </p>
-                        </div>
-                      )
-                    ) : (
-                      <Image
-                        src={(content.thumbnailUrl as string) || "/api/placeholder/800/600"}
-                        alt="Document preview"
-                        width={800}
-                        height={600}
-                        className="w-full object-contain mb-4 rounded"
-                      />
-                    )}
-                    {!content.fileUrl && (
-                      <p className="text-red-500 text-sm mt-2">
-                        No document available for preview.
-                      </p>
-                    )}
-                  </div>
-                </div>
-              </div>
-            )}
+                         {content.type === "VIDEO" && (
+               finalVideoSrc ? (
+                 <div className="relative w-full  mx-auto">
+                   <div
+                     className="relative"
+                     style={{
+                       width: "1000px",
+                       height: "550px",
+                     }}
+                   >
+                     <video
+                       controls
+                       poster={finalPoster || "/api/placeholder/800/450"}
+                       className="w-full h-full rounded-lg object-cover"
+                       style={{ objectFit: "cover" }}
+                       src={finalVideoSrc}
+                     >
+                       <source
+                         src={finalVideoSrc}
+                         type="video/mp4"
+                       />
+                       Your browser does not support the video tag.
+                     </video>
+                   </div>
+                 </div>
+               ) : (
+                 <div className="text-center py-8">
+                   <p className="text-gray-500 dark:text-gray-300">No video available for this lesson.</p>
+                 </div>
+               )
+             )}
+                         {content.type === "DOCUMENT" && (
+               resolvedDocUrl ? (
+                 <div className="space-y-2">
+                   <a
+                     href={resolvedDocUrl}
+                     download
+                     className="inline-block px-4 py-2 bg-[#facc15] text-black dark:bg-[#facc15] dark:text-[#18181b] rounded font-semibold hover:bg-yellow-400 dark:hover:bg-yellow-400 transition-colors mb-2"
+                   >
+                     Download Document
+                   </a>
+                   {isPdfDoc ? (
+                     <div className="w-full">
+                       {!iframeLoaded && (
+                         <Skeleton className="w-full h-[600px] rounded bg-gray-200 dark:bg-gray-700 animate-pulse" />
+                       )}
+                       <iframe
+                         src={resolvedDocUrl}
+                         className={`${!iframeLoaded ? 'hidden' : ''} w-full h-[600px] rounded border border-gray-200 dark:border-gray-700`}
+                         title="Document preview"
+                         onLoad={() => setIframeLoaded(true)}
+                       />
+                     </div>
+                   ) : (
+                     <div className="text-gray-500 dark:text-gray-300">Preview not available for this document type.</div>
+                   )}
+                 </div>
+               ) : (
+                 <div className="text-center py-8">
+                   <p className="text-gray-500 dark:text-gray-300">No document available for this lesson.</p>
+                 </div>
+               )
+             )}
             {content.type === "QUIZ" && (
               <div className="">
                 <h3 className="text-xl font-semibold text-black dark:text-white mb-4">
