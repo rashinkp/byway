@@ -220,4 +220,8 @@ export class UserProfile {
       updatedAt: this._updatedAt,
     };
   }
+
+  toJSON(): UserProfileInterface {
+    return this.getProps();
+  }
 }

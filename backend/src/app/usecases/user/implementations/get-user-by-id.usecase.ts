@@ -2,6 +2,7 @@ import { GetUserDto, ProfileDTO, UserResponseDTO } from "../../../dtos/user.dto"
 import { HttpError } from "../../../../presentation/http/errors/http-error";
 import { IUserRepository } from "../../../repositories/user.repository";
 import { IGetUserByIdUseCase } from "../interfaces/get-user-by-id.usecase.interface";
+import { mapProfileToDTO, mapUserToDTO } from "../utils/user-dto-mapper";
 
 export class GetUserByIdUseCase implements IGetUserByIdUseCase {
   constructor(private _userRepository: IUserRepository) {}
@@ -14,6 +15,6 @@ export class GetUserByIdUseCase implements IGetUserByIdUseCase {
       throw new HttpError("User not found", 404);
     }
     const profile = await this._userRepository.findProfileByUserId(dto.userId);
-    return { user, profile };
+    return { user: mapUserToDTO(user)!, profile: mapProfileToDTO(profile) };
   }
 }

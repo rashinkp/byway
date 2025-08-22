@@ -57,30 +57,9 @@ export class CartController extends BaseController {
         validated
       );
 
-      // Format cart items to include course data
-      const formattedCart = cart.map((item) => ({
-        ...item,
-        course: item.course
-          ? {
-              id: item.course.id,
-              title: item.course.title,
-              description: item.course.description,
-              thumbnail: item.course.thumbnail,
-              price: item.course.price?.getValue() ?? null,
-              offer: item.course.offer?.getValue() ?? null,
-              duration: item.course.duration?.getValue() ?? null,
-              level: item.course.level,
-              lessons: item.course.lessons,
-              rating: item.course.rating,
-              reviewCount: item.course.reviewCount,
-              bestSeller: item.course.bestSeller,
-            }
-          : undefined,
-      }));
-
       return this.success_200(
         {
-          cartItems: formattedCart,
+          cartItems: cart,
           total: cart.length,
         },
         "Cart retrieved successfully"

@@ -4,6 +4,7 @@ import { IEnrollmentRepository } from "../../../repositories/enrollment.reposito
 import { AddToCartDto, CartResponseDTO } from "../../../dtos/cart.dto";
 import { IAddToCartUseCase } from "../interfaces/add-to-cart.usecase.interface";
 import { HttpError } from "../../../../presentation/http/errors/http-error";
+import { mapCartToDTO } from "../utils/cart-dto-mapper";
 
 export class AddToCartUseCase implements IAddToCartUseCase {
   constructor(
@@ -51,6 +52,7 @@ export class AddToCartUseCase implements IAddToCartUseCase {
     });
 
     // Save to database
-    return this._cartRepository.create(cart);
-  }
+    const createdCart = await this._cartRepository.create(cart);
+    return mapCartToDTO(createdCart);
+  } 
 }
