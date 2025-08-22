@@ -49,16 +49,28 @@ export default function CommonLayout({
 	}, [isInitialized, initializeAuth]);
 
 
-	// Handle screen size for collapsible sidebar
+	// Handle screen size for collapsible sidebar and mobile menu
 	useEffect(() => {
-		if (isCollapsible) {
-			const checkScreenSize = () => {
-				setCollapsed(window.innerWidth < 1024);
-			};
-			checkScreenSize();
-			window.addEventListener("resize", checkScreenSize);
-			return () => window.removeEventListener("resize", checkScreenSize);
-		}
+		const checkScreenSize = () => {
+			if (isCollapsible) {
+				// On mobile: always collapsed, on desktop: allow user control
+				const isMobile = window.innerWidth < 1024;
+				if (isMobile) {
+					setCollapsed(true);
+					// On mobile, sidebar is collapsed by default but visible
+					setMobileMenuOpen(false);
+				}
+				// Don't force collapse on desktop, let user control it
+				
+				// Close mobile menu on larger screens
+				if (window.innerWidth >= 1024) {
+					setMobileMenuOpen(false);
+				}
+			}
+		};
+		checkScreenSize();
+		window.addEventListener("resize", checkScreenSize);
+		return () => window.removeEventListener("resize", checkScreenSize);
 	}, [isCollapsible]);
 
 	// Handle role-based redirects
@@ -112,6 +124,7 @@ export default function CommonLayout({
 
 	return (
     <div className="flex min-h-screen bg-gray-50 dark:bg-[#18181b]">
+      {/* Sidebar */}
       <CommonSidebar
         collapsed={collapsed}
         toggleCollapse={
@@ -127,16 +140,20 @@ export default function CommonLayout({
         isCollapsible={isCollapsible}
         onNotificationClick={() => setNotificationOpen(true)}
       />
+      
+      {/* Notification Modal */}
       <NotificationModal
         open={notificationOpen}
         onOpenChange={setNotificationOpen}
       />
+      
+      {/* Main Content Area */}
       <div className="flex-1 flex flex-col min-h-screen bg-gray-50 dark:bg-[#18181b]">
         <main
           className={`flex-1 transition-all duration-300 ease-in-out ${
             isCollapsible
               ? collapsed
-                ? "lg:ml-20"
+                ? "ml-20 lg:ml-20" // Give space for collapsed sidebar on mobile and desktop
                 : "lg:ml-64"
               : "lg:ml-64 lg:[&@media(min-width:1024px)]:ml-[80px] xl:ml-64"
           }`}
@@ -145,11 +162,13 @@ export default function CommonLayout({
             <div className="max-w-7xl mx-auto text-gray-900 dark:text-gray-100">{children}</div>
           </div>
         </main>
+        
+        {/* Footer */}
         <div
           className={`${
             isCollapsible
               ? collapsed
-                ? "lg:ml-20"
+                ? "ml-20 lg:ml-20" // Give space for collapsed sidebar on mobile and desktop
                 : "lg:ml-64"
               : "lg:ml-64 lg:[&@media(min-width:1024px)]:ml-[80px] xl:ml-64"
           }`}
@@ -157,6 +176,14 @@ export default function CommonLayout({
           <BywayFooter />
         </div>
       </div>
+      
+      {/* Mobile Overlay - Only show when sidebar is expanded on mobile */}
+      {mobileMenuOpen && (
+        <div
+          className="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden"
+          onClick={() => setMobileMenuOpen(false)}
+        />
+      )}
     </div>
   );
 }

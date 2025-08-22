@@ -51,13 +51,13 @@ export default function AdminDashboard() {
 			error={error}
 			data={data}
 		>
-			<div className="flex justify-end mb-4">
+			<div className="flex justify-end mb-3 sm:mb-4">
 				<PDFExportButton dashboardData={data} />
 			</div>
 			{data && (
-				<div ref={dashboardRef} className="space-y-8">
+				<div ref={dashboardRef} className="space-y-6 sm:space-y-8">
 					{/* Statistics Cards Grid */}
-					<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+					<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
 						{/* Courses Stats */}
 						<StatCard
 							icon={BookOpen}
@@ -135,7 +135,7 @@ export default function AdminDashboard() {
 					</div>
 
 					{/* Enrollments Stats */}
-					<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+					<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
 						<StatCard
 							icon={Users}
 							iconColor="text-indigo-600"
@@ -190,7 +190,7 @@ export default function AdminDashboard() {
 														by {course.instructorName}
 													</span>
 												</div>
-												<div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+												<div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3 sm:gap-4">
 													<div className="flex items-center space-x-2">
 														<Users className="w-4 h-4 text-gray-400" />
 														<div>
@@ -296,7 +296,7 @@ export default function AdminDashboard() {
 														{instructor.isActive ? "Active" : "Inactive"}
 													</span>
 												</div>
-												<div className="grid grid-cols-1 md:grid-cols-6 gap-4">
+												<div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3 sm:gap-4">
 													<div className="flex items-center space-x-2">
 														<BookOpen className="w-4 h-4 text-gray-400" />
 														<div>

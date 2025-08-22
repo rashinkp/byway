@@ -39,27 +39,43 @@ export function CommonSidebar({
   isCollapsible,
   onNotificationClick,
 }: CommonSidebarProps) {
+  // Determine sidebar width and visibility
+  const getSidebarClasses = () => {
+    // Mobile behavior
+    if (mobileMenuOpen) {
+      return "translate-x-0 w-64"; // Full width when mobile menu is open (overlay)
+    }
+    
+    if (collapsed) {
+      // On mobile: collapsed sidebar should not overlap content
+      return "translate-x-0 w-20 lg:relative"; // Fixed width, relative on desktop
+    }
+    
+    // Desktop behavior
+    if (isCollapsible) {
+      return "lg:translate-x-0 w-64"; // Full width on desktop
+    } else {
+      return "lg:translate-x-0 w-64 lg:w-[80px] xl:w-64"; // Responsive width
+    }
+  };
+
   return (
     <aside
-      className={`fixed top-0 left-0 z-40 h-screen bg-[#18181b] shadow-xl transition-all duration-300 ease-in-out
-        ${mobileMenuOpen ? "translate-x-0" : "-translate-x-full"}
-        lg:translate-x-0 ${
-          isCollapsible
-            ? collapsed
-              ? "w-20"
-              : "w-64"
-            : "w-64 lg:w-[80px] xl:w-64"
-        }`}
+      className={`fixed top-0 left-0 z-50 h-screen bg-[#18181b] shadow-xl transition-all duration-300 ease-in-out
+        ${getSidebarClasses()}
+        lg:relative lg:z-40`}
     >
       <div className="flex flex-col h-full">
         <SidebarHeader
-          collapsed={collapsed}
+          collapsed={collapsed && !mobileMenuOpen} // Show expanded header when mobile menu is open
           toggleCollapse={toggleCollapse}
           title={headerTitle}
           subtitle={headerSubtitle}
+          mobileMenuOpen={mobileMenuOpen}
+          setMobileMenuOpen={setMobileMenuOpen}
         />
 
-        <div className="flex-1 px-4 py-6 overflow-y-auto">
+        <div className="flex-1 px-3 lg:px-4 py-4 lg:py-6 overflow-y-auto">
           <TooltipProvider delayDuration={0}>
             <nav className="space-y-1">
               {navItems.map((item) => {
@@ -73,7 +89,7 @@ export function CommonSidebar({
                   <NavItemLink
                     key={item.href}
                     item={item}
-                    collapsed={collapsed}
+                    collapsed={collapsed && !mobileMenuOpen} // Show text when mobile menu is expanded
                     isActive={isActive}
                     onClick={() => setMobileMenuOpen(false)}
                   />
@@ -84,8 +100,8 @@ export function CommonSidebar({
         </div>
 
         <div
-          className={`px-5 pb-2 flex ${
-            collapsed ? "justify-center" : "justify-start"
+          className={`px-3 lg:px-5 pb-2 flex ${
+            (collapsed && !mobileMenuOpen) ? "justify-center" : "justify-start"
           } w-full`}
         >
           <TooltipProvider>
@@ -94,13 +110,13 @@ export function CommonSidebar({
                 <button
                   type="button"
                   onClick={onNotificationClick}
-                  className={`flex items-center gap-2 rounded-lg px-3 py-2 transition-colors duration-200 hover:bg-[#facc15]/10 text-[#facc15] hover:text-[#facc15] w-full ${
-                    collapsed ? "justify-center" : ""
+                  className={`flex items-center gap-2 rounded-lg px-2 lg:px-3 py-2 transition-colors duration-200 hover:bg-[#facc15]/10 text-[#facc15] hover:text-[#facc15] w-full ${
+                    (collapsed && !mobileMenuOpen) ? "justify-center" : ""
                   }`}
                   aria-label="Notifications"
                 >
                   <Bell className="w-4 h-4" />
-                  {!collapsed && <span className="text-sm">Notifications</span>}
+                  {!(collapsed && !mobileMenuOpen) && <span className="text-sm">Notifications</span>}
                 </button>
               </TooltipTrigger>
               <TooltipContent
@@ -114,8 +130,8 @@ export function CommonSidebar({
         </div>
 
         <div
-          className={`p-5 border-t border-gray-800 ${
-            collapsed
+          className={`p-3 lg:p-5 border-t border-gray-800 ${
+            (collapsed && !mobileMenuOpen)
               ? "flex justify-center"
               : "flex justify-center lg:justify-start"
           }`}
@@ -130,7 +146,7 @@ export function CommonSidebar({
                   onClick={handleLogout}
                 >
                   <LogOut className="h-5 w-5" />
-                  {!collapsed && (
+                  {!(collapsed && !mobileMenuOpen) && (
                     <span className="ml-2 hidden xl:inline font-medium">
                       Logout
                     </span>
