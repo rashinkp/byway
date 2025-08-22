@@ -49,16 +49,28 @@ export default function CommonLayout({
 	}, [isInitialized, initializeAuth]);
 
 
-	// Handle screen size for collapsible sidebar
+	// Handle screen size for collapsible sidebar and mobile menu
 	useEffect(() => {
-		if (isCollapsible) {
-			const checkScreenSize = () => {
-				setCollapsed(window.innerWidth < 1024);
-			};
-			checkScreenSize();
-			window.addEventListener("resize", checkScreenSize);
-			return () => window.removeEventListener("resize", checkScreenSize);
-		}
+		const checkScreenSize = () => {
+			if (isCollapsible) {
+				// On mobile: always collapsed, on desktop: allow user control
+				const isMobile = window.innerWidth < 1024;
+				if (isMobile) {
+					setCollapsed(true);
+					// On mobile, sidebar is collapsed by default but visible
+					setMobileMenuOpen(false);
+				}
+				// Don't force collapse on desktop, let user control it
+				
+				// Close mobile menu on larger screens
+				if (window.innerWidth >= 1024) {
+					setMobileMenuOpen(false);
+				}
+			}
+		};
+		checkScreenSize();
+		window.addEventListener("resize", checkScreenSize);
+		return () => window.removeEventListener("resize", checkScreenSize);
 	}, [isCollapsible]);
 
 	// Handle role-based redirects
@@ -111,7 +123,8 @@ export default function CommonLayout({
 	}
 
 	return (
-    <div className="flex min-h-screen bg-gray-50 dark:bg-[#18181b]">
+    <div className="flex min-h-screen bg-gray-50 dark:bg-[#18181b] overflow-x-hidden">
+      {/* Sidebar */}
       <CommonSidebar
         collapsed={collapsed}
         toggleCollapse={
@@ -127,36 +140,50 @@ export default function CommonLayout({
         isCollapsible={isCollapsible}
         onNotificationClick={() => setNotificationOpen(true)}
       />
+      
+      {/* Notification Modal */}
       <NotificationModal
         open={notificationOpen}
         onOpenChange={setNotificationOpen}
       />
-      <div className="flex-1 flex flex-col min-h-screen bg-gray-50 dark:bg-[#18181b]">
+      
+      {/* Main Content Area */}
+      <div className="flex-1 flex flex-col min-h-screen bg-gray-50 dark:bg-[#18181b] overflow-x-hidden">
         <main
-          className={`flex-1 transition-all duration-300 ease-in-out ${
+          className={`flex-1 transition-all duration-300 ease-in-out overflow-x-hidden ${
             isCollapsible
               ? collapsed
-                ? "lg:ml-20"
-                : "lg:ml-64"
-              : "lg:ml-64 lg:[&@media(min-width:1024px)]:ml-[80px] xl:ml-64"
+                ? "ml-20 lg:ml-10" 
+                : "lg:ml-10"
+              : "lg:ml-10"
           }`}
         >
-          <div className="p-4 lg:p-6">
-            <div className="max-w-7xl mx-auto text-gray-900 dark:text-gray-100">{children}</div>
+          <div className="p-4 lg:pl-0 lg:pr-6">
+            <div className="w-full max-w-none mx-0 text-gray-900 dark:text-gray-100 overflow-x-hidden">{children}</div>
           </div>
         </main>
+        
+        {/* Footer */}
         <div
           className={`${
             isCollapsible
               ? collapsed
-                ? "lg:ml-20"
-                : "lg:ml-64"
-              : "lg:ml-64 lg:[&@media(min-width:1024px)]:ml-[80px] xl:ml-64"
-          }`}
+                ? "ml-20 lg:ml-10" 
+                : "lg:ml-10"
+              : "lg:ml-10"
+          } mt-6 lg:mt-8 border-t border-gray-200 dark:border-gray-800`}
         >
           <BywayFooter />
         </div>
       </div>
+      
+      {/* Mobile Overlay - Only show when sidebar is expanded on mobile */}
+      {mobileMenuOpen && (
+        <div
+          className="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden"
+          onClick={() => setMobileMenuOpen(false)}
+        />
+      )}
     </div>
   );
 }

@@ -45,7 +45,7 @@ export default function AdminActions({
 		return null;
 	}
 	return (
-		<div className="rounded-2xl border border-gray-200 dark:border-[#232323] bg-white/80 dark:bg-[#18181b] p-8 shadow-xl space-y-6">
+		<div className="rounded-2xl  bg-white/80 dark:bg-[#18181b] p-8  space-y-6">
 			{/* Course Status Section */}
 			<div className="space-y-4">
 				<div className="flex items-center gap-2 text-black dark:text-[#facc15] text-lg font-semibold">

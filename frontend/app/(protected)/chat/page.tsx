@@ -470,22 +470,19 @@ export default function ChatPage() {
   }
 
   return (
-    <div className="flex-1 flex flex-col h-full overflow-hidden">
-      {/* Main Chat Interface */}
-      <div className="w-full h-[calc(100vh-4rem)] flex items-stretch">
+    <div className="h-[100dvh] flex flex-col overflow-hidden">
+      <div className="w-full h-full min-h-0 flex items-stretch">
         <div className="w-full overflow-hidden flex flex-col min-h-0">
           <div className="flex flex-1 min-h-0">
-            {/* Chat List Sidebar (show on mobile only if sidebar is open and no chat selected) */}
             {((isSidebarOpen && (!selectedChat || !isMobile)) ||
               (!selectedChat && isMobile)) && (
               <div
-                className={`$${
+                className={`relative ${
                   isSidebarOpen ? "translate-x-0" : "-translate-x-full"
                 } md:relative md:translate-x-0 z-40 ${
                   isMobile && !selectedChat ? "w-full" : "w-80 md:w-96"
                 } h-full transition-transform duration-300 ease-in-out md:transition-none`}
               >
-                {/* Back button for non-USER roles */}
                 {user?.role !== "USER" && (
                   <div className="flex items-center gap-2 p-3 pt-5 border-b border-gray-200 dark:border-gray-700 dark:bg-[#18181b]">
                     <button
@@ -505,7 +502,7 @@ export default function ChatPage() {
                   onSelectChat={handleSelectChat}
                   onSearch={setSearchQuery}
                 />
-                {/* Load More Button */}
+                
                 {hasMore && (
                   <div className="absolute bottom-0 left-0 right-0 p-4">
                     <Button

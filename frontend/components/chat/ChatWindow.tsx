@@ -120,7 +120,7 @@ export const ChatWindow = forwardRef<{ scrollToBottom: () => void }, ChatWindowP
   };
 
   return (
-    <div className="flex flex-col h-[calc(100vh-4rem)] bg-gray-100 dark:bg-[#18181b] transition-colors duration-300">
+    <div className="flex flex-col h-full min-h-0 bg-gray-100 dark:bg-[#18181b] transition-colors duration-300">
       {/* Header */}
       <div className="flex items-center justify-between px-4 py-3 border-b border-gray-200 dark:border-white/10 bg-white dark:bg-[#18181b] shadow-sm">
         <div className="flex items-center gap-3">

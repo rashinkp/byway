@@ -51,13 +51,13 @@ export default function AdminDashboard() {
 			error={error}
 			data={data}
 		>
-			<div className="flex justify-end mb-4">
+			<div className="flex justify-end mb-3 sm:mb-4">
 				<PDFExportButton dashboardData={data} />
 			</div>
 			{data && (
-				<div ref={dashboardRef} className="space-y-8">
+				<div ref={dashboardRef} className="space-y-6 sm:space-y-8">
 					{/* Statistics Cards Grid */}
-					<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+					<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
 						{/* Courses Stats */}
 						<StatCard
 							icon={BookOpen}
@@ -135,7 +135,7 @@ export default function AdminDashboard() {
 					</div>
 
 					{/* Enrollments Stats */}
-					<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+					<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
 						<StatCard
 							icon={Users}
 							iconColor="text-indigo-600"
@@ -176,21 +176,21 @@ export default function AdminDashboard() {
 												</span>
 											</div>
 											<div className="flex-1 space-y-2">
-												<div className="flex items-center gap-2">
+												<div className="flex flex-wrap items-center gap-2 min-w-0">
 													<span className="text-sm font-medium text-gray-500">
 														#{index + 1}
 													</span>
 													<button
 														onClick={() => handleCourseClick(course.courseId)}
-														className="text-lg font-semibold text-gray-900 dark:text-white hover:text-blue-600 hover:underline transition-colors cursor-pointer"
+														className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white hover:text-blue-600 hover:underline transition-colors cursor-pointer flex-1 min-w-0 whitespace-normal break-words line-clamp-2"
 													>
 														{course.courseTitle}
 													</button>
-													<span className="text-sm text-gray-500 dark:text-gray-300">
+													<span className="text-xs sm:text-sm text-gray-500 dark:text-gray-300 w-full sm:w-auto">
 														by {course.instructorName}
 													</span>
 												</div>
-												<div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+												<div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 sm:gap-4">
 													<div className="flex items-center space-x-2">
 														<Users className="w-4 h-4 text-gray-400" />
 														<div>
@@ -276,7 +276,7 @@ export default function AdminDashboard() {
 												</span>
 											</div>
 											<div className="flex-1 space-y-2">
-												<div className="flex items-center gap-2">
+												<div className="flex flex-wrap items-center gap-2">
 													<span className="text-sm font-medium text-gray-500">
 														#{index + 1}
 													</span>
@@ -287,7 +287,7 @@ export default function AdminDashboard() {
 														{instructor.email}
 													</span>
 													<span
-														className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${
+														className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium mt-1 sm:mt-0 sm:ml-auto ${
 															instructor.isActive
 																? "bg-green-50 text-green-700 border border-green-200 dark:bg-green-900 dark:text-green-300 dark:border-green-700"
 																: "bg-red-50 text-red-700 border border-red-200 dark:bg-red-900 dark:text-red-300 dark:border-red-700"
@@ -296,7 +296,7 @@ export default function AdminDashboard() {
 														{instructor.isActive ? "Active" : "Inactive"}
 													</span>
 												</div>
-												<div className="grid grid-cols-1 md:grid-cols-6 gap-4">
+												<div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3 sm:gap-4">
 													<div className="flex items-center space-x-2">
 														<BookOpen className="w-4 h-4 text-gray-400" />
 														<div>
