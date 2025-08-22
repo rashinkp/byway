@@ -7,6 +7,7 @@ import { IUserRepository } from "../../../repositories/user.repository";
 import { IUpdateUserUseCase } from "../interfaces/update-user.usecase.interface";
 import { S3ServiceInterface } from "../../../providers/s3.service.interface";
 import { ILogger } from "../../../providers/logger-provider.interface";
+import { mapProfileToDTO, mapUserToDTO } from "../utils/user-dto-mapper";
 
 export class UpdateUserUseCase implements IUpdateUserUseCase {
   constructor(
@@ -78,6 +79,6 @@ export class UpdateUserUseCase implements IUpdateUserUseCase {
 
     const savedUser = await this._userRepository.updateUser(updatedUser);
 
-    return { user: savedUser, profile };
+    return { user: mapUserToDTO(savedUser)!, profile: mapProfileToDTO(profile) };
   }
 }

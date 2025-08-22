@@ -21,6 +21,27 @@ export class ApplyCouponUseCase implements IApplyCouponUseCase {
     }
 
     cart.applyCoupon(data.couponId);
-    return this._cartRepository.update(cart);
+    const updatedCart = await this._cartRepository.update(cart);
+    
+    // Convert Cart entity to DTO
+    const cartData = updatedCart.toJSON();
+    
+    return {
+      ...cartData,
+      course: updatedCart.course ? {
+        id: updatedCart.course.id,
+        title: updatedCart.course.title,
+        description: updatedCart.course.description,
+        thumbnail: updatedCart.course.thumbnail,
+        price: updatedCart.course.price?.getValue() ? Number(updatedCart.course.price.getValue()) : null,
+        offer: updatedCart.course.offer?.getValue() ? Number(updatedCart.course.offer.getValue()) : null,
+        duration: updatedCart.course.duration?.getValue() ?? null,
+        level: updatedCart.course.level,
+        lessons: updatedCart.course.lessons,
+        rating: updatedCart.course.rating,
+        reviewCount: updatedCart.course.reviewCount,
+        bestSeller: updatedCart.course.bestSeller,
+      } : undefined,
+    };
   }
 }

@@ -4,6 +4,7 @@ import { IUserRepository } from "../../../repositories/user.repository";
 import { IInstructorRepository } from "../../../repositories/instructor.repository";
 import { IGetUserAdminDetailsUseCase } from "../interfaces/get-user-admin-details.usecase.interface";
 import { InstructorResponseDTO } from "../../../dtos/instructor.dto";
+import { mapProfileToDTO, mapUserToDTO } from "../utils/user-dto-mapper";
 
 export class GetUserAdminDetailsUseCase implements IGetUserAdminDetailsUseCase {
   constructor(
@@ -28,6 +29,6 @@ export class GetUserAdminDetailsUseCase implements IGetUserAdminDetailsUseCase {
       dto.userId
     );
 
-    return { user, profile, instructor };
+    return { user: mapUserToDTO(user)!, profile: mapProfileToDTO(profile), instructor };
   }
 }

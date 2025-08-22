@@ -1,5 +1,20 @@
-import { Course } from "../../domain/entities/course.entity";
 import { User } from "../../domain/entities/user.entity";
+
+// Simplified course interface for cart responses
+export interface CartCourseDTO {
+  id: string;
+  title: string;
+  description: string | null;
+  thumbnail: string | null;
+  price: number | null;
+  offer: number | null;
+  duration: number | null;
+  level: string;
+  lessons: number | undefined;
+  rating: number | undefined;
+  reviewCount: number | undefined;
+  bestSeller: boolean | undefined;
+}
 
 export interface AddToCartDto {
   courseId: string; 
@@ -33,5 +48,5 @@ export interface CartResponseDTO {
   updatedAt?: Date,
   deletedAt?: Date,
   user?: User,
-  course? : Course
+  course?: CartCourseDTO
 }

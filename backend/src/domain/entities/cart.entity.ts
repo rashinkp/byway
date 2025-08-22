@@ -58,7 +58,34 @@ export class Cart {
     updatedAt: Date;
     deletedAt?: Date | null;
     user?: { id: string; name: string; email: string; role: string; [key: string]: unknown };
-    course?: { id: string; title: string; description: string | null; [key: string]: unknown };
+    course?: { 
+      id: string; 
+      title: string; 
+      description: string | null; 
+      level: string;
+      price?: { toNumber(): number } | null;
+      thumbnail?: string | null;
+      duration?: number | null;
+      offer?: { toNumber(): number } | null;
+      status: string;
+      categoryId: string;
+      createdBy: string;
+      createdAt: Date;
+      updatedAt: Date;
+      approvalStatus: string;
+      adminSharePercentage: { toNumber(): number };
+      details?: {
+        prerequisites: string | null;
+        longDescription: string | null;
+        objectives: string | null;
+        targetAudience: string | null;
+      } | null;
+      rating?: number | null;
+      reviewCount?: number | null;
+      lessons?: unknown[];
+      bestSeller?: boolean;
+      [key: string]: unknown 
+    };
   }): Cart {
     return new Cart({
       id: data.id,
@@ -70,7 +97,7 @@ export class Cart {
       updatedAt: data.updatedAt,
       deletedAt: data.deletedAt ?? undefined,
       user: undefined, // Don't try to reconstruct User entity from incomplete data
-      course: undefined, // Don't try to reconstruct Course entity from incomplete data
+      course: data.course ? Course.fromPersistence(data.course) : undefined,
     });
   }
 
