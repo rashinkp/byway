@@ -26,10 +26,12 @@ const PayPalPayment: FC<PayPalPaymentProps> = memo(
 					<PayPalScriptProvider options={paypalOptions}>
 						<PayPalButtons
 							style={{ layout: "vertical" }}
-							createOrder={createOrder as any}
-							onApprove={onApprove as any}
-							onCancel={onCancel as any}
-							onError={onError as any}
+							// @ts-expect-error - PayPal types are complex, using type assertion
+							createOrder={createOrder}
+							// @ts-expect-error - PayPal types are complex, using type assertion
+							onApprove={onApprove}
+							onCancel={onCancel}
+							onError={onError}
 							disabled={isPending}
 						/>
 					</PayPalScriptProvider>

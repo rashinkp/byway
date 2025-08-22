@@ -31,13 +31,6 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "@/components/ui/select";
-import {
-	DropdownMenu,
-	DropdownMenuTrigger,
-	DropdownMenuContent,
-	DropdownMenuCheckboxItem,
-	DropdownMenuSeparator,
-} from "@/components/ui/dropdown-menu";
 import { X, Save, Loader2 } from "lucide-react";
 import { Path } from "react-hook-form";
 import FileUploadComponent, {

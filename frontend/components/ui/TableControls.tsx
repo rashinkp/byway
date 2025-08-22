@@ -90,8 +90,6 @@ export function TableControls({
 		return "grid-cols-12";
 	};
 
-	// Build responsive grid: 2 columns on small screens, N columns on sm+
-	const smGridCols = `sm:${getGridCols(filterTabs.length)}`;
 
 	return (
 		<div className="space-y-6">
