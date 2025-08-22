@@ -94,7 +94,7 @@ export class CartController extends BaseController {
         throw new UnauthorizedError("User not authenticated");
       }
 
-      const courseId = request.params.courseId;
+      const courseId = request.params?.courseId;
       if (!courseId) {
         throw new HttpError("Course ID is required", 400);
       }

@@ -24,7 +24,7 @@ export function useDeclineInstructor() {
 			// Update instructor listing cache
 			queryClient.setQueriesData(
 				{ queryKey: ["instructors"] },
-				(oldData: any) => {
+				(oldData: { data: { items: IInstructorWithUserDetails[] } } | undefined) => {
 					if (!oldData?.data?.items) return oldData;
 					
 					return {
@@ -81,7 +81,6 @@ export function useDeclineInstructor() {
 			});
 		},
 		onError: (error) => {
-			console.error("Instructor decline failed:", error.message);
 			toast.error("Instructor Decline Failed", {
 				description: error.message || "Something went wrong while declining",
 			});

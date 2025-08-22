@@ -7,18 +7,18 @@ import {
 } from "../../../app/providers/generate-certificate.interface";
 
 export class CertificatePdfService implements CertificatePdfServiceInterface {
-  private readonly platformName: string;
-  private readonly certificateTemplate: string;
+  private readonly _platformName: string;
+  private readonly _certificateTemplate: string;
 
   constructor(platformName: string = "Byway Learning Platform") {
-    this.platformName = platformName;
-    this.certificateTemplate = this.getTemplatePath();
+    this._platformName = platformName;
+    this._certificateTemplate = this.getTemplatePath();
   }
 
   async generateCertificatePDF(data: CertificateTemplateData): Promise<Buffer> {
     try {
       // Load the certificate template image
-      const templatePath = this.certificateTemplate;
+      const templatePath = this._certificateTemplate;
       const image = await loadImage(templatePath);
 
       // Create canvas with same dimensions as template
@@ -80,15 +80,12 @@ export class CertificatePdfService implements CertificatePdfServiceInterface {
       // Save PDF as buffer
       const pdfBytes = await pdfDoc.save();
       return Buffer.from(pdfBytes);
-    } catch (error) {
-      console.error("Error generating certificate PDF:", error);
+    } catch {
       throw new Error("Failed to generate certificate PDF");
     }
   }
 
-  generateCertificatePDFStream(data: CertificateTemplateData): any {
-    // For streaming, we'll return the buffer for now
-    // You can implement streaming if needed
+  generateCertificatePDFStream(data: CertificateTemplateData): never {
     throw new Error("Streaming not implemented for image-based certificates");
   }
 

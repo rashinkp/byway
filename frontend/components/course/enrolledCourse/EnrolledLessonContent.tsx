@@ -3,11 +3,13 @@
 import { FileText} from "lucide-react";
 import { ILesson } from "@/types/lesson";
 import { QuizQuestion } from "@/types/content";
+import type { LessonContent } from "@/types/content";
 import { useState } from "react";
 import { IQuizAnswer } from "@/types/progress";
 import ErrorDisplay from "@/components/ErrorDisplay";
 import Image from 'next/image';
 import { Button } from "@/components/ui/button";
+import { useSignedUrl } from "@/hooks/file/useSignedUrl";
 
 interface LessonWithCompletion extends ILesson {
   completed: boolean;
@@ -19,7 +21,7 @@ interface LessonWithCompletion extends ILesson {
 
 interface LessonContentProps {
   selectedLesson: LessonWithCompletion;
-  content: any; 
+  content?: LessonContent | null; 
   isContentLoading: boolean;
   isContentError: boolean;
   contentError: Error | null;
@@ -55,7 +57,7 @@ export function LessonContent({
   };
 
   const handleQuizSubmit = () => {
-    if (!content.quizQuestions) return;
+    if (!content?.quizQuestions) return;
 
     const answers: IQuizAnswer[] = content.quizQuestions.map((question: QuizQuestion) => {
       const selectedAnswer = selectedAnswers[question.id];
@@ -78,6 +80,20 @@ export function LessonContent({
       totalQuestions
     });
   };
+
+  // Resolve S3 keys to signed URLs for secure playback and downloads
+  const isAbsoluteUrl = (v?: string | null) => !!v && (v.startsWith("http://") || v.startsWith("https://"));
+  const shouldSignVideo = content?.type === "VIDEO" && content.fileUrl && !isAbsoluteUrl(content.fileUrl);
+  const shouldSignThumb = content?.type === "VIDEO" && content.thumbnailUrl && !isAbsoluteUrl(content.thumbnailUrl);
+  const shouldSignDoc = content?.type === "DOCUMENT" && content.fileUrl && !isAbsoluteUrl(content.fileUrl);
+
+  const { url: signedVideoUrl } = useSignedUrl(shouldSignVideo ? (content!.fileUrl as string) : null, 3600, false);
+  const { url: signedThumbUrl } = useSignedUrl(shouldSignThumb ? (content!.thumbnailUrl as string) : null, 3600, false);
+  const { url: signedDocUrl } = useSignedUrl(shouldSignDoc ? (content!.fileUrl as string) : null, 600, false);
+
+  const finalVideoSrc = shouldSignVideo ? signedVideoUrl : (content?.fileUrl || undefined);
+  const finalPoster = shouldSignThumb ? signedThumbUrl : (content?.thumbnailUrl || undefined);
+  const finalDocHref = shouldSignDoc ? signedDocUrl : (content?.fileUrl || "");
 
   // Helper to detect file type based on URL extension
   const getFileType = (url: string) => {
@@ -142,12 +158,12 @@ export function LessonContent({
                 >
                   <video
                     controls
-                    poster={content.thumbnailUrl || "/api/placeholder/800/450"}
+                    poster={finalPoster || "/api/placeholder/800/450"}
                     className="w-full h-full rounded-lg object-cover"
                     style={{ objectFit: "cover" }}
                   >
                     <source
-                      src={content.fileUrl ?? undefined}
+                      src={finalVideoSrc}
                       type="video/mp4"
                     />
                     Your browser does not support the video tag.
@@ -165,12 +181,12 @@ export function LessonContent({
                   </div>
                   {content.fileUrl && (
                     <a
-                      href={content.fileUrl}
+                      href={finalDocHref}
                       download
                       className=" text-white dark:text-black rounded-lg  transition-colors"
                     >
                       Download{" "}
-                      {getFileType(content.fileUrl) === "pdf"
+                      {getFileType(finalDocHref) === "pdf"
                         ? "PDF"
                         : "Document"}
                     </a>
@@ -179,15 +195,12 @@ export function LessonContent({
                 <div className=" mt-5">
                   <div className=" rounded-lg min-h-64">
                     {content.fileUrl ? (
-                      getFileType(content.fileUrl) === "pdf" ? (
+                      getFileType(finalDocHref) === "pdf" ? (
                         <>
                           <iframe
-                            src={content.fileUrl}
+                            src={finalDocHref}
                             className="w-full h-[600px] rounded mb-4"
                             title="Document preview"
-                            onError={(e) => {
-                              console.error("Iframe load error:", e);
-                            }}
                           />
                           <p className="text-gray-500 dark:text-gray-300 text-sm mt-2">
                             If the PDF doesn't load, use the download button
@@ -210,7 +223,7 @@ export function LessonContent({
                       )
                     ) : (
                       <Image
-                        src={content.thumbnailUrl || "/api/placeholder/800/600"}
+                        src={(content.thumbnailUrl as string) || "/api/placeholder/800/600"}
                         alt="Document preview"
                         width={800}
                         height={600}
@@ -229,7 +242,7 @@ export function LessonContent({
             {content.type === "QUIZ" && (
               <div className="">
                 <h3 className="text-xl font-semibold text-black dark:text-white mb-4">
-                  Quiz: {content.title}
+                  Quiz: {content.title || "Untitled Quiz"}
                 </h3>
                 {selectedLesson.completed &&
                   selectedLesson.score !== undefined && (
@@ -254,7 +267,7 @@ export function LessonContent({
                     </div>
                   )}
                 <div className="space-y-6">
-                  {content.quizQuestions.map(
+                  {content.quizQuestions?.map(
                     (question: QuizQuestion, index: number) => {
                       return (
                         <div
@@ -363,7 +376,7 @@ export function LessonContent({
               disabled={
                 selectedLesson.completed ||
                 Object.keys(selectedAnswers).length !==
-                  content.quizQuestions.length
+                  (content.quizQuestions?.length || 0)
               }
             >
               {selectedLesson.completed ? "Completed" : "Submit Quiz"}

@@ -16,8 +16,5 @@ export const useCreateOrder = () => {
       queryClient.invalidateQueries({ queryKey: ["orders"] });
       queryClient.invalidateQueries({ queryKey: ["transactions"] });
     },
-    onError: (error) => {
-      console.error("Create order error:", error.message);
-    },
   });
 };

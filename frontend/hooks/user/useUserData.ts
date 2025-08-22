@@ -5,6 +5,11 @@ import { User } from "@/types/user";
 import { getUserData } from "@/api/users";
 import { useAuthStore } from "@/stores/auth.store";
 
+// Extend Error interface to include optional code property
+interface ErrorWithCode extends Error {
+	code?: string;
+}
+
 export interface UseUserDataReturn {
 	data: User | undefined;
 	isLoading: boolean;
@@ -42,7 +47,7 @@ export function useUserData(): UseUserDataReturn {
 						: "An unexpected error occurred",
 				code:
 					error instanceof Error && "code" in error
-						? (error as any).code
+						? (error as ErrorWithCode).code
 						: undefined,
 			}
 		: null;

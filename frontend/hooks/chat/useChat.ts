@@ -1,5 +1,5 @@
 import { sendMessage } from "../../services/socketChat";
-import { Message } from "../../types/chat";
+import { ChatMessage as Message } from "../../types/chat";
 
 export const sendMessageSocket = (
 	data: {

@@ -34,10 +34,9 @@ export class CategoryController extends BaseController {
   async createCategory(httpRequest: IHttpRequest): Promise<IHttpResponse> {
     return this.handleRequest(httpRequest, async (request) => {
       const validated = validateCreateCategory({
-        ...request.body,
+        ...(request.body || {}),
         createdBy: request.user?.id,
       });
-      console.log(validated)
       const category = await this.createCategoryUseCase.execute(validated);
       return this.success_201(category, "Category created successfully");
     });
@@ -45,8 +44,11 @@ export class CategoryController extends BaseController {
 
   async updateCategory(httpRequest: IHttpRequest): Promise<IHttpResponse> {
     return this.handleRequest(httpRequest, async (request) => {
+      if (!request.params?.categoryId) {
+        throw new BadRequestError("Category ID is required");
+      }
       const validated = validateUpdateCategory({
-        ...request.body,
+        ...(request.body || {}),
         id: request.params.categoryId,
       });
       const category = await this.updateCategoryUseCase.execute(validated);
@@ -56,6 +58,9 @@ export class CategoryController extends BaseController {
 
   async getCategoryById(httpRequest: IHttpRequest): Promise<IHttpResponse> {
     return this.handleRequest(httpRequest, async (request) => {
+      if (!request.params?.categoryId) {
+        throw new BadRequestError("Category ID is required");
+      }
       const validated = validateCategoryId({ id: request.params.categoryId });
       const category = await this.getCategoryByIdUseCase.execute(validated);
       if (!category) {
@@ -75,6 +80,9 @@ export class CategoryController extends BaseController {
 
   async deleteCategory(httpRequest: IHttpRequest): Promise<IHttpResponse> {
     return this.handleRequest(httpRequest, async (request) => {
+      if (!request.params?.categoryId) {
+        throw new BadRequestError("Category ID is required");
+      }
       const validated = validateCategoryId({ id: request.params.categoryId });
       const category = await this.deleteCategoryUseCase.execute(validated);
       return this.success_200(category, "Category deleted successfully");
@@ -83,6 +91,9 @@ export class CategoryController extends BaseController {
 
   async recoverCategory(httpRequest: IHttpRequest): Promise<IHttpResponse> {
     return this.handleRequest(httpRequest, async (request) => {
+      if (!request.params?.categoryId) {
+        throw new BadRequestError("Category ID is required");
+      }
       const validated = validateCategoryId({ id: request.params.categoryId });
       const category = await this.recoverCategoryUseCase.execute(validated);
       return this.success_200(category, "Category recovered successfully");

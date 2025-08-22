@@ -1,6 +1,7 @@
 import { WebhookEvent } from "../../../../domain/value-object/webhook-event.value-object";
 import { Transaction } from "../../../../domain/entities/transaction.entity";
 import { CreateCheckoutSessionDto } from "../../../dtos/payment.dto";
+import { Order } from "../../../../domain/entities/order.entity";
 
 interface ServiceResponse<T> {
   data: T;
@@ -29,5 +30,5 @@ export interface IPaymentService {
   >;
   handleStripeWebhook(
     event: WebhookEvent
-  ): Promise<ServiceResponse<{ order?: any; transaction?: Transaction }>>;
+  ): Promise<ServiceResponse<{ order?: Order; transaction?: Transaction }>>;
 }

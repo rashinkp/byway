@@ -1,4 +1,4 @@
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient, Order as PrismaOrder, OrderItem as PrismaOrderItem, Course as PrismaCourse } from "@prisma/client";
 import { IOrderRepository } from "../../app/repositories/order.repository";
 import { Order } from "../../domain/entities/order.entity";
 import { Course } from "../../domain/entities/course.entity";
@@ -8,7 +8,7 @@ import { PaymentGateway } from "../../domain/enum/payment-gateway.enum";
 import { OrderFilters, PaginatedOrderResult, OrderItemCreation, CourseOrderData } from "../../domain/types/order.interface";
 
 export class OrderRepository implements IOrderRepository {
-  constructor(private prisma: PrismaClient) {}
+  constructor(private _prisma: PrismaClient) {}
 
   async findAll(
     userId: string,
@@ -50,7 +50,7 @@ export class OrderRepository implements IOrderRepository {
     } as const;
 
     const [orders, total] = await Promise.all([
-      this.prisma.order.findMany({
+      this._prisma.order.findMany({
         where,
         skip: (page - 1) * limit,
         take: limit,
@@ -63,7 +63,7 @@ export class OrderRepository implements IOrderRepository {
           },
         },
       }),
-      this.prisma.order.count({ where }),
+      this._prisma.order.count({ where }),
     ]);
 
     const totalPages = Math.ceil(total / limit);
@@ -77,47 +77,52 @@ export class OrderRepository implements IOrderRepository {
     };
   }
 
-  private mapToOrderEntity(order: any): Order {
+  private mapToOrderEntity(order: Record<string, unknown>): Order {
     const mappedOrder = new Order(
-      order.userId,
+      order.userId as string,
       order.orderStatus as OrderStatus,
       order.paymentStatus as PaymentStatus,
-      order.paymentId,
+      order.paymentId as string | null,
       order.paymentGateway as PaymentGateway,
-      Number(order.amount),
-      order.couponCode,
-      order.items.map((item: any) => ({
-        orderId: item.orderId,
-        courseId: item.courseId,
-        courseTitle: item.courseTitle || item.course?.title || "Unknown Course",
-        coursePrice: Number(item.coursePrice),
-        discount: item.discount ? Number(item.discount) : null,
-        couponId: item.couponId,
-        title: item.course?.title || item.courseTitle || "Unknown Course",
-        description: item.course?.description || "No description available",
-        level: item.course?.level || "BEGINNER",
-        price: item.course?.price
-          ? Number(item.course.price)
-          : Number(item.coursePrice),
-        thumbnail: item.course?.thumbnail || null,
-        status: item.course?.status || "ACTIVE",
-        categoryId: item.course?.categoryId || "",
-        createdBy: item.course?.createdBy || "",
-        deletedAt: item.course?.deletedAt
-          ? new Date(item.course.deletedAt).toISOString()
+      typeof order.amount === 'number' ? order.amount : (order.amount as { toNumber(): number }).toNumber(),
+      order.couponCode as string | null,
+      (order.items as Array<Record<string, unknown>>).map((item) => ({
+        orderId: item.orderId as string,
+        courseId: item.courseId as string,
+        courseTitle: (item.courseTitle as string) || (item.course as Record<string, unknown>)?.title as string || "Unknown Course",
+        coursePrice: typeof item.coursePrice === 'number' ? item.coursePrice : (item.coursePrice as { toNumber(): number }).toNumber(),
+        discount: item.discount ? (typeof item.discount === 'number' ? item.discount : (item.discount as { toNumber(): number }).toNumber()) : null,
+        couponId: item.couponId as string | null,
+        title: (item.course as Record<string, unknown>)?.title as string || (item.courseTitle as string) || "Unknown Course",
+        description: (item.course as Record<string, unknown>)?.description as string || "No description available",
+        level: (item.course as Record<string, unknown>)?.level as string || "BEGINNER",
+        price: (item.course as Record<string, unknown>)?.price
+          ? (typeof (item.course as Record<string, unknown>).price === 'number' ? (item.course as Record<string, unknown>).price as number : ((item.course as Record<string, unknown>).price as { toNumber(): number }).toNumber())
+          : (typeof item.coursePrice === 'number' ? item.coursePrice : (item.coursePrice as { toNumber(): number }).toNumber()),
+        thumbnail: (item.course as Record<string, unknown>)?.thumbnail as string | null,
+        status: (item.course as Record<string, unknown>)?.status as string || "ACTIVE",
+        categoryId: (item.course as Record<string, unknown>)?.categoryId as string || "",
+        createdBy: (item.course as Record<string, unknown>)?.createdBy as string || "",
+        deletedAt: (item.course as Record<string, unknown>)?.deletedAt
+          ? new Date((item.course as Record<string, unknown>).deletedAt as Date).toISOString()
           : null,
-        approvalStatus: item.course?.approvalStatus || "PENDING",
-        details: item.course?.details || null,
+        approvalStatus: (item.course as Record<string, unknown>)?.approvalStatus as string || "PENDING",
+        details: (item.course as Record<string, unknown>)?.details ? {
+          prerequisites: ((item.course as Record<string, unknown>)?.details as Record<string, unknown>)?.prerequisites as string | null || null,
+          longDescription: ((item.course as Record<string, unknown>)?.details as Record<string, unknown>)?.longDescription as string | null || null,
+          objectives: ((item.course as Record<string, unknown>)?.details as Record<string, unknown>)?.objectives as string | null || null,
+          targetAudience: ((item.course as Record<string, unknown>)?.details as Record<string, unknown>)?.targetAudience as string | null || null,
+        } : null,
       }))
     );
-    mappedOrder.id = order.id;
-    mappedOrder.createdAt = order.createdAt;
-    mappedOrder.updatedAt = order.updatedAt;
+    mappedOrder.id = order.id as string;
+    mappedOrder.createdAt = order.createdAt as Date;
+    mappedOrder.updatedAt = order.updatedAt as Date;
     return mappedOrder;
   }
 
   async findById(id: string): Promise<Order | null> {
-    const order = await this.prisma.order.findUnique({
+    const order = await this._prisma.order.findUnique({
       where: { id },
       include: {
         items: {
@@ -132,7 +137,7 @@ export class OrderRepository implements IOrderRepository {
   }
 
   async getAllOrders(userId: string): Promise<Order[]> {
-    const orders = await this.prisma.order.findMany({
+    const orders = await this._prisma.order.findMany({
       where: { userId },
       include: {
         items: {
@@ -160,7 +165,7 @@ export class OrderRepository implements IOrderRepository {
     );
 
     // Create order with items in a transaction
-    const order = await this.prisma.$transaction(async (prisma) => {
+    const order = await this._prisma.$transaction(async (prisma) => {
       // Create the order
       const newOrder = await prisma.order.create({
         data: {
@@ -212,7 +217,7 @@ export class OrderRepository implements IOrderRepository {
     paymentGateway: PaymentGateway
   ): Promise<void> {
     const paymentStatus = this.mapOrderStatusToPaymentStatus(status);
-    await this.prisma.order.update({
+    await this._prisma.order.update({
       where: { id: orderId },
       data: {
         orderStatus: status,
@@ -240,22 +245,21 @@ export class OrderRepository implements IOrderRepository {
   }
 
   async findMany(params: {
-    where: any;
     skip: number;
     take: number;
-    orderBy: any;
-    include?: any;
+    orderBy: Record<string, 'asc' | 'desc' | undefined>;
+    include?: Record<string, unknown>;
   }): Promise<Order[]> {
-    const orders = await this.prisma.order.findMany(params);
+    const orders = await this._prisma.order.findMany(params);
     return orders.map((order) => this.mapToOrderEntity(order));
   }
 
-  async count(where: any): Promise<number> {
-    return this.prisma.order.count({ where });
+  async count(where: Record<string, unknown>): Promise<number> {
+    return this._prisma.order.count({ where });
   }
 
   async create(order: Order): Promise<Order> {
-    const createdOrder = await this.prisma.order.create({
+    const createdOrder = await this._prisma.order.create({
       data: {
         userId: order.userId,
         orderStatus: order.status as "PENDING" | "CONFIRMED" | "CANCELLED",
@@ -288,7 +292,7 @@ export class OrderRepository implements IOrderRepository {
   }
 
   async update(order: Order): Promise<Order> {
-    const updatedOrder = await this.prisma.order.update({
+    const updatedOrder = await this._prisma.order.update({
       where: { id: order.id },
       data: {
         orderStatus: order.status as "PENDING" | "CONFIRMED" | "CANCELLED",
@@ -310,13 +314,13 @@ export class OrderRepository implements IOrderRepository {
   }
 
   async delete(id: string): Promise<void> {
-    await this.prisma.order.delete({
+    await this._prisma.order.delete({
       where: { id },
     });
   }
 
   async findByPaymentId(paymentId: string): Promise<Order | null> {
-    const order = await this.prisma.order.findFirst({
+    const order = await this._prisma.order.findFirst({
       where: { paymentId },
       include: {
         items: {
@@ -336,7 +340,7 @@ export class OrderRepository implements IOrderRepository {
   ): Promise<OrderItemCreation[]> {
     const orderItems = await Promise.all(
       courses.map(async (course) => {
-        const orderItem = await this.prisma.orderItem.create({
+        const orderItem = await this._prisma.orderItem.create({
           data: {
             orderId,
             courseId: course.id,
@@ -357,7 +361,7 @@ export class OrderRepository implements IOrderRepository {
   async findOrderItems(
     orderId: string
   ): Promise<OrderItemCreation[]> {
-    const orderItems = await this.prisma.orderItem.findMany({
+    const orderItems = await this._prisma.orderItem.findMany({
       where: { orderId },
       include: {
         course: true,
@@ -371,9 +375,9 @@ export class OrderRepository implements IOrderRepository {
   }
 
   async findCourseById(courseId: string): Promise<Course | null> {
-    const course = await this.prisma.course.findUnique({
+    const course = await this._prisma.course.findUnique({
       where: { id: courseId },
     });
-    return course ? Course.fromPrisma(course) : null;
+    return course ? Course.fromPersistence(course) : null;
   }
 }

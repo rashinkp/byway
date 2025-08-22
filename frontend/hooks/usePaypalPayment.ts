@@ -7,6 +7,13 @@ interface PayPalOptions {
 	intent?: string;
 }
 
+interface PayPalActions {
+	order: {
+		create: (orderData: { purchase_units: Array<{ amount: { value: string; currency_code: string } }> }) => Promise<string>;
+		capture: () => Promise<{ id: string; status: string; [key: string]: unknown }>;
+	};
+}
+
 interface UsePayPalPaymentProps {
 	paypalOptions: PayPalOptions;
 	finalAmount: number;
@@ -15,10 +22,10 @@ interface UsePayPalPaymentProps {
 interface UsePayPalPaymentReturn {
 	isPaypalLoading: boolean;
 	setIsPaypalLoading: (loading: boolean) => void;
-	createOrder: (data: any, actions: any) => Promise<string>;
-	onApprove: (data: any, actions: any) => Promise<void>;
-	onCancel: (data: any) => void;
-	onError: (err: any) => void;
+	createOrder: (data: Record<string, unknown>, actions: PayPalActions) => Promise<string>;
+	onApprove: (data: Record<string, unknown>, actions: PayPalActions) => Promise<void>;
+	onCancel: (data: Record<string, unknown>) => void;
+	onError: (err: Record<string, unknown>) => void;
 }
 
 export const usePayPalPayment = ({
@@ -28,7 +35,7 @@ export const usePayPalPayment = ({
 	const [isPaypalLoading, setIsPaypalLoading] = useState(false);
 
 	const createOrder = useCallback(
-		async (data: any, actions: any) => {
+		async (data: Record<string, unknown>, actions: PayPalActions) => {
 			if (finalAmount <= 0) {
 				toast.error("Invalid order amount");
 				throw new Error("Invalid order amount");
@@ -48,26 +55,22 @@ export const usePayPalPayment = ({
 		[finalAmount, paypalOptions.currency],
 	);
 
-	const onApprove = useCallback(async (data: any, actions: any) => {
+	const onApprove = useCallback(async (data: Record<string, unknown>, actions: PayPalActions) => {
 		try {
-			console.log("PayPal order approved:", data);
 			const details = await actions.order?.capture();
 			toast.success("Payment completed successfully!", {
 				description: JSON.stringify(details),
 			});
-		} catch (error) {
-			console.error("Error in onApprove:", error);
+		} catch  {
 			toast.error("Failed to complete PayPal payment");
 		}
 	}, []);
 
-	const onCancel = useCallback((data: any) => {
-		console.log("PayPal payment cancelled:", data);
+	const onCancel = useCallback(() => {
 		toast.info("PayPal payment was cancelled");
 	}, []);
 
-	const onError = useCallback((err: any) => {
-		console.error("PayPal button error:", err);
+	const onError = useCallback(() => {
 		toast.error("An error occurred with PayPal. Please try again.");
 	}, []);
 

@@ -11,10 +11,10 @@ export interface ICreateTransactionInputDTO {
   status?: TransactionStatus;
   paymentGateway?: PaymentGateway;
   paymentMethod?: string;
-  paymentDetails?: Record<string, any>;
+  paymentDetails?: Record<string, unknown>;
   courseId?: string;
   transactionId?: string;
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
 }
 
 export interface ITransactionOutputDTO {
@@ -26,10 +26,10 @@ export interface ITransactionOutputDTO {
   status: TransactionStatus;
   paymentGateway: PaymentGateway;
   paymentMethod?: string;
-  paymentDetails?: Record<string, any>;
+  paymentDetails?: Record<string, unknown>;
   courseId?: string;
   transactionId?: string;
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -37,7 +37,7 @@ export interface ITransactionOutputDTO {
 export interface IUpdateTransactionStatusInputDTO {
   id: string;
   status: TransactionStatus;
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
 }
 
 export interface IGetTransactionsByUserInputDTO {

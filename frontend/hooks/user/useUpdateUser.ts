@@ -6,6 +6,11 @@ import { updateUser } from "@/api/users";
 import { toast } from "sonner";
 import { useAuthStore } from "@/stores/auth.store";
 
+// Extend Error interface to include optional code property
+interface ErrorWithCode extends Error {
+	code?: string;
+}
+
 interface UseUpdateUserReturn {
 	mutate: (data: {
 		name?: string;
@@ -62,7 +67,6 @@ export function useUpdateUser(): UseUpdateUserReturn {
 		onSuccess: (updatedUser) => {
 			// Safety check: ensure updatedUser exists
 			if (!updatedUser) {
-				console.error("Update user response is undefined");
 				toast.error("Error", {
 					description: "Failed to update profile. Please try again.",
 				});
@@ -101,7 +105,7 @@ export function useUpdateUser(): UseUpdateUserReturn {
 						: "An unexpected error occurred",
 				code:
 					error instanceof Error && "code" in error
-						? (error as any).code
+						? (error as ErrorWithCode).code
 						: undefined,
 			}
 		: null;

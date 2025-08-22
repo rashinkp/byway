@@ -15,9 +15,9 @@ import { QuizAnswer } from "../../../../domain/entities/quiz-answer.entity";
 
 export class UpdateProgressUseCase implements IUpdateProgressUseCase {
   constructor(
-    private readonly enrollmentRepository: IEnrollmentRepository,
-    private readonly lessonProgressRepository: ILessonProgressRepository,
-    private readonly lessonRepository: ILessonRepository
+    private readonly _enrollmentRepository: IEnrollmentRepository,
+    private readonly _lessonProgressRepository: ILessonProgressRepository,
+    private readonly _lessonRepository: ILessonRepository
   ) {}
 
   async execute(
@@ -29,7 +29,7 @@ export class UpdateProgressUseCase implements IUpdateProgressUseCase {
       }
 
       // Check if enrollment exists
-      const enrollment = await this.enrollmentRepository.findByUserAndCourse(
+      const enrollment = await this._enrollmentRepository.findByUserAndCourse(
         input.userId,
         input.courseId
       );
@@ -43,7 +43,7 @@ export class UpdateProgressUseCase implements IUpdateProgressUseCase {
       }
 
       // Verify lesson exists and belongs to the course
-      const lesson = await this.lessonRepository.findById(input.lessonId);
+      const lesson = await this._lessonRepository.findById(input.lessonId);
       if (!lesson) {
         throw new HttpError("Lesson not found", StatusCodes.NOT_FOUND);
       }
@@ -56,7 +56,7 @@ export class UpdateProgressUseCase implements IUpdateProgressUseCase {
 
       // Find or create lesson progress
       let progress =
-        await this.lessonProgressRepository.findByEnrollmentAndLesson(
+        await this._lessonProgressRepository.findByEnrollmentAndLesson(
           input.userId,
           input.courseId,
           input.lessonId
@@ -71,7 +71,7 @@ export class UpdateProgressUseCase implements IUpdateProgressUseCase {
           score: input.score,
           totalQuestions: input.totalQuestions,
         });
-        progress = await this.lessonProgressRepository.save(progress);
+        progress = await this._lessonProgressRepository.save(progress);
       } else {
         if (input.completed) {
           progress.markAsCompleted();
@@ -84,7 +84,7 @@ export class UpdateProgressUseCase implements IUpdateProgressUseCase {
         if (input.totalQuestions !== undefined) {
           progress.updateTotalQuestions(input.totalQuestions);
         }
-        progress = await this.lessonProgressRepository.update(progress);
+        progress = await this._lessonProgressRepository.update(progress);
       }
 
       // Handle quiz answers if provided
@@ -104,7 +104,7 @@ export class UpdateProgressUseCase implements IUpdateProgressUseCase {
             isCorrect: answer.isCorrect,
           })
         );
-        await this.lessonProgressRepository.saveQuizAnswers(
+        await this._lessonProgressRepository.saveQuizAnswers(
           progressId,
           quizAnswers
         );
@@ -112,13 +112,13 @@ export class UpdateProgressUseCase implements IUpdateProgressUseCase {
 
       // Get all lesson progress for this enrollment
       const lessonProgress =
-        await this.lessonProgressRepository.findByEnrollment(
+        await this._lessonProgressRepository.findByEnrollment(
           input.userId,
           input.courseId
         );
 
       // Get all lessons in the course
-      const allLessons = await this.lessonRepository.findByCourseId(
+      const allLessons = await this._lessonRepository.findByCourseId(
         input.courseId
       );
 
@@ -145,7 +145,7 @@ export class UpdateProgressUseCase implements IUpdateProgressUseCase {
                 );
               }
               const answers =
-                await this.lessonProgressRepository.findQuizAnswers(p.id);
+                await this._lessonProgressRepository.findQuizAnswers(p.id);
               return {
                 lessonId: p.lessonId,
                 completed: p.completed,

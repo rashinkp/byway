@@ -1,5 +1,3 @@
-
-import { User } from "../../../../domain/entities/user.entity";
 import { FacebookAuthDto } from "../../../dtos/auth.dto";
 import { UserResponseDTO } from "../../../dtos/user.dto";
 

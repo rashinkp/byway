@@ -4,11 +4,12 @@ import { useQuery } from "@tanstack/react-query";
 import {
 	GetUserReviewsParams,
 	GetUserReviewsResponse,
+	CourseReview,
 } from "@/types/course-review";
 import { getUserReviews } from "@/api/course-review";
 
 interface UseGetUserReviewsReturn {
-	data: { items: any[]; total: number; totalPages: number } | undefined;
+	data: { items: CourseReview[]; total: number; totalPages: number } | undefined;
 	isLoading: boolean;
 	error: { message: string } | null;
 	refetch: () => void;

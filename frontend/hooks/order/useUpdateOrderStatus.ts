@@ -26,8 +26,5 @@ export const useUpdateOrderStatus = () => {
       queryClient.invalidateQueries({ queryKey: ["transactions"] });
       queryClient.invalidateQueries({ queryKey: ["enrollments"] });
     },
-    onError: (error) => {
-      console.error("Update order status error:", error.message);
-    },
   });
 };

@@ -55,8 +55,8 @@ export class UserController extends BaseController {
             createdAt: user.createdAt,
             updatedAt: user.updatedAt,
           })),
-          total: result.total,
-          totalPages: result.totalPage,
+          total: result.total || 0,
+          totalPages: result.totalPage || Math.ceil((result.total || 0) / (validated.limit || 10)),
         },
         "Users retrieved successfully"
       );
@@ -68,7 +68,7 @@ export class UserController extends BaseController {
       if (!request.user?.id) {
         throw new UnauthorizedError("User not authenticated");
       }
-      if (!request.params.id) {
+      if (!request.params?.id) {
         throw new BadRequestError("User ID is required");
       }
       const validated = validateToggleDeleteUser({
@@ -118,36 +118,36 @@ export class UserController extends BaseController {
   async getCurrentUser(httpRequest: IHttpRequest): Promise<IHttpResponse> {
     return this.handleRequest(httpRequest, async (request) => {
       if (!request.user?.id) {
-        throw new UnauthorizedError("User not authenticated");
+        throw new UnauthorizedError("User not authenticated");  
       }
       const { user, cartCount } = await this.getCurrentUserUseCase.execute(
         request.user.id
       );
       const { user: fetchedUser, profile } =
         await this.getUserByIdUseCase.execute({ userId: user.id });
-      return this.success_200(
-        {
-          id: fetchedUser.id,
-          name: fetchedUser.name,
-          email: fetchedUser.email,
-          role: fetchedUser.role,
-          avatar: fetchedUser.avatar,
-          bio: profile?.bio,
-          education: profile?.education,
-          skills: profile?.skills,
-          phoneNumber: profile?.phoneNumber,
-          country: profile?.country,
-          city: profile?.city,
-          address: profile?.address,
-          dateOfBirth: profile?.dateOfBirth,
-          gender: profile?.gender,
-          deletedAt: fetchedUser.deletedAt,
-          createdAt: fetchedUser.createdAt,
-          updatedAt: fetchedUser.updatedAt,
-          cartCount,
-        },
-        "User retrieved successfully"
-      );
+        return this.success_200(
+          {
+            id: fetchedUser.id,
+            name: fetchedUser.name,
+            email: fetchedUser.email,
+            role: fetchedUser.role,
+            avatar: fetchedUser.avatar,
+            bio: profile?.bio,
+            education: profile?.education,
+            skills: profile?.skills,
+            phoneNumber: profile?.phoneNumber,
+            country: profile?.country,
+            city: profile?.city,
+            address: profile?.address,
+            dateOfBirth: profile?.dateOfBirth,
+            gender: profile?.gender,
+            deletedAt: fetchedUser.deletedAt,
+            createdAt: fetchedUser.createdAt,
+            updatedAt: fetchedUser.updatedAt,
+            cartCount,
+          },
+          "User retrieved successfully"
+        );
     });
   }
 
@@ -156,7 +156,7 @@ export class UserController extends BaseController {
       if (!request.user?.id) {
         throw new UnauthorizedError("User not authenticated");
       }
-      if (!request.params.userId) {
+      if (!request.params?.userId) {
         throw new BadRequestError("User ID is required");
       }
       const validated = validateGetUser({ userId: request.params.userId });
@@ -230,7 +230,7 @@ export class UserController extends BaseController {
 
   async getPublicUser(httpRequest: IHttpRequest): Promise<IHttpResponse> {
     return this.handleRequest(httpRequest, async (request) => {
-      if (!request.params.userId) {
+      if (!request.params?.userId) {
         throw new BadRequestError("User ID is required");
       }
       const validated = validateGetUser({ userId: request.params.userId });
@@ -258,7 +258,7 @@ export class UserController extends BaseController {
 
   async getUserAdminDetails(httpRequest: IHttpRequest): Promise<IHttpResponse> {
     return this.handleRequest(httpRequest, async (request) => {
-      if (!request.params.userId) {
+      if (!request.params?.userId) {
         throw new BadRequestError("User ID is required");
       }
       const validated = validateGetUser({ userId: request.params.userId });

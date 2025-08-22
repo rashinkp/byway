@@ -40,10 +40,10 @@ export function useRemoveFromCart() {
 		onSuccess: () => {
 			useCartStore.getState().decrement();
 		},
-		onError: (error: any, courseId, context: any) => {
+		onError: (error: Error, courseId: string, context: { previousQueries: Map<string, { data: ICart[]; total: number; page: number; limit: number }> } | undefined) => {
 			// Revert all queries to previous state
-			context?.previousQueries?.forEach((data: any, queryKey: any) => {
-				queryClient.setQueryData(queryKey, data);
+			context?.previousQueries?.forEach((data: { data: ICart[]; total: number; page: number; limit: number }, queryKey: string) => {
+				queryClient.setQueryData([queryKey], data);
 			});
 
 			toast.error("Failed to remove from cart", {

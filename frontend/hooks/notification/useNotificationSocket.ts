@@ -2,9 +2,10 @@ import { useEffect, useState, useCallback, useRef } from "react";
 import { getUserNotificationsSocket } from "@/services/socketNotification";
 import { useAuth } from "@/hooks/auth/useAuth";
 import socket from "@/lib/socket";
+import { Notification } from "@/types/notification";
 
 // Utility function to deduplicate notifications by ID
-const deduplicateNotifications = (notifications: any[]) => {
+const deduplicateNotifications = (notifications: Notification[]) => {
 	const seenIds = new Set();
 	return notifications.filter((n) => {
 		if (seenIds.has(n.id)) {
@@ -46,7 +47,7 @@ function formatDateForGrouping(dateStr: string) {
 
 export const useNotificationSocket = () => {
 	const { user } = useAuth();
-	const [notifications, setNotifications] = useState<any[]>([]);
+	const [notifications, setNotifications] = useState<Notification[]>([]);
 	const [loading, setLoading] = useState(false);
 	const [error, setError] = useState<string | null>(null);
 	const [page, setPage] = useState(1);
@@ -66,15 +67,7 @@ export const useNotificationSocket = () => {
 			setError(null);
 			const currentPage = opts?.pageOverride ?? page;
 			const skip = opts?.reset ? 0 : (currentPage - 1) * take;
-			console.log("[Notification Fetch]", {
-				currentPage,
-				skip,
-				take,
-				sortBy,
-				sortOrder,
-				eventType,
-				search,
-			});
+
 			getUserNotificationsSocket(
 				{
 					userId: user.id,
@@ -88,7 +81,7 @@ export const useNotificationSocket = () => {
 				(result) => {
 					setTotal(result.total);
 					setHasMore(result.hasMore);
-					const mapped = (result.items || []).map((n: any) => ({
+					const mapped = (result.items || []).map((n: Notification) => ({
 						...n,
 						title: n.entityName || n.eventType || "Notification",
 						message: n.message,

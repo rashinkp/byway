@@ -7,11 +7,11 @@ import { ILessonRepository } from "../../../repositories/lesson.repository";
 import { IGetAllLessonsUseCase } from "../interfaces/get-all-lessons.usecase.interface";
 
 export class GetAllLessonsUseCase implements IGetAllLessonsUseCase {
-  constructor(private readonly lessonRepository: ILessonRepository) {}
+  constructor(private readonly _lessonRepository: ILessonRepository) {}
 
   async execute(params: IGetAllLessonsInputDTO): Promise<ILessonListOutputDTO> {
     try {
-      return await this.lessonRepository.getAllLessons(params);
+      return await this._lessonRepository.getAllLessons(params);
     } catch (error) {
       if (error instanceof Error) {
         throw new HttpError(error.message, 400);

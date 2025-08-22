@@ -3,6 +3,7 @@ import { cn } from "@/utils/cn";
 import { useRouter } from "next/navigation";
 import { Course } from "@/types/course";
 import Image from "next/image";
+import { useSignedUrl } from "@/hooks/file/useSignedUrl";
 
 interface CourseCardProps {
   course: Course;
@@ -11,6 +12,7 @@ interface CourseCardProps {
 
 export function CourseCard({ course, className }: CourseCardProps) {
   const router = useRouter();
+  const { url: thumbnailUrl } = useSignedUrl(course.thumbnail || null);
 
   const handleCardClick = () => {
     router.push(`/courses/${course.id}`);
@@ -48,7 +50,7 @@ export function CourseCard({ course, className }: CourseCardProps) {
       {/* Hero Image */}
       <div className="relative h-48 overflow-hidden">
         <Image
-          src={course.thumbnail || "/placeHolder.jpg"}
+          src={thumbnailUrl || "/placeHolder.jpg"}
           alt={course.title}
           className="w-full h-full object-cover"
           width={400}
@@ -69,7 +71,7 @@ export function CourseCard({ course, className }: CourseCardProps) {
             src={
               (course.instructor &&
                 "profileImage" in course.instructor &&
-                (course.instructor as any).profileImage) ||
+                (course.instructor as { profileImage?: string }).profileImage) ||
               "/UserProfile.jpg"
             }
             alt={course.instructor?.name || "Instructor"}
@@ -84,7 +86,7 @@ export function CourseCard({ course, className }: CourseCardProps) {
             <p className="text-xs text-gray-500 dark:text-gray-400">
               {(course.instructor &&
                 "role" in course.instructor &&
-                (course.instructor as any).role) ||
+                (course.instructor as { role?: string }).role) ||
                 "Instructor"}
             </p>
           </div>

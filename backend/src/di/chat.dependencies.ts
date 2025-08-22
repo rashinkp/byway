@@ -1,6 +1,4 @@
-import { createSharedDependencies } from "./shared.dependencies";
-import { ChatRepository } from "../infra/repositories/chat.repository.impl";
-import { MessageRepository } from "../infra/repositories/message.repository.impl";
+import {  SharedDependencies } from "./shared.dependencies";
 import { SendMessageUseCase } from "../app/usecases/message/implementations/send-message.usecase";
 import { CreateChatUseCase } from "../app/usecases/chat/implementations/create-chat.usecase";
 import { ListUserChatsUseCase } from "../app/usecases/chat/implementations/list-user-chats.usecase";
@@ -13,11 +11,11 @@ import { MarkReadMessagesUseCase } from "../app/usecases/message/implementations
 import { GetTotalUnreadCountUseCase } from "../app/usecases/message/implementations/get-total-unread-count.usecase";
 
 export function createChatDependencies(
-  sharedDeps?: ReturnType<typeof createSharedDependencies>
+  sharedDeps: SharedDependencies
 ) {
-  const deps = sharedDeps || createSharedDependencies();
-  const chatRepository = new ChatRepository();
-  const messageRepository = new MessageRepository();
+  const deps = sharedDeps 
+  const { chatRepository , messageRepository } = deps;
+
   const sendMessageUseCase = new SendMessageUseCase(
     chatRepository,
     messageRepository

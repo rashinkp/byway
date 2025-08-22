@@ -18,6 +18,30 @@ export class Message {
     public readonly id?: MessageId,
   ) {}
 
+  static fromPersistence(raw: {
+    chatId: string;
+    senderId: string;
+    content: string | null;
+    imageUrl: string | null;
+    audioUrl: string | null;
+    type: string;
+    isRead: boolean;
+    createdAt: Date;
+    id?: string;
+  }): Message {
+    return new Message(
+      new ChatId(raw.chatId),
+      new UserId(raw.senderId),
+      raw.content ? new MessageContent(raw.content) : null,
+      raw.imageUrl ?? null,
+      raw.audioUrl ?? null,
+      MessageType[raw.type as keyof typeof MessageType],
+      raw.isRead,
+      new Timestamp(raw.createdAt),
+      raw.id ? new MessageId(raw.id) : undefined
+    );
+  }
+
   isFromUser(userId: UserId): boolean {
     return this.senderId.value === userId.value;
   }

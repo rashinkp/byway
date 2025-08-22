@@ -28,7 +28,7 @@ export function useSoftDeleteCourse() {
 				limit: number;
 			}>(["courses", 1, 10, ""]);
 
-			queryClient.setQueryData(["courses", 1, 10, ""], (old: any) => ({
+			queryClient.setQueryData(["courses", 1, 10, ""], (old: { data: Course[]; total: number; page: number; limit: number } | undefined) => ({
 				data: old?.data.filter((c: Course) => c.id !== course.id) ?? [],
 				total: (old?.total ?? 1) - 1,
 				page: old?.page || 1,
@@ -102,7 +102,7 @@ export function useSoftDeleteCourse() {
 				},
 			);
 		},
-		onError: (error: any, course: Course, context: any) => {
+		onError: (error: Error, course: Course, context: { previousCourses: { data: Course[]; total: number; page: number; limit: number } | undefined; previousCourse: Course | undefined } | undefined) => {
 			// Rollback course list
 			queryClient.setQueryData(
 				["courses", 1, 10, ""],

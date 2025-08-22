@@ -17,4 +17,21 @@ export class Enrollment {
       orderItemId
     );
   }
+
+  static fromPersistence(raw: {
+    userId: string;
+    courseId: string;
+    enrolledAt: Date;
+    orderItemId?: string | null;
+    accessStatus: 'ACTIVE' | 'BLOCKED' | 'EXPIRED';
+  }): Enrollment {
+    return new Enrollment(
+      `${raw.userId}-${raw.courseId}`,
+      raw.userId,
+      raw.courseId,
+      raw.enrolledAt,
+      raw.orderItemId ?? undefined,
+      raw.accessStatus
+    );
+  }
 } 

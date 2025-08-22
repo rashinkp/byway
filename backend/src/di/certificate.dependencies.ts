@@ -7,6 +7,7 @@ import { ICourseRepository } from "../app/repositories/course.repository.interfa
 import { IUserRepository } from "../app/repositories/user.repository";
 import { ILessonProgressRepository } from "../app/repositories/lesson-progress.repository.interface";
 import { CertificateController } from "../presentation/http/controllers/certificate.controller";
+import { CertificatePdfServiceInterface } from "../app/providers/generate-certificate.interface";
 
 export interface CertificateDependencies {
   generateCertificateUseCase: GenerateCertificateUseCase;
@@ -22,7 +23,7 @@ export function createCertificateDependencies(
   lessonProgressRepository: ILessonProgressRepository
 ): CertificateDependencies {
   // Create infrastructure services
-  const certificatePdfService = new CertificatePdfService();
+  const certificatePdfService = new CertificatePdfService() as unknown as CertificatePdfServiceInterface;
 
   // Create use case
   const generateCertificateUseCase = new GenerateCertificateUseCase(

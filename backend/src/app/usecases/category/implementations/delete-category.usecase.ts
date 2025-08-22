@@ -7,10 +7,10 @@ import {
 } from "../../../dtos/category.dto";
 
 export class DeleteCategoryUseCase implements IDeleteCategoryUseCase {
-  constructor(private categoryRepository: ICategoryRepository) {}
+  constructor(private _categoryRepository: ICategoryRepository) {}
 
   async execute(input: ICategoryIdInputDTO): Promise<ICategoryOutputDTO> {
-    const category = await this.categoryRepository.findById(input.id);
+    const category = await this._categoryRepository.findById(input.id);
     if (!category) {
       throw new HttpError("Category not found", 404);
     }
@@ -19,7 +19,7 @@ export class DeleteCategoryUseCase implements IDeleteCategoryUseCase {
     }
 
     category.softDelete();
-    const savedCategory = await this.categoryRepository.save(category);
+    const savedCategory = await this._categoryRepository.save(category);
 
     return {
       id: savedCategory.id,

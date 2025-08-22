@@ -5,14 +5,14 @@ import { UserId } from "../../../../domain/value-object/UserId";
 import { ChatResponseDTO } from "../../../dtos/chat.dto";
 
 export class CreateChatUseCase implements ICreateChatUseCase {
-  constructor(private readonly chatRepository: IChatRepository) {}
+  constructor(private readonly _chatRepository: IChatRepository) {}
 
   async execute(user1Id: UserId, user2Id: UserId): Promise<ChatResponseDTO> {
     const chat = new Chat(
       user1Id,
       user2Id,
     );
-    await this.chatRepository.create(chat);
+    await this._chatRepository.create(chat);
 
       
     const dto = {

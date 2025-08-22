@@ -1,11 +1,10 @@
 import { IGetTransactionsByUserInputDTO, ITransactionOutputDTO } from "../../../../app/dtos/transaction.dto";
 import { ITransactionRepository } from "../../../repositories/transaction.repository";
 import { IGetTransactionsByUserUseCase } from "../interfaces/get-transactions-by-user.usecase.interface";
+import { Transaction } from "../../../../domain/entities/transaction.entity";
 
-export class GetTransactionsByUserUseCase
-  implements IGetTransactionsByUserUseCase
-{
-  constructor(private readonly transactionRepository: ITransactionRepository) {}
+export class GetTransactionsByUserUseCase implements IGetTransactionsByUserUseCase {
+  constructor(private readonly _transactionRepository: ITransactionRepository) {}
 
   async execute(
     input: IGetTransactionsByUserInputDTO
@@ -17,8 +16,8 @@ export class GetTransactionsByUserUseCase
   }> {
     const { userId, page = 1, limit = 10 } = input;
     const [transactions, total] = await Promise.all([
-      this.transactionRepository.findByUserId(userId, page, limit),
-      this.transactionRepository.countByUserId(userId),
+      this._transactionRepository.findByUserId(userId, page, limit),
+      this._transactionRepository.countByUserId(userId),
     ]);
     const totalPages = Math.ceil(total / limit);
     return {
@@ -29,7 +28,7 @@ export class GetTransactionsByUserUseCase
     };
   }
 
-  private mapToDTO(transaction: any): ITransactionOutputDTO {
+  private mapToDTO(transaction: Transaction): ITransactionOutputDTO {
     return {
       id: transaction.id,
       orderId: transaction.orderId,

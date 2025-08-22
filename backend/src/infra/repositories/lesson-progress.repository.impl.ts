@@ -5,11 +5,11 @@ import { HttpError } from "../../presentation/http/errors/http-error";
 import { QuizAnswer } from "../../domain/entities/quiz-answer.entity";
 
 export class LessonProgressRepository implements ILessonProgressRepository {
-  constructor(private readonly prisma: PrismaClient) {}
+  constructor(private readonly _prisma: PrismaClient) {}
 
   async save(progress: LessonProgress): Promise<LessonProgress> {
     const data = progress.toJSON();
-    const created = await this.prisma.lessonProgress.create({
+    const created = await this._prisma.lessonProgress.create({
       data: {
         enrollmentId: data.enrollmentId,
         courseId: data.courseId,
@@ -60,7 +60,7 @@ export class LessonProgressRepository implements ILessonProgressRepository {
     courseId: string,
     lessonId: string
   ): Promise<LessonProgress | null> {
-    const progress = await this.prisma.lessonProgress.findUnique({
+    const progress = await this._prisma.lessonProgress.findUnique({
       where: {
         enrollmentId_courseId_lessonId: {
           enrollmentId,
@@ -110,7 +110,7 @@ export class LessonProgressRepository implements ILessonProgressRepository {
     enrollmentId: string,
     courseId: string
   ): Promise<LessonProgress[]> {
-    const progress = await this.prisma.lessonProgress.findMany({
+    const progress = await this._prisma.lessonProgress.findMany({
       where: {
         enrollmentId,
         courseId,
@@ -153,7 +153,7 @@ export class LessonProgressRepository implements ILessonProgressRepository {
 
   async update(progress: LessonProgress): Promise<LessonProgress> {
     const data = progress.toJSON();
-    const updated = await this.prisma.lessonProgress.update({
+    const updated = await this._prisma.lessonProgress.update({
       where: {
         id: data.id,
       },
@@ -204,13 +204,13 @@ export class LessonProgressRepository implements ILessonProgressRepository {
   ): Promise<number> {
     try {
       const [totalLessons, completedLessons] = await Promise.all([
-        this.prisma.lesson.count({
+        this._prisma.lesson.count({
           where: {
             courseId,
             deletedAt: null,
           },
         }),
-        this.prisma.lessonProgress.count({
+        this._prisma.lessonProgress.count({
           where: {
             enrollmentId,
             courseId,
@@ -224,8 +224,7 @@ export class LessonProgressRepository implements ILessonProgressRepository {
       }
 
       return Math.round((completedLessons / totalLessons) * 100);
-    } catch (error) {
-      console.error("Error calculating course progress:", error);
+    } catch  {
       throw new HttpError("Failed to calculate course progress", 500);
     }
   }
@@ -234,7 +233,7 @@ export class LessonProgressRepository implements ILessonProgressRepository {
     progressId: string,
     answers: QuizAnswer[]
   ): Promise<void> {
-    await this.prisma.$transaction(async (prisma) => {
+    await this._prisma.$transaction(async (prisma) => {
       // Delete existing answers
       await prisma.quizAnswer.deleteMany({
         where: { lessonProgressId: progressId },
@@ -256,7 +255,7 @@ export class LessonProgressRepository implements ILessonProgressRepository {
   }
 
   async findQuizAnswers(progressId: string): Promise<QuizAnswer[]> {
-    const answers = await this.prisma.quizAnswer.findMany({
+    const answers = await this._prisma.quizAnswer.findMany({
       where: { lessonProgressId: progressId },
       include: { quizQuestion: true },
     });

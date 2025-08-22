@@ -14,6 +14,6 @@ export interface ITransactionRepository {
   updateStatus(
     id: string,
     status: TransactionStatus,
-    metadata?: Record<string, any>
+    metadata?: Record<string, unknown>
   ): Promise<Transaction>;
 }

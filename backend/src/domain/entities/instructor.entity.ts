@@ -95,7 +95,7 @@ export class Instructor {
     return new Instructor(updatedProps);
   }
 
-  static fromPrisma(data: {
+  static fromPersistence(data: {
     id: string;
     userId: string;
     areaOfExpertise: string;

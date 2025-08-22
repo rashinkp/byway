@@ -141,7 +141,7 @@ function ListPage<T>({
 					setSortBy={setSortBy}
 					sortOrder={sortOrder}
 					setSortOrder={setSortOrder}
-					sortOptions={sortOptions}
+					sortOptions={sortOptions as SortOption<unknown>[]}
 					filterTabs={filterOptions}
 				/>
 

@@ -1,37 +1,54 @@
 import { Socket, Server as SocketIOServer } from "socket.io";
 import { socketHandler } from "../socket.utils";
 import { ChatController } from "../../http/controllers/chat.controller";
+import { 
+  GetMessagesByChatData, 
+  GetMessageByIdData, 
+  DeleteMessageData,
+  JoinChatData,
+  MarkMessagesAsReadData,
+  SendMessageData
+} from "../types/socket-data.types";
 
 export function registerMessageHandlers(
   socket: Socket,
   io: SocketIOServer,
   chatController: ChatController
 ) {
-  socket.on(
-    "getMessagesByChat",
-    socketHandler(async (data) => {
-      const messages = await chatController.getMessagesByChat({
-        query: data,
-      } as any);
-      return messages;
-    }, "messagesByChat")
-  );
+socket.on(
+  "getMessagesByChat",
+  socketHandler<GetMessagesByChatData>(async (data) => {
+    const query: Record<string, string | number | boolean> = {
+      chatId: data.chatId,
+      limit: data.limit ?? 20,
+    };
+
+    if (data.beforeMessageId !== undefined) {
+      query.beforeMessageId = data.beforeMessageId;
+    }
+
+    const messages = await chatController.getMessagesByChat({
+      query,
+      params: {},
+    });
+    return messages;
+  }, "messagesByChat")
+);
 
   socket.on(
     "getMessageById",
-    socketHandler(async (data) => {
+    socketHandler<GetMessageByIdData>(async (data) => {
       const message = await chatController.getMessageById({
-        params: data,
-      } as any);
+        params: {messageId:data.messageId},
+      });
       return message;
     }, "messageById")
   );
 
   socket.on(
     "deleteMessage",
-    socketHandler(async (data) => {
+    socketHandler<DeleteMessageData>(async (data) => {
       try {
-        console.log("[SocketIO] deleteMessage event received:", data);
 
         // Validate required data
         if (!data || !data.messageId || !data.chatId) {
@@ -50,7 +67,7 @@ export function registerMessageHandlers(
             ...data,
             userId, // Pass userId for authorization check
           },
-        } as any);
+        });
 
         if (!deletionResult) {
           throw new Error("Failed to delete message");
@@ -61,11 +78,6 @@ export function registerMessageHandlers(
           data.chatId
         );
         if (participants) {
-          console.log(
-            "[SocketIO] Emitting chatListUpdated after deleteMessage to:",
-            participants.user1Id,
-            participants.user2Id
-          );
 
           // Emit to chat room first
           io.to(data.chatId).emit("messageDeleted", {
@@ -77,10 +89,6 @@ export function registerMessageHandlers(
           io.to(participants.user1Id).emit("chatListUpdated");
           io.to(participants.user2Id).emit("chatListUpdated");
         } else {
-          console.log(
-            "[SocketIO] No participants found for chat:",
-            data.chatId
-          );
         }
 
         return {
@@ -89,142 +97,114 @@ export function registerMessageHandlers(
           chatId: data.chatId,
         };
       } catch (error) {
-        console.error("[SocketIO] Error in deleteMessage:", error);
-        // Throw error to be handled by socketHandler wrapper
         throw error;
       }
     }, "messageDeleted")
   );
 
   // Handle when user joins a chat (to clear pending notifications)
-  socket.on("joinChat", async ({ chatId }) => {
-    try {
+  socket.on("joinChat", async (data: JoinChatData) => {
       const userId = socket.data.user?.id;
-      if (userId && chatId) {
+      if (userId && data.chatId) {
         // Join the chat room
-        socket.join(chatId);
+        socket.join(data.chatId);
 
         // Mark all messages as read for this user in this chat
-        await chatController.markMessagesAsRead({ chatId, userId });
+        await chatController.markMessagesAsRead({ chatId: data.chatId, userId });
 
         // Emit updated unread count to the user
         const unreadCount = await chatController.getTotalUnreadCount(userId);
         io.to(userId).emit("unreadMessageCount", { count: unreadCount });
-        console.log("unread message count ----------> ", unreadCount);
 
         // Emit updated chat list to the user
         io.to(userId).emit("chatListUpdated");
-
-        // Emit messagesRead event to the user
-        console.log(
-          "[SocketIO] Emitting messagesRead to user:",
-          userId,
-          "for chat:",
-          chatId
-        );
-        io.to(userId).emit("messagesRead", { chatId, userId });
+        io.to(userId).emit("messagesRead", { chatId: data.chatId, userId });
         // Also notify all participants in the chat room
-        io.to(chatId).emit("messagesRead", { chatId, userId });
-
-        console.log(
-          `[SocketIO] User ${userId} joined chat ${chatId} and messages marked as read`
-        );
+        io.to(data.chatId).emit("messagesRead", { chatId: data.chatId, userId });
       }
-    } catch (err) {
-      console.log("[SocketIO] Error in joinChat:", err);
-    }
+   
   });
 
   // Handle marking messages as read
-  socket.on("markMessagesAsRead", async ({ chatId, userId }) => {
+  socket.on("markMessagesAsRead", async (data: MarkMessagesAsReadData) => {
     try {
       const authenticatedUserId = socket.data.user?.id;
-      if (!authenticatedUserId || authenticatedUserId !== userId) {
+      if (!authenticatedUserId || authenticatedUserId !== data.userId) {
         socket.emit("error", {
           message: "Not authorized to mark messages as read",
         });
         return;
       }
 
-      await chatController.markMessagesAsRead({ chatId, userId });
+      await chatController.markMessagesAsRead({ chatId: data.chatId, userId: data.userId });
 
       // Emit updated unread count to the user
-      const unreadCount = await chatController.getTotalUnreadCount(userId);
-      io.to(userId).emit("unreadMessageCount", { count: unreadCount });
+      const unreadCount = await chatController.getTotalUnreadCount(data.userId);
+      io.to(data.userId).emit("unreadMessageCount", { count: unreadCount });
 
       // Emit chatListUpdated to update the chat list UI
-      io.to(userId).emit("chatListUpdated");
+      io.to(data.userId).emit("chatListUpdated");
 
       // Emit messagesRead event to all participants in the chat
-      io.to(chatId).emit("messagesRead", { chatId, userId });
+      io.to(data.chatId).emit("messagesRead", { chatId: data.chatId, userId: data.userId });
 
-      console.log(
-        `[SocketIO] Messages marked as read for user ${userId} in chat ${chatId}`
-      );
-    } catch (err) {
-      console.error("[SocketIO] Error marking messages as read:", err);
+
+    } catch {
       socket.emit("error", { message: "Failed to mark messages as read" });
     }
   });
 
   socket.on(
     "sendMessage",
-    async ({ chatId, userId, content, imageUrl, audioUrl }) => {
+    async (data: SendMessageData) => {
       try {
-        console.log("[SocketIO] sendMessage event received:", {
-          chatId,
-          userId,
-          content,
-          imageUrl,
-          audioUrl,
-        });
         const senderId = socket.data.user?.id;
-        console.log("[SocketIO] senderId:", senderId);
         if (!senderId) {
-          console.log("[SocketIO] No senderId, emitting error");
           socket.emit("error", {
             message: "Authentication required to send messages.",
           });
           return;
         }
         const message = await chatController.handleNewMessage({
-          chatId,
-          userId,
+          chatId: data.chatId,
+          userId: data.userId,
           senderId,
-          content,
-          imageUrl,
-          audioUrl,
+          content: data.content,
+          imageUrl: data.imageUrl,
+          audioUrl: data.audioUrl,
         });
-        console.log(
-          "[SocketIO] message result from handleNewMessage:",
-          message
-        );
         if (!message) {
-          console.log("[SocketIO] No message returned, emitting error");
           socket.emit("error", { message: "Failed to send message." });
           return;
         }
-        const effectiveChatId = message.chatId;
-        if (!chatId && effectiveChatId) {
+
+
+        
+        const effectiveChatId: string = message.chatId;
+        
+        const targetChatId = effectiveChatId || data.chatId; 
+
+        if (!targetChatId) {
+          socket.emit("error", { message: "Chat ID is missing." });
+          return;
+        }
+
+        if (!data.chatId && effectiveChatId) {
           socket.join(effectiveChatId);
         }
         socket.emit("messageSent", message);
         socket.emit("message", message);
-        io.to(effectiveChatId || chatId).emit("message", message);
+        io.to(targetChatId).emit("message", message);
 
         // Note: Real-time notifications are now handled by the batching service
         // which will send them after a delay to prevent overwhelming the user
 
         // Emit chatListUpdated to both users in the chat using controller
         const participants = await chatController.getChatParticipantsById(
-          effectiveChatId || chatId
+          targetChatId
         );
         if (participants) {
-          console.log(
-            "[SocketIO] Emitting chatListUpdated after sendMessage to:",
-            participants.user1Id,
-            participants.user2Id
-          );
+    
           io.to(participants.user1Id).emit("chatListUpdated");
           io.to(participants.user2Id).emit("chatListUpdated");
           // Emit unreadMessageCount to the recipient
@@ -238,7 +218,6 @@ export function registerMessageHandlers(
           io.to(recipientId).emit("unreadMessageCount", { count: unreadCount });
         }
       } catch (err) {
-        console.log("[SocketIO] Caught error in sendMessage:", err);
         socket.emit("error", { message: "Failed to send message." });
       }
     }

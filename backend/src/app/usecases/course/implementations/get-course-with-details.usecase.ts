@@ -9,26 +9,21 @@ import { CourseStatus } from "../../../../domain/enum/course-status.enum";
 import { IGetCourseWithDetailsUseCase } from "../interfaces/get-course-with-details.usecase.interface";
 import { UserDTO } from "../../../dtos/general.dto";
 
-
-
 export class GetCourseWithDetailsUseCase
   implements IGetCourseWithDetailsUseCase
 {
   constructor(
-    private courseRepository: ICourseRepository,
-    private enrollmentRepository: IEnrollmentRepository,
-    private courseReviewRepository: ICourseReviewRepository,
-    private cartRepository: ICartRepository
+    private _courseRepository: ICourseRepository,
+    private _enrollmentRepository: IEnrollmentRepository,
+    private _courseReviewRepository: ICourseReviewRepository,
+    private _cartRepository: ICartRepository
   ) { }
-  
-
-  
 
   async execute(
     courseId: string,
     user?: UserDTO
   ): Promise<ICourseWithEnrollmentDTO | null> {
-    const course = await this.courseRepository.findById(courseId);
+    const course = await this._courseRepository.findById(courseId);
     if (!course) {
       throw new HttpError("Course not found", 404);
     }
@@ -46,12 +41,12 @@ export class GetCourseWithDetailsUseCase
       }
     }
 
-    const courseDetails = await this.courseRepository.findCourseDetails(
+    const courseDetails = await this._courseRepository.findCourseDetails(
       course.id
     );
     let isEnrolled = false;
     if (user?.id) {
-      const enrollment = await this.enrollmentRepository.findByUserAndCourse(
+      const enrollment = await this._enrollmentRepository.findByUserAndCourse(
         user.id,
         courseId
       );
@@ -61,7 +56,7 @@ export class GetCourseWithDetailsUseCase
     // Check cart status
     let isInCart = false;
     if (user?.id) {
-      const cartItem = await this.cartRepository.findByUserAndCourse(
+      const cartItem = await this._cartRepository.findByUserAndCourse(
         user.id,
         courseId
       );
@@ -69,7 +64,7 @@ export class GetCourseWithDetailsUseCase
     }
 
     // Get review stats
-    const reviewStats = await this.courseReviewRepository.getCourseReviewStats(
+    const reviewStats = await this._courseReviewRepository.getCourseReviewStats(
       courseId
     );
 
@@ -79,22 +74,11 @@ export class GetCourseWithDetailsUseCase
       isEnrolled,
       isInCart,
       details: courseDetails?.toJSON() ?? null,
-      instructorSharePercentage: 100 - courseData.adminSharePercentage,
+      instructorSharePercentage: 100 - (courseData.adminSharePercentage as number),
       reviewStats: {
         averageRating: reviewStats.averageRating,
         totalReviews: reviewStats.totalReviews,
-        ratingDistribution: reviewStats.ratingDistribution,
-        ratingPercentages: Object.fromEntries(
-          Object.entries(reviewStats.ratingDistribution).map(
-            ([rating, count]) => [
-              rating,
-              reviewStats.totalReviews > 0
-                ? (count as number / reviewStats.totalReviews) * 100
-                : 0,
-            ]
-          )
-        ),
       },
-    };
+    } as ICourseWithEnrollmentDTO;
   }
 }

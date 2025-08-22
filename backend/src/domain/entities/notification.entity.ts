@@ -42,4 +42,30 @@ export class Notification {
       new Timestamp(props.expiresAt ?? new Date(Date.now() + 90 * 24 * 60 * 60 * 1000)) // 3 months default
     );
   }
+
+  static fromPersistence(raw: {
+    id: string;
+    userId: string;
+    eventType: string;
+    entityType: string;
+    entityId: string;
+    entityName: string;
+    message: string;
+    link: string | null;
+    createdAt: Date;
+    expiresAt: Date;
+  }): Notification {
+    return new Notification(
+      raw.id,
+      new UserId(raw.userId),
+      raw.eventType as NotificationEventType,
+      raw.entityType as NotificationEntityType,
+      raw.entityId,
+      raw.entityName,
+      raw.message,
+      raw.link,
+      new Timestamp(raw.createdAt),
+      new Timestamp(raw.expiresAt)
+    );
+  }
 } 

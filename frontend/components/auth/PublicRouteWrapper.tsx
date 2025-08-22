@@ -26,13 +26,11 @@ export function PublicRouteWrapper({ children }: PublicRouteWrapperProps) {
 		if (!isLoading && isAuthenticated && user) {
 			// Don't redirect if we're on an auth route
 			if (authRoutes.some(route => pathname.startsWith(route))) {
-				console.log("PublicRouteWrapper: On auth route, not redirecting");
 				return;
 			}
 
 			// Don't redirect if we're on a user-specific route
 			if (userRoutes.some(route => pathname.startsWith(route))) {
-				console.log("PublicRouteWrapper: On user route, not redirecting");
 				return;
 			}
 
@@ -40,7 +38,6 @@ export function PublicRouteWrapper({ children }: PublicRouteWrapperProps) {
 			if (pathname === "/") {
 				// Redirect to appropriate dashboard based on user role
 				const route = ROUTES[user.role as keyof typeof ROUTES] || ROUTES.DEFAULT;
-				console.log("PublicRouteWrapper: Redirecting authenticated user to:", route, "from:", pathname);
 				router.push(route);
 			}
 		}

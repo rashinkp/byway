@@ -13,19 +13,19 @@ import { IUpdateUserRequestDTO, UserResponseDTO } from "../../../dtos/user.dto";
 
 export class GoogleAuthUseCase implements IGoogleAuthUseCase {
   constructor(
-    private authRepository: IAuthRepository,
-    private googleAuthGateway: GoogleAuthGateway
+    private _authRepository: IAuthRepository,
+    private _googleAuthGateway: GoogleAuthGateway
   ) {}
 
   async execute(accessToken: string): Promise<UserResponseDTO> {
     let googleUser: GoogleUserInfo;
     try {
-      googleUser = await this.googleAuthGateway.getUserInfo(accessToken);
+      googleUser = await this._googleAuthGateway.getUserInfo(accessToken);
     } catch {
       throw new HttpError("Invalid Google access token", 401);
     }
 
-    let user = await this.authRepository.findUserByEmail(googleUser.email);
+    let user = await this._authRepository.findUserByEmail(googleUser.email);
 
     try {
       if (!user) {
@@ -39,7 +39,7 @@ export class GoogleAuthUseCase implements IGoogleAuthUseCase {
           avatar: googleUser.picture,
         });
         user.verifyEmail(); // Google users are verified by default
-        return await this.authRepository.createUser(user);
+        return await this._authRepository.createUser(user);
       }
 
       // Update existing user
@@ -53,7 +53,7 @@ export class GoogleAuthUseCase implements IGoogleAuthUseCase {
         updates.name = googleUser.name;
       }
       user = User.update(user, updates);
-      return await this.authRepository.updateUser(user);
+      return await this._authRepository.updateUser(user);
     } catch (error) {
       if (error instanceof Error) {
         throw new HttpError(error.message, 400);

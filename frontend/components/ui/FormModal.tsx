@@ -37,11 +37,12 @@ import FileUploadComponent, {
 	FileUploadStatus,
 } from "@/components/FileUploadComponent";
 import Image from "next/image";
+import MultiSelect from "@/components/ui/multi-select";
 
 export interface FormFieldConfig<T> {
 	name: keyof T;
 	label: string;
-	type: "input" | "textarea" | "select" | "checkbox" | "radio" | "file";
+	type: "input" | "textarea" | "select" | "checkbox" | "radio" | "file" | "multiselect";
 	fieldType?: "text" | "number" | "email" | "password" | "file" | "date";
 	placeholder?: string;
 	description?: string;
@@ -56,12 +57,13 @@ export interface FormFieldConfig<T> {
 	min?: number;
 	max?: number;
 	step?: number;
+	showPreview?: boolean;
 }
 
-interface FormModalProps<T extends z.ZodType<any, any>> {
+interface FormModalProps<T extends z.ZodType> {
 	open: boolean;
 	onOpenChange: (open: boolean) => void;
-	onSubmit: (data: any) => Promise<void>;
+	onSubmit: (data: z.infer<T>) => Promise<void>;
 	schema: T;
 	initialData?: Partial<z.infer<T>>;
 	title: string;
@@ -71,7 +73,7 @@ interface FormModalProps<T extends z.ZodType<any, any>> {
 	isSubmitting?: boolean;
 }
 
-export function FormModal<T extends z.ZodType<any, any>>({
+export function FormModal<T extends z.ZodType>({
 	open,
 	onOpenChange,
 	onSubmit,
@@ -95,7 +97,7 @@ export function FormModal<T extends z.ZodType<any, any>>({
 							? undefined
 							: field.type === "input" && field.fieldType === "date"
 								? undefined
-								: field.type === "input" || field.type === "textarea"
+								: field.type === "input" || field.type === "textarea" || field.type === "multiselect"
 									? ""
 									: field.fieldType === "file"
 										? undefined
@@ -105,9 +107,9 @@ export function FormModal<T extends z.ZodType<any, any>>({
 			}) as z.infer<T>,
 		[fields],
 	);
-
+	
 	const form = useForm<z.infer<T>>({
-		resolver: zodResolver(schema),
+		resolver: zodResolver(schema as any),
 		defaultValues: initialData
 			? { ...defaultValues, ...initialData }
 			: defaultValues,
@@ -126,10 +128,10 @@ export function FormModal<T extends z.ZodType<any, any>>({
 			setInternalSubmitting(true);
 			await onSubmit(data);
 			form.reset();
-		} catch (error: any) {
-			console.error("Error submitting form:", error);
+		} catch (error: unknown) {
+			const errorMessage = error instanceof Error ? error.message : "Failed to submit the form";
 			form.setError("root", {
-				message: error.message || "Failed to submit the form",
+				message: errorMessage,
 			});
 		} finally {
 			setInternalSubmitting(false);
@@ -143,7 +145,8 @@ export function FormModal<T extends z.ZodType<any, any>>({
 				(field.fieldType === "text" ||
 					field.fieldType === "number" ||
 					field.fieldType === "date")) ||
-			field.type === "select",
+			field.type === "select" ||
+			field.type === "multiselect",
 	);
 	const textareaFields = fields.filter((field) => field.type === "textarea");
 	const fileFields = fields.filter(
@@ -289,6 +292,14 @@ export function FormModal<T extends z.ZodType<any, any>>({
 																		))}
 																	</SelectContent>
 																</Select>
+															) : field.type === "multiselect" && field.options ? (
+																<MultiSelect
+																	value={(formField.value as string) || ""}
+																	onChange={formField.onChange}
+																	options={field.options}
+																	placeholder={field.placeholder}
+																	disabled={isSubmitting || field.disabled}
+																/>
 															) : null}
 														</FormControl>
 														{field.description && (
@@ -352,15 +363,24 @@ export function FormModal<T extends z.ZodType<any, any>>({
 													{field.label}
 												</FormLabel>
 												{typeof formField.value === "string" &&
-													formField.value && (
+													formField.value && field.showPreview !== false && (
 														<div className="mb-4">
-															<Image
-																src={formField.value}
-																alt={`${field.label} preview`}
-																className="w-32 h-32 object-cover rounded-md border-[#facc15] dark:border-[#facc15]"
-																width={128}
-																height={128}
-															/>
+															{formField.value.startsWith('http') ? (
+																<Image
+																	src={formField.value}
+																	alt={`${field.label} preview`}
+																	className="w-32 h-32 object-cover rounded-md border-[#facc15] dark:border-[#facc15]"
+																	width={128}
+																	height={128}
+																/>
+															) : (
+																// Handle S3 keys - show a placeholder or try to construct a basic preview
+																<div className="w-32 h-32 bg-gray-200 dark:bg-gray-700 rounded-md border-[#facc15] dark:border-[#facc15] flex items-center justify-center">
+																	<span className="text-xs text-gray-500 dark:text-gray-400 text-center px-2">
+																		Current file: {formField.value.split('/').pop() || 'Unknown'}
+																	</span>
+																</div>
+															)}
 														</div>
 													)}
 												<FormControl>

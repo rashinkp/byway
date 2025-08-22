@@ -24,21 +24,21 @@ export function StatCard({
 }: StatCardProps) {
 	return (
 		<div
-			className={`bg-white/80 backdrop-blur-sm border border-gray-200 rounded-xl p-6 dark:bg-[#232323] dark:border-gray-700 ${className}`}
+			className={`bg-white/80 backdrop-blur-sm border border-gray-200 rounded-xl p-4 sm:p-6 dark:bg-[#232323] dark:border-gray-700 ${className}`}
 		>
 			<div className="flex items-center justify-between">
-				<div className="space-y-2 flex-1">
+				<div className="space-y-2 flex-1 min-w-0">
 					<div className="flex items-center gap-2">
-						<Icon className={`w-5 h-5 ${iconColor || "text-[#facc15] dark:text-[#facc15]"}`} />
-						<span className="text-sm font-medium text-gray-700 dark:text-gray-300">{title}</span>
+						<Icon className={`w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0 ${iconColor || "text-[#facc15] dark:text-[#facc15]"}`} />
+						<span className="text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 truncate">{title}</span>
 					</div>
-					<div className="text-2xl font-bold text-black dark:text-white">{value}</div>
+					<div className="text-xl sm:text-2xl font-bold text-black dark:text-white">{value}</div>
 					{badges && (
-						<div className="flex items-center gap-2">
+						<div className="flex flex-wrap items-center gap-1 sm:gap-2">
 							{badges.map((badge, index) => (
 								<span
 									key={index}
-									className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium border ${
+									className={`inline-flex items-center gap-1 px-1.5 sm:px-2 py-1 rounded-full text-xs font-medium border ${
 										badge.variant === "default"
 											? "bg-[#facc15] text-black border-[#facc15] dark:bg-[#18181b] dark:text-[#facc15] dark:border-[#facc15]"
 										: badge.variant === "secondary"
@@ -49,7 +49,7 @@ export function StatCard({
 									} ${badge.color || ""}`}
 								>
 									{badge.icon && <badge.icon className="w-3 h-3" />}
-									{badge.label}
+									<span className="truncate">{badge.label}</span>
 								</span>
 							))}
 						</div>

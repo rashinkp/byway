@@ -59,7 +59,7 @@ export default function courseReviewRouter(
       expressAdapter(
         req,
         res,
-        courseReviewController.getCourseReviewStats.bind(courseReviewController) , next
+        courseReviewController.getCourseReviews.bind(courseReviewController) , next
       )
   );
 

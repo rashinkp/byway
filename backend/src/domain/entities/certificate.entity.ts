@@ -1,5 +1,18 @@
 import { CertificateStatus } from "../enum/certificate-status.enum";
 
+// Certificate metadata structure - moved to domain layer
+export interface CertificateMetadata {
+  completionStats?: {
+    completionDate: string;
+    instructorName?: string;
+    totalLessons: number;
+    completedLessons: number;
+    averageScore: number;
+  };
+  generatedAt?: string;
+  [key: string]: unknown; // Allow for future extensibility
+}
+
 export interface CertificateProps {
   id?: string; 
   userId: string;
@@ -10,7 +23,7 @@ export interface CertificateProps {
   issuedAt?: Date | null;
   expiresAt?: Date | null;
   pdfUrl?: string | null;
-  metadata?: Record<string, any> | null;
+  metadata?: CertificateMetadata | null;
   createdAt?: Date;
   updatedAt?: Date;
 }
@@ -25,7 +38,7 @@ export class Certificate {
   private _issuedAt: Date | null;
   private _expiresAt: Date | null;
   private _pdfUrl: string | null;
-  private _metadata: Record<string, any> | null;
+  private _metadata: CertificateMetadata | null;
   private _createdAt: Date;
   private _updatedAt: Date;
 
@@ -84,7 +97,7 @@ export class Certificate {
     return this._pdfUrl;
   }
 
-  get metadata(): Record<string, any> | null {
+  get metadata(): CertificateMetadata | null {
     return this._metadata;
   }
 
@@ -110,7 +123,7 @@ export class Certificate {
   // Business logic methods
   public generateCertificate(
     pdfUrl: string,
-    metadata?: Record<string, any>
+    metadata?: CertificateMetadata
   ): void {
     this._status = CertificateStatus.GENERATED;
     this._pdfUrl = pdfUrl;
@@ -151,7 +164,7 @@ export class Certificate {
     return this._status === CertificateStatus.GENERATED && !this.isExpired();
   }
 
-  public static toDomain(raw: {
+  public static fromPersistence(raw: {
     id: string;
     userId: string;
     courseId: string;
@@ -161,7 +174,7 @@ export class Certificate {
     issuedAt?: Date | null;
     expiresAt?: Date | null;
     pdfUrl?: string | null;
-    metadata?: any;
+    metadata?: CertificateMetadata;
     createdAt: Date;
     updatedAt: Date;
   }): Certificate {
@@ -181,7 +194,7 @@ export class Certificate {
     });
   }
 
-  static toPersistence(certificate: Certificate): any {
+  static toPersistence(certificate: Certificate): Record<string, unknown> {
     return {
       id: certificate.id,
       userId: certificate.userId,

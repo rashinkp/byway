@@ -2,62 +2,75 @@ import {
   S3Client,
   PutObjectCommand,
   DeleteObjectCommand,
+  GetObjectCommand,
 } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { S3ServiceInterface } from "../../../app/providers/s3.service.interface";
 import { awsConfig } from "../../../infra/config/aws.config";
+import { ILogger } from "../../../app/providers/logger-provider.interface";
 
 export class S3Service implements S3ServiceInterface {
-  private readonly s3Client: S3Client;
-  private readonly bucketName: string;
-  private readonly urlExpirationTime = 3600; // 1 hour in seconds
+  private readonly _s3Client: S3Client;
+  private readonly _bucketName: string;
+  private readonly _urlExpirationTime = 3600; // 1 hour in seconds
+  private readonly _logger: ILogger;
 
-  constructor() {
+  constructor(logger: ILogger) {
+    this._logger = logger;
     if (!awsConfig.bucketName) {
       throw new Error("AWS bucket name is required");
     }
-    this.bucketName = awsConfig.bucketName;
-    this.s3Client = new S3Client({
+    this._bucketName = awsConfig.bucketName;
+    this._s3Client = new S3Client({
       region: awsConfig.region,
       credentials: awsConfig.credentials,
     });
   }
 
-  async generatePresignedUrl(
-    fileName: string,
-    fileType: string,
-    uploadType: "course" | "profile" | "certificate",
-    metadata?: {
-      courseId?: string;
-      userId?: string;
-      certificateId?: string;
-      contentType?: "thumbnail" | "video" | "document" | "avatar" | "cv";
-    }
+  /**
+   * Generates a presigned PUT URL for direct client uploads.
+   * Returns only the uploadUrl and the S3 object key. No public file URL is returned.
+   */
+  async generatePresignedPutUrl(
+    key: string,
+    contentType: string,
+    expiresInSeconds: number = this._urlExpirationTime
   ): Promise<{
     uploadUrl: string;
-    fileUrl: string;
+    key: string;
   }> {
-    const key = this.generateS3Key(fileName, uploadType, metadata);
-
     const command = new PutObjectCommand({
-      Bucket: this.bucketName,
+      Bucket: this._bucketName,
       Key: key,
-      ContentType: fileType,
+      ContentType: contentType,
     });
 
-    const uploadUrl = await getSignedUrl(this.s3Client, command, {
-      expiresIn: this.urlExpirationTime,
+    const uploadUrl = await getSignedUrl(this._s3Client, command, {
+      expiresIn: expiresInSeconds,
     });
 
-    const fileUrl = `https://${this.bucketName}.s3.${awsConfig.region}.amazonaws.com/${key}`;
-
-    return {
-      uploadUrl,
-      fileUrl,
-    };
+    return { uploadUrl, key };
   }
 
-  // New method for direct server-side uploads (like certificate generation)
+  /**
+   * Generates a presigned GET URL for serving private objects temporarily.
+   */
+  async generatePresignedGetUrl(
+    key: string,
+    expiresInSeconds: number = 60
+  ): Promise<string> {
+    const command = new GetObjectCommand({
+      Bucket: this._bucketName,
+      Key: key,
+    });
+
+    const signedUrl = await getSignedUrl(this._s3Client, command, {
+      expiresIn: expiresInSeconds,
+    });
+    return signedUrl;
+  }
+
+  // Server-side upload (e.g., certificate generation). Returns the S3 key.
   async uploadFile(
     fileBuffer: Buffer,
     fileName: string,
@@ -74,7 +87,7 @@ export class S3Service implements S3ServiceInterface {
       const key = this.generateS3Key(fileName, uploadType, metadata);
 
       const command = new PutObjectCommand({
-        Bucket: this.bucketName,
+        Bucket: this._bucketName,
         Key: key,
         Body: fileBuffer,
         ContentType: fileType,
@@ -82,18 +95,17 @@ export class S3Service implements S3ServiceInterface {
         CacheControl: "public, max-age=31536000", // 1 year cache
       });
 
-      await this.s3Client.send(command);
+      await this._s3Client.send(command);
 
-      // Return the public URL
-      const fileUrl = `https://${this.bucketName}.s3.${awsConfig.region}.amazonaws.com/${key}`;
-      return fileUrl;
+      // Return the object key (not public URL)
+      return key;
     } catch (error) {
-      console.error("Error uploading file to S3:", error);
+      this._logger.error("Error uploading file to S3:", error);
       throw new Error("Failed to upload file to cloud storage");
     }
   }
 
-  private generateS3Key(
+  public generateS3Key(
     fileName: string,
     uploadType: "course" | "profile" | "certificate",
     metadata?: {
@@ -151,19 +163,21 @@ export class S3Service implements S3ServiceInterface {
     }
   }
 
-  async deleteFile(fileUrl: string): Promise<void> {
+  async deleteFile(fileUrlOrKey: string): Promise<void> {
     try {
-      const url = new URL(fileUrl);
-      const key = url.pathname.startsWith("/")
-        ? url.pathname.slice(1)
-        : url.pathname;
+      // Accept either a full S3 URL or a raw key
+      let key = fileUrlOrKey;
+      if (fileUrlOrKey.startsWith("http://") || fileUrlOrKey.startsWith("https://")) {
+        const url = new URL(fileUrlOrKey);
+        key = url.pathname.startsWith("/") ? url.pathname.slice(1) : url.pathname;
+      }
       const command = new DeleteObjectCommand({
-        Bucket: this.bucketName,
+        Bucket: this._bucketName,
         Key: key,
       });
-      await this.s3Client.send(command);
+      await this._s3Client.send(command);
     } catch (error) {
-      console.error("Failed to delete file from S3:", error);
+      this._logger.error("Failed to delete file from S3:", error);
       throw new Error("Failed to delete file from S3");
     }
   }

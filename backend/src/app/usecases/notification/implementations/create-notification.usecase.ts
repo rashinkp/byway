@@ -7,11 +7,11 @@ export class CreateNotificationUseCase
   implements CreateNotificationUseCaseInterface
 {
   constructor(
-    private readonly notificationRepository: NotificationRepositoryInterface
+    private readonly _notificationRepository: NotificationRepositoryInterface
   ) {}
 
   async execute(notification: Notification): Promise<NotificationDTO> {
-    const created = await this.notificationRepository.create(notification);
+    const created = await this._notificationRepository.create(notification);
     return {
       id: created.id,
       userId: created.userId.value,

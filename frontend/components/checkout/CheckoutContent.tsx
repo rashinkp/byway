@@ -163,8 +163,9 @@ const response = await createOrder.mutateAsync(orderData);
           router.push(`/success?order_id=${response.data.order.id}&type=wallet-payment`);
         }
       }
-    } catch (error: any) {
-      toast.error(error.message || "Failed to create order");
+    } catch (error: unknown) {
+      const err = error as Error;
+      toast.error(err.message || "Failed to create order");
     } finally {
       setIsCreatingOrder(false);
     }

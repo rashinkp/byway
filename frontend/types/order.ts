@@ -17,7 +17,7 @@ export interface OrderItem {
 	createdBy: string;
 	deletedAt: string | null;
 	approvalStatus: string;
-	details: any | null;
+	details: CourseDetail | null;
 	createdAt: string;
 	updatedAt: string;
 }

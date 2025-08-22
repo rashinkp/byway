@@ -6,21 +6,21 @@ import React, { useState, useRef } from "react";
 import { CourseCard } from "@/components/course/CourseCard";
 import { EmptyStateFallback } from "@/components/common/EmptyStateFallback";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useRouter } from "next/navigation";
 
 interface TopCoursesProps {
 	courses: Course[];
 	className?: string;
 	variant?: "default" | "compact" | "sidebar";
-	router: any;
 	isLoading?: boolean;
 }
 
 export function TopCourses({
 	courses,
 	className,
-	router,
 	isLoading = false,
 }: TopCoursesProps) {
+	const router = useRouter();
 	const [currentIndex, setCurrentIndex] = useState(0);
 	const [direction, setDirection] = useState<"left" | "right" | null>(null);
 	const [isAnimating, setIsAnimating] = useState(false);

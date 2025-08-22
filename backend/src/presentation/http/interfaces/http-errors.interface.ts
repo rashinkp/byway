@@ -1,6 +1,6 @@
-export interface IHttpError {
+export interface IHttpError<T = unknown> {
   statusCode: number;
-  body: { success: boolean; message: string; data?: any };
+  body: { success: boolean; message: string; data?: T };
 }
 
 export interface IHttpErrors {

@@ -4,15 +4,15 @@ import { ILessonRepository } from "../../../repositories/lesson.repository";
 import { IGetLessonByIdUseCase } from "../interfaces/get-lesson-by-id.usecase.interface";
 
 export class GetLessonByIdUseCase implements IGetLessonByIdUseCase {
-  constructor(private readonly lessonRepository: ILessonRepository) {}
+  constructor(private readonly _lessonRepository: ILessonRepository) {}
 
   async execute(id: string): Promise<ILessonOutputDTO> {
     try {
-      const lesson = await this.lessonRepository.findById(id);
+      const lesson = await this._lessonRepository.findById(id);
       if (!lesson || !lesson.isActive()) {
         throw new HttpError("Lesson not found or deleted", 404);
       }
-      return lesson.toJSON();
+      return lesson.toJSON() as unknown as ILessonOutputDTO;
     } catch (error) {
       if (error instanceof Error) {
         throw new HttpError(

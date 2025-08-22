@@ -22,7 +22,7 @@ export function useLogout() {
 			router.push("/login");
 			setLoading(false);
 		},
-		onError: (error: any) => {
+		onError: (error: Error) => {
 			setLoading(false);
 			setError(error.message || "Something went wrong");
 			toast.error("Logout failed", {

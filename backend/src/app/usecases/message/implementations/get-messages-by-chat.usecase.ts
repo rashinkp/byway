@@ -6,8 +6,8 @@ import { MessageResponseDTO } from "../../../dtos/message.dto";
 
 export class GetMessagesByChatUseCase implements IGetMessagesByChatUseCase {
   constructor(
-    private readonly messageRepository: IMessageRepository,
-    private readonly chatRepository: IChatRepository
+    private readonly _messageRepository: IMessageRepository,
+    private readonly _chatRepository: IChatRepository
   ) {}
 
   async execute(
@@ -15,12 +15,12 @@ export class GetMessagesByChatUseCase implements IGetMessagesByChatUseCase {
     limit = 20,
     beforeMessageId?: string
   ): Promise<MessageResponseDTO[]> {
-    const messages = await this.messageRepository.findByChatWithUserData(
+    const messages = await this._messageRepository.findByChatWithUserData(
       chatId,
       limit,
       beforeMessageId
     );
-    const chat = await this.chatRepository.findById(chatId);
+    const chat = await this._chatRepository.findById(chatId);
     if (!chat) return [];
     return messages.map((msg) => {
       // Infer receiverId: the other participant in the chat

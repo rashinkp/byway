@@ -8,6 +8,7 @@ import { ICategoryRepository } from "../../../repositories/category.repository";
 import { ICourseRepository } from "../../../repositories/course.repository.interface";
 import { IUserRepository } from "../../../repositories/user.repository";
 import { ICreateCourseUseCase } from "../interfaces/create-course.usecase.interface";
+import { Role } from "../../../../domain/enum/role.enum";
 import { NotificationEventType } from "../../../../domain/enum/notification-event-type.enum";
 import { NotificationEntityType } from "../../../../domain/enum/notification-entity-type.enum";
 import { Price } from "../../../../domain/value-object/price";
@@ -21,15 +22,15 @@ export interface CreateCourseResultDTO extends ICourseWithDetailsDTO {
 
 export class CreateCourseUseCase implements ICreateCourseUseCase {
   constructor(
-    private courseRepository: ICourseRepository,
-    private categoryRepository: ICategoryRepository,
-    private userRepository: IUserRepository,
-    private createNotificationsForUsersUseCase: CreateNotificationsForUsersUseCaseInterface
+    private _courseRepository: ICourseRepository,
+    private _categoryRepository: ICategoryRepository,
+    private _userRepository: IUserRepository,
+    private _createNotificationsForUsersUseCase: CreateNotificationsForUsersUseCaseInterface
   ) {}
 
   async execute(input: ICreateCourseInputDTO): Promise<CreateCourseResultDTO> {
     // Validate user is an instructor
-    const user = await this.userRepository.findById(input.createdBy);
+    const user = await this._userRepository.findById(input.createdBy);
     if (!user) {
       throw new HttpError("User not found", 404);
     }
@@ -38,13 +39,13 @@ export class CreateCourseUseCase implements ICreateCourseUseCase {
     }
 
     // Validate category exists and is active
-    const category = await this.categoryRepository.findById(input.categoryId);
+    const category = await this._categoryRepository.findById(input.categoryId);
     if (!category || category.deletedAt) {
       throw new HttpError("Category not found or deleted", 404);
     }
 
     // Check for existing course
-    const existingCourse = await this.courseRepository.findByName(input.title);
+    const existingCourse = await this._courseRepository.findByName(input.title);
     if (existingCourse && !existingCourse.deletedAt) {
       throw new HttpError("A course with this title already exists", 400);
     }
@@ -89,18 +90,12 @@ export class CreateCourseUseCase implements ICreateCourseUseCase {
       });
     }
 
-    const savedCourse = await this.courseRepository.save(course);
-
-
-
-
-
-    
+    const savedCourse = await this._courseRepository.save(course);
 
     // Notify all admins using the notification use case
-    const admins = await this.userRepository.findByRole("ADMIN");
+    const admins = await this._userRepository.findByRole(Role.ADMIN);
     const adminIds = admins.map((a) => a.id);
-    await this.createNotificationsForUsersUseCase.execute(adminIds, {
+    await this._createNotificationsForUsersUseCase.execute(adminIds, {
       eventType: NotificationEventType.COURSE_CREATION,
       entityType: NotificationEntityType.COURSE,
       entityId: savedCourse.id,
@@ -109,9 +104,10 @@ export class CreateCourseUseCase implements ICreateCourseUseCase {
       link: `/admin/courses/${savedCourse.id}`,
     });
 
+    const courseData = savedCourse.toJSON() as unknown as ICourseWithDetailsDTO;
     return {
-      ...savedCourse.toJSON(),
+      ...courseData,
       notifiedAdminIds: adminIds,
-    };
+    } as CreateCourseResultDTO;
   }
 }

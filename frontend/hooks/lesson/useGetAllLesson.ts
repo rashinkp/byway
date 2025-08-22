@@ -1,4 +1,4 @@
-import { getAllLessonsInCourse } from "@/api/lesson";
+import { getLessons } from "@/api/lesson";
 import { useAuthStore } from "@/stores/auth.store";
 import { GetAllLessonsParams, GetAllLessonsResponse } from "@/types/lesson";
 import { useQuery } from "@tanstack/react-query";
@@ -22,7 +22,7 @@ export const useGetAllLessonsInCourse = ({
 			{ page, limit, sortBy, sortOrder, search, filterBy, includeDeleted },
 		],
 		queryFn: () =>
-			getAllLessonsInCourse({
+			getLessons({
 				courseId,
 				page,
 				limit,

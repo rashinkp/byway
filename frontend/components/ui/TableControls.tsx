@@ -23,6 +23,13 @@ import {
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Separator } from "@/components/ui/separator";
 import { SortOption } from "@/types/common";
+import {
+	Select,
+	SelectContent,
+	SelectItem,
+	SelectTrigger,
+	SelectValue,
+} from "@/components/ui/select";
 
 interface TableControlsProps {
 	searchTerm: string;
@@ -33,7 +40,7 @@ interface TableControlsProps {
 	setSortBy: (sort: string) => void;
 	sortOrder: "asc" | "desc";
 	setSortOrder: (order: "asc" | "desc") => void;
-	sortOptions: SortOption<any>[];
+	sortOptions: SortOption<unknown>[];   
 	filterTabs?: { value: string; label: string }[];
 }
 
@@ -83,110 +90,127 @@ export function TableControls({
 		return "grid-cols-12";
 	};
 
+
 	return (
-    <div className="space-y-6">
-      {/* Header with Icon */}
-      <div className="flex items-center gap-3">
-        <div className="bg-[#facc15]/10 p-2 rounded-lg dark:bg-[#232323]">
-          <Clock className="w-5 h-5 text-[#facc15] dark:text-[#facc15]" />
-        </div>
-        <div>
-          <h2 className="text-lg font-semibold text-black dark:text-white">
-            Data Management
-          </h2>
-          <p className="text-sm text-gray-700 dark:text-gray-300">
-            Filter, search, and organize your data
-          </p>
-        </div>
-      </div>
+		<div className="space-y-6">
+			{/* Header with Icon */}
+			<div className="flex items-center gap-3">
+				<div className="bg-[#facc15]/10 p-2 rounded-lg dark:bg-[#232323]">
+					<Clock className="w-5 h-5 text-[#facc15] dark:text-[#facc15]" />
+				</div>
+				<div>
+					<h2 className="text-lg font-semibold text-black dark:text-white">
+						Data Management
+					</h2>
+					<p className="text-sm text-gray-700 dark:text-gray-300">
+						Filter, search, and organize your data
+					</p>
+				</div>
+			</div>
 
-      <Separator />
+			<Separator />
 
-      {/* Filter Tabs */}
-      <div className="space-y-4">
-        <Tabs
-          value={filterStatus}
-          onValueChange={setFilterStatus}
-          className="w-full"
-        >
-          <TabsList
-            className={`grid w-full max-w-4xl ${getGridCols(
-              filterTabs.length
-            )} bg-white/80 dark:bg-[#232323]`}
-          >
-            {filterTabs.map((tab) => (
-              <TabsTrigger
-                key={tab.value}
-                value={tab.value}
-                className="text-xs"
-              >
-                {tab.label}
-              </TabsTrigger>
-            ))}
-          </TabsList>
-        </Tabs>
+			{/* Filter Tabs / Dropdown */}
+			<div className="space-y-4">
+				{/* Mobile: Dropdown */}
+				<div className="sm:hidden">
+					<Select value={filterStatus} onValueChange={setFilterStatus}>
+						<SelectTrigger className="w-full bg-white/80 dark:bg-[#232323] text-black dark:text-white border border-gray-200 dark:border-gray-700">
+							<SelectValue placeholder="Filter" />
+						</SelectTrigger>
+						<SelectContent className="bg-white/90 dark:bg-[#232323] text-black dark:text-white border-[#facc15] dark:border-[#facc15]">
+							{filterTabs.map((tab) => (
+								<SelectItem key={tab.value} value={tab.value}>
+									{tab.label}
+								</SelectItem>
+							))}
+						</SelectContent>
+					</Select>
+				</div>
 
-        {/* Search and Controls */}
-        <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
-          <div className="relative w-full lg:w-64">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-            <Input
-              placeholder="Search..."
-              value={inputSearchTerm}
-              className="pl-10 w-full bg-white/80 dark:bg-[#232323] text-black dark:text-white border border-gray-200 dark:border-gray-700"
-              onChange={(e) => setInputSearchTerm(e.target.value)}
-            />
-          </div>
+				{/* Desktop: Tabs */}
+				<div className="hidden sm:block">
+					<Tabs
+						value={filterStatus}
+						onValueChange={setFilterStatus}
+						className="w-full"
+					>
+						<TabsList
+							className={`grid w-full max-w-4xl ${getGridCols(
+								filterTabs.length
+							)} bg-white/80 dark:bg-[#232323]`}
+						>
+							{filterTabs.map((tab) => (
+								<TabsTrigger
+									key={tab.value}
+									value={tab.value}
+									className="text-xs"
+								>
+									{tab.label}
+								</TabsTrigger>
+							))}
+						</TabsList>
+					</Tabs>
+				</div>
 
-          <div className="flex items-center gap-2">
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button
-              
-                >
-                  <Filter className="h-4 w-4" />
-                  Sort:{" "}
-                  {sortOptions.find((opt) => opt.value === sortBy)?.label ||
-                    "Select"}
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent
-                align="end"
-                className="w-48 bg-white/80 dark:bg-[#232323] text-black dark:text-white border-[#facc15] dark:border-[#facc15]"
-              >
-                <DropdownMenuLabel>Sort by</DropdownMenuLabel>
-                <DropdownMenuSeparator />
-                <DropdownMenuRadioGroup
-                  value={sortBy}
-                  onValueChange={setSortBy}
-                >
-                  {sortOptions.map((option) => (
-                    <DropdownMenuRadioItem
-                      key={option.value}
-                      value={option.value}
-                      className=" dark:hover:bg-[#facc15] dark:hover:text-black"
-                    >
-                      {option.label}
-                    </DropdownMenuRadioItem>
-                  ))}
-                </DropdownMenuRadioGroup>
-              </DropdownMenuContent>
-            </DropdownMenu>
+				{/* Search and Controls */}
+				<div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
+					<div className="relative w-full lg:w-64">
+						<Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+						<Input
+							placeholder="Search..."
+							value={inputSearchTerm}
+							className="pl-10 w-full bg-white/80 dark:bg-[#232323] text-black dark:text-white border border-gray-200 dark:border-gray-700"
+							onChange={(e) => setInputSearchTerm(e.target.value)}
+						/>
+					</div>
 
-            <Button
-              onClick={() => setSortOrder(sortOrder === "asc" ? "desc" : "asc")}
-             
-            >
-              {sortOrder === "asc" ? (
-                <ArrowUp className="h-4 w-4" />
-              ) : (
-                <ArrowDown className="h-4 w-4" />
-              )}
-              {getOrderLabel()}
-            </Button>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
+					<div className="flex items-center gap-2">
+						<DropdownMenu>
+							<DropdownMenuTrigger asChild>
+								<Button>
+									<Filter className="h-4 w-4" />
+									Sort:{" "}
+									{sortOptions.find((opt) => opt.value === sortBy)?.label ||
+										"Select"}
+								</Button>
+							</DropdownMenuTrigger>
+							<DropdownMenuContent
+								align="end"
+								className="w-48 bg-white/80 dark:bg-[#232323] text-black dark:text-white border-[#facc15] dark:border-[#facc15]"
+							>
+								<DropdownMenuLabel>Sort by</DropdownMenuLabel>
+								<DropdownMenuSeparator />
+								<DropdownMenuRadioGroup
+									value={sortBy}
+									onValueChange={setSortBy}
+								>
+									{sortOptions.map((option) => (
+										<DropdownMenuRadioItem
+											key={option.value}
+											value={option.value}
+											className=" dark:hover:bg-[#facc15] dark:hover:text-black"
+										>
+											{option.label}
+										</DropdownMenuRadioItem>
+									))}
+								</DropdownMenuRadioGroup>
+							</DropdownMenuContent>
+						</DropdownMenu>
+
+						<Button
+							onClick={() => setSortOrder(sortOrder === "asc" ? "desc" : "asc")}
+						>
+							{sortOrder === "asc" ? (
+								<ArrowUp className="h-4 w-4" />
+							) : (
+								<ArrowDown className="h-4 w-4" />
+							)}
+							{getOrderLabel()}
+						</Button>
+					</div>
+				</div>
+			</div>
+		</div>
+	);
 }

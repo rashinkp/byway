@@ -1,13 +1,14 @@
+import { api } from "@/api/api";
+import { ApiError } from "@/types/error";
 import {
-	GetAllLessonsParams,
-	GetAllLessonsResponse,
+	ILesson,
+	GetAllLessonsParams as GetLessonsParams,
+	GetAllLessonsResponse as GetLessonsResponse,
 	GetPublicLessonsParams,
 	GetPublicLessonsResponse,
-	ILesson,
 } from "@/types/lesson";
-import { api } from "./api";
 
-export async function getAllLessonsInCourse({
+export async function getLessons({
 	courseId,
 	page = 1,
 	limit = 10,
@@ -16,9 +17,9 @@ export async function getAllLessonsInCourse({
 	search = "",
 	filterBy = "ALL",
 	includeDeleted = false,
-}: GetAllLessonsParams): Promise<GetAllLessonsResponse> {
+}: GetLessonsParams): Promise<GetLessonsResponse> {
 	try {
-		const response = await api.get<{ data: GetAllLessonsResponse }>(
+		const response = await api.get<{ data: GetLessonsResponse }>(
 			`/lessons/${courseId}/lessons`,
 			{
 				params: {
@@ -33,8 +34,9 @@ export async function getAllLessonsInCourse({
 			},
 		);
 		return response.data.data;
-	} catch (error: any) {
-		throw new Error(error.response?.data?.message || "Failed to fetch lessons");
+	} catch (error: unknown) {
+		const apiError = error as ApiError;
+		throw new Error(apiError.response?.data?.message || "Failed to fetch lessons");
 	}
 }
 
@@ -48,8 +50,9 @@ export async function createLesson(data: {
 	try {
 		const response = await api.post<{ data: ILesson }>("/lessons", data);
 		return response.data.data;
-	} catch (error: any) {
-		throw new Error(error.response?.data?.message || "Failed to create lesson");
+	} catch (error: unknown) {
+		const apiError = error as ApiError;
+		throw new Error(apiError.response?.data?.message || "Failed to create lesson");
 	}
 }
 
@@ -70,8 +73,9 @@ export async function updateLesson(
 			data,
 		);
 		return response.data.data;
-	} catch (error: any) {
-		throw new Error(error.response?.data?.message || "Failed to update lesson");
+	} catch (error: unknown) {
+		const apiError = error as ApiError;
+		throw new Error(apiError.response?.data?.message || "Failed to update lesson");
 	}
 }
 
@@ -79,9 +83,10 @@ export async function deleteLesson(lessonId: string): Promise<ILesson> {
 	try {
 		const response = await api.delete(`/lessons/${lessonId}`);
 		return response.data;
-	} catch (error: any) {
+	} catch (error: unknown) {
+		const apiError = error as ApiError;
 		throw new Error(
-			error.response?.data?.message || "Failed to toggle lesson status",
+			apiError.response?.data?.message || "Failed to toggle lesson status",
 		);
 	}
 }
@@ -90,8 +95,9 @@ export async function getLessonById(lessonId: string): Promise<ILesson> {
 	try {
 		const response = await api.get<{ data: ILesson }>(`/lessons/${lessonId}`);
 		return response.data.data;
-	} catch (error: any) {
-		throw new Error(error.response?.data?.message || "Failed to fetch lesson");
+	} catch (error: unknown) {
+		const apiError = error as ApiError;
+		throw new Error(apiError.response?.data?.message || "Failed to fetch lesson");
 	}
 }
 
@@ -117,9 +123,10 @@ export async function getPublicLessons({
 			},
 		);
 		return response.data.data;
-	} catch (error: any) {
+	} catch (error: unknown) {
+		const apiError = error as ApiError;
 		throw new Error(
-			error.response?.data?.message || "Failed to fetch public lessons",
+			apiError.response?.data?.message || "Failed to fetch public lessons",
 		);
 	}
 }

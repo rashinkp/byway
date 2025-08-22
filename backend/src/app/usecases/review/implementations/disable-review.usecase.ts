@@ -3,12 +3,12 @@ import { IDisableReviewUseCase } from "../interfaces/disable-review.usecase.inte
 
 export class DisableReviewUseCase implements IDisableReviewUseCase {
   constructor(
-    private readonly courseReviewRepository: ICourseReviewRepository
+    private readonly _courseReviewRepository: ICourseReviewRepository
   ) {}
 
   async execute(reviewId: string): Promise<{ action: 'disabled' | 'enabled' }> {
     // Find the review
-    const review = await this.courseReviewRepository.findById(reviewId);
+    const review = await this._courseReviewRepository.findById(reviewId);
     if (!review) {
       throw new Error("Review not found");
     }
@@ -17,12 +17,12 @@ export class DisableReviewUseCase implements IDisableReviewUseCase {
     if (review.isDeleted()) {
       // Enable the review (restore)
       review.restore();
-      await this.courseReviewRepository.restore(review);
+      await this._courseReviewRepository.restore(review);
       return { action: 'enabled' };
     } else {
       // Disable the review
       review.softDelete();
-      await this.courseReviewRepository.softDelete(review);
+      await this._courseReviewRepository.softDelete(review);
       return { action: 'disabled' };
     }
   }

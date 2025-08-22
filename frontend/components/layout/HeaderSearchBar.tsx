@@ -4,9 +4,30 @@ import { Search, Loader2, BookOpen, Clock, Users } from "lucide-react";
 import { useGlobalSearch } from "@/hooks/search/useGlobalSearch";
 import { useDebounce } from "@/hooks/useDebounce";
 import Image from "next/image";
+import { User } from "@/types/user";
+import { useSignedUrl } from "@/hooks/file/useSignedUrl";
+
+// Component to handle course thumbnails with proper S3 URL handling
+const CourseThumbnail = ({ course }: { course: { thumbnail?: string | null; title: string } }) => {
+  const { url: thumbnailUrl } = useSignedUrl(course.thumbnail || null);
+  
+  if (!thumbnailUrl) {
+    return <BookOpen className="w-5 h-5 text-[#facc15]" />;
+  }
+  
+  return (
+    <Image
+      src={thumbnailUrl}
+      alt={course.title}
+      className="w-full h-full object-cover"
+      width={100}
+      height={100}
+    />
+  );
+};
 
 interface HeaderSearchBarProps {
-	user: any;
+	user: User | null;
 	searchQuery: string;
 	setSearchQuery: (q: string) => void;
 	showSearchResults: boolean;
@@ -137,13 +158,7 @@ export const HeaderSearchBar: React.FC<HeaderSearchBarProps> = ({
 											>
 												<div className="w-12 h-8 rounded-md bg-[#facc15]/10 flex items-center justify-center shadow-sm overflow-hidden">
 													{course.thumbnail ? (
-														<Image
-															src={course.thumbnail}
-															alt={course.title}
-															className="w-full h-full object-cover"
-															width={100}
-															height={100}
-														/>
+														<CourseThumbnail course={course} />
 													) : (
 														<BookOpen className="w-5 h-5 text-[#facc15]" />
 													)}

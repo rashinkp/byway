@@ -1,5 +1,6 @@
 import {
   PrismaClient,
+  Prisma,
   TransactionHistory,
   TransactionType as PrismaTransactionType,
   TransactionStatus as PrismaTransactionStatus,
@@ -12,7 +13,7 @@ import { PaymentGateway } from "../../domain/enum/payment-gateway.enum";
 import { TransactionType } from "../../domain/enum/transaction-type.enum";
 
 export class TransactionRepository implements ITransactionRepository {
-  constructor(private prisma: PrismaClient) {}
+  constructor(private _prisma: PrismaClient) {}
 
   private mapToTransaction(prismaTransaction: TransactionHistory): Transaction {
     return new Transaction({
@@ -41,7 +42,7 @@ export class TransactionRepository implements ITransactionRepository {
 
   async create(transaction: Transaction): Promise<Transaction> {
     try {
-      const createdTransaction = await this.prisma.transactionHistory.create({
+      const createdTransaction = await this._prisma.transactionHistory.create({
         data: {
           userId: transaction.userId,
           amount: transaction.amount,
@@ -49,10 +50,10 @@ export class TransactionRepository implements ITransactionRepository {
           status: transaction.status as PrismaTransactionStatus,
           paymentGateway: transaction.paymentGateway as PrismaPaymentGateway,
           paymentMethod: transaction.paymentMethod,
-          paymentDetails: transaction.paymentDetails,
+          paymentDetails: transaction.paymentDetails ? (transaction.paymentDetails as Prisma.InputJsonValue) : undefined,
           courseId: transaction.courseId,
           transactionId: transaction.transactionId,
-          metadata: transaction.metadata,
+          metadata: transaction.metadata ? (transaction.metadata as Prisma.InputJsonValue) : undefined,
           orderId: transaction.orderId,
         },
       });
@@ -72,20 +73,20 @@ export class TransactionRepository implements ITransactionRepository {
         updatedAt: createdTransaction.updatedAt,
       });
     } catch (error) {
-      console.error("Error creating transaction:", error);
+    
       throw error;
     }
   }
 
   async findById(id: string): Promise<Transaction | null> {
-    const transaction = await this.prisma.transactionHistory.findUnique({
+    const transaction = await this._prisma.transactionHistory.findUnique({
       where: { id },
     });
     return transaction ? this.mapToTransaction(transaction) : null;
   }
 
   async findByOrderId(orderId: string): Promise<Transaction | null> {
-    const transaction = await this.prisma.transactionHistory.findFirst({
+    const transaction = await this._prisma.transactionHistory.findFirst({
       where: { orderId },
       orderBy: { createdAt: "desc" },
     });
@@ -97,7 +98,7 @@ export class TransactionRepository implements ITransactionRepository {
     page?: number,
     limit?: number
   ): Promise<Transaction[]> {
-    const transactions = await this.prisma.transactionHistory.findMany({
+    const transactions = await this._prisma.transactionHistory.findMany({
       where: { userId },
       skip: page ? (page - 1) * (limit || 10) : undefined,
       take: limit,
@@ -109,20 +110,21 @@ export class TransactionRepository implements ITransactionRepository {
   async updateStatus(
     id: string,
     status: TransactionStatus,
-    metadata?: Record<string, any>
+    metadata?: Record<string, unknown>
   ): Promise<Transaction> {
-    const updated = await this.prisma.transactionHistory.update({
+    const updated = await this._prisma.transactionHistory.update({
       where: { id },
       data: {
         status: this.mapToPrismaTransactionStatus(status),
-        ...(metadata && { metadata: JSON.stringify(metadata) }),
+        updatedAt: new Date(),
+        ...(metadata && { metadata: metadata as Prisma.InputJsonValue }),
       },
     });
     return this.mapToTransaction(updated);
   }
 
   async countByUserId(userId: string): Promise<number> {
-    return this.prisma.transactionHistory.count({ where: { userId } });
+    return this._prisma.transactionHistory.count({ where: { userId } });
   }
 
   

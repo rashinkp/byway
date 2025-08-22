@@ -1,4 +1,5 @@
 import { api } from "./api";
+import { ApiError } from "@/types/error";
 import {
 	IProgress,
 	IProgressResponse,
@@ -21,15 +22,11 @@ export async function updateProgress(
 			},
 		);
 		return response.data.data;
-	} catch (error: any) {
-		console.error("Update progress error:", {
-			status: error.response?.status,
-			data: error.response?.data,
-			message: error.message,
-		});
+	} catch (error: unknown) {
+		const apiError = error as ApiError;
 		throw new Error(
-			error.response?.data?.message ||
-				error.response?.data?.error ||
+			apiError.response?.data?.message ||
+				apiError.response?.data?.error ||
 				"Failed to update progress",
 		);
 	}
@@ -43,15 +40,11 @@ export async function getProgress({
 			`/progress/${courseId}/progress`,
 		);
 		return response.data.data;
-	} catch (error: any) {
-		console.error("Get progress error:", {
-			status: error.response?.status,
-			data: error.response?.data,
-			message: error.message,
-		});
+	} catch (error: unknown) {
+		const apiError = error as ApiError;
 		throw new Error(
-			error.response?.data?.message ||
-				error.response?.data?.error ||
+			apiError.response?.data?.message ||
+				apiError.response?.data?.error ||
 				"Failed to get progress",
 		);
 	}

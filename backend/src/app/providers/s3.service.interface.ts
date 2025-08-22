@@ -1,7 +1,17 @@
 export interface S3ServiceInterface {
-  generatePresignedUrl(
-    fileName: string, 
-    fileType: string, 
+  generatePresignedPutUrl(
+    key: string,
+    contentType: string,
+    expiresInSeconds?: number
+  ): Promise<{ uploadUrl: string; key: string }>;
+
+  generatePresignedGetUrl(
+    key: string,
+    expiresInSeconds?: number
+  ): Promise<string>;
+
+  generateS3Key(
+    fileName: string,
     uploadType: 'course' | 'profile' | 'certificate',
     metadata?: {
       courseId?: string;
@@ -9,10 +19,7 @@ export interface S3ServiceInterface {
       certificateId?: string;
       contentType?: 'thumbnail' | 'video' | 'document' | 'avatar' | 'cv';
     }
-  ): Promise<{
-    uploadUrl: string;
-    fileUrl: string;
-  }>;
+  ): string;
   
   uploadFile(
     fileBuffer: Buffer,
@@ -25,7 +32,7 @@ export interface S3ServiceInterface {
       certificateId?: string;
       contentType?: 'thumbnail' | 'video' | 'document' | 'avatar' | 'cv';
     }
-  ): Promise<string>;
+  ): Promise<string>; // returns S3 key
   
-  deleteFile(fileUrl: string): Promise<void>;
+  deleteFile(fileUrlOrKey: string): Promise<void>;
 } 

@@ -1,27 +1,22 @@
-import { GeneratePresignedUrlParams, PresignedUrlResponse } from "@/types/file";
+import { GeneratePresignedUrlParams, PresignedPutResponse, PresignedGetResponse } from "@/types/file";
 import { api } from "./api";
 import { ApiResponse } from "@/types/general";
+import { ApiError } from "@/types/error";
 
-
-
-export async function getPresignedUrl(
+export async function getPresignedPutUrl(
 	params: GeneratePresignedUrlParams
-): Promise<PresignedUrlResponse> {
+): Promise<PresignedPutResponse> {
 	try {
-		const response = await api.post<ApiResponse <PresignedUrlResponse>>(
+		const response = await api.post<ApiResponse<PresignedPutResponse>>(
 			"/files/generate-presigned-url",
 			params,
 		);
 		return response.data.data;
-	} catch (error: any) {
-		console.error("Get presigned URL error:", {
-			status: error.response?.status,
-			data: error.response?.data,
-			message: error.message,
-		});
+	} catch (error: unknown) {
+		const apiError = error as ApiError;
 		throw new Error(
-			error.response?.data?.message ||
-				error.response?.data?.error ||
+			apiError.response?.data?.message ||
+				apiError.response?.data?.error ||
 				"Failed to get presigned URL",
 		);
 	}
@@ -33,8 +28,8 @@ export async function getCoursePresignedUrl(
 	fileType: string,
 	courseId: string,
 	contentType: 'thumbnail' | 'video' | 'document' = 'video'
-): Promise<PresignedUrlResponse> {
-	return getPresignedUrl({
+): Promise<PresignedPutResponse> {
+	return getPresignedPutUrl({
 		fileName,
 		fileType,
 		uploadType: 'course',
@@ -50,8 +45,8 @@ export async function getProfilePresignedUrl(
 	fileType: string,
 	userId: string,
 	contentType: 'avatar' | 'cv' = 'avatar'
-): Promise<PresignedUrlResponse> {
-	return getPresignedUrl({
+): Promise<PresignedPutResponse> {
+	return getPresignedPutUrl({
 		fileName,
 		fileType,
 		uploadType: 'profile',
@@ -67,8 +62,8 @@ export async function getCertificatePresignedUrl(
 	fileType: string,
 	courseId: string,
 	certificateId: string
-): Promise<PresignedUrlResponse> {
-	return getPresignedUrl({
+): Promise<PresignedPutResponse> {
+	return getPresignedPutUrl({
 		fileName,
 		fileType,
 		uploadType: 'certificate',
@@ -114,4 +109,21 @@ export function uploadFileToS3(
 		xhr.setRequestHeader("Content-Type", file.type);
 		xhr.send(file);
 	});
+}
+
+export async function getPresignedGetUrl(key: string, expiresInSeconds = 60): Promise<string> {
+	try {
+		const response = await api.get<ApiResponse<PresignedGetResponse>>(
+			"/files/get-presigned-url",
+			{ params: { key, expiresInSeconds } }
+		);
+		return response.data.data.signedUrl;
+	} catch (error: unknown) {
+		const apiError = error as ApiError;
+		throw new Error(
+			apiError.response?.data?.message ||
+				apiError.response?.data?.error ||
+				"Failed to get signed URL"
+		);
+	}
 }

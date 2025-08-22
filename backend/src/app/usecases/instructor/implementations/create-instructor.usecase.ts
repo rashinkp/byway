@@ -9,8 +9,8 @@ import { UserDTO } from "../../../dtos/general.dto";
 
 export class CreateInstructorUseCase implements ICreateInstructorUseCase {
   constructor(
-    private instructorRepository: IInstructorRepository,
-    private userRepository: IUserRepository
+    private _instructorRepository: IInstructorRepository,
+    private _userRepository: IUserRepository
   ) {}
 
   async execute(
@@ -28,7 +28,7 @@ export class CreateInstructorUseCase implements ICreateInstructorUseCase {
     }
 
     const existingInstructor =
-      await this.instructorRepository.findInstructorByUserId(dto.userId);
+      await this._instructorRepository.findInstructorByUserId(dto.userId);
     if (existingInstructor?.status === "PENDING") {
       throw new HttpError("Your application is under process please wait", 400);
     }
@@ -49,13 +49,13 @@ export class CreateInstructorUseCase implements ICreateInstructorUseCase {
       }
     }
 
-    const user = await this.userRepository.findById(dto.userId);
+    const user = await this._userRepository.findById(dto.userId);
     if (!user) {
       throw new HttpError("User not found", 404);
     }
 
     const instructor = Instructor.create(dto);
-    const createdInstructor = await this.instructorRepository.createInstructor(
+    const createdInstructor = await this._instructorRepository.createInstructor(
       instructor
     );
 

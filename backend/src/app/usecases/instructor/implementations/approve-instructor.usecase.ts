@@ -12,10 +12,10 @@ import { UserDTO } from "../../../dtos/general.dto";
 
 export class ApproveInstructorUseCase implements IApproveInstructorUseCase {
   constructor(
-    private instructorRepository: IInstructorRepository,
-    private userRepository: IUserRepository,
-    private updateUserUseCase: IUpdateUserUseCase,
-    private createNotificationsForUsersUseCase: CreateNotificationsForUsersUseCase
+    private _instructorRepository: IInstructorRepository,
+    private _userRepository: IUserRepository,
+    private _updateUserUseCase: IUpdateUserUseCase,
+    private _createNotificationsForUsersUseCase: CreateNotificationsForUsersUseCase
   ) {}
 
   async execute(
@@ -26,7 +26,7 @@ export class ApproveInstructorUseCase implements IApproveInstructorUseCase {
       throw new HttpError("Unauthorized: Admin access required", 403);
     }
 
-    const instructor = await this.instructorRepository.findInstructorById(
+    const instructor = await this._instructorRepository.findInstructorById(
       dto.instructorId
     );
     if (!instructor) {
@@ -36,24 +36,24 @@ export class ApproveInstructorUseCase implements IApproveInstructorUseCase {
     instructor.approve();
 
     // Update the user's role to INSTRUCTOR
-    const user = await this.userRepository.findById(instructor.userId);
+    const user = await this._userRepository.findById(instructor.userId);
     if (!user) {
       throw new HttpError("User not found", 404);
     }
 
-    await this.updateUserUseCase.execute(
+    await this._updateUserUseCase.execute(
       {
         role: Role.INSTRUCTOR,
       },
       user.id
     );
 
-    const updatedInstructor = await this.instructorRepository.updateInstructor(
+    const updatedInstructor = await this._instructorRepository.updateInstructor(
       instructor
     );
 
     // Send notification to the instructor about approval
-    await this.createNotificationsForUsersUseCase.execute([instructor.userId], {
+    await this._createNotificationsForUsersUseCase.execute([instructor.userId], {
       eventType: NotificationEventType.INSTRUCTOR_APPROVED,
       entityType: NotificationEntityType.INSTRUCTOR,
       entityId: instructor.id,

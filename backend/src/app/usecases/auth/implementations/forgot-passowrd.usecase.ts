@@ -6,18 +6,18 @@ import { ForgotPasswordDto } from "../../../dtos/auth.dto";
 
 export class ForgotPasswordUseCase implements IForgotPasswordUseCase {
   constructor(
-    private authRepository: IAuthRepository,
-    private otpProvider: OtpProvider
+    private _authRepository: IAuthRepository,
+    private _otpProvider: OtpProvider
   ) {}
 
   async execute(dto: ForgotPasswordDto): Promise<void> {
-    const user = await this.authRepository.findUserByEmail(dto.email);
+    const user = await this._authRepository.findUserByEmail(dto.email);
     if (!user) {
       throw new HttpError("User not found", 404);
     }
 
     try {
-      await this.otpProvider.generateOtp(user.email, user.id);
+      await this._otpProvider.generateOtp(user.email, user.id);
       // TODO: Implement email sending
       // await this.emailProvider.sendResetTokenEmail(user.email, verification.otp);
     } catch (error) {

@@ -86,7 +86,7 @@ export class UserVerification {
     });
   }
 
-  static fromPrisma(data: {
+  static fromPersistence(data: {
     id: string;
     userId: string;
     email: string;

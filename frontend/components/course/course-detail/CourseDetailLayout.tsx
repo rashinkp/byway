@@ -11,6 +11,8 @@ import { AlertCircle } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useGetContentByLessonId } from "@/hooks/content/useGetContentByLessonId";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useSignedUrl } from "@/hooks/file/useSignedUrl";
+import { useEffect, useState } from "react";
 
 
 export default function CourseDetailLayout({
@@ -28,6 +30,54 @@ export default function CourseDetailLayout({
 	const isAdmin = userRole === 'ADMIN';
 	const { data: lessonContent, isLoading: isContentLoading, error: contentError } = useGetContentByLessonId(openLessonContentId || "");
 
+	// Resolve signed URLs for lesson content (video/document) when fileUrl/thumbnailUrl are S3 keys
+	const lessonFileIsKey = typeof lessonContent?.fileUrl === 'string' && !!lessonContent?.fileUrl && !/^https?:\/\//.test(lessonContent.fileUrl) && !lessonContent.fileUrl.startsWith('/');
+	const { url: lessonFileUrl } = useSignedUrl(lessonFileIsKey ? (lessonContent?.fileUrl as string) : null);
+	const lessonThumbIsKey = typeof lessonContent?.thumbnailUrl === 'string' && !!lessonContent?.thumbnailUrl && !/^https?:\/\//.test(lessonContent.thumbnailUrl) && !lessonContent.thumbnailUrl.startsWith('/');
+	const { url: lessonThumbUrl } = useSignedUrl(lessonThumbIsKey ? (lessonContent?.thumbnailUrl as string) : null);
+
+	const resolvedVideoUrl = lessonContent?.fileUrl
+		? (lessonFileIsKey ? lessonFileUrl : lessonContent.fileUrl)
+		: undefined;
+	const resolvedPosterUrl = lessonContent?.thumbnailUrl
+		? (lessonThumbIsKey ? lessonThumbUrl : lessonContent.thumbnailUrl)
+		: undefined;
+	const resolvedDocUrl = lessonContent?.fileUrl
+		? (lessonFileIsKey ? lessonFileUrl : lessonContent.fileUrl)
+		: undefined;
+	const isPdfDoc = typeof resolvedDocUrl === 'string'
+		? resolvedDocUrl.split('?')[0].toLowerCase().endsWith('.pdf')
+		: false;
+
+	// Media loading state management
+	const [videoLoading, setVideoLoading] = useState(true);
+	const [docLoading, setDocLoading] = useState(true);
+
+	useEffect(() => {
+		// Reset loading when a different lesson is opened
+		setVideoLoading(true);
+		setDocLoading(true);
+	}, [openLessonContentId]);
+
+	useEffect(() => {
+		// When the resolved URLs change, assume loading until media reports ready
+		setVideoLoading(true);
+	}, [resolvedVideoUrl]);
+
+	useEffect(() => {
+		setDocLoading(true);
+	}, [resolvedDocUrl]);
+
+	// Resolve signed URLs for course thumbnail and instructor avatar when they are S3 keys
+	const courseThumbIsKey = typeof course?.thumbnail === 'string' && !!course?.thumbnail && !/^https?:\/\//.test(course.thumbnail) && !course.thumbnail.startsWith('/');
+	const { url: courseThumbUrl } = useSignedUrl(courseThumbIsKey ? course?.thumbnail : null);
+	const instructorAvatar = (instructor as { avatar?: string })?.avatar;
+	const avatarIsKey = typeof instructorAvatar === 'string' && !!instructorAvatar && !/^https?:\/\//.test(instructorAvatar) && !instructorAvatar.startsWith('/');
+	const { url: instructorAvatarUrl } = useSignedUrl(avatarIsKey ? instructorAvatar : null);
+
+	// Default no-op functions for AdminActions
+	const noOp: () => void = () => {};
+
 	if (error) {
 		return (
 			<ErrorDisplay
@@ -44,12 +94,12 @@ export default function CourseDetailLayout({
 
 	return (
 		<div className="min-h-screen p-4 sm:p-8 bg-white dark:bg-[#18181b] flex justify-center">
-			<div className="w-full max-w-5xl p-6 space-y-8">
+			<div className={`w-full max-w-5xl ${isAdmin ? 'p-4 space-y-6' : 'p-6 space-y-8'}`}>
 				{/* Header: Thumbnail, Title, Meta, Price, Purchase/Enroll */}
-				<div className="flex flex-col sm:flex-row gap-6 items-center">
+				<div className={`flex flex-col sm:flex-row ${isAdmin ? 'gap-4' : 'gap-6'} items-center`}>
 					<div className="w-40 h-40 rounded-xl overflow-hidden flex-shrink-0 bg-[#f9fafb] dark:bg-[#18181b] border border-gray-200">
 						<Image
-							src={course?.thumbnail || '/placeholder-course.jpg'}
+							src={courseThumbIsKey ? (courseThumbUrl || '/placeholder-course.jpg') : (course?.thumbnail || '/placeholder-course.jpg')}
 							alt={course?.title || 'Course Thumbnail'}
 							width={160}
 							height={160}
@@ -78,7 +128,7 @@ export default function CourseDetailLayout({
 								</span>
 							</div>
 						)}
-						<div className="flex flex-wrap gap-3 items-center justify-center sm:justify-start mt-2">
+						<div className={`flex flex-wrap ${isAdmin ? 'gap-2' : 'gap-3'} items-center justify-center sm:justify-start mt-2`}>
 							{userRole !== 'ADMIN' && course?.price && (
 								<span className="text-2xl font-bold text-[#facc15]">${Number(course?.offer ?? course?.price).toFixed(2)}</span>
 							)}
@@ -92,7 +142,15 @@ export default function CourseDetailLayout({
 										sidebarProps.adminActions ? (
 											sidebarProps.adminActions
 										) : (
-											<AdminActions course={course} {...(sidebarProps.adminActionsProps || {})} />
+											<AdminActions 
+												course={course} 
+												isApproving={Boolean(sidebarProps.adminActionsProps?.isApproving)}
+												isDeclining={Boolean(sidebarProps.adminActionsProps?.isDeclining)}
+												isTogglingStatus={Boolean(sidebarProps.adminActionsProps?.isTogglingStatus)}
+												onApprove={(sidebarProps.adminActionsProps?.onApprove || noOp) as () => void}
+												onDecline={(sidebarProps.adminActionsProps?.onDecline || noOp) as () => void}
+												onToggleStatus={(sidebarProps.adminActionsProps?.onToggleStatus || noOp) as () => void}	
+											/>
 										)
 									) : sidebarProps.isEnrolled ? (
 										<Button variant={'primary'} className="px-6 py-2" onClick={() => window.location.href = `/user/my-courses/${course?.id}`}>Learn Now</Button>
@@ -122,11 +180,11 @@ export default function CourseDetailLayout({
 				</div>
 
 				{/* Instructor */}
-				<div className="flex items-center gap-4">
+				<div className={`flex items-center ${isAdmin ? 'gap-3' : 'gap-4'}`}>
 					<div className="w-14 h-14 rounded-full overflow-hidden bg-[#f9fafb] dark:bg-[#18181b] border border-gray-200">
-						{instructor && (instructor as any).avatar ? (
+						{instructor && (instructor as { avatar?: string }).avatar ? (
 							<Image
-								src={(instructor as any).avatar}
+								src={avatarIsKey ? (instructorAvatarUrl || '/UserProfile.jpg') : ((instructor as { avatar?: string }).avatar || '/UserProfile.jpg')}
 								alt={instructor.name}
 								width={56}
 								height={56}
@@ -142,8 +200,8 @@ export default function CourseDetailLayout({
 					<div>
 						<div className="text-lg font-semibold text-black dark:text-white">{instructor?.name || 'Anonymous'}</div>
 						<div className="text-sm text-gray-500 dark:text-gray-300">{instructor?.bio || 'No bio available.'}</div>
-						{instructor && (instructor as any).longBio && (
-							<div className="text-gray-500 dark:text-gray-300 text-sm mt-1">{(instructor as any).longBio}</div>
+						{instructor && (instructor as { longBio?: string }).longBio && (
+							<div className="text-gray-500 dark:text-gray-300 text-sm mt-1">{(instructor as { longBio?: string }).longBio}</div>
 						)}
 					</div>
 				</div>
@@ -191,7 +249,7 @@ export default function CourseDetailLayout({
 						<div className="text-gray-500 dark:text-gray-300">No lessons available.</div>
 					)}
 					{/* Lesson Content Modal */}
-					<Dialog open={!!openLessonContentId} onOpenChange={() => setOpenLessonContentId(null)}>
+					<Dialog open={!!openLessonContentId} onOpenChange={(open) => { if (!open) setOpenLessonContentId(null); }}>
 						<DialogContent className="max-w-2xl bg-white/80 dark:bg-[#232323] border border-gray-200 dark:border-gray-700">
 							<DialogHeader>
 								<DialogTitle className="text-lg font-bold text-black dark:text-white flex items-center gap-2">
@@ -215,32 +273,53 @@ export default function CourseDetailLayout({
 									{lessonContent.description && (
 										<p className="text-gray-700 dark:text-gray-300 mb-4 whitespace-pre-line">{lessonContent.description}</p>
 									)}
-									{lessonContent.type === 'VIDEO' && lessonContent.fileUrl && (
-										<video
-											controls
-											poster={lessonContent.thumbnailUrl || "/api/placeholder/800/450"}
-											className="w-full max-w-2xl rounded-lg object-cover mb-4"
-											style={{ maxHeight: 400 }}
-										>
-											<source src={lessonContent.fileUrl} type="video/mp4" />
-											Your browser does not support the video tag.
-										</video>
+									{lessonContent.type === 'VIDEO' && (
+										resolvedVideoUrl ? (
+											<div className="w-full max-w-2xl">
+												{videoLoading && (
+													<Skeleton className="w-full h-64 max-h-[400px] rounded-lg bg-gray-200 dark:bg-gray-700 animate-pulse mb-2" />
+												)}
+												<video
+													key={resolvedVideoUrl}
+													controls
+													playsInline
+													preload="metadata"
+													poster={resolvedPosterUrl || "/api/placeholder/800/450"}
+													src={resolvedVideoUrl}
+													onLoadedData={() => setVideoLoading(false)}
+													onCanPlay={() => setVideoLoading(false)}
+													onError={() => setVideoLoading(false)}
+													className={`${videoLoading ? 'hidden' : ''} w-full max-w-2xl rounded-lg object-cover mb-4`}
+													style={{ maxHeight: 400 }}
+												>
+													Your browser does not support the video tag.
+												</video>
+											</div>
+										) : (
+											<Skeleton className="w-full max-w-2xl h-64 rounded-lg bg-gray-200 dark:bg-gray-700 animate-pulse" />
+										)
 									)}
-									{lessonContent.type === 'DOCUMENT' && lessonContent.fileUrl && (
+									{lessonContent.type === 'DOCUMENT' && resolvedDocUrl && (
 										<div className="space-y-2">
 											<a
-												href={lessonContent.fileUrl}
+												href={resolvedDocUrl}
 												download
 												className="inline-block px-4 py-2 bg-[#facc15] text-black dark:bg-[#facc15] dark:text-[#18181b] rounded font-semibold hover:bg-yellow-400 dark:hover:bg-yellow-400 transition-colors mb-2"
 											>
 												Download Document
 											</a>
-											{lessonContent.fileUrl.endsWith('.pdf') ? (
-												<iframe
-													src={lessonContent.fileUrl}
-													className="w-full h-[400px] rounded border border-gray-200 dark:border-gray-700"
-													title="Document preview"
-												/>
+											{isPdfDoc ? (
+												<div className="w-full">
+													{docLoading && (
+														<Skeleton className="w-full h-[400px] rounded bg-gray-200 dark:bg-gray-700 animate-pulse" />
+													)}
+													<iframe
+														src={resolvedDocUrl}
+														className={`${docLoading ? 'hidden' : ''} w-full h-[400px] rounded border border-gray-200 dark:border-gray-700`}
+														title="Document preview"
+														onLoad={() => setDocLoading(false)}
+													/>
+												</div>
 											) : (
 												<div className="text-gray-500 dark:text-gray-300">Preview not available for this document type.</div>
 											)}

@@ -8,8 +8,8 @@ import { ICreateCourseReviewUseCase } from "../interfaces/create-course-review.u
 
 export class CreateCourseReviewUseCase implements ICreateCourseReviewUseCase {
   constructor(
-    private readonly courseReviewRepository: ICourseReviewRepository,
-    private readonly enrollmentRepository: IEnrollmentRepository
+    private readonly _courseReviewRepository: ICourseReviewRepository,
+    private readonly _enrollmentRepository: IEnrollmentRepository
   ) {}
 
   async execute(
@@ -17,7 +17,7 @@ export class CreateCourseReviewUseCase implements ICreateCourseReviewUseCase {
     userId: string
   ): Promise<CourseReviewResponseDto> {
     // Check if user is enrolled in the course
-    const enrollment = await this.enrollmentRepository.findByUserAndCourse(
+    const enrollment = await this._enrollmentRepository.findByUserAndCourse(
       userId,
       input.courseId
     );
@@ -27,7 +27,7 @@ export class CreateCourseReviewUseCase implements ICreateCourseReviewUseCase {
 
     // Check if user already has a review for this course
     const existingReview =
-      await this.courseReviewRepository.findByUserAndCourse(
+      await this._courseReviewRepository.findByUserAndCourse(
         userId,
         input.courseId
       );
@@ -48,7 +48,7 @@ export class CreateCourseReviewUseCase implements ICreateCourseReviewUseCase {
     });
 
     // Save to repository
-    const savedReview = await this.courseReviewRepository.save(courseReview);
+    const savedReview = await this._courseReviewRepository.save(courseReview);
 
     // Return response DTO
     return {

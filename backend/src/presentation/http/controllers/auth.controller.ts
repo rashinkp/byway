@@ -26,6 +26,13 @@ import { BadRequestError } from "../errors/bad-request-error";
 import { BaseController } from "./base.controller";
 import { JwtProvider } from "../../../infra/providers/auth/jwt.provider";
 
+interface UserData {
+  id: string;
+  name: string;
+  email: string;
+  role: string;
+}
+
 export class AuthController extends BaseController {
   constructor(
     private facebookAuthUseCase: IFacebookAuthUseCase,
@@ -94,13 +101,13 @@ export class AuthController extends BaseController {
     });
   }
 
-  private getCookieResponse(user: any): { action: "set"; user: any } {
+  private getCookieResponse(user: UserData): { action: "set"; user: UserData } {
     return { action: "set", user };
   }
 
-  private getUserFromRefreshToken(request: IHttpRequest): any {
+  private getUserFromRefreshToken(request: IHttpRequest): UserData {
     const jwtProvider = new JwtProvider();
-    const refreshToken = request.cookies?.refresh_token;
+    const refreshToken = request.cookies?.refresh_token as string;
     if (!refreshToken) {
       throw new BadRequestError("No refresh token provided");
     }
@@ -117,12 +124,7 @@ export class AuthController extends BaseController {
     ) {
       throw new BadRequestError("Invalid refresh token");
     }
-    const { id, name, email, role } = payload as {
-      id: string;
-      name: string;
-      email: string;
-      role: string;
-    };
+    const { id, name, email, role } = payload as UserData;
     return { id, name, email, role };
   }
 

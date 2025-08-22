@@ -9,5 +9,9 @@ export function fileRouter(fileController: FileController): Router {
     expressAdapter(req, res, fileController.generatePresignedUrl.bind(fileController), next)
   );
 
+  router.get("/get-presigned-url", (req, res, next) =>
+    expressAdapter(req, res, fileController.getPresignedGetUrl.bind(fileController), next)
+  );
+
   return router;
 }

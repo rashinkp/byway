@@ -29,8 +29,7 @@ export default function SuccessContent() {
       try {
         toast.success("Payment verified successfully!");
         setIsLoading(false);
-      } catch (err) {
-        console.error("Error verifying payment:", err);
+      } catch {
         toast.warning(
           "Payment completed, but verification encountered an issue"
         );

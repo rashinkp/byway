@@ -3,6 +3,11 @@ import { useQuery } from "@tanstack/react-query";
 import { UseUserDataReturn } from "./useUserData";
 import { User } from "@/types/user";
 
+// Extend Error interface to include optional code property
+interface ErrorWithCode extends Error {
+	code?: string;
+}
+
 export function useUserDataById(userId: string): UseUserDataReturn {
 	const { data, isLoading, error, refetch } = useQuery<User>({
 		queryKey: ["userData", userId],
@@ -21,7 +26,7 @@ export function useUserDataById(userId: string): UseUserDataReturn {
 						: "An unexpected error occurred",
 				code:
 					error instanceof Error && "code" in error
-						? (error as any).code
+						? (error as ErrorWithCode).code
 						: undefined,
 			}
 		: null;

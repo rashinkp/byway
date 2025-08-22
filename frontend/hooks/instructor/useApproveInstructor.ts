@@ -24,7 +24,7 @@ export function useApproveInstructor() {
 			// Update instructor listing cache
 			queryClient.setQueriesData(
 				{ queryKey: ["instructors"] },
-				(oldData: any) => {
+				(oldData: { data: { items: IInstructorWithUserDetails[] } } | undefined) => {
 					if (!oldData?.data?.items) return oldData;
 					
 					return {
@@ -81,7 +81,6 @@ export function useApproveInstructor() {
 			});
 		},
 		onError: (error) => {
-			console.error("Instructor approval failed:", error.message);
 			toast.error("Instructor Approval Failed", {
 				description: error.message || "Something went wrong while approving",
 			});

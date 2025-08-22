@@ -5,13 +5,13 @@ import { TransactionStatus } from "../../../../domain/enum/transaction-status.en
 import { GetCourseRevenueParamsDTO, GetCourseRevenueResultDTO } from "../../../dtos/revenue.dto";
 
 export class GetCourseRevenueUseCase implements IGetCourseRevenueUseCase {
-  constructor(private readonly revenueRepository: IRevenueRepository) {}
+  constructor(private readonly _revenueRepository: IRevenueRepository) {}
 
   async execute(params: GetCourseRevenueParamsDTO): Promise<GetCourseRevenueResultDTO> {
     const { startDate, endDate, userId, sortBy = "totalRevenue", sortOrder = "desc", search, page = 1, limit = 10 } = params;
 
     // Get course transactions
-    const courseTransactions = await this.revenueRepository.getCourseTransactions({
+    const courseTransactions = await this._revenueRepository.getCourseTransactions({
       startDate,
       endDate,
       type: TransactionType.REVENUE,
@@ -21,10 +21,10 @@ export class GetCourseRevenueUseCase implements IGetCourseRevenueUseCase {
 
     // Get course details
     const courseIds = courseTransactions.map((t) => t.courseId);
-    const courseDetails = await this.revenueRepository.getCourseDetails({ courseIds });
+    const courseDetails = await this._revenueRepository.getCourseDetails({ courseIds });
 
     // Get total courses count for pagination
-    const total = await this.revenueRepository.getTotalCourses({
+    const total = await this._revenueRepository.getTotalCourses({
       startDate,
       endDate,
       userId,

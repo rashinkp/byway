@@ -2,6 +2,7 @@ import React from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { User } from "lucide-react";
+import { useSignedUrl } from "@/hooks/file/useSignedUrl";
 
 interface InstructorCardProps {
 	instructor: {
@@ -18,6 +19,11 @@ interface InstructorCardProps {
 
 export function InstructorCard({ instructor }: InstructorCardProps) {
 	const router = useRouter();
+	const avatar = instructor.user.avatar || null;
+	const isAbsolute = (v?: string | null) => !!v && (v.startsWith("http://") || v.startsWith("https://"));
+	const shouldSign = !!avatar && !isAbsolute(avatar);
+	const { url: avatarUrl } = useSignedUrl(shouldSign ? avatar : null, 3600, false);
+	const finalAvatar = shouldSign ? avatarUrl : avatar || undefined;
 	return (
 		<div
 			className="bg-white/80 dark:bg-[#232326] rounded-2xl shadow-lg cursor-pointer overflow-hidden max-w-xs w-full flex flex-col p-4"
@@ -30,9 +36,9 @@ export function InstructorCard({ instructor }: InstructorCardProps) {
 		>
 			<div className="flex justify-center mb-2">
 				<div className="w-16 h-16 rounded-full ring-2 ring-[#facc15] bg-white dark:bg-[#232326] shadow flex items-center justify-center overflow-hidden">
-					{instructor.user.avatar ? (
+					{finalAvatar ? (
 						<Image
-							src={instructor.user.avatar}
+							src={finalAvatar}
 							alt={instructor.user.name}
 							className="w-full h-full object-cover rounded-full"
 							width={80}

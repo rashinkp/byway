@@ -32,7 +32,6 @@ export interface QuizQuestion {
   question: string;
   options: string[];
   correctAnswer: string;
-  // any other quiz question fields you want to add
 }
 
 export interface ILessonContentInput {
@@ -264,7 +263,7 @@ export class LessonContent {
     };
   }
 
-  toJSON(): any {
+  toJSON(): Record<string, unknown> {
     return {
       id: this._id,
       lessonId: this._lessonId,

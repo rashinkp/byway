@@ -37,9 +37,9 @@ export function NavItemLink({
 						}
             transition-all duration-200 py-3 h-auto my-1 rounded-lg`}
 					>
-						<IconComponent className={`${collapsed ? "h-5 w-5" : "h-5 w-5"}`} />
+						{IconComponent && <IconComponent className={`${collapsed ? "h-5 w-5" : "h-5 w-5"}`} />}
 						{!collapsed && (
-							<span className="ml-3 font-medium">{item.label}</span>
+							<span className={`font-medium ${IconComponent ? "ml-3" : ""}`}>{item.label}</span>
 						)}
 					</Button>
 				</Link>

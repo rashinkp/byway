@@ -5,12 +5,21 @@ import { IResetPasswordUseCase } from "../interfaces/reset-password.usecase.inte
 import { JwtProvider } from "../../../../infra/providers/auth/jwt.provider";
 import { ResetPasswordDto } from "../../../dtos/auth.dto";
 
+// Type for reset password JWT payload
+interface ResetPasswordPayload {
+  email: string;
+  type: string;
+  iat: number;
+}
+
 export class ResetPasswordUseCase implements IResetPasswordUseCase {
-  constructor(private authRepository: IAuthRepository) {}
+  constructor(private _authRepository: IAuthRepository) {}
 
   async execute(dto: ResetPasswordDto): Promise<void> {
     const jwtProvider = new JwtProvider();
-    const payload = jwtProvider.verifyAccessToken(dto.resetToken) as any;
+    const payload = jwtProvider.verifyAccessToken(
+      dto.resetToken
+    ) as ResetPasswordPayload | null;
     if (!payload) {
       throw new HttpError("Invalid or expired reset token", 400);
     }
@@ -22,7 +31,7 @@ export class ResetPasswordUseCase implements IResetPasswordUseCase {
       throw new HttpError("Invalid reset token payload", 400);
     }
 
-    const user = await this.authRepository.findUserByEmail(email);
+    const user = await this._authRepository.findUserByEmail(email);
     if (!user) {
       throw new HttpError("User not found", 404);
     }
@@ -30,7 +39,7 @@ export class ResetPasswordUseCase implements IResetPasswordUseCase {
     try {
       // Update password using entity method
       user.changePassword(await bcrypt.hash(dto.newPassword, 10));
-      await this.authRepository.updateUser(user);
+      await this._authRepository.updateUser(user);
     } catch (error) {
       if (error instanceof Error) {
         throw new HttpError(error.message, 400);

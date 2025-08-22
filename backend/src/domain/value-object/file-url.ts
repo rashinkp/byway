@@ -3,10 +3,22 @@ export class FileUrl {
 
   constructor(value: string | null) {
     if (value != null) {
-      try {
-        new URL(value);
-      } catch {
-        throw new Error("Invalid URL format for fileUrl");
+      const isHttpUrl = value.startsWith("http://") || value.startsWith("https://");
+
+      if (isHttpUrl) {
+        try {
+          new URL(value);
+        } catch {
+          throw new Error("Invalid URL format for fileUrl");
+        }
+      } else {
+        // Accept S3 object keys or other storage keys as non-empty strings without whitespace
+        if (value.trim().length === 0) {
+          throw new Error("fileUrl cannot be empty");
+        }
+        if (/\s/.test(value)) {
+          throw new Error("fileUrl cannot contain whitespace");
+        }
       }
     }
     this._value = value;

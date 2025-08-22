@@ -9,6 +9,10 @@ interface ModernAudioRecorderProps {
   maxDuration?: number;
 }
 
+interface WindowWithWebkitAudioContext extends Window {
+	webkitAudioContext?: typeof AudioContext;
+}
+
 export function ModernAudioRecorder({
   onSend,
   onCancel,
@@ -168,7 +172,7 @@ export function ModernAudioRecorder({
 
       // Set up Web Audio API for waveform
       const audioContext = new (window.AudioContext ||
-        (window as any).webkitAudioContext)();
+        (window as WindowWithWebkitAudioContext).webkitAudioContext)();
       analyserRef.current = audioContext.createAnalyser();
       analyserRef.current.fftSize = 2048;
       const source = audioContext.createMediaStreamSource(stream);
@@ -247,9 +251,10 @@ export function ModernAudioRecorder({
       }, 1000);
 
       drawWaveform();
-    } catch (err: any) {
+    } catch (err: unknown) {
+      const error = err as Error;
       setError(
-        err.message || "Could not access microphone. Please check permissions."
+        error.message || "Could not access microphone. Please check permissions."
       );
       setRecordingState("idle");
     }

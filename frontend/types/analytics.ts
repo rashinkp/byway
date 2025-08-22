@@ -166,3 +166,26 @@ export interface LatestRevenueResponse {
 		totalPages: number;
 	};
 }
+
+export interface AdminDashboardResponse {
+	success: boolean;
+	message: string;
+	data: {
+		totalUsers: number;
+		totalCourses: number;
+		totalRevenue: number;
+		totalEnrollments: number;
+		recentActivity: Array<{
+			id: string;
+			type: string;
+			description: string;
+			createdAt: string;
+		}>;
+		topInstructors: Array<{
+			id: string;
+			name: string;
+			courseCount: number;
+			revenue: number;
+		}>;
+	};
+}

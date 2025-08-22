@@ -1,6 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import { FilterSidebar } from "@/components/FilterSidebar";
+import type { FilterValues } from "@/components/FilterSidebar";
 import { CourseGrid } from "@/components/course/CourseGrid";
 import { Pagination } from "@/components/ui/Pagination";
 import ErrorDisplay from "@/components/ErrorDisplay";
@@ -9,13 +10,23 @@ import { useGetAllCourses } from "@/hooks/course/useGetAllCourse";
 import { useSearchParams } from "next/navigation";
 import { Button } from "../ui/button";
 
-
+interface CourseFilters {
+  search: string;
+  category: string;
+  level: string;
+  price: string;
+  rating: string;
+  duration: string;
+  sort: string;
+  status?: string;
+  [key: string]: string | undefined;
+}
 
 export default function MainCourseListing() {
   const searchParams = useSearchParams();
   const itemsPerPage = 20;
   const [currentPage, setCurrentPage] = useState(1);
-  const [filters, setFilters] = useState<Record<string, any>>({
+  const [filters, setFilters] = useState<CourseFilters>({
     search: "",
     category: "all",
     level: "all",
@@ -38,8 +49,8 @@ export default function MainCourseListing() {
     }
   }, [searchParams]);
 
-  const handleFilterChange = (newFilters: Record<string, any>) => {
-    setFilters(newFilters);
+  const handleFilterChange = (newFilters: FilterValues) => {
+    setFilters(newFilters as CourseFilters);
     setCurrentPage(1);
   };
 
@@ -47,7 +58,7 @@ export default function MainCourseListing() {
     page: currentPage,
     limit: itemsPerPage,
     search: filters.search || "",
-    filterBy: filters.status || "All",
+    filterBy: (filters.status as "All" | "Active" | "Inactive" | "Approved" | "Declined" | "Pending" | "Published" | "Draft" | "Archived") || "All",
     sortBy: filters.sort?.includes("price")
       ? "price"
       : filters.sort?.includes("title")
@@ -145,12 +156,12 @@ export default function MainCourseListing() {
               ×
             </button>
             <FilterSidebar
-              onFilterChange={(f) => {
-                setFilters(f);
+              onFilterChange={(f: FilterValues) => {
+                setFilters(f as CourseFilters);
                 setCurrentPage(1);
                 setFilterModalOpen(false);
               }}
-              currentFilters={filters}
+              currentFilters={filters as FilterValues}
               isLoading={isLoading}
               onClose={() => setFilterModalOpen(false)}
             />
@@ -162,7 +173,7 @@ export default function MainCourseListing() {
         <div className="hidden lg:block lg:w-1/5">
           <FilterSidebar
             onFilterChange={handleFilterChange}
-            currentFilters={filters}
+            currentFilters={filters as FilterValues}
             isLoading={isLoading}
           />
         </div>

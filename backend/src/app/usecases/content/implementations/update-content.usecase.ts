@@ -8,20 +8,20 @@ import { ILessonContentRepository } from "../../../repositories/content.reposito
 import { IUpdateLessonContentUseCase } from "../interfaces/update-content.usecase.interface";
 
 export class UpdateLessonContentUseCase implements IUpdateLessonContentUseCase {
-  constructor(private readonly contentRepository: ILessonContentRepository) {}
+  constructor(private readonly _contentRepository: ILessonContentRepository) {}
 
   async execute(
     dto: IUpdateLessonContentInputDTO
   ): Promise<ILessonContentOutputDTO> {
     try {
-      const content = await this.contentRepository.findById(dto.id);
+      const content = await this._contentRepository.findById(dto.id);
       if (!content || !content.isActive()) {
         throw new HttpError("Content not found or deleted", 404);
       }
 
       const updatedContent = LessonContent.update(content, dto);
-      const savedContent = await this.contentRepository.update(updatedContent);
-      return savedContent.toJSON();
+      const savedContent = await this._contentRepository.update(updatedContent);
+      return savedContent.toJSON() as unknown as ILessonContentOutputDTO;
     } catch (error) {
       if (error instanceof Error) {
         throw new HttpError(

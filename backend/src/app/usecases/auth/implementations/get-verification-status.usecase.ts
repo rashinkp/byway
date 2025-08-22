@@ -3,13 +3,13 @@ import { IGetVerificationStatusUseCase } from "../interfaces/get-verification-st
 
 
 export class GetVerificationStatusUseCase implements IGetVerificationStatusUseCase {
-  constructor(private authRepository: IAuthRepository) {}
+  constructor(private _authRepository: IAuthRepository) {}
 
   async execute(email: string): Promise<{
     cooldownTime: number;
     isExpired: boolean;
   }> {
-    const verification = await this.authRepository.findVerificationByEmail(email);
+    const verification = await this._authRepository.findVerificationByEmail(email);
     
     if (!verification) {
       return {

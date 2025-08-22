@@ -28,8 +28,5 @@ export const useCreateTransaction = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["transactions"] });
     },
-    onError: (error) => {
-      console.error("Create transaction error:", error.message);
-    },
   });
 };

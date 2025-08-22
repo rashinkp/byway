@@ -37,6 +37,13 @@ export const generatePresignedUrlSchema = z.object({
     certificateId: z.string().optional(),
     contentType: z.enum(['thumbnail', 'video', 'document', 'avatar', 'cv']).optional(),
   }).optional(),
+  // Optional size hint from client for pre-validation (bytes). Enforce max 100MB here.
+  fileSize: z.number().int().positive().max(100 * 1024 * 1024).optional(),
 });
 
 export type GeneratePresignedUrlRequest = z.infer<typeof generatePresignedUrlSchema>; 
+
+export const getPresignedGetUrlSchema = z.object({
+  key: z.string().min(1),
+  expiresInSeconds: z.coerce.number().int().positive().max(3600).optional(), // up to 1 hour
+});

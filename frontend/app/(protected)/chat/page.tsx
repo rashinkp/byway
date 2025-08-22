@@ -17,6 +17,7 @@ import {
 } from "@/services/socketChat";
 import socket from "@/lib/socket";
 import { useRouter } from "next/navigation";
+import { ChatMessage, ChatListItem } from "@/types/chat";
 
 export default function ChatPage() {
   const user = useAuthStore((state) => state.user);
@@ -40,7 +41,7 @@ export default function ChatPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [isMobile, setIsMobile] = useState(false);
   const [isSocketConnected, setIsSocketConnected] = useState(socket.connected);
-  const chatWindowRef = useRef<any>(null);
+  const chatWindowRef = useRef<{ scrollToBottom: () => void } | null>(null);
 
   // Track previous chatId for leave logic
   const previousChatIdRef = React.useRef<string | null>(null);
@@ -73,11 +74,11 @@ export default function ChatPage() {
     try {
       listUserChats(
         { page: 1, limit: 10, search: searchQuery },
-        (result: any) => {
-          const chatData = result?.body?.data || result?.data || result;
-          if (chatData && Array.isArray(chatData.items)) {
-            setChatItems(chatData.items);
-            setHasMore(chatData.hasMore || false);
+        (result: ChatListItem[]) => {
+          const chatData = result;
+          if (chatData && Array.isArray(chatData)) {
+            setChatItems(chatData);
+            setHasMore(chatData.length === 10); // Assuming 10 is the limit
             setCurrentPage(1);
             setLoading(false);
           } else {
@@ -96,12 +97,12 @@ export default function ChatPage() {
 
     setLoading(true);
 
-    listUserChats({ page: currentPage + 1, limit: 10 }, (result: any) => {
-      const chatData = result?.body?.data || result?.data || result;
+    listUserChats({ page: currentPage + 1, limit: 10 }, (result: ChatListItem[]) => {
+      const chatData = result;
 
-      if (chatData && Array.isArray(chatData.items)) {
-        setChatItems((prev) => [...prev, ...chatData.items]);
-        setHasMore(chatData.hasMore || false);
+      if (chatData && Array.isArray(chatData)) {
+        setChatItems((prev) => [...prev, ...chatData]);
+        setHasMore(chatData.length === 10);
         setCurrentPage(currentPage + 1);
         setLoading(false);
       } else {
@@ -117,8 +118,8 @@ export default function ChatPage() {
       joinChat(selectedChat.chatId);
       getMessagesByChat(
         { chatId: selectedChat.chatId, limit: 20 },
-        (result: any) => {
-          const msgs = result?.body?.data || result?.data || result;
+        (result: ChatMessage[]) => {
+          const msgs = result;
           // Backend now returns ASC order (oldest first), which matches display expectations
           setMessages(Array.isArray(msgs) ? msgs : []);
         }
@@ -131,7 +132,6 @@ export default function ChatPage() {
   // Listen for new incoming messages
 		useEffect(() => {
 			const handleMessage = (msg: Message) => {
-				console.log("[SocketIO] New message received:", msg);
 				if (msg.chatId === selectedChat?.chatId) {
 					setMessages((prev) =>
 						prev.some((m) => m.id === msg.id) ? prev : [...prev, msg]
@@ -155,11 +155,9 @@ export default function ChatPage() {
 
   // Debug wrappers for pending media setters
   const debugSetPendingImageUrl = (url: string) => {
-    console.log("[Debug] setPendingImageUrl called with:", url);
     setPendingImageUrl(url);
   };
   const debugSetPendingAudioUrl = (url: string) => {
-    console.log("[Debug] setPendingAudioUrl called with:", url);
     setPendingAudioUrl(url);
 	};
 	
@@ -173,13 +171,7 @@ export default function ChatPage() {
       selectedChat.type === "chat" &&
       selectedChat.chatId
     ) {
-      console.log("[Debug] About to send message:", {
-        pendingMessage,
-        pendingImageUrl,
-        pendingAudioUrl,
-        chatId: selectedChat.chatId,
-        userId: selectedChat.userId,
-      });
+     
       sendMessageSocket(
         {
           chatId: selectedChat.chatId,
@@ -189,8 +181,8 @@ export default function ChatPage() {
           audioUrl: pendingAudioUrl || undefined,
         },
         () => {
-          getMessagesByChat({ chatId: selectedChat.chatId }, (result: any) => {
-            const msgs = result?.body?.data || result?.data || result;
+          getMessagesByChat({ chatId: selectedChat.chatId! }, (result: ChatMessage[]) => {
+            const msgs = result;
             // Backend now returns ASC order (oldest first), which matches display expectations
             setMessages(Array.isArray(msgs) ? msgs : []);
           });
@@ -203,8 +195,7 @@ export default function ChatPage() {
   }, [pendingMessage, pendingImageUrl, pendingAudioUrl, selectedChat, user]);
 
   const handleSelectChat = (chat: EnhancedChatItem) => {
-    console.log("[Debug] handleSelectChat called with:", chat);
-    // Leave previous chat room if any
+  
     if (
       previousChatIdRef.current &&
       previousChatIdRef.current !== chat.chatId
@@ -226,14 +217,10 @@ export default function ChatPage() {
   const handleDeleteMessage = useCallback(
     (messageId: string) => {
       if (!messageId || !selectedChat?.chatId) {
-        console.error("Missing messageId or chatId for deletion");
         return;
       }
 
-      console.log("[Frontend] Requesting message deletion:", {
-        messageId,
-        chatId: selectedChat.chatId,
-      });
+     
 
       // Emit delete message event
       socket.emit(
@@ -242,8 +229,8 @@ export default function ChatPage() {
           messageId,
           chatId: selectedChat.chatId,
         },
-        (response: any) => {
-          console.log("[Frontend] Delete message response:", response);
+        (response: { success?: boolean }) => {
+        
 
           if (response?.success) {
             // Remove the message locally first for immediate feedback
@@ -251,9 +238,9 @@ export default function ChatPage() {
 
             // Then refresh messages from server
             getMessagesByChat(
-              { chatId: selectedChat.chatId },
-              (result: any) => {
-                const msgs = result?.body?.data || result?.data || result;
+              { chatId: selectedChat.chatId! },
+              (result: ChatMessage[]) => {
+                const msgs = result;
                 setMessages(Array.isArray(msgs) ? msgs : []);
               }
             );
@@ -261,19 +248,16 @@ export default function ChatPage() {
             // Refresh chat list as well
             listUserChats(
               { page: 1, limit: 10, search: searchQuery },
-              (result: any) => {
-                const chatData = result?.body?.data || result?.data || result;
-                if (chatData && Array.isArray(chatData.items)) {
-                  setChatItems(chatData.items);
-                  setHasMore(chatData.hasMore || false);
+              (result: ChatListItem[]) => {
+                const chatData = result;
+                if (chatData && Array.isArray(chatData)) {
+                  setChatItems(chatData);
+                  setHasMore(chatData.length === 10);
                   setCurrentPage(1);
                 }
               }
             );
-          } else {
-            console.error("[Frontend] Failed to delete message:", response);
-            // You might want to show an error toast/alert here
-          }
+          } 
         }
       );
     },
@@ -282,16 +266,14 @@ export default function ChatPage() {
 
   useEffect(() => {
     function handleChatListUpdated() {
-      console.log(
-        "[Frontend] Received chatListUpdated event, refetching chat list..."
-      );
+    
       listUserChats(
         { page: 1, limit: 10, search: searchQuery },
-        (result: any) => {
-          const chatData = result?.body?.data || result?.data || result;
-          if (chatData && Array.isArray(chatData.items)) {
-            setChatItems(chatData.items);
-            setHasMore(chatData.hasMore || false);
+        (result: ChatListItem[]) => {
+          const chatData = result;
+          if (chatData && Array.isArray(chatData)) {
+            setChatItems(chatData);
+            setHasMore(chatData.length === 10);
             setCurrentPage(1);
           }
         }
@@ -306,12 +288,7 @@ export default function ChatPage() {
   // Restore handleSendMessage function
   const handleSendMessage = useCallback(
     (content: string, imageUrl?: string, audioUrl?: string) => {
-      console.log("[Debug] handleSendMessage called with:", {
-        content,
-        imageUrl,
-        audioUrl,
-        selectedChat,
-      });
+    
       if (!user || !selectedChat) return;
       if (selectedChat.type === "user") {
         sendMessageSocket(
@@ -350,22 +327,23 @@ export default function ChatPage() {
                 )
               );
               // Re-fetch chat list and messages from backend for stability
-              listUserChats({ page: 1, limit: 10 }, (result: any) => {
-                const chatData = result?.body?.data || result?.data || result;
-                if (chatData && Array.isArray(chatData.items)) {
-                  setChatItems(chatData.items);
-                  setHasMore(chatData.hasMore || false);
+              listUserChats({ page: 1, limit: 10 }, (result: ChatListItem[]) => {
+                const chatData = result;
+                if (chatData && Array.isArray(chatData)) {
+                  setChatItems(chatData);
+                  setHasMore(chatData.length === 10);
                   setCurrentPage(1);
                 }
               });
-              getMessagesByChat({ chatId: msg.chatId }, (result: any) => {
-                const msgs = result?.body?.data || result?.data || result;
-                // Backend now returns ASC order (oldest first), which matches display expectations
-                setMessages(Array.isArray(msgs) ? msgs : []);
+              getMessagesByChat({ chatId: msg.chatId }, (result: ChatMessage[]) => {
+                const msgs = result;
+                if (Array.isArray(msgs)) {
+                  setMessages(msgs);
+                }
               });
             }
           },
-          (err: any) => {
+          (err: { message?: string }) => {
             alert(err?.message || "Failed to send message");
           }
         );
@@ -378,7 +356,7 @@ export default function ChatPage() {
         imageUrl,
         audioUrl,
       };
-      console.log("[Debug] Sending payload to sendMessageSocket:", payload);
+     
       sendMessageSocket(
         payload,
         (msg: Message) => {
@@ -387,7 +365,7 @@ export default function ChatPage() {
           );
           // Do not update chatItems here; rely on chatListUpdated event to refetch from backend
         },
-        (err: any) => {
+        (err: { message?: string }) => {
           alert(err?.message || "Failed to send message");
         }
       );
@@ -398,7 +376,7 @@ export default function ChatPage() {
   useEffect(() => {
     if (!user) return;
     const handleConnect = () => {
-      console.log("[Frontend] Joining userId room:", user.id);
+     
       socket.emit("join", user.id);
     };
     socket.on("connect", handleConnect);
@@ -423,32 +401,31 @@ export default function ChatPage() {
   useEffect(() => {
     if (isMobile && selectedChat && chatWindowRef.current && chatWindowRef.current.scrollToBottom) {
       setTimeout(() => {
-        chatWindowRef.current.scrollToBottom();
+        chatWindowRef.current?.scrollToBottom();
       }, 100); // slight delay to ensure messages are rendered
     }
   }, [selectedChat, isMobile]);
 
   useEffect(() => {
     function handleMessagesRead({ chatId }: { chatId: string }) {
-      console.log("[SocketIO] messagesRead event received:", chatId);
+     
       if (selectedChat?.chatId === chatId) {
-        console.log("[SocketIO] Refetching messages for chat:", chatId);
-        getMessagesByChat({ chatId }, (result: any) => {
-          const msgs = result?.body?.data || result?.data || result;
-          console.log("[SocketIO] Updated messages:", msgs);
+      
+        getMessagesByChat({ chatId }, (result: ChatMessage[]) => {
+          const msgs = result;
+      
           setMessages(Array.isArray(msgs) ? msgs : []);
         });
       }
-      // Always refresh chat list to update unread counts
-      console.log("[SocketIO] Refetching chat list after messagesRead");
+   
       listUserChats(
         { page: 1, limit: 10, search: searchQuery },
-        (result: any) => {
-          const chatData = result?.body?.data || result?.data || result;
-          console.log("[SocketIO] Updated chat list:", chatData);
-          if (chatData && Array.isArray(chatData.items)) {
-            setChatItems(chatData.items);
-            setHasMore(chatData.hasMore || false);
+        (result: ChatListItem[]) => {
+          const chatData = result;
+         
+          if (chatData && Array.isArray(chatData)) {
+            setChatItems(chatData);
+            setHasMore(chatData.length === 10);
             setCurrentPage(1);
           }
         }
@@ -493,22 +470,19 @@ export default function ChatPage() {
   }
 
   return (
-    <div className="flex-1 flex flex-col h-full overflow-hidden">
-      {/* Main Chat Interface */}
-      <div className="w-full h-[calc(100vh-4rem)] flex items-stretch">
+    <div className="h-[100dvh] flex flex-col overflow-hidden">
+      <div className="w-full h-full min-h-0 flex items-stretch">
         <div className="w-full overflow-hidden flex flex-col min-h-0">
           <div className="flex flex-1 min-h-0">
-            {/* Chat List Sidebar (show on mobile only if sidebar is open and no chat selected) */}
             {((isSidebarOpen && (!selectedChat || !isMobile)) ||
               (!selectedChat && isMobile)) && (
               <div
-                className={`$${
+                className={`relative ${
                   isSidebarOpen ? "translate-x-0" : "-translate-x-full"
                 } md:relative md:translate-x-0 z-40 ${
                   isMobile && !selectedChat ? "w-full" : "w-80 md:w-96"
                 } h-full transition-transform duration-300 ease-in-out md:transition-none`}
               >
-                {/* Back button for non-USER roles */}
                 {user?.role !== "USER" && (
                   <div className="flex items-center gap-2 p-3 pt-5 border-b border-gray-200 dark:border-gray-700 dark:bg-[#18181b]">
                     <button
@@ -528,7 +502,7 @@ export default function ChatPage() {
                   onSelectChat={handleSelectChat}
                   onSearch={setSearchQuery}
                 />
-                {/* Load More Button */}
+                
                 {hasMore && (
                   <div className="absolute bottom-0 left-0 right-0 p-4">
                     <Button

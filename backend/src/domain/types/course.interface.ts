@@ -1,3 +1,4 @@
+import { UserProfile } from "../entities/user-profile.entity";
 import { APPROVALSTATUS } from "../enum/approval-status.enum";
 import { CourseLevel } from "../enum/course-level.enum";
 import { CourseStatus } from "../enum/course-status.enum";
@@ -21,9 +22,8 @@ export interface ICourseReviewStatsDetailed {
 export interface ICourseInstructor {
   id: string;
   name: string;
-  bio: string | null;
-  profilePicture: string | null;
-  expertise: string[];
+  email: string;
+  profile: UserProfile | null
 }
 
 export interface ICourseReviewStats {
@@ -36,6 +36,13 @@ export interface ICourseReviewStats {
   oneStar: number;
 }
 
+
+
+
+export interface ReviewStats {
+  rating: number,
+  reviewCount:number
+}
 
 export interface ICourse {
   id: string;
@@ -86,8 +93,8 @@ export interface CourseWithEnrollment
   deletedAt: string | null;
   isEnrolled: boolean;
   isInCart: boolean;
-  instructor: ICourseInstructor;
-  reviewStats: ICourseReviewStats;
+  instructor: ICourseInstructor | null;
+  reviewStats: ReviewStats;
 }
 
 

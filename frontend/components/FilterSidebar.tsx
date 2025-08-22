@@ -11,10 +11,22 @@ import {
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Skeleton } from "./ui/skeleton";
 
+export interface FilterValues {
+  search?: string;
+  category?: string;
+  level?: string;
+  price?: string;
+  rating?: string;
+  duration?: string;
+  sort?: string;
+  status?: string;
+  [key: string]: string | undefined;
+}
+
 interface FilterSidebarProps {
   className?: string;
-  onFilterChange?: (filters: Record<string, any>) => void;
-	currentFilters: Record<string, any>;
+  onFilterChange?: (filters: FilterValues) => void;
+	currentFilters: FilterValues;
 	isLoading?: boolean;
 	onClose?: () => void; // <-- added
 }
@@ -34,14 +46,14 @@ export function FilterSidebar({
 
   const handleFilterChange = (
     key: string,
-    value: string | Record<string, string>
+    value: string | FilterValues
   ) => {
     const updatedFilters =
       key === "reset"
-        ? (value as Record<string, any>)
+        ? (value as FilterValues)
         : { ...currentFilters, [key]: value };
     if (onFilterChange) {
-      onFilterChange(updatedFilters);
+      onFilterChange(updatedFilters as FilterValues);
     }
   };
 
@@ -89,7 +101,7 @@ export function FilterSidebar({
                   "createdAt-desc": "Newest First",
                   "createdAt-asc": "Oldest First",
                 };
-                return sortLabels[currentFilters.sort] || "Sort";
+                return sortLabels[currentFilters.sort || ""] || "Sort";
               })()}
               <span className="ml-2">▾</span>
             </button>

@@ -19,6 +19,23 @@ export class Chat {
     }
   }
 
+  static fromPersistence(raw: {
+    user1Id: string;
+    user2Id: string;
+    createdAt: Date;
+    updatedAt: Date;
+    id?: string;
+  }): Chat {
+    return new Chat(
+      new UserId(raw.user1Id),
+      new UserId(raw.user2Id),
+      new Timestamp(raw.createdAt),
+      new Timestamp(raw.updatedAt),
+      undefined,
+      raw.id ? new ChatId(raw.id) : undefined
+    );
+  }
+
   // Business logic: Add a message to the chat
   addMessage(message: Message): void {
     if (!this.isParticipant(message.senderId)) {

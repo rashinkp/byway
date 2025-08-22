@@ -11,13 +11,13 @@ import { ICategoryRepository } from "../../../repositories/category.repository";
 
 export class CreateCategoryUseCase implements ICreateCategoryUseCase {
   constructor(
-    private categoryRepository: ICategoryRepository,
-    private userRepository: IUserRepository
+    private _categoryRepository: ICategoryRepository,
+    private _userRepository: IUserRepository
   ) {}
 
   async execute(input: ICreateCategoryInputDTO): Promise<ICategoryOutputDTO> {
     // Validate user is an admin
-    const user = await this.userRepository.findById(input.createdBy);
+    const user = await this._userRepository.findById(input.createdBy);
     if (!user) {
       throw new HttpError("User not found", 404);
     }
@@ -26,7 +26,7 @@ export class CreateCategoryUseCase implements ICreateCategoryUseCase {
     }
 
     // Check for existing category
-    const existingCategory = await this.categoryRepository.findByName(
+    const existingCategory = await this._categoryRepository.findByName(
       input.name
     );
     if (existingCategory && existingCategory.isActive()) {
@@ -37,14 +37,12 @@ export class CreateCategoryUseCase implements ICreateCategoryUseCase {
     const category = Category.create(
       input.name,
       input.description,
-      input.createdBy,
+      input.createdBy
     );
 
 
-    console.log('category ', category);
-
     // Persist category
-    const savedCategory = await this.categoryRepository.save(category);
+    const savedCategory = await this._categoryRepository.save(category);
 
     return {
       id: savedCategory.id,

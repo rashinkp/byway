@@ -29,7 +29,7 @@ export function useCreateCategory() {
 				createdAt: new Date().toLocaleDateString(),
 				updatedAt: new Date().toLocaleDateString(),
 			};
-			queryClient.setQueryData(["categories", 1, 10, ""], (old: any) => ({
+			queryClient.setQueryData(["categories", 1, 10, ""], (old: { data: Category[]; total: number; page: number; limit: number } | undefined) => ({
 				data: [...(old?.data || []), tempCategory],
 				total: (old?.total || 0) + 1,
 				page: old?.page || 1,
@@ -40,7 +40,7 @@ export function useCreateCategory() {
 		},
 		onSuccess: (newCategory) => {
 			// Update with real category data
-			queryClient.setQueryData(["categories", 1, 10, ""], (old: any) => ({
+			queryClient.setQueryData(["categories", 1, 10, ""], (old: { data: Category[]; total: number; page: number; limit: number } | undefined) => ({
 				data: old?.data.map((cat: Category) =>
 					cat.id === "temp-id" ? newCategory : cat,
 				),
@@ -52,7 +52,7 @@ export function useCreateCategory() {
 				description: "The category has been created successfully.",
 			});
 		},
-		onError: (error: any, newCategory, context) => {
+		onError: (error: Error, newCategory: CategoryFormData, context: { previousCategories: { data: Category[]; total: number } | undefined } | undefined) => {
 			// Revert on error
 			queryClient.setQueryData(
 				["categories", 1, 10, ""],

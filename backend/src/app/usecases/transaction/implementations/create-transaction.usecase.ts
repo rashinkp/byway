@@ -7,7 +7,7 @@ import { ICreateTransactionInputDTO, ITransactionOutputDTO } from "../../../../a
 import { PaymentGateway } from "../../../../domain/enum/payment-gateway.enum";
 
 export class CreateTransactionUseCase implements ICreateTransactionUseCase {
-  constructor(private readonly transactionRepository: ITransactionRepository) {}
+  constructor(private readonly _transactionRepository: ITransactionRepository) {}
 
   async execute(
     input: ICreateTransactionInputDTO
@@ -26,7 +26,7 @@ export class CreateTransactionUseCase implements ICreateTransactionUseCase {
       metadata: input.metadata,
     });
 
-    const createdTransaction = await this.transactionRepository.create(
+    const createdTransaction = await this._transactionRepository.create(
       transaction
     );
     return this.mapToDTO(createdTransaction);

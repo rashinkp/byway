@@ -7,7 +7,7 @@ import {
 import { IGetAllUsersUseCase } from "../interfaces/get-all-users.usecase.interface";
 
 export class GetAllUsersUseCase implements IGetAllUsersUseCase {
-  constructor(private userRepository: IUserRepository) {}
+  constructor(private _userRepository: IUserRepository) {}
 
   async execute(
     dto: GetAllUsersDto
@@ -22,6 +22,6 @@ export class GetAllUsersUseCase implements IGetAllUsersUseCase {
       filterBy: dto.filterBy || "All",
       role: dto.role || "USER",
     };
-    return await this.userRepository.findAll(input);
+    return await this._userRepository.findAll(input);
   }
 }

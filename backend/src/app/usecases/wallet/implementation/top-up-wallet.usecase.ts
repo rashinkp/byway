@@ -14,9 +14,9 @@ import { TopUpWalletDto, TopUpWalletResponseDTO } from "../../../dtos/wallet";
 
 export class TopUpWalletUseCase implements ITopUpWalletUseCase {
   constructor(
-    private walletRepository: IWalletRepository,
-    private transactionRepository: ITransactionRepository,
-    private paymentService: IPaymentService
+    private _walletRepository: IWalletRepository,
+    private _transactionRepository: ITransactionRepository,
+    private _paymentService: IPaymentService
   ) {}
 
   async execute(
@@ -26,7 +26,7 @@ export class TopUpWalletUseCase implements ITopUpWalletUseCase {
     const { amount, paymentMethod } = input;
 
     // Create a pending transaction without an orderId for wallet top-ups
-    const transaction = await this.transactionRepository.create(
+    const transaction = await this._transactionRepository.create(
       new Transaction({
         userId,
         amount,
@@ -44,13 +44,13 @@ export class TopUpWalletUseCase implements ITopUpWalletUseCase {
     // Handle different payment methods
     if (paymentMethod === "WALLET") {
       // For wallet payments, directly update the balance
-      const wallet = await this.walletRepository.findByUserId(userId);
+      const wallet = await this._walletRepository.findByUserId(userId);
       if (!wallet) {
         throw new HttpError("Wallet not found", StatusCodes.NOT_FOUND);
       }
       wallet.addAmount(amount);
-      await this.walletRepository.update(wallet);
-      await this.transactionRepository.updateStatus(
+      await this._walletRepository.update(wallet);
+      await this._transactionRepository.updateStatus(
         transaction.id,
         TransactionStatus.COMPLETED
       );
@@ -60,7 +60,7 @@ export class TopUpWalletUseCase implements ITopUpWalletUseCase {
       };
     } else {
       // For other payment methods, create a checkout session
-      const session = await this.paymentService.createStripeCheckoutSession(
+      const session = await this._paymentService.createStripeCheckoutSession(
         userId,
         transaction.id,
         {

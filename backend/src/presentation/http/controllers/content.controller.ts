@@ -14,6 +14,7 @@ import {
 } from "../../validators/content.validator";
 import { BaseController } from "./base.controller";
 import { HttpError } from "../errors/http-error";
+import { ICreateLessonContentInputDTO, IUpdateLessonContentInputDTO } from "../../../app/dtos/lesson.dto";
 
 export class LessonContentController extends BaseController {
   constructor(
@@ -28,13 +29,12 @@ export class LessonContentController extends BaseController {
   }
 
   async createLessonContent(httpRequest: IHttpRequest): Promise<IHttpResponse> {
-    console.log("Creating lesson content with data:", httpRequest.body);
     return this.handleRequest(httpRequest, async (request) => {
       if (!request.user?.id) {
         throw new HttpError("Unauthorized", 401);
       }
 
-      const validated = validateCreateLessonContent(request.body);
+      const validated = validateCreateLessonContent(request.body as ICreateLessonContentInputDTO);
       const content = await this.createLessonContentUseCase.execute({
         ...validated,
         userId: request.user.id,
@@ -45,9 +45,12 @@ export class LessonContentController extends BaseController {
 
   async updateLessonContent(httpRequest: IHttpRequest): Promise<IHttpResponse> {
     return this.handleRequest(httpRequest, async (request) => {
+      if (!request.params?.contentId) {
+        throw new HttpError("Content ID is required", 400);
+      }
       const validated = validateUpdateLessonContent({
-        ...request.body,
-        contentId: request.params.contentId,
+        ...(request.body as Partial<IUpdateLessonContentInputDTO>),
+        id: request.params.contentId,
       });
       const content = await this.updateLessonContentUseCase.execute(validated);
       return this.success_200(content, "Lesson content updated successfully");
@@ -62,6 +65,9 @@ export class LessonContentController extends BaseController {
         throw new HttpError("Unauthorized", 401);
       }
 
+      if (!request.params?.lessonId) {
+        throw new HttpError("Lesson ID is required", 400);
+      }
       const validated = validateGetLessonContentByLessonId({
         lessonId: request.params.lessonId,
       });
@@ -75,6 +81,9 @@ export class LessonContentController extends BaseController {
 
   async deleteLessonContent(httpRequest: IHttpRequest): Promise<IHttpResponse> {
     return this.handleRequest(httpRequest, async (request) => {
+      if (!request.params?.contentId) {
+        throw new HttpError("Content ID is required", 400);
+      }
       const validated = validateDeleteLessonContent({
         id: request.params.contentId,
       });

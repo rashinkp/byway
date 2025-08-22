@@ -1,49 +1,100 @@
+export interface ChatMessage {
+  id: string;
+  chatId: string;
+  senderId: string;
+  receiverId?: string;
+  content?: string;
+  imageUrl?: string;
+  audioUrl?: string;
+  type: 'text' | 'image' | 'audio';
+  isRead: boolean;
+  createdAt: string;
+  timestamp?: string;
+  sender?: {
+    id: string;
+    name: string;
+    role: string;
+  };
+}
+
+// Alias for backward compatibility
+export type Message = ChatMessage;
+
 export interface Chat {
-	id: string;
-	userName: string;
-	userRole: "user" | "instructor" | "admin";
-	lastMessage: string;
-	lastMessageTime: string;
-	unreadCount: number;
-	avatar: string;
+  id: string;
+  user1Id: string;
+  user2Id: string;
+  createdAt: string;
+  updatedAt: string;
+  messages?: ChatMessage[];
 }
 
-// Enhanced chat list item for the new structure
-export interface EnhancedChatItem {
-	id: string;
-	type: "chat" | "user"; // 'chat' for existing chats, 'user' for other users
-	displayName: string;
-	avatar?: string;
-	role: string;
-	lastMessage?: {
-		content?: string;
-		imageUrl?: string;
-		audioUrl?: string;
-		type: "text" | "image" | "audio";
-	};
-	lastMessageTime?: string;
-	unreadCount?: number;
-	userId?: string; // For user items, this is the other user's ID
-	chatId?: string; // For chat items, this is the chat ID
-	isOnline?: boolean;
+export interface ChatListItem {
+  id: string;
+  type: 'chat' | 'user';
+  displayName: string;
+  avatar?: string;
+  role: string;
+  lastMessage?: {
+    content?: string;
+    imageUrl?: string;
+    audioUrl?: string;
+    type: 'text' | 'image' | 'audio';
+  };
+  lastMessageTime?: string;
+  unreadCount: number;
+  chatId?: string;
+  userId?: string;
+  isOnline: boolean;
 }
 
-// Paginated chat list response
-export interface PaginatedChatList {
-	items: EnhancedChatItem[];
-	totalCount: number;
-	hasMore: boolean;
-	nextPage?: number;
+// Alias for backward compatibility
+export type EnhancedChatItem = ChatListItem;
+
+export interface ChatHistoryResponse {
+  items: ChatListItem[];
+  totalCount: number;
+  hasMore: boolean;
+  nextPage?: number;
 }
 
-export interface Message {
-	id: string;
-	chatId: string;
-	senderId: string;
-	receiverId: string;
-	content?: string;
-	imageUrl?: string;
-	audioUrl?: string;
-	isRead: boolean;
-	timestamp: string;
+export interface SendMessageData {
+  chatId?: string;
+  content: string;
+  userId?: string;
+  imageUrl?: string;
+  audioUrl?: string;
+}
+
+export interface CreateChatData {
+  user1Id: string;
+  user2Id: string;
+}
+
+export interface GetChatHistoryData {
+  page?: number;
+  limit?: number;
+  search?: string;
+  sort?: string;
+  filter?: string;
+}
+
+export interface GetMessagesData {
+  chatId: string;
+  limit?: number;
+  beforeMessageId?: string;
+}
+
+export interface GetMessageData {
+  messageId: string;
+}
+
+export interface DeleteMessageData {
+  messageId: string;
+  chatId: string;
+}
+
+export interface MarkMessagesAsReadData {
+  chatId: string;
+  userId: string;
 }

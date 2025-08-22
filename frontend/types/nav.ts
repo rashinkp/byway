@@ -14,7 +14,7 @@ import {
 export interface NavItem {
 	href: string;
 	label: string;
-	icon: ComponentType<SVGProps<SVGSVGElement>>;
+	icon?: ComponentType<SVGProps<SVGSVGElement>>;
 }
 
 export const ADMIN_NAV_ITEMS: NavItem[] = [

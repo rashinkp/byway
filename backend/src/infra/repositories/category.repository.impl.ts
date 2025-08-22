@@ -5,7 +5,7 @@ import { PaginationFilter } from "../../domain/types/pagination-filter.interface
 
 
 export class CategoryRepository implements ICategoryRepository {
-  constructor(private prisma: PrismaClient) {}
+  constructor(private _prisma: PrismaClient) {}
 
   async save(category: Category): Promise<Category> {
     const data = {
@@ -18,7 +18,7 @@ export class CategoryRepository implements ICategoryRepository {
       deletedAt: category.deletedAt ? category.deletedAt : null,
     };
 
-    const saved = await this.prisma.category.upsert({
+    const saved = await this._prisma.category.upsert({
       where: { id: category.id },
       update: data,
       create: data,
@@ -28,13 +28,13 @@ export class CategoryRepository implements ICategoryRepository {
   }
 
   async findById(id: string): Promise<Category | null> {
-    const category = await this.prisma.category.findUnique({ where: { id } });
+    const category = await this._prisma.category.findUnique({ where: { id } });
     if (!category) return null;
     return Category.fromPersistence(category);
   }
 
   async findByName(name: string): Promise<Category | null> {
-    const category = await this.prisma.category.findUnique({ where: { name } });
+    const category = await this._prisma.category.findUnique({ where: { name } });
     if (!category) return null;
     return Category.fromPersistence(category);
   }
@@ -52,7 +52,7 @@ export class CategoryRepository implements ICategoryRepository {
       filterBy = "all",
     } = input;
 
-    const where: any = {};
+    const where: Record<string, unknown> = {};
     if (!includeDeleted && filterBy !== "Inactive") {
       where.deletedAt = null;
     }
@@ -67,13 +67,13 @@ export class CategoryRepository implements ICategoryRepository {
     }
 
     const [categories, total] = await Promise.all([
-      this.prisma.category.findMany({
+      this._prisma.category.findMany({
         where,
         skip: (page - 1) * limit,
         take: limit,
         orderBy: { [sortBy]: sortOrder },
       }),
-      this.prisma.category.count({ where }),
+      this._prisma.category.count({ where }),
     ]);
 
     return {

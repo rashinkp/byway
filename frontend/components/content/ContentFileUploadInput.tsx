@@ -1,7 +1,6 @@
-import { useState, useCallback } from "react";
+import { useState } from "react";
 import { ContentType } from "@/types/content";
 import { Upload, File, CheckCircle, XCircle } from "lucide-react";
-import { getPresignedUrl, getCoursePresignedUrl, uploadFileToS3 } from "@/api/file";
 
 interface FileUploadInputProps {
 	type: ContentType;
@@ -25,10 +24,7 @@ export const FileUploadInput = ({
 	setFileUrl,
 	uploadStatus,
 	uploadProgress,
-	setUploadStatus,
-	setUploadProgress,
 	errors,
-	courseId,
 }: FileUploadInputProps) => {
 	const [isDragging, setIsDragging] = useState(false);
 
@@ -61,54 +57,6 @@ export const FileUploadInput = ({
 			setFile(droppedFile);
 		}
 	};
-
-	// S3 upload logic
-	const uploadToS3 = useCallback(
-		async (file: File): Promise<string> => {
-			setUploadStatus("uploading");
-			setUploadProgress(0);
-			try {
-				let uploadUrl: string;
-				let fileUrl: string;
-				
-				if (courseId) {
-					// Use course-specific upload
-					const contentType = type === ContentType.VIDEO ? 'video' : 'document';
-					const response = await getCoursePresignedUrl(
-						file.name,
-						file.type,
-						courseId,
-						contentType
-					);
-					uploadUrl = response.uploadUrl;
-					fileUrl = response.fileUrl;
-				} else {
-					// Fallback to generic upload (for backward compatibility)
-					const response = await getPresignedUrl({
-						fileName: file.name,
-						fileType: file.type,
-						uploadType: 'course',
-						metadata: {
-							contentType: type === ContentType.VIDEO ? 'video' : 'document',
-						},
-					});
-					uploadUrl = response.uploadUrl;
-					fileUrl = response.fileUrl;
-				}
-				
-				await uploadFileToS3(file, uploadUrl, setUploadProgress);
-				setUploadStatus("success");
-				return fileUrl;
-			} catch (error) {
-				setUploadStatus("error");
-				throw error;
-			}
-		},
-		[setUploadStatus, setUploadProgress, courseId, type],
-	);
-
-	// Expose uploadToS3 as a static method for ContentInputForm
-	(FileUploadInput as any).uploadToS3 = uploadToS3;
 
 	return (
 		<div className="space-y-3">

@@ -16,7 +16,7 @@ const facebookAuthSchema = z.object({
   userId: z.string().min(1, "Facebook user ID is required"),
   name: z.string().min(1, "Name is required"),
   email: z.string().email().optional(),
-  picture: z.string().url().optional(),
+  picture: z.string().optional(),
 });
 
 // ForgotPasswordDto schema

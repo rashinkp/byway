@@ -1,7 +1,8 @@
 import { Dialog, DialogContent, DialogOverlay } from "@/components/ui/dialog";
 import { DialogTitle } from "@radix-ui/react-dialog";
-import NotificationList from "./NotificationList";
+import NotificationList, { Notification as NotificationListType } from "./NotificationList";
 import { useNotificationSocket } from "@/hooks/notification/useNotificationSocket";
+import { Notification as ApiNotification } from "@/types/notification";
 import React, { useRef, useEffect } from "react";
 
 interface NotificationModalProps {
@@ -31,6 +32,15 @@ const NotificationModal: React.FC<NotificationModalProps> = ({
 		refetch,
 	} = useNotificationSocket();
 
+	// Convert API notifications to component notifications
+	const convertedNotifications: NotificationListType[] = notifications.map((notification: ApiNotification) => ({
+		id: notification.id,
+		title: notification.entityName,
+		message: notification.message,
+		date: notification.createdAt,
+		eventType: notification.eventType,
+	}));
+
 	// Only call refetch when modal transitions from closed to open
 	const prevOpen = useRef(open);
 	useEffect(() => {
@@ -50,7 +60,7 @@ const NotificationModal: React.FC<NotificationModalProps> = ({
 				{/* Modal content with full height */}
 				<div className="flex flex-col h-full">
 					<NotificationList
-						notifications={notifications}
+						notifications={convertedNotifications}
 						loading={loading}
 						hasMore={hasMore}
 						total={total}

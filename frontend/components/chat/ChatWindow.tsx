@@ -16,7 +16,7 @@ export interface ChatWindowProps {
   onBack?: () => void;
 }
 
-export const ChatWindow = forwardRef<any, ChatWindowProps & {
+export const ChatWindow = forwardRef<{ scrollToBottom: () => void }, ChatWindowProps & {
   setPendingImageUrl?: (url: string) => void;
   setPendingAudioUrl?: (url: string) => void;
   isNewChat?: boolean;
@@ -66,7 +66,7 @@ export const ChatWindow = forwardRef<any, ChatWindowProps & {
   const groupedMessages: { date: string; messages: Message[] }[] = [];
   if (Array.isArray(messages)) {
     messages.forEach((msg) => {
-      const dateLabel = getDateLabel(msg.timestamp);
+      const dateLabel = getDateLabel(msg.createdAt);
       if (
         !groupedMessages.length ||
         groupedMessages[groupedMessages.length - 1].date !== dateLabel
@@ -120,7 +120,7 @@ export const ChatWindow = forwardRef<any, ChatWindowProps & {
   };
 
   return (
-    <div className="flex flex-col h-[calc(100vh-4rem)] bg-gray-100 dark:bg-[#18181b] transition-colors duration-300">
+    <div className="flex flex-col h-full min-h-0 bg-gray-100 dark:bg-[#18181b] transition-colors duration-300">
       {/* Header */}
       <div className="flex items-center justify-between px-4 py-3 border-b border-gray-200 dark:border-white/10 bg-white dark:bg-[#18181b] shadow-sm">
         <div className="flex items-center gap-3">
@@ -197,7 +197,10 @@ export const ChatWindow = forwardRef<any, ChatWindowProps & {
               {group.messages.map((msg) => (
                 <MessageComponent
                   key={msg.id}
-                  message={msg}
+                  message={{
+                    ...msg,
+                    timestamp: msg.timestamp || msg.createdAt
+                  }}
                   currentUserId={currentUserId}
                   chat={chat}
                   onDelete={

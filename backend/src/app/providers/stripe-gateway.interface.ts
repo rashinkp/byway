@@ -10,19 +10,19 @@ export interface StripeGateway {
     url: string;
   }>;
 
-  verifySignature(event: any, signature: string): Promise<any>;
-  getPaymentIntentId(event: any): string | undefined;
-  isCheckoutSessionCompleted(event: any): boolean;
+  verifySignature(event: { type: string; data: { object: Record<string, unknown> } }, signature: string): Promise<{ type: string; data: { object: Record<string, unknown> } }>;
+  getPaymentIntentId(event: { type: string; data: { object: Record<string, unknown> } }): string | undefined;
+  isCheckoutSessionCompleted(event: { type: string; data: { object: Record<string, unknown> } }): boolean;
   parseMetadata(metadata: Record<string, string>): {
     userId: string;
     orderId?: string;
-    courses?: any[];
+    courses?: Record<string, unknown>[];
     isWalletTopUp?: boolean;
   };
   getCheckoutSessionMetadata(paymentIntentId: string): Promise<{
     userId: string;
     orderId?: string;
-    courses?: any[];
+    courses?: Record<string, unknown>[];
     isWalletTopUp?: boolean;
   }>;
 } 

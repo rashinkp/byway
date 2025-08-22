@@ -1,6 +1,6 @@
-export interface IHttpResponse {
+export interface IHttpResponse<T = unknown> {
   statusCode: number;
-  body: any;
+  body: T;
   headers?: Record<string, string>;
   cookie?: {
     action: "set" | "clear";

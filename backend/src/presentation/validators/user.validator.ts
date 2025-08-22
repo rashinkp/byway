@@ -32,7 +32,7 @@ const toggleDeleteUserSchema = z.object({
 
 const updateUserSchema = z.object({
   name: z.string().min(1).optional(),
-  avatar: z.string().url().optional().or(z.literal("")),
+  avatar: z.string().optional().or(z.literal("")),
   bio: z.string().optional(),
   education: z.string().optional(),
   skills: z.string().optional(),

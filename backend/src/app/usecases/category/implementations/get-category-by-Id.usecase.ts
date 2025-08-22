@@ -7,10 +7,10 @@ import {
 } from "../../../dtos/category.dto";
 
 export class GetCategoryByIdUseCase implements IGetCategoryByIdUseCase {
-  constructor(private categoryRepository: ICategoryRepository) {}
+  constructor(private _categoryRepository: ICategoryRepository) {}
 
   async execute(input: ICategoryIdInputDTO): Promise<ICategoryOutputDTO> {
-    const category = await this.categoryRepository.findById(input.id);
+    const category = await this._categoryRepository.findById(input.id);
     if (!category) {
       throw new HttpError("Category not found", 404);
     }

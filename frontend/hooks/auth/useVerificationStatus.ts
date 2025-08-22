@@ -3,7 +3,7 @@ import { getVerificationStatus } from "@/api/auth";
 
 interface UseVerificationStatusProps {
 	email: string | null;
-	onError?: (error: any) => void;
+	onError?: (error: Error) => void;
 }
 
 export function useVerificationStatus({
@@ -22,7 +22,6 @@ export function useVerificationStatus({
 					setResendCooldown(response.cooldownTime);
 				})
 				.catch((error) => {
-					console.error("Failed to get verification status:", error);
 					onError?.(error);
 				})
 				.finally(() => {
@@ -58,12 +57,11 @@ export function useVerificationStatus({
 			const response = await getVerificationStatus(email);
 			setResendCooldown(response.cooldownTime);
 		} catch (error) {
-			console.error("Failed to refresh verification status:", error);
-			onError?.(error);
+			onError?.(error as Error);
 		} finally {
 			setIsLoading(false);
 		}
-	};
+	};	
 
 	return {
 		resendCooldown,

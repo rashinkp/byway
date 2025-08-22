@@ -16,11 +16,45 @@ import { ILessonRepository } from "../../app/repositories/lesson.repository";
 import { Lesson } from "../../domain/entities/lesson.entity";
 import {
   LessonContent,
-  QuizQuestion,
 } from "../../domain/entities/content.entity";
 
+// Type definitions for lesson data
+interface LessonData {
+  id: string;
+  courseId: string;
+  title: string;
+  description: string | null;
+  order: number;
+  status: LessonStatus;
+  createdAt: string | Date;
+  updatedAt: string | Date;
+  deletedAt: string | Date | null;
+  content?: ContentData | null;
+}
+
+interface ContentData {
+  id?: string;
+  type: ContentType;
+  status: ContentStatus;
+  title: string;
+  description: string | null;
+  fileUrl: string | null;
+  thumbnailUrl: string | null;
+  quizQuestions?: QuizQuestionData[] | null;
+  createdAt: string | Date;
+  updatedAt: string | Date;
+  deletedAt: string | Date | null;
+}
+
+interface QuizQuestionData {
+  id?: string;
+  question: string;
+  options: string[];
+  correctAnswer: string;
+}
+
 export class LessonRepository implements ILessonRepository {
-  constructor(private readonly prisma: PrismaClient) {}
+  constructor(private readonly _prisma: PrismaClient) {}
 
   async getAllLessons(
     params: IGetAllLessonsInputDTO
@@ -37,7 +71,7 @@ export class LessonRepository implements ILessonRepository {
     } = params;
 
     const skip = (page - 1) * limit;
-    const where: any = {
+    const where: Record<string, unknown> = {
       courseId,
       ...(includeDeleted ? {} : { deletedAt: null }),
       ...(filterBy !== "ALL" && filterBy !== "INACTIVE"
@@ -56,14 +90,14 @@ export class LessonRepository implements ILessonRepository {
     };
 
     const [lessons, total] = await Promise.all([
-      this.prisma.lesson.findMany({
+      this._prisma.lesson.findMany({
         where,
         skip,
         take: limit,
         orderBy: { [sortBy]: sortOrder },
         include: { content: { include: { quizQuestions: true } } },
       }),
-      this.prisma.lesson.count({ where }),
+      this._prisma.lesson.count({ where }),
     ]);
 
     return {
@@ -88,7 +122,7 @@ export class LessonRepository implements ILessonRepository {
     } = params;
 
     const skip = (page - 1) * limit;
-    const where: any = {
+    const where: Record<string, unknown> = {
       courseId,
       status: LessonStatus.PUBLISHED,
       deletedAt: null,
@@ -103,7 +137,7 @@ export class LessonRepository implements ILessonRepository {
     };
 
     const [lessons, total] = await Promise.all([
-      this.prisma.lesson.findMany({
+      this._prisma.lesson.findMany({
         where,
         skip,
         take: limit,
@@ -115,7 +149,7 @@ export class LessonRepository implements ILessonRepository {
           order: true,
         },
       }),
-      this.prisma.lesson.count({ where }),
+      this._prisma.lesson.count({ where }),
     ]);
 
     return {
@@ -133,7 +167,7 @@ export class LessonRepository implements ILessonRepository {
   }
 
   async findById(id: string): Promise<Lesson | null> {
-    const lesson = await this.prisma.lesson.findUnique({
+    const lesson = await this._prisma.lesson.findUnique({
       where: { id },
       include: { content: { include: { quizQuestions: true } } },
     });
@@ -146,10 +180,10 @@ export class LessonRepository implements ILessonRepository {
   }
 
   async create(lesson: Lesson): Promise<Lesson> {
-    const lessonData = lesson.toJSON();
+    const lessonData = lesson.toJSON() as unknown as LessonData;
     const contentData = lessonData.content;
 
-    const createdLesson = await this.prisma.lesson.create({
+    const createdLesson = await this._prisma.lesson.create({
       data: {
         course: { connect: { id: lessonData.courseId } },
         title: lessonData.title,
@@ -172,7 +206,7 @@ export class LessonRepository implements ILessonRepository {
                 quizQuestions: contentData.quizQuestions
                   ? {
                       create: contentData.quizQuestions.map(
-                        (q: QuizQuestion) => ({
+                        (q: QuizQuestionData) => ({
                           id: q.id || undefined,
                           question: q.question,
                           options: q.options,
@@ -197,15 +231,15 @@ export class LessonRepository implements ILessonRepository {
   }
 
   async update(lesson: Lesson): Promise<Lesson> {
-    const lessonData = lesson.toJSON();
+    const lessonData = lesson.toJSON() as unknown as LessonData;
     const contentData = lessonData.content;
 
     // Check if LessonContent exists before attempting delete
-    const existingContent = await this.prisma.lessonContent.findUnique({
+    const existingContent = await this._prisma.lessonContent.findUnique({
       where: { lessonId: lessonData.id },
     });
 
-    const updatedLesson = await this.prisma.lesson.update({
+    const updatedLesson = await this._prisma.lesson.update({
       where: { id: lessonData.id },
       data: {
         title: lessonData.title,
@@ -229,7 +263,7 @@ export class LessonRepository implements ILessonRepository {
                   quizQuestions: contentData.quizQuestions
                     ? {
                         create: contentData.quizQuestions.map(
-                          (q: QuizQuestion) => ({
+                          (q: QuizQuestionData) => ({
                             id: q.id || undefined,
                             question: q.question,
                             options: q.options,
@@ -255,7 +289,7 @@ export class LessonRepository implements ILessonRepository {
                     ? {
                         deleteMany: {},
                         create: contentData.quizQuestions.map(
-                          (q: QuizQuestion) => ({
+                          (q: QuizQuestionData) => ({
                             id: q.id || undefined,
                             question: q.question,
                             options: q.options,
@@ -282,14 +316,14 @@ export class LessonRepository implements ILessonRepository {
   }
 
   async delete(id: string): Promise<void> {
-    await this.prisma.lesson.update({
+    await this._prisma.lesson.update({
       where: { id },
       data: { deletedAt: new Date() },
     });
   }
 
   async deletePermanently(id: string): Promise<void> {
-    await this.prisma.$transaction(async (prisma) => {
+    await this._prisma.$transaction(async (prisma) => {
       await prisma.lessonContent.deleteMany({
         where: { lessonId: id },
       });
@@ -302,7 +336,7 @@ export class LessonRepository implements ILessonRepository {
 
   private mapToLessonEntity(
     lesson: PrismaLesson & {
-      content?: (PrismaLessonContent & { quizQuestions: any[] }) | null;
+      content?: (PrismaLessonContent & { quizQuestions: Array<{ id: string; question: string; options: string[]; correctAnswer: string }> }) | null;
     }
   ): Lesson {
     return Lesson.fromPersistence({
@@ -343,7 +377,7 @@ export class LessonRepository implements ILessonRepository {
 
   private mapToLessonOutputDTO(
     lesson: PrismaLesson & {
-      content?: (PrismaLessonContent & { quizQuestions: any[] }) | null;
+      content?: (PrismaLessonContent & { quizQuestions: Array<{ id: string; question: string; options: string[]; correctAnswer: string }> }) | null;
     }
   ): ILessonOutputDTO {
     return {
@@ -386,7 +420,7 @@ export class LessonRepository implements ILessonRepository {
     courseId: string,
     order: number
   ): Promise<Lesson | null> {
-    const lesson = await this.prisma.lesson.findFirst({
+    const lesson = await this._prisma.lesson.findFirst({
       where: {
         courseId,
         order,
@@ -402,7 +436,7 @@ export class LessonRepository implements ILessonRepository {
   }
 
   async hasPublishedLessons(courseId: string): Promise<boolean> {
-    const count = await this.prisma.lesson.count({
+    const count = await this._prisma.lesson.count({
       where: {
         courseId,
         status: LessonStatus.PUBLISHED,
@@ -413,7 +447,7 @@ export class LessonRepository implements ILessonRepository {
   }
 
   async findByCourseId(courseId: string): Promise<Lesson[]> {
-    const lessons = await this.prisma.lesson.findMany({
+    const lessons = await this._prisma.lesson.findMany({
       where: {
         courseId,
         deletedAt: null,

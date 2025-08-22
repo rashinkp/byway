@@ -17,6 +17,7 @@ import { CourseCard } from "@/components/course/CourseCard";
 import Link from "next/link";
 import InstructorSidebar from "./InstructorSidebar";
 import Image from 'next/image';
+import { useSignedUrl } from "@/hooks/file/useSignedUrl";
 
 
 
@@ -29,6 +30,11 @@ export const InstructorDetailBase: React.FC<InstructorDetailBaseProps> = ({
 }) => {
   const [activeTab, setActiveTab] = useState("about");
   const userRole = sidebarProps?.userRole || "USER";
+
+  // Resolve instructor avatar if it's an S3 key
+  const avatar = instructor.avatar as string | undefined;
+  const avatarIsKey = typeof avatar === 'string' && !!avatar && !/^https?:\/\//.test(avatar) && !avatar.startsWith('/');
+  const { url: signedAvatarUrl } = useSignedUrl(avatarIsKey ? avatar : null);
 
   const education = instructor.education
     ? instructor.education
@@ -171,9 +177,9 @@ export const InstructorDetailBase: React.FC<InstructorDetailBaseProps> = ({
           <div className="flex flex-col md:flex-row justify-between items-center gap-8">
             {/* Avatar/Initial */}
             <div className="flex-shrink-0 flex flex-col items-center gap-2">
-              {instructor.avatar ? (
+              {avatar ? (
                 <Image
-                  src={instructor.avatar}
+                  src={avatarIsKey ? (signedAvatarUrl || '/UserProfile.jpg') : (avatar || '/UserProfile.jpg')}
                   alt={instructor.name}
                   width={96}
                   height={96}

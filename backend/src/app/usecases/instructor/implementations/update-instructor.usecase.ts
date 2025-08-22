@@ -8,14 +8,14 @@ import { UserDTO } from "../../../dtos/general.dto";
 
 export class UpdateInstructorUseCase implements IUpdateInstructorUseCase {
   constructor(
-    private instructorRepository: IInstructorRepository,
+    private _instructorRepository: IInstructorRepository,
   ) {}
 
   async execute(
     dto: UpdateInstructorRequestDTO,
     requestingUser: UserDTO
   ): Promise<InstructorResponseDTO> {
-    const instructor = await this.instructorRepository.findInstructorById(
+    const instructor = await this._instructorRepository.findInstructorById(
       dto.id
     );
     if (!instructor) {
@@ -33,6 +33,6 @@ export class UpdateInstructorUseCase implements IUpdateInstructorUseCase {
     }
 
     const updatedInstructor = Instructor.update(instructor, dto);
-    return this.instructorRepository.updateInstructor(updatedInstructor);
+    return this._instructorRepository.updateInstructor(updatedInstructor);
   }
 }

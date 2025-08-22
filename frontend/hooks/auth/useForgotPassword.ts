@@ -20,7 +20,7 @@ export function useForgotPassword() {
 			});
 			router.push(`/verify-otp?type=forgot-password`);
 		},
-		onError: (error: any) => {
+		onError: (error: Error) => {
 			toast.error("Error", {
 				description:
 					error.message ||

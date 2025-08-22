@@ -33,8 +33,9 @@ export function useCertificateList() {
 			setTotalPages(result.totalPages);
 			setHasMore(result.hasMore);
 			setPage(pageNum);
-		} catch (err: any) {
-			setError(err.message || "Failed to fetch certificates");
+		} catch (err: unknown) {
+			const error = err as Error;
+			setError(error.message || "Failed to fetch certificates");
 		} finally {
 			setLoading(false);
 		}

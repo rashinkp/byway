@@ -25,13 +25,13 @@ export interface IOrderRepository {
     paymentGateway: PaymentGateway
   ): Promise<void>;
   findMany(params: {
-    where: any;
+    where: Record<string, unknown>;
     skip: number;
     take: number;
-    orderBy: any;
-    include?: any;
+    orderBy: Record<string, 'asc' | 'desc' | undefined>;
+    include?: Record<string, unknown>;
   }): Promise<Order[]>;
-  count(where: any): Promise<number>;
+  count(where: Record<string, unknown>): Promise<number>;
   create(order: Order): Promise<Order>;
   update(order: Order): Promise<Order>;
   delete(id: string): Promise<void>;

@@ -23,7 +23,7 @@ export function useApproveCourse(): UseCourseApprovalReturn {
 			// Update all courses queries in the cache
 			queryClient.setQueriesData(
 				{ queryKey: ["courses"] },
-				(oldData: any) => {
+				(oldData: { courses: Course[] } | undefined) => {
 					if (!oldData?.courses) return oldData;
 					
 					return {
@@ -56,7 +56,7 @@ export function useApproveCourse(): UseCourseApprovalReturn {
 			// Update instructor courses cache
 			queryClient.setQueriesData(
 				{ queryKey: ["instructor-courses"] },
-				(oldData: any) => {
+				(oldData: { data: { items: Course[] } } | undefined) => {
 					if (!oldData?.data?.items) return oldData;
 					
 					return {
@@ -79,7 +79,6 @@ export function useApproveCourse(): UseCourseApprovalReturn {
 			toast.success("Course approved successfully!");
 		},
 		onError: (err) => {
-			console.error("Course approval failed:", err);
 			toast.error("Failed to approve course", {
 				description: err.message || "Please try again",
 			});
@@ -106,7 +105,7 @@ export function useDeclineCourse(): UseCourseApprovalReturn {
 			// Update all courses queries in the cache
 			queryClient.setQueriesData(
 				{ queryKey: ["courses"] },
-				(oldData: any) => {
+				(oldData: { courses: Course[] } | undefined) => {
 					if (!oldData?.courses) return oldData;
 					
 					return {
@@ -139,7 +138,7 @@ export function useDeclineCourse(): UseCourseApprovalReturn {
 			// Update instructor courses cache
 			queryClient.setQueriesData(
 				{ queryKey: ["instructor-courses"] },
-				(oldData: any) => {
+				(oldData: { data: { items: Course[] } } | undefined) => {
 					if (!oldData?.data?.items) return oldData;
 					
 					return {
@@ -162,7 +161,6 @@ export function useDeclineCourse(): UseCourseApprovalReturn {
 			toast.success("Course declined successfully!");
 		},
 		onError: (err) => {
-			console.error("Course decline failed:", err);
 			toast.error("Failed to decline course", {
 				description: err.message || "Please try again",
 			});

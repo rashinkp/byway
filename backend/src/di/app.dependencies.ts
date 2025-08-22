@@ -60,16 +60,21 @@ import { Router } from "express";
 import { RevenueDistributionService } from "../app/services/revenue-distribution/implementations/revenue-distribution.service";
 import { PaymentService } from "../app/services/payment/implementations/payment.service";
 import { GetTotalUnreadCountUseCase } from "../app/usecases/message/implementations/get-total-unread-count.usecase";
+import { CheckUserActiveUseCase } from "../app/usecases/user/implementations/check-user-active.usecase";
+import { LessonContentController } from "../presentation/http/controllers/content.controller";
+import { SendMessageUseCase } from "../app/usecases/message/implementations/send-message.usecase";
+import { CreateChatUseCase } from "../app/usecases/chat/implementations/create-chat.usecase";
+import { IMessageRepository } from "../app/repositories/message.repository.interface";
 
 export interface AppDependencies {
   authController: AuthController;
   userController: UserController;
-  checkUserActiveUseCase: any;
+  checkUserActiveUseCase: CheckUserActiveUseCase;
   instructorController: InstructorController;
   categoryController: CategoryController;
   courseController: CourseController;
   lessonController: LessonController;
-  lessonContentController: any;
+  lessonContentController: LessonContentController;
   cartController: CartController;
   stripeController: StripeController;
   transactionController: TransactionController;
@@ -86,9 +91,9 @@ export interface AppDependencies {
   courseReviewController: CourseReviewController;
   courseReviewRouter: Router;
   chatController: ChatController;
-  sendMessageUseCase: any;
-  createChatUseCase: any;
-  messageRepository: any;
+  sendMessageUseCase: SendMessageUseCase;
+  createChatUseCase: CreateChatUseCase;
+  messageRepository: IMessageRepository;
   httpErrors: HttpErrors;
   httpSuccess: HttpSuccess;
   getUserNotificationsUseCase: GetUserNotificationsUseCase;

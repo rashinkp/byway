@@ -41,7 +41,7 @@ export class WalletController extends BaseController {
         throw new UnauthorizedError("User not authenticated");
       }
 
-      const { amount, currency } = request.body;
+      const { amount, currency } = request.body as AddMoneyDto;
       if (!amount || amount <= 0) {
         throw new HttpError("Invalid amount", 400);
       }
@@ -58,7 +58,7 @@ export class WalletController extends BaseController {
         throw new UnauthorizedError("User not authenticated");
       }
 
-      const { amount, currency } = request.body;
+      const { amount, currency } = request.body as ReduceMoneyDto;
       if (!amount || amount <= 0) {
         throw new HttpError("Invalid amount", 400);
       }
@@ -79,7 +79,6 @@ export class WalletController extends BaseController {
       }
 
       const validatedData = TopUpWalletDtoSchema.parse(request.body);
-      console.log(validatedData, "validatedData");
       const result = await this.topUpWalletUseCase.execute(
         request.user.id,
         validatedData

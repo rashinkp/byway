@@ -3,7 +3,7 @@ import { IGetAllOrdersUseCase } from "../interfaces/get-all-orders.usecase.inter
 import { OrdersResponseDto, OrderDto, GetAllOrdersDto } from "../../../dtos/order.dto";
 
 export class GetAllOrdersUseCase implements IGetAllOrdersUseCase {
-  constructor(private orderRepository: IOrderRepository) {}
+  constructor(private _orderRepository: IOrderRepository) {}
 
   async execute(userId: string, filters: GetAllOrdersDto): Promise<OrdersResponseDto> {
     try {
@@ -22,8 +22,8 @@ export class GetAllOrdersUseCase implements IGetAllOrdersUseCase {
       // Calculate skip for pagination
       const skip = (page - 1) * limit;
 
-      // Build where clause
-      const where: any = { userId };
+      // Build where clause using generic object
+      const where: Record<string, unknown> = { userId };
 
       if (status !== "ALL") {
         where.orderStatus = status;
@@ -38,15 +38,15 @@ export class GetAllOrdersUseCase implements IGetAllOrdersUseCase {
 
       if (minAmount !== undefined || maxAmount !== undefined) {
         where.amount = {};
-        if (minAmount !== undefined) where.amount.gte = minAmount;
-        if (maxAmount !== undefined) where.amount.lte = maxAmount;
+        if (minAmount !== undefined) (where.amount as Record<string, unknown>).gte = minAmount;
+        if (maxAmount !== undefined) (where.amount as Record<string, unknown>).lte = maxAmount;
       }
 
       // Get total count for pagination
-      const total = await this.orderRepository.count(where);
+      const total = await this._orderRepository.count(where);
 
       // Get paginated orders
-      const orders = await this.orderRepository.findMany({
+      const orders = await this._orderRepository.findMany({
         where,
         skip,
         take: limit,

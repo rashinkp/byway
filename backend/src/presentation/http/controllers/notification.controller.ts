@@ -7,6 +7,14 @@ import { IHttpResponse } from "../interfaces/http-response.interface";
 import { validateGetUserNotifications } from "../../validators/notification.validators";
 import { UnauthorizedError } from "../errors/unautherized-error";
 
+interface NotificationData {
+  userId: string;
+  page?: number;
+  limit?: number;
+  eventType?: string;
+  entityType?: string;
+}
+
 export class NotificationController extends BaseController {
   constructor(
     private getUserNotificationsUseCase: GetUserNotificationsUseCaseInterface,
@@ -34,7 +42,7 @@ export class NotificationController extends BaseController {
     });
   }
 
-  async getUserNotificationsForSocketIO(data: any) {
+  async getUserNotificationsForSocketIO(data: NotificationData) {
     return this.getUserNotificationsUseCase.execute(data);
   }
 }

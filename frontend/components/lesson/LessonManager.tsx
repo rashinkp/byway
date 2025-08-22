@@ -125,9 +125,9 @@ export function LessonManager({ courseId }: { courseId: string }) {
 				sortOrder={sortOrder}
 				setSortOrder={setSortOrder}
 				sortOptions={[
-					{ value: "title", label: "Title (A-Z)" },
-					{ value: "order", label: "Order" },
-					{ value: "createdAt", label: "Created At" },
+					{ value: "-title", label: "Title (A-Z)" },
+					{ value: "-order", label: "Order" },
+					{ value: "-createdAt", label: "Created At" },
 				]}
 				filterTabs={[
 					{ value: "ALL", label: "All" },

@@ -6,18 +6,20 @@ import { HttpError } from "../../../../presentation/http/errors/http-error";
 import { IUserRepository } from "../../../repositories/user.repository";
 import { IUpdateUserUseCase } from "../interfaces/update-user.usecase.interface";
 import { S3ServiceInterface } from "../../../providers/s3.service.interface";
+import { ILogger } from "../../../providers/logger-provider.interface";
 
 export class UpdateUserUseCase implements IUpdateUserUseCase {
   constructor(
-    private userRepository: IUserRepository,
-    private s3Service: S3ServiceInterface
+    private _userRepository: IUserRepository,
+    private _s3Service: S3ServiceInterface,
+    private _logger: ILogger
   ) {}
 
   async execute(
     dto: UpdateUserDto,
     userId: string
   ): Promise<{ user: UserResponseDTO; profile: ProfileDTO | null }> {
-    const user = await this.userRepository.findById(userId);
+    const user = await this._userRepository.findById(userId);
     if (!user) {
       throw new HttpError("User not found", 404);
     }
@@ -25,14 +27,14 @@ export class UpdateUserUseCase implements IUpdateUserUseCase {
     if (
       dto.avatar &&
       user.avatar &&
-      dto.avatar !== user.avatar &&
-      user.avatar.includes(".s3.")
+      dto.avatar !== user.avatar
     ) {
       try {
-        await this.s3Service.deleteFile(user.avatar);
-        console.log("[Deleted] deleted old avatar");
+        await this._s3Service.deleteFile(user.avatar);
       } catch (err) {
-        console.error("Failed to delete old avatar from S3:", err);
+        // Log this error since it's not critical to the main operation
+        // and we want to track S3 cleanup issues
+        this._logger.warn(`Failed to delete old avatar from S3: ${err}`);
       }
     }
 
@@ -42,7 +44,7 @@ export class UpdateUserUseCase implements IUpdateUserUseCase {
       role: dto.role as Role,
     });
 
-    let profile = await this.userRepository.findProfileByUserId(userId);
+    let profile = await this._userRepository.findProfileByUserId(userId);
 
     if (!profile) {
       profile = UserProfile.create(userId, {
@@ -57,7 +59,7 @@ export class UpdateUserUseCase implements IUpdateUserUseCase {
         dateOfBirth: dto.dateOfBirth ? new Date(dto.dateOfBirth) : undefined,
         gender: dto.gender,
       });
-      profile = await this.userRepository.createProfile(profile);
+      profile = await this._userRepository.createProfile(profile);
     } else {
       profile = UserProfile.update(profile, {
         // no id passed here, update only uses changes object
@@ -71,10 +73,10 @@ export class UpdateUserUseCase implements IUpdateUserUseCase {
         dateOfBirth: dto.dateOfBirth ? new Date(dto.dateOfBirth) : undefined,
         gender: dto.gender,
       });
-      profile = await this.userRepository.updateProfile(profile);
+      profile = await this._userRepository.updateProfile(profile);
     }
 
-    const savedUser = await this.userRepository.updateUser(updatedUser);
+    const savedUser = await this._userRepository.updateUser(updatedUser);
 
     return { user: savedUser, profile };
   }

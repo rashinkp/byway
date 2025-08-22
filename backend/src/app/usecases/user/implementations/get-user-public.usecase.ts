@@ -11,16 +11,16 @@ export interface IGetPublicUserUseCase {
 }
 
 export class GetPublicUserUseCase implements IGetPublicUserUseCase {
-  constructor(private userRepository: IUserRepository) {}
+  constructor(private _userRepository: IUserRepository) {}
 
   async execute(
     dto: GetUserDto
   ): Promise<{ user: User; profile: UserProfile | null }> {
-    const user = await this.userRepository.findById(dto.userId);
+    const user = await this._userRepository.findById(dto.userId);
     if (!user) {
       throw new HttpError("User not found", 404);
     }
-    const profile = await this.userRepository.findProfileByUserId(dto.userId);
+    const profile = await this._userRepository.findProfileByUserId(dto.userId);
     return { user, profile };
   }
 }

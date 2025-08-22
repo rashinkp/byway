@@ -40,12 +40,13 @@ export function ForgotPasswordForm() {
 		try {
 			setError(null);
 			forgotPassword(data.email, {
-				onError: (err: any) => {
+				onError: (err: Error) => {
 					setError(err.message || "Failed to send reset OTP");
 				},
 			});
-		} catch (err: any) {
-			const message = err.message || "Failed to send reset OTP";
+		} catch (err: unknown) {
+			const error = err as Error;
+			const message = error.message || "Failed to send reset OTP";
 			setError(message);
 		}
 	};

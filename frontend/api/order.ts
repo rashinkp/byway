@@ -1,8 +1,7 @@
 import { api } from "@/api/api";
 import { ApiResponse } from "@/types/general";
+import { ApiError } from "@/types/error";
 import { Order, OrdersResponse, GetOrdersParams, CreateOrderRequest, OrderResponse } from "@/types/order";
-
-
 
 export const createOrder = async (
 	data: CreateOrderRequest,
@@ -10,9 +9,9 @@ export const createOrder = async (
 	try {
 		const response = await api.post("/orders", data);
 		return response.data;
-	} catch (error: any) {
-		console.error("Error creating order:", error);
-		throw new Error(error.response?.data?.message || "Failed to create order");
+	} catch (error: unknown) {
+		const apiError = error as ApiError;
+		throw new Error(apiError.response?.data?.message || "Failed to create order");
 	}
 };
 
@@ -25,10 +24,10 @@ export const updateOrderStatus = async (data: {
 	try {
 		const response = await api.post("/orders/status", data);
 		return response.data;
-	} catch (error: any) {
-		console.error("Error updating order status:", error);
+	} catch (error: unknown) {
+		const apiError = error as ApiError;
 		throw new Error(
-			error.response?.data?.message || "Failed to update order status",
+			apiError.response?.data?.message || "Failed to update order status",
 		);
 	}
 };

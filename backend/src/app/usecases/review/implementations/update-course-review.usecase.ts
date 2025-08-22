@@ -6,7 +6,7 @@ import { IUpdateCourseReviewUseCase } from "../interfaces/update-course-review.u
 
 export class UpdateCourseReviewUseCase implements IUpdateCourseReviewUseCase {
   constructor(
-    private readonly courseReviewRepository: ICourseReviewRepository
+    private readonly _courseReviewRepository: ICourseReviewRepository
   ) {}
 
   async execute(
@@ -15,7 +15,7 @@ export class UpdateCourseReviewUseCase implements IUpdateCourseReviewUseCase {
     userId: string
   ): Promise<CourseReviewResponseDto> {
     // Find the review
-    const review = await this.courseReviewRepository.findById(reviewId);
+    const review = await this._courseReviewRepository.findById(reviewId);
     if (!review) {
       throw new Error("Review not found");
     }
@@ -26,7 +26,11 @@ export class UpdateCourseReviewUseCase implements IUpdateCourseReviewUseCase {
     }
 
     // Prepare update data
-    const updateData: any = {};
+    const updateData: {
+      rating?: Rating;
+      title?: string | null;
+      comment?: string | null;
+    } = {};
 
     if (input.rating !== undefined) {
       updateData.rating = new Rating(input.rating);
@@ -42,7 +46,7 @@ export class UpdateCourseReviewUseCase implements IUpdateCourseReviewUseCase {
     review.updateReview(updateData);
 
     // Save to repository
-    const updatedReview = await this.courseReviewRepository.update(review);
+    const updatedReview = await this._courseReviewRepository.update(review);
 
     // Return response DTO
     return {

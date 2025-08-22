@@ -7,7 +7,9 @@ export interface FileDependencies {
 }
 
 export function createFileDependencies(sharedDeps: SharedDependencies): FileDependencies {
-  const s3Service = new S3Service();
+  const s3Service = new S3Service(
+    sharedDeps.logger
+  );
   
   const fileController = new FileController(
     s3Service,

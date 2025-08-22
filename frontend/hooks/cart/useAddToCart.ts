@@ -31,7 +31,7 @@ export function useAddToCart() {
 				updatedAt: new Date().toISOString(),
 				deletedAt: null,
 			};
-			queryClient.setQueryData(["cart", 1, 10, false], (old: any) => ({
+			queryClient.setQueryData(["cart", 1, 10, false], (old: { data: ICart[]; total: number; page: number; limit: number } | undefined) => ({
 				data: [...(old?.data || []), tempCartItem],
 				total: (old?.total || 0) + 1,
 				page: old?.page || 1,
@@ -42,7 +42,7 @@ export function useAddToCart() {
 		},
 		onSuccess: (newCartItem) => {
 			// Update with real cart item data
-			queryClient.setQueryData(["cart", 1, 10, false], (old: any) => ({
+			queryClient.setQueryData(["cart", 1, 10, false], (old: { data: ICart[]; total: number; page: number; limit: number } | undefined) => ({
 				data: old?.data.map((item: ICart) =>
 					item.id === "temp-id" ? newCartItem : item,
 				),
@@ -53,7 +53,7 @@ export function useAddToCart() {
 			// Increment cart count in store
 			useCartStore.getState().increment();
 		},
-		onError: (error: any, newCartItem, context) => {
+		onError: (error: Error, newCartItem: ICartFormData, context: { previousCart: { data: ICart[]; total: number; page: number; limit: number } | undefined } | undefined) => {
 			// Revert on error
 			queryClient.setQueryData(["cart", 1, 10, false], context?.previousCart);
 			toast.error("Failed to add to cart", {

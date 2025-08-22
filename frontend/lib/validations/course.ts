@@ -22,7 +22,7 @@ export const courseEditSchema = z
 			errorMap: () => ({ message: "Status is required" }),
 		}),
 		thumbnail: z
-			.union([z.instanceof(File), z.string().url()])
+			.union([z.instanceof(File), z.string().min(1, "Thumbnail must not be empty")])
 			.optional()
 			.nullable(),
 		categoryId: z.string().nonempty("Category is required"),
@@ -132,7 +132,7 @@ export const courseSchema = z
 					(file) => file.type.startsWith('image/'),
 					"Thumbnail must be an image file"
 				),
-				z.string().url("Thumbnail must be a valid URL")
+				z.string().min(1, "Thumbnail must not be empty")
 			])
 			.optional()
 			.nullable(),

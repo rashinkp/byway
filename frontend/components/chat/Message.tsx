@@ -35,8 +35,17 @@ interface MessageProps {
   onDelete?: () => void;
 }
 
-// Mock AlertComponent for the example
-const AlertComponent = ({
+interface ConfirmationDialogProps {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  title: string;
+  description: string;
+  confirmText: string;
+  cancelText: string;
+  onConfirm: () => void;
+}
+
+const ConfirmationDialog = ({
   open,
   onOpenChange,
   title,
@@ -44,7 +53,7 @@ const AlertComponent = ({
   confirmText,
   cancelText,
   onConfirm,
-}: any) => {
+}: ConfirmationDialogProps) => {
   if (!open) return null;
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
@@ -293,7 +302,7 @@ export function Message({
 
         {/* Delete confirmation dialog */}
         {showDeleteConfirm && (
-          <AlertComponent
+          <ConfirmationDialog
             open={showDeleteConfirm}
             onOpenChange={setShowDeleteConfirm}
             title="Delete Message"
@@ -469,10 +478,9 @@ function AudioMessage({
       if (currentTime >= duration) {
         audioRef.current.currentTime = 0;
       }
-      audioRef.current.play().catch((err) => {
-        console.error("Play failed:", err);
+      audioRef.current.play().catch(() => {
         setAudioError(true);
-        setErrorMessage("Failed to play audio");
+        setErrorMessage("Failed to play audio" );
       });
     }
   };

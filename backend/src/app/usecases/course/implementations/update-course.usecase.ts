@@ -10,18 +10,14 @@ import { Duration } from "../../../../domain/value-object/duration";
 import { Offer } from "../../../../domain/value-object/offer";
 
 export class UpdateCourseUseCase implements IUpdateCourseUseCase {
-  constructor(private courseRepository: ICourseRepository) {}
+  constructor(private _courseRepository: ICourseRepository) {}
 
   async execute(input: IUpdateCourseInputDTO): Promise<ICourseWithDetailsDTO> {
     try {
-      const course = await this.courseRepository.findById(input.id);
+      const course = await this._courseRepository.findById(input.id);
       if (!course) {
         throw new HttpError("Course not found", 404);
       }
-
-      console.log("Updating course with input:", input);
-
-      // Update course with input data
       course.updateBasicInfo({
         title: input.title,
         description: input.description,
@@ -35,7 +31,6 @@ export class UpdateCourseUseCase implements IUpdateCourseUseCase {
         adminSharePercentage: input.adminSharePercentage,
       });
 
-      console.log("Course updated with basic info:", course.toJSON());
 
       // Update course details if provided
       if (
@@ -52,10 +47,9 @@ export class UpdateCourseUseCase implements IUpdateCourseUseCase {
         });
       }
 
-      const updatedCourse = await this.courseRepository.update(course);
-      return updatedCourse.toJSON();
+      const updatedCourse = await this._courseRepository.update(course);
+      return updatedCourse.toJSON() as unknown as ICourseWithDetailsDTO;
     } catch (error) {
-      console.error("Error updating course", { error, input });
       throw new HttpError("Failed to update course", 500);
     }
   }

@@ -222,36 +222,37 @@ export class User {
     this._updatedAt = new Date();
   }
 
-  // From database (Prisma) to User instance
-  static fromPrisma(data: {
+  // Create a domain User from persisted values (DB/DTO), keeping domain concerns here
+  static fromPersistence(props: {
     id: string;
     name: string;
-    email: string;
-    password?: string | null;
-    googleId?: string | null;
-    facebookId?: string | null;
-    role: string;
-    authProvider: string;
+    email: string | Email;
+    password?: string;
+    googleId?: string;
+    facebookId?: string;
+    role: Role;
+    authProvider: AuthProvider;
     isVerified: boolean;
-    avatar?: string | null;
-    deletedAt?: Date | null;
+    avatar?: string;
+    deletedAt?: Date;
     createdAt: Date;
     updatedAt: Date;
   }): User {
+    const emailVO = props.email instanceof Email ? props.email : new Email(props.email);
     return new User({
-      id: data.id,
-      name: data.name,
-      email: new Email(data.email),
-      password: data.password ?? undefined,
-      googleId: data.googleId ?? undefined,
-      facebookId: data.facebookId ?? undefined,
-      role: data.role as Role,
-      authProvider: data.authProvider as AuthProvider,
-      isVerified: data.isVerified,
-      avatar: data.avatar ?? undefined,
-      deletedAt: data.deletedAt ?? undefined,
-      createdAt: data.createdAt,
-      updatedAt: data.updatedAt,
+      id: props.id,
+      name: props.name,
+      email: emailVO,
+      password: props.password,
+      googleId: props.googleId,
+      facebookId: props.facebookId,
+      role: props.role,
+      authProvider: props.authProvider,
+      isVerified: props.isVerified,
+      avatar: props.avatar,
+      deletedAt: props.deletedAt,
+      createdAt: props.createdAt,
+      updatedAt: props.updatedAt,
     });
   }
 

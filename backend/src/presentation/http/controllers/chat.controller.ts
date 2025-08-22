@@ -24,6 +24,21 @@ import {
   deleteMessageSchema,
 } from "../../validators/chat.validators";
 import { IGetTotalUnreadCountUseCase } from "../../../app/usecases/message/interfaces/get-total-unread-count.usecase.interface";
+import { SendMessageBodyDTO } from "../../../app/dtos/chat.dto";
+
+interface SendMessageSocketData {
+  chatId?: string;
+  userId: string;
+  senderId: string;
+  content?: string;
+  imageUrl?: string;
+  audioUrl?: string;
+}
+
+interface CreateChatSocketData {
+  user1Id: string;
+  user2Id: string;
+}
 
 export class ChatController extends BaseController {
   constructor(
@@ -42,7 +57,7 @@ export class ChatController extends BaseController {
     super(httpErrors, httpSuccess);
   }
 
-  async handleNewMessage(socketData: any) {
+  async handleNewMessage(socketData: SendMessageSocketData) {
     const validated = sendMessageSocketSchema.parse(socketData);
     const { chatId, content, imageUrl, audioUrl } = validated;
     const senderId = socketData.senderId;
@@ -58,7 +73,7 @@ export class ChatController extends BaseController {
     return message;
   }
 
-  async handleCreateChat(socketData: any) {
+  async handleCreateChat(socketData: CreateChatSocketData) {
     const validated = createChatSchema.parse(socketData);
     const chat = await this.createChatUseCase.execute(
       new UserId(validated.user1Id),
@@ -113,9 +128,11 @@ export class ChatController extends BaseController {
     });
   }
 
-  async sendMessage(httpRequest: IHttpRequest): Promise<IHttpResponse> {
+  async sendMessage(
+    httpRequest: IHttpRequest<SendMessageBodyDTO>
+  ): Promise<IHttpResponse> {
     return this.handleRequest(httpRequest, async (request) => {
-      const { chatId, userId, content } = request.body;
+      const { chatId, userId, content } = request.body as SendMessageBodyDTO;
       const senderId = request.user?.id;
       if (!senderId) {
         return this.httpErrors.error_401("Unauthorized: No user id");

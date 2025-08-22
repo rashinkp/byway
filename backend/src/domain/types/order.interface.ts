@@ -44,6 +44,11 @@ export interface CourseOrderData {
   updatedAt?: string;
   deletedAt: string | null;
   approvalStatus: string;
-  details: any | null;
+  details: {
+    prerequisites: string | null;
+    longDescription: string | null;
+    objectives: string | null;
+    targetAudience: string | null;
+  } | null;
   offer?: number;
 }

@@ -15,6 +15,9 @@ export interface CourseReview {
 	};
 }
 
+// Alias for backward compatibility
+export type Review = CourseReview;
+
 export interface CreateCourseReviewParams {
 	courseId: string;
 	rating: number;

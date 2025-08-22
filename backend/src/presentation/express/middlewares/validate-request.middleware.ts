@@ -11,9 +11,9 @@ interface ValidationSchema {
 
 declare module "express" {
   interface Request {
-    validatedBody?: any;
-    validatedQuery?: any;
-    validatedParams?: any;
+    validatedBody?: unknown;
+    validatedQuery?: unknown;
+    validatedParams?: unknown;
   }
 }
 

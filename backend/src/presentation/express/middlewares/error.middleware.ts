@@ -3,12 +3,13 @@ import { ZodError } from "zod";
 import { HttpError } from "../../http/errors/http-error";
 import { ApiResponse } from "../../http/interfaces/ApiResponse";
 import { CookieUtils } from "./cookie.utils";
+import { ILogger } from "../../../app/providers/logger-provider.interface";
 
 /**
  * Helper function to clear auth cookies and return 401 response
  */
-function handleUnauthorizedError(res: Response, message: string): void {
-  console.log("[ErrorMiddleware] Unauthorized error detected, clearing auth cookies");
+function handleUnauthorizedError(res: Response, message: string, logger: ILogger): void {
+  logger.info("[ErrorMiddleware] Unauthorized error detected, clearing auth cookies");
   CookieUtils.clearAuthCookies(res);
   
   const response: ApiResponse<null> = {
@@ -20,31 +21,30 @@ function handleUnauthorizedError(res: Response, message: string): void {
   res.status(401).json(response);
 }
 
-export function errorMiddleware(
-  err: Error,
-  req: Request,
-  res: Response,
-  next: NextFunction
-): void {
+export function createErrorMiddleware(logger: ILogger) {
+  return function errorMiddleware(
+    err: Error,
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): void {
 
-  console.log("[ErrorMiddleware] Handling error:", err);
+    logger.info(`[ErrorMiddleware] Handling error: ${err.message}`);
 
+    // Type guard: ensure res is an Express Response
+    if (typeof res.status !== "function") {
+      logger.error("errorMiddleware called with invalid res object:", res);
+      return;
+    }
 
-
-// Type guard: ensure res is an Express Response
-  if (typeof res.status !== "function") {
-    console.error("errorMiddleware called with invalid res object:", res);
-    return;
-  }
-
-  // Log the error for debugging
-  console.error("Error details:", {
-    name: err.name,
-    message: err.message,
-    stack: err.stack,
-    path: req.path,
-    method: req.method
-  });
+    // Log the error for debugging
+    logger.error("Error details:", {
+      name: err.name,
+      message: err.message,
+      stack: err.stack,
+      path: req.path,
+      method: req.method
+    });
 
   if (
     (err instanceof HttpError && err.statusCode === 401) ||
@@ -53,7 +53,7 @@ export function errorMiddleware(
       err.message.toLowerCase().includes("invalid token")
     ))
   ) {
-    handleUnauthorizedError(res, err.message);
+    handleUnauthorizedError(res, err.message, logger);
     return;
   }
 
@@ -66,7 +66,7 @@ export function errorMiddleware(
     };
     res.status(err.statusCode).json(response);
   } else if (err instanceof ZodError) {
-    const response: ApiResponse<{ details: any }> = {
+    const response: ApiResponse<{ details: Array<{ path: (string | number)[]; message: string; code: string }> }> = {
       statusCode: 400,
       success: false,
       message: "Validation failed",
@@ -103,6 +103,7 @@ export function errorMiddleware(
     }
   }
 
-  // To avoid linter error for unused 'next' argument
-  void next;
+    // To avoid linter error for unused 'next' argument
+    void next;
+  }
 }

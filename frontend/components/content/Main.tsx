@@ -68,13 +68,11 @@ export default function MainContentSection() {
   // Handle content errors
   useEffect(() => {
     if (isContentError && contentError) {
-      console.log("contentError", contentError);
       const axiosError = contentError as AxiosError<{ message: string }>;
       const errorMessage =
         axiosError.response?.data?.message ||
         axiosError.message ||
         "Unknown error";
-      console.log("errorMessage", errorMessage);
 
       if (
         errorMessage.toLowerCase().includes("not enrolled") ||
@@ -85,9 +83,7 @@ export default function MainContentSection() {
         setTimeout(() => {
           router.push(`/courses/${courseId}`);
         }, 2000);
-      } else {
-        console.log("errorMessage", errorMessage);
-      }
+      } 
     }
   }, [isContentError, contentError, courseId, router]);
 

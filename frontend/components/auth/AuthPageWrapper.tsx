@@ -35,7 +35,6 @@ export function AuthPageWrapper({
 				// Redirect to appropriate dashboard if user is already authenticated
 				const route =
 					ROUTES[user.role as keyof typeof ROUTES] || ROUTES.DEFAULT;
-				console.log("Redirecting authenticated user to:", route);
 				router.push(route);
 				return;
 			}

@@ -42,8 +42,8 @@ export interface CreateLessonContentInput {
 	status?: ContentStatus;
 	title: string;
 	description?: string | null;
-	fileUrl?: string;
-	thumbnailUrl?: string;
+	fileUrl?: string | null;
+	thumbnailUrl?: string | null;
 	quizQuestions?: {
 		question: string;
 		options: string[];
@@ -58,8 +58,8 @@ export interface UpdateLessonContentInput {
 	status?: ContentStatus;
 	title?: string;
 	description?: string | null;
-	fileUrl?: string;
-	thumbnailUrl?: string;
+	fileUrl?: string | null;
+	thumbnailUrl?: string | null;
 	quizQuestions?: {
 		question: string;
 		options: string[];

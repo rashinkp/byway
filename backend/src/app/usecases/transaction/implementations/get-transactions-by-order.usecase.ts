@@ -1,25 +1,20 @@
 import { IGetTransactionsByOrderInputDTO, ITransactionOutputDTO } from "../../../../app/dtos/transaction.dto";
 import { ITransactionRepository } from "../../../repositories/transaction.repository";
 import { IGetTransactionsByOrderUseCase } from "../interfaces/get-transactions-by-order.usecase.interface";
+import { Transaction } from "../../../../domain/entities/transaction.entity";
 
-export class GetTransactionsByOrderUseCase
-  implements IGetTransactionsByOrderUseCase
-{
-  constructor(private readonly transactionRepository: ITransactionRepository) {}
+export class GetTransactionsByOrderUseCase implements IGetTransactionsByOrderUseCase {
+  constructor(private readonly _transactionRepository: ITransactionRepository) {}
 
-  async execute(
-    input: IGetTransactionsByOrderInputDTO
-  ): Promise<ITransactionOutputDTO[]> {
-    const transaction = await this.transactionRepository.findByOrderId(
-      input.orderId
-    );
+  async execute(input: IGetTransactionsByOrderInputDTO): Promise<ITransactionOutputDTO[]> {
+    const transaction = await this._transactionRepository.findByOrderId(input.orderId);
     if (!transaction) {
       return [];
     }
     return [this.mapToDTO(transaction)];
   }
 
-  private mapToDTO(transaction: any): ITransactionOutputDTO {
+  private mapToDTO(transaction: Transaction): ITransactionOutputDTO {
     return {
       id: transaction.id,
       orderId: transaction.orderId,

@@ -4,13 +4,6 @@ import { useRoleRedirect } from "../useRoleRedirects";
 import { useAuthStore } from "@/stores/auth.store";
 import { clearAllCache } from "@/lib/utils";
 
-declare global {
-	interface Window {
-		fbAsyncInit?: () => void;
-		FB: any;
-	}
-}
-
 interface FacebookUserData {
 	id: string;
 	name: string;
@@ -20,7 +13,7 @@ interface FacebookUserData {
 			url: string;
 		};
 	};
-	error?: any;
+	error?: { message: string; type: string };
 }
 
 interface AuthResponse {
@@ -51,7 +44,7 @@ export function useFacebookAuth(): UseFacebookAuthResult {
 	useEffect(() => {
 		window.fbAsyncInit = () => {
 			window.FB.init({
-				appId: process.env.NEXT_PUBLIC_FACEBOOK_APP_ID,
+				appId: process.env.NEXT_PUBLIC_FACEBOOK_APP_ID || "",
 				cookie: true,
 				xfbml: true,
 				version: "v21.0",
@@ -84,7 +77,7 @@ export function useFacebookAuth(): UseFacebookAuthResult {
 			const loginResponse = await new Promise<AuthResponse>(
 				(resolve, reject) => {
 					window.FB.login(
-						(response: { authResponse: AuthResponse | undefined }) => {
+						(response: { authResponse?: AuthResponse | undefined }) => {
 							if (response.authResponse) {
 								resolve(response.authResponse);
 							} else {
@@ -109,7 +102,7 @@ export function useFacebookAuth(): UseFacebookAuthResult {
 							} else {
 								reject(new Error("Failed to fetch user data"));
 							}
-						},
+						}
 					);
 				},
 			);
@@ -122,7 +115,6 @@ export function useFacebookAuth(): UseFacebookAuthResult {
 				picture: userData.picture?.data.url,
 			});
 
-			console.log(backendResponse.data);
 
 			// Clear all cache to ensure fresh data for the logged-in user
 			clearAllCache();
@@ -131,9 +123,10 @@ export function useFacebookAuth(): UseFacebookAuthResult {
 			setIsAuthenticated(true);
 			setIsLoading(false);
 			redirectByRole(backendResponse.data.role || "/");
-		} catch (err: any) {
+		} catch (err: unknown) {
+			const error = err as Error;
 			setError(
-				err.message || "An error occurred during Facebook authentication",
+				error.message || "An error occurred during Facebook authentication",
 			);
 			setIsLoading(false);
 		}

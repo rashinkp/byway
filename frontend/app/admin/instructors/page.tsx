@@ -22,10 +22,10 @@ export default function InstructorsPage() {
 		page,
 		limit: 10,
 		search: searchTerm,
-		sortBy: (["createdAt", "status", "areaOfExpertise", "user"] as const).includes(sortBy as any) ? (sortBy as "createdAt" | "status" | "areaOfExpertise" | "user") : "createdAt",
+		sortBy: (["createdAt", "status", "areaOfExpertise", "user"] as const).includes(sortBy as "createdAt" | "status" | "areaOfExpertise" | "user") ? (sortBy as "createdAt" | "status" | "areaOfExpertise" | "user") : "createdAt",
 		sortOrder,
 		includeDeleted: filterStatus === "Inactive" || filterStatus === "All",
-		filterBy: (["All", "Pending", "Approved", "Declined"] as const).includes(filterStatus as any) ? (filterStatus as "All" | "Pending" | "Approved" | "Declined") : "All",
+		filterBy: (["All", "Pending", "Approved", "Declined"] as const).includes(filterStatus as "All" | "Pending" | "Approved" | "Declined") ? (filterStatus as "All" | "Pending" | "Approved" | "Declined") : "All",
 	});
 
 	const columns: Column<IInstructorWithUserDetails>[] = [

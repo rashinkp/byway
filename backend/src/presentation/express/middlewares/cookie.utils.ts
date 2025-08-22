@@ -34,7 +34,7 @@ export class CookieUtils {
    * Set access token cookie
    */
   static setAccessTokenCookie(res: Response, token: string, maxAge: number = 2 * 60 * 60 * 1000): void {
-    console.log("[CookieUtils] Setting access token cookie");
+    // Cookie setting is a low-level operation, no need for logging
     res.cookie("access_token", token, {
       ...COOKIE_CONFIG,
       maxAge,
@@ -45,18 +45,18 @@ export class CookieUtils {
    * Set refresh token cookie
    */
   static setRefreshTokenCookie(res: Response, token: string, maxAge: number = 7 * 24 * 60 * 60 * 1000): void {
-    console.log("[CookieUtils] Setting refresh token cookie");
+    // Cookie setting is a low-level operation, no need for logging
     res.cookie("refresh_token", token, {
       ...COOKIE_CONFIG,
       maxAge,
     });
   }
 
-  /**
+    /**
    * Set both access and refresh token cookies
    */
   static setAuthCookies(res: Response, accessToken: string, refreshToken: string): void {
-    console.log("[CookieUtils] Setting auth cookies");
+    // Cookie setting is a low-level operation, no need for logging 
     this.setAccessTokenCookie(res, accessToken, 2 * 60 * 60 * 1000);
     this.setRefreshTokenCookie(res, refreshToken, 7 * 24 * 60 * 60 * 1000);
   }
@@ -68,7 +68,7 @@ export class CookieUtils {
   static setAuthCookiesFromUser(
     res: Response,
     user: { id: string; email: string; role: string },
-    jwtProvider: any
+    jwtProvider: { signAccessToken: (user: { id: string; email: string; role: string }) => string; signRefreshToken: (user: { id: string; email: string; role: string }) => string }
   ): void {
     const accessToken = jwtProvider.signAccessToken(user);
     const refreshToken = jwtProvider.signRefreshToken(user);

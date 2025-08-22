@@ -8,37 +8,35 @@ import {
 import { PaginationFilter } from "../../../../domain/types/pagination-filter.interface";
 
 export class GetAllCategoriesUseCase implements IGetAllCategoriesUseCase {
-  constructor(private categoryRepository: ICategoryRepository) {}
+  constructor(private _categoryRepository: ICategoryRepository) {}
 
   async execute(
     dto: IGetAllCategoriesInputDTO
   ): Promise<ICategoryListOutputDTO> {
     try {
+      const {
+        page,
+        limit,
+        sortBy,
+        sortOrder,
+        includeDeleted,
+        search,
+        filterBy,
+      } = dto;
 
+      const paginationFilter: PaginationFilter = {
+        page,
+        limit,
+        sortBy,
+        sortOrder,
+        includeDeleted,
+        search,
+        filterBy,
+      };
 
-     const {
-       page,
-       limit,
-       sortBy,
-       sortOrder,
-       includeDeleted,
-       search,
-       filterBy,
-     } = dto;
-
-     const paginationFilter: PaginationFilter = {
-       page,
-       limit,
-       sortBy,
-       sortOrder,
-       includeDeleted,
-       search,
-       filterBy,
-     };
-
-     const { categories, total } = await this.categoryRepository.findAll(
-       paginationFilter
-     );
+      const { categories, total } = await this._categoryRepository.findAll(
+        paginationFilter
+      );
       return {
         categories: categories.map((category) => ({
           id: category.id,

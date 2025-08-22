@@ -6,26 +6,49 @@ import { UserId } from "../../domain/value-object/UserId";
 import { MessageContent } from "../../domain/value-object/MessageContent";
 import { Timestamp } from "../../domain/value-object/Timestamp";
 import { IMessageWithUserData } from "../../domain/types/message.interface";
-import { MessageType as DomainMessageType } from "../../domain/enum/Message-type.enum";
+import { MessageType as DomainMessageType, MessageType } from "../../domain/enum/Message-type.enum";
 import { MessageType as PrismaMessageType, PrismaClient } from "@prisma/client";
 
-const prisma = new PrismaClient();
-
 export class MessageRepository implements IMessageRepository {
+  constructor(private _prisma: PrismaClient) { }
+  
   async findById(id: MessageId): Promise<Message | null> {
-    const message = await prisma.message.findUnique({
+    const message = await this._prisma.message.findUnique({
       where: { id: id.value },
     });
     if (!message) return null;
-    return this.toDomain(message);
+
+    return Message.fromPersistence(message as unknown as {
+      chatId: string;
+      senderId: string;
+      content: string | null;
+      imageUrl: string | null;
+      audioUrl: string | null;
+      type: string;
+      isRead: boolean;
+      createdAt: Date;
+      id?: string;
+    });
   }
 
   async findByChat(chatId: ChatId): Promise<Message[]> {
-    const messages = await prisma.message.findMany({
+    const messages = await this._prisma.message.findMany({
       where: { chatId: chatId.value },
       orderBy: { createdAt: "asc" },
     });
-    return messages.map((msg) => this.toDomain(msg));
+    return messages.map((msg) =>
+      Message.fromPersistence(msg as unknown as {
+        chatId: string;
+        senderId: string;
+        content: string | null;
+        imageUrl: string | null;
+        audioUrl: string | null;
+        type: string;
+        isRead: boolean;
+        createdAt: Date;
+        id?: string;
+      })
+    );
   }
 
   async findByChatWithUserData(
@@ -35,12 +58,12 @@ export class MessageRepository implements IMessageRepository {
   ): Promise<IMessageWithUserData[]> {
     let beforeDate: Date | undefined = undefined;
     if (beforeMessageId) {
-      const beforeMsg = await prisma.message.findUnique({
+      const beforeMsg = await this._prisma.message.findUnique({
         where: { id: beforeMessageId },
       });
       if (beforeMsg) beforeDate = beforeMsg.createdAt;
     }
-    const messages = await prisma.message.findMany({
+    const messages = await this._prisma.message.findMany({
       where: {
         chatId: chatId.value,
         ...(beforeDate ? { createdAt: { lt: beforeDate } } : {}),
@@ -82,7 +105,7 @@ export class MessageRepository implements IMessageRepository {
   async findByIdWithUserData(
     id: MessageId
   ): Promise<IMessageWithUserData | null> {
-    const message = await prisma.message.findUnique({
+    const message = await this._prisma.message.findUnique({
       where: { id: id.value },
       include: {
         sender: {
@@ -116,7 +139,7 @@ export class MessageRepository implements IMessageRepository {
   }
 
   async create(message: Message): Promise<void> {
-    await prisma.message.create({
+    await this._prisma.message.create({
       data: {
         chatId: message.chatId.value,
         senderId: message.senderId.value,
@@ -131,7 +154,7 @@ export class MessageRepository implements IMessageRepository {
   }
 
   async save(message: Message): Promise<void> {
-    await prisma.message.update({
+    await this._prisma.message.update({
       where: { id: message.id?.value },
       data: {
         content: message.content?.value || null,
@@ -144,11 +167,11 @@ export class MessageRepository implements IMessageRepository {
   }
 
   async delete(id: MessageId): Promise<void> {
-    await prisma.message.delete({ where: { id: id.value } });
+    await this._prisma.message.delete({ where: { id: id.value } });
   }
 
   async markAllAsRead(chatId: ChatId, userId: UserId): Promise<number> {
-    const result = await prisma.message.updateMany({
+    const result = await this._prisma.message.updateMany({
       where: {
         chatId: chatId.value,
         senderId: { not: userId.value },
@@ -161,7 +184,7 @@ export class MessageRepository implements IMessageRepository {
 
   async getTotalUnreadCount(userId: UserId): Promise<number> {
     // Count all unread messages for this user across all chats
-    const count = await prisma.message.count({
+    const count = await this._prisma.message.count({
       where: {
         isRead: false,
         senderId: { not: userId.value },
@@ -173,16 +196,5 @@ export class MessageRepository implements IMessageRepository {
     return count;
   }
 
-  private toDomain(prismaMessage: any): Message {
-    return new Message(
-      new ChatId(prismaMessage.chatId),
-      new UserId(prismaMessage.senderId),
-      prismaMessage.content ? new MessageContent(prismaMessage.content) : null,
-      prismaMessage.imageUrl ?? null,
-      prismaMessage.audioUrl ?? null,
-      prismaMessage.type,
-      prismaMessage.isRead,
-      new Timestamp(prismaMessage.createdAt)
-    );
-  }
+  // Conversion handled by Message.fromPersistence
 }

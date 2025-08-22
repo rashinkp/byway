@@ -26,6 +26,7 @@ import { format } from "date-fns";
 import { useState, useEffect, useMemo, useCallback } from "react";
 import { useDebounce } from "@/hooks/useDebounce";
 import React from "react";
+import { LatestRevenueItem } from "@/types/analytics";
 
 // Separate SearchInput component to prevent re-renders
 const SearchInput = React.memo(
@@ -60,11 +61,12 @@ const SearchInput = React.memo(
 
 SearchInput.displayName = "SearchInput";
 
+
 interface LatestRevenueListProps {
 	latestData:
 		| {
 				data: {
-					items: any[];
+					items: LatestRevenueItem[];
 					total: number;
 					page: number;
 					limit: number;
@@ -93,7 +95,7 @@ export default function LatestRevenueList({
 }: LatestRevenueListProps) {
 	const [searchInput, setSearchInput] = useState(searchValue);
 	const debouncedSearch = useDebounce(searchInput, 500);
-	const [selectedTransaction, setSelectedTransaction] = useState<any>(null);
+	const [selectedTransaction, setSelectedTransaction] = useState<LatestRevenueItem | null>(null);
 	const [isModalOpen, setIsModalOpen] = useState(false);
 
 	// Update parent when debounced search changes
@@ -105,7 +107,7 @@ export default function LatestRevenueList({
 		setSearchInput(searchTerm);
 	}, []);
 
-	const handleTransactionClick = useCallback((transaction: any) => {
+	const handleTransactionClick = useCallback((transaction: LatestRevenueItem) => {
 		setSelectedTransaction(transaction);
 		setIsModalOpen(true);
 	}, []);
@@ -208,7 +210,7 @@ export default function LatestRevenueList({
 				</div>
 			) : (
 				<div className="space-y-4">
-					{latestItems.map((item: any) => (
+					{latestItems.map((item: LatestRevenueItem) => (
 						<div
 							key={item.orderId}
 							className="bg-white/60 backdrop-blur-sm border border-gray-200/50 rounded-xl p-4 hover:bg-white/80 hover:shadow-sm transition-all duration-200 dark:bg-[#232323] dark:border-gray-700 dark:hover:bg-[#18181b]"
@@ -237,7 +239,7 @@ export default function LatestRevenueList({
 											<div className="flex items-center space-x-2">
 												<User className="w-4 h-4 text-[#facc15] dark:text-[#facc15]" />
 												<div>
-													<span className="text-gray-600 dark:text-gray-300">Instructor:</span>
+													<span className="text-gray-600 dark:text-gray-300">Creator:</span>
 													<span className="ml-1 font-medium text-black dark:text-white">
 														{item.creatorName}
 													</span>
@@ -253,15 +255,9 @@ export default function LatestRevenueList({
 												</div>
 											</div>
 											<div>
-												<span className="text-gray-600 dark:text-gray-300">Offer Price:</span>
+												<span className="text-gray-600 dark:text-gray-300">Amount:</span>
 												<span className="ml-1 font-medium text-black  dark:text-white">
-													{formatCurrency(item.offerPrice)}
-												</span>
-											</div>
-											<div>
-												<span className="text-gray-600 dark:text-gray-300">Admin Share:</span>
-												<span className="ml-1 font-medium text-black  dark:text-white">
-													{item.adminSharePercentage}%
+													{formatCurrency(item.transactionAmount)}
 												</span>
 											</div>
 										</div>
@@ -367,7 +363,7 @@ export default function LatestRevenueList({
 									<div className="flex justify-between">
 										<span className="text-gray-600">Course Price:</span>
 										<span className="font-medium text-black dark:text-white">
-											{formatCurrency(selectedTransaction.coursePrice)}
+											{formatCurrency(selectedTransaction.transactionAmount)}
 										</span>
 									</div>
 									<div className="flex justify-between">
@@ -383,9 +379,9 @@ export default function LatestRevenueList({
 										</span>
 									</div>
 									<div className="flex justify-between">
-										<span className="text-gray-600">Admin Share:</span>
+										<span className="text-gray-600">Admin Share Amount:</span>
 										<span className="font-medium text-black dark:text-white">
-											{formatCurrency(selectedTransaction.transactionAmount)}
+											{formatCurrency(selectedTransaction.adminShare)}
 										</span>
 									</div>
 									<div className="flex justify-between">
@@ -397,11 +393,7 @@ export default function LatestRevenueList({
 									<div className="flex justify-between">
 										<span className="text-gray-600">Instructor Revenue:</span>
 										<span className="font-medium text-black dark:text-white">
-											{formatCurrency(
-												selectedTransaction.offerPrice *
-													((100 - selectedTransaction.adminSharePercentage) /
-														100),
-											)}
+											{formatCurrency(selectedTransaction.netAmount)}
 										</span>
 									</div>
 								</div>
@@ -435,7 +427,8 @@ export default function LatestRevenueList({
 												{selectedTransaction.customerName}
 											</div>
 											<div className="text-sm text-gray-500">
-												{selectedTransaction.customerEmail}
+												{/* Assuming customerEmail is part of RevenueItem or not needed */}
+												{/* For now, removing as it's not in the new RevenueItem interface */}
 											</div>
 										</div>
 									</div>

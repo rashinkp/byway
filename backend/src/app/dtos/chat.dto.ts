@@ -60,3 +60,12 @@ export interface ChatResponseDTO {
   createdAt?: string;
   messages: Message[];
 }
+
+
+export interface SendMessageBodyDTO {
+  chatId: string;
+  userId: string;
+  content: string;
+  imageUrl?: string;
+  audioUrl?: string;
+}

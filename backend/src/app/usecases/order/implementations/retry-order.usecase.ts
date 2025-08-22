@@ -8,17 +8,18 @@ import { PaymentGateway } from "../../../../domain/enum/payment-gateway.enum";
 import { HttpError } from "../../../../presentation/http/errors/http-error";
 import { StatusCodes } from "http-status-codes";
 import { RetryOrderResponseDTO } from "../../../dtos/order.dto";
+import { ITransactionOutputDTO } from "../../../dtos/transaction.dto";
 
 export class RetryOrderUseCase implements IRetryOrderUseCase {
   constructor(
-    private readonly orderRepository: IOrderRepository,
-    private readonly paymentService: IPaymentService,
-    private readonly createTransactionUseCase: ICreateTransactionUseCase
+    private readonly _orderRepository: IOrderRepository,
+    private readonly _paymentService: IPaymentService,
+    private readonly _createTransactionUseCase: ICreateTransactionUseCase
   ) {}
 
   async execute(userId: string, orderId: string): Promise<RetryOrderResponseDTO> {
     // Get the existing order
-    const order = await this.orderRepository.findById(orderId);
+    const order = await this._orderRepository.findById(orderId);
     if (!order) {
       throw new HttpError("Order not found", StatusCodes.NOT_FOUND);
     }
@@ -28,10 +29,8 @@ export class RetryOrderUseCase implements IRetryOrderUseCase {
       throw new HttpError("Unauthorized to retry this order", StatusCodes.FORBIDDEN);
     }
 
- 
-
     // Get order items to calculate total amount
-    const orderItems = await this.orderRepository.findOrderItems(orderId);
+    const orderItems = await this._orderRepository.findOrderItems(orderId);
     if (!orderItems || orderItems.length === 0) {
       throw new HttpError("No items found in order", StatusCodes.BAD_REQUEST);
     }
@@ -39,7 +38,7 @@ export class RetryOrderUseCase implements IRetryOrderUseCase {
     // Get course details for each order item
     const courses = await Promise.all(
       orderItems.map(async (item) => {
-        const course = await this.orderRepository.findCourseById(item.courseId);
+        const course = await this._orderRepository.findCourseById(item.courseId);
         if (!course) {
           throw new HttpError(`Course not found: ${item.courseId}`, StatusCodes.NOT_FOUND);
         }
@@ -55,7 +54,7 @@ export class RetryOrderUseCase implements IRetryOrderUseCase {
     }, 0);
 
     // Create new transaction for retry
-    const transaction = await this.createTransactionUseCase.execute({
+    const transaction: ITransactionOutputDTO = await this._createTransactionUseCase.execute({
       orderId: order.id,
       userId,
       amount: totalAmount,
@@ -66,7 +65,7 @@ export class RetryOrderUseCase implements IRetryOrderUseCase {
     });
 
     // Create new Stripe checkout session
-    const session = await this.paymentService.createStripeCheckoutSession(userId, order.id!, {
+    const session = await this._paymentService.createStripeCheckoutSession(userId, order.id!, {
       courses: courses.map(course => ({
         id: course.id,
         title: course.title,
@@ -83,7 +82,7 @@ export class RetryOrderUseCase implements IRetryOrderUseCase {
 
     return {
       order,
-      transaction: transaction as any, // TODO: Fix type conversion
+      transaction,
       session: session.data.session
     };
   }

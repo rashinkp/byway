@@ -6,10 +6,10 @@ import { IGetTopInstructorsInput } from "../../app/usecases/user/interfaces/get-
 import { InstructorStats } from "../../domain/types/instructor.interface";
 
 export class PrismaInstructorRepository implements IInstructorRepository {
-  constructor(private prisma: PrismaClient) { }
+  constructor(private _prisma: PrismaClient) { }
   
   async createInstructor(instructor: Instructor): Promise<Instructor> {
-    const upserted = await this.prisma.instructorDetails.upsert({
+    const upserted = await this._prisma.instructorDetails.upsert({
       where: {
         userId: instructor.userId,
       },
@@ -42,11 +42,11 @@ export class PrismaInstructorRepository implements IInstructorRepository {
       },
     });
 
-    return Instructor.fromPrisma(upserted);
+    return Instructor.fromPersistence(upserted);
   }
 
   async updateInstructor(instructor: Instructor): Promise<Instructor> {
-    const updated = await this.prisma.instructorDetails.update({
+    const updated = await this._prisma.instructorDetails.update({
       where: { id: instructor.id },
       data: {
         areaOfExpertise: instructor.areaOfExpertise,
@@ -61,23 +61,23 @@ export class PrismaInstructorRepository implements IInstructorRepository {
         updatedAt: instructor.updatedAt,
       },
     });
-    return Instructor.fromPrisma(updated);
+    return Instructor.fromPersistence(updated);
   }
 
   async findInstructorById(id: string): Promise<Instructor | null> {
-    const instructor = await this.prisma.instructorDetails.findUnique({
+    const instructor = await this._prisma.instructorDetails.findUnique({
       where: { id },
     });
     if (!instructor) return null;
-    return Instructor.fromPrisma(instructor);
+    return Instructor.fromPersistence(instructor);
   }
 
   async findInstructorByUserId(userId: string): Promise<Instructor | null> {
-    const instructor = await this.prisma.instructorDetails.findUnique({
+    const instructor = await this._prisma.instructorDetails.findUnique({
       where: { userId },
     });
     if (!instructor) return null;
-    return Instructor.fromPrisma(instructor);
+    return Instructor.fromPersistence(instructor);
   }
 
   async findAllInstructors(
@@ -94,7 +94,7 @@ export class PrismaInstructorRepository implements IInstructorRepository {
     const { search, sortBy, sortOrder, filterBy, includeDeleted } = options;
 
     // Build where clause
-    const where: any = {
+    const where: Record<string, unknown> = {
       user: {
         deletedAt: includeDeleted ? undefined : null,
       },
@@ -115,7 +115,7 @@ export class PrismaInstructorRepository implements IInstructorRepository {
     }
 
     // Build order by clause
-    let orderBy: any = {};
+    let orderBy: Record<string, unknown> = {};
     if (sortBy) {
       if (sortBy.startsWith("user.")) {
         const field = sortBy.split(".")[1];
@@ -126,10 +126,10 @@ export class PrismaInstructorRepository implements IInstructorRepository {
     }
 
     // Get total count
-    const total = await this.prisma.instructorDetails.count({ where });
+    const total = await this._prisma.instructorDetails.count({ where });
 
     // Get paginated results
-    const instructors = await this.prisma.instructorDetails.findMany({
+    const instructors = await this._prisma.instructorDetails.findMany({
       where,
       orderBy,
       skip: (page - 1) * limit,
@@ -148,7 +148,7 @@ export class PrismaInstructorRepository implements IInstructorRepository {
     });
 
     return {
-      items: instructors.map((instructor) => Instructor.fromPrisma(instructor)),
+      items: instructors.map((instructor) => Instructor.fromPersistence(instructor)),
       total,
       totalPages: Math.ceil(total / limit),
     };
@@ -157,7 +157,7 @@ export class PrismaInstructorRepository implements IInstructorRepository {
   async getTopInstructors(
     input: IGetTopInstructorsInput
   ): Promise<InstructorStats[]> {
-    const instructors = await this.prisma.user.findMany({
+    const instructors = await this._prisma.user.findMany({
       where: {
         role: "INSTRUCTOR",
         deletedAt: null,
@@ -180,7 +180,7 @@ export class PrismaInstructorRepository implements IInstructorRepository {
 
         // Calculate total enrollments across all courses
         const totalEnrollments = instructor.coursesCreated.reduce(
-          (sum: number, course: any) => {
+          (sum: number, course: { enrollments: unknown[] }) => {
             return sum + course.enrollments.length;
           },
           0
@@ -188,9 +188,9 @@ export class PrismaInstructorRepository implements IInstructorRepository {
 
         // Calculate total revenue from completed order items for instructor's courses
         const courseIds = instructor.coursesCreated.map(
-          (course: any) => course.id
+          (course: { id: string }) => course.id
         );
-        const completedOrderItems = await this.prisma.orderItem.findMany({
+        const completedOrderItems = await this._prisma.orderItem.findMany({
           where: {
             courseId: {
               in: courseIds,
@@ -202,20 +202,17 @@ export class PrismaInstructorRepository implements IInstructorRepository {
           },
         });
 
-        // Calculate total revenue (instructor gets the remaining amount after admin share)
-        const totalRevenue = completedOrderItems.reduce(
-          (sum: number, item: any) => {
-            const itemPrice = Number(item.coursePrice);
-            const adminSharePercentage = Number(item.adminSharePercentage);
-            const adminRevenue = itemPrice * (adminSharePercentage / 100);
-            const instructorRevenue = itemPrice - adminRevenue; // Instructor gets the remaining amount
-            return sum + instructorRevenue;
-          },
-          0
-        );
+    const totalRevenue = completedOrderItems.reduce((sum, item) => {
+      const itemPrice = Number(item.coursePrice); // Decimal is converted
+      const adminSharePercentage = Number(item.adminSharePercentage);
+      const adminRevenue = itemPrice * (adminSharePercentage / 100);
+      const instructorRevenue = itemPrice - adminRevenue;
+      return sum + instructorRevenue;
+    }, 0);
+
 
         // Calculate average rating from course reviews
-        const reviews = await this.prisma.courseReview.findMany({
+        const reviews = await this._prisma.courseReview.findMany({
           where: {
             courseId: {
               in: courseIds,
@@ -230,7 +227,7 @@ export class PrismaInstructorRepository implements IInstructorRepository {
         const averageRating =
           reviews.length > 0
             ? reviews.reduce(
-                (sum: number, review: any) => sum + review.rating,
+                (sum: number, review: { rating: number }) => sum + review.rating,
                 0
               ) / reviews.length
             : 0;

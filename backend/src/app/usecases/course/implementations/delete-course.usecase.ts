@@ -8,8 +8,8 @@ import { NotificationEntityType } from "../../../../domain/enum/notification-ent
 
 export class DeleteCourseUseCase implements IDeleteCourseUseCase {
   constructor(
-    private courseRepository: ICourseRepository,
-    private createNotificationsForUsersUseCase: CreateNotificationsForUsersUseCase
+    private _courseRepository: ICourseRepository,
+    private _createNotificationsForUsersUseCase: CreateNotificationsForUsersUseCase
   ) {}
 
   async execute(
@@ -17,7 +17,7 @@ export class DeleteCourseUseCase implements IDeleteCourseUseCase {
     userId: string,
     role: string
   ): Promise<ICourseWithDetailsDTO> {
-    const course = await this.courseRepository.findById(courseId);
+    const course = await this._courseRepository.findById(courseId);
     if (!course) {
       throw new HttpError("Course not found", 404);
     }
@@ -33,7 +33,7 @@ export class DeleteCourseUseCase implements IDeleteCourseUseCase {
     const isCurrentlyDeleted = course.isDeleted();
 
     course.softDelete();
-    const updatedCourse = await this.courseRepository.softDelete(course);
+    const updatedCourse = await this._courseRepository.softDelete(course);
 
     // Determine the action and notify the instructor
     const eventType = isCurrentlyDeleted
@@ -44,7 +44,7 @@ export class DeleteCourseUseCase implements IDeleteCourseUseCase {
       : `Your course "${course.title}" has been disabled and is no longer available to students.`;
 
     // Notify the instructor (creator) about the course status change
-    await this.createNotificationsForUsersUseCase.execute([course.createdBy], {
+    await this._createNotificationsForUsersUseCase.execute([course.createdBy], {
       eventType: eventType,
       entityType: NotificationEntityType.COURSE,
       entityId: course.id,
@@ -53,6 +53,6 @@ export class DeleteCourseUseCase implements IDeleteCourseUseCase {
       link: `/instructor/courses/${course.id}`,
     });
 
-    return updatedCourse.toJSON();
+    return updatedCourse.toJSON() as unknown as ICourseWithDetailsDTO;
   }
 }

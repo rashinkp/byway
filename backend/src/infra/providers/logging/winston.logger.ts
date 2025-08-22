@@ -3,10 +3,10 @@ import { envConfig } from "../../../presentation/express/configs/env.config";
 import { ILogger } from "../../../app/providers/logger-provider.interface";
 
 export class WinstonLogger implements ILogger {
-  private logger: winston.Logger;
+  private _logger: winston.Logger;
 
   constructor() {
-    this.logger = winston.createLogger({
+    this._logger = winston.createLogger({
       level: envConfig.LOG_LEVEL,
       format: winston.format.combine(
         winston.format.timestamp(),
@@ -20,18 +20,18 @@ export class WinstonLogger implements ILogger {
   }
 
   info(message: string): void {
-    this.logger.info(message);
+    this._logger.info(message);
   }
 
   error(message: string, error?: unknown): void {
-    this.logger.error(message, error);
+    this._logger.error(message, error);
   }
 
   warn(message: string): void {
-    this.logger.warn(message);
+    this._logger.warn(message);
   }
 
   debug(message: string): void {
-    this.logger.debug(message);
+    this._logger.debug(message);
   }
 }

@@ -5,7 +5,7 @@ import { IRevenueRepository } from "../../app/repositories/revenue.repository";
 import { LatestRevenue } from "../../domain/types/revenue.interface";
 
 export class PrismaRevenueRepository implements IRevenueRepository {
-  constructor(private readonly prisma: PrismaClient) {}
+  constructor(private readonly _prisma: PrismaClient) {}
 
   async getTransactionAmounts(params: {
     startDate: Date;
@@ -14,7 +14,7 @@ export class PrismaRevenueRepository implements IRevenueRepository {
     status: TransactionStatus;
     userId: string;
   }): Promise<{ amount: number }> {
-    const result = await this.prisma.transactionHistory.aggregate({
+    const result = await this._prisma.transactionHistory.aggregate({
       where: {
         createdAt: {
           gte: params.startDate,
@@ -41,7 +41,7 @@ export class PrismaRevenueRepository implements IRevenueRepository {
     status?: TransactionStatus;
     userId: string;
   }): Promise<number> {
-    const result = await this.prisma.transactionHistory.count({
+    const result = await this._prisma.transactionHistory.count({
       where: {
         createdAt: {
           gte: params.startDate,
@@ -64,7 +64,7 @@ export class PrismaRevenueRepository implements IRevenueRepository {
     userId: string;
     courseId?: string;
   }): Promise<Array<{ courseId: string; amount: number; count: number }>> {
-    const transactions = await this.prisma.transactionHistory.groupBy({
+    const transactions = await this._prisma.transactionHistory.groupBy({
       by: ["courseId"],
       where: {
         createdAt: {
@@ -114,7 +114,7 @@ export class PrismaRevenueRepository implements IRevenueRepository {
       return [];
     }
 
-    const courses = await this.prisma.course.findMany({
+    const courses = await this._prisma.course.findMany({
       where: {
         id: {
           in: validCourseIds,
@@ -154,7 +154,7 @@ export class PrismaRevenueRepository implements IRevenueRepository {
     userId: string;
     search?: string;
   }): Promise<number> {
-    return this.prisma.course.count({
+    return this._prisma.course.count({
       where: {
         createdAt: {
           gte: params.startDate,
@@ -172,7 +172,7 @@ export class PrismaRevenueRepository implements IRevenueRepository {
   }
 
   async getTotalRevenue(userId: string): Promise<number> {
-    const result = await this.prisma.transactionHistory.aggregate({
+    const result = await this._prisma.transactionHistory.aggregate({
       where: {
         userId,
         type: "REVENUE",
@@ -210,7 +210,7 @@ export class PrismaRevenueRepository implements IRevenueRepository {
     const skip = (page - 1) * limit;
 
     // Build where clause
-    const whereClause: any = {
+    const whereClause: Record<string, unknown> = {
       userId,
       type: "REVENUE",
       status: "COMPLETED",
@@ -271,7 +271,7 @@ export class PrismaRevenueRepository implements IRevenueRepository {
     }
 
     // Get transactions with type REVENUE and status COMPLETED
-    const transactions = await this.prisma.transactionHistory.findMany({
+    const transactions = await this._prisma.transactionHistory.findMany({
       where: whereClause,
       include: {
         order: {
@@ -309,7 +309,7 @@ export class PrismaRevenueRepository implements IRevenueRepository {
     });
 
     // Get total count for pagination
-    const total = await this.prisma.transactionHistory.count({
+    const total = await this._prisma.transactionHistory.count({
       where: whereClause,
     });
 

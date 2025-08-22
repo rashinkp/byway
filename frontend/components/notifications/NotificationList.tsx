@@ -83,7 +83,6 @@ const NotificationList: React.FC<NotificationListProps> = ({
 	loading,
 	hasMore,
 	total,
-	page,
 	setSearch,
 	search,
 	setSortBy,
@@ -323,12 +322,6 @@ const NotificationList: React.FC<NotificationListProps> = ({
 									<Button
 										onClick={() => {
 											setLoadMoreLoading(true);
-											console.log("Load More Clicked:", {
-												page,
-												hasMore,
-												loading,
-												notificationsLength: uniqueNotifications.length,
-											});
 											loadMore?.();
 											setTimeout(() => setLoadMoreLoading(false), 1000);
 										}}

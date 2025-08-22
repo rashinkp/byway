@@ -11,7 +11,7 @@ export function useResendOtp() {
 				description: "A new verification code has been sent to your email.",
 			});
 		},
-		onError: (error: any) => {
+		onError: (error: Error) => {
 			toast.error("Failed to resend OTP", {
 				description: error.message || "Something went wrong",
 			});

@@ -62,7 +62,7 @@ export default function CertificatesSection() {
 									</div>
 									<div className="text-sm text-[var(--color-muted)]">
 										Issued:{" "}
-										{cert.metadata.generatedAt
+										{cert.metadata?.generatedAt
 											? new Date(cert.metadata.generatedAt).toLocaleDateString()
 											: "-"}
 									</div>
