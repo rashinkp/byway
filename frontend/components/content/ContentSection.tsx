@@ -46,7 +46,7 @@ export const ContentSection = ({ lessonId }: ContentSectionProps) => {
 	const shouldSignThumb = !!thumbKey && !isAbsoluteUrl(thumbKey);
 
 	const { url: signedVideoUrl, isLoading: videoLoading } = useSignedUrl(shouldSignVideo ? fileKey : null, 3600, false);
-	const { url: signedDocUrl, isLoading: docLoading } = useSignedUrl(shouldSignDoc ? fileKey : null, 600, false);
+	const { url: signedDocUrl } = useSignedUrl(shouldSignDoc ? fileKey : null, 600, false);
 	const { url: signedThumbUrl } = useSignedUrl(shouldSignThumb ? thumbKey : null, 3600, false);
 
 	const handleDelete = (contentId: string) => {

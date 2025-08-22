@@ -13,6 +13,7 @@ export class StripePaymentGateway implements PaymentGateway {
 
   constructor() {
     const stripeKey = envConfig.STRIPE_SECRET_KEY;
+    
     if (!stripeKey) {
       throw new Error("STRIPE_SECRET_KEY is not defined");
     }

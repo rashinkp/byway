@@ -32,4 +32,3 @@ export default function PublicLayout({
 		</div>
 	);
 }
-1

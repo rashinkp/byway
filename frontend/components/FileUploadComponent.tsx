@@ -138,7 +138,7 @@ export default function FileUploadComponent({
 			if (onFileUrlChange) onFileUrlChange("");
 			if (onFileChange) onFileChange(newFile);
 		},
-		[maxSize, onFileChange, accept],
+		[maxSize, onFileChange, onFileUrlChange, accept],
 	);
 
 	// Handle URL input change
@@ -156,12 +156,6 @@ export default function FileUploadComponent({
 		[onFileUrlChange, onFileChange],
 	);
 
-	// Handle drag events
-	const handleDragOver = useCallback((e: React.DragEvent<HTMLDivElement>) => {
-		e.preventDefault();
-		e.stopPropagation();
-		setIsDragging(true);
-	}, []);
 
 	const handleDragLeave = useCallback((e: React.DragEvent<HTMLDivElement>) => {
 		e.preventDefault();

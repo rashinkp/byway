@@ -8,7 +8,7 @@ import { User } from "@/types/user";
 import { useSignedUrl } from "@/hooks/file/useSignedUrl";
 
 // Component to handle course thumbnails with proper S3 URL handling
-const CourseThumbnail = ({ course }: { course: any }) => {
+const CourseThumbnail = ({ course }: { course: { thumbnail?: string | null; title: string } }) => {
   const { url: thumbnailUrl } = useSignedUrl(course.thumbnail || null);
   
   if (!thumbnailUrl) {

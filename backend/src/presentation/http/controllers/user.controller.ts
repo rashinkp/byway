@@ -118,36 +118,36 @@ export class UserController extends BaseController {
   async getCurrentUser(httpRequest: IHttpRequest): Promise<IHttpResponse> {
     return this.handleRequest(httpRequest, async (request) => {
       if (!request.user?.id) {
-        throw new UnauthorizedError("User not authenticated");
+        throw new UnauthorizedError("User not authenticated");  
       }
       const { user, cartCount } = await this.getCurrentUserUseCase.execute(
         request.user.id
       );
       const { user: fetchedUser, profile } =
         await this.getUserByIdUseCase.execute({ userId: user.id });
-      return this.success_200(
-        {
-          id: fetchedUser.id,
-          name: fetchedUser.name,
-          email: fetchedUser.email,
-          role: fetchedUser.role,
-          avatar: fetchedUser.avatar,
-          bio: profile?.bio,
-          education: profile?.education,
-          skills: profile?.skills,
-          phoneNumber: profile?.phoneNumber,
-          country: profile?.country,
-          city: profile?.city,
-          address: profile?.address,
-          dateOfBirth: profile?.dateOfBirth,
-          gender: profile?.gender,
-          deletedAt: fetchedUser.deletedAt,
-          createdAt: fetchedUser.createdAt,
-          updatedAt: fetchedUser.updatedAt,
-          cartCount,
-        },
-        "User retrieved successfully"
-      );
+        return this.success_200(
+          {
+            id: fetchedUser.id,
+            name: fetchedUser.name,
+            email: fetchedUser.email,
+            role: fetchedUser.role,
+            avatar: fetchedUser.avatar,
+            bio: profile?.bio,
+            education: profile?.education,
+            skills: profile?.skills,
+            phoneNumber: profile?.phoneNumber,
+            country: profile?.country,
+            city: profile?.city,
+            address: profile?.address,
+            dateOfBirth: profile?.dateOfBirth,
+            gender: profile?.gender,
+            deletedAt: fetchedUser.deletedAt,
+            createdAt: fetchedUser.createdAt,
+            updatedAt: fetchedUser.updatedAt,
+            cartCount,
+          },
+          "User retrieved successfully"
+        );
     });
   }
 

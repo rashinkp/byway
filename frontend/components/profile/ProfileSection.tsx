@@ -30,7 +30,7 @@ export default function ProfileSection({
   setIsModalOpen,
 }: ProfileSectionProps) {
   // Get signed URL for avatar
-  const { url: avatarUrl, isLoading: avatarLoading, error: avatarError, refresh } = useSignedUrl(user.avatar);
+  const { url: avatarUrl, isLoading: avatarLoading, refresh } = useSignedUrl(user.avatar);
   
   // Refresh signed URL when profile updates (e.g., after saving), even if key stays same
   useEffect(() => {
