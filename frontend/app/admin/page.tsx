@@ -176,21 +176,21 @@ export default function AdminDashboard() {
 												</span>
 											</div>
 											<div className="flex-1 space-y-2">
-												<div className="flex items-center gap-2">
+												<div className="flex flex-wrap items-center gap-2 min-w-0">
 													<span className="text-sm font-medium text-gray-500">
 														#{index + 1}
 													</span>
 													<button
 														onClick={() => handleCourseClick(course.courseId)}
-														className="text-lg font-semibold text-gray-900 dark:text-white hover:text-blue-600 hover:underline transition-colors cursor-pointer"
+														className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white hover:text-blue-600 hover:underline transition-colors cursor-pointer flex-1 min-w-0 whitespace-normal break-words line-clamp-2"
 													>
 														{course.courseTitle}
 													</button>
-													<span className="text-sm text-gray-500 dark:text-gray-300">
+													<span className="text-xs sm:text-sm text-gray-500 dark:text-gray-300 w-full sm:w-auto">
 														by {course.instructorName}
 													</span>
 												</div>
-												<div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3 sm:gap-4">
+												<div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 sm:gap-4">
 													<div className="flex items-center space-x-2">
 														<Users className="w-4 h-4 text-gray-400" />
 														<div>

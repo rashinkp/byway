@@ -153,13 +153,13 @@ export default function CommonLayout({
           className={`flex-1 transition-all duration-300 ease-in-out overflow-x-hidden ${
             isCollapsible
               ? collapsed
-                ? "ml-20 lg:ml-20" // Give space for collapsed sidebar on mobile and desktop
-                : "lg:ml-64"
-              : "lg:ml-64 lg:[&@media(min-width:1024px)]:ml-[80px] xl:ml-64"
+                ? "ml-20 lg:ml-10" 
+                : "lg:ml-10"
+              : "lg:ml-10"
           }`}
         >
-          <div className="p-4 lg:p-6">
-            <div className="w-full max-w-full sm:max-w-7xl mx-auto text-gray-900 dark:text-gray-100 overflow-x-hidden">{children}</div>
+          <div className="p-4 lg:pl-0 lg:pr-6">
+            <div className="w-full max-w-none mx-0 text-gray-900 dark:text-gray-100 overflow-x-hidden">{children}</div>
           </div>
         </main>
         
@@ -168,10 +168,10 @@ export default function CommonLayout({
           className={`${
             isCollapsible
               ? collapsed
-                ? "ml-20 lg:ml-20" 
-                : "lg:ml-64"
-              : "lg:ml-64 lg:[&@media(min-width:1024px)]:ml-[80px] xl:ml-64"
-          }`}
+                ? "ml-20 lg:ml-10" 
+                : "lg:ml-10"
+              : "lg:ml-10"
+          } mt-6 lg:mt-8 border-t border-gray-200 dark:border-gray-800`}
         >
           <BywayFooter />
         </div>

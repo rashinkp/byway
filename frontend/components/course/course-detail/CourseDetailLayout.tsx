@@ -60,7 +60,7 @@ export default function CourseDetailLayout({
 				<div className="flex flex-col sm:flex-row gap-6 items-center">
 					<div className="w-40 h-40 rounded-xl overflow-hidden flex-shrink-0 bg-[#f9fafb] dark:bg-[#18181b] border border-gray-200">
 						<Image
-							src={courseThumbUrl || course?.thumbnail || '/placeholder-course.jpg'}
+							src={courseThumbIsKey ? (courseThumbUrl || '/placeholder-course.jpg') : (course?.thumbnail || '/placeholder-course.jpg')}
 							alt={course?.title || 'Course Thumbnail'}
 							width={160}
 							height={160}
@@ -145,7 +145,7 @@ export default function CourseDetailLayout({
 					<div className="w-14 h-14 rounded-full overflow-hidden bg-[#f9fafb] dark:bg-[#18181b] border border-gray-200">
 						{instructor && (instructor as { avatar?: string }).avatar ? (
 							<Image
-								src={instructorAvatarUrl || (instructor as { avatar?: string }).avatar || ""}
+								src={avatarIsKey ? (instructorAvatarUrl || '/UserProfile.jpg') : ((instructor as { avatar?: string }).avatar || '/UserProfile.jpg')}
 								alt={instructor.name}
 								width={56}
 								height={56}
@@ -210,7 +210,7 @@ export default function CourseDetailLayout({
 						<div className="text-gray-500 dark:text-gray-300">No lessons available.</div>
 					)}
 					{/* Lesson Content Modal */}
-					<Dialog open={!!openLessonContentId} onOpenChange={() => setOpenLessonContentId(null)}>
+					<Dialog open={!!openLessonContentId} onOpenChange={(open) => { if (!open) setOpenLessonContentId(null); }}>
 						<DialogContent className="max-w-2xl bg-white/80 dark:bg-[#232323] border border-gray-200 dark:border-gray-700">
 							<DialogHeader>
 								<DialogTitle className="text-lg font-bold text-black dark:text-white flex items-center gap-2">

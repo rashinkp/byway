@@ -61,7 +61,7 @@ export function CommonSidebar({
 
   return (
     <aside
-      className={`fixed top-0 left-0 z-50 h-screen bg-[#18181b] shadow-xl transition-all duration-300 ease-in-out
+      className={`fixed top-0 left-0 z-50 h-screen bg-[#18181b]  transition-all duration-300 ease-in-out
         ${getSidebarClasses()}
         lg:relative lg:z-40`}
     >
