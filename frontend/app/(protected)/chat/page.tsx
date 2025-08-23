@@ -57,7 +57,7 @@ export default function ChatPage() {
     const handleConnect = () => {
       setIsSocketConnected(true);
     };
-    const handleDisconnect = (reason: string) => {
+    const handleDisconnect = () => {
       setIsSocketConnected(false);
     };
     socket.on("connect", handleConnect);
