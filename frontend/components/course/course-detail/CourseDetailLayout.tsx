@@ -157,7 +157,7 @@ export default function CourseDetailLayout({
 									) : course?.isInCart ? (
 										<>
 											<Button variant={'primary'} onClick={() => window.location.href = '/user/cart'}>Go to Cart</Button>
-											<Button variant={'default'}  onClick={() => window.location.href = `/user/checkout?courseId=${course?.id}`}>Buy Now</Button>
+											<Button variant={'default'}  onClick={sidebarProps.handleBuyNow}>Buy Now</Button>
 										</>
 									) : (
 										<>
@@ -169,7 +169,7 @@ export default function CourseDetailLayout({
 											>
 												{sidebarProps.isCartLoading ? 'Processing...' : 'Add to Cart'}
 											</Button>
-											<Button  onClick={() => window.location.href = `/user/checkout?courseId=${course?.id}`}>Buy Now</Button>
+											<Button  onClick={sidebarProps.handleBuyNow}>Buy Now</Button>
 										</>
 									)}
 								</>

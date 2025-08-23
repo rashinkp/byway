@@ -41,6 +41,16 @@ export default function MainCourseDetailsContent() {
     }
   };
 
+  const handleBuyNow = () => {
+    if (!user) {
+      router.push("/login");
+      return;
+    }
+    if (course?.id) {
+      router.push(`/user/checkout?courseId=${course.id}`);
+    }
+  };
+
   const error = courseError || instructorError || lessonError;
 
   if (error) {
@@ -63,6 +73,7 @@ export default function MainCourseDetailsContent() {
         sidebarProps={{
           isCartLoading,
           handleAddToCart,
+          handleBuyNow,
           isEnrolled: course?.isEnrolled || false,
           userLoading,
         }}
