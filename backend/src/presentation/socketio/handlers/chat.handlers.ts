@@ -53,7 +53,7 @@ export function registerChatHandlers(socket: Socket, io: SocketIOServer, chatCon
       if (data.filter) query.filter = data.filter;
 
       const chat = await chatController.getChatHistory({ query });
-      return chat;
+      return chat.body;
     }, "chatHistory")
   );
 
@@ -84,7 +84,15 @@ export function registerChatHandlers(socket: Socket, io: SocketIOServer, chatCon
       if (filter !== undefined) query.filter = filter;
 
       const result = await chatController.listUserChats({ query, params: {} });
-      return result;
+      console.log("🔍 listUserChats result:", {
+        hasResult: !!result,
+        resultType: typeof result,
+        hasBody: !!result?.body,
+        bodyType: typeof result?.body,
+        bodyLength: Array.isArray(result?.body) ? result.body.length : 'not array',
+        timestamp: new Date().toISOString(),
+      });
+      return result.body;
     }, "userChats")
   );
 
@@ -107,7 +115,7 @@ export function registerChatHandlers(socket: Socket, io: SocketIOServer, chatCon
         params: {},
       });
 
-      return messages;
+      return messages.body;
     }, "messagesByChat")
   );
 } 

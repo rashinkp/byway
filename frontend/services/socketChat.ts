@@ -321,9 +321,11 @@ export const listUserChats = (
 
 	socket.once("userChats", (result: any[]) => {
 		logger.info('User chats received', {
-			chatCount: result.length,
+			chatCount: result?.length || 0,
+			resultType: typeof result,
+			isArray: Array.isArray(result),
 			timestamp: new Date().toISOString(),
 		});
-		callback(result);
+		callback(result || []);
 	});
 };
