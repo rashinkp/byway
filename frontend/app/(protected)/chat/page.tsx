@@ -54,15 +54,22 @@ export default function ChatPage() {
 
   // Track socket connection state
   useEffect(() => {
-    const handleConnect = () => setIsSocketConnected(true);
-    const handleDisconnect = () => setIsSocketConnected(false);
+    const handleConnect = () => {
+      setIsSocketConnected(true);
+    };
+    const handleDisconnect = () => {
+      setIsSocketConnected(false);
+    };
     socket.on("connect", handleConnect);
     socket.on("disconnect", handleDisconnect);
+    
     return () => {
       socket.off("connect", handleConnect);
       socket.off("disconnect", handleDisconnect);
     };
-  }, []);
+  }, [user?.id]);
+
+
 
   // Fetch user chats on mount and when searchQuery or socket connection changes
   useEffect(() => {
@@ -112,21 +119,40 @@ export default function ChatPage() {
 
   // Fetch messages when selected chat changes (paginated)
   useEffect(() => {
-    if (!selectedChat) return;
+    if (!selectedChat) {
+      setMessages([]);
+      setCurrentPage(1);
+      setHasMore(false);
+      return;
+    }
+    
     if (selectedChat.type === "chat" && selectedChat.chatId) {
-      joinChat(selectedChat.chatId);
+      setLoading(true);
       getMessagesByChat(
         { chatId: selectedChat.chatId, limit: 20 },
         (result: ChatMessage[]) => {
           const msgs = result;
           // Backend now returns ASC order (oldest first), which matches display expectations
           setMessages(Array.isArray(msgs) ? msgs : []);
+          setLoading(false);
+          
+          // Mark messages as read for this chat
+          if (user?.id && selectedChat.chatId) {
+            markMessagesAsRead(selectedChat.chatId, user.id);
+          }
+          
+          // Scroll to bottom after messages are loaded
+          setTimeout(() => {
+            if (chatWindowRef.current?.scrollToBottom) {
+              chatWindowRef.current.scrollToBottom();
+            }
+          }, 100);
         }
       );
     } else {
       setMessages([]);
     }
-  }, [selectedChat]);
+  }, [selectedChat, user?.id]);
 
   // Listen for new incoming messages
 		useEffect(() => {
@@ -142,15 +168,19 @@ export default function ChatPage() {
 			};
 			
 			socket.on("message", handleMessage);
-			socket.on("connect", () => setIsSidebarOpen(true));
-			socket.on("disconnect", () => setIsSidebarOpen(false));
+			socket.on("connect", () => {
+				setIsSidebarOpen(true);
+			});
+			socket.on("disconnect", () => {
+				setIsSidebarOpen(false);
+			});
 			
 			return () => {
 				socket.off("message", handleMessage);
 				socket.off("connect");
 				socket.off("disconnect");
 			};
-		}, [selectedChat, user]);
+		}, [selectedChat?.chatId, user?.id]); // More stable dependencies
 
   // Debug wrappers for pending media setters
   const debugSetPendingImageUrl = (url: string) => {
@@ -194,18 +224,20 @@ export default function ChatPage() {
   }, [pendingMessage, pendingImageUrl, pendingAudioUrl, selectedChat, user]);
 
   const handleSelectChat = (chat: EnhancedChatItem) => {
-  
     if (
       previousChatIdRef.current &&
       previousChatIdRef.current !== chat.chatId
     ) {
       socket.emit("leave", previousChatIdRef.current);
     }
-    // Join new chat room
+    
+    // Join new chat room using the service function
     if (chat.type === "chat" && chat.chatId) {
-      socket.emit("join", chat.chatId);
-      previousChatIdRef.current = chat.chatId;
+      const chatId = chat.chatId; // Extract to avoid TypeScript issues
+      joinChat(chatId);
+      previousChatIdRef.current = chatId;
     }
+    
     setSelectedChat(chat);
     // Auto-close sidebar on mobile when chat is selected
     if (window.innerWidth < 768) {
@@ -284,71 +316,81 @@ export default function ChatPage() {
     };
   }, [searchQuery]);
 
-  // Restore handleSendMessage function
+    // Restore handleSendMessage function
   const handleSendMessage = useCallback(
     (content: string, imageUrl?: string, audioUrl?: string) => {
-    
-      if (!user || !selectedChat) return;
+      if (!user || !selectedChat) {
+        return;
+      }
+      
       if (selectedChat.type === "user") {
+        // For new chats, chatId might not exist yet
+        const messageData: any = {
+          userId: selectedChat.userId!, // Required by backend
+          content,  
+          imageUrl,
+          audioUrl,
+        };
+        
+        // Only include chatId if it exists
+        if (selectedChat.chatId) {
+          messageData.chatId = selectedChat.chatId;
+        }
+        
         sendMessageSocket(
-          {
-            chatId: selectedChat.chatId!,
-            userId: selectedChat.userId!, // Required by backend
-            content,  
-            imageUrl,
-            audioUrl,
-          },
-                  (msg: ChatMessage) => {
-          // After first message, join the new chat room and update selectedChat
-          if (msg.chatId) {
-            joinChat(msg.chatId);
-            // Update selectedChat to new chat type
-            setSelectedChat((prev) =>
-              prev && prev.userId === msg.receiverId
-                ? {
-                    ...prev,
-                    type: "chat",
-                    chatId: msg.chatId,
-                    id: msg.chatId,
-                  }
-                : prev
-            );
-            // Update chatItems to reflect the new chat type and chatId
-            setChatItems((prev) =>
-              prev.map((item) =>
-                item.userId === msg.receiverId && item.type === "user"
+          messageData,
+          (msg: ChatMessage) => {
+            // After first message, join the new chat room and update selectedChat
+            if (msg.chatId) {
+              joinChat(msg.chatId);
+              // Update selectedChat to new chat type
+              setSelectedChat((prev) =>
+                prev && prev.userId === msg.receiverId
                   ? {
-                      ...item,
+                      ...prev,
                       type: "chat",
                       chatId: msg.chatId,
                       id: msg.chatId,
                     }
-                  : item
-              )
-            );
-            // Re-fetch chat list and messages from backend for stability
-            listUserChats({ page: 1, limit: 10 }, (result: ChatListItem[]) => {
-              const chatData = result;
-              if (chatData && Array.isArray(chatData)) {
-                setChatItems(chatData);
-                setHasMore(chatData.length === 10);
-                setCurrentPage(1);
-              }
-            });
-            getMessagesByChat({ chatId: msg.chatId }, (result: ChatMessage[]) => {
-              const msgs = result;
-              if (Array.isArray(msgs)) {
-                setMessages(msgs);
-              }
-            });
-          }
-        },
+                  : prev
+              );
+              // Update chatItems to reflect the new chat type and chatId
+              setChatItems((prev) =>
+                prev.map((item) =>
+                  item.userId === msg.receiverId && item.type === "user"
+                    ? {
+                        ...item,
+                        type: "chat",
+                        chatId: msg.chatId,
+                        id: msg.chatId,
+                      }
+                    : item
+                )
+              );
+              // Re-fetch chat list and messages from backend for stability
+              listUserChats({ page: 1, limit: 10 }, (result: ChatListItem[]) => {
+                const chatData = result;
+                if (chatData && Array.isArray(chatData)) {
+                  setChatItems(chatData);
+                  setHasMore(chatData.length === 10);
+                  setCurrentPage(1);
+                }
+              });
+              getMessagesByChat({ chatId: msg.chatId }, (result: ChatMessage[]) => {
+                const msgs = result;
+                if (Array.isArray(msgs)) {
+                  setMessages(msgs);
+                }
+              });
+            }
+          },
           (err: { message?: string }) => {
             alert(err?.message || "Failed to send message");
           }
         );
         return;
       }
+      
       // Existing chat
       const payload = {
         chatId: selectedChat.chatId!,
@@ -357,7 +399,7 @@ export default function ChatPage() {
         imageUrl,
         audioUrl,
       };
-     
+      
       sendMessageSocket(
         payload,
         (msg: ChatMessage) => {
@@ -374,21 +416,8 @@ export default function ChatPage() {
     [user, selectedChat]
   );
 
-  useEffect(() => {
-    if (!user) return;
-    const handleConnect = () => {
-     
-      socket.emit("join", user.id);
-    };
-    socket.on("connect", handleConnect);
-    // If already connected, join immediately
-    if (socket.connected) {
-      handleConnect();
-    }
-    return () => {
-      socket.off("connect", handleConnect);
-    };
-  }, [user]);
+  // Note: Backend automatically joins user to their personal room on connection
+  // No need to manually emit "join" event for user's personal room
 
   // Responsive mobile detection
   useEffect(() => {
@@ -409,16 +438,14 @@ export default function ChatPage() {
 
   useEffect(() => {
     function handleMessagesRead({ chatId }: { chatId: string }) {
-     
       if (selectedChat?.chatId === chatId) {
-      
         getMessagesByChat({ chatId }, (result: ChatMessage[]) => {
           const msgs = result;
-      
           setMessages(Array.isArray(msgs) ? msgs : []);
         });
       }
    
+      // Always refresh chat list when messages are read
       listUserChats(
         { page: 1, limit: 10, search: searchQuery },
         (result: ChatListItem[]) => {
@@ -432,11 +459,12 @@ export default function ChatPage() {
         }
       );
     }
+    
     socket.on("messagesRead", handleMessagesRead);
     return () => {
       socket.off("messagesRead", handleMessagesRead);
     };
-  }, [selectedChat, searchQuery, user]);
+  }, [selectedChat?.chatId, searchQuery, user?.id]); // More stable dependencies
 
   useEffect(() => {
     function handleMessageDeleted({ messageId, chatId }: { messageId: string; chatId: string }) {
@@ -548,6 +576,7 @@ export default function ChatPage() {
                   }}
                   setPendingImageUrl={debugSetPendingImageUrl}
                   setPendingAudioUrl={debugSetPendingAudioUrl}
+                  loadingMoreMessages={loading}
                 />
               </div>
             )}

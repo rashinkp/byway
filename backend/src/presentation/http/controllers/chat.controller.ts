@@ -58,18 +58,28 @@ export class ChatController extends BaseController {
   }
 
   async handleNewMessage(socketData: SendMessageSocketData) {
+    
     const validated = sendMessageSocketSchema.parse(socketData);
-    const { chatId, content, imageUrl, audioUrl } = validated;
+    const { content, imageUrl, audioUrl } = validated;
     const senderId = socketData.senderId;
     const userId = socketData.userId;
-    const message = await this.sendMessageUseCase.execute({
-      chatId,
+    
+    // Prepare the input for the use case
+    const useCaseInput: any = {
       userId,
       senderId,
       content,
       imageUrl,
       audioUrl,
-    });
+    };
+    
+    // Only include chatId if it exists in validated data
+    if (validated.chatId) {
+      useCaseInput.chatId = validated.chatId;
+    }
+    
+    const message = await this.sendMessageUseCase.execute(useCaseInput);
+    
     return message;
   }
 

@@ -138,8 +138,8 @@ export class MessageRepository implements IMessageRepository {
     };
   }
 
-  async create(message: Message): Promise<void> {
-    await this._prisma.message.create({
+  async create(message: Message): Promise<Message> {
+    const createdMessage = await this._prisma.message.create({
       data: {
         chatId: message.chatId.value,
         senderId: message.senderId.value,
@@ -150,6 +150,19 @@ export class MessageRepository implements IMessageRepository {
         isRead: message.isRead,
         createdAt: message.createdAt.value,
       },
+    });
+    
+    // Return the message with the generated ID
+    return Message.fromPersistence(createdMessage as unknown as {
+      chatId: string;
+      senderId: string;
+      content: string | null;
+      imageUrl: string | null;
+      audioUrl: string | null;
+      type: string;
+      isRead: boolean;
+      createdAt: Date;
+      id?: string;
     });
   }
 

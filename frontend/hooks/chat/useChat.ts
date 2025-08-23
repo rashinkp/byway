@@ -3,7 +3,7 @@ import { ChatMessage as Message } from "../../types/chat";
 
 export const sendMessageSocket = (
 	data: {
-		chatId: string;
+		chatId?: string; // Make chatId optional for new chats
 		content: string;
 		userId: string;
 		imageUrl?: string;

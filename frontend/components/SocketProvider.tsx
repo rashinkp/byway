@@ -1,7 +1,7 @@
 "use client";
 import { useEffect } from "react";
 import { toast } from "sonner";
-import socket, { safeSocketConnect, safeSocketDisconnect } from "../lib/socket";
+import socket, { safeSocketConnect } from "../lib/socket";
 import { useAuth } from "@/hooks/auth/useAuth";
 import { Bell } from "lucide-react";
 
@@ -56,9 +56,36 @@ export default function SocketProvider() {
 			log('User not authenticated, disconnecting socket');
 			
 			if (socket.connected) {
-				safeSocketDisconnect();
+				socket.disconnect();
 			}
 		}
+	}, [user?.id]);
+
+	// Add socket connection state monitoring
+	useEffect(() => {
+		const handleConnect = () => {
+			log('Socket connected', {
+				socketId: socket.id,
+				userId: user?.id,
+				timestamp: new Date().toISOString(),
+			});
+		};
+
+		const handleDisconnect = (reason: string) => {
+			log('Socket disconnected', {
+				reason,
+				userId: user?.id,
+				timestamp: new Date().toISOString(),
+			});
+		};
+
+		socket.on('connect', handleConnect);
+		socket.on('disconnect', handleDisconnect);
+
+		return () => {
+			socket.off('connect', handleConnect);
+			socket.off('disconnect', handleDisconnect);
+		};
 	}, [user?.id]);
 
 	useEffect(() => {

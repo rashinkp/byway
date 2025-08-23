@@ -20,12 +20,9 @@ const createLogger = (prefix: string) => ({
 const logger = createLogger('SocketChat');
 
 export const joinChat = (chatId: string) => {
-	logger.info('Joining chat room', {
-		chatId,
-		socketConnected: socket.connected,
-		socketId: socket.id,
-		timestamp: new Date().toISOString(),
-	});
+	if (!socket.connected) {
+		return;
+	}
 	
 	socket.emit("joinChat", { chatId });
 };
@@ -58,37 +55,19 @@ export const sendMessage = (
 	socket.emit("sendMessage", data);
 
 	if (onSuccess) {
-		logger.debug('Setting up success callback for message send', {
-			chatId: data.chatId,
-			userId: data.userId,
-			timestamp: new Date().toISOString(),
-		});
-		socket.once("messageSent", (message: ChatMessage) => {
-			logger.info('Message sent successfully', {
-				chatId: data.chatId,
-				userId: data.userId,
-				messageId: message.id,
-				timestamp: new Date().toISOString(),
-			});
+		const successHandler = (message: ChatMessage) => {
 			onSuccess(message);
-		});
+			socket.off("messageSent", successHandler);
+		};
+		socket.on("messageSent", successHandler);
 	}
 
 	if (onError) {
-		logger.debug('Setting up error callback for message send', {
-			chatId: data.chatId,
-			userId: data.userId,
-			timestamp: new Date().toISOString(),
-		});
-		socket.once("error", (error: { message: string }) => {
-			logger.error('Message send failed', {
-				chatId: data.chatId,
-				userId: data.userId,
-				error: error.message,
-				timestamp: new Date().toISOString(),
-			});
+		const errorHandler = (error: { message: string }) => {
 			onError(error);
-		});
+			socket.off("error", errorHandler);
+		};
+		socket.on("error", errorHandler);
 	}
 };
 
@@ -96,38 +75,14 @@ export const createChat = (
 	data: CreateChatData,
 	callback?: (chat: any) => void,
 ) => {
-	logger.info('Attempting to create chat', {
-		user1Id: data.user1Id,
-		user2Id: data.user2Id,
-		socketConnected: socket.connected,
-		socketId: socket.id,
-		timestamp: new Date().toISOString(),
-	});
-
 	if (!socket.connected) {
-		logger.error('Failed to create chat - socket not connected', {
-			user1Id: data.user1Id,
-			user2Id: data.user2Id,
-			timestamp: new Date().toISOString(),
-		});
 		return;
 	}
 
 	socket.emit("createChat", data);
 
 	if (callback) {
-		logger.debug('Setting up callback for chat creation', {
-			user1Id: data.user1Id,
-			user2Id: data.user2Id,
-			timestamp: new Date().toISOString(),
-		});
 		socket.once("chatCreated", (chat: any) => {
-			logger.info('Chat created successfully', {
-				chatId: chat.id,
-				user1Id: data.user1Id,
-				user2Id: data.user2Id,
-				timestamp: new Date().toISOString(),
-			});
 			callback(chat);
 		});
 	}
