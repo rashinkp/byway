@@ -9,11 +9,11 @@ import { Button } from "@/components/ui/button";
 import { Loader2 } from "lucide-react";
 import { ChevronLeft } from "lucide-react";
 import {
-  listUserChats,
   getMessagesByChat,
   joinChat,
   sendMessage as sendMessageSocket,
   markMessagesAsRead,
+  listUserChats,
 } from "@/services/socketChat";
 import socket from "@/lib/socket";
 import { useRouter } from "next/navigation";

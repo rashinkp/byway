@@ -5,7 +5,6 @@ import { Toaster } from "sonner";
 import { Providers } from "@/components/providers";
 import { GoogleOAuthProvider } from "@react-oauth/google";
 import SocketProvider from "@/components/SocketProvider";
-import SocketDebugger from "@/components/SocketDebugger";
 
 // Load fonts
 const geistSans = Geist({
@@ -36,7 +35,6 @@ export default function RootLayout({
 				suppressHydrationWarning
 			>
 					<SocketProvider />
-					<SocketDebugger />
 					<Providers>
 						<GoogleOAuthProvider
 							clientId={process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID!}

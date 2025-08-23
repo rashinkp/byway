@@ -296,3 +296,34 @@ export const createChatSocket = (
 export const markMessagesAsRead = (chatId: string, userId: string) => {
 	socket.emit("markMessagesAsRead", { chatId, userId });
 };
+
+export const listUserChats = (
+	data: GetChatHistoryData = {},
+	callback: (result: any[]) => void,
+) => {
+	logger.info('Requesting user chats', {
+		page: data.page,
+		limit: data.limit,
+		search: data.search,
+		socketConnected: socket.connected,
+		socketId: socket.id,
+		timestamp: new Date().toISOString(),
+	});
+
+	if (!socket.connected) {
+		logger.error('Failed to get user chats - socket not connected', {
+			timestamp: new Date().toISOString(),
+		});
+		return;
+	}
+
+	socket.emit("listUserChats", data);
+
+	socket.once("userChats", (result: any[]) => {
+		logger.info('User chats received', {
+			chatCount: result.length,
+			timestamp: new Date().toISOString(),
+		});
+		callback(result);
+	});
+};
