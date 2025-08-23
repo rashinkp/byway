@@ -1,7 +1,7 @@
 "use client";
 import { useEffect } from "react";
 import { toast } from "sonner";
-import socket, { safeSocketConnect } from "../lib/socket";
+import socket, { safeSocketConnect, safeSocketDisconnect } from "../lib/socket";
 import { useAuth } from "@/hooks/auth/useAuth";
 import { Bell } from "lucide-react";
 
@@ -19,35 +19,70 @@ interface SocketNotification {
 	timestamp?: string;
 }
 
+// Simple logger
+const log = (message: string, data?: any) => {
+  console.log(`🔌 [Provider] ${message}`, data || '');
+};
+
 export default function SocketProvider() {
 	const { user } = useAuth();
 
 	useEffect(() => {
-
+		log('Provider mounted', {
+			hasUser: !!user,
+			userId: user?.id,
+			userRole: user?.role,
+		});
 	}, []);
 
 	useEffect(() => {
 		if (user?.id) {
+			log('User authenticated, connecting socket', {
+				userId: user.id,
+				userRole: user.role,
+			});
+
 			// Add a small delay to ensure cookies are available
 			const timer = setTimeout(() => {
+				log('Connecting socket after delay', { userId: user.id });
 				safeSocketConnect();
 			}, 100);
 			
-			return () => clearTimeout(timer);
+			return () => {
+				log('Clearing connection timer', { userId: user.id });
+				clearTimeout(timer);
+			};
 		} else {
+			log('User not authenticated, disconnecting socket');
+			
 			if (socket.connected) {
-				socket.disconnect();
+				safeSocketDisconnect();
 			}
 		}
 	}, [user?.id]);
 
 	useEffect(() => {
-		if (!user?.id) return;
+		if (!user?.id) {
+			log('No user ID, skipping notification setup');
+			return;
+		}
+
+		log('Setting up notification listeners', {
+			userId: user.id,
+			userRole: user.role,
+		});
 
 		const handleNewNotification = (notification: SocketNotification) => {
 			const notificationType = notification.type || notification.eventType;
 
+			log('🔔 Processing notification', {
+				userId: user.id,
+				type: notificationType,
+				message: notification.message,
+			});
+
 			if (!notificationType) {
+				log('⚠️ Notification without type', { notification });
 				return;
 			}
 
@@ -84,6 +119,7 @@ export default function SocketProvider() {
 					<div
 						className="bg-white dark:bg-[#232323] border border-[#facc15] rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300 cursor-pointer max-w-sm"
 						onClick={() => {
+							log('Notification clicked', { type: notificationType });
 							// Navigate based on notification type and user role
 							handleNotificationClick(notification, user.role);
 						}}
@@ -96,13 +132,17 @@ export default function SocketProvider() {
 					position: "top-right",
 				},
 			);
+			
+			log('✅ Notification displayed', { type: notificationType });
 		};
 
 		// Listen for new notifications
 		socket.on("newNotification", handleNewNotification);
+		log('✅ Notification listener attached');
 
 		// Cleanup
 		return () => {
+			log('🧹 Cleaning up notification listeners');
 			socket.off("newNotification", handleNewNotification);
 		};
 	}, [user?.id, user?.role]);
