@@ -3,9 +3,9 @@ import { ChatMessage as Message } from "../../types/chat";
 
 export const sendMessageSocket = (
 	data: {
-		chatId?: string;
+		chatId: string;
 		content: string;
-		userId?: string;
+		userId: string;
 		imageUrl?: string;
 		audioUrl?: string;
 	},

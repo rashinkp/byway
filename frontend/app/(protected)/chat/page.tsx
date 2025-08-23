@@ -3,7 +3,7 @@
 import React, { useEffect, useState, useCallback, useRef } from "react";
 import { ChatList } from "@/components/chat/ChatList";
 import { ChatWindow } from "@/components/chat/ChatWindow";
-import { Message, EnhancedChatItem } from "@/types/chat";
+import { ChatMessage, EnhancedChatItem, ChatListItem } from "@/types/chat";
 import { useAuthStore } from "@/stores/auth.store";
 import { Button } from "@/components/ui/button";
 import { Loader2 } from "lucide-react";
@@ -17,7 +17,6 @@ import {
 } from "@/services/socketChat";
 import socket from "@/lib/socket";
 import { useRouter } from "next/navigation";
-import { ChatMessage, ChatListItem } from "@/types/chat";
 
 export default function ChatPage() {
   const user = useAuthStore((state) => state.user);
@@ -30,7 +29,7 @@ export default function ChatPage() {
   const [selectedChat, setSelectedChat] = useState<EnhancedChatItem | null>(
     null
   );
-  const [messages, setMessages] = useState<Message[]>([]);
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [hasMore, setHasMore] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -131,7 +130,7 @@ export default function ChatPage() {
 
   // Listen for new incoming messages
 		useEffect(() => {
-			const handleMessage = (msg: Message) => {
+			const handleMessage = (msg: ChatMessage) => {
 				if (msg.chatId === selectedChat?.chatId) {
 					setMessages((prev) =>
 						prev.some((m) => m.id === msg.id) ? prev : [...prev, msg]
@@ -141,16 +140,16 @@ export default function ChatPage() {
 					}
 				}
 			};
-			import("@/lib/socket").then(({ default: socket }) => {
-				socket.on("message", handleMessage);
-				socket.on("connect", () => setIsSidebarOpen(true));
-				socket.on("disconnect", () => setIsSidebarOpen(false));
-				return () => {
-					socket.off("message", handleMessage);
-					socket.off("connect");
-					socket.off("disconnect");
-				};
-			});
+			
+			socket.on("message", handleMessage);
+			socket.on("connect", () => setIsSidebarOpen(true));
+			socket.on("disconnect", () => setIsSidebarOpen(false));
+			
+			return () => {
+				socket.off("message", handleMessage);
+				socket.off("connect");
+				socket.off("disconnect");
+			};
 		}, [selectedChat, user]);
 
   // Debug wrappers for pending media setters
@@ -174,8 +173,8 @@ export default function ChatPage() {
      
       sendMessageSocket(
         {
-          chatId: selectedChat.chatId,
-          userId: selectedChat.userId, // recipient's userId
+          chatId: selectedChat.chatId!,
+          userId: selectedChat.userId!, // recipient's userId - required by backend
           content: pendingMessage || "",
           imageUrl: pendingImageUrl || undefined,
           audioUrl: pendingAudioUrl || undefined,
@@ -293,56 +292,57 @@ export default function ChatPage() {
       if (selectedChat.type === "user") {
         sendMessageSocket(
           {
-            userId: selectedChat.userId,
-            content,
+            chatId: selectedChat.chatId!,
+            userId: selectedChat.userId!, // Required by backend
+            content,  
             imageUrl,
             audioUrl,
           },
-          (msg: Message) => {
-            // After first message, join the new chat room and update selectedChat
-            if (msg.chatId) {
-              joinChat(msg.chatId);
-              // Update selectedChat to new chat type
-              setSelectedChat((prev) =>
-                prev && prev.userId === msg.receiverId
+                  (msg: ChatMessage) => {
+          // After first message, join the new chat room and update selectedChat
+          if (msg.chatId) {
+            joinChat(msg.chatId);
+            // Update selectedChat to new chat type
+            setSelectedChat((prev) =>
+              prev && prev.userId === msg.receiverId
+                ? {
+                    ...prev,
+                    type: "chat",
+                    chatId: msg.chatId,
+                    id: msg.chatId,
+                  }
+                : prev
+            );
+            // Update chatItems to reflect the new chat type and chatId
+            setChatItems((prev) =>
+              prev.map((item) =>
+                item.userId === msg.receiverId && item.type === "user"
                   ? {
-                      ...prev,
+                      ...item,
                       type: "chat",
                       chatId: msg.chatId,
                       id: msg.chatId,
                     }
-                  : prev
-              );
-              // Update chatItems to reflect the new chat type and chatId
-              setChatItems((prev) =>
-                prev.map((item) =>
-                  item.userId === msg.receiverId && item.type === "user"
-                    ? {
-                        ...item,
-                        type: "chat",
-                        chatId: msg.chatId,
-                        id: msg.chatId,
-                      }
-                    : item
-                )
-              );
-              // Re-fetch chat list and messages from backend for stability
-              listUserChats({ page: 1, limit: 10 }, (result: ChatListItem[]) => {
-                const chatData = result;
-                if (chatData && Array.isArray(chatData)) {
-                  setChatItems(chatData);
-                  setHasMore(chatData.length === 10);
-                  setCurrentPage(1);
-                }
-              });
-              getMessagesByChat({ chatId: msg.chatId }, (result: ChatMessage[]) => {
-                const msgs = result;
-                if (Array.isArray(msgs)) {
-                  setMessages(msgs);
-                }
-              });
-            }
-          },
+                  : item
+              )
+            );
+            // Re-fetch chat list and messages from backend for stability
+            listUserChats({ page: 1, limit: 10 }, (result: ChatListItem[]) => {
+              const chatData = result;
+              if (chatData && Array.isArray(chatData)) {
+                setChatItems(chatData);
+                setHasMore(chatData.length === 10);
+                setCurrentPage(1);
+              }
+            });
+            getMessagesByChat({ chatId: msg.chatId }, (result: ChatMessage[]) => {
+              const msgs = result;
+              if (Array.isArray(msgs)) {
+                setMessages(msgs);
+              }
+            });
+          }
+        },
           (err: { message?: string }) => {
             alert(err?.message || "Failed to send message");
           }
@@ -352,6 +352,7 @@ export default function ChatPage() {
       // Existing chat
       const payload = {
         chatId: selectedChat.chatId!,
+        userId: selectedChat.userId!, // Required by backend
         content,
         imageUrl,
         audioUrl,
@@ -359,7 +360,7 @@ export default function ChatPage() {
      
       sendMessageSocket(
         payload,
-        (msg: Message) => {
+        (msg: ChatMessage) => {
           setMessages((prev) =>
             prev.some((m) => m.id === msg.id) ? prev : [...prev, msg]
           );

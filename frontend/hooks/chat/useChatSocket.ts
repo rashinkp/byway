@@ -18,7 +18,7 @@ export function useChatSocket() {
 	// Expose emitters and listeners
 	return {
 		joinChat: (chatId: string) => socket.emit("join", chatId),
-		sendMessage: (data: SendMessageData) => socket.emit("newMessage", data),
+		sendMessage: (data: SendMessageData) => socket.emit("sendMessage", data),
 		createChat: (data: CreateChatData) => socket.emit("createChat", data),
 		getChatHistory: (data: GetChatHistoryData) => socket.emit("getChatHistory", data),
 		listUserChats: (data: GetChatHistoryData) => socket.emit("listUserChats", data),

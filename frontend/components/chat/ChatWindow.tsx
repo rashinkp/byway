@@ -1,13 +1,13 @@
 import React, { useRef, useEffect, forwardRef, useImperativeHandle } from "react";
-import { EnhancedChatItem, Message } from "@/types/chat";
+import { ChatListItem, ChatMessage } from "@/types/chat";
 import { Message as MessageComponent } from "./Message";
 import { Badge } from "@/components/ui/badge";
 import { ModernChatInput } from "./ChatInput";
 import { ArrowLeft } from "lucide-react";
 
 export interface ChatWindowProps {
-  chat: EnhancedChatItem;
-  messages: Message[];
+  chat: ChatListItem;
+  messages: ChatMessage[];
   onSendMessage: (content: string, imageUrl?: string, audioUrl?: string) => void;
   currentUserId: string;
   onDeleteMessage?: (messageId: string) => void;
@@ -63,10 +63,10 @@ export const ChatWindow = forwardRef<{ scrollToBottom: () => void }, ChatWindowP
   }, [messages.length]);
 
   // Group messages by date
-  const groupedMessages: { date: string; messages: Message[] }[] = [];
+  const groupedMessages: { date: string; messages: ChatMessage[] }[] = [];
   if (Array.isArray(messages)) {
     messages.forEach((msg) => {
-      const dateLabel = getDateLabel(msg.createdAt);
+      const dateLabel = getDateLabel(msg.timestamp || msg.createdAt || "");
       if (
         !groupedMessages.length ||
         groupedMessages[groupedMessages.length - 1].date !== dateLabel
@@ -199,7 +199,7 @@ export const ChatWindow = forwardRef<{ scrollToBottom: () => void }, ChatWindowP
                   key={msg.id}
                   message={{
                     ...msg,
-                    timestamp: msg.timestamp || msg.createdAt
+                    timestamp: msg.timestamp || msg.createdAt || ""
                   }}
                   currentUserId={currentUserId}
                   chat={chat}

@@ -2,14 +2,14 @@ export interface ChatMessage {
   id: string;
   chatId: string;
   senderId: string;
-  receiverId?: string;
+  receiverId: string; // Required by backend MessageResponseDTO
   content?: string;
   imageUrl?: string;
   audioUrl?: string;
-  type: 'text' | 'image' | 'audio';
+  type: 'TEXT' | 'IMAGE' | 'AUDIO'; // Fixed to match backend enum values
   isRead: boolean;
-  createdAt: string;
-  timestamp?: string;
+  timestamp: string; // Primary timestamp field (matches backend)
+  createdAt?: string; // Optional for backward compatibility
   sender?: {
     id: string;
     name: string;
@@ -39,7 +39,7 @@ export interface ChatListItem {
     content?: string;
     imageUrl?: string;
     audioUrl?: string;
-    type: 'text' | 'image' | 'audio';
+    type: 'TEXT' | 'IMAGE' | 'AUDIO'; // Fixed to match backend enum values
   };
   lastMessageTime?: string;
   unreadCount?: number;
@@ -59,9 +59,9 @@ export interface ChatHistoryResponse {
 }
 
 export interface SendMessageData {
-  chatId?: string;
-  content: string;
-  userId?: string;
+  chatId: string; // Required for sending messages
+  userId: string; // Required by backend
+  content?: string; // Made optional to match backend
   imageUrl?: string;
   audioUrl?: string;
 }
