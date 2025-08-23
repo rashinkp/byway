@@ -59,7 +59,7 @@ export interface ChatHistoryResponse {
 }
 
 export interface SendMessageData {
-  chatId: string; // Required for sending messages
+  chatId?: string; // Optional - backend can create chat if not provided
   userId: string; // Required by backend
   content?: string; // Made optional to match backend
   imageUrl?: string;

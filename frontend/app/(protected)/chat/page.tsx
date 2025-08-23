@@ -54,13 +54,56 @@ export default function ChatPage() {
 
   // Track socket connection state
   useEffect(() => {
-    const handleConnect = () => setIsSocketConnected(true);
-    const handleDisconnect = () => setIsSocketConnected(false);
+    const handleConnect = () => {
+      console.log('🔌 [Chat] Socket connected in chat page', {
+        socketId: socket.id,
+        userId: user?.id,
+        timestamp: new Date().toISOString(),
+      });
+      setIsSocketConnected(true);
+    };
+    const handleDisconnect = (reason: string) => {
+      console.log('🔌 [Chat] Socket disconnected in chat page', {
+        reason,
+        userId: user?.id,
+        timestamp: new Date().toISOString(),
+      });
+      setIsSocketConnected(false);
+    };
     socket.on("connect", handleConnect);
     socket.on("disconnect", handleDisconnect);
+    
+    // Check initial connection state
+    console.log('🔌 [Chat] Initial socket state:', {
+      connected: socket.connected,
+      socketId: socket.id,
+      userId: user?.id,
+      timestamp: new Date().toISOString(),
+    });
+    
     return () => {
       socket.off("connect", handleConnect);
       socket.off("disconnect", handleDisconnect);
+    };
+  }, [user?.id]);
+
+  // Global message listener for debugging
+  useEffect(() => {
+    const handleGlobalMessage = (msg: any) => {
+      console.log('🌍 [Chat] Global message received:', {
+        event: 'message',
+        messageId: msg?.id,
+        chatId: msg?.chatId,
+        senderId: msg?.senderId,
+        content: msg?.content?.substring(0, 50) + '...',
+        timestamp: new Date().toISOString(),
+      });
+    };
+    
+    socket.on("message", handleGlobalMessage);
+    
+    return () => {
+      socket.off("message", handleGlobalMessage);
     };
   }, []);
 
@@ -112,45 +155,97 @@ export default function ChatPage() {
 
   // Fetch messages when selected chat changes (paginated)
   useEffect(() => {
-    if (!selectedChat) return;
+    if (!selectedChat) {
+      console.log('🗑️ [Chat] No chat selected, clearing messages');
+      setMessages([]);
+      setCurrentPage(1);
+      setHasMore(false);
+      return;
+    }
+    
     if (selectedChat.type === "chat" && selectedChat.chatId) {
-      joinChat(selectedChat.chatId);
+      console.log('📚 [Chat] Loading messages for selected chat:', selectedChat.chatId);
+      setLoading(true);
       getMessagesByChat(
         { chatId: selectedChat.chatId, limit: 20 },
         (result: ChatMessage[]) => {
           const msgs = result;
+          console.log('📚 [Chat] Messages loaded from useEffect:', {
+            chatId: selectedChat.chatId,
+            messageCount: Array.isArray(msgs) ? msgs.length : 0,
+            isArray: Array.isArray(msgs),
+            timestamp: new Date().toISOString(),
+          });
           // Backend now returns ASC order (oldest first), which matches display expectations
           setMessages(Array.isArray(msgs) ? msgs : []);
+          setLoading(false);
+          
+          // Mark messages as read for this chat
+          if (user?.id && selectedChat.chatId) {
+            markMessagesAsRead(selectedChat.chatId, user.id);
+          }
+          
+          // Scroll to bottom after messages are loaded
+          setTimeout(() => {
+            if (chatWindowRef.current?.scrollToBottom) {
+              chatWindowRef.current.scrollToBottom();
+            }
+          }, 100);
         }
       );
     } else {
       setMessages([]);
     }
-  }, [selectedChat]);
+  }, [selectedChat, user?.id]);
 
   // Listen for new incoming messages
 		useEffect(() => {
 			const handleMessage = (msg: ChatMessage) => {
+				console.log('💬 [Chat] Received message event:', {
+					messageId: msg.id,
+					chatId: msg.chatId,
+					selectedChatId: selectedChat?.chatId,
+					senderId: msg.senderId,
+					userId: user?.id,
+					content: msg.content?.substring(0, 50) + '...',
+					timestamp: new Date().toISOString(),
+				});
+				
 				if (msg.chatId === selectedChat?.chatId) {
+					console.log('✅ [Chat] Message matches selected chat, adding to messages');
 					setMessages((prev) =>
 						prev.some((m) => m.id === msg.id) ? prev : [...prev, msg]
 					);
 					if (user && msg.senderId !== user.id) {
+						console.log('📖 [Chat] Marking message as read');
 						markMessagesAsRead(msg.chatId, user.id);
 					}
+				} else {
+					console.log('❌ [Chat] Message does not match selected chat', {
+						messageChatId: msg.chatId,
+						selectedChatId: selectedChat?.chatId,
+					});
 				}
 			};
 			
+			console.log('🎧 [Chat] Setting up message listener for chat:', selectedChat?.chatId);
 			socket.on("message", handleMessage);
-			socket.on("connect", () => setIsSidebarOpen(true));
-			socket.on("disconnect", () => setIsSidebarOpen(false));
+			socket.on("connect", () => {
+				console.log('🔌 [Chat] Socket connected');
+				setIsSidebarOpen(true);
+			});
+			socket.on("disconnect", () => {
+				console.log('🔌 [Chat] Socket disconnected');
+				setIsSidebarOpen(false);
+			});
 			
 			return () => {
+				console.log('🧹 [Chat] Cleaning up message listener for chat:', selectedChat?.chatId);
 				socket.off("message", handleMessage);
 				socket.off("connect");
 				socket.off("disconnect");
 			};
-		}, [selectedChat, user]);
+		}, [selectedChat?.chatId, user?.id]); // More stable dependencies
 
   // Debug wrappers for pending media setters
   const debugSetPendingImageUrl = (url: string) => {
@@ -194,18 +289,32 @@ export default function ChatPage() {
   }, [pendingMessage, pendingImageUrl, pendingAudioUrl, selectedChat, user]);
 
   const handleSelectChat = (chat: EnhancedChatItem) => {
+    console.log('🎯 [Chat] Selecting chat:', {
+      chatId: chat.chatId,
+      chatType: chat.type,
+      displayName: chat.displayName,
+      previousChatId: previousChatIdRef.current,
+      timestamp: new Date().toISOString(),
+    });
   
     if (
       previousChatIdRef.current &&
       previousChatIdRef.current !== chat.chatId
     ) {
+      console.log('🚪 [Chat] Leaving previous chat room:', previousChatIdRef.current);
       socket.emit("leave", previousChatIdRef.current);
     }
-    // Join new chat room
+    
+    // Join new chat room using the service function
     if (chat.type === "chat" && chat.chatId) {
-      socket.emit("join", chat.chatId);
-      previousChatIdRef.current = chat.chatId;
+      const chatId = chat.chatId; // Extract to avoid TypeScript issues
+      console.log('🚪 [Chat] Joining new chat room:', chatId);
+      joinChat(chatId);
+      previousChatIdRef.current = chatId;
+      
+
     }
+    
     setSelectedChat(chat);
     // Auto-close sidebar on mobile when chat is selected
     if (window.innerWidth < 768) {
@@ -287,17 +396,43 @@ export default function ChatPage() {
   // Restore handleSendMessage function
   const handleSendMessage = useCallback(
     (content: string, imageUrl?: string, audioUrl?: string) => {
+      console.log('📤 [Chat] handleSendMessage called:', {
+        content: content?.substring(0, 50) + '...',
+        selectedChatType: selectedChat?.type,
+        selectedChatId: selectedChat?.chatId,
+        selectedUserId: selectedChat?.userId,
+        timestamp: new Date().toISOString(),
+      });
     
-      if (!user || !selectedChat) return;
+      if (!user || !selectedChat) {
+        console.log('❌ [Chat] Cannot send message - missing user or selectedChat');
+        return;
+      }
+      
       if (selectedChat.type === "user") {
+        // For new chats, chatId might not exist yet
+        console.log('📤 [Chat] Sending message for new chat:', {
+          chatId: selectedChat.chatId,
+          userId: selectedChat.userId,
+          content: content?.substring(0, 50) + '...',
+        });
+        
+        const messageData: any = {
+          userId: selectedChat.userId!, // Required by backend
+          content,  
+          imageUrl,
+          audioUrl,
+        };
+        
+        // Only include chatId if it exists
+        if (selectedChat.chatId) {
+          messageData.chatId = selectedChat.chatId;
+        }
+        
+        console.log('📤 [Chat] Final messageData being sent:', messageData);
+        
         sendMessageSocket(
-          {
-            chatId: selectedChat.chatId!,
-            userId: selectedChat.userId!, // Required by backend
-            content,  
-            imageUrl,
-            audioUrl,
-          },
+          messageData,
                   (msg: ChatMessage) => {
           // After first message, join the new chat room and update selectedChat
           if (msg.chatId) {
@@ -350,6 +485,12 @@ export default function ChatPage() {
         return;
       }
       // Existing chat
+      console.log('📤 [Chat] Sending message for existing chat:', {
+        chatId: selectedChat.chatId,
+        userId: selectedChat.userId,
+        content: content?.substring(0, 50) + '...',
+      });
+      
       const payload = {
         chatId: selectedChat.chatId!,
         userId: selectedChat.userId!, // Required by backend
@@ -357,6 +498,8 @@ export default function ChatPage() {
         imageUrl,
         audioUrl,
       };
+      
+      console.log('📤 [Chat] Final payload being sent for existing chat:', payload);
      
       sendMessageSocket(
         payload,
@@ -374,21 +517,8 @@ export default function ChatPage() {
     [user, selectedChat]
   );
 
-  useEffect(() => {
-    if (!user) return;
-    const handleConnect = () => {
-     
-      socket.emit("join", user.id);
-    };
-    socket.on("connect", handleConnect);
-    // If already connected, join immediately
-    if (socket.connected) {
-      handleConnect();
-    }
-    return () => {
-      socket.off("connect", handleConnect);
-    };
-  }, [user]);
+  // Note: Backend automatically joins user to their personal room on connection
+  // No need to manually emit "join" event for user's personal room
 
   // Responsive mobile detection
   useEffect(() => {
@@ -409,16 +539,21 @@ export default function ChatPage() {
 
   useEffect(() => {
     function handleMessagesRead({ chatId }: { chatId: string }) {
+      console.log('📖 [Chat] Received messagesRead event:', {
+        chatId,
+        selectedChatId: selectedChat?.chatId,
+        timestamp: new Date().toISOString(),
+      });
      
       if (selectedChat?.chatId === chatId) {
-      
+        console.log('📖 [Chat] Refreshing messages for selected chat');
         getMessagesByChat({ chatId }, (result: ChatMessage[]) => {
           const msgs = result;
-      
           setMessages(Array.isArray(msgs) ? msgs : []);
         });
       }
    
+      // Always refresh chat list when messages are read
       listUserChats(
         { page: 1, limit: 10, search: searchQuery },
         (result: ChatListItem[]) => {
@@ -432,11 +567,14 @@ export default function ChatPage() {
         }
       );
     }
+    
+    console.log('📖 [Chat] Setting up messagesRead listener');
     socket.on("messagesRead", handleMessagesRead);
     return () => {
+      console.log('📖 [Chat] Cleaning up messagesRead listener');
       socket.off("messagesRead", handleMessagesRead);
     };
-  }, [selectedChat, searchQuery, user]);
+  }, [selectedChat?.chatId, searchQuery, user?.id]); // More stable dependencies
 
   useEffect(() => {
     function handleMessageDeleted({ messageId, chatId }: { messageId: string; chatId: string }) {
@@ -548,6 +686,7 @@ export default function ChatPage() {
                   }}
                   setPendingImageUrl={debugSetPendingImageUrl}
                   setPendingAudioUrl={debugSetPendingAudioUrl}
+                  loadingMoreMessages={loading}
                 />
               </div>
             )}

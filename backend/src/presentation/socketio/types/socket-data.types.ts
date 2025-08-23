@@ -23,7 +23,7 @@ export interface MarkMessagesAsReadData {
 }
 
 export interface SendMessageData {
-  chatId: string; // Required for sending messages
+  chatId?: string; // Optional - backend can create chat if not provided
   userId: string;
   content?: string;
   imageUrl?: string;

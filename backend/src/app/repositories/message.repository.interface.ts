@@ -14,7 +14,7 @@ export interface IMessageRepository {
     beforeMessageId?: string
   ): Promise<IMessageWithUserData[]>;
   findByIdWithUserData(id: MessageId): Promise<IMessageWithUserData | null>;
-  create(message: Message): Promise<void>;
+  create(message: Message): Promise<Message>;
   save(message: Message): Promise<void>;
   delete(id: MessageId): Promise<void>;
   markAllAsRead(chatId: ChatId, userId: UserId): Promise<number>;

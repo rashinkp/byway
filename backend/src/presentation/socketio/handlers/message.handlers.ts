@@ -133,9 +133,23 @@ export function registerMessageHandlers(
   // Handle when user joins a chat (to clear pending notifications)
   socket.on("joinChat", async (data: JoinChatData) => {
       const userId = socket.data.user?.id;
+      console.log(`🚪 [Backend] User ${userId} attempting to join chat: ${data.chatId}`, {
+        userId,
+        chatId: data.chatId,
+        socketId: socket.id,
+        timestamp: new Date().toISOString(),
+      });
+      
       if (userId && data.chatId) {
         // Join the chat room
         socket.join(data.chatId);
+        console.log(`✅ [Backend] User ${userId} joined chat room: ${data.chatId}`, {
+          userId,
+          chatId: data.chatId,
+          socketId: socket.id,
+          socketRooms: Array.from(socket.rooms),
+          timestamp: new Date().toISOString(),
+        });
 
         // Mark all messages as read for this user in this chat
         await chatController.markMessagesAsRead({ chatId: data.chatId, userId });
@@ -149,6 +163,18 @@ export function registerMessageHandlers(
         io.to(userId).emit("messagesRead", { chatId: data.chatId, userId });
         // Also notify all participants in the chat room
         io.to(data.chatId).emit("messagesRead", { chatId: data.chatId, userId });
+        
+        console.log(`📤 [Backend] Emitted messagesRead event for chat: ${data.chatId}`, {
+          userId,
+          chatId: data.chatId,
+          timestamp: new Date().toISOString(),
+        });
+      } else {
+        console.log(`❌ [Backend] Failed to join chat - missing userId or chatId`, {
+          userId,
+          chatId: data.chatId,
+          timestamp: new Date().toISOString(),
+        });
       }
    
   });
@@ -252,20 +278,56 @@ export function registerMessageHandlers(
     async (data: SendMessageData) => {
       try {
         const senderId = socket.data.user?.id;
+        console.log(`📥 [Backend] Received sendMessage event:`, {
+          senderId,
+          chatId: data.chatId,
+          userId: data.userId,
+          content: data.content?.substring(0, 50) + '...',
+          timestamp: new Date().toISOString(),
+        });
+        
         if (!senderId) {
           socket.emit("error", {
             message: "Authentication required to send messages.",
           });
           return;
         }
-        const message = await chatController.handleNewMessage({
+        console.log(`🔍 [Backend] Calling handleNewMessage with:`, {
           chatId: data.chatId,
+          userId: data.userId,
+          senderId,
+          content: data.content?.substring(0, 50) + '...',
+          imageUrl: data.imageUrl,
+          audioUrl: data.audioUrl,
+          timestamp: new Date().toISOString(),
+        });
+        
+        // Handle the case where chatId is undefined (new chat)
+        const messageData = {
           userId: data.userId,
           senderId,
           content: data.content,
           imageUrl: data.imageUrl,
           audioUrl: data.audioUrl,
+        };
+        
+        // Only include chatId if it's not undefined
+        if (data.chatId !== undefined) {
+          (messageData as any).chatId = data.chatId;
+        }
+        
+        const message = await chatController.handleNewMessage(messageData);
+        
+        console.log(`🔍 [Backend] handleNewMessage result:`, {
+          hasMessage: !!message,
+          messageId: message?.id,
+          chatId: message?.chatId,
+          timestamp: new Date().toISOString(),
         });
+        
+        console.log(`🔍 [Backend] Full message result from controller:`, message);
+        console.log(`🔍 [Backend] Message type:`, typeof message);
+        console.log(`🔍 [Backend] Message keys:`, message ? Object.keys(message) : []);
         if (!message) {
           socket.emit("error", { message: "Failed to send message." });
           return;
@@ -285,8 +347,19 @@ export function registerMessageHandlers(
         if (!data.chatId && effectiveChatId) {
           socket.join(effectiveChatId);
         }
+        console.log(`📤 [Backend] Emitting message to sender: ${senderId}`, {
+          messageId: message.id,
+          chatId: targetChatId,
+          timestamp: new Date().toISOString(),
+        });
         socket.emit("messageSent", message);
         socket.emit("message", message);
+        
+        console.log(`📤 [Backend] Broadcasting message to chat room: ${targetChatId}`, {
+          messageId: message.id,
+          chatId: targetChatId,
+          timestamp: new Date().toISOString(),
+        });
         io.to(targetChatId).emit("message", message);
 
         // Note: Real-time notifications are now handled by the batching service

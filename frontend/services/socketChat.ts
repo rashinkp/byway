@@ -27,7 +27,32 @@ export const joinChat = (chatId: string) => {
 		timestamp: new Date().toISOString(),
 	});
 	
+	if (!socket.connected) {
+		logger.warn('Cannot join chat room - socket not connected', {
+			chatId,
+			socketConnected: socket.connected,
+			timestamp: new Date().toISOString(),
+		});
+		return;
+	}
+	
 	socket.emit("joinChat", { chatId });
+	logger.info('JoinChat event emitted', {
+		chatId,
+		socketId: socket.id,
+		timestamp: new Date().toISOString(),
+	});
+	
+	// Add a callback to confirm room join
+	socket.once("messagesRead", (data: { chatId: string; userId: string }) => {
+		if (data.chatId === chatId) {
+			logger.info('✅ Successfully joined chat room', {
+				chatId,
+				socketId: socket.id,
+				timestamp: new Date().toISOString(),
+			});
+		}
+	});
 };
 
 export const sendMessage = (
@@ -63,7 +88,9 @@ export const sendMessage = (
 			userId: data.userId,
 			timestamp: new Date().toISOString(),
 		});
-		socket.once("messageSent", (message: ChatMessage) => {
+		
+		// Create a specific success handler for this message send operation
+		const successHandler = (message: ChatMessage) => {
 			logger.info('Message sent successfully', {
 				chatId: data.chatId,
 				userId: data.userId,
@@ -71,7 +98,16 @@ export const sendMessage = (
 				timestamp: new Date().toISOString(),
 			});
 			onSuccess(message);
-		});
+			// Remove the success listener to prevent it from being called again
+			socket.off("messageSent", successHandler);
+		};
+		
+		socket.on("messageSent", successHandler);
+		
+		// Set a timeout to clean up the success listener if no success occurs
+		setTimeout(() => {
+			socket.off("messageSent", successHandler);
+		}, 5000); // 5 second timeout
 	}
 
 	if (onError) {
@@ -80,15 +116,32 @@ export const sendMessage = (
 			userId: data.userId,
 			timestamp: new Date().toISOString(),
 		});
-		socket.once("error", (error: { message: string }) => {
+		
+		// Create a specific error handler for this message send operation
+		const errorHandler = (error: { message: string }) => {
 			logger.error('Message send failed', {
 				chatId: data.chatId,
 				userId: data.userId,
 				error: error.message,
 				timestamp: new Date().toISOString(),
 			});
+			logger.debug('Error handler triggered for message send', {
+				chatId: data.chatId,
+				userId: data.userId,
+				errorMessage: error.message,
+				timestamp: new Date().toISOString(),
+			});
 			onError(error);
-		});
+			// Remove the error listener to prevent it from being called again
+			socket.off("error", errorHandler);
+		};
+		
+		socket.on("error", errorHandler);
+		
+		// Set a timeout to clean up the error listener if no error occurs
+		setTimeout(() => {
+			socket.off("error", errorHandler);
+		}, 5000); // 5 second timeout
 	}
 };
 
