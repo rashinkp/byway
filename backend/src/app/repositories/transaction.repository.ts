@@ -5,6 +5,7 @@ export interface ITransactionRepository {
   create(transaction: Transaction): Promise<Transaction>;
   findById(id: string): Promise<Transaction | null>;
   findByOrderId(orderId: string): Promise<Transaction | null>;
+  findByTransactionId(transactionId: string): Promise<Transaction | null>;
   findByUserId(
     userId: string,
     page?: number,
