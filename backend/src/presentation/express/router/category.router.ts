@@ -24,7 +24,7 @@ export default function categoryRouter(
       next
     )
   );
-  router.get("/:id", (req, res, next) =>
+  router.get("/:categoryId", (req, res, next) =>
     expressAdapter(
       req,
       res,
