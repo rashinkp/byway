@@ -231,13 +231,47 @@ export class PaymentService implements IPaymentService {
         }
 
         if (!transaction) {
-          throw new HttpError("Transaction not found", StatusCodes.NOT_FOUND);
+          // Create transaction if it doesn't exist (this can happen if the initial transaction creation failed)
+          console.log("Creating missing transaction for order:", orderId);
+          try {
+            transaction = await this._transactionRepository.create(
+              new Transaction({
+                orderId,
+                userId: session.metadata?.userId || "",
+                amount: session.amount_total ? session.amount_total / 100 : 0, // Convert from cents
+                type: TransactionType.PURCHASE,
+                status: TransactionStatus.COMPLETED,
+                paymentGateway: PaymentGatewayEnum.STRIPE,
+                transactionId: session.payment_intent as string,
+                paymentMethod: "STRIPE",
+                metadata: {
+                  stripeSessionId: session.id,
+                  isWalletTopUp: isWalletTopUp,
+                  ...session.metadata
+                }
+              })
+            );
+          } catch (error) {
+                         // If transaction creation fails due to duplicate transactionId, try to find existing transaction
+             if (error instanceof Error && error.message.includes('already exists')) {
+               console.log("Transaction already exists, trying to find by transactionId");
+               // Try to find by transactionId instead
+               transaction = await this._transactionRepository.findByTransactionId(session.payment_intent as string);
+               
+               if (!transaction) {
+                 throw new HttpError("Failed to create or find transaction", StatusCodes.INTERNAL_SERVER_ERROR);
+               }
+             } else {
+               throw error;
+             }
+          }
+        } else {
+          // Update existing transaction status
+          await this._transactionRepository.updateStatus(
+            transaction.id,
+            TransactionStatus.COMPLETED
+          );
         }
-
-        await this._transactionRepository.updateStatus(
-          transaction.id,
-          TransactionStatus.COMPLETED
-        );
 
         if (isWalletTopUp) {
           const wallet = await this._walletRepository.findByUserId(

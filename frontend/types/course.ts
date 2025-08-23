@@ -177,6 +177,7 @@ export interface CourseDetailLayoutProps {
 	sidebarProps: {
 		isCartLoading?: boolean;
 		handleAddToCart?: () => void;
+		handleBuyNow?: () => void;
 		isEnrolled?: boolean;
 		userLoading?: boolean;
 		adminActions?: ReactNode;

@@ -72,3 +72,34 @@ export const envConfig = {
   AWS_REGION: process.env.AWS_REGION || "",
   AWS_BUCKET_NAME: process.env.AWS_BUCKET_NAME || "",
 };
+
+// Validate critical environment variables
+const validateEnvironment = () => {
+  const errors: string[] = [];
+  
+  if (!envConfig.STRIPE_SECRET_KEY) {
+    errors.push("STRIPE_SECRET_KEY is not configured");
+  } else if (!envConfig.STRIPE_SECRET_KEY.startsWith('sk_')) {
+    errors.push("STRIPE_SECRET_KEY format is invalid (should start with 'sk_')");
+  }
+  
+  if (!envConfig.STRIPE_WEBHOOK_SECRET) {
+    errors.push("STRIPE_WEBHOOK_SECRET is not configured");
+  } else if (!envConfig.STRIPE_WEBHOOK_SECRET.startsWith('whsec_')) {
+    errors.push("STRIPE_WEBHOOK_SECRET format is invalid (should start with 'whsec_')");
+  }
+  
+  if (errors.length > 0) {
+    console.error("Environment validation errors:", errors);
+    console.error("Current environment:", envConfig.NODE_ENV);
+    console.error("Environment file:", envFile);
+    throw new Error(`Environment validation failed: ${errors.join(', ')}`);
+  }
+  
+  console.log("✅ Environment validation passed");
+  console.log("🔧 Current environment:", envConfig.NODE_ENV);
+  console.log("📁 Environment file:", envFile);
+};
+
+// Run validation when this module is loaded
+validateEnvironment();

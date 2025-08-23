@@ -73,7 +73,25 @@ export class TransactionRepository implements ITransactionRepository {
         updatedAt: createdTransaction.updatedAt,
       });
     } catch (error) {
-    
+      console.error("Transaction creation error:", {
+        error: error instanceof Error ? error.message : error,
+        transactionData: {
+          userId: transaction.userId,
+          orderId: transaction.orderId,
+          amount: transaction.amount,
+          type: transaction.type,
+          status: transaction.status,
+          paymentGateway: transaction.paymentGateway,
+          transactionId: transaction.transactionId,
+        }
+      });
+      
+      if (error instanceof Prisma.PrismaClientKnownRequestError) {
+        if (error.code === 'P2002') {
+          throw new Error(`Transaction with transactionId ${transaction.transactionId} already exists`);
+        }
+      }
+      
       throw error;
     }
   }
@@ -89,6 +107,13 @@ export class TransactionRepository implements ITransactionRepository {
     const transaction = await this._prisma.transactionHistory.findFirst({
       where: { orderId },
       orderBy: { createdAt: "desc" },
+    });
+    return transaction ? this.mapToTransaction(transaction) : null;
+  }
+
+  async findByTransactionId(transactionId: string): Promise<Transaction | null> {
+    const transaction = await this._prisma.transactionHistory.findUnique({
+      where: { transactionId },
     });
     return transaction ? this.mapToTransaction(transaction) : null;
   }
