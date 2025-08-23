@@ -68,23 +68,35 @@ export class StripeController extends BaseController {
 
         const session = event.data.object;
         const userId = session.metadata?.userId;
-        const courseId = session.metadata?.courseId;
+        const courseIds = session.metadata?.courseIds;
 
-        console.log("Webhook metadata:", { userId, courseId, metadata: session.metadata });
+        console.log("Webhook metadata:", { userId, courseIds, metadata: session.metadata });
 
-        if (!userId || !courseId) {
+        if (!userId || !courseIds) {
           console.error("Missing required metadata in webhook");
-          throw new Error("Missing Stripe metadata: userId or courseId");
+          throw new Error("Missing Stripe metadata: userId or courseIds");
         }
 
-        const isEnrolled = await this.getEnrollmentStatsUseCase.execute({
-          userId,
-          courseId,
-        });
+        // Parse courseIds from JSON string
+        let parsedCourseIds: string[];
+        try {
+          parsedCourseIds = JSON.parse(courseIds);
+        } catch (error) {
+          console.error("Invalid courseIds format in metadata:", courseIds);
+          throw new Error("Invalid courseIds format in metadata");
+        }
 
-        if (isEnrolled) {
-          console.log("User already enrolled, skipping enrollment");
-          return this.success_200(null, "Already enrolled");
+        // Check enrollment for each course
+        for (const courseId of parsedCourseIds) {
+          const isEnrolled = await this.getEnrollmentStatsUseCase.execute({
+            userId,
+            courseId,
+          });
+
+          if (isEnrolled) {
+            console.log("User already enrolled, skipping enrollment");
+            return this.success_200(null, "Already enrolled in one or more courses");
+          }
         }
 
         console.log("Processing webhook payment...");
