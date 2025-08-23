@@ -31,7 +31,7 @@ socket.on(
       query,
       params: {},
     });
-    return messages;
+    return messages.body;
   }, "messagesByChat")
 );
 
@@ -41,7 +41,7 @@ socket.on(
       const message = await chatController.getMessageById({
         params: {messageId:data.messageId},
       });
-      return message;
+      return message.body;
     }, "messageById")
   );
 
