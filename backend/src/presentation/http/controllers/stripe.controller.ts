@@ -8,6 +8,7 @@ import { IPaymentService } from "../../../app/services/payment/interfaces/paymen
 import { createCheckoutSessionSchema } from "../../../app/dtos/payment.dto";
 import { StripeWebhookGateway } from "../../../infra/providers/stripe/stripe-webhook.gateway";
 import { IGetEnrollmentStatsUseCase } from "../../../app/usecases/enrollment/interfaces/get-enrollment-stats.usecase.interface";
+import { IEnrollmentRepository } from "../../../app/repositories/enrollment.repository.interface";
 
 export class StripeController extends BaseController {
   private webhookGateway: StripeWebhookGateway;
@@ -15,6 +16,7 @@ export class StripeController extends BaseController {
   constructor(
     private paymentService: IPaymentService,
     private getEnrollmentStatsUseCase: IGetEnrollmentStatsUseCase,
+    private enrollmentRepository: IEnrollmentRepository,
     httpErrors: IHttpErrors,
     httpSuccess: IHttpSuccess
   ) {
@@ -69,12 +71,27 @@ export class StripeController extends BaseController {
         const session = event.data.object;
         const userId = session.metadata?.userId;
         const courseIds = session.metadata?.courseIds;
+        const isWalletTopUp = session.metadata?.isWalletTopUp === 'true';
 
-        console.log("Webhook metadata:", { userId, courseIds, metadata: session.metadata });
+        console.log("Webhook metadata:", { userId, courseIds, isWalletTopUp, metadata: session.metadata });
 
-        if (!userId || !courseIds) {
+        if (!userId) {
           console.error("Missing required metadata in webhook");
-          throw new Error("Missing Stripe metadata: userId or courseIds");
+          throw new Error("Missing Stripe metadata: userId");
+        }
+
+        // Handle wallet top-up
+        if (isWalletTopUp) {
+          console.log("Processing wallet top-up webhook...");
+          const response = await this.paymentService.handleStripeWebhook(event);
+          console.log("Wallet top-up processed successfully:", response.message);
+          return this.success_200(response.data, response.message);
+        }
+
+        // Handle course purchase
+        if (!courseIds) {
+          console.error("Missing courseIds for course purchase");
+          throw new Error("Missing Stripe metadata: courseIds for course purchase");
         }
 
         // Parse courseIds from JSON string
@@ -86,17 +103,12 @@ export class StripeController extends BaseController {
           throw new Error("Invalid courseIds format in metadata");
         }
 
-        // Check enrollment for each course
-        for (const courseId of parsedCourseIds) {
-          const isEnrolled = await this.getEnrollmentStatsUseCase.execute({
-            userId,
-            courseId,
-          });
-
-          if (isEnrolled) {
-            console.log("User already enrolled, skipping enrollment");
-            return this.success_200(null, "Already enrolled in one or more courses");
-          }
+        // Check if user is already enrolled in any of the courses
+        const existingEnrollments = await this.enrollmentRepository.findByUserIdAndCourseIds(userId, parsedCourseIds);
+        
+        if (existingEnrollments && existingEnrollments.length > 0) {
+          console.log("User already enrolled in one or more courses, skipping enrollment");
+          return this.success_200(null, "Already enrolled in one or more courses");
         }
 
         console.log("Processing webhook payment...");
