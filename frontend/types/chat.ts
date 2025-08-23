@@ -42,10 +42,10 @@ export interface ChatListItem {
     type: 'text' | 'image' | 'audio';
   };
   lastMessageTime?: string;
-  unreadCount: number;
+  unreadCount?: number;
   chatId?: string;
   userId?: string;
-  isOnline: boolean;
+  isOnline?: boolean;
 }
 
 // Alias for backward compatibility

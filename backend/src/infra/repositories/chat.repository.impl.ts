@@ -310,6 +310,7 @@ export class ChatRepository implements IChatRepository {
         avatar: user.avatar || undefined,
         role: user.role,
         userId: user.id,
+        unreadCount: 0,
         isOnline: false,
       }));
       chatItems.push(...userItems);
