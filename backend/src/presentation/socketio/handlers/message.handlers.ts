@@ -15,25 +15,39 @@ export function registerMessageHandlers(
   io: SocketIOServer,
   chatController: ChatController
 ) {
-socket.on(
-  "getMessagesByChat",
-  socketHandler<GetMessagesByChatData>(async (data) => {
-    const query: Record<string, string | number | boolean> = {
-      chatId: data.chatId,
-      limit: data.limit ?? 20,
-    };
+  socket.on(
+    "getMessagesByChat",
+    socketHandler<GetMessagesByChatData>(async (data) => {
+      const query: Record<string, string | number | boolean> = {
+        chatId: data.chatId,
+        limit: data.limit ?? 20,
+      };
 
-    if (data.beforeMessageId !== undefined) {
-      query.beforeMessageId = data.beforeMessageId;
-    }
+      if (data.beforeMessageId !== undefined) {
+        query.beforeMessageId = data.beforeMessageId;
+      }
 
-    const messages = await chatController.getMessagesByChat({
-      query,
-      params: {},
-    });
-    return messages.body;
-  }, "messagesByChat")
-);
+      const messages = await chatController.getMessagesByChat({
+        query,
+        params: {},
+      });
+      
+      // Extract the data from the controller response
+      // The controller returns { statusCode: 200, body: { success: true, message: "Success", data: result, message: "Messages retrieved successfully" } }
+      const messageData = (messages.body as any)?.data;
+      
+      console.log("🔍 getMessagesByChat result:", {
+        hasResult: !!messages,
+        resultType: typeof messages,
+        hasBody: !!messages?.body,
+        bodyType: typeof messages?.body,
+        messageCount: Array.isArray(messageData) ? messageData.length : 'not array',
+        timestamp: new Date().toISOString(),
+      });
+      
+      return messageData || [];
+    }, "messagesByChat")
+  );
 
   socket.on(
     "getMessageById",
@@ -41,7 +55,21 @@ socket.on(
       const message = await chatController.getMessageById({
         params: {messageId:data.messageId},
       });
-      return message.body;
+      
+      // Extract the data from the controller response
+      // The controller returns { statusCode: 200, body: { success: true, message: "Success", data: result, message: "Message retrieved successfully" } }
+      const messageData = (message.body as any)?.data;
+      
+      console.log("🔍 getMessageById result:", {
+        hasResult: !!message,
+        resultType: typeof message,
+        hasBody: !!message?.body,
+        bodyType: typeof message?.body,
+        hasData: !!messageData,
+        timestamp: new Date().toISOString(),
+      });
+      
+      return messageData || null;
     }, "messageById")
   );
 
@@ -153,6 +181,71 @@ socket.on(
       socket.emit("error", { message: "Failed to mark messages as read" });
     }
   });
+
+  // Handle newMessage event (frontend emits this)
+  socket.on(
+    "newMessage",
+    async (data: SendMessageData) => {
+      try {
+        const senderId = socket.data.user?.id;
+        if (!senderId) {
+          socket.emit("error", {
+            message: "Authentication required to send messages.",
+          });
+          return;
+        }
+
+        // Validate required fields
+        if (!data.chatId) {
+          socket.emit("error", { message: "Chat ID is required." });
+          return;
+        }
+
+        if (!data.content && !data.imageUrl && !data.audioUrl) {
+          socket.emit("error", { message: "Message content, image, or audio is required." });
+          return;
+        }
+
+        const message = await chatController.handleNewMessage({
+          chatId: data.chatId,
+          userId: data.userId || senderId, // Use senderId as fallback
+          senderId,
+          content: data.content,
+          imageUrl: data.imageUrl,
+          audioUrl: data.audioUrl,
+        });
+
+        if (!message) {
+          socket.emit("error", { message: "Failed to send message." });
+          return;
+        }
+
+        // Join the chat room if not already joined
+        socket.join(data.chatId);
+        
+        // Emit success response
+        socket.emit("messageSent", message);
+        
+        // Broadcast to all participants in the chat
+        io.to(data.chatId).emit("message", message);
+
+        // Update chat list for all participants
+        const participants = await chatController.getChatParticipantsById(data.chatId);
+        if (participants) {
+          io.to(participants.user1Id).emit("chatListUpdated");
+          io.to(participants.user2Id).emit("chatListUpdated");
+          
+          // Update unread count for recipient
+          const recipientId = participants.user1Id === senderId ? participants.user2Id : participants.user1Id;
+          const unreadCount = await chatController.getTotalUnreadCount(recipientId);
+          io.to(recipientId).emit("unreadMessageCount", { count: unreadCount });
+        }
+      } catch (err) {
+        console.error("❌ newMessage handler error:", err);
+        socket.emit("error", { message: "Failed to send message." });
+      }
+    }
+  );
 
   socket.on(
     "sendMessage",

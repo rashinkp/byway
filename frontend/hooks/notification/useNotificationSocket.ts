@@ -79,7 +79,7 @@ export const useNotificationSocket = () => {
 					search: search.trim() || undefined,
 				},
 				(result) => {
-					setTotal(result.total);
+					setTotal(result.totalCount);
 					setHasMore(result.hasMore);
 					const mapped = (result.items || []).map((n: Notification) => ({
 						...n,

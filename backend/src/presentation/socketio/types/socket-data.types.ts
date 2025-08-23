@@ -23,7 +23,7 @@ export interface MarkMessagesAsReadData {
 }
 
 export interface SendMessageData {
-  chatId?: string;
+  chatId: string; // Required for sending messages
   userId: string;
   content?: string;
   imageUrl?: string;
