@@ -17,14 +17,20 @@ export const createApp = (deps: AppDependencies, logger: ILogger): Application =
   app.post(
     "/api/v1/stripe/webhook",
     express.raw({ type: "application/json" }),
-    (req, res, next) => {
-      logger.info(`Stripe webhook received - Method: ${req.method}, URL: ${req.url}`);
-      return expressAdapter(
-        req,
-        res,
-        deps.stripeController.handleWebhook.bind(deps.stripeController),
-        next
-      );
+
+    async (req, res, next) => {
+      try {
+        logger.info(`Stripe webhook received - Method: ${req.method}, URL: ${req.url}`);
+        return await expressAdapter(
+          req,
+          res,
+          deps.stripeController.handleWebhook.bind(deps.stripeController),
+          next
+        );
+      } catch (error) {
+        logger.error(`Stripe webhook error: ${error instanceof Error ? error.message : 'Unknown error'}`);
+        return res.status(500).json({ error: 'Webhook processing failed' });
+      }
     }
   );
 
