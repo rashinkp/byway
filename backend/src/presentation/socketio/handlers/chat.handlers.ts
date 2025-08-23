@@ -84,28 +84,11 @@ export function registerChatHandlers(socket: Socket, io: SocketIOServer, chatCon
       if (filter !== undefined) query.filter = filter;
 
       const result = await chatController.listUserChats({ query, params: {} });
-      console.log("🔍 listUserChats result:", {
-        hasResult: !!result,
-        resultType: typeof result,
-        hasBody: !!result?.body,
-        bodyType: typeof result?.body,
-        bodyLength: Array.isArray(result?.body) ? result.body.length : 'not array',
-        timestamp: new Date().toISOString(),
-      });
       
       // Return the items array directly for socket communication
       // The controller returns { statusCode: 200, body: { success: true, message: "Success", data: result, message: "User chats retrieved successfully" } }
       const chatData = (result.body as any)?.data;
       const items = chatData?.items || [];
-      
-      console.log("🔍 listUserChats final data:", {
-        chatCount: items.length,
-        isArray: Array.isArray(items),
-        resultType: "object",
-        timestamp: new Date().toISOString(),
-        args: [userId],
-        dataSize: JSON.stringify(items).length,
-      });
       
       return items;
     }, "userChats")

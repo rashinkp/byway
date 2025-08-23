@@ -58,40 +58,8 @@ export class ChatController extends BaseController {
   }
 
   async handleNewMessage(socketData: SendMessageSocketData) {
-    console.log(`🔍 [Controller] handleNewMessage called with:`, {
-      chatId: socketData.chatId,
-      userId: socketData.userId,
-      senderId: socketData.senderId,
-      content: socketData.content?.substring(0, 50) + '...',
-      timestamp: new Date().toISOString(),
-    });
-    
-    console.log(`🔍 [Controller] About to validate data:`, {
-      hasChatId: 'chatId' in socketData,
-      chatIdValue: socketData.chatId,
-      chatIdType: typeof socketData.chatId,
-      hasUserId: 'userId' in socketData,
-      userIdValue: socketData.userId,
-      timestamp: new Date().toISOString(),
-    });
     
     const validated = sendMessageSocketSchema.parse(socketData);
-    console.log(`🔍 [Controller] Validation passed:`, {
-      chatId: validated.chatId,
-      userId: validated.userId,
-      timestamp: new Date().toISOString(),
-    });
-    
-    console.log(`🔍 [Controller] Validated data details:`, {
-      hasChatId: 'chatId' in validated,
-      chatIdValue: validated.chatId,
-      chatIdType: typeof validated.chatId,
-      hasUserId: 'userId' in validated,
-      userIdValue: validated.userId,
-      userIdType: typeof validated.userId,
-      timestamp: new Date().toISOString(),
-    });
-    
     const { content, imageUrl, audioUrl } = validated;
     const senderId = socketData.senderId;
     const userId = socketData.userId;
@@ -110,26 +78,7 @@ export class ChatController extends BaseController {
       useCaseInput.chatId = validated.chatId;
     }
     
-    console.log(`🔍 [Controller] Calling sendMessageUseCase with:`, {
-      chatId: useCaseInput.chatId,
-      userId,
-      senderId,
-      content: content?.substring(0, 50) + '...',
-      timestamp: new Date().toISOString(),
-    });
-    
     const message = await this.sendMessageUseCase.execute(useCaseInput);
-    
-    console.log(`🔍 [Controller] sendMessageUseCase result:`, {
-      hasMessage: !!message,
-      messageId: message?.id,
-      chatId: message?.chatId,
-      timestamp: new Date().toISOString(),
-    });
-    
-    console.log(`🔍 [Controller] Full message result:`, message);
-    console.log(`🔍 [Controller] About to return message from controller, type:`, typeof message);
-    console.log(`🔍 [Controller] Message keys:`, message ? Object.keys(message) : []);
     
     return message;
   }
