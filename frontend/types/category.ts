@@ -41,6 +41,7 @@ export interface CategoryFormModalProps {
 	onOpenChange: (open: boolean) => void;
 	onSubmit: (data: CategoryFormData) => void;
 	initialData?: {
+		id?: string;
 		name: string;
 		description?: string;
 	};

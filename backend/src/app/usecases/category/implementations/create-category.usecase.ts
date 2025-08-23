@@ -8,6 +8,7 @@ import {
 } from "../../../dtos/category.dto";
 import { Category } from "../../../../domain/entities/category.entity";
 import { ICategoryRepository } from "../../../repositories/category.repository";
+import { randomUUID } from "crypto";
 
 export class CreateCategoryUseCase implements ICreateCategoryUseCase {
   constructor(
@@ -35,9 +36,10 @@ export class CreateCategoryUseCase implements ICreateCategoryUseCase {
 
     // Create category entity
     const category = Category.create(
+      randomUUID(), // Generate a new UUID for the category
       input.name,
-      input.description,
-      input.createdBy
+      input.createdBy,
+      input.description
     );
 
 

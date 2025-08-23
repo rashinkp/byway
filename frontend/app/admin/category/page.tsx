@@ -209,7 +209,7 @@ export default function CategoriesPage() {
 					if (!open) setEditCategory(undefined);
 				}}
 				onSubmit={handleEditSubmit}
-				initialData={editCategory}
+				initialData={editCategory ? { name: editCategory.name, description: editCategory.description } : undefined}
 				title="Edit Category"
 				submitText="Update"
 				isLoading={isUpdating}
