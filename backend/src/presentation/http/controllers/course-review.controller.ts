@@ -29,14 +29,14 @@ import { CreateCourseReviewDto, UpdateCourseReviewDto } from "../../../app/dtos/
 
 export class CourseReviewController extends BaseController {
   constructor(
-    private createCourseReviewUseCase: ICreateCourseReviewUseCase,
-    private updateCourseReviewUseCase: IUpdateCourseReviewUseCase,
-    private deleteCourseReviewUseCase: IDeleteCourseReviewUseCase,
-    private getCourseReviewsUseCase: IGetCourseReviewsUseCase,
-    private getCourseReviewStatsUseCase: IGetCourseReviewStatsUseCase,
-    private getUserReviewsUseCase: IGetUserReviewsUseCase,
-    private deleteReviewUseCase: IDeleteReviewUseCase,
-    private disableReviewUseCase: IDisableReviewUseCase,
+    private _createCourseReviewUseCase: ICreateCourseReviewUseCase,
+    private _updateCourseReviewUseCase: IUpdateCourseReviewUseCase,
+    private _deleteCourseReviewUseCase: IDeleteCourseReviewUseCase,
+    private _getCourseReviewsUseCase: IGetCourseReviewsUseCase,
+    private _getCourseReviewStatsUseCase: IGetCourseReviewStatsUseCase,
+    private _getUserReviewsUseCase: IGetUserReviewsUseCase,
+    private _deleteReviewUseCase: IDeleteReviewUseCase,
+    private _disableReviewUseCase: IDisableReviewUseCase,
     httpErrors: IHttpErrors,
     httpSuccess: IHttpSuccess
   ) {
@@ -50,7 +50,7 @@ export class CourseReviewController extends BaseController {
       }
 
       const validated = createReviewSchemaDef.body!.parse(request.body as CreateCourseReviewDto);
-      const review = await this.createCourseReviewUseCase.execute(
+      const review = await this._createCourseReviewUseCase.execute(
         validated,
         request.user.id
       );
@@ -74,7 +74,7 @@ export class CourseReviewController extends BaseController {
       });
       const validatedBody = updateReviewSchemaDef.body!.parse(request.body as UpdateCourseReviewDto);
 
-      const review = await this.updateCourseReviewUseCase.execute(
+      const review = await this._updateCourseReviewUseCase.execute(
         validatedParams.id,
         validatedBody,
         request.user.id
@@ -97,7 +97,7 @@ export class CourseReviewController extends BaseController {
       const validated = deleteReviewSchemaDef.params!.parse({
         id: request.params.id,
       });
-      await this.deleteReviewUseCase.execute(validated.id, request.user.id);
+      await this._deleteReviewUseCase.execute(validated.id, request.user.id);
 
       return this.success_200(null, "Review deleted successfully");
     });
@@ -129,7 +129,7 @@ export class CourseReviewController extends BaseController {
         includeDisabled: validatedQuery.includeDisabled,
       };
 
-      const result = await this.getCourseReviewsUseCase.execute(
+      const result = await this._getCourseReviewsUseCase.execute(
         queryParams,
         queryParams.isMyReviews ? request.user?.id : undefined
       );
@@ -146,7 +146,7 @@ export class CourseReviewController extends BaseController {
 
       const validated = getUserReviewsSchemaDef.query!.parse(request.query);
 
-      const result = await this.getUserReviewsUseCase.execute(
+      const result = await this._getUserReviewsUseCase.execute(
         request.user.id,
         validated.page,
         validated.limit
@@ -166,7 +166,7 @@ export class CourseReviewController extends BaseController {
         courseId: request.params.courseId,
       });
 
-      const stats = await this.getCourseReviewStatsUseCase.execute(
+      const stats = await this._getCourseReviewStatsUseCase.execute(
         validated.courseId
       );
 
@@ -188,7 +188,7 @@ export class CourseReviewController extends BaseController {
         id: request.params.id,
       });
 
-      await this.disableReviewUseCase.execute(validated.id, request.user.id);
+      await this._disableReviewUseCase.execute(validated.id, request.user.id);
 
       return this.success_200(null, "Review disabled successfully");
     });

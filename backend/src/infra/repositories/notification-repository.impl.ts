@@ -12,7 +12,7 @@ export class PrismaNotificationRepository
 {
   constructor(private readonly _prisma: PrismaClient) {}
 
-  private mapEntityType(
+  private _mapEntityType(
     entityType: NotificationEntityType
   ):
     | "COURSE"
@@ -51,7 +51,7 @@ export class PrismaNotificationRepository
       data: {
         userId: notification.userId.value,
         eventType: notification.eventType,
-        entityType: this.mapEntityType(notification.entityType),
+        entityType: this._mapEntityType(notification.entityType),
         entityId: notification.entityId,
         entityName: notification.entityName,
         message: notification.message,

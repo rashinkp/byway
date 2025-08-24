@@ -167,7 +167,7 @@ export class ChatRepository implements IChatRepository {
                 }
               : undefined,
             lastMessageTime: lastMessage?.createdAt
-              ? this.formatTime(lastMessage.createdAt)
+              ? this._formatTime(lastMessage.createdAt)
               : undefined,
             unreadCount,
             chatId: chat.id,
@@ -249,7 +249,7 @@ export class ChatRepository implements IChatRepository {
                 }
               : undefined,
             lastMessageTime: lastMessage?.createdAt
-              ? this.formatTime(lastMessage.createdAt)
+              ? this._formatTime(lastMessage.createdAt)
               : undefined,
             unreadCount,
             chatId: chat.id,
@@ -381,7 +381,7 @@ export class ChatRepository implements IChatRepository {
 
   // Conversion handled by Chat.fromPersistence
 
-  private formatTime(date: Date): string {
+  private _formatTime(date: Date): string {
     const now = new Date();
     const diffInHours = (now.getTime() - date.getTime()) / (1000 * 60 * 60);
 

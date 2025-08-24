@@ -13,11 +13,11 @@ import { ICreateTransactionInputDTO, IUpdateTransactionStatusInputDTO } from "..
 
 export class TransactionController extends BaseController {
   constructor(
-    private readonly createTransactionUseCase: ICreateTransactionUseCase,
-    private readonly getTransactionByIdUseCase: IGetTransactionByIdUseCase,
-    private readonly getTransactionsByOrderUseCase: IGetTransactionsByOrderUseCase,
-    private readonly getTransactionsByUserUseCase: IGetTransactionsByUserUseCase,
-    private readonly updateTransactionStatusUseCase: IUpdateTransactionStatusUseCase,
+    private readonly _createTransactionUseCase: ICreateTransactionUseCase,
+    private readonly _getTransactionByIdUseCase: IGetTransactionByIdUseCase,
+    private readonly _getTransactionsByOrderUseCase: IGetTransactionsByOrderUseCase,
+    private readonly _getTransactionsByUserUseCase: IGetTransactionsByUserUseCase,
+    private readonly _updateTransactionStatusUseCase: IUpdateTransactionStatusUseCase,
     httpErrors: IHttpErrors,
     httpSuccess: IHttpSuccess
   ) {
@@ -26,7 +26,7 @@ export class TransactionController extends BaseController {
 
   async createTransaction(httpRequest: IHttpRequest): Promise<IHttpResponse> {
     return this.handleRequest(httpRequest, async (request) => {
-      const transaction = await this.createTransactionUseCase.execute(
+      const transaction = await this._createTransactionUseCase.execute(
         request.body  as ICreateTransactionInputDTO
       );
       return this.success_201(transaction, "Transaction created successfully");
@@ -36,7 +36,7 @@ export class TransactionController extends BaseController {
   async getTransactionById(httpRequest: IHttpRequest): Promise<IHttpResponse> {
     return this.handleRequest(httpRequest, async (request) => {
       const { id } = request.params as { id: string };
-      const transaction = await this.getTransactionByIdUseCase.execute(id);
+      const transaction = await this._getTransactionByIdUseCase.execute(id);
 
       if (!transaction) {
         throw new Error("Transaction not found");
@@ -54,7 +54,7 @@ export class TransactionController extends BaseController {
   ): Promise<IHttpResponse> {
     return this.handleRequest(httpRequest, async (request) => {
       const { orderId } = request.params as { orderId: string };
-      const transactions = await this.getTransactionsByOrderUseCase.execute({
+      const transactions = await this._getTransactionsByOrderUseCase.execute({
         orderId,
       });
       return this.success_200(
@@ -78,7 +78,7 @@ export class TransactionController extends BaseController {
       const limit = request.query?.limit
         ? parseInt(request.query.limit as string)
         : 10;
-      const transactions = await this.getTransactionsByUserUseCase.execute({
+      const transactions = await this._getTransactionsByUserUseCase.execute({
         userId: user.id,
         page,
         limit,
@@ -95,7 +95,7 @@ export class TransactionController extends BaseController {
   ): Promise<IHttpResponse> {
     return this.handleRequest(httpRequest, async (request) => {
       const { id, status, metadata } = request.body as IUpdateTransactionStatusInputDTO;
-      const transaction = await this.updateTransactionStatusUseCase.execute({
+      const transaction = await this._updateTransactionStatusUseCase.execute({
         id,
         status,
         metadata,

@@ -48,7 +48,7 @@ export class PaymentService implements IPaymentService {
     if (!wallet) {
       throw new HttpError("Wallet not found", StatusCodes.NOT_FOUND);
     }
-    if (wallet.balance.amount < amount) {
+    if (wallet.balance._amount < amount) {
       throw new HttpError(
         "Insufficient wallet balance",
         StatusCodes.BAD_REQUEST
@@ -95,7 +95,7 @@ export class PaymentService implements IPaymentService {
           );
 
         if (existingEnrollment) {
-          continue; 
+          continue;
         }
 
         // Create new enrollment
@@ -127,21 +127,21 @@ export class PaymentService implements IPaymentService {
       for (const item of orderItems) {
         await this._cartRepository.deleteByUserAndCourse(userId, item.courseId);
       }
-    } catch {
-
-    }
+    } catch {}
 
     // Send real-time notifications via Socket.IO
     const orderItemsWithPrices = await Promise.all(
       orderItems.map(async (item) => {
-        const course = await this._orderRepository.findCourseById(item.courseId);
+        const course = await this._orderRepository.findCourseById(
+          item.courseId
+        );
         return {
           courseId: item.courseId,
-          coursePrice: course?.price?.getValue()?.toNumber() || 0
+          coursePrice: course?.price?.getValue()?.toNumber() || 0,
         };
       })
     );
-    await this.sendPurchaseNotifications({ userId }, orderItemsWithPrices);
+    await this._sendPurchaseNotifications({ userId }, orderItemsWithPrices);
 
     return {
       data: {
@@ -170,10 +170,13 @@ export class PaymentService implements IPaymentService {
       throw new HttpError("User not found", StatusCodes.NOT_FOUND);
     }
 
-    const courseIds = input.courses?.map(c => c.id) || [];
-    const isEnrolled = await this._enrollmentRepository.findByUserIdAndCourseIds(userId, courseIds);
+    const courseIds = input.courses?.map((c) => c.id) || [];
+    const isEnrolled =
+      await this._enrollmentRepository.findByUserIdAndCourseIds(
+        userId,
+        courseIds
+      );
 
-    
     if (isEnrolled && isEnrolled.length > 0) {
       throw new HttpError("User already enrolled in this course", 400);
     }
@@ -247,23 +250,34 @@ export class PaymentService implements IPaymentService {
                 metadata: {
                   stripeSessionId: session.id,
                   isWalletTopUp: isWalletTopUp,
-                  ...session.metadata
-                }
+                  ...session.metadata,
+                },
               })
             );
           } catch (error) {
-                         // If transaction creation fails due to duplicate transactionId, try to find existing transaction
-             if (error instanceof Error && error.message.includes('already exists')) {
-               console.log("Transaction already exists, trying to find by transactionId");
-               // Try to find by transactionId instead
-               transaction = await this._transactionRepository.findByTransactionId(session.payment_intent as string);
-               
-               if (!transaction) {
-                 throw new HttpError("Failed to create or find transaction", StatusCodes.INTERNAL_SERVER_ERROR);
-               }
-             } else {
-               throw error;
-             }
+            // If transaction creation fails due to duplicate transactionId, try to find existing transaction
+            if (
+              error instanceof Error &&
+              error.message.includes("already exists")
+            ) {
+              console.log(
+                "Transaction already exists, trying to find by transactionId"
+              );
+              // Try to find by transactionId instead
+              transaction =
+                await this._transactionRepository.findByTransactionId(
+                  session.payment_intent as string
+                );
+
+              if (!transaction) {
+                throw new HttpError(
+                  "Failed to create or find transaction",
+                  StatusCodes.INTERNAL_SERVER_ERROR
+                );
+              }
+            } else {
+              throw error;
+            }
           }
         } else {
           // Update existing transaction status
@@ -342,25 +356,26 @@ export class PaymentService implements IPaymentService {
               throw error;
             }
 
-           
-              for (const item of orderItems) {
-                await this._cartRepository.deleteByUserAndCourse(
-                  order.userId,
-                  item.courseId
-                );
-              }
+            for (const item of orderItems) {
+              await this._cartRepository.deleteByUserAndCourse(
+                order.userId,
+                item.courseId
+              );
+            }
 
             // Send real-time notifications via Socket.IO
             const orderItemsWithPrices = await Promise.all(
               orderItems.map(async (item) => {
-                const course = await this._orderRepository.findCourseById(item.courseId);
-                                 return {
-                   courseId: item.courseId,
-                   coursePrice: course?.price?.getValue()?.toNumber() || 0
-                 };
+                const course = await this._orderRepository.findCourseById(
+                  item.courseId
+                );
+                return {
+                  courseId: item.courseId,
+                  coursePrice: course?.price?.getValue()?.toNumber() || 0,
+                };
               })
             );
-            await this.sendPurchaseNotifications(order, orderItemsWithPrices);
+            await this._sendPurchaseNotifications(order, orderItemsWithPrices);
 
             return {
               data: { order, transaction },
@@ -425,13 +440,13 @@ export class PaymentService implements IPaymentService {
           PaymentGatewayEnum.STRIPE
         );
 
-                 return {
-           data: {
-             order: order,
-             transaction: transaction || undefined,
-           },
-           message: "Payment failure handled",
-         };
+        return {
+          data: {
+            order: order,
+            transaction: transaction || undefined,
+          },
+          message: "Payment failure handled",
+        };
       }
 
       return {
@@ -446,73 +461,72 @@ export class PaymentService implements IPaymentService {
     }
   }
 
-  private async sendPurchaseNotifications(
+  private async _sendPurchaseNotifications(
     order: { userId: string },
     orderItems: { courseId: string; coursePrice: string | number }[]
   ): Promise<void> {
-      const io = getSocketIOInstance();
-      if (!io) {
-        return;
+    const io = getSocketIOInstance();
+    if (!io) {
+      return;
+    }
+
+    const { items: admins } = await this._userRepository.findAll({
+      role: "ADMIN",
+      page: 1,
+      limit: 1,
+      includeDeleted: false,
+      sortBy: "createdAt",
+      filterBy: "All",
+      search: "",
+      sortOrder: "asc",
+    });
+
+    if (!admins || admins.length === 0) {
+      return;
+    }
+    const adminId = admins[0].id;
+
+    // Process each order item and send notifications
+    for (const item of orderItems) {
+      const course = await this._orderRepository.findCourseById(item.courseId);
+      if (!course) {
+        continue;
       }
 
-      const { items: admins } = await this._userRepository.findAll({
-        role: "ADMIN",
-        page: 1,
-        limit: 1,
-        includeDeleted: false,
-        sortBy: 'createdAt',
-        filterBy: 'All',
-        search: '',
-        sortOrder:'asc'
+      // Calculate shares (same logic as revenue distribution)
+      const coursePrice = Number(item.coursePrice);
+      const adminShare = (coursePrice * 20) / 100; // 20% admin share
+      const instructorShare = (coursePrice * 80) / 100; // 80% instructor share
+
+      // 1. Notify instructor about revenue earned
+      io.to(course.createdBy).emit("newNotification", {
+        message: `Revenue earned: $${instructorShare.toFixed(2)} from course "${
+          course.title
+        }" purchase.`,
+        type: "REVENUE_EARNED",
+        courseId: course.id,
+        courseTitle: course.title,
+        amount: instructorShare,
       });
 
-      if (!admins || admins.length === 0) {
-        return;
-      }
-      const adminId = admins[0].id;
+      // 2. Notify admin about revenue earned
+      io.to(adminId).emit("newNotification", {
+        message: `Revenue earned: $${adminShare.toFixed(2)} from course "${
+          course.title
+        }" purchase.`,
+        type: "REVENUE_EARNED",
+        courseId: course.id,
+        courseTitle: course.title,
+        amount: adminShare,
+      });
 
-      // Process each order item and send notifications
-      for (const item of orderItems) {
-        const course = await this._orderRepository.findCourseById(item.courseId);
-        if (!course) {
-          continue;
-        }
-
-        // Calculate shares (same logic as revenue distribution)
-        const coursePrice = Number(item.coursePrice);
-        const adminShare = (coursePrice * 20) / 100; // 20% admin share
-        const instructorShare = (coursePrice * 80) / 100; // 80% instructor share
-
-        // 1. Notify instructor about revenue earned
-        io.to(course.createdBy).emit("newNotification", {
-          message: `Revenue earned: $${instructorShare.toFixed(
-            2
-          )} from course "${course.title}" purchase.`,
-          type: "REVENUE_EARNED",
-          courseId: course.id,
-          courseTitle: course.title,
-          amount: instructorShare,
-        });
-
-        // 2. Notify admin about revenue earned
-        io.to(adminId).emit("newNotification", {
-          message: `Revenue earned: $${adminShare.toFixed(2)} from course "${
-            course.title
-          }" purchase.`,
-          type: "REVENUE_EARNED",
-          courseId: course.id,
-          courseTitle: course.title,
-          amount: adminShare,
-        });
-
-        // 3. Notify purchaser about course purchase completion
-        io.to(order.userId).emit("newNotification", {
-          message: `Course "${course.title}" purchase completed! You're ready to start learning.`,
-          type: "COURSE_PURCHASED",
-          courseId: course.id,
-          courseTitle: course.title,
-        });
-      }
-    } 
+      // 3. Notify purchaser about course purchase completion
+      io.to(order.userId).emit("newNotification", {
+        message: `Course "${course.title}" purchase completed! You're ready to start learning.`,
+        type: "COURSE_PURCHASED",
+        courseId: course.id,
+        courseTitle: course.title,
+      });
+    }
   }
-
+}

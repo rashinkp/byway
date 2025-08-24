@@ -11,9 +11,9 @@ import { BadRequestError } from "../errors/bad-request-error";
 
 export class OrderController extends BaseController {
   constructor(
-    private getAllOrdersUseCase: IGetAllOrdersUseCase,
-    private createOrderUseCase: ICreateOrderUseCase,
-    private retryOrderUseCase: IRetryOrderUseCase,
+    private _getAllOrdersUseCase: IGetAllOrdersUseCase,
+    private _createOrderUseCase: ICreateOrderUseCase,
+    private _retryOrderUseCase: IRetryOrderUseCase,
     httpErrors: IHttpErrors,
     httpSuccess: IHttpSuccess
   ) {
@@ -28,7 +28,7 @@ export class OrderController extends BaseController {
       }
 
       const filters = await validateGetAllOrders(request.query);
-      const result = await this.getAllOrdersUseCase.execute(userId, filters);
+      const result = await this._getAllOrdersUseCase.execute(userId, filters);
       return this.success_200(result, "Orders retrieved successfully");
     });
   }
@@ -41,7 +41,7 @@ export class OrderController extends BaseController {
       }
 
       const validatedData = await CreateOrderDtoSchema.parseAsync(request.body);
-      const result = await this.createOrderUseCase.execute(
+      const result = await this._createOrderUseCase.execute(
         userId,
         validatedData
       );
@@ -61,7 +61,7 @@ export class OrderController extends BaseController {
         throw new BadRequestError("Order ID is required");
       }
 
-      const result = await this.retryOrderUseCase.execute(userId, orderId);
+      const result = await this._retryOrderUseCase.execute(userId, orderId);
       return this.success_200(result, "Order retry initiated successfully");
     });
   }

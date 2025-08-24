@@ -15,7 +15,7 @@ import { TransactionType } from "../../domain/enum/transaction-type.enum";
 export class TransactionRepository implements ITransactionRepository {
   constructor(private _prisma: PrismaClient) {}
 
-  private mapToTransaction(prismaTransaction: TransactionHistory): Transaction {
+  private _mapToTransaction(prismaTransaction: TransactionHistory): Transaction {
     return new Transaction({
       id: prismaTransaction.id,
       orderId: prismaTransaction.orderId || undefined,
@@ -34,7 +34,7 @@ export class TransactionRepository implements ITransactionRepository {
 
 
 
-  private mapToPrismaTransactionStatus(
+  private _mapToPrismaTransactionStatus(
     status: TransactionStatus
   ): PrismaTransactionStatus {
     return status as PrismaTransactionStatus;
@@ -100,7 +100,7 @@ export class TransactionRepository implements ITransactionRepository {
     const transaction = await this._prisma.transactionHistory.findUnique({
       where: { id },
     });
-    return transaction ? this.mapToTransaction(transaction) : null;
+    return transaction ? this._mapToTransaction(transaction) : null;
   }
 
   async findByOrderId(orderId: string): Promise<Transaction | null> {
@@ -108,14 +108,14 @@ export class TransactionRepository implements ITransactionRepository {
       where: { orderId },
       orderBy: { createdAt: "desc" },
     });
-    return transaction ? this.mapToTransaction(transaction) : null;
+    return transaction ? this._mapToTransaction(transaction) : null;
   }
 
   async findByTransactionId(transactionId: string): Promise<Transaction | null> {
     const transaction = await this._prisma.transactionHistory.findUnique({
       where: { transactionId },
     });
-    return transaction ? this.mapToTransaction(transaction) : null;
+    return transaction ? this._mapToTransaction(transaction) : null;
   }
 
   async findByUserId(
@@ -129,7 +129,7 @@ export class TransactionRepository implements ITransactionRepository {
       take: limit,
       orderBy: { createdAt: "desc" },
     });
-    return transactions.map((t) => this.mapToTransaction(t));
+    return transactions.map((t) => this._mapToTransaction(t));
   }
 
   async updateStatus(
@@ -140,12 +140,12 @@ export class TransactionRepository implements ITransactionRepository {
     const updated = await this._prisma.transactionHistory.update({
       where: { id },
       data: {
-        status: this.mapToPrismaTransactionStatus(status),
+        status: this._mapToPrismaTransactionStatus(status),
         updatedAt: new Date(),
         ...(metadata && { metadata: metadata as Prisma.InputJsonValue }),
       },
     });
-    return this.mapToTransaction(updated);
+    return this._mapToTransaction(updated);
   }
 
   async countByUserId(userId: string): Promise<number> {

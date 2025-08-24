@@ -3,10 +3,10 @@ import { envConfig } from "../../../presentation/express/configs/env.config";
 import { EmailProvider } from "../../../app/providers/email.provider.interface";
 
 export class EmailProviderImpl implements EmailProvider {
-  private transporter: Transporter;
+  private _transporter: Transporter;
 
   constructor() {
-    this.transporter = nodemailer.createTransport({
+    this._transporter = nodemailer.createTransport({
       service: "gmail",
       auth: {
         user: envConfig.EMAIL_USER,
@@ -38,7 +38,7 @@ export class EmailProviderImpl implements EmailProvider {
         </div>
       </div>
     `;
-    await this.transporter.sendMail({
+    await this._transporter.sendMail({
       from: `Byway <${envConfig.EMAIL_USER}>`,
       to: email,
       subject: "Your Byway Email Verification Code",
@@ -69,7 +69,7 @@ export class EmailProviderImpl implements EmailProvider {
         </div>
       </div>
     `;
-    await this.transporter.sendMail({
+    await this._transporter.sendMail({
       from: `Byway <${envConfig.EMAIL_USER}>`,
       to: email,
       subject: "Reset Your Byway Password",
@@ -113,7 +113,7 @@ export class EmailProviderImpl implements EmailProvider {
         </div>
       </div>
     `;
-    await this.transporter.sendMail({
+    await this._transporter.sendMail({
       from: `Byway Contact Form <${envConfig.EMAIL_USER}>`,
       to: envConfig.EMAIL_USER, // Send to admin/support email
       subject: `Contact Form: ${data.subject}`,
@@ -153,7 +153,7 @@ export class EmailProviderImpl implements EmailProvider {
         </div>
       </div>
     `;
-    await this.transporter.sendMail({
+    await this._transporter.sendMail({
       from: `Byway Support <${envConfig.EMAIL_USER}>`,
       to: data.email,
       subject: "We've received your message - Byway",

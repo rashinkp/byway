@@ -12,9 +12,9 @@ import { getCourseRevenueSchema, getLatestRevenueSchema, getOverallRevenueSchema
 
 export class RevenueController extends BaseController {
   constructor(
-    private readonly getOverallRevenueUseCase: IGetOverallRevenueUseCase,
-    private readonly getCourseRevenueUseCase: IGetCourseRevenueUseCase,
-    private readonly getLatestRevenueUseCase: IGetLatestRevenueUseCase,
+    private readonly _getOverallRevenueUseCase: IGetOverallRevenueUseCase,
+    private readonly _getCourseRevenueUseCase: IGetCourseRevenueUseCase,
+    private readonly _getLatestRevenueUseCase: IGetLatestRevenueUseCase,
     httpErrors: IHttpErrors,
     httpSuccess: IHttpSuccess
   ) {
@@ -33,7 +33,7 @@ export class RevenueController extends BaseController {
         throw new Error("User not authenticated");
       }
 
-      const result = await this.getOverallRevenueUseCase.execute({
+      const result = await this._getOverallRevenueUseCase.execute({
         startDate,
         endDate,
         userId: request.user.id,
@@ -61,7 +61,7 @@ export class RevenueController extends BaseController {
         throw new Error("User not authenticated");
       }
 
-      const result = await this.getCourseRevenueUseCase.execute({
+      const result = await this._getCourseRevenueUseCase.execute({
         startDate,
         endDate,
         userId: request.user.id,
@@ -93,7 +93,7 @@ export class RevenueController extends BaseController {
         throw new Error("User not authenticated");
       }
 
-      const result = await this.getLatestRevenueUseCase.execute({
+      const result = await this._getLatestRevenueUseCase.execute({
         startDate,
         endDate,
         userId: request.user.id,

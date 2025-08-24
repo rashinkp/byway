@@ -32,7 +32,7 @@ export class CreateTransactionUseCase implements ICreateTransactionUseCase {
     return this.mapToDTO(createdTransaction);
   }
 
-  private mapToDTO(transaction: Transaction): ITransactionOutputDTO {
+  private _mapToDTO(transaction: Transaction): ITransactionOutputDTO {
     return {
       id: transaction.id,
       orderId: transaction.orderId,

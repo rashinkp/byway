@@ -27,7 +27,7 @@ export class WalletRepository implements IWalletRepository {
       data: {
         id: wallet.id,
         userId: wallet.userId,
-        balance: wallet.balance.amount,
+        balance: wallet.balance._amount,
         createdAt: wallet.createdAt,
         updatedAt: wallet.updatedAt,
       },
@@ -46,7 +46,7 @@ export class WalletRepository implements IWalletRepository {
     const updatedWallet = await this._prisma.wallet.update({
       where: { id: wallet.id },
       data: {
-        balance: wallet.balance.amount,
+        balance: wallet.balance._amount,
         updatedAt: new Date(),
       },
     });

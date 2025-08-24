@@ -8,7 +8,7 @@ import { IHttpSuccess } from "../interfaces/http-success.interface";
 
 export class FileController extends BaseController {
   constructor(
-    private readonly s3Service: S3ServiceInterface,
+    private readonly _s3Service: S3ServiceInterface,
     httpErrors: IHttpErrors,
     httpSuccess: IHttpSuccess
   ) {
@@ -23,8 +23,8 @@ export class FileController extends BaseController {
       const validatedData = generatePresignedUrlSchema.parse(request.body);
       const { fileName, fileType, uploadType, metadata } = validatedData;
 
-      const key = this.s3Service.generateS3Key(fileName, uploadType, metadata);
-      const { uploadUrl } = await this.s3Service.generatePresignedPutUrl(
+      const key = this._s3Service.generateS3Key(fileName, uploadType, metadata);
+      const { uploadUrl } = await this._s3Service.generatePresignedPutUrl(
         key,
         fileType
       );
@@ -42,7 +42,7 @@ export class FileController extends BaseController {
   ): Promise<IHttpResponse> => {
     return this.handleRequest(httpRequest, async (request) => {
       const validated = getPresignedGetUrlSchema.parse(request.query);
-      const signedUrl = await this.s3Service.generatePresignedGetUrl(
+      const signedUrl = await this._s3Service.generatePresignedGetUrl(
         validated.key,
         validated.expiresInSeconds ?? 60
       );

@@ -69,7 +69,7 @@ export class OrderRepository implements IOrderRepository {
     const totalPages = Math.ceil(total / limit);
 
     return {
-      orders: orders.map((order) => this.mapToOrderEntity(order)),
+      orders: orders.map((order) => this._mapToOrderEntity(order)),
       total,
       page,
       limit,
@@ -77,7 +77,7 @@ export class OrderRepository implements IOrderRepository {
     };
   }
 
-  private mapToOrderEntity(order: Record<string, unknown>): Order {
+  private _mapToOrderEntity(order: Record<string, unknown>): Order {
     const mappedOrder = new Order(
       order.userId as string,
       order.orderStatus as OrderStatus,
@@ -133,7 +133,7 @@ export class OrderRepository implements IOrderRepository {
       },
     });
 
-    return order ? this.mapToOrderEntity(order) : null;
+    return order ? this._mapToOrderEntity(order) : null;
   }
 
   async getAllOrders(userId: string): Promise<Order[]> {
@@ -150,7 +150,7 @@ export class OrderRepository implements IOrderRepository {
         createdAt: "desc",
       },
     });
-    return orders.map((order) => this.mapToOrderEntity(order));
+    return orders.map((order) => this._mapToOrderEntity(order));
   }
 
   async createOrder(
@@ -207,7 +207,7 @@ export class OrderRepository implements IOrderRepository {
       };
     });
 
-    return this.mapToOrderEntity(order);
+    return this._mapToOrderEntity(order);
   }
 
   async updateOrderStatus(
@@ -216,7 +216,7 @@ export class OrderRepository implements IOrderRepository {
     paymentId: string,
     paymentGateway: PaymentGateway
   ): Promise<void> {
-    const paymentStatus = this.mapOrderStatusToPaymentStatus(status);
+    const paymentStatus = this._mapOrderStatusToPaymentStatus(status);
     await this._prisma.order.update({
       where: { id: orderId },
       data: {
@@ -229,7 +229,7 @@ export class OrderRepository implements IOrderRepository {
     });
   }
 
-  private mapOrderStatusToPaymentStatus(
+  private _mapOrderStatusToPaymentStatus(
     orderStatus: OrderStatus
   ): PaymentStatus {
     switch (orderStatus) {
@@ -251,7 +251,7 @@ export class OrderRepository implements IOrderRepository {
     include?: Record<string, unknown>;
   }): Promise<Order[]> {
     const orders = await this._prisma.order.findMany(params);
-    return orders.map((order) => this.mapToOrderEntity(order));
+    return orders.map((order) => this._mapToOrderEntity(order));
   }
 
   async count(where: Record<string, unknown>): Promise<number> {
@@ -286,7 +286,7 @@ export class OrderRepository implements IOrderRepository {
       },
     });
 
-    const mappedOrder = this.mapToOrderEntity(createdOrder);
+    const mappedOrder = this._mapToOrderEntity(createdOrder);
     order.id = mappedOrder.id;
     return order;
   }
@@ -310,7 +310,7 @@ export class OrderRepository implements IOrderRepository {
       },
     });
 
-    return this.mapToOrderEntity(updatedOrder);
+    return this._mapToOrderEntity(updatedOrder);
   }
 
   async delete(id: string): Promise<void> {
@@ -331,7 +331,7 @@ export class OrderRepository implements IOrderRepository {
       },
     });
 
-    return order ? this.mapToOrderEntity(order) : null;
+    return order ? this._mapToOrderEntity(order) : null;
   }
 
   async createOrderItems(

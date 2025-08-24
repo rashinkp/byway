@@ -14,7 +14,7 @@ export class GetTransactionsByOrderUseCase implements IGetTransactionsByOrderUse
     return [this.mapToDTO(transaction)];
   }
 
-  private mapToDTO(transaction: Transaction): ITransactionOutputDTO {
+  private _mapToDTO(transaction: Transaction): ITransactionOutputDTO {
     return {
       id: transaction.id,
       orderId: transaction.orderId,

@@ -231,7 +231,7 @@ export class Lesson {
     return this._deletedAt;
   }
 
-  private getProps(): LessonProps {
+  private _getProps(): LessonProps {
     return {
       id: this._id,
       courseId: this._courseId,

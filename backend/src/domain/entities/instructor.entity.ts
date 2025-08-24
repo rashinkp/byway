@@ -218,7 +218,7 @@ export class Instructor {
     this._updatedAt = new Date();
   }
 
-  private getProps(): InstructorInterface {
+  private _getProps(): InstructorInterface {
     return {
       id: this._id,
       userId: this._userId,

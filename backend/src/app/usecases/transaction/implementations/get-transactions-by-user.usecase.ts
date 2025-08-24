@@ -28,7 +28,7 @@ export class GetTransactionsByUserUseCase implements IGetTransactionsByUserUseCa
     };
   }
 
-  private mapToDTO(transaction: Transaction): ITransactionOutputDTO {
+  private _mapToDTO(transaction: Transaction): ITransactionOutputDTO {
     return {
       id: transaction.id,
       orderId: transaction.orderId,

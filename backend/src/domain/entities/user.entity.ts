@@ -298,7 +298,7 @@ export class User {
   }
 
   // Internal helper to get all props
-  private getProps(): UserInterface {
+  private _getProps(): UserInterface {
     return {
       id: this._id,
       name: this._name,

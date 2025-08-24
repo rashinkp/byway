@@ -11,17 +11,17 @@ import { IGetEnrollmentStatsUseCase } from "../../../app/usecases/enrollment/int
 import { IEnrollmentRepository } from "../../../app/repositories/enrollment.repository.interface";
 
 export class StripeController extends BaseController {
-  private webhookGateway: StripeWebhookGateway;
+  private _webhookGateway: StripeWebhookGateway;
 
   constructor(
-    private paymentService: IPaymentService,
-    private getEnrollmentStatsUseCase: IGetEnrollmentStatsUseCase,
-    private enrollmentRepository: IEnrollmentRepository,
+    private _paymentService: IPaymentService,
+    private _getEnrollmentStatsUseCase: IGetEnrollmentStatsUseCase,
+    private _enrollmentRepository: IEnrollmentRepository,
     httpErrors: IHttpErrors,
     httpSuccess: IHttpSuccess
   ) {
     super(httpErrors, httpSuccess);
-    this.webhookGateway = new StripeWebhookGateway();
+    this._webhookGateway = new StripeWebhookGateway();
   }
 
   async createCheckoutSession(
@@ -33,7 +33,7 @@ export class StripeController extends BaseController {
       }
 
       const validatedData = createCheckoutSessionSchema.parse(request.body);
-      const response = await this.paymentService.createStripeCheckoutSession(
+      const response = await this._paymentService.createStripeCheckoutSession(
         request.user.id,
         validatedData.orderId!,
         validatedData
@@ -61,7 +61,7 @@ export class StripeController extends BaseController {
         }
 
         console.log("Verifying webhook signature...");
-        const event = await this.webhookGateway.verifySignature(
+        const event = await this._webhookGateway.verifySignature(
           request.body as unknown as string | Buffer,
           signature
         );
@@ -83,7 +83,7 @@ export class StripeController extends BaseController {
         // Handle wallet top-up
         if (isWalletTopUp) {
           console.log("Processing wallet top-up webhook...");
-          const response = await this.paymentService.handleStripeWebhook(event);
+          const response = await this._paymentService.handleStripeWebhook(event);
           console.log("Wallet top-up processed successfully:", response.message);
           return this.success_200(response.data, response.message);
         }
@@ -104,7 +104,7 @@ export class StripeController extends BaseController {
         }
 
         // Check if user is already enrolled in any of the courses
-        const existingEnrollments = await this.enrollmentRepository.findByUserIdAndCourseIds(userId, parsedCourseIds);
+        const existingEnrollments = await this._enrollmentRepository.findByUserIdAndCourseIds(userId, parsedCourseIds);
         
         if (existingEnrollments && existingEnrollments.length > 0) {
           console.log("User already enrolled in one or more courses, skipping enrollment");
@@ -112,7 +112,7 @@ export class StripeController extends BaseController {
         }
 
         console.log("Processing webhook payment...");
-        const response = await this.paymentService.handleStripeWebhook(event);
+        const response = await this._paymentService.handleStripeWebhook(event);
         console.log("Webhook processed successfully:", response.message);
         console.log("Webhook response data:", response.data);
         

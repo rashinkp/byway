@@ -1,7 +1,7 @@
 import { Decimal } from "@prisma/client/runtime/library";
 
 export class Price {
-  private constructor(private readonly value: Decimal | null) {}
+  private constructor(private readonly _value: Decimal | null) {}
 
   static create(value: number | null): Price {
     if (value != null && value < 0) {
@@ -11,6 +11,6 @@ export class Price {
   }
 
   getValue(): Decimal | null {
-    return this.value;
+    return this._value;
   }
 }

@@ -19,12 +19,12 @@ import { BaseController } from "./base.controller";
 
 export class CategoryController extends BaseController {
   constructor(
-    private createCategoryUseCase: ICreateCategoryUseCase,
-    private updateCategoryUseCase: IUpdateCategoryUseCase,
-    private getCategoryByIdUseCase: IGetCategoryByIdUseCase,
-    private getAllCategoriesUseCase: IGetAllCategoriesUseCase,
-    private deleteCategoryUseCase: IDeleteCategoryUseCase,
-    private recoverCategoryUseCase: IRecoverCategoryUseCase,
+    private _createCategoryUseCase: ICreateCategoryUseCase,
+    private _updateCategoryUseCase: IUpdateCategoryUseCase,
+    private _getCategoryByIdUseCase: IGetCategoryByIdUseCase,
+    private _getAllCategoriesUseCase: IGetAllCategoriesUseCase,
+    private _deleteCategoryUseCase: IDeleteCategoryUseCase,
+    private _recoverCategoryUseCase: IRecoverCategoryUseCase,
     httpErrors: IHttpErrors,
     httpSuccess: IHttpSuccess
   ) {
@@ -37,7 +37,7 @@ export class CategoryController extends BaseController {
         ...(request.body || {}),
         createdBy: request.user?.id,
       });
-      const category = await this.createCategoryUseCase.execute(validated);
+      const category = await this._createCategoryUseCase.execute(validated);
       return this.success_201(category, "Category created successfully");
     });
   }
@@ -51,7 +51,7 @@ export class CategoryController extends BaseController {
         ...(request.body || {}),
         id: request.params.categoryId,
       });
-      const category = await this.updateCategoryUseCase.execute(validated);
+      const category = await this._updateCategoryUseCase.execute(validated);
       return this.success_200(category, "Category updated successfully");
     });
   }
@@ -62,7 +62,7 @@ export class CategoryController extends BaseController {
         throw new BadRequestError("Category ID is required");
       }
       const validated = validateCategoryId({ id: request.params.categoryId });
-      const category = await this.getCategoryByIdUseCase.execute(validated);
+      const category = await this._getCategoryByIdUseCase.execute(validated);
       if (!category) {
         throw new BadRequestError("Category not found");
       }
@@ -73,7 +73,7 @@ export class CategoryController extends BaseController {
   async getAllCategories(httpRequest: IHttpRequest): Promise<IHttpResponse> {
     return this.handleRequest(httpRequest, async (request) => {
       const validated = validateGetAllCategories(request.query);
-      const result = await this.getAllCategoriesUseCase.execute(validated);
+      const result = await this._getAllCategoriesUseCase.execute(validated);
       return this.success_200(result, "Categories retrieved successfully");
     });
   }
@@ -84,7 +84,7 @@ export class CategoryController extends BaseController {
         throw new BadRequestError("Category ID is required");
       }
       const validated = validateCategoryId({ id: request.params.categoryId });
-      const category = await this.deleteCategoryUseCase.execute(validated);
+      const category = await this._deleteCategoryUseCase.execute(validated);
       return this.success_200(category, "Category deleted successfully");
     });
   }
@@ -95,7 +95,7 @@ export class CategoryController extends BaseController {
         throw new BadRequestError("Category ID is required");
       }
       const validated = validateCategoryId({ id: request.params.categoryId });
-      const category = await this.recoverCategoryUseCase.execute(validated);
+      const category = await this._recoverCategoryUseCase.execute(validated);
       return this.success_200(category, "Category recovered successfully");
     });
   }

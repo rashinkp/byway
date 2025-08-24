@@ -2,11 +2,11 @@ export class Rating {
   private readonly _value: number;
 
   constructor(value: number) {
-    this.validate(value);
+    this._validate(value);
     this._value = value;
   }
 
-  private validate(value: number): void {
+  private _validate(value: number): void {
     if (!Number.isInteger(value)) {
       throw new Error("Rating must be an integer");
     }

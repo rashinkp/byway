@@ -8,28 +8,28 @@ export interface IDatabaseProvider {
 }
 
 export class PrismaDatabaseProvider implements IDatabaseProvider {
-  private client: PrismaClient;
+  private _client: PrismaClient;
 
-  constructor(private logger: ILogger) {
-    this.client = new PrismaClient();
+  constructor(private _logger: ILogger) {
+    this._client = new PrismaClient();
   }
 
   async connect(): Promise<void> {
     try {
-      await this.client.$connect();
-      this.logger.info("Connected to the database successfully!");
+      await this._client.$connect();
+      this._logger.info("Connected to the database successfully!");
     } catch (error) {
-      this.logger.error("Failed to connect to the database", error);
+      this._logger.error("Failed to connect to the database", error);
       throw new Error("Database connection failed");
     }
   }
 
   async disconnect(): Promise<void> {
-    await this.client.$disconnect();
-    this.logger.info("Database disconnected");
+    await this._client.$disconnect();
+    this._logger.info("Database disconnected");
   }
 
   getClient(): PrismaClient {
-    return this.client;
+    return this._client;
   }
 }
