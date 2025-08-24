@@ -79,7 +79,7 @@ export class Instructor {
     }
 
     const updatedProps: InstructorInterface = {
-      ...existingInstructor.getProps(),
+      ...existingInstructor._getProps(),
       updatedAt: new Date(),
     };
 

@@ -29,7 +29,7 @@ export class CreateTransactionUseCase implements ICreateTransactionUseCase {
     const createdTransaction = await this._transactionRepository.create(
       transaction
     );
-    return this.mapToDTO(createdTransaction);
+    return this._mapToDTO(createdTransaction);
   }
 
   private _mapToDTO(transaction: Transaction): ITransactionOutputDTO {

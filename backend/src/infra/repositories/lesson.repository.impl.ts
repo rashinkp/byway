@@ -101,7 +101,7 @@ export class LessonRepository implements ILessonRepository {
     ]);
 
     return {
-      lessons: lessons.map(this.mapToLessonOutputDTO),
+      lessons: lessons.map(this._mapToLessonOutputDTO),
       total,
       page,
       limit,

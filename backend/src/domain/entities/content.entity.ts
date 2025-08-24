@@ -125,7 +125,7 @@ export class LessonContent {
     }
   ): LessonContent {
     const props: LessonContentProps = {
-      ...existingContent.getProps(),
+      ...existingContent._getProps(),
       updatedAt: new Date(),
     };
 

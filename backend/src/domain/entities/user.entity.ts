@@ -127,7 +127,7 @@ export class User {
     }
   ): User {
     const updatedProps: UserInterface = {
-      ...existingUser.getProps(),
+      ...existingUser._getProps(),
       updatedAt: new Date(),
     };
 

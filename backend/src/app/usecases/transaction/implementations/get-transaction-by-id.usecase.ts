@@ -11,7 +11,7 @@ export class GetTransactionByIdUseCase implements IGetTransactionByIdUseCase {
     if (!transaction) {
       return null;
     }
-    return this.mapToDTO(transaction);
+    return this._mapToDTO(transaction);
   }
 
   private _mapToDTO(transaction: Transaction): ITransactionOutputDTO {

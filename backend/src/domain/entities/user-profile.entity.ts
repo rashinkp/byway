@@ -99,7 +99,7 @@ export class UserProfile {
     }
   ): UserProfile {
     const updatedProps: UserProfileInterface = {
-      ...existingProfile.getProps(),
+      ...existingProfile._getProps(),
       updatedAt: new Date(),
     };
 
