@@ -4,7 +4,8 @@ import { BaseController } from "./base.controller";
 import { IHttpErrors } from "../interfaces/http-errors.interface";
 import { IHttpSuccess } from "../interfaces/http-success.interface";
 import { UnauthorizedError } from "../errors/unautherized-error";
-import { IPaymentService } from "../../../app/services/payment/interfaces/payment.service.interface";
+import { ICreateStripeCheckoutSessionUseCase } from "../../../app/usecases/payment/interfaces/create-stripe-checkout-session.usecase.interface";
+import { IHandleStripeWebhookUseCase } from "../../../app/usecases/payment/interfaces/handle-stripe-webhook.usecase.interface";
 import { createCheckoutSessionSchema } from "../../../app/dtos/payment.dto";
 import { StripeWebhookGateway } from "../../../infra/providers/stripe/stripe-webhook.gateway";
 import { IGetEnrollmentStatsUseCase } from "../../../app/usecases/enrollment/interfaces/get-enrollment-stats.usecase.interface";
@@ -14,7 +15,11 @@ export class StripeController extends BaseController {
   private _webhookGateway: StripeWebhookGateway;
 
   constructor(
-    private _paymentService: IPaymentService,
+    private _paymentService: {
+      handleWalletPayment: (userId: string, orderId: string, amount: number) => Promise<any>;
+      createStripeCheckoutSession: (userId: string, orderId: string, input: any) => Promise<any>;
+      handleStripeWebhook: (event: any) => Promise<any>;
+    },
     private _getEnrollmentStatsUseCase: IGetEnrollmentStatsUseCase,
     private _enrollmentRepository: IEnrollmentRepository,
     httpErrors: IHttpErrors,

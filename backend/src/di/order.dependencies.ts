@@ -10,7 +10,8 @@ export interface OrderDependencies {
 }
 
 export function createOrderDependencies(
-  deps: SharedDependencies
+  deps: SharedDependencies,
+  appDeps: any
 ): OrderDependencies {
   // Initialize use cases
   const createTransactionUseCase = new CreateTransactionUseCase(
@@ -18,14 +19,15 @@ export function createOrderDependencies(
   );
   const createOrderUseCase = new CreateOrderUseCase(
     deps.orderRepository,
-    deps.paymentService,
-    createTransactionUseCase
+    appDeps.handleWalletPaymentUseCase,
+    createTransactionUseCase,
+    appDeps.createStripeCheckoutSessionUseCase
   );
 
   const getAllOrdersUseCase = new GetAllOrdersUseCase(deps.orderRepository);
   const retryOrderUseCase = new RetryOrderUseCase(
     deps.orderRepository,
-    deps.paymentService,
+    appDeps.createStripeCheckoutSessionUseCase,
     createTransactionUseCase
   );
 
