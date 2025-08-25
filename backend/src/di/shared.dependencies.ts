@@ -28,11 +28,8 @@ import { TransactionRepository } from "../infra/repositories/transaction.reposit
 import { ITransactionRepository } from "../app/repositories/transaction.repository";
 import { IWalletRepository } from "../app/repositories/wallet.repository.interface";
 import { WalletRepository } from "../infra/repositories/wallet.repository";
-import { PaymentService } from "../app/services/payment/implementations/payment.service";
-import { IPaymentService } from "../app/services/payment/interfaces/payment.service.interface";
 import { StripePaymentGateway } from "../infra/providers/stripe/stripe-payment.gateway";
 import { StripeWebhookGateway } from "../infra/providers/stripe/stripe-webhook.gateway";
-import { IRevenueDistributionService } from "../app/services/revenue-distribution/interfaces/revenue-distribution.service.interface";
 import { PrismaRevenueRepository } from "../infra/repositories/revenue.repository";
 import { IRevenueRepository } from "../app/repositories/revenue.repository";
 import { CourseReviewRepository } from "../infra/repositories/course-review.repository.impl";
@@ -75,7 +72,6 @@ export interface SharedDependencies {
   httpSuccess: HttpSuccess;
   cookieService: CookieService;
   walletRepository: IWalletRepository;
-  paymentService: IPaymentService;
   paymentGateway: StripePaymentGateway;
   webhookGateway: StripeWebhookGateway;
   lessonProgressRepository: ILessonProgressRepository;
@@ -114,29 +110,13 @@ export function createSharedDependencies(): SharedDependencies {
   const chatRepository = new ChatRepository(prismaClient);
   const messageRepository = new MessageRepository(prismaClient);
 
-  const mockRevenueDistributionService: IRevenueDistributionService = {
-    distributeRevenue: async () => {
-      // Mock service - will be replaced with real implementation
-    },
-  };
 
-  const paymentService = new PaymentService(
-    walletRepository,
-    orderRepository,
-    transactionRepository,
-    enrollmentRepository,
-    paymentGateway,
-    webhookGateway,
-    userRepository,
-    mockRevenueDistributionService,
-    cartRepository
-  );
 
   const httpErrors = new HttpErrors();
   const httpSuccess = new HttpSuccess();
   const cookieService = new CookieService();
 
-  const revenueRepository = new PrismaRevenueRepository(prismaClient);
+  const revenueRepository = new PrismaRevenueRepository(prismaClient)
   const lessonProgressRepository = new LessonProgressRepository(prismaClient);
   const certificateRepository = new PrismaCertificateRepository(prismaClient);
 
@@ -165,7 +145,6 @@ export function createSharedDependencies(): SharedDependencies {
     httpSuccess,
     cookieService,
     walletRepository,
-    paymentService,
     paymentGateway,
     webhookGateway,
     lessonProgressRepository,

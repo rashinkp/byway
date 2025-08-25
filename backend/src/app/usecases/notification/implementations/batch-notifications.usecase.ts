@@ -1,6 +1,7 @@
-import { CreateNotificationsForUsersUseCase } from '../../usecases/notification/implementations/create-notifications-for-users.usecase';
-import { NotificationEventType } from '../../../domain/enum/notification-event-type.enum';
-import { NotificationEntityType } from '../../../domain/enum/notification-entity-type.enum';
+import { IBatchNotificationsUseCase } from "../interfaces/batch-notifications.usecase.interface";
+import { CreateNotificationsForUsersUseCase } from "./create-notifications-for-users.usecase";
+import { NotificationEventType } from "../../../../domain/enum/notification-event-type.enum";
+import { NotificationEntityType } from "../../../../domain/enum/notification-entity-type.enum";
 
 interface PendingNotification {
   userId: string;
@@ -13,7 +14,7 @@ interface PendingNotification {
   notificationId?: string;
 }
 
-export class NotificationBatchingService {
+export class BatchNotificationsUseCase implements IBatchNotificationsUseCase {
   private _pendingNotifications: Map<string, PendingNotification> = new Map();
   private readonly _BATCH_WINDOW_MS = 5 * 60 * 1000; // 5 minutes
   private readonly _MAX_MESSAGE_LENGTH = 50;
@@ -99,49 +100,4 @@ export class NotificationBatchingService {
     }
     return message.substring(0, this._MAX_MESSAGE_LENGTH) + '...';
   }
-
-  // Method to force send all pending notifications (useful for cleanup)
-  async flushAllPendingNotifications(): Promise<void> {
-    const notifications = Array.from(this._pendingNotifications.values());
-    
-    for (const notification of notifications) {
-      await this._sendBatchedNotification(notification);
-    }
-    
-    this._pendingNotifications.clear();
-  }
-
-  // Method to clear notifications for a specific user (when they start chatting)
-  clearNotificationsForUser(userId: string, chatId: string): void {
-    const keysToDelete: string[] = [];
-    
-    for (const [key, notification] of this._pendingNotifications.entries()) {
-      if (notification.userId === userId && notification.chatId === chatId) {
-        keysToDelete.push(key);
-      }
-    }
-    
-    keysToDelete.forEach(key => this._pendingNotifications.delete(key));
-  }
-
-  // Method to check if user has pending notifications for a specific chat
-  hasPendingNotifications(userId: string, chatId: string): boolean {
-    for (const [, notification] of this._pendingNotifications.entries()) {
-      if (notification.userId === userId && notification.chatId === chatId) {
-        return true;
-      }
-    }
-    return false;
-  }
-
-  // Method to get pending notification count for a user
-  getPendingNotificationCount(userId: string): number {
-    let count = 0;
-    for (const [, notification] of this._pendingNotifications.entries()) {
-      if (notification.userId === userId) {
-        count += notification.messageCount;
-      }
-    }
-    return count;
-  }
-} 
+}

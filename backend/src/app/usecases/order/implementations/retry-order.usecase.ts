@@ -1,6 +1,6 @@
 import { IRetryOrderUseCase } from "../interfaces/retry-order.usecase.interface";
 import { IOrderRepository } from "../../../repositories/order.repository";
-import { IPaymentService } from "../../../services/payment/interfaces/payment.service.interface";
+import { ICreateStripeCheckoutSessionUseCase } from "../../payment/interfaces/create-stripe-checkout-session.usecase.interface";
 import { ICreateTransactionUseCase } from "../../transaction/interfaces/create-transaction.usecase.interface";
 import { TransactionType } from "../../../../domain/enum/transaction-type.enum";
 import { TransactionStatus } from "../../../../domain/enum/transaction-status.enum";
@@ -13,7 +13,7 @@ import { ITransactionOutputDTO } from "../../../dtos/transaction.dto";
 export class RetryOrderUseCase implements IRetryOrderUseCase {
   constructor(
     private readonly _orderRepository: IOrderRepository,
-    private readonly _paymentService: IPaymentService,
+    private readonly _createStripeCheckoutSessionUseCase: ICreateStripeCheckoutSessionUseCase,
     private readonly _createTransactionUseCase: ICreateTransactionUseCase
   ) {}
 
@@ -65,7 +65,7 @@ export class RetryOrderUseCase implements IRetryOrderUseCase {
     });
 
     // Create new Stripe checkout session
-    const session = await this._paymentService.createStripeCheckoutSession(userId, order.id!, {
+    const session = await this._createStripeCheckoutSessionUseCase.execute(userId, order.id!, {
       courses: courses.map(course => ({
         id: course.id,
         title: course.title,

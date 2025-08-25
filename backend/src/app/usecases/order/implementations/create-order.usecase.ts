@@ -1,6 +1,7 @@
 import { ICreateOrderUseCase } from "../interfaces/create-order.usecase.interface";
 import { IOrderRepository } from "../../../repositories/order.repository";
-import { IPaymentService } from "../../../services/payment/interfaces/payment.service.interface";
+import { IHandleWalletPaymentUseCase } from "../../payment/interfaces/handle-wallet-payment.usecase.interface";
+import { ICreateStripeCheckoutSessionUseCase } from "../../payment/interfaces/create-stripe-checkout-session.usecase.interface";
 import { PaymentGateway } from "../../../../domain/enum/payment-gateway.enum";
 import { ICreateTransactionUseCase } from "../../transaction/interfaces/create-transaction.usecase.interface";
 import { TransactionType } from "../../../../domain/enum/transaction-type.enum";
@@ -15,8 +16,9 @@ import { CreateOrderDto } from "../../../dtos/order.dto";
 export class CreateOrderUseCase implements ICreateOrderUseCase {
   constructor(
     private readonly _orderRepository: IOrderRepository,
-    private readonly _paymentService: IPaymentService,
-    private readonly _createTransactionUseCase: ICreateTransactionUseCase
+    private readonly _handleWalletPaymentUseCase: IHandleWalletPaymentUseCase,
+    private readonly _createTransactionUseCase: ICreateTransactionUseCase,
+    private readonly _createStripeCheckoutSessionUseCase: ICreateStripeCheckoutSessionUseCase
   ) {}
 
   async execute(userId: string, input: CreateOrderDto) {
@@ -79,7 +81,7 @@ export class CreateOrderUseCase implements ICreateOrderUseCase {
     // Handle payment based on method
     if (paymentMethod === "WALLET") {
       // Process wallet payment
-      const paymentResult = await this._paymentService.handleWalletPayment(
+      const paymentResult = await this._handleWalletPaymentUseCase.execute(
         userId,
         order.id!,
         totalAmount
@@ -102,7 +104,7 @@ export class CreateOrderUseCase implements ICreateOrderUseCase {
       });
 
       // Create Stripe checkout session
-      const session = await this._paymentService.createStripeCheckoutSession(
+      const session = await this._createStripeCheckoutSessionUseCase.execute(
         userId,
         order.id!,
         {

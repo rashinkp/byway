@@ -20,9 +20,10 @@ export interface WalletDependencies {
 }
 
 export const createWalletDependencies = (
-  sharedDeps: SharedDependencies
+  sharedDeps: SharedDependencies,
+  appDeps: any
 ): WalletDependencies => {
-  const { prisma, httpErrors, httpSuccess, paymentService } = sharedDeps;
+  const { prisma, httpErrors, httpSuccess } = sharedDeps;
 
   const walletRepository = new WalletRepository(prisma);
   const transactionRepository = new TransactionRepository(prisma);
@@ -32,7 +33,7 @@ export const createWalletDependencies = (
   const topUpWalletUseCase = new TopUpWalletUseCase(
     walletRepository,
     transactionRepository,
-    paymentService
+    appDeps.createStripeCheckoutSessionUseCase
   );
   const walletController = new WalletController(
     getWalletUseCase,

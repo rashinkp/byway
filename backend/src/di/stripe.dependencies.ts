@@ -5,11 +5,15 @@ export interface StripeDependencies {
   stripeController: StripeController;
 }
 
-export const createStripeDependencies = (sharedDeps: SharedDependencies): StripeDependencies => {
-  const { httpErrors, httpSuccess, paymentService, getEnrollmentStatsUseCase, enrollmentRepository } = sharedDeps;
+export const createStripeDependencies = (sharedDeps: SharedDependencies, appDeps: any): StripeDependencies => {
+  const { httpErrors, httpSuccess, getEnrollmentStatsUseCase, enrollmentRepository } = sharedDeps;
 
   const stripeController = new StripeController(
-    paymentService,
+    {
+      handleWalletPayment: appDeps.handleWalletPaymentUseCase.execute.bind(appDeps.handleWalletPaymentUseCase),
+      createStripeCheckoutSession: appDeps.createStripeCheckoutSessionUseCase.execute.bind(appDeps.createStripeCheckoutSessionUseCase),
+      handleStripeWebhook: appDeps.handleStripeWebhookUseCase.execute.bind(appDeps.handleStripeWebhookUseCase),
+    },
     getEnrollmentStatsUseCase,
     enrollmentRepository,
     httpErrors,

@@ -1,3 +1,4 @@
+import { IDistributeRevenueUseCase } from "../interfaces/distribute-revenue.usecase.interface";
 import { IWalletRepository } from "../../../repositories/wallet.repository.interface";
 import { ITransactionRepository } from "../../../repositories/transaction.repository";
 import { TransactionType } from "../../../../domain/enum/transaction-type.enum";
@@ -5,16 +6,15 @@ import { TransactionStatus } from "../../../../domain/enum/transaction-status.en
 import { PaymentGateway } from "../../../../domain/enum/payment-gateway.enum";
 import { HttpError } from "../../../../presentation/http/errors/http-error";
 import { StatusCodes } from "http-status-codes";
-import { IRevenueDistributionService } from "../interfaces/revenue-distribution.service.interface";
 import { IOrderRepository } from "../../../repositories/order.repository";
 import { Transaction } from "../../../../domain/entities/transaction.entity";
 import { Wallet } from "../../../../domain/entities/wallet.entity";
 import { IUserRepository } from "../../../repositories/user.repository";
-import { CreateNotificationsForUsersUseCase } from "../../../usecases/notification/implementations/create-notifications-for-users.usecase";
 import { NotificationEventType } from "../../../../domain/enum/notification-event-type.enum";
 import { NotificationEntityType } from "../../../../domain/enum/notification-entity-type.enum";
+import { CreateNotificationsForUsersUseCaseInterface } from "../../notification/interfaces/create-notifications-for-users.usecase.interface";
 
-export class RevenueDistributionService implements IRevenueDistributionService {
+export class DistributeRevenueUseCase implements IDistributeRevenueUseCase {
   private readonly _ADMIN_SHARE_PERCENTAGE = 20;
   private readonly _INSTRUCTOR_SHARE_PERCENTAGE = 80;
 
@@ -23,17 +23,16 @@ export class RevenueDistributionService implements IRevenueDistributionService {
     private _transactionRepository: ITransactionRepository,
     private _orderRepository: IOrderRepository,
     private _userRepository: IUserRepository,
-    private _createNotificationsForUsersUseCase: CreateNotificationsForUsersUseCase
+    private _createNotificationsForUsersUseCase: CreateNotificationsForUsersUseCaseInterface
   ) {}
 
-  async distributeRevenue(orderId: string): Promise<void> {
+  async execute(orderId: string): Promise<void> {
     try {
       const orderItems = await this._orderRepository.findOrderItems(orderId);
 
       if (!orderItems || orderItems.length === 0) {
         throw new HttpError("No order items found", StatusCodes.NOT_FOUND);
       }
-
 
       for (const orderItem of orderItems) {
         try {
@@ -68,7 +67,6 @@ export class RevenueDistributionService implements IRevenueDistributionService {
     const coursePrice = course.price?.getValue()?.toNumber() || 0;
     const instructorId = course.createdBy;
     const { adminShare, instructorShare } = this._calculateShares(coursePrice);
-
 
     await this._updateWallets(instructorId, adminShare, instructorShare);
     await this._createTransactions(
@@ -228,6 +226,5 @@ export class RevenueDistributionService implements IRevenueDistributionService {
         message: `Course "${course.title}" purchase completed! You're ready to start learning.`,
         link: `/user/my-courses`,
       });
-    
   }
 }
