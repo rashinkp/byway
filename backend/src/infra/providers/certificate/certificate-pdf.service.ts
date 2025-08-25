@@ -12,7 +12,7 @@ export class CertificatePdfService implements CertificatePdfServiceInterface {
 
   constructor(platformName: string = "Byway Learning Platform") {
     this._platformName = platformName;
-    this._certificateTemplate = this.getTemplatePath();
+    this._certificateTemplate = this._getTemplatePath();
   }
 
   async generateCertificatePDF(data: CertificateTemplateData): Promise<Buffer> {
@@ -89,7 +89,7 @@ export class CertificatePdfService implements CertificatePdfServiceInterface {
     throw new Error("Streaming not implemented for image-based certificates");
   }
 
-  private getTemplatePath(): string {
+  private _getTemplatePath(): string {
     // Path to your certificate template image
     // Use process.cwd() for more reliable path resolution
     return path.join(
@@ -99,7 +99,7 @@ export class CertificatePdfService implements CertificatePdfServiceInterface {
     );
   }
 
-  private getDefaultTemplate(): string {
+  private _getDefaultTemplate(): string {
     // This method is no longer needed but kept for interface compatibility
     return "";
   }

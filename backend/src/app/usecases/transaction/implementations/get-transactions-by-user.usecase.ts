@@ -21,14 +21,14 @@ export class GetTransactionsByUserUseCase implements IGetTransactionsByUserUseCa
     ]);
     const totalPages = Math.ceil(total / limit);
     return {
-      items: transactions.map((transaction) => this.mapToDTO(transaction)),
+      items: transactions.map((transaction) => this._mapToDTO(transaction)),
       total,
       page,
       totalPages,
     };
   }
 
-  private mapToDTO(transaction: Transaction): ITransactionOutputDTO {
+  private _mapToDTO(transaction: Transaction): ITransactionOutputDTO {
     return {
       id: transaction.id,
       orderId: transaction.orderId,

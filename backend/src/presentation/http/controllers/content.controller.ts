@@ -18,10 +18,10 @@ import { ICreateLessonContentInputDTO, IUpdateLessonContentInputDTO } from "../.
 
 export class LessonContentController extends BaseController {
   constructor(
-    private createLessonContentUseCase: ICreateLessonContentUseCase,
-    private updateLessonContentUseCase: IUpdateLessonContentUseCase,
-    private getLessonContentByLessonIdUseCase: IGetContentByLessonIdUseCase,
-    private deleteLessonContentUseCase: IDeleteLessonContentUseCase,
+    private _createLessonContentUseCase: ICreateLessonContentUseCase,
+    private _updateLessonContentUseCase: IUpdateLessonContentUseCase,
+    private _getLessonContentByLessonIdUseCase: IGetContentByLessonIdUseCase,
+    private _deleteLessonContentUseCase: IDeleteLessonContentUseCase,
     httpErrors: IHttpErrors,
     httpSuccess: IHttpSuccess
   ) {
@@ -35,7 +35,7 @@ export class LessonContentController extends BaseController {
       }
 
       const validated = validateCreateLessonContent(request.body as ICreateLessonContentInputDTO);
-      const content = await this.createLessonContentUseCase.execute({
+      const content = await this._createLessonContentUseCase.execute({
         ...validated,
         userId: request.user.id,
       });
@@ -52,7 +52,7 @@ export class LessonContentController extends BaseController {
         ...(request.body as Partial<IUpdateLessonContentInputDTO>),
         id: request.params.contentId,
       });
-      const content = await this.updateLessonContentUseCase.execute(validated);
+      const content = await this._updateLessonContentUseCase.execute(validated);
       return this.success_200(content, "Lesson content updated successfully");
     });
   }
@@ -71,7 +71,7 @@ export class LessonContentController extends BaseController {
       const validated = validateGetLessonContentByLessonId({
         lessonId: request.params.lessonId,
       });
-      const content = await this.getLessonContentByLessonIdUseCase.execute(
+      const content = await this._getLessonContentByLessonIdUseCase.execute(
         validated.lessonId,
         { id: request.user.id, role: request.user.role }
       );
@@ -87,7 +87,7 @@ export class LessonContentController extends BaseController {
       const validated = validateDeleteLessonContent({
         id: request.params.contentId,
       });
-      await this.deleteLessonContentUseCase.execute(validated.id);
+      await this._deleteLessonContentUseCase.execute(validated.id);
       return this.success_200(null, "Lesson content deleted successfully");
     });
   }

@@ -9,8 +9,8 @@ import { Certificate } from "../../../domain/entities/certificate.entity";
 
 export class CertificateController extends BaseController {
   constructor(
-    private readonly generateCertificateUseCase: IGenerateCertificateUseCase,
-    private readonly certificateRepository: CertificateRepositoryInterface,
+    private readonly _generateCertificateUseCase: IGenerateCertificateUseCase,
+    private readonly _certificateRepository: CertificateRepositoryInterface,
     httpErrors: IHttpErrors,
     httpSuccess: IHttpSuccess
   ) {
@@ -24,14 +24,14 @@ export class CertificateController extends BaseController {
       const userId = request.user?.id;
       const { courseId } = request.body as { courseId: string };
       if (!userId || !courseId) {
-        return this.httpErrors.error_400("User ID or Course ID missing");
+        return this._httpErrors.error_400("User ID or Course ID missing");
       }
-      const result = await this.generateCertificateUseCase.execute({
+      const result = await this._generateCertificateUseCase.execute({
         userId,
         courseId,
       });
       if (!result.success) {
-        return this.httpErrors.error_400(
+        return this._httpErrors.error_400(
           result.error || "Certificate generation failed"
         );
       }
@@ -50,21 +50,24 @@ export class CertificateController extends BaseController {
       const courseId = request.query?.["courseId"];
 
       if (!userId || !courseId) {
-        return this.httpErrors.error_400("User ID or Course ID missing");
+        return this._httpErrors.error_400("User ID or Course ID missing");
       }
 
       // Try to fetch certificate
       const certificate =
-        await this.certificateRepository.findByUserIdAndCourseId(
+        await this._certificateRepository.findByUserIdAndCourseId(
           userId,
           courseId as string
         );
 
       if (!certificate) {
-        return this.httpErrors.error_404("Certificate not found");
+        return this._httpErrors.error_404("Certificate not found");
       }
 
-      return this.success_200(Certificate.toPersistence(certificate), "Certificate found");
+      return this.success_200(
+        Certificate.toPersistence(certificate),
+        "Certificate found"
+      );
     });
   };
 
@@ -74,7 +77,7 @@ export class CertificateController extends BaseController {
     return this.handleRequest(httpRequest, async (request) => {
       const userId = request.user?.id;
       if (!userId) {
-        return this.httpErrors.error_400("User ID missing");
+        return this._httpErrors.error_400("User ID missing");
       }
       // Get pagination and filter params
       const page = parseInt(request.query?.["page"] as string) || 1;
@@ -85,7 +88,7 @@ export class CertificateController extends BaseController {
       const status = request.query?.["status"] as string | undefined;
       const search = request.query?.["search"] as string | undefined;
       const skip = (page - 1) * limit;
-      const result = await this.certificateRepository.findManyByUserId({
+      const result = await this._certificateRepository.findManyByUserId({
         userId,
         skip,
         take: limit,

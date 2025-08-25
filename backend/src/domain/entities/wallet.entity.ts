@@ -12,7 +12,7 @@ export class Wallet {
   static create(
     userId: string,
     initialBalance: number = 0,
-    currency: string = 'USD'
+    currency: string = "USD"
   ): Wallet {
     return new Wallet(
       crypto.randomUUID(),
@@ -23,12 +23,12 @@ export class Wallet {
     );
   }
 
-  addAmount(amount: number, currency: string = 'USD'): void {
+  addAmount(amount: number, currency: string = "USD"): void {
     const moneyToAdd = Money.create(amount, currency);
     this.balance = this.balance.add(moneyToAdd);
   }
 
-  reduceAmount(amount: number, currency: string = 'USD'): void {
+  reduceAmount(amount: number, currency: string = "USD"): void {
     const moneyToReduce = Money.create(amount, currency);
     this.balance = this.balance.subtract(moneyToReduce);
   }
@@ -37,10 +37,10 @@ export class Wallet {
     return {
       id: this.id,
       userId: this.userId,
-      balance: this.balance.amount,
-      currency: this.balance.currency,
+      balance: this.balance._amount,
+      currency: this.balance._currency,
       createdAt: this.createdAt,
-      updatedAt: this.updatedAt
+      updatedAt: this.updatedAt,
     };
   }
-} 
+}

@@ -19,7 +19,7 @@ export class NotificationBatchingService {
   private readonly _MAX_MESSAGE_LENGTH = 50;
 
   constructor(
-    private readonly createNotificationsForUsersUseCase: CreateNotificationsForUsersUseCase
+    private readonly _createNotificationsForUsersUseCase: CreateNotificationsForUsersUseCase
   ) {}
 
   async addMessageToBatch(
@@ -43,7 +43,7 @@ export class NotificationBatchingService {
 
       // If the batch window has expired, send the notification
       if (now.getTime() - existing.lastMessageTime.getTime() > this._BATCH_WINDOW_MS) {
-        await this.sendBatchedNotification(existing);
+        await this._sendBatchedNotification(existing);
         this._pendingNotifications.delete(key);
       }
     } else {
@@ -64,20 +64,20 @@ export class NotificationBatchingService {
       setTimeout(async () => {
         const notification = this._pendingNotifications.get(key);
         if (notification) {
-          await this.sendBatchedNotification(notification);
+          await this._sendBatchedNotification(notification);
           this._pendingNotifications.delete(key);
         }
       }, this._BATCH_WINDOW_MS);
     }
   }
 
-  private async sendBatchedNotification(notification: PendingNotification): Promise<void> {
+  private async _sendBatchedNotification(notification: PendingNotification): Promise<void> {
     try {
       const message = notification.messageCount === 1
-        ? `You have received a new message from ${notification.senderName}: ${this.truncateMessage(notification.lastMessage)}`
+        ? `You have received a new message from ${notification.senderName}: ${this._truncateMessage(notification.lastMessage)}`
         : `You have received ${notification.messageCount} new messages from ${notification.senderName}`;
 
-      await this.createNotificationsForUsersUseCase.execute(
+      await this._createNotificationsForUsersUseCase.execute(
         [notification.userId],
         {
           eventType: NotificationEventType.NEW_MESSAGE,
@@ -93,7 +93,7 @@ export class NotificationBatchingService {
     }
   }
 
-  private truncateMessage(message: string): string {
+  private _truncateMessage(message: string): string {
     if (message.length <= this._MAX_MESSAGE_LENGTH) {
       return message;
     }
@@ -105,7 +105,7 @@ export class NotificationBatchingService {
     const notifications = Array.from(this._pendingNotifications.values());
     
     for (const notification of notifications) {
-      await this.sendBatchedNotification(notification);
+      await this._sendBatchedNotification(notification);
     }
     
     this._pendingNotifications.clear();

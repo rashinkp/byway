@@ -1,39 +1,39 @@
 export class Money {
   private constructor(
-    public readonly amount: number,
-    public readonly currency: string = 'USD'
+    public readonly _amount: number,
+    public readonly _currency: string = "USD"
   ) {
-    if (amount < 0) {
-      throw new Error('Amount cannot be negative');
+    if (_amount < 0) {
+      throw new Error("Amount cannot be negative");
     }
   }
 
-  static create(amount: number, currency: string = 'USD'): Money {
+  static create(amount: number, currency: string = "USD"): Money {
     return new Money(amount, currency);
   }
 
   add(other: Money): Money {
-    if (this.currency !== other.currency) {
-      throw new Error('Cannot add money with different currencies');
+    if (this._currency !== other._currency) {
+      throw new Error("Cannot add money with different currencies");
     }
-    return new Money(this.amount + other.amount, this.currency);
+    return new Money(this._amount + other._amount, this._currency);
   }
 
   subtract(other: Money): Money {
-    if (this.currency !== other.currency) {
-      throw new Error('Cannot subtract money with different currencies');
+    if (this._currency !== other._currency) {
+      throw new Error("Cannot subtract money with different currencies");
     }
-    if (this.amount < other.amount) {
-      throw new Error('Insufficient balance');
+    if (this._amount < other._amount) {
+      throw new Error("Insufficient balance");
     }
-    return new Money(this.amount - other.amount, this.currency);
+    return new Money(this._amount - other._amount, this._currency);
   }
 
   equals(other: Money): boolean {
-    return this.amount === other.amount && this.currency === other.currency;
+    return this._amount === other._amount && this._currency === other._currency;
   }
 
   toString(): string {
-    return `${this.amount} ${this.currency}`;
+    return `${this._amount} ${this._currency}`;
   }
-} 
+}

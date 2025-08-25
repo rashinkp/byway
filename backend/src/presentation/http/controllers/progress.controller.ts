@@ -10,8 +10,8 @@ import { GetProgressSchema, UpdateProgressSchema } from "../../../presentation/v
 
 export class ProgressController extends BaseController {
   constructor(
-    private readonly updateProgressUseCase: IUpdateProgressUseCase,
-    private readonly getProgressUseCase: IGetProgressUseCase,
+    private readonly _updateProgressUseCase: IUpdateProgressUseCase,
+    private readonly _getProgressUseCase: IGetProgressUseCase,
     httpErrors: IHttpErrors,
     httpSuccess: IHttpSuccess
   ) {
@@ -32,7 +32,7 @@ export class ProgressController extends BaseController {
       });
 
 
-      const response = await this.updateProgressUseCase.execute(validatedData);
+      const response = await this._updateProgressUseCase.execute(validatedData);
       return this.success_200(response.data, response.message);
     });
   }
@@ -48,7 +48,7 @@ export class ProgressController extends BaseController {
         courseId: req.params?.courseId,
       });
 
-      const response = await this.getProgressUseCase.execute(validatedData);
+      const response = await this._getProgressUseCase.execute(validatedData);
       return this.success_200(response.data, response.message);
     });
   }

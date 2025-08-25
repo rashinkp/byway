@@ -15,8 +15,8 @@ import { NotificationEventType } from "../../../../domain/enum/notification-even
 import { NotificationEntityType } from "../../../../domain/enum/notification-entity-type.enum";
 
 export class RevenueDistributionService implements IRevenueDistributionService {
-  private readonly ADMIN_SHARE_PERCENTAGE = 20;
-  private readonly INSTRUCTOR_SHARE_PERCENTAGE = 80;
+  private readonly _ADMIN_SHARE_PERCENTAGE = 20;
+  private readonly _INSTRUCTOR_SHARE_PERCENTAGE = 80;
 
   constructor(
     private _walletRepository: IWalletRepository,
@@ -37,7 +37,7 @@ export class RevenueDistributionService implements IRevenueDistributionService {
 
       for (const orderItem of orderItems) {
         try {
-          await this.distributeRevenueForOrderItem(orderItem);
+          await this._distributeRevenueForOrderItem(orderItem);
         } catch (error) {
           throw error; 
         }
@@ -50,7 +50,7 @@ export class RevenueDistributionService implements IRevenueDistributionService {
     }
   }
 
-  private async distributeRevenueForOrderItem(orderItem: { 
+  private async _distributeRevenueForOrderItem(orderItem: { 
     id: string; 
     courseId: string; 
     orderId: string; 
@@ -67,11 +67,11 @@ export class RevenueDistributionService implements IRevenueDistributionService {
 
     const coursePrice = course.price?.getValue()?.toNumber() || 0;
     const instructorId = course.createdBy;
-    const { adminShare, instructorShare } = this.calculateShares(coursePrice);
+    const { adminShare, instructorShare } = this._calculateShares(coursePrice);
 
 
-    await this.updateWallets(instructorId, adminShare, instructorShare);
-    await this.createTransactions(
+    await this._updateWallets(instructorId, adminShare, instructorShare);
+    await this._createTransactions(
       instructorId,
       adminShare,
       instructorShare,
@@ -80,7 +80,7 @@ export class RevenueDistributionService implements IRevenueDistributionService {
     );
 
     // Send notifications to instructor and admin
-    await this.sendPurchaseNotifications(
+    await this._sendPurchaseNotifications(
       course,
       orderItem,
       instructorShare,
@@ -88,17 +88,17 @@ export class RevenueDistributionService implements IRevenueDistributionService {
     );
   }
 
-  private calculateShares(coursePrice: number): {
+  private _calculateShares(coursePrice: number): {
     adminShare: number;
     instructorShare: number;
   } {
-    const adminShare = (coursePrice * this.ADMIN_SHARE_PERCENTAGE) / 100;
+    const adminShare = (coursePrice * this._ADMIN_SHARE_PERCENTAGE) / 100;
     const instructorShare =
-      (coursePrice * this.INSTRUCTOR_SHARE_PERCENTAGE) / 100;
+      (coursePrice * this._INSTRUCTOR_SHARE_PERCENTAGE) / 100;
     return { adminShare, instructorShare };
   }
 
-  private async getAdminUserId(): Promise<string> {
+  private async _getAdminUserId(): Promise<string> {
     const { items } = await this._userRepository.findAll({
       role: "ADMIN",
       page: 1,
@@ -116,13 +116,13 @@ export class RevenueDistributionService implements IRevenueDistributionService {
     return items[0].id;
   }
 
-  private async updateWallets(
+  private async _updateWallets(
     instructorId: string,
     adminShare: number,
     instructorShare: number
   ): Promise<void> {
     // Get admin user ID
-    const adminId = await this.getAdminUserId();
+    const adminId = await this._getAdminUserId();
 
     // Get or create admin wallet
     let adminWallet = await this._walletRepository.findByUserId(adminId);
@@ -145,14 +145,14 @@ export class RevenueDistributionService implements IRevenueDistributionService {
     await this._walletRepository.update(instructorWallet);
   }
 
-  private async createTransactions(
+  private async _createTransactions(
     instructorId: string,
     adminShare: number,
     instructorShare: number,
     orderId: string,
     coursePrice: number
   ): Promise<void> {
-    const adminId = await this.getAdminUserId();
+    const adminId = await this._getAdminUserId();
 
     const adminTransaction = Transaction.create({
       userId: adminId,
@@ -178,14 +178,14 @@ export class RevenueDistributionService implements IRevenueDistributionService {
     await this._transactionRepository.create(instructorTransaction);
   }
 
-  private async sendPurchaseNotifications(
+  private async _sendPurchaseNotifications(
     course: { id: string; title: string; createdBy: string },
     orderItem: { orderId: string },
     instructorShare: number,
     adminShare: number
   ): Promise<void> {
       // Get admin user ID and order details
-      const adminId = await this.getAdminUserId();
+      const adminId = await this._getAdminUserId();
       const order = await this._orderRepository.findById(orderItem.orderId);
 
       if (!order) {

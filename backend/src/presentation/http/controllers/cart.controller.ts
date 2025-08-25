@@ -18,15 +18,15 @@ import {
 
 export class CartController extends BaseController {
   constructor(
-    private addToCartUseCase: IAddToCartUseCase,
-    private getCartUseCase: IGetCartUseCase,
-    private removeFromCartUseCase: IRemoveFromCartUseCase,
-    private applyCouponUseCase: IApplyCouponUseCase,
-    private clearCartUseCase: IClearCartUseCase,
-    protected httpErrors: IHttpErrors,
-    protected httpSuccess: IHttpSuccess
+    private _addToCartUseCase: IAddToCartUseCase,
+    private _getCartUseCase: IGetCartUseCase,
+    private _removeFromCartUseCase: IRemoveFromCartUseCase,
+    private _applyCouponUseCase: IApplyCouponUseCase,
+    private _clearCartUseCase: IClearCartUseCase,
+    protected _httpErrors: IHttpErrors,
+    protected _httpSuccess: IHttpSuccess
   ) {
-    super(httpErrors, httpSuccess);
+    super(_httpErrors, _httpSuccess);
   }
 
   async addToCart(httpRequest: IHttpRequest): Promise<IHttpResponse> {
@@ -36,7 +36,7 @@ export class CartController extends BaseController {
       }
 
       const validated = validateAddToCart(request.body);
-      const cart = await this.addToCartUseCase.execute(
+      const cart = await this._addToCartUseCase.execute(
         request.user.id,
         validated
       );
@@ -52,7 +52,7 @@ export class CartController extends BaseController {
       }
 
       const validated = validateGetCart(request.query);
-      const cart = await this.getCartUseCase.execute(
+      const cart = await this._getCartUseCase.execute(
         request.user.id,
         validated
       );
@@ -78,7 +78,7 @@ export class CartController extends BaseController {
         throw new HttpError("Course ID is required", 400);
       }
 
-      await this.removeFromCartUseCase.execute(request.user.id, { courseId });
+      await this._removeFromCartUseCase.execute(request.user.id, { courseId });
 
       return this.success_200(null, "Course removed from cart successfully");
     });
@@ -91,7 +91,7 @@ export class CartController extends BaseController {
       }
 
       const validated = validateApplyCoupon(request.body);
-      const cart = await this.applyCouponUseCase.execute(
+      const cart = await this._applyCouponUseCase.execute(
         request.user.id,
         validated
       );
@@ -106,7 +106,7 @@ export class CartController extends BaseController {
         throw new UnauthorizedError("User not authenticated");
       }
 
-      await this.clearCartUseCase.execute(request.user.id);
+      await this._clearCartUseCase.execute(request.user.id);
       return this.success_200(null, "Cart cleared successfully");
     });
   }

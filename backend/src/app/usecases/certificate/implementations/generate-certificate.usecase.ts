@@ -105,7 +105,7 @@ export class GenerateCertificateUseCase implements IGenerateCertificateUseCase {
       );
 
       // 6. Generate certificate number
-      const certificateNumber = this.generateCertificateNumber();
+      const certificateNumber = this._generateCertificateNumber();
   
 
       // 7. Create or update certificate entity
@@ -348,7 +348,7 @@ export class GenerateCertificateUseCase implements IGenerateCertificateUseCase {
     };
   }
 
-  private generateCertificateNumber(): string {
+  private _generateCertificateNumber(): string {
     const timestamp = Date.now().toString(36);
     const random = Math.random().toString(36).substring(2, 8);
     return `CERT-${timestamp}-${random}`.toUpperCase();

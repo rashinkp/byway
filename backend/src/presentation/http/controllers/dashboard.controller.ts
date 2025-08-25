@@ -16,10 +16,10 @@ const getDashboardSchema = z.object({
 
 export class DashboardController extends BaseController {
   constructor(
-    private readonly getDashboardUseCase: IGetDashboardUseCase,
+    private readonly _getDashboardUseCase: IGetDashboardUseCase,
     httpErrors: IHttpErrors,
     httpSuccess: IHttpSuccess,
-    private readonly getInstructorDashboardUseCase?: IGetInstructorDashboardUseCase
+    private readonly _getInstructorDashboardUseCase?: IGetInstructorDashboardUseCase
   ) {
     super(httpErrors, httpSuccess);
   }
@@ -31,7 +31,7 @@ export class DashboardController extends BaseController {
         limit: query.limit,
       });
       if (!request?.user?.id) throw new Error("User ID is required");
-      const result = await this.getDashboardUseCase.execute({
+      const result = await this._getDashboardUseCase.execute({
         userId: request?.user?.id,
         limit: limit || 10,
       });
@@ -43,7 +43,7 @@ export class DashboardController extends BaseController {
   async getInstructorDashboard(
     httpRequest: IHttpRequest
   ): Promise<IHttpResponse> {
-    if (!this.getInstructorDashboardUseCase) {
+    if (!this._getInstructorDashboardUseCase) {
       throw new Error("Instructor dashboard use case not available");
     }
     return this.handleRequest(httpRequest, async (request) => {
@@ -52,7 +52,7 @@ export class DashboardController extends BaseController {
         limit: query.limit,
       });
       if (!request?.user?.id) throw new Error("User ID is required");
-      const result = await this.getInstructorDashboardUseCase!.execute({
+      const result = await this._getInstructorDashboardUseCase!.execute({
         instructorId: request?.user?.id,
         limit: limit || 5,
       });

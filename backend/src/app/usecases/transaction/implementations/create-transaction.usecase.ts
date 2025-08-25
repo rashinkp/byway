@@ -29,10 +29,10 @@ export class CreateTransactionUseCase implements ICreateTransactionUseCase {
     const createdTransaction = await this._transactionRepository.create(
       transaction
     );
-    return this.mapToDTO(createdTransaction);
+    return this._mapToDTO(createdTransaction);
   }
 
-  private mapToDTO(transaction: Transaction): ITransactionOutputDTO {
+  private _mapToDTO(transaction: Transaction): ITransactionOutputDTO {
     return {
       id: transaction.id,
       orderId: transaction.orderId,

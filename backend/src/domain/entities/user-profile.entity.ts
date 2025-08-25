@@ -99,7 +99,7 @@ export class UserProfile {
     }
   ): UserProfile {
     const updatedProps: UserProfileInterface = {
-      ...existingProfile.getProps(),
+      ...existingProfile._getProps(),
       updatedAt: new Date(),
     };
 
@@ -203,7 +203,7 @@ export class UserProfile {
     return this._updatedAt;
   }
 
-  private getProps(): UserProfileInterface {
+  private _getProps(): UserProfileInterface {
     return {
       id: this._id,
       userId: this._userId,
@@ -222,6 +222,6 @@ export class UserProfile {
   }
 
   toJSON(): UserProfileInterface {
-    return this.getProps();
+    return this._getProps();
   }
 }

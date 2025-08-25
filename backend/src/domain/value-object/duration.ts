@@ -1,5 +1,5 @@
 export class Duration {
-  private constructor(private readonly value: number | null) {}
+  private constructor(private readonly _value: number | null) {}
 
   static create(value: number | null): Duration {
     if (value != null && value < 0) {
@@ -9,6 +9,6 @@ export class Duration {
   }
 
   getValue(): number | null {
-    return this.value;
+    return this._value;
   }
 }
