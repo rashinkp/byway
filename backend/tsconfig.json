@@ -1,13 +1,22 @@
 {
   "compilerOptions": {
-    "target": "es2016" ,
-    "module": "commonjs" ,
-    "rootDir": "src" ,
+    "target": "es2016",
+    "module": "commonjs",
+    "rootDir": "src",
     "outDir": "./dist",
     "esModuleInterop": true,                     
-    "forceConsistentCasingInFileNames": true ,
-    "strict": true ,
+    "forceConsistentCasingInFileNames": true,
+    "strict": true,
     "skipLibCheck": true,
+    "resolveJsonModule": true,
+    "allowSyntheticDefaultImports": true,
+    "declaration": true,
+    "declarationMap": true,
+    "sourceMap": true,
+    "removeComments": false,
+    "noImplicitAny": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true
   },
   "include": ["src/**/*"],
   "exclude": ["node_modules", "dist"]

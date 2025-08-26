@@ -4,6 +4,7 @@ import { SharedDependencies } from "./shared.dependencies";
 import { GetAllOrdersUseCase } from "../app/usecases/order/implementations/get-all-orders.use-case";
 import { CreateTransactionUseCase } from "../app/usecases/transaction/implementations/create-transaction.usecase";
 import { RetryOrderUseCase } from "../app/usecases/order/implementations/retry-order.usecase";
+import { PaymentDependencies } from "./payment.dependencies";
 
 export interface OrderDependencies {
   orderController: OrderController;
@@ -11,7 +12,7 @@ export interface OrderDependencies {
 
 export function createOrderDependencies(
   deps: SharedDependencies,
-  appDeps: any
+  paymentDeps: PaymentDependencies
 ): OrderDependencies {
   // Initialize use cases
   const createTransactionUseCase = new CreateTransactionUseCase(
@@ -19,15 +20,15 @@ export function createOrderDependencies(
   );
   const createOrderUseCase = new CreateOrderUseCase(
     deps.orderRepository,
-    appDeps.handleWalletPaymentUseCase,
+    paymentDeps.handleWalletPaymentUseCase,
     createTransactionUseCase,
-    appDeps.createStripeCheckoutSessionUseCase
+    paymentDeps.createStripeCheckoutSessionUseCase
   );
 
   const getAllOrdersUseCase = new GetAllOrdersUseCase(deps.orderRepository);
   const retryOrderUseCase = new RetryOrderUseCase(
     deps.orderRepository,
-    appDeps.createStripeCheckoutSessionUseCase,
+    paymentDeps.createStripeCheckoutSessionUseCase,
     createTransactionUseCase
   );
 
