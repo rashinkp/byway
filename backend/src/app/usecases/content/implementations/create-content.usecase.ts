@@ -3,11 +3,11 @@ import {
   ILessonContentOutputDTO,
 } from "../../../dtos/lesson.dto";
 import { LessonContent } from "../../../../domain/entities/content.entity";
-import { HttpError } from "../../../../presentation/http/errors/http-error";
 import { ILessonContentRepository } from "../../../repositories/content.repository";
 import { ICreateLessonContentUseCase } from "../interfaces/create-content.usecase.interface";
 import { ILessonRepository } from "../../../repositories/lesson.repository";
 import { ICourseRepository } from "../../../repositories/course.repository.interface";
+import { CourseNotFoundError, LessonNotFoundError, UserAuthorizationError, ContentValidationError } from "../../../../domain/errors/domain-errors";
 
 export class CreateLessonContentUseCase implements ICreateLessonContentUseCase {
   constructor(
@@ -23,20 +23,19 @@ export class CreateLessonContentUseCase implements ICreateLessonContentUseCase {
       // Get the lesson to find the course ID
       const lesson = await this._lessonRepository.findById(dto.lessonId);
       if (!lesson) {
-        throw new HttpError("Lesson not found", 404);
+        throw new LessonNotFoundError(dto.lessonId);
       }
 
       // Get the course to verify instructor
       const course = await this._courseRepository.findById(lesson.courseId);
       if (!course) {
-        throw new HttpError("Course not found", 404);
+        throw new CourseNotFoundError(lesson.courseId);
       }
 
       // Verify the user is the instructor of the course
       if (course.createdBy !== dto.userId) {
-        throw new HttpError(
-          "You are not authorized to create content for this lesson",
-          403
+        throw new UserAuthorizationError(
+          "You are not authorized to create content for this lesson"
         );
       }
 
@@ -44,13 +43,17 @@ export class CreateLessonContentUseCase implements ICreateLessonContentUseCase {
       const createdContent = await this._contentRepository.create(content);
       return createdContent.toJSON() as unknown as ILessonContentOutputDTO;
     } catch (error) {
-      if (error instanceof HttpError) {
+      if (
+        error instanceof LessonNotFoundError ||
+        error instanceof CourseNotFoundError ||
+        error instanceof UserAuthorizationError
+      ) {
         throw error;
       }
       if (error instanceof Error) {
-        throw new HttpError(error.message, 400);
+        throw new ContentValidationError(error.message);
       }
-      throw new HttpError("Failed to create content", 500);
+      throw new ContentValidationError("Failed to create content");
     }
   }
 }

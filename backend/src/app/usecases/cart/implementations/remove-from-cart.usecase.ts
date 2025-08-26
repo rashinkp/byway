@@ -1,7 +1,7 @@
 import { ICartRepository } from "../../../repositories/cart.repository";
 import { RemoveFromCartDto } from "../../../dtos/cart.dto";
 import { IRemoveFromCartUseCase } from "../interfaces/remove-from-cart.usecase.interface";
-import { HttpError } from "../../../../presentation/http/errors/http-error";
+import { CartItemNotFoundError } from "../../../../domain/errors/domain-errors";
 
 export class RemoveFromCartUseCase implements IRemoveFromCartUseCase {
   constructor(private _cartRepository: ICartRepository) {}
@@ -13,7 +13,7 @@ export class RemoveFromCartUseCase implements IRemoveFromCartUseCase {
     );
 
     if (!cart) {
-      throw new HttpError("Course not found in cart", 404);
+      throw new CartItemNotFoundError("Course not found in cart");
     }
 
     await this._cartRepository.delete(cart.id);

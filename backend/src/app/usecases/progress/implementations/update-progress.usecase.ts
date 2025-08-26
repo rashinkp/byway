@@ -7,11 +7,10 @@ import { ApiResponse } from "../../../../presentation/http/interfaces/ApiRespons
 import { IEnrollmentRepository } from "../../../repositories/enrollment.repository.interface";
 import { ILessonProgressRepository } from "../../../repositories/lesson-progress.repository.interface";
 import { ILessonRepository } from "../../../repositories/lesson.repository";
-import { HttpError } from "../../../../presentation/http/errors/http-error";
-import { StatusCodes } from "http-status-codes";
 import { LessonProgress } from "../../../../domain/entities/progress.entity";
 import { AccessStatus } from "../../../../domain/enum/access-status.enum";
 import { QuizAnswer } from "../../../../domain/entities/quiz-answer.entity";
+import { ValidationError, NotFoundError, UserAuthorizationError } from "../../../../domain/errors/domain-errors";
 
 export class UpdateProgressUseCase implements IUpdateProgressUseCase {
   constructor(
@@ -25,7 +24,7 @@ export class UpdateProgressUseCase implements IUpdateProgressUseCase {
   ): Promise<ApiResponse<IProgressOutputDTO>> {
     try {
       if (!input.lessonId) {
-        throw new HttpError("Lesson ID is required", StatusCodes.BAD_REQUEST);
+        throw new ValidationError("Lesson ID is required");
       }
 
       // Check if enrollment exists
@@ -35,23 +34,20 @@ export class UpdateProgressUseCase implements IUpdateProgressUseCase {
       );
 
       if (!enrollment) {
-        throw new HttpError("Enrollment not found", StatusCodes.NOT_FOUND);
+        throw new NotFoundError("Enrollment", `${input.userId}:${input.courseId}`);
       }
 
       if (enrollment.accessStatus !== "ACTIVE") {
-        throw new HttpError("Enrollment is not active", StatusCodes.FORBIDDEN);
+        throw new UserAuthorizationError("Enrollment is not active");
       }
 
       // Verify lesson exists and belongs to the course
       const lesson = await this._lessonRepository.findById(input.lessonId);
       if (!lesson) {
-        throw new HttpError("Lesson not found", StatusCodes.NOT_FOUND);
+        throw new NotFoundError("Lesson", input.lessonId);
       }
       if (lesson.courseId !== input.courseId) {
-        throw new HttpError(
-          "Lesson does not belong to this course",
-          StatusCodes.BAD_REQUEST
-        );
+        throw new ValidationError("Lesson does not belong to this course");
       }
 
       // Find or create lesson progress
@@ -90,10 +86,7 @@ export class UpdateProgressUseCase implements IUpdateProgressUseCase {
       // Handle quiz answers if provided
       if (input.quizAnswers && input.quizAnswers.length > 0) {
         if (!progress.id) {
-          throw new HttpError(
-            "Progress ID is required",
-            StatusCodes.INTERNAL_SERVER_ERROR
-          );
+          throw new ValidationError("Progress ID is required");
         }
         const progressId = progress.id;
         const quizAnswers = input.quizAnswers.map((answer) =>
@@ -139,10 +132,7 @@ export class UpdateProgressUseCase implements IUpdateProgressUseCase {
           lessonProgress: await Promise.all(
             lessonProgress.map(async (p) => {
               if (!p.id) {
-                throw new HttpError(
-                  "Progress ID is required",
-                  StatusCodes.INTERNAL_SERVER_ERROR
-                );
+                throw new ValidationError("Progress ID is required");
               }
               const answers =
                 await this._lessonProgressRepository.findQuizAnswers(p.id);
@@ -164,16 +154,17 @@ export class UpdateProgressUseCase implements IUpdateProgressUseCase {
           ),
         },
         message: "Lesson progress updated successfully",
-        statusCode: StatusCodes.OK,
+        statusCode: 200,
       };
     } catch (error) {
-      if (error instanceof HttpError) {
+      if (
+        error instanceof ValidationError ||
+        error instanceof NotFoundError ||
+        error instanceof UserAuthorizationError
+      ) {
         throw error;
       }
-      throw new HttpError(
-        "Failed to update progress",
-        StatusCodes.INTERNAL_SERVER_ERROR
-      );
+      throw new ValidationError("Failed to update progress");
     }
   }
 }

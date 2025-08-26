@@ -1,3 +1,4 @@
+import { NotFoundError } from "../../../../domain/errors/domain-errors";
 import { ReduceMoneyDto, WalletResponseDto } from "../../../dtos/wallet";
 import { IWalletRepository } from "../../../repositories/wallet.repository.interface";
 import { IReduceMoneyUseCase } from "../interfaces/reduce-money.usecase.interface";
@@ -12,7 +13,7 @@ export class ReduceMoneyUseCase implements IReduceMoneyUseCase {
     const wallet = await this._walletRepository.findByUserId(userId);
 
     if (!wallet) {
-      throw new Error("Wallet not found");
+      throw new NotFoundError("Wallet", userId);
     }
 
     wallet.reduceAmount(data.amount, data.currency);

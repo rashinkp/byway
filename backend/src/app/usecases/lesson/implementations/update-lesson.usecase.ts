@@ -3,11 +3,11 @@ import {
   IUpdateLessonInputDTO,
 } from "../../../dtos/lesson.dto";
 import { Lesson } from "../../../../domain/entities/lesson.entity";
-import { HttpError } from "../../../../presentation/http/errors/http-error";
 import { ILessonRepository } from "../../../repositories/lesson.repository";
 import { IUpdateLessonUseCase } from "../interfaces/update-lesson.usecase.interface";
 import { ILessonContentRepository } from "../../../repositories/content.repository";
 import { LessonStatus } from "../../../../domain/enum/lesson.enum";
+import { LessonNotFoundError, LessonValidationError } from "../../../../domain/errors/domain-errors";
 
 export class UpdateLessonUseCase implements IUpdateLessonUseCase {
   constructor(
@@ -19,7 +19,7 @@ export class UpdateLessonUseCase implements IUpdateLessonUseCase {
     try {
       const lesson = await this._lessonRepository.findById(dto.lessonId);
       if (!lesson || !lesson.isActive()) {
-        throw new HttpError("Lesson not found or deleted", 404);
+        throw new LessonNotFoundError(dto.lessonId);
       }
 
       // Check if content exists when publishing
@@ -28,7 +28,7 @@ export class UpdateLessonUseCase implements IUpdateLessonUseCase {
           dto.lessonId
         );
         if (!content) {
-          throw new HttpError("Cannot publish lesson without content", 400);
+          throw new LessonValidationError("Cannot publish lesson without content");
         }
       }
 
@@ -36,13 +36,13 @@ export class UpdateLessonUseCase implements IUpdateLessonUseCase {
       const savedLesson = await this._lessonRepository.update(updatedLesson);
       return savedLesson.toJSON() as unknown as ILessonOutputDTO;
     } catch (error) {
-      if (error instanceof Error) {
-        throw new HttpError(
-          error.message,
-          error.message.includes("404") ? 404 : 400
-        );
+      if (error instanceof LessonNotFoundError || error instanceof LessonValidationError) {
+        throw error;
       }
-      throw new HttpError("Failed to update lesson", 500);
+      if (error instanceof Error) {
+        throw new LessonValidationError(error.message);
+      }
+      throw new LessonValidationError("Failed to update lesson");
     }
   }
 }

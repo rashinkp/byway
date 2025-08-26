@@ -5,11 +5,11 @@ import { IGetCartUseCase } from "../../../app/usecases/cart/interfaces/get-cart.
 import { IRemoveFromCartUseCase } from "../../../app/usecases/cart/interfaces/remove-from-cart.usecase.interface";
 import { IApplyCouponUseCase } from "../../../app/usecases/cart/interfaces/apply-coupon.usecase.interface";
 import { IClearCartUseCase } from "../../../app/usecases/cart/interfaces/clear-cart.usecase.interface";
-import { HttpError } from "../errors/http-error";
 import { BaseController } from "./base.controller";
 import { IHttpErrors } from "../interfaces/http-errors.interface";
 import { IHttpSuccess } from "../interfaces/http-success.interface";
 import { UnauthorizedError } from "../errors/unautherized-error";
+import { BadRequestError } from "../errors/bad-request-error";
 import {
   validateAddToCart,
   validateApplyCoupon,
@@ -75,7 +75,7 @@ export class CartController extends BaseController {
 
       const courseId = request.params?.courseId;
       if (!courseId) {
-        throw new HttpError("Course ID is required", 400);
+        throw new BadRequestError("Course ID is required");
       }
 
       await this._removeFromCartUseCase.execute(request.user.id, { courseId });

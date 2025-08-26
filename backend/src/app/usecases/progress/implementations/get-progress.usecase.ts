@@ -4,9 +4,8 @@ import { ApiResponse } from "../../../../presentation/http/interfaces/ApiRespons
 import { IEnrollmentRepository } from "../../../repositories/enrollment.repository.interface";
 import { ILessonProgressRepository } from "../../../repositories/lesson-progress.repository.interface";
 import { ILessonRepository } from "../../../repositories/lesson.repository";
-import { HttpError } from "../../../../presentation/http/errors/http-error";
-import { StatusCodes } from "http-status-codes";
 import { AccessStatus } from "../../../../domain/enum/access-status.enum";
+import { ValidationError, NotFoundError } from "../../../../domain/errors/domain-errors";
 
 export class GetProgressUseCase implements IGetProgressUseCase {
   constructor(
@@ -25,7 +24,7 @@ export class GetProgressUseCase implements IGetProgressUseCase {
       );
 
       if (!enrollment) {
-        throw new HttpError("Enrollment not found", StatusCodes.NOT_FOUND);
+        throw new NotFoundError("Enrollment", `${input.userId}:${input.courseId}`);
       }
 
       // Get all lesson progress for this enrollment
@@ -59,10 +58,7 @@ export class GetProgressUseCase implements IGetProgressUseCase {
           lessonProgress: await Promise.all(
             lessonProgress.map(async (p) => {
               if (!p.id) {
-                throw new HttpError(
-                  "Progress ID is required",
-                  StatusCodes.INTERNAL_SERVER_ERROR
-                );
+                throw new ValidationError("Progress ID is required");
               }
               const answers =
                 await this._lessonProgressRepository.findQuizAnswers(p.id);
@@ -84,16 +80,13 @@ export class GetProgressUseCase implements IGetProgressUseCase {
           ),
         },
         message: "Progress retrieved successfully",
-        statusCode: StatusCodes.OK,
+        statusCode: 200,
       };
     } catch (error) {
-      if (error instanceof HttpError) {
+      if (error instanceof ValidationError || error instanceof NotFoundError) {
         throw error;
       }
-      throw new HttpError(
-        "Failed to get progress",
-        StatusCodes.INTERNAL_SERVER_ERROR
-      );
+      throw new ValidationError("Failed to get progress");
     }
   }
 }

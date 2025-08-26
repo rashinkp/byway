@@ -2,7 +2,7 @@ import { Cart } from "../../../../domain/entities/cart.entity";
 import { ICartRepository } from "../../../repositories/cart.repository";
 import { ApplyCouponDto, CartResponseDTO } from "../../../dtos/cart.dto";
 import { IApplyCouponUseCase } from "../interfaces/apply-coupon.usecase.interface";
-import { HttpError } from "../../../../presentation/http/errors/http-error";
+import { CartItemNotFoundError } from "../../../../domain/errors/domain-errors";
 
 export class ApplyCouponUseCase implements IApplyCouponUseCase {
   constructor(private _cartRepository: ICartRepository) {}
@@ -17,7 +17,7 @@ export class ApplyCouponUseCase implements IApplyCouponUseCase {
     );
 
     if (!cart) {
-      throw new HttpError("Course not found in cart", 404);
+      throw new CartItemNotFoundError("Course not found in cart");
     }
 
     cart.applyCoupon(data.couponId);

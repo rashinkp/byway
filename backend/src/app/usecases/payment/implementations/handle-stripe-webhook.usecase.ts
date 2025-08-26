@@ -2,8 +2,6 @@ import { IHandleStripeWebhookUseCase } from "../interfaces/handle-stripe-webhook
 import { WebhookEvent } from "../../../../domain/value-object/webhook-event.value-object";
 import { Transaction } from "../../../../domain/entities/transaction.entity";
 import { Order } from "../../../../domain/entities/order.entity";
-import { HttpError } from "../../../../presentation/http/errors/http-error";
-import { StatusCodes } from "http-status-codes";
 import { TransactionType } from "../../../../domain/enum/transaction-type.enum";
 import { TransactionStatus } from "../../../../domain/enum/transaction-status.enum";
 import { PaymentGateway as PaymentGatewayEnum } from "../../../../domain/enum/payment-gateway.enum";
@@ -17,6 +15,7 @@ import { IDistributeRevenueUseCase } from "../../revenue-distribution/interfaces
 import { StripeWebhookGateway } from "../../../../infra/providers/stripe/stripe-webhook.gateway";
 import { getSocketIOInstance } from "../../../../presentation/socketio";
 import Stripe from "stripe";
+import { ValidationError, NotFoundError, PaymentError } from "../../../../domain/errors/domain-errors";
 
 interface ServiceResponse<T> {
   data: T;
@@ -46,10 +45,7 @@ export class HandleStripeWebhookUseCase implements IHandleStripeWebhookUseCase {
         const isWalletTopUp = session.metadata?.isWalletTopUp === "true";
 
         if (!orderId) {
-          throw new HttpError(
-            "No order ID found in session metadata",
-            StatusCodes.BAD_REQUEST
-          );
+          throw new ValidationError("No order ID found in session metadata");
         }
 
         let transaction = await this._transactionRepository.findByOrderId(
@@ -62,7 +58,6 @@ export class HandleStripeWebhookUseCase implements IHandleStripeWebhookUseCase {
 
         if (!transaction) {
           // Create transaction if it doesn't exist (this can happen if the initial transaction creation failed)
-          console.log("Creating missing transaction for order:", orderId);
           try {
             transaction = await this._transactionRepository.create(
               new Transaction({
@@ -87,9 +82,6 @@ export class HandleStripeWebhookUseCase implements IHandleStripeWebhookUseCase {
               error instanceof Error &&
               error.message.includes("already exists")
             ) {
-              console.log(
-                "Transaction already exists, trying to find by transactionId"
-              );
               // Try to find by transactionId instead
               transaction =
                 await this._transactionRepository.findByTransactionId(
@@ -97,10 +89,7 @@ export class HandleStripeWebhookUseCase implements IHandleStripeWebhookUseCase {
                 );
 
               if (!transaction) {
-                throw new HttpError(
-                  "Failed to create or find transaction",
-                  StatusCodes.INTERNAL_SERVER_ERROR
-                );
+                throw new PaymentError("Failed to create or find transaction");
               }
             } else {
               throw error;
@@ -119,7 +108,7 @@ export class HandleStripeWebhookUseCase implements IHandleStripeWebhookUseCase {
             transaction.userId
           );
           if (!wallet) {
-            throw new HttpError("Wallet not found", StatusCodes.NOT_FOUND);
+            throw new NotFoundError("Wallet", transaction.userId);
           }
           wallet.addAmount(transaction.amount);
           await this._walletRepository.update(wallet);
@@ -132,7 +121,7 @@ export class HandleStripeWebhookUseCase implements IHandleStripeWebhookUseCase {
             // Update order status
             const order = await this._orderRepository.findById(orderId);
             if (!order) {
-              throw new HttpError("Order not found", StatusCodes.NOT_FOUND);
+              throw new NotFoundError("Order", orderId);
             }
 
             await this._orderRepository.updateOrderStatus(
@@ -147,41 +136,30 @@ export class HandleStripeWebhookUseCase implements IHandleStripeWebhookUseCase {
             );
 
             if (!orderItems || orderItems.length === 0) {
-              throw new HttpError(
-                "No order items found",
-                StatusCodes.NOT_FOUND
-              );
+              throw new ValidationError("No order items found");
             }
 
             for (const item of orderItems) {
-              try {
-                // Check if user is already enrolled in this course
-                const existingEnrollment =
-                  await this._enrollmentRepository.findByUserAndCourse(
-                    order.userId,
-                    item.courseId
-                  );
+              // Check if user is already enrolled in this course
+              const existingEnrollment =
+                await this._enrollmentRepository.findByUserAndCourse(
+                  order.userId,
+                  item.courseId
+                );
 
-                if (existingEnrollment) {
-                  continue; // Skip creating duplicate enrollment
-                }
-
-                // Create new enrollment
-                await this._enrollmentRepository.create({
-                  userId: order.userId,
-                  courseIds: [item.courseId],
-                  orderItemId: item.id,
-                });
-              } catch (error) {
-                throw error;
+              if (existingEnrollment) {
+                continue; // Skip creating duplicate enrollment
               }
+
+              // Create new enrollment
+              await this._enrollmentRepository.create({
+                userId: order.userId,
+                courseIds: [item.courseId],
+                orderItemId: item.id,
+              });
             }
 
-            try {
-              await this._distributeRevenueUseCase.execute(orderId);
-            } catch (error) {
-              throw error;
-            }
+            await this._distributeRevenueUseCase.execute(orderId);
 
             for (const item of orderItems) {
               await this._cartRepository.deleteByUserAndCourse(
@@ -198,7 +176,7 @@ export class HandleStripeWebhookUseCase implements IHandleStripeWebhookUseCase {
                 );
                 return {
                   courseId: item.courseId,
-                  coursePrice: course?.price?.getValue()?.toNumber() || 0,
+                  coursePrice: course?.price?.getValue() || 0,
                 };
               })
             );
@@ -213,11 +191,10 @@ export class HandleStripeWebhookUseCase implements IHandleStripeWebhookUseCase {
               transaction.id,
               TransactionStatus.FAILED
             );
-            throw new HttpError(
+            throw new PaymentError(
               error instanceof Error
                 ? error.message
-                : "Error processing successful payment",
-              StatusCodes.INTERNAL_SERVER_ERROR
+                : "Error processing successful payment"
             );
           }
         }
@@ -238,10 +215,7 @@ export class HandleStripeWebhookUseCase implements IHandleStripeWebhookUseCase {
         const orderId = metadata.orderId;
 
         if (!orderId) {
-          throw new HttpError(
-            "No order ID found in session metadata",
-            StatusCodes.BAD_REQUEST
-          );
+          throw new ValidationError("No order ID found in session metadata");
         }
 
         const transaction = await this._transactionRepository.findByOrderId(
@@ -257,7 +231,7 @@ export class HandleStripeWebhookUseCase implements IHandleStripeWebhookUseCase {
 
         const order = await this._orderRepository.findById(orderId);
         if (!order) {
-          throw new HttpError("Order not found", StatusCodes.NOT_FOUND);
+          throw new NotFoundError("Order", orderId);
         }
 
         await this._orderRepository.updateOrderStatus(
@@ -281,11 +255,10 @@ export class HandleStripeWebhookUseCase implements IHandleStripeWebhookUseCase {
         message: "Webhook event processed",
       };
     } catch (error) {
-      throw new HttpError(
+      throw new PaymentError(
         error instanceof Error
           ? error.message
-          : "Error processing webhook event",
-        StatusCodes.INTERNAL_SERVER_ERROR
+          : "Error processing webhook event"
       );
     }
   }

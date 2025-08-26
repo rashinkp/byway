@@ -4,6 +4,7 @@ import { HttpError } from "../../http/errors/http-error";
 import { ApiResponse } from "../../http/interfaces/ApiResponse";
 import { CookieUtils } from "./cookie.utils";
 import { ILogger } from "../../../app/providers/logger-provider.interface";
+import { mapDomainErrorToHttpResponse, isDomainError } from "../../../app/utils/error-mapper";
 
 /**
  * Helper function to clear auth cookies and return 401 response
@@ -46,62 +47,81 @@ export function createErrorMiddleware(logger: ILogger) {
       method: req.method
     });
 
-  if (
-    (err instanceof HttpError && err.statusCode === 401) ||
-    (typeof err.message === "string" && (
-      err.message.toLowerCase().includes("unauthorized") ||
-      err.message.toLowerCase().includes("invalid token")
-    ))
-  ) {
-    handleUnauthorizedError(res, err.message, logger);
-    return;
-  }
+    // Domain error mapping first
+    if (isDomainError(err)) {
+      const mapped = mapDomainErrorToHttpResponse(err);
 
-  if (err instanceof HttpError) {
-    const response: ApiResponse<null> = {
-      statusCode: err.statusCode,
-      success: false,
-      message: err.message,
-      data: null,
-    };
-    res.status(err.statusCode).json(response);
-  } else if (err instanceof ZodError) {
-    const response: ApiResponse<{ details: Array<{ path: (string | number)[]; message: string; code: string }> }> = {
-      statusCode: 400,
-      success: false,
-      message: "Validation failed",
-      data: { details: err.errors },
-    };
-    res.status(400).json(response);
-  } else {
-    // Handle specific error cases
-    if (typeof err.message === "string" && err.message.includes("not found")) {
+      if (mapped.statusCode === 401) {
+        handleUnauthorizedError(res, mapped.message, logger);
+        return;
+      }
+
       const response: ApiResponse<null> = {
-        statusCode: 404,
+        statusCode: mapped.statusCode,
         success: false,
-        message: err.message,
+        message: mapped.message,
         data: null,
       };
-      res.status(404).json(response);
-    } else if (typeof err.message === "string" && (err.message.includes("forbidden") || err.message.includes("permission denied"))) {
-      const response: ApiResponse<null> = {
-        statusCode: 403,
-        success: false,
-        message: err.message,
-        data: null,
-      };
-      res.status(403).json(response);
-    } else {
-      // For unexpected errors, still return a 500 but with more context
-      const response: ApiResponse<null> = {
-        statusCode: 500,
-        success: false,
-        message: err.message || "An unexpected error occurred",
-        data: null,
-      };
-      res.status(500).json(response);
+      res.status(mapped.statusCode).json(response);
+      return;
     }
-  }
+
+    if (
+      (err instanceof HttpError && err.statusCode === 401) ||
+      (typeof err.message === "string" && (
+        err.message.toLowerCase().includes("unauthorized") ||
+        err.message.toLowerCase().includes("invalid token")
+      ))
+    ) {
+      handleUnauthorizedError(res, err.message, logger);
+      return;
+    }
+
+    if (err instanceof HttpError) {
+      const response: ApiResponse<null> = {
+        statusCode: err.statusCode,
+        success: false,
+        message: err.message,
+        data: null,
+      };
+      res.status(err.statusCode).json(response);
+    } else if (err instanceof ZodError) {
+      const response: ApiResponse<{ details: Array<{ path: (string | number)[]; message: string; code: string }> }> = {
+        statusCode: 400,
+        success: false,
+        message: "Validation failed",
+        data: { details: err.errors },
+      };
+      res.status(400).json(response);
+    } else {
+      // Handle specific error cases
+      if (typeof err.message === "string" && err.message.includes("not found")) {
+        const response: ApiResponse<null> = {
+          statusCode: 404,
+          success: false,
+          message: err.message,
+          data: null,
+        };
+        res.status(404).json(response);
+      } else if (typeof err.message === "string" && (err.message.includes("forbidden") || err.message.includes("permission denied"))) {
+        const response: ApiResponse<null> = {
+          statusCode: 403,
+          success: false,
+          message: err.message,
+          data: null,
+        };
+        res.status(403).json(response);
+      } else {
+        // For unexpected errors, still return a 500 but with more context
+        const response: ApiResponse<null> = {
+          statusCode: 500,
+          success: false,
+          message: err.message || "An unexpected error occurred",
+          data: null,
+        };
+        res.status(500).json(response);
+      }
+    }
 
     // To avoid linter error for unused 'next' argument
     void next;

@@ -3,9 +3,9 @@ import {
   IUpdateLessonContentInputDTO,
 } from "../../../dtos/lesson.dto";
 import { LessonContent } from "../../../../domain/entities/content.entity";
-import { HttpError } from "../../../../presentation/http/errors/http-error";
 import { ILessonContentRepository } from "../../../repositories/content.repository";
 import { IUpdateLessonContentUseCase } from "../interfaces/update-content.usecase.interface";
+import { ContentNotFoundError, ContentValidationError } from "../../../../domain/errors/domain-errors";
 
 export class UpdateLessonContentUseCase implements IUpdateLessonContentUseCase {
   constructor(private readonly _contentRepository: ILessonContentRepository) {}
@@ -16,20 +16,20 @@ export class UpdateLessonContentUseCase implements IUpdateLessonContentUseCase {
     try {
       const content = await this._contentRepository.findById(dto.id);
       if (!content || !content.isActive()) {
-        throw new HttpError("Content not found or deleted", 404);
+        throw new ContentNotFoundError(dto.id);
       }
 
       const updatedContent = LessonContent.update(content, dto);
       const savedContent = await this._contentRepository.update(updatedContent);
       return savedContent.toJSON() as unknown as ILessonContentOutputDTO;
     } catch (error) {
-      if (error instanceof Error) {
-        throw new HttpError(
-          error.message,
-          error.message.includes("404") ? 404 : 400
-        );
+      if (error instanceof ContentNotFoundError) {
+        throw error;
       }
-      throw new HttpError("Failed to update content", 500);
+      if (error instanceof Error) {
+        throw new ContentValidationError(error.message);
+      }
+      throw new ContentValidationError("Failed to update content");
     }
   }
 }

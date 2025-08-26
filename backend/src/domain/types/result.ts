@@ -1,3 +1,5 @@
+import { DomainError } from "../errors/domain-errors";
+
 // Result type for handling success/failure scenarios
 export type Result<T, E = DomainError> = Success<T> | Failure<E>;
 

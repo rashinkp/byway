@@ -10,16 +10,11 @@ export { Transaction } from './transaction.entity';
 export { Wallet } from './wallet.entity';
 export { Instructor } from './instructor.entity';
 export { Enrollment } from './enrollment.entity';
-export { Content } from './content.entity';
 export { Certificate } from './certificate.entity';
-export { Review } from './review.entity';
 export { Notification } from './notification.entity';
 export { Message } from './message.entity';
 export { Chat } from './chat.entity';
-export { Progress } from './progress.entity';
-export { Revenue } from './revenue.entity';
 export { UserVerification } from './user-verification.entity';
 export { OrderItem } from './order-item.entity';
-export { QuizAnswer } from './quiz-answer.entity';
 
 // Add other entities as they are created

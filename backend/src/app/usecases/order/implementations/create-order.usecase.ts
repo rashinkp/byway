@@ -9,9 +9,8 @@ import { TransactionStatus } from "../../../../domain/enum/transaction-status.en
 import { Order } from "../../../../domain/entities/order.entity";
 import { OrderStatus } from "../../../../domain/enum/order-status.enum";
 import { PaymentStatus } from "../../../../domain/enum/payment-status.enum";
-import { StatusCodes } from "http-status-codes";
-import { HttpError } from "../../../../presentation/http/errors/http-error";
 import { CreateOrderDto } from "../../../dtos/order.dto";
+import { ValidationError } from "../../../../domain/errors/domain-errors";
 
 export class CreateOrderUseCase implements ICreateOrderUseCase {
   constructor(
@@ -64,7 +63,7 @@ export class CreateOrderUseCase implements ICreateOrderUseCase {
     );
 
     if (!order.isPending()) {
-      throw new HttpError("Invalid order status", StatusCodes.BAD_REQUEST);
+      throw new ValidationError("Invalid order status");
     }
 
     // Persist order

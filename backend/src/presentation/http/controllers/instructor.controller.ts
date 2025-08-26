@@ -14,13 +14,14 @@ import { IApproveInstructorUseCase } from "../../../app/usecases/instructor/inte
 import { IDeclineInstructorUseCase } from "../../../app/usecases/instructor/interfaces/decline-instructor.usecase.interface";
 import { IGetInstructorByUserIdUseCase } from "../../../app/usecases/instructor/interfaces/get-instructor-by-Id.usecase.interface";
 import { IGetAllInstructorsUseCase } from "../../../app/usecases/instructor/interfaces/get-all-instructors.usecase.interface";
-import { StatusCodes } from "http-status-codes";
 import { IHttpErrors } from "../interfaces/http-errors.interface";
 import { IHttpSuccess } from "../interfaces/http-success.interface";
 import { IHttpRequest } from "../interfaces/http-request.interface";
 import { IHttpResponse } from "../interfaces/http-response.interface";
 import { UnauthorizedError } from "../errors/unautherized-error";
-import { HttpError } from "../errors/http-error";
+import { NotFoundError } from "../errors/not-found-error";
+import { BadRequestError } from "../errors/bad-request-error";
+import { InternalServerError } from "../errors/internal-server-error";
 import { BaseController } from "./base.controller";
 import { GetInstructorDetailsUseCase } from "../../../app/usecases/instructor/interfaces/get-instructor-details.usecase.interface";
 import { getSocketIOInstance } from "../../socketio";
@@ -55,9 +56,8 @@ export class InstructorController extends BaseController {
       // Fetch user data for response
       const user = await this._userRepository.findById(request.user.id);
       if (!user) {
-        throw new HttpError(
-          "User data not found after instructor creation",
-          StatusCodes.INTERNAL_SERVER_ERROR
+        throw new InternalServerError(
+          "User data not found after instructor creation"
         );
       }
 
@@ -101,7 +101,7 @@ export class InstructorController extends BaseController {
       );
       const user = await this._userRepository.findById(request.user.id);
       if (!user) {
-        throw new HttpError("User not found", StatusCodes.NOT_FOUND);
+        throw new NotFoundError("User not found");
       }
       return this.success_200(
         {
@@ -218,7 +218,7 @@ export class InstructorController extends BaseController {
       );
       const user = await this._userRepository.findById(request.user.id);
       if (!user) {
-        throw new HttpError("User not found", StatusCodes.NOT_FOUND);
+        throw new NotFoundError("User not found");
       }
       return this.success_200(
         instructor
@@ -264,7 +264,7 @@ export class InstructorController extends BaseController {
     return this.handleRequest(httpRequest, async (request) => {
       const { userId } = request.params || {};
       if (!userId) {
-        throw new HttpError("User ID is required", StatusCodes.BAD_REQUEST);
+        throw new BadRequestError("User ID is required");
       }
       const result = await this._getInstructorDetailsUseCase.execute(userId);
       return this.success_200(

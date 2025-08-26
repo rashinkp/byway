@@ -1,10 +1,10 @@
 import { InstructorResponseDTO, UpdateInstructorRequestDTO } from "../../../dtos/instructor.dto";
 import { Instructor } from "../../../../domain/entities/instructor.entity";
 import { Role } from "../../../../domain/enum/role.enum";
-import { HttpError } from "../../../../presentation/http/errors/http-error";
 import { IInstructorRepository } from "../../../repositories/instructor.repository";
 import { IUpdateInstructorUseCase } from "../interfaces/update-instructor.usecase.interface";
 import { UserDTO } from "../../../dtos/general.dto";
+import { NotFoundError, UserAuthorizationError } from "../../../../domain/errors/domain-errors";
 
 export class UpdateInstructorUseCase implements IUpdateInstructorUseCase {
   constructor(
@@ -19,16 +19,15 @@ export class UpdateInstructorUseCase implements IUpdateInstructorUseCase {
       dto.id
     );
     if (!instructor) {
-      throw new HttpError("Instructor not found", 404);
+      throw new NotFoundError("Instructor", dto.id);
     }
 
     if (
       instructor.userId !== requestingUser.id &&
       requestingUser.role !== Role.ADMIN
     ) {
-      throw new HttpError(
-        "Unauthorized: Cannot update another instructor's details",
-        403
+      throw new UserAuthorizationError(
+        "Unauthorized: Cannot update another instructor's details"
       );
     }
 

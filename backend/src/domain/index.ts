@@ -1,8 +1,6 @@
 // Export all domain components
 export * from './entities';
 export * from './value-object';
-export * from './types';
-export * from './enum';
 export * from './errors/domain-errors';
 export * from './events/domain-event';
 export * from './validation/validation-rules';

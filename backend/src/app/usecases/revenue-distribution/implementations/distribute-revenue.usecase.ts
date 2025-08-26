@@ -4,8 +4,6 @@ import { ITransactionRepository } from "../../../repositories/transaction.reposi
 import { TransactionType } from "../../../../domain/enum/transaction-type.enum";
 import { TransactionStatus } from "../../../../domain/enum/transaction-status.enum";
 import { PaymentGateway } from "../../../../domain/enum/payment-gateway.enum";
-import { HttpError } from "../../../../presentation/http/errors/http-error";
-import { StatusCodes } from "http-status-codes";
 import { IOrderRepository } from "../../../repositories/order.repository";
 import { Transaction } from "../../../../domain/entities/transaction.entity";
 import { Wallet } from "../../../../domain/entities/wallet.entity";
@@ -13,6 +11,7 @@ import { IUserRepository } from "../../../repositories/user.repository";
 import { NotificationEventType } from "../../../../domain/enum/notification-event-type.enum";
 import { NotificationEntityType } from "../../../../domain/enum/notification-entity-type.enum";
 import { CreateNotificationsForUsersUseCaseInterface } from "../../notification/interfaces/create-notifications-for-users.usecase.interface";
+import { NotFoundError, ValidationError } from "../../../../domain/errors/domain-errors";
 
 export class DistributeRevenueUseCase implements IDistributeRevenueUseCase {
   private readonly _ADMIN_SHARE_PERCENTAGE = 20;
@@ -31,20 +30,15 @@ export class DistributeRevenueUseCase implements IDistributeRevenueUseCase {
       const orderItems = await this._orderRepository.findOrderItems(orderId);
 
       if (!orderItems || orderItems.length === 0) {
-        throw new HttpError("No order items found", StatusCodes.NOT_FOUND);
+        throw new NotFoundError("Order items", orderId);
       }
 
       for (const orderItem of orderItems) {
-        try {
-          await this._distributeRevenueForOrderItem(orderItem);
-        } catch (error) {
-          throw error; 
-        }
+        await this._distributeRevenueForOrderItem(orderItem);
       }
     } catch (error) {
-      throw new HttpError(
-        error instanceof Error ? error.message : "Error distributing revenue",
-        StatusCodes.INTERNAL_SERVER_ERROR
+      throw new ValidationError(
+        error instanceof Error ? error.message : "Error distributing revenue"
       );
     }
   }
@@ -61,10 +55,10 @@ export class DistributeRevenueUseCase implements IDistributeRevenueUseCase {
     );
 
     if (!course) {
-      throw new HttpError("Course not found", StatusCodes.NOT_FOUND);
+      throw new NotFoundError("Course", orderItem.courseId);
     }
 
-    const coursePrice = course.price?.getValue()?.toNumber() || 0;
+    const coursePrice = course.price?.getValue() || 0;
     const instructorId = course.createdBy;
     const { adminShare, instructorShare } = this._calculateShares(coursePrice);
 
@@ -109,7 +103,7 @@ export class DistributeRevenueUseCase implements IDistributeRevenueUseCase {
     });
 
     if (!items || items.length === 0) {
-      throw new HttpError("Admin user not found", StatusCodes.NOT_FOUND);
+      throw new NotFoundError("Admin user", "unknown");
     }
     return items[0].id;
   }

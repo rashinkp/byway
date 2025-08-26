@@ -7,10 +7,9 @@ import { ICreateStripeCheckoutSessionUseCase } from "../../payment/interfaces/cr
 import { TransactionType } from "../../../../domain/enum/transaction-type.enum";
 import { TransactionStatus } from "../../../../domain/enum/transaction-status.enum";
 import { PaymentGateway } from "../../../../domain/enum/payment-gateway.enum";
-import { HttpError } from "../../../../presentation/http/errors/http-error";
-import { StatusCodes } from "http-status-codes";
 import { Transaction } from "../../../../domain/entities/transaction.entity";
 import { TopUpWalletDto, TopUpWalletResponseDTO } from "../../../dtos/wallet";
+import { NotFoundError } from "../../../../domain/errors/domain-errors";
 
 export class TopUpWalletUseCase implements ITopUpWalletUseCase {
   constructor(
@@ -46,7 +45,7 @@ export class TopUpWalletUseCase implements ITopUpWalletUseCase {
       // For wallet payments, directly update the balance
       const wallet = await this._walletRepository.findByUserId(userId);
       if (!wallet) {
-        throw new HttpError("Wallet not found", StatusCodes.NOT_FOUND);
+        throw new NotFoundError("Wallet", userId);
       }
       wallet.addAmount(amount);
       await this._walletRepository.update(wallet);

@@ -1,6 +1,5 @@
 import { ApproveInstructorRequestDTO, InstructorResponseDTO } from "../../../dtos/instructor.dto";
 import { Role } from "../../../../domain/enum/role.enum";
-import { HttpError } from "../../../../presentation/http/errors/http-error";
 import { IUserRepository } from "../../../repositories/user.repository";
 import { IUpdateUserUseCase } from "../../user/interfaces/update-user.usecase.interface";
 import { IApproveInstructorUseCase } from "../interfaces/approve-instructor.usecase.interface";
@@ -9,6 +8,7 @@ import { CreateNotificationsForUsersUseCase } from "../../notification/implement
 import { NotificationEventType } from "../../../../domain/enum/notification-event-type.enum";
 import { NotificationEntityType } from "../../../../domain/enum/notification-entity-type.enum";
 import { UserDTO } from "../../../dtos/general.dto";
+import { UserAuthorizationError, UserNotFoundError, NotFoundError } from "../../../../domain/errors/domain-errors";
 
 export class ApproveInstructorUseCase implements IApproveInstructorUseCase {
   constructor(
@@ -23,14 +23,14 @@ export class ApproveInstructorUseCase implements IApproveInstructorUseCase {
     requestingUser: UserDTO
   ): Promise<InstructorResponseDTO> {
     if (requestingUser.role !== Role.ADMIN) {
-      throw new HttpError("Unauthorized: Admin access required", 403);
+      throw new UserAuthorizationError("Unauthorized: Admin access required");
     }
 
     const instructor = await this._instructorRepository.findInstructorById(
       dto.instructorId
     );
     if (!instructor) {
-      throw new HttpError("Instructor not found", 404);
+      throw new NotFoundError("Instructor", dto.instructorId);
     }
 
     instructor.approve();
@@ -38,7 +38,7 @@ export class ApproveInstructorUseCase implements IApproveInstructorUseCase {
     // Update the user's role to INSTRUCTOR
     const user = await this._userRepository.findById(instructor.userId);
     if (!user) {
-      throw new HttpError("User not found", 404);
+      throw new UserNotFoundError(instructor.userId);
     }
 
     await this._updateUserUseCase.execute(

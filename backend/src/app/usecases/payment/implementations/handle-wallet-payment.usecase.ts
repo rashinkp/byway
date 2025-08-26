@@ -1,6 +1,4 @@
 import { IHandleWalletPaymentUseCase } from "../interfaces/handle-wallet-payment.usecase.interface";
-import { HttpError } from "../../../../presentation/http/errors/http-error";
-import { StatusCodes } from "http-status-codes";
 import { TransactionType } from "../../../../domain/enum/transaction-type.enum";
 import { TransactionStatus } from "../../../../domain/enum/transaction-status.enum";
 import { PaymentGateway as PaymentGatewayEnum } from "../../../../domain/enum/payment-gateway.enum";
@@ -13,6 +11,7 @@ import { ICartRepository } from "../../../repositories/cart.repository";
 import { IDistributeRevenueUseCase } from "../../revenue-distribution/interfaces/distribute-revenue.usecase.interface";
 import { OrderStatus } from "../../../../domain/enum/order-status.enum";
 import { getSocketIOInstance } from "../../../../presentation/socketio";
+import { ValidationError, BusinessRuleViolationError } from "../../../../domain/errors/domain-errors";
 
 interface ServiceResponse<T> {
   data: T;
@@ -36,13 +35,10 @@ export class HandleWalletPaymentUseCase implements IHandleWalletPaymentUseCase {
   ): Promise<ServiceResponse<{ transaction: Transaction }>> {
     const wallet = await this._walletRepository.findByUserId(userId);
     if (!wallet) {
-      throw new HttpError("Wallet not found", StatusCodes.NOT_FOUND);
+      throw new ValidationError("Wallet not found");
     }
     if (wallet.balance._amount < amount) {
-      throw new HttpError(
-        "Insufficient wallet balance",
-        StatusCodes.BAD_REQUEST
-      );
+      throw new BusinessRuleViolationError("Insufficient wallet balance");
     }
 
     // Deduct from wallet
@@ -72,47 +68,33 @@ export class HandleWalletPaymentUseCase implements IHandleWalletPaymentUseCase {
     const orderItems = await this._orderRepository.findOrderItems(orderId);
 
     if (!orderItems || orderItems.length === 0) {
-      throw new HttpError("No order items found", StatusCodes.NOT_FOUND);
+      throw new ValidationError("No order items found");
     }
 
     for (const item of orderItems) {
-      try {
-        // Check if user is already enrolled in this course
-        const existingEnrollment =
-          await this._enrollmentRepository.findByUserAndCourse(
-            userId,
-            item.courseId
-          );
-
-        if (existingEnrollment) {
-          continue;
-        }
-
-        // Create new enrollment
-        await this._enrollmentRepository.create({
+      // Check if user is already enrolled in this course
+      const existingEnrollment =
+        await this._enrollmentRepository.findByUserAndCourse(
           userId,
-          courseIds: [item.courseId],
-          orderItemId: item.id,
-        });
-      } catch (error) {
-        throw new HttpError(
-          `Failed to create enrollment for course ${item.courseId}`,
-          StatusCodes.INTERNAL_SERVER_ERROR
+          item.courseId
         );
+
+      if (existingEnrollment) {
+        continue;
       }
+
+      // Create new enrollment
+      await this._enrollmentRepository.create({
+        userId,
+        courseIds: [item.courseId],
+        orderItemId: item.id,
+      });
     }
 
     // Distribute revenue
-    try {
-      await this._distributeRevenueUseCase.execute(orderId);
-    } catch (error) {
-      throw new HttpError(
-        "Failed to distribute revenue",
-        StatusCodes.INTERNAL_SERVER_ERROR
-      );
-    }
+    await this._distributeRevenueUseCase.execute(orderId);
 
-    // Clear cart items for purchased courses
+    // Clear cart items for purchased courses (best-effort)
     try {
       for (const item of orderItems) {
         await this._cartRepository.deleteByUserAndCourse(userId, item.courseId);
@@ -127,7 +109,7 @@ export class HandleWalletPaymentUseCase implements IHandleWalletPaymentUseCase {
         );
         return {
           courseId: item.courseId,
-          coursePrice: course?.price?.getValue()?.toNumber() || 0,
+          coursePrice: course?.price?.getValue() || 0,
         };
       })
     );

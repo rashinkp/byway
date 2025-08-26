@@ -5,10 +5,9 @@ import { ICreateTransactionUseCase } from "../../transaction/interfaces/create-t
 import { TransactionType } from "../../../../domain/enum/transaction-type.enum";
 import { TransactionStatus } from "../../../../domain/enum/transaction-status.enum";
 import { PaymentGateway } from "../../../../domain/enum/payment-gateway.enum";
-import { HttpError } from "../../../../presentation/http/errors/http-error";
-import { StatusCodes } from "http-status-codes";
 import { RetryOrderResponseDTO } from "../../../dtos/order.dto";
 import { ITransactionOutputDTO } from "../../../dtos/transaction.dto";
+import { NotFoundError, UserAuthorizationError, ValidationError } from "../../../../domain/errors/domain-errors";
 
 export class RetryOrderUseCase implements IRetryOrderUseCase {
   constructor(
@@ -21,18 +20,18 @@ export class RetryOrderUseCase implements IRetryOrderUseCase {
     // Get the existing order
     const order = await this._orderRepository.findById(orderId);
     if (!order) {
-      throw new HttpError("Order not found", StatusCodes.NOT_FOUND);
+      throw new NotFoundError("Order", orderId);
     }
 
     // Verify order ownership
     if (order.userId !== userId) {
-      throw new HttpError("Unauthorized to retry this order", StatusCodes.FORBIDDEN);
+      throw new UserAuthorizationError("Unauthorized to retry this order");
     }
 
     // Get order items to calculate total amount
     const orderItems = await this._orderRepository.findOrderItems(orderId);
     if (!orderItems || orderItems.length === 0) {
-      throw new HttpError("No items found in order", StatusCodes.BAD_REQUEST);
+      throw new ValidationError("No items found in order");
     }
 
     // Get course details for each order item
@@ -40,7 +39,7 @@ export class RetryOrderUseCase implements IRetryOrderUseCase {
       orderItems.map(async (item) => {
         const course = await this._orderRepository.findCourseById(item.courseId);
         if (!course) {
-          throw new HttpError(`Course not found: ${item.courseId}`, StatusCodes.NOT_FOUND);
+          throw new NotFoundError("Course", item.courseId);
         }
         return course;
       })
@@ -48,8 +47,8 @@ export class RetryOrderUseCase implements IRetryOrderUseCase {
 
     // Calculate total amount
     const totalAmount = courses.reduce((sum, course) => {
-      const price = course.price?.getValue()?.toNumber() || 0;
-      const offer = course.offer?.getValue()?.toNumber() || 0;
+      const price = course.price?.getValue() || 0;
+      const offer = course.offer?.getValue() || 0;
       return sum + (offer || price);
     }, 0);
 
@@ -70,8 +69,8 @@ export class RetryOrderUseCase implements IRetryOrderUseCase {
         id: course.id,
         title: course.title,
         description: course.description,
-        price: course.price?.getValue()?.toNumber() || 0,
-        offer: course.offer?.getValue()?.toNumber(),
+        price: course.price?.getValue() || 0,
+        offer: course.offer?.getValue() ?? undefined,
         thumbnail: course.thumbnail,
         duration: course.duration?.toString(),
         level: course.level?.toString()

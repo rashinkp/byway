@@ -1,10 +1,12 @@
-import { ILessonContentOutputDTO } from "../../../dtos/lesson.dto";
-import { HttpError } from "../../../../presentation/http/errors/http-error";
+import {
+  ILessonContentOutputDTO
+} from "../../../dtos/lesson.dto";
 import { ILessonContentRepository } from "../../../repositories/content.repository";
 import { IEnrollmentRepository } from "../../../repositories/enrollment.repository.interface";
 import { ILessonRepository } from "../../../repositories/lesson.repository";
 import { IGetContentByLessonIdUseCase } from "../interfaces/get-content-by-lesson-id.usecase.interface";
 import { ICourseRepository } from "../../../repositories/course.repository.interface";
+import { CourseNotFoundError, LessonNotFoundError, UserAuthorizationError } from "../../../../domain/errors/domain-errors";
 
 export class GetContentByLessonIdUseCase
   implements IGetContentByLessonIdUseCase
@@ -24,13 +26,13 @@ export class GetContentByLessonIdUseCase
       // Get lesson to find courseId
       const lesson = await this._lessonRepository.findById(lessonId);
       if (!lesson) {
-        throw new HttpError("Lesson not found", 404);
+        throw new LessonNotFoundError(lessonId);
       }
 
       // Get course to check if user is instructor or admin
       const course = await this._courseRepository.findById(lesson.courseId);
       if (!course) {
-        throw new HttpError("Course not found", 404);
+        throw new CourseNotFoundError(lesson.courseId);
       }
 
       // If user is admin, allow access
@@ -51,23 +53,23 @@ export class GetContentByLessonIdUseCase
         lesson.courseId
       );
       if (!enrollment) {
-        throw new HttpError("You are not enrolled in this course", 403);
+        throw new UserAuthorizationError("You are not enrolled in this course");
       }
 
       if (enrollment.accessStatus !== "ACTIVE") {
-        throw new HttpError("Your enrollment is not active", 403);
+        throw new UserAuthorizationError("Your enrollment is not active");
       }
 
       const content = await this._contentRepository.findByLessonId(lessonId);
       return content && content.isActive() ? content.toJSON() as unknown as ILessonContentOutputDTO : null;
     } catch (error) {
-      if (error instanceof HttpError) {
+      if (error instanceof LessonNotFoundError || error instanceof CourseNotFoundError || error instanceof UserAuthorizationError) {
         throw error;
       }
       if (error instanceof Error) {
-        throw new HttpError(error.message, 400);
+        throw new UserAuthorizationError(error.message);
       }
-      throw new HttpError("Failed to fetch content", 500);
+      throw new UserAuthorizationError("Failed to fetch content");
     }
   }
 }

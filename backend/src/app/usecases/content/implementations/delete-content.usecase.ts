@@ -1,8 +1,8 @@
-import { HttpError } from "../../../../presentation/http/errors/http-error";
 import { ILessonContentRepository } from "../../../repositories/content.repository";
 import { IDeleteLessonContentUseCase } from "../interfaces/delete-content.usecase.interface";
 import { S3ServiceInterface } from "../../../providers/s3.service.interface";
 import { ILessonContentOutputDTO } from "../../../dtos/lesson.dto";
+import { ContentNotFoundError, ContentValidationError } from "../../../../domain/errors/domain-errors";
 
 export class DeleteLessonContentUseCase implements IDeleteLessonContentUseCase {
   constructor(
@@ -14,7 +14,7 @@ export class DeleteLessonContentUseCase implements IDeleteLessonContentUseCase {
     try {
       const content = await this._contentRepository.findById(id);
       if (!content) {
-        throw new HttpError("Content not found", 404);
+        throw new ContentNotFoundError(id);
       }
 
       // Delete files from S3 if they exist
@@ -35,13 +35,13 @@ export class DeleteLessonContentUseCase implements IDeleteLessonContentUseCase {
       // Delete from database
       await this._contentRepository.delete(id);
     } catch (error) {
-      if (error instanceof Error) {
-        throw new HttpError(
-          error.message,
-          error.message.includes("404") ? 404 : 400
-        );
+      if (error instanceof ContentNotFoundError) {
+        throw error;
       }
-      throw new HttpError("Failed to delete content", 500);
+      if (error instanceof Error) {
+        throw new ContentValidationError(error.message);
+      }
+      throw new ContentValidationError("Failed to delete content");
     }
   }
 }

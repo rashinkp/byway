@@ -7,7 +7,7 @@ import { BaseController } from "./base.controller";
 import { IHttpErrors } from "../interfaces/http-errors.interface";
 import { IHttpSuccess } from "../interfaces/http-success.interface";
 import { UnauthorizedError } from "../errors/unautherized-error";
-import { HttpError } from "../errors/http-error";
+import { BadRequestError } from "../errors/bad-request-error";
 import { ITopUpWalletUseCase } from "../../../app/usecases/wallet/interfaces/top-up-wallet.usecase.interface";
 import { AddMoneyDto, ReduceMoneyDto } from "../../../app/dtos/wallet";
 import { TopUpWalletDtoSchema } from "../../../presentation/validators/wallet";
@@ -43,7 +43,7 @@ export class WalletController extends BaseController {
 
       const { amount, currency } = request.body as AddMoneyDto;
       if (!amount || amount <= 0) {
-        throw new HttpError("Invalid amount", 400);
+        throw new BadRequestError("Invalid amount");
       }
 
       const data: AddMoneyDto = { amount, currency };
@@ -60,7 +60,7 @@ export class WalletController extends BaseController {
 
       const { amount, currency } = request.body as ReduceMoneyDto;
       if (!amount || amount <= 0) {
-        throw new HttpError("Invalid amount", 400);
+        throw new BadRequestError("Invalid amount");
       }
 
       const data: ReduceMoneyDto = { amount, currency };

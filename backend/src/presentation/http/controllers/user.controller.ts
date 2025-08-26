@@ -17,7 +17,7 @@ import { IHttpRequest } from "../interfaces/http-request.interface";
 import { IHttpResponse } from "../interfaces/http-response.interface";
 import { UnauthorizedError } from "../errors/unautherized-error";
 import { BadRequestError } from "../errors/bad-request-error";
-import { HttpError } from "../errors/http-error";
+import { NotFoundError } from "../errors/not-found-error";
 import { BaseController } from "./base.controller";
 import { getSocketIOInstance } from "../../socketio";
 
@@ -164,7 +164,7 @@ export class UserController extends BaseController {
         validated
       );
       if (!user) {
-        throw new HttpError("User not found", 404);
+        throw new NotFoundError("User not found");
       }
 
       return this.success_200(
@@ -238,7 +238,7 @@ export class UserController extends BaseController {
         validated
       );
       if (!user) {
-        throw new HttpError("User not found", 404);
+        throw new NotFoundError("User not found");
       }
       return this.success_200(
         {
@@ -265,7 +265,7 @@ export class UserController extends BaseController {
       const { user, profile, instructor } =
         await this._getUserAdminDetailsUseCase.execute(validated);
       if (!user) {
-        throw new HttpError("User not found", 404);
+        throw new NotFoundError("User not found");
       }
       return this.success_200(
         {
