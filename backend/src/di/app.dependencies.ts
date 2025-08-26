@@ -67,6 +67,7 @@ import { LessonContentController } from "../presentation/http/controllers/conten
 import { SendMessageUseCase } from "../app/usecases/message/implementations/send-message.usecase";
 import { CreateChatUseCase } from "../app/usecases/chat/implementations/create-chat.usecase";
 import { IMessageRepository } from "../app/repositories/message.repository.interface";
+import { PaymentDependencies } from "./payment.dependencies";
 
 export interface AppDependencies {
   authController: AuthController;
@@ -158,6 +159,14 @@ export function createAppDependencies(): AppDependencies {
     shared.webhookGateway
   );
 
+  // Create payment dependencies object
+  const paymentDeps: PaymentDependencies = {
+    createStripeCheckoutSessionUseCase,
+    handleWalletPaymentUseCase,
+    handleStripeWebhookUseCase,
+    distributeRevenueUseCase,
+  };
+
 
 
   const authDeps = createAuthDependencies(shared);
@@ -177,28 +186,13 @@ export function createAppDependencies(): AppDependencies {
   const lessonDeps = createLessonDependencies(shared);
   const lessonContentDeps = createLessonContentDependencies(shared);
   const cartDeps = createCartDependencies(shared);
-  const stripeDeps = createStripeDependencies(shared, {
-    createStripeCheckoutSessionUseCase,
-    handleWalletPaymentUseCase,
-    handleStripeWebhookUseCase,
-    distributeRevenueUseCase,
-  });
+  const stripeDeps = createStripeDependencies(shared, paymentDeps);
   const transactionDeps = createTransactionDependencies(shared);
-  const orderDeps = createOrderDependencies(shared, {
-    createStripeCheckoutSessionUseCase,
-    handleWalletPaymentUseCase,
-    handleStripeWebhookUseCase,
-    distributeRevenueUseCase,
-  });
+  const orderDeps = createOrderDependencies(shared, paymentDeps);
   const fileDeps = createFileDependencies(shared);
   const progressDeps = createProgressDependencies(shared);
   const courseReviewDeps = createCourseReviewDependencies(shared);
-  const walletDeps = createWalletDependencies(shared, {
-    createStripeCheckoutSessionUseCase,
-    handleWalletPaymentUseCase,
-    handleStripeWebhookUseCase,
-    distributeRevenueUseCase,
-  });
+  const walletDeps = createWalletDependencies(shared, paymentDeps);
   const revenueDeps = createRevenueDependencies(shared);
   const dashboardDeps = createDashboardDependencies(shared);
   const chatDeps = createChatDependencies(shared);
