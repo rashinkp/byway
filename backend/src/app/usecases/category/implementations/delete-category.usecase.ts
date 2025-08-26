@@ -1,10 +1,10 @@
 import { IDeleteCategoryUseCase } from "../interfaces/delete-category.usecase.interface";
 import { ICategoryRepository } from "../../../repositories/category.repository";
-import { HttpError } from "../../../../presentation/http/errors/http-error";
 import {
   ICategoryIdInputDTO,
   ICategoryOutputDTO,
 } from "../../../dtos/category.dto";
+import { CategoryNotFoundError, CategoryValidationError } from "../../../../domain/errors/domain-errors";
 
 export class DeleteCategoryUseCase implements IDeleteCategoryUseCase {
   constructor(private _categoryRepository: ICategoryRepository) {}
@@ -12,10 +12,10 @@ export class DeleteCategoryUseCase implements IDeleteCategoryUseCase {
   async execute(input: ICategoryIdInputDTO): Promise<ICategoryOutputDTO> {
     const category = await this._categoryRepository.findById(input.id);
     if (!category) {
-      throw new HttpError("Category not found", 404);
+      throw new CategoryNotFoundError(input.id);
     }
     if (!category.isActive()) {
-      throw new HttpError("Category is already deleted", 400);
+      throw new CategoryValidationError("Category is already deleted");
     }
 
     category.softDelete();

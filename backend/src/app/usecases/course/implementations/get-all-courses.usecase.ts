@@ -2,7 +2,6 @@ import {
   ICourseListResponseDTO,
   IGetAllCoursesInputDTO,
 } from "../../../dtos/course.dto";
-import { HttpError } from "../../../../presentation/http/errors/http-error";
 import { ICourseRepository } from "../../../repositories/course.repository.interface";
 import { IEnrollmentRepository } from "../../../repositories/enrollment.repository.interface";
 import { ICartRepository } from "../../../repositories/cart.repository";
@@ -10,6 +9,7 @@ import { IUserRepository } from "../../../repositories/user.repository";
 import { ICourseReviewRepository } from "../../../repositories/course-review.repository.interface";
 import { ILessonRepository } from "../../../repositories/lesson.repository";
 import { IGetAllCoursesUseCase } from "../interfaces/get-all-courses.usecase.interface";
+import { ValidationError } from "../../../../domain/errors/domain-errors";
 
 export class GetAllCoursesUseCase implements IGetAllCoursesUseCase {
   constructor(
@@ -89,7 +89,7 @@ export class GetAllCoursesUseCase implements IGetAllCoursesUseCase {
         courses: enhancedCourses,
       };
     } catch {
-      throw new HttpError("Failed to retrieve courses", 500);
+      throw new ValidationError("Failed to retrieve courses");
     }
   }
 }

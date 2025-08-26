@@ -3,7 +3,6 @@ import {
   ICourseWithDetailsDTO,
 } from "../../../dtos/course.dto";
 import { Course } from "../../../../domain/entities/course.entity";
-import { HttpError } from "../../../../presentation/http/errors/http-error";
 import { ICategoryRepository } from "../../../repositories/category.repository";
 import { ICourseRepository } from "../../../repositories/course.repository.interface";
 import { IUserRepository } from "../../../repositories/user.repository";
@@ -15,6 +14,7 @@ import { Price } from "../../../../domain/value-object/price";
 import { Duration } from "../../../../domain/value-object/duration";
 import { Offer } from "../../../../domain/value-object/offer";
 import { CreateNotificationsForUsersUseCaseInterface } from "../../notification/interfaces/create-notifications-for-users.usecase.interface";
+import { UserNotFoundError, UserAuthorizationError, CategoryNotFoundError, BusinessRuleViolationError } from "../../../../domain/errors/domain-errors";
 
 export interface CreateCourseResultDTO extends ICourseWithDetailsDTO {
   notifiedAdminIds: string[];
@@ -32,22 +32,22 @@ export class CreateCourseUseCase implements ICreateCourseUseCase {
     // Validate user is an instructor
     const user = await this._userRepository.findById(input.createdBy);
     if (!user) {
-      throw new HttpError("User not found", 404);
+      throw new UserNotFoundError(input.createdBy);
     }
     if (user.role !== "INSTRUCTOR") {
-      throw new HttpError("Only instructors can create courses", 403);
+      throw new UserAuthorizationError("Only instructors can create courses");
     }
 
     // Validate category exists and is active
     const category = await this._categoryRepository.findById(input.categoryId);
     if (!category || category.deletedAt) {
-      throw new HttpError("Category not found or deleted", 404);
+      throw new CategoryNotFoundError(input.categoryId);
     }
 
     // Check for existing course
     const existingCourse = await this._courseRepository.findByName(input.title);
     if (existingCourse && !existingCourse.deletedAt) {
-      throw new HttpError("A course with this title already exists", 400);
+      throw new BusinessRuleViolationError("A course with this title already exists");
     }
 
     // Create course entity with basic info

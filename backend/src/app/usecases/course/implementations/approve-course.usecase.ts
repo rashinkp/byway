@@ -4,11 +4,11 @@ import {
 } from "../../../dtos/course.dto";
 import { APPROVALSTATUS } from "../../../../domain/enum/approval-status.enum";
 import { ICourseRepository } from "../../../repositories/course.repository.interface";
-import { HttpError } from "../../../../presentation/http/errors/http-error";
 import { IApproveCourseUseCase } from "../interfaces/approve-course.usecase.interface";
 import { CreateNotificationsForUsersUseCase } from "../../notification/implementations/create-notifications-for-users.usecase";
 import { NotificationEventType } from "../../../../domain/enum/notification-event-type.enum";
 import { NotificationEntityType } from "../../../../domain/enum/notification-entity-type.enum";
+import { CourseNotFoundError } from "../../../../domain/errors/domain-errors";
 
 export class ApproveCourseUseCase implements IApproveCourseUseCase {
   constructor(
@@ -21,7 +21,7 @@ export class ApproveCourseUseCase implements IApproveCourseUseCase {
   ): Promise<ICourseWithDetailsDTO> {
     const course = await this._courseRepository.findById(input.courseId);
     if (!course) {
-      throw new HttpError("Course not found", 404);
+      throw new CourseNotFoundError(input.courseId);
     }
 
     course.setApprovalStatus(APPROVALSTATUS.APPROVED);

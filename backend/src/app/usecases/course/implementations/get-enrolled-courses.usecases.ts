@@ -2,12 +2,12 @@ import {
   ICourseListResponseDTO,
   IGetEnrolledCoursesInputDTO,
 } from "../../../dtos/course.dto";
-import { HttpError } from "../../../../presentation/http/errors/http-error";
 import { ICourseRepository } from "../../../repositories/course.repository.interface";
 import { IUserRepository } from "../../../repositories/user.repository";
 import { ICourseReviewRepository } from "../../../repositories/course-review.repository.interface";
 import { ILessonRepository } from "../../../repositories/lesson.repository";
 import { IGetEnrolledCoursesUseCase } from "../interfaces/get-enrolled-courses.usecase.interface";
+import { UserNotFoundError, ValidationError } from "../../../../domain/errors/domain-errors";
 
 export class GetEnrolledCoursesUseCase implements IGetEnrolledCoursesUseCase {
   constructor(
@@ -22,7 +22,7 @@ export class GetEnrolledCoursesUseCase implements IGetEnrolledCoursesUseCase {
   ): Promise<ICourseListResponseDTO> {
     const user = await this._userRepository.findById(input.userId);
     if (!user) {
-      throw new HttpError("User not found", 404);
+      throw new UserNotFoundError(input.userId);
     }
 
     try {
@@ -73,7 +73,7 @@ export class GetEnrolledCoursesUseCase implements IGetEnrolledCoursesUseCase {
         courses: enhancedCourses,
       };
     } catch {
-      throw new HttpError("Failed to retrieve enrolled courses", 500);
+      throw new ValidationError("Failed to retrieve enrolled courses");
     }
   }
 }

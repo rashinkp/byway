@@ -1,10 +1,10 @@
-import { HttpError } from "../../../../presentation/http/errors/http-error";
 import { ICourseRepository } from "../../../repositories/course.repository.interface";
 import { IDeleteCourseUseCase } from "../interfaces/delete-course.usecase.interface";
 import { ICourseWithDetailsDTO } from "../../../dtos/course.dto";
 import { CreateNotificationsForUsersUseCase } from "../../notification/implementations/create-notifications-for-users.usecase";
 import { NotificationEventType } from "../../../../domain/enum/notification-event-type.enum";
 import { NotificationEntityType } from "../../../../domain/enum/notification-entity-type.enum";
+import { CourseNotFoundError, UserAuthorizationError } from "../../../../domain/errors/domain-errors";
 
 export class DeleteCourseUseCase implements IDeleteCourseUseCase {
   constructor(
@@ -19,13 +19,12 @@ export class DeleteCourseUseCase implements IDeleteCourseUseCase {
   ): Promise<ICourseWithDetailsDTO> {
     const course = await this._courseRepository.findById(courseId);
     if (!course) {
-      throw new HttpError("Course not found", 404);
+      throw new CourseNotFoundError(courseId);
     }
 
     if (course.createdBy !== userId && role !== "ADMIN") {
-      throw new HttpError(
-        "Only the course creator or admins can delete or restore it",
-        403
+      throw new UserAuthorizationError(
+        "Only the course creator or admins can delete or restore it"
       );
     }
 

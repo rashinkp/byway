@@ -1,8 +1,8 @@
-import { HttpError } from "../../../../presentation/http/errors/http-error";
 import { ILessonRepository } from "../../../repositories/lesson.repository";
 import { IDeleteLessonUseCase } from "../interfaces/delete-lesson.usecase.interface";
 import { S3ServiceInterface } from "../../../providers/s3.service.interface";
 import { ILessonOutputDTO } from "../../../dtos/lesson.dto";
+import { LessonNotFoundError, LessonValidationError } from "../../../../domain/errors/domain-errors";
 
 export class DeleteLessonUseCase implements IDeleteLessonUseCase {
   constructor(
@@ -14,7 +14,7 @@ export class DeleteLessonUseCase implements IDeleteLessonUseCase {
     try {
       const lesson = await this._lessonRepository.findById(id);
       if (!lesson) {
-        throw new HttpError("Lesson not found", 404);
+        throw new LessonNotFoundError(id);
       }
 
       const lessonData = lesson.toJSON() as unknown as ILessonOutputDTO;
@@ -34,13 +34,13 @@ export class DeleteLessonUseCase implements IDeleteLessonUseCase {
 
       await this._lessonRepository.deletePermanently(id);
     } catch (error) {
-      if (error instanceof Error) {
-        throw new HttpError(
-          error.message,
-          error.message.includes("404") ? 404 : 400
-        );
+      if (error instanceof LessonNotFoundError) {
+        throw error;
       }
-      throw new HttpError("Failed to delete lesson", 500);
+      if (error instanceof Error) {
+        throw new LessonValidationError(error.message);
+      }
+      throw new LessonValidationError("Failed to delete lesson");
     }
   }
 }

@@ -3,13 +3,13 @@ import {
   IUpdateCourseApprovalInputDTO,
 } from "../../../dtos/course.dto";
 import { APPROVALSTATUS } from "../../../../domain/enum/approval-status.enum";
-import { HttpError } from "../../../../presentation/http/errors/http-error";
 import { ICourseRepository } from "../../../repositories/course.repository.interface";
 import { IDeclineCourseUseCase } from "../interfaces/decline-course.usecase.interface";
 import { IUserRepository } from "../../../repositories/user.repository";
 import { CreateNotificationsForUsersUseCase } from "../../notification/implementations/create-notifications-for-users.usecase";
 import { NotificationEventType } from "../../../../domain/enum/notification-event-type.enum";
 import { NotificationEntityType } from "../../../../domain/enum/notification-entity-type.enum";
+import { CourseNotFoundError } from "../../../../domain/errors/domain-errors";
 
 export class DeclineCourseUseCase implements IDeclineCourseUseCase {
   constructor(
@@ -22,7 +22,7 @@ export class DeclineCourseUseCase implements IDeclineCourseUseCase {
   ): Promise<ICourseWithDetailsDTO> {
     const course = await this._courseRepository.findById(input.courseId);
     if (!course) {
-      throw new HttpError("Course not found", 404);
+      throw new CourseNotFoundError(input.courseId);
     }
 
     course.setApprovalStatus(APPROVALSTATUS.DECLINED);
