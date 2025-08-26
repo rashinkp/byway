@@ -1,10 +1,10 @@
 import { GetUserDto, ProfileDTO, UserResponseDTO } from "../../../dtos/user.dto";
-import { HttpError } from "../../../../presentation/http/errors/http-error";
 import { IUserRepository } from "../../../repositories/user.repository";
 import { IInstructorRepository } from "../../../repositories/instructor.repository";
 import { IGetUserAdminDetailsUseCase } from "../interfaces/get-user-admin-details.usecase.interface";
 import { InstructorResponseDTO } from "../../../dtos/instructor.dto";
 import { mapProfileToDTO, mapUserToDTO } from "../utils/user-dto-mapper";
+import { UserNotFoundError } from "../../../../domain/errors/domain-errors";
 
 export class GetUserAdminDetailsUseCase implements IGetUserAdminDetailsUseCase {
   constructor(
@@ -19,7 +19,7 @@ export class GetUserAdminDetailsUseCase implements IGetUserAdminDetailsUseCase {
   }> {
     const user = await this._userRepository.findById(dto.userId);
     if (!user) {
-      throw new HttpError("User not found", 404);
+      throw new UserNotFoundError(dto.userId);
     }
 
     const profile = await this._userRepository.findProfileByUserId(dto.userId);

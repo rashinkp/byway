@@ -1,5 +1,4 @@
 import { ICourseWithEnrollmentDTO } from "../../../dtos/course.dto";
-import { HttpError } from "../../../../presentation/http/errors/http-error";
 import { ICourseRepository } from "../../../repositories/course.repository.interface";
 import { IEnrollmentRepository } from "../../../repositories/enrollment.repository.interface";
 import { ICourseReviewRepository } from "../../../repositories/course-review.repository.interface";
@@ -8,6 +7,7 @@ import { APPROVALSTATUS } from "../../../../domain/enum/approval-status.enum";
 import { CourseStatus } from "../../../../domain/enum/course-status.enum";
 import { IGetCourseWithDetailsUseCase } from "../interfaces/get-course-with-details.usecase.interface";
 import { UserDTO } from "../../../dtos/general.dto";
+import { CourseNotFoundError } from "../../../../domain/errors/domain-errors";
 
 export class GetCourseWithDetailsUseCase
   implements IGetCourseWithDetailsUseCase
@@ -25,7 +25,7 @@ export class GetCourseWithDetailsUseCase
   ): Promise<ICourseWithEnrollmentDTO | null> {
     const course = await this._courseRepository.findById(courseId);
     if (!course) {
-      throw new HttpError("Course not found", 404);
+      throw new CourseNotFoundError(courseId);
     }
 
     const isAdmin = user?.role === "ADMIN";
@@ -37,7 +37,7 @@ export class GetCourseWithDetailsUseCase
         course.approvalStatus !== APPROVALSTATUS.APPROVED ||
         course.status !== CourseStatus.PUBLISHED
       ) {
-        throw new HttpError("Course not found", 404);
+        throw new CourseNotFoundError(courseId);
       }
     }
 

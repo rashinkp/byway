@@ -3,9 +3,9 @@ import { IAuthRepository } from "../../../repositories/auth.repository";
 import { IFacebookAuthUseCase } from "../interfaces/facebook-auth.usecase.interface";
 import { AuthProvider } from "../../../../domain/enum/auth-provider.enum";
 import { Role } from "../../../../domain/enum/role.enum";
-import { HttpError } from "../../../../presentation/http/errors/http-error";
 import { IUpdateUserRequestDTO, UserResponseDTO } from "../../../dtos/user.dto";
 import { FacebookAuthDto } from "../../../dtos/auth.dto";
+import { UserValidationError } from "../../../../domain/errors/domain-errors";
 
 export class FacebookAuthUseCase implements IFacebookAuthUseCase {
   constructor(private _authRepository: IAuthRepository) {}
@@ -46,9 +46,9 @@ export class FacebookAuthUseCase implements IFacebookAuthUseCase {
       return await this._authRepository.updateUser(user);
     } catch (error) {
       if (error instanceof Error) {
-        throw new HttpError(error.message, 400);
+        throw new UserValidationError(error.message);
       }
-      throw new HttpError("Failed to process Facebook authentication", 500);
+      throw new UserValidationError("Failed to process Facebook authentication");
     }
   }
 }

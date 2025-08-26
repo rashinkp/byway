@@ -1,5 +1,5 @@
-import { AuthProvider } from "@prisma/client";
 import { Role } from "../../domain/enum/role.enum";
+import { AuthProvider } from "../../domain/enum/auth-provider.enum";
 
 // Create User Profile Request DTO
 export interface ICreateUserProfileRequestDTO {

@@ -3,8 +3,8 @@ import { ICartRepository } from "../../../repositories/cart.repository";
 import { IEnrollmentRepository } from "../../../repositories/enrollment.repository.interface";
 import { AddToCartDto, CartResponseDTO } from "../../../dtos/cart.dto";
 import { IAddToCartUseCase } from "../interfaces/add-to-cart.usecase.interface";
-import { HttpError } from "../../../../presentation/http/errors/http-error";
 import { mapCartToDTO } from "../utils/cart-dto-mapper";
+import { CartValidationError, BusinessRuleViolationError } from "../../../../domain/errors/domain-errors";
 
 export class AddToCartUseCase implements IAddToCartUseCase {
   constructor(
@@ -17,9 +17,8 @@ export class AddToCartUseCase implements IAddToCartUseCase {
     const cartCount = await this._cartRepository.countByUserId(userId);
     const MAX_CART_ITEMS = 5;
     if (cartCount >= MAX_CART_ITEMS) {
-      throw new HttpError(
-        `You can only have up to ${MAX_CART_ITEMS} items in your cart.`,
-        400
+      throw new CartValidationError(
+        `You can only have up to ${MAX_CART_ITEMS} items in your cart.`
       );
     }
 
@@ -30,7 +29,7 @@ export class AddToCartUseCase implements IAddToCartUseCase {
     );
 
     if (existingCart) {
-      throw new HttpError("Course already in cart", 400);
+      throw new CartValidationError("Course already in cart");
     }
 
     // Check if user is already enrolled in the course
@@ -41,7 +40,7 @@ export class AddToCartUseCase implements IAddToCartUseCase {
       );
 
     if (existingEnrollment) {
-      throw new HttpError("You are already enrolled in this course", 400);
+      throw new BusinessRuleViolationError("You are already enrolled in this course");
     }
 
     // Create new cart item

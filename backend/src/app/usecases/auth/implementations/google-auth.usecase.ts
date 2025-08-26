@@ -7,9 +7,9 @@ import {
   GoogleAuthGateway,
   GoogleUserInfo,
 } from "../../../providers/google-auth.interface";
-import { HttpError } from "../../../../presentation/http/errors/http-error";
 import { User } from "../../../../domain/entities/user.entity";
 import { IUpdateUserRequestDTO, UserResponseDTO } from "../../../dtos/user.dto";
+import { UserAuthenticationError, UserValidationError } from "../../../../domain/errors/domain-errors";
 
 export class GoogleAuthUseCase implements IGoogleAuthUseCase {
   constructor(
@@ -22,7 +22,7 @@ export class GoogleAuthUseCase implements IGoogleAuthUseCase {
     try {
       googleUser = await this._googleAuthGateway.getUserInfo(accessToken);
     } catch {
-      throw new HttpError("Invalid Google access token", 401);
+      throw new UserAuthenticationError("Invalid Google access token");
     }
 
     let user = await this._authRepository.findUserByEmail(googleUser.email);
@@ -56,9 +56,9 @@ export class GoogleAuthUseCase implements IGoogleAuthUseCase {
       return await this._authRepository.updateUser(user);
     } catch (error) {
       if (error instanceof Error) {
-        throw new HttpError(error.message, 400);
+        throw new UserValidationError(error.message);
       }
-      throw new HttpError("Failed to process Google authentication", 500);
+      throw new UserValidationError("Failed to process Google authentication");
     }
   }
 }

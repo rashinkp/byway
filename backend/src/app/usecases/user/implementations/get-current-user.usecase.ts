@@ -1,9 +1,9 @@
 
-import { HttpError } from "../../../../presentation/http/errors/http-error";
 import { IUserRepository } from "../../../repositories/user.repository";
 import { IGetCurrentUserUseCase } from "../interfaces/get-current-user.usecase.interface";
 import { ICartRepository } from "../../../repositories/cart.repository";
 import { UserResponseDTO } from "../../../dtos/user.dto";
+import { UserNotFoundError, UserAuthenticationError } from "../../../../domain/errors/domain-errors";
 
 export class GetCurrentUserUseCase implements IGetCurrentUserUseCase {
   constructor(
@@ -16,11 +16,11 @@ export class GetCurrentUserUseCase implements IGetCurrentUserUseCase {
   ): Promise<{ user: UserResponseDTO; cartCount: number }> {
     const user = await this._userRepository.findById(userId);
     if (!user) {
-      throw new HttpError("User not found", 404);
+      throw new UserNotFoundError(userId);
     }
 
     if (user.deletedAt) {
-      throw new HttpError("User account is disabled", 401);
+      throw new UserAuthenticationError("User account is disabled");
     }
     const cartCount = await this._cartRepository.countByUserId(userId);
     return { user, cartCount };

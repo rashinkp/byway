@@ -1,10 +1,9 @@
 import { ICreateStripeCheckoutSessionUseCase } from "../interfaces/create-stripe-checkout-session.usecase.interface";
 import { CreateCheckoutSessionDto } from "../../../dtos/payment.dto";
-import { HttpError } from "../../../../presentation/http/errors/http-error";
-import { StatusCodes } from "http-status-codes";
 import { IUserRepository } from "../../../repositories/user.repository";
 import { IEnrollmentRepository } from "../../../repositories/enrollment.repository.interface";
 import { PaymentGateway } from "../../../providers/payment-gateway.interface";
+import { UserNotFoundError, BusinessRuleViolationError } from "../../../../domain/errors/domain-errors";
 
 interface ServiceResponse<T> {
   data: T;
@@ -34,7 +33,7 @@ export class CreateStripeCheckoutSessionUseCase implements ICreateStripeCheckout
   > {
     const user = await this._userRepository.findById(userId);
     if (!user) {
-      throw new HttpError("User not found", StatusCodes.NOT_FOUND);
+      throw new UserNotFoundError(userId);
     }
 
     const courseIds = input.courses?.map((c) => c.id) || [];
@@ -45,7 +44,7 @@ export class CreateStripeCheckoutSessionUseCase implements ICreateStripeCheckout
       );
 
     if (isEnrolled && isEnrolled.length > 0) {
-      throw new HttpError("User already enrolled in this course", 400);
+      throw new BusinessRuleViolationError("User already enrolled in this course");
     }
 
     const session = await this._paymentGateway.createCheckoutSession(

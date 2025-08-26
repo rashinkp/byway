@@ -1,12 +1,15 @@
 import { User } from "../../../../domain/entities/user.entity";
 import { IAuthRepository } from "../../../repositories/auth.repository";
-import { HttpError } from "../../../../presentation/http/errors/http-error";
 import { IRegisterUseCase } from "../interfaces/register.usecase.interface";
 import { AuthProvider } from "../../../../domain/enum/auth-provider.enum";
 import { RegisterDto } from "../../../dtos/auth.dto";
 import { IOtpProvider } from "../../../providers/otp-provider.interface";
 import { IPasswordHasher } from "../../../providers/password-hasher.interface";
 import { UserResponseDTO } from "../../../dtos/user.dto";
+import { 
+  UserValidationError, 
+  BusinessRuleViolationError 
+} from "../../../../domain/errors/domain-errors";
 
 export class RegisterUseCase implements IRegisterUseCase {
   constructor(
@@ -20,11 +23,11 @@ export class RegisterUseCase implements IRegisterUseCase {
 
     try {
       if (user && user.isVerified) {
-        throw new HttpError("Email already exists and is verified", 409);
+        throw new BusinessRuleViolationError("Email already exists and is verified");
       }
 
       if (!dto.password) {
-        throw new HttpError("Password is required", 400);
+        throw new UserValidationError("Password is required");
       }
 
       const hashedPassword = await this._passwordHasher.hash(dto.password);
@@ -52,13 +55,14 @@ export class RegisterUseCase implements IRegisterUseCase {
 
       return user;
     } catch (error) {
-      if (error instanceof HttpError) {
+      if (error instanceof UserValidationError || 
+          error instanceof BusinessRuleViolationError) {
         throw error;
       }
       if (error instanceof Error) {
-        throw new HttpError(error.message, 400);
+        throw new UserValidationError(error.message);
       }
-      throw new HttpError("Registration failed", 500);
+      throw new UserValidationError("Registration failed");
     }
   }
 }
