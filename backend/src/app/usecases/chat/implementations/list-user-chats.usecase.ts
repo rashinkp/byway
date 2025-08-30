@@ -14,14 +14,33 @@ export class ListUserChatsUseCase implements IListUserChatsUseCase {
     sort?: string,
     filter?: string
   ): Promise<PaginatedChatListDTO> {
-    return this._chatRepository.findEnhancedChatList(
+    const result = await this._chatRepository.findEnhancedChatList(
       userId,
       page,
       limit,
       search,
-      sort,
-      filter
+      sort
     );
+
+    // Map repository result to DTO format
+    return {
+      items: result.items.map(item => ({
+        id: item.id,
+        type: item.type,
+        displayName: item.displayName,
+        avatar: item.avatar,
+        role: item.role,
+        lastMessage: item.lastMessage,
+        lastMessageTime: item.lastMessageTime,
+        unreadCount: item.unreadCount,
+        userId: item.userId,
+        chatId: item.chatId,
+        isOnline: item.isOnline,
+      })),
+      totalCount: result.totalCount,
+      hasMore: result.hasMore,
+      nextPage: result.nextPage,
+    };
   }
 
   async getChatParticipantsById(

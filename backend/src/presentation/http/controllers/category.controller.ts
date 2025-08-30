@@ -63,9 +63,6 @@ export class CategoryController extends BaseController {
       }
       const validated = validateCategoryId({ id: request.params.categoryId });
       const category = await this._getCategoryByIdUseCase.execute(validated);
-      if (!category) {
-        throw new BadRequestError("Category not found");
-      }
       return this.success_200(category, "Category retrieved successfully");
     });
   }

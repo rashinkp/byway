@@ -21,7 +21,22 @@ export class UpdateLessonContentUseCase implements IUpdateLessonContentUseCase {
 
       const updatedContent = LessonContent.update(content, dto);
       const savedContent = await this._contentRepository.update(updatedContent);
-      return savedContent.toJSON() as unknown as ILessonContentOutputDTO;
+      
+      // Properly map domain entity to DTO
+      return {
+        id: savedContent.id,
+        lessonId: savedContent.lessonId,
+        type: savedContent.type,
+        status: savedContent.status,
+        title: savedContent.title,
+        description: savedContent.description,
+        fileUrl: savedContent.fileUrl,
+        thumbnailUrl: savedContent.thumbnailUrl,
+        quizQuestions: savedContent.quizQuestions,
+        createdAt: savedContent.createdAt.toISOString(),
+        updatedAt: savedContent.updatedAt.toISOString(),
+        deletedAt: savedContent.deletedAt?.toISOString() ?? null,
+      };
     } catch (error) {
       if (error instanceof ContentNotFoundError) {
         throw error;

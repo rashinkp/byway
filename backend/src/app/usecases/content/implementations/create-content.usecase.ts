@@ -41,7 +41,22 @@ export class CreateLessonContentUseCase implements ICreateLessonContentUseCase {
 
       const content = LessonContent.create(dto);
       const createdContent = await this._contentRepository.create(content);
-      return createdContent.toJSON() as unknown as ILessonContentOutputDTO;
+      
+      // Properly map domain entity to DTO
+      return {
+        id: createdContent.id,
+        lessonId: createdContent.lessonId,
+        type: createdContent.type,
+        status: createdContent.status,
+        title: createdContent.title,
+        description: createdContent.description,
+        fileUrl: createdContent.fileUrl,
+        thumbnailUrl: createdContent.thumbnailUrl,
+        quizQuestions: createdContent.quizQuestions,
+        createdAt: createdContent.createdAt.toISOString(),
+        updatedAt: createdContent.updatedAt.toISOString(),
+        deletedAt: createdContent.deletedAt?.toISOString() ?? null,
+      };
     } catch (error) {
       if (
         error instanceof LessonNotFoundError ||

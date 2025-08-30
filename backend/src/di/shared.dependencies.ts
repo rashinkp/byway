@@ -17,6 +17,8 @@ import { ILessonRepository } from "../app/repositories/lesson.repository";
 import { HttpErrors } from "../presentation/http/http.errors";
 import { HttpSuccess } from "../presentation/http/http.success";
 import { CookieService } from "../presentation/http/utils/cookie.service";
+import { IJwtProvider } from "../app/providers/jwt.provider.interface";
+import { JwtProvider } from "../infra/providers/auth/jwt.provider";
 import { LessonRepository } from "../infra/repositories/lesson.repository.impl";
 import { LessonContentRepository } from "../infra/repositories/content.repository";
 import { ILessonContentRepository } from "../app/repositories/content.repository";
@@ -71,6 +73,7 @@ export interface SharedDependencies {
   httpErrors: HttpErrors;
   httpSuccess: HttpSuccess;
   cookieService: CookieService;
+  jwtProvider: IJwtProvider;
   walletRepository: IWalletRepository;
   paymentGateway: StripePaymentGateway;
   webhookGateway: StripeWebhookGateway;
@@ -115,6 +118,7 @@ export function createSharedDependencies(): SharedDependencies {
   const httpErrors = new HttpErrors();
   const httpSuccess = new HttpSuccess();
   const cookieService = new CookieService();
+  const jwtProvider: IJwtProvider = new JwtProvider();
 
   const revenueRepository = new PrismaRevenueRepository(prismaClient)
   const lessonProgressRepository = new LessonProgressRepository(prismaClient);
@@ -144,6 +148,7 @@ export function createSharedDependencies(): SharedDependencies {
     httpErrors,
     httpSuccess,
     cookieService,
+    jwtProvider,
     walletRepository,
     paymentGateway,
     webhookGateway,

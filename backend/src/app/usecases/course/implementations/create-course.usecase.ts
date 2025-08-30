@@ -104,7 +104,32 @@ export class CreateCourseUseCase implements ICreateCourseUseCase {
       link: `/admin/courses/${savedCourse.id}`,
     });
 
-    const courseData = savedCourse.toJSON() as unknown as ICourseWithDetailsDTO;
+    // Properly map domain entity to DTO
+    const courseData: ICourseWithDetailsDTO = {
+      id: savedCourse.id,
+      title: savedCourse.title,
+      description: savedCourse.description,
+      level: savedCourse.level,
+      price: savedCourse.price?.getValue() ?? null,
+      thumbnail: savedCourse.thumbnail,
+      duration: savedCourse.duration?.getValue() ?? null,
+      offer: savedCourse.offer?.getValue() ?? null,
+      status: savedCourse.status,
+      categoryId: savedCourse.categoryId,
+      createdBy: savedCourse.createdBy,
+      createdAt: savedCourse.createdAt.toISOString(),
+      updatedAt: savedCourse.updatedAt.toISOString(),
+      deletedAt: savedCourse.deletedAt?.toISOString() ?? null,
+      approvalStatus: savedCourse.approvalStatus,
+      adminSharePercentage: savedCourse.adminSharePercentage,
+      instructorSharePercentage: 100 - savedCourse.adminSharePercentage,
+      details: savedCourse.details?.toJSON() ?? null,
+      rating: savedCourse.rating,
+      reviewCount: savedCourse.reviewCount,
+      lessons: savedCourse.lessons,
+      bestSeller: savedCourse.bestSeller,
+    };
+
     return {
       ...courseData,
       notifiedAdminIds: adminIds,

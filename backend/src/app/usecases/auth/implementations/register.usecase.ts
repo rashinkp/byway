@@ -2,14 +2,15 @@ import { User } from "../../../../domain/entities/user.entity";
 import { IAuthRepository } from "../../../repositories/auth.repository";
 import { IRegisterUseCase } from "../interfaces/register.usecase.interface";
 import { AuthProvider } from "../../../../domain/enum/auth-provider.enum";
-import { RegisterDto } from "../../../dtos/auth.dto";
+import { RegisterDto, AuthUserDTO } from "../../../dtos/auth.dto";
 import { IOtpProvider } from "../../../providers/otp-provider.interface";
 import { IPasswordHasher } from "../../../providers/password-hasher.interface";
-import { UserResponseDTO } from "../../../dtos/user.dto";
+import { mapUserToAuthUserDTO } from "../../user/utils/user-dto-mapper";
 import { 
   UserValidationError, 
   BusinessRuleViolationError 
 } from "../../../../domain/errors/domain-errors";
+import { Role } from "../../../../domain/enum/role.enum";
 
 export class RegisterUseCase implements IRegisterUseCase {
   constructor(
@@ -18,7 +19,7 @@ export class RegisterUseCase implements IRegisterUseCase {
     private _passwordHasher: IPasswordHasher
   ) {}
 
-  async execute(dto: RegisterDto): Promise<UserResponseDTO> {
+  async execute(dto: RegisterDto): Promise<AuthUserDTO> {
     let user = await this._authRepository.findUserByEmail(dto.email);
 
     try {
@@ -38,7 +39,7 @@ export class RegisterUseCase implements IRegisterUseCase {
           name: dto.name,
           email: dto.email,
           password: hashedPassword,
-          role: dto.role,
+          role: Role.USER,
           authProvider: AuthProvider.EMAIL_PASSWORD,
         });
         user = await this._authRepository.createUser(user);
@@ -53,7 +54,7 @@ export class RegisterUseCase implements IRegisterUseCase {
 
       await this._otpProvider.generateOtp(user.email, user.id);
 
-      return user;
+      return mapUserToAuthUserDTO(user);
     } catch (error) {
       if (error instanceof UserValidationError || 
           error instanceof BusinessRuleViolationError) {

@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from "express";
 import { IHttpRequest } from "../http/interfaces/http-request.interface";
 import { IHttpResponse } from "../http/interfaces/http-response.interface";
 import { CookieService } from "../http/utils/cookie.service";
-import { JwtProvider } from "../../infra/providers/auth/jwt.provider";
+import { getAppDependencies } from "../../di/app.dependencies";
 
 export async function expressAdapter(
   request: Request,
@@ -24,7 +24,7 @@ export async function expressAdapter(
 
     if (httpResponse.cookie) {
       if (httpResponse.cookie.action === "set" && httpResponse.cookie.user) {
-        const jwtProvider = new JwtProvider();
+        const { jwtProvider } = getAppDependencies();
         const { id, email, role } = httpResponse.cookie.user;
         CookieService.setAuthCookies(response, { id, email, role }, jwtProvider);
       } else if (httpResponse.cookie.action === "clear") {

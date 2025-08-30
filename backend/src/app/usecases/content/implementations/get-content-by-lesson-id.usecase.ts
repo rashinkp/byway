@@ -38,13 +38,13 @@ export class GetContentByLessonIdUseCase
       // If user is admin, allow access
       if (user.role === "ADMIN") {
         const content = await this._contentRepository.findByLessonId(lessonId);
-        return content && content.isActive() ? content.toJSON() as unknown as ILessonContentOutputDTO : null;
+        return content && content.isActive() ? this._mapToDTO(content) : null;
       }
 
       // If user is the course instructor, allow access without enrollment check
       if (course.createdBy === user.id) {
         const content = await this._contentRepository.findByLessonId(lessonId);
-        return content && content.isActive() ? content.toJSON() as unknown as ILessonContentOutputDTO : null;
+        return content && content.isActive() ? this._mapToDTO(content) : null;
       }
 
       // For non-instructors, check enrollment
@@ -61,7 +61,7 @@ export class GetContentByLessonIdUseCase
       }
 
       const content = await this._contentRepository.findByLessonId(lessonId);
-      return content && content.isActive() ? content.toJSON() as unknown as ILessonContentOutputDTO : null;
+      return content && content.isActive() ? this._mapToDTO(content) : null;
     } catch (error) {
       if (error instanceof LessonNotFoundError || error instanceof CourseNotFoundError || error instanceof UserAuthorizationError) {
         throw error;
@@ -71,5 +71,22 @@ export class GetContentByLessonIdUseCase
       }
       throw new UserAuthorizationError("Failed to fetch content");
     }
+  }
+
+  private _mapToDTO(content: any): ILessonContentOutputDTO {
+    return {
+      id: content.id,
+      lessonId: content.lessonId,
+      type: content.type,
+      status: content.status,
+      title: content.title,
+      description: content.description,
+      fileUrl: content.fileUrl,
+      thumbnailUrl: content.thumbnailUrl,
+      quizQuestions: content.quizQuestions,
+      createdAt: content.createdAt.toISOString(),
+      updatedAt: content.updatedAt.toISOString(),
+      deletedAt: content.deletedAt?.toISOString() ?? null,
+    };
   }
 }

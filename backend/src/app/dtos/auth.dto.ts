@@ -28,6 +28,14 @@ export interface RegisterDto {
   name: string;
   email: string;
   password?: string;
+  role?: Role;
+}
+
+// Minimal user info used for auth responses
+export interface AuthUserDTO {
+  id: string;
+  name: string;
+  email: string;
   role: Role;
 }
 
@@ -46,4 +54,12 @@ export interface VerifyOtpDto {
   email: string;
   otp: string;
   type: string;
+}
+
+// Minimal user info used for auth responses
+export interface AuthUserDTO {
+  id: string;
+  name: string;
+  email: string;
+  role: Role;
 }

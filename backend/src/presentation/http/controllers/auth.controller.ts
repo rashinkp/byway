@@ -24,7 +24,7 @@ import { IHttpRequest } from "../interfaces/http-request.interface";
 import { IHttpResponse } from "../interfaces/http-response.interface";
 import { BadRequestError } from "../errors/bad-request-error";
 import { BaseController } from "./base.controller";
-import { JwtProvider } from "../../../infra/providers/auth/jwt.provider";
+import { IRefreshTokenUseCase } from "../../../app/usecases/auth/interfaces/refresh-token.usecase.interface";
 
 interface UserData {
   id: string;
@@ -45,6 +45,7 @@ export class AuthController extends BaseController {
     private _resetPasswordUseCase: IResetPasswordUseCase,
     private _verifyOtpUseCase: IVerifyOtpUseCase,
     private _getVerificationStatusUseCase: IGetVerificationStatusUseCase,
+    private _refreshTokenUseCase: IRefreshTokenUseCase,
     httpErrors: IHttpErrors,
     httpSuccess: IHttpSuccess
   ) {
@@ -105,32 +106,17 @@ export class AuthController extends BaseController {
     return { action: "set", user };
   }
 
-  private _getUserFromRefreshToken(request: IHttpRequest): UserData {
-    const jwtProvider = new JwtProvider();
+  private _getUserFromRefreshToken(request: IHttpRequest): Promise<UserData> {
     const refreshToken = request.cookies?.refresh_token as string;
     if (!refreshToken) {
       throw new BadRequestError("No refresh token provided");
     }
-    const payload = jwtProvider.verifyRefreshToken(refreshToken);
-    if (
-      !payload ||
-      typeof payload !== "object" ||
-      !(
-        "email" in payload &&
-        "id" in payload &&
-        "name" in payload &&
-        "role" in payload
-      )
-    ) {
-      throw new BadRequestError("Invalid refresh token");
-    }
-    const { id, name, email, role } = payload as UserData;
-    return { id, name, email, role };
+    return this._refreshTokenUseCase.execute(refreshToken) as unknown as Promise<UserData>;
   }
 
   async token(httpRequest: IHttpRequest): Promise<IHttpResponse> {
     return this.handleRequest(httpRequest, async (request) => {
-      const user = this._getUserFromRefreshToken(request);
+      const user = await this._getUserFromRefreshToken(request);
       const data = {
         id: user.id,
         name: user.name,

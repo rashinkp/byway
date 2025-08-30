@@ -1,6 +1,5 @@
-import { RegisterDto } from "../../../dtos/auth.dto";
-import { UserResponseDTO } from "../../../dtos/user.dto";
+import { RegisterDto, AuthUserDTO } from "../../../dtos/auth.dto";
 
 export interface IRegisterUseCase {
-  execute(dto: RegisterDto): Promise<UserResponseDTO>;
+  execute(dto: RegisterDto): Promise<AuthUserDTO>;
 }

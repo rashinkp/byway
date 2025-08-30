@@ -68,11 +68,13 @@ import { SendMessageUseCase } from "../app/usecases/message/implementations/send
 import { CreateChatUseCase } from "../app/usecases/chat/implementations/create-chat.usecase";
 import { IMessageRepository } from "../app/repositories/message.repository.interface";
 import { PaymentDependencies } from "./payment.dependencies";
+import { IJwtProvider } from "../app/providers/jwt.provider.interface";
 
 export interface AppDependencies {
   authController: AuthController;
   userController: UserController;
   checkUserActiveUseCase: CheckUserActiveUseCase;
+  jwtProvider: IJwtProvider;
   instructorController: InstructorController;
   categoryController: CategoryController;
   courseController: CourseController;
@@ -231,6 +233,7 @@ export function createAppDependencies(): AppDependencies {
     ...courseDeps,
     authController: authDeps.authController,
     userController: userDeps.userController,
+    jwtProvider: shared.jwtProvider,
     checkUserActiveUseCase: userDeps.checkUserActiveUseCase,
     instructorController: instructorDeps.instructorController,
     categoryController: categoryDeps.categoryController,

@@ -34,7 +34,34 @@ export class UpdateLessonUseCase implements IUpdateLessonUseCase {
 
       const updatedLesson = Lesson.update(lesson, dto);
       const savedLesson = await this._lessonRepository.update(updatedLesson);
-      return savedLesson.toJSON() as unknown as ILessonOutputDTO;
+      // Map domain entity to DTO
+      return {
+        id: savedLesson.id,
+        title: savedLesson.title,
+        description: savedLesson.description,
+        order: savedLesson.order,
+        courseId: savedLesson.courseId,
+        status: savedLesson.status,
+        content: savedLesson.content ? {
+          id: savedLesson.content.id,
+          lessonId: savedLesson.content.lessonId,
+          type: savedLesson.content.type,
+          status: savedLesson.content.status,
+          title: savedLesson.content.title,
+          description: savedLesson.content.description,
+          fileUrl: savedLesson.content.fileUrl,
+          thumbnailUrl: savedLesson.content.thumbnailUrl,
+          quizQuestions: savedLesson.content.quizQuestions,
+          createdAt: savedLesson.content.createdAt.toISOString(),
+          updatedAt: savedLesson.content.updatedAt.toISOString(),
+          deletedAt: savedLesson.content.deletedAt?.toISOString() ?? null,
+        } : null,
+        thumbnail: null, // Not available in domain entity
+        duration: null, // Not available in domain entity
+        createdAt: savedLesson.createdAt.toISOString(),
+        updatedAt: savedLesson.updatedAt.toISOString(),
+        deletedAt: savedLesson.deletedAt?.toISOString() ?? null,
+      };
     } catch (error) {
       if (error instanceof LessonNotFoundError || error instanceof LessonValidationError) {
         throw error;

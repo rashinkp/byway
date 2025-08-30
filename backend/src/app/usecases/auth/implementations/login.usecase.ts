@@ -4,8 +4,8 @@ import * as bcrypt from "bcrypt";
 import { AuthProvider } from "../../../../domain/enum/auth-provider.enum";
 import { ILoginUseCase } from "../interfaces/login.usecase.interface";
 import { ICartRepository } from "../../../repositories/cart.repository";
-import { LoginDto } from "../../../dtos/auth.dto";
-import { UserResponseDTO } from "../../../dtos/user.dto";
+import { LoginDto, AuthUserDTO } from "../../../dtos/auth.dto";
+import { mapUserToAuthUserDTO } from "../../user/utils/user-dto-mapper";
 import { 
   UserNotFoundError, 
   UserAuthenticationError, 
@@ -18,7 +18,7 @@ export class LoginUseCase implements ILoginUseCase {
     private _cartRepository: ICartRepository
   ) {}
 
-  async execute(dto: LoginDto): Promise<{ user: UserResponseDTO; cartCount: number }> {
+  async execute(dto: LoginDto): Promise<{ user: AuthUserDTO; cartCount: number }> {
     const user = await this._authRepository.findUserByEmail(dto.email);
     if (!user) {
       throw new UserAuthenticationError("Invalid credentials");
@@ -55,10 +55,8 @@ export class LoginUseCase implements ILoginUseCase {
 
       const cartCount = await this._cartRepository.countByUserId(user.id);
 
-      return {
-        user,
-        cartCount,
-      };
+      const userDto = mapUserToAuthUserDTO(user);
+      return { user: userDto, cartCount };
     } catch (error) {
       if (error instanceof UserAuthenticationError || 
           error instanceof UserAuthorizationError) {

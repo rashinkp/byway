@@ -68,17 +68,43 @@ export class GetCourseWithDetailsUseCase
       courseId
     );
 
-    const courseData = course.toJSON();
-    return {
-      ...courseData,
+    // Properly map domain entity to DTO
+    const courseData: ICourseWithEnrollmentDTO = {
+      id: course.id,
+      title: course.title,
+      description: course.description,
+      level: course.level,
+      price: course.price?.getValue() ?? null,
+      thumbnail: course.thumbnail,
+      duration: course.duration?.getValue() ?? null,
+      offer: course.offer?.getValue() ?? null,
+      status: course.status,
+      categoryId: course.categoryId,
+      createdBy: course.createdBy,
+      createdAt: course.createdAt.toISOString(),
+      updatedAt: course.updatedAt.toISOString(),
+      deletedAt: course.deletedAt?.toISOString() ?? null,
+      approvalStatus: course.approvalStatus,
+      adminSharePercentage: course.adminSharePercentage,
+      instructorSharePercentage: 100 - course.adminSharePercentage,
+      details: courseDetails?.toJSON() ?? null,
+      rating: course.rating,
+      reviewCount: course.reviewCount,
+      lessons: course.lessons,
+      bestSeller: course.bestSeller,
       isEnrolled,
       isInCart,
-      details: courseDetails?.toJSON() ?? null,
-      instructorSharePercentage: 100 - (courseData.adminSharePercentage as number),
+      instructor: {
+        id: course.createdBy,
+        name: "Unknown Instructor", 
+        avatar: null,
+      },
       reviewStats: {
         averageRating: reviewStats.averageRating,
         totalReviews: reviewStats.totalReviews,
       },
-    } as ICourseWithEnrollmentDTO;
+    };
+
+    return courseData;
   }
 }

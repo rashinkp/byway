@@ -17,8 +17,21 @@ export class DeleteLessonContentUseCase implements IDeleteLessonContentUseCase {
         throw new ContentNotFoundError(id);
       }
 
-      // Delete files from S3 if they exist
-      const contentData = content.toJSON() as unknown as ILessonContentOutputDTO;
+      // Map domain entity to DTO for file deletion
+      const contentData: ILessonContentOutputDTO = {
+        id: content.id,
+        lessonId: content.lessonId,
+        type: content.type,
+        status: content.status,
+        title: content.title,
+        description: content.description,
+        fileUrl: content.fileUrl,
+        thumbnailUrl: content.thumbnailUrl,
+        quizQuestions: content.quizQuestions,
+        createdAt: content.createdAt.toISOString(),
+        updatedAt: content.updatedAt.toISOString(),
+        deletedAt: content.deletedAt?.toISOString() ?? null,
+      };
       
       // Delete main file if it exists
       if (contentData.fileUrl) {

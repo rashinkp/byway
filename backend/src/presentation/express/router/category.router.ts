@@ -32,7 +32,7 @@ export default function categoryRouter(
       next
     )
   );
-  router.put("/:categoryId", (req, res, next) =>
+  router.put("/:categoryId", restrictTo("ADMIN"), (req, res, next) =>
     expressAdapter(
       req,
       res,
@@ -40,7 +40,7 @@ export default function categoryRouter(
       next
     )
   );
-  router.delete("/:categoryId", (req, res, next) =>
+  router.delete("/:categoryId", restrictTo("ADMIN"), (req, res, next) =>
     expressAdapter(
       req,
       res,
@@ -48,7 +48,7 @@ export default function categoryRouter(
       next
     )
   );
-  router.patch("/:categoryId/recover", (req, res, next) =>
+  router.patch("/:categoryId/recover", restrictTo("ADMIN"), (req, res, next) =>
     expressAdapter(
       req,
       res,

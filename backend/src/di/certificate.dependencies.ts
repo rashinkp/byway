@@ -9,9 +9,15 @@ import { ILessonProgressRepository } from "../app/repositories/lesson-progress.r
 import { CertificateController } from "../presentation/http/controllers/certificate.controller";
 import { CertificatePdfServiceInterface } from "../app/providers/generate-certificate.interface";
 import { ILessonRepository } from "../app/repositories/lesson.repository";
+import { GetCertificateUseCase } from "../app/usecases/certificate/implementations/get-certificate.usecase";
+import { IGetCertificateUseCase } from "../app/usecases/certificate/interfaces/get-certificate.usecase.interface";
+import { ListUserCertificatesUseCase } from "../app/usecases/certificate/implementations/list-user-certificates.usecase";
+import { IListUserCertificatesUseCase } from "../app/usecases/certificate/interfaces/list-user-certificates.usecase.interface";
 
 export interface CertificateDependencies {
   generateCertificateUseCase: GenerateCertificateUseCase;
+  getCertificateUseCase: IGetCertificateUseCase;
+  listUserCertificatesUseCase: IListUserCertificatesUseCase;
   certificateController: CertificateController;
 }
 
@@ -37,16 +43,23 @@ export function createCertificateDependencies(
     sharedDeps.s3Service
   );
 
+  const getCertificateUseCase: IGetCertificateUseCase = new GetCertificateUseCase(certificateRepository);
+
+  const listUserCertificatesUseCase: IListUserCertificatesUseCase = new ListUserCertificatesUseCase(certificateRepository);
+
   // Create controller
   const certificateController = new CertificateController(
     generateCertificateUseCase,
-    certificateRepository,
+    getCertificateUseCase,
+    listUserCertificatesUseCase,
     sharedDeps.httpErrors,
-    sharedDeps.httpSuccess
+    sharedDeps.httpSuccess,
   );
 
   return {
     generateCertificateUseCase,
+    getCertificateUseCase,
+    listUserCertificatesUseCase,
     certificateController,
   };
 }

@@ -45,12 +45,11 @@ const loginSchema = z.object({
     .default(AuthProvider.EMAIL_PASSWORD),
 });
 
-// RegisterDto schema
+// RegisterDto schema (role is not accepted from client)
 const registerSchema = z.object({
   name: z.string().min(1, "Name is required"),
   email: z.string().email("Invalid email address"),
   password: z.string().min(6, "Password must be at least 6 characters"),
-  role: z.enum([Role.USER, Role.ADMIN]).default(Role.USER),
 });
 
 // ResendOtpDto schema

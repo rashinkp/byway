@@ -12,17 +12,16 @@ export class CreateChatUseCase implements ICreateChatUseCase {
       user1Id,
       user2Id,
     );
-    await this._chatRepository.create(chat);
+    const savedChat = await this._chatRepository.create(chat);
 
-      
-    const dto = {
-      user1Id: chat.user1Id,
-      user2Id: chat.user2Id,
-      updatedAt:chat.updatedAt?.value.toString(),
-      createdAt: chat.createdAt?.value.toString(),
-       messages: chat.messages
-  }      
-
-    return dto;
+    // Properly map domain entity to DTO
+    return {
+      id: savedChat.id,
+      user1Id: savedChat.user1Id,
+      user2Id: savedChat.user2Id,
+      updatedAt: savedChat.updatedAt?.value.toString(),
+      createdAt: savedChat.createdAt?.value.toString(),
+      messages: savedChat.messages
+    };
   }
 }

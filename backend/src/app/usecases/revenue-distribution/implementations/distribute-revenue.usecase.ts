@@ -21,7 +21,7 @@ export class DistributeRevenueUseCase implements IDistributeRevenueUseCase {
     private _walletRepository: IWalletRepository,
     private _transactionRepository: ITransactionRepository,
     private _orderRepository: IOrderRepository,
-    private _userRepository: IUserRepository,
+    private _userRepository: IUserRepository,                     
     private _createNotificationsForUsersUseCase: CreateNotificationsForUsersUseCaseInterface
   ) {}
 

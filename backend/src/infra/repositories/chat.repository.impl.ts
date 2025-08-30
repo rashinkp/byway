@@ -1,4 +1,4 @@
-import { EnhancedChatListItem, IChatRepository, PaginatedChatList } from "../../app/repositories/chat.repository.interface";
+import { IChatRepository } from "../../app/repositories/chat.repository.interface";
 import { Chat } from "../../domain/entities/chat.entity";
 import { ChatId } from "../../domain/value-object/ChatId";
 import { UserId } from "../../domain/value-object/UserId";
@@ -33,10 +33,49 @@ export class ChatRepository implements IChatRepository {
     limit: number = 10,
     search?: string,
     sort?: string
-  ): Promise<PaginatedChatList> {
+  ): Promise<{
+    items: Array<{
+      id: string;
+      type: "chat" | "user";
+      displayName: string;
+      avatar?: string;
+      role: string;
+      lastMessage?: {
+        content?: string;
+        imageUrl?: string;
+        audioUrl?: string;
+        type: "text" | "image" | "audio";
+      };
+      lastMessageTime?: string;
+      unreadCount?: number;
+      userId?: string;
+      chatId?: string;
+      isOnline?: boolean;
+    }>;
+    totalCount: number;
+    hasMore: boolean;
+    nextPage?: number;
+  }> {
     const offset = (page - 1) * limit;
 
-    let chatItems: EnhancedChatListItem[] = [];
+    let chatItems: Array<{
+      id: string;
+      type: "chat" | "user";
+      displayName: string;
+      avatar?: string;
+      role: string;
+      lastMessage?: {
+        content?: string;
+        imageUrl?: string;
+        audioUrl?: string;
+        type: "text" | "image" | "audio";
+      };
+      lastMessageTime?: string;
+      unreadCount?: number;
+      userId?: string;
+      chatId?: string;
+      isOnline?: boolean;
+    }> = [];
     if (search) {
       const normalizedSearch = search.trim().toLowerCase();
       const roleMap: Record<string, Role> = {
@@ -261,7 +300,24 @@ export class ChatRepository implements IChatRepository {
     }
 
     // If we have fewer chats than the limit, fill with other users
-    let userItems: EnhancedChatListItem[] = [];
+    let userItems: Array<{
+      id: string;
+      type: "chat" | "user";
+      displayName: string;
+      avatar?: string;
+      role: string;
+      lastMessage?: {
+        content?: string;
+        imageUrl?: string;
+        audioUrl?: string;
+        type: "text" | "image" | "audio";
+      };
+      lastMessageTime?: string;
+      unreadCount?: number;
+      userId?: string;
+      chatId?: string;
+      isOnline?: boolean;
+    }> = [];
     if (chatItems.length < limit) {
       const remainingSlots = limit - chatItems.length;
       const existingUserIds = new Set([

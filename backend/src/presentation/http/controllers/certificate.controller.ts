@@ -1,16 +1,17 @@
 import { IHttpRequest } from "../interfaces/http-request.interface";
 import { IHttpResponse } from "../interfaces/http-response.interface";
 import { IGenerateCertificateUseCase } from "../../../app/usecases/certificate/interfaces/generate-certificate.usecase.interface";
+import { IGetCertificateUseCase } from "../../../app/usecases/certificate/interfaces/get-certificate.usecase.interface";
+import { IListUserCertificatesUseCase } from "../../../app/usecases/certificate/interfaces/list-user-certificates.usecase.interface";
 import { BaseController } from "./base.controller";
 import { IHttpErrors } from "../interfaces/http-errors.interface";
 import { IHttpSuccess } from "../interfaces/http-success.interface";
-import { CertificateRepositoryInterface } from "../../../app/repositories/certificate-repository.interface";
-import { Certificate } from "../../../domain/entities/certificate.entity";
 
 export class CertificateController extends BaseController {
   constructor(
     private readonly _generateCertificateUseCase: IGenerateCertificateUseCase,
-    private readonly _certificateRepository: CertificateRepositoryInterface,
+    private readonly _getCertificateUseCase: IGetCertificateUseCase,
+    private readonly _listUserCertificatesUseCase: IListUserCertificatesUseCase,
     httpErrors: IHttpErrors,
     httpSuccess: IHttpSuccess
   ) {
@@ -53,19 +54,18 @@ export class CertificateController extends BaseController {
         return this._httpErrors.error_400("User ID or Course ID missing");
       }
 
-      // Try to fetch certificate
-      const certificate =
-        await this._certificateRepository.findByUserIdAndCourseId(
-          userId,
-          courseId as string
-        );
+      // Use the use case to fetch certificate
+      const certificate = await this._getCertificateUseCase.execute({
+        userId,
+        courseId: courseId as string,
+      });
 
       if (!certificate) {
         return this._httpErrors.error_404("Certificate not found");
       }
 
       return this.success_200(
-        Certificate.toPersistence(certificate),
+        certificate,
         "Certificate found"
       );
     });
@@ -87,25 +87,19 @@ export class CertificateController extends BaseController {
         (request.query?.["sortOrder"] as string) === "asc" ? "asc" : "desc";
       const status = request.query?.["status"] as string | undefined;
       const search = request.query?.["search"] as string | undefined;
-      const skip = (page - 1) * limit;
-      const result = await this._certificateRepository.findManyByUserId({
+
+      const result = await this._listUserCertificatesUseCase.execute({
         userId,
-        skip,
-        take: limit,
+        page,
+        limit,
         sortBy,
         sortOrder,
         status,
         search,
       });
+
       return this.success_200(
-        {
-          items: result.items,
-          total: result.total,
-          page,
-          totalPages: Math.ceil(result.total / limit),
-          hasMore: result.hasMore,
-          nextPage: result.nextPage,
-        },
+        result,
         "Certificates found"
       );
     });
