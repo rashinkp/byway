@@ -23,19 +23,21 @@ export default function SocketProvider() {
 	const { user } = useAuth();
 
 	useEffect(() => {
-
+		console.log("[SocketProvider] mounted");
 	}, []);
 
 	useEffect(() => {
 		if (user?.id) {
 			// Add a small delay to ensure cookies are available
 			const timer = setTimeout(() => {
+				console.log("[SocketProvider] attempting connect", { userId: user.id });
 				safeSocketConnect();
 			}, 100);
 			
 			return () => clearTimeout(timer);
 		} else {
 			if (socket.connected) {
+				console.log("[SocketProvider] disconnecting: no user");
 				socket.disconnect();
 			}
 		}
@@ -99,6 +101,7 @@ export default function SocketProvider() {
 		};
 
 		// Listen for new notifications
+		console.log("[SocketProvider] listening for newNotification");
 		socket.on("newNotification", handleNewNotification);
 
 		// Cleanup

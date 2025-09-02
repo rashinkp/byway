@@ -366,6 +366,7 @@ export default function ChatPage() {
           // Do not update chatItems here; rely on chatListUpdated event to refetch from backend
         },
         (err: { message?: string }) => {
+          console.log(err)
           alert(err?.message || "Failed to send message");
         }
       );
