@@ -7,7 +7,7 @@ export interface StripeDependencies {
 }
 
 export const createStripeDependencies = (sharedDeps: SharedDependencies, paymentDeps: PaymentDependencies): StripeDependencies => {
-  const { httpErrors, httpSuccess, getEnrollmentStatsUseCase, enrollmentRepository } = sharedDeps;
+  const { httpErrors, httpSuccess, getEnrollmentStatsUseCase } = sharedDeps;
 
   const stripeController = new StripeController(
     {
@@ -16,7 +16,6 @@ export const createStripeDependencies = (sharedDeps: SharedDependencies, payment
       handleStripeWebhook: paymentDeps.handleStripeWebhookUseCase.execute.bind(paymentDeps.handleStripeWebhookUseCase),
     },
     getEnrollmentStatsUseCase,
-    enrollmentRepository,
     httpErrors,
     httpSuccess
   );

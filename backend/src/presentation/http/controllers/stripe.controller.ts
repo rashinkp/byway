@@ -4,12 +4,9 @@ import { BaseController } from "./base.controller";
 import { IHttpErrors } from "../interfaces/http-errors.interface";
 import { IHttpSuccess } from "../interfaces/http-success.interface";
 import { UnauthorizedError } from "../errors/unautherized-error";
-import { ICreateStripeCheckoutSessionUseCase } from "../../../app/usecases/payment/interfaces/create-stripe-checkout-session.usecase.interface";
-import { IHandleStripeWebhookUseCase } from "../../../app/usecases/payment/interfaces/handle-stripe-webhook.usecase.interface";
 import { createCheckoutSessionSchema } from "../../../app/dtos/payment.dto";
 import { StripeWebhookGateway } from "../../../infra/providers/stripe/stripe-webhook.gateway";
 import { IGetEnrollmentStatsUseCase } from "../../../app/usecases/enrollment/interfaces/get-enrollment-stats.usecase.interface";
-import { IEnrollmentRepository } from "../../../app/repositories/enrollment.repository.interface";
 
 export class StripeController extends BaseController {
   private _webhookGateway: StripeWebhookGateway;
@@ -21,7 +18,6 @@ export class StripeController extends BaseController {
       handleStripeWebhook: (event: any) => Promise<any>;
     },
     private _getEnrollmentStatsUseCase: IGetEnrollmentStatsUseCase,
-    private _enrollmentRepository: IEnrollmentRepository,
     httpErrors: IHttpErrors,
     httpSuccess: IHttpSuccess
   ) {
@@ -73,50 +69,6 @@ export class StripeController extends BaseController {
 
         console.log("Webhook event verified:", { type: event.type });
 
-        const session = event.data.object;
-        const userId = session.metadata?.userId;
-        const courseIds = session.metadata?.courseIds;
-        const isWalletTopUp = session.metadata?.isWalletTopUp === 'true';
-
-        console.log("Webhook metadata:", { userId, courseIds, isWalletTopUp, metadata: session.metadata });
-
-        if (!userId) {
-          console.error("Missing required metadata in webhook");
-          throw new Error("Missing Stripe metadata: userId");
-        }
-
-        // Handle wallet top-up
-        if (isWalletTopUp) {
-          console.log("Processing wallet top-up webhook...");
-          const response = await this._paymentService.handleStripeWebhook(event);
-          console.log("Wallet top-up processed successfully:", response.message);
-          return this.success_200(response.data, response.message);
-        }
-
-        // Handle course purchase
-        if (!courseIds) {
-          console.error("Missing courseIds for course purchase");
-          throw new Error("Missing Stripe metadata: courseIds for course purchase");
-        }
-
-        // Parse courseIds from JSON string
-        let parsedCourseIds: string[];
-        try {
-          parsedCourseIds = JSON.parse(courseIds);
-        } catch (error) {
-          console.error("Invalid courseIds format in metadata:", courseIds);
-          throw new Error("Invalid courseIds format in metadata");
-        }
-
-        // Check if user is already enrolled in any of the courses
-        const existingEnrollments = await this._enrollmentRepository.findByUserIdAndCourseIds(userId, parsedCourseIds);
-        
-        if (existingEnrollments && existingEnrollments.length > 0) {
-          console.log("User already enrolled in one or more courses, skipping enrollment");
-          return this.success_200(null, "Already enrolled in one or more courses");
-        }
-
-        console.log("Processing webhook payment...");
         const response = await this._paymentService.handleStripeWebhook(event);
         console.log("Webhook processed successfully:", response.message);
         console.log("Webhook response data:", response.data);

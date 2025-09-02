@@ -1,4 +1,3 @@
-import { IUserRepository } from "../../../app/repositories/user.repository";
 import {
   validateApproveInstructor,
   validateCreateInstructor,
@@ -25,6 +24,7 @@ import { InternalServerError } from "../errors/internal-server-error";
 import { BaseController } from "./base.controller";
 import { GetInstructorDetailsUseCase } from "../../../app/usecases/instructor/interfaces/get-instructor-details.usecase.interface";
 import { getSocketIOInstance } from "../../socketio";
+import { IGetUserByIdUseCase } from "../../../app/usecases/user/interfaces/get-user-by-id.usecase.interface";
 
 export class InstructorController extends BaseController {
   constructor(
@@ -34,7 +34,7 @@ export class InstructorController extends BaseController {
     private _declineInstructorUseCase: IDeclineInstructorUseCase,
     private _getInstructorByUserIdUseCase: IGetInstructorByUserIdUseCase,
     private _getAllInstructorsUseCase: IGetAllInstructorsUseCase,
-    private _userRepository: IUserRepository,
+    private _getUserByIdUseCase: IGetUserByIdUseCase,
     private _getInstructorDetailsUseCase: GetInstructorDetailsUseCase,
     httpErrors: IHttpErrors,
     httpSuccess: IHttpSuccess
@@ -53,8 +53,9 @@ export class InstructorController extends BaseController {
         request.user
       );
 
-      // Fetch user data for response
-      const user = await this._userRepository.findById(request.user.id);
+      // Fetch user data for response via use case
+      const userResult = await this._getUserByIdUseCase.execute({ userId: request.user.id });
+      const user = userResult?.user;
       if (!user) {
         throw new InternalServerError(
           "User data not found after instructor creation"
@@ -99,7 +100,8 @@ export class InstructorController extends BaseController {
         validated,
         request.user
       );
-      const user = await this._userRepository.findById(request.user.id);
+      const userResult = await this._getUserByIdUseCase.execute({ userId: request.user.id });
+      const user = userResult?.user;
       if (!user) {
         throw new NotFoundError("User not found");
       }
@@ -143,7 +145,8 @@ export class InstructorController extends BaseController {
       );
 
       // Get user details for Socket.IO notification
-      const user = await this._userRepository.findById(instructor.userId);
+      const userResult = await this._getUserByIdUseCase.execute({ userId: instructor.userId });
+      const user = userResult?.user;
 
       // Emit real-time notification to the instructor
       const io = getSocketIOInstance();
@@ -179,7 +182,8 @@ export class InstructorController extends BaseController {
       );
 
       // Get user details for Socket.IO notification
-      const user = await this._userRepository.findById(instructor.userId);
+      const userResult = await this._getUserByIdUseCase.execute({ userId: instructor.userId });
+      const user = userResult?.user;
 
       // Emit real-time notification to the instructor
       const io = getSocketIOInstance();
@@ -216,7 +220,8 @@ export class InstructorController extends BaseController {
       const instructor = await this._getInstructorByUserIdUseCase.execute(
         validated
       );
-      const user = await this._userRepository.findById(request.user.id);
+      const userResult = await this._getUserByIdUseCase.execute({ userId: request.user.id });
+      const user = userResult?.user;
       if (!user) {
         throw new NotFoundError("User not found");
       }

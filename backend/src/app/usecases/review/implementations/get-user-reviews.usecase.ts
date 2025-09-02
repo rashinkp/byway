@@ -17,6 +17,22 @@ export class GetUserReviewsUseCase implements IGetUserReviewsUseCase {
     total: number;
     totalPages: number;
   }> {
-    return await this._courseReviewRepository.findByUserId(userId, page, limit);
+    const result = await this._courseReviewRepository.findByUserId(userId, page, limit);
+    
+    // Map domain entities to DTOs
+    return {
+      reviews: result.reviews.map(review => ({
+        id: review.id,
+        courseId: review.courseId,
+        userId: review.userId,
+        rating: review.rating,
+        title: review.title,
+        comment: review.comment,
+        createdAt: review.createdAt,
+        updatedAt: review.updatedAt,
+      })),
+      total: result.total,
+      totalPages: result.totalPages,
+    };
   }
 }

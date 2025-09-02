@@ -32,6 +32,21 @@ export class UpdateInstructorUseCase implements IUpdateInstructorUseCase {
     }
 
     const updatedInstructor = Instructor.update(instructor, dto);
-    return this._instructorRepository.updateInstructor(updatedInstructor);
+    const updatedInstructorResult = await this._instructorRepository.updateInstructor(updatedInstructor);
+    return {
+      id: updatedInstructorResult.id,
+      userId: updatedInstructorResult.userId,
+      areaOfExpertise: updatedInstructorResult.areaOfExpertise,
+      professionalExperience: updatedInstructorResult.professionalExperience,
+      about: updatedInstructorResult.about,
+      website: updatedInstructorResult.website,
+      education: updatedInstructorResult.education,
+      certifications: updatedInstructorResult.certifications,
+      cv: updatedInstructorResult.cv,
+      status: updatedInstructorResult.status,
+      totalStudents: updatedInstructorResult.totalStudents,
+      createdAt: updatedInstructorResult.createdAt,
+      updatedAt: updatedInstructorResult.updatedAt,
+    };
   }
 }

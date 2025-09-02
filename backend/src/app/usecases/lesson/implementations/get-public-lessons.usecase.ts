@@ -13,7 +13,23 @@ export class GetPublicLessonsUseCase implements IGetPublicLessonsUseCase {
     params: IGetPublicLessonsInputDTO
   ): Promise<IPublicLessonListOutputDTO> {
     try {
-      return await this._lessonRepository.getPublicLessons(params);
+      const result = await this._lessonRepository.getPublicLessons(params);
+      
+      // Map domain entities to DTOs
+      return {
+        lessons: result.lessons.map(lesson => ({
+          id: lesson.id,
+          title: lesson.title,
+          description: lesson.description,
+          order: lesson.order,
+          thumbnail: null, // Not available in domain entity
+          duration: null, // Not available in domain entity
+        })),
+        total: result.total,
+        page: result.page,
+        limit: result.limit,
+        totalPages: result.totalPages,
+      };
     } catch (error) {
       if (error instanceof Error) {
         throw new ValidationError(error.message);

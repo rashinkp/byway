@@ -34,10 +34,26 @@ export class GetCourseReviewsUseCase implements IGetCourseReviewsUseCase {
     }
 
     // Get reviews from repository
-    return await this._courseReviewRepository.findByCourseId(
+    const result = await this._courseReviewRepository.findByCourseId(
       query.courseId,
       query,
       userId
     );
+    
+    // Map domain entities to DTOs
+    return {
+      reviews: result.reviews.map(review => ({
+        id: review.id,
+        courseId: review.courseId,
+        userId: review.userId,
+        rating: review.rating,
+        title: review.title,
+        comment: review.comment,
+        createdAt: review.createdAt,
+        updatedAt: review.updatedAt,
+      })),
+      total: result.total,
+      totalPages: result.totalPages,
+    };
   }
 }

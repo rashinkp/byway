@@ -9,6 +9,23 @@ export class GetInstructorByUserIdUseCase implements IGetInstructorByUserIdUseCa
   async execute(
     dto: GetInstructorByUserIdRequestDTO
   ): Promise<InstructorResponseDTO | null> {
-    return this._instructorRepository.findInstructorByUserId(dto.userId);
+    const instructor = await this._instructorRepository.findInstructorByUserId(dto.userId);
+    if (!instructor) return null;
+    
+    return {
+      id: instructor.id,
+      userId: instructor.userId,
+      areaOfExpertise: instructor.areaOfExpertise,
+      professionalExperience: instructor.professionalExperience,
+      about: instructor.about,
+      website: instructor.website,
+      education: instructor.education,
+      certifications: instructor.certifications,
+      cv: instructor.cv,
+      status: instructor.status,
+      totalStudents: instructor.totalStudents,
+      createdAt: instructor.createdAt,
+      updatedAt: instructor.updatedAt,
+    };
   }
 }

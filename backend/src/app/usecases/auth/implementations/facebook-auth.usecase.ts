@@ -30,7 +30,19 @@ export class FacebookAuthUseCase implements IFacebookAuthUseCase {
           avatar: picture,
         });
         user.verifyEmail(); // Facebook users are verified by default
-        return await this._authRepository.createUser(user);
+        const createdUser = await this._authRepository.createUser(user);
+        return {
+          id: createdUser.id,
+          name: createdUser.name,
+          email: createdUser.email,
+          role: createdUser.role,
+          authProvider: createdUser.authProvider,
+          isVerified: createdUser.isVerified,
+          avatar: createdUser.avatar,
+          deletedAt: createdUser.deletedAt,
+          updatedAt: createdUser.updatedAt,
+          createdAt: createdUser.createdAt,
+        };
       }
 
       const updates: IUpdateUserRequestDTO = {
@@ -43,7 +55,19 @@ export class FacebookAuthUseCase implements IFacebookAuthUseCase {
         updates.name = name;
       }
       user = User.update(user, updates);
-      return await this._authRepository.updateUser(user);
+      const updatedUser = await this._authRepository.updateUser(user);
+      return {
+        id: updatedUser.id,
+        name: updatedUser.name,
+        email: updatedUser.email,
+        role: updatedUser.role,
+        authProvider: updatedUser.authProvider,
+        isVerified: updatedUser.isVerified,
+        avatar: updatedUser.avatar,
+        deletedAt: updatedUser.deletedAt,
+        updatedAt: updatedUser.updatedAt,
+        createdAt: updatedUser.createdAt,
+      };
     } catch (error) {
       if (error instanceof Error) {
         throw new UserValidationError(error.message);
