@@ -17,7 +17,34 @@ export class DeleteLessonUseCase implements IDeleteLessonUseCase {
         throw new LessonNotFoundError(id);
       }
 
-      const lessonData = lesson.toJSON() as unknown as ILessonOutputDTO;
+      // Map domain entity to DTO for S3 operations
+      const lessonData: ILessonOutputDTO = {
+        id: lesson.id,
+        title: lesson.title,
+        description: lesson.description,
+        order: lesson.order,
+        courseId: lesson.courseId,
+        status: lesson.status,
+        content: lesson.content ? {
+          id: lesson.content.id,
+          lessonId: lesson.content.lessonId,
+          type: lesson.content.type,
+          status: lesson.content.status,
+          title: lesson.content.title,
+          description: lesson.content.description,
+          fileUrl: lesson.content.fileUrl,
+          thumbnailUrl: lesson.content.thumbnailUrl,
+          quizQuestions: lesson.content.quizQuestions,
+          createdAt: lesson.content.createdAt.toISOString(),
+          updatedAt: lesson.content.updatedAt.toISOString(),
+          deletedAt: lesson.content.deletedAt?.toISOString() ?? null,
+        } : null,
+        thumbnail: null, // Not available in domain entity
+        duration: null, // Not available in domain entity
+        createdAt: lesson.createdAt.toISOString(),
+        updatedAt: lesson.updatedAt.toISOString(),
+        deletedAt: lesson.deletedAt?.toISOString() ?? null,
+      };
       if (lessonData.content) {
         const contentData = lessonData.content;
         

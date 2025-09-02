@@ -33,7 +33,7 @@ export class ProgressController extends BaseController {
 
 
       const response = await this._updateProgressUseCase.execute(validatedData);
-      return this.success_200(response.data, response.message);
+      return this.success_200(response, "Lesson progress updated successfully");
     });
   }
 
@@ -49,7 +49,7 @@ export class ProgressController extends BaseController {
       });
 
       const response = await this._getProgressUseCase.execute(validatedData);
-      return this.success_200(response.data, response.message);
+      return this.success_200(response, "Progress retrieved successfully");
     });
   }
 }

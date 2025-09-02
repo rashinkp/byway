@@ -3,7 +3,7 @@ import {
   UpdateProgressDto,
   IProgressOutputDTO,
 } from "../../../dtos/progress.dto";
-import { ApiResponse } from "../../../../presentation/http/interfaces/ApiResponse";
+
 import { IEnrollmentRepository } from "../../../repositories/enrollment.repository.interface";
 import { ILessonProgressRepository } from "../../../repositories/lesson-progress.repository.interface";
 import { ILessonRepository } from "../../../repositories/lesson.repository";
@@ -21,7 +21,7 @@ export class UpdateProgressUseCase implements IUpdateProgressUseCase {
 
   async execute(
     input: UpdateProgressDto
-  ): Promise<ApiResponse<IProgressOutputDTO>> {
+  ): Promise<IProgressOutputDTO> {
     try {
       if (!input.lessonId) {
         throw new ValidationError("Lesson ID is required");
@@ -120,41 +120,36 @@ export class UpdateProgressUseCase implements IUpdateProgressUseCase {
       const totalLessons = allLessons.length;
 
       return {
-        success: true,
-        data: {
-          userId: enrollment.userId,
-          courseId: enrollment.courseId,
-          lastLessonId: input.lessonId,
-          enrolledAt: new Date(enrollment.enrolledAt),
-          accessStatus: enrollment.accessStatus as AccessStatus,
-          completedLessons,
-          totalLessons,
-          lessonProgress: await Promise.all(
-            lessonProgress.map(async (p) => {
-              if (!p.id) {
-                throw new ValidationError("Progress ID is required");
-              }
-              const answers =
-                await this._lessonProgressRepository.findQuizAnswers(p.id);
-              return {
-                lessonId: p.lessonId,
-                completed: p.completed,
-                completedAt: p.completedAt
-                  ? new Date(p.completedAt)
-                  : undefined,
-                score: p.score,
-                totalQuestions: p.totalQuestions,
-                answers: answers.map((a) => ({
-                  questionId: a.quizQuestionId,
-                  selectedAnswer: a.selectedAnswer,
-                  isCorrect: a.isCorrect,
-                })),
-              };
-            })
-          ),
-        },
-        message: "Lesson progress updated successfully",
-        statusCode: 200,
+        userId: enrollment.userId,
+        courseId: enrollment.courseId,
+        lastLessonId: input.lessonId,
+        enrolledAt: new Date(enrollment.enrolledAt),
+        accessStatus: enrollment.accessStatus as AccessStatus,
+        completedLessons,
+        totalLessons,
+        lessonProgress: await Promise.all(
+          lessonProgress.map(async (p) => {
+            if (!p.id) {
+              throw new ValidationError("Progress ID is required");
+            }
+            const answers =
+              await this._lessonProgressRepository.findQuizAnswers(p.id);
+            return {
+              lessonId: p.lessonId,
+              completed: p.completed,
+              completedAt: p.completedAt
+                ? new Date(p.completedAt)
+                : undefined,
+              score: p.score,
+              totalQuestions: p.totalQuestions,
+              answers: answers.map((a) => ({
+                questionId: a.quizQuestionId,
+                selectedAnswer: a.selectedAnswer,
+                isCorrect: a.isCorrect,
+              })),
+            };
+          })
+        ),
       };
     } catch (error) {
       if (
