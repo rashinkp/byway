@@ -19,30 +19,7 @@ const socket = io(process.env.NEXT_PUBLIC_SOCKET_URL || "", {
 	},
 });
 
-// Debug logging for socket events (enabled if NEXT_PUBLIC_SOCKET_DEBUG=1 or not production)
-if (
-	typeof window !== "undefined" &&
-	(process.env.NEXT_PUBLIC_SOCKET_DEBUG === "1" || process.env.NODE_ENV !== "production")
-) {
-	// Connection lifecycle logs
-	socket.on("connect", () => {
-		console.log("[socket] connect", { id: socket.id });
-	});
-
-	socket.on("disconnect", (reason: string) => {
-		console.log("[socket] disconnect", { reason });
-	});
-
-	socket.on("connect_error", (err: Error) => {
-		console.log("[socket] connect_error", { message: err.message, data: err });
-	});
-
-	// Log every incoming event payload once connected
-	// @ts-expect-error onAny exists in socket.io-client v4, not in older types
-	socket.onAny((event: string, ...args: unknown[]) => {
-		console.log("[socket][in]", event, ...args);
-	});
-}
+// Remove verbose debug logging for production use
 
 export const safeSocketConnect = () => {
 	if (!socket.connected) {

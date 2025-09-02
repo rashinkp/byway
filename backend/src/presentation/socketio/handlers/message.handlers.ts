@@ -157,14 +157,17 @@ socket.on(
   socket.on(
     "sendMessage",
     async (data: SendMessageData) => {
+      console.log(`[backend] sendMessage called by socket ${socket.id}`, data);
       try {
         const senderId = socket.data.user?.id;
         if (!senderId) {
+          console.log(`[backend] sendMessage failed: no senderId for socket ${socket.id}`);
           socket.emit("error", {
             message: "Authentication required to send messages.",
           });
           return;
         }
+        console.log(`[backend] sendMessage processing for sender ${senderId}`);
         const message = await chatController.handleNewMessage({
           chatId: data.chatId,
           userId: data.userId,
@@ -174,6 +177,7 @@ socket.on(
           audioUrl: data.audioUrl,
         });
         if (!message) {
+          console.log(`[backend] sendMessage failed: handleNewMessage returned null`);
           socket.emit("error", { message: "Failed to send message." });
           return;
         }
@@ -194,6 +198,17 @@ socket.on(
         }
         socket.emit("messageSent", message);
         socket.emit("message", message);
+        // Debug: log room broadcast details
+        console.log(`[backend] broadcasting message to room: ${targetChatId}`);
+        const room = io.sockets.adapter.rooms.get(targetChatId);
+        if (room) {
+          console.log(`[backend] room ${targetChatId} has ${room.size} sockets`);
+          room.forEach(socketId => {
+            console.log(`[backend] socket in room: ${socketId}`);
+          });
+        } else {
+          console.log(`[backend] room ${targetChatId} not found`);
+        }
         io.to(targetChatId).emit("message", message);
 
         // Note: Real-time notifications are now handled by the batching service
@@ -218,6 +233,7 @@ socket.on(
           io.to(recipientId).emit("unreadMessageCount", { count: unreadCount });
         }
       } catch (err) {
+        console.error(`[backend] sendMessage failed with error:`, err);
         socket.emit("error", { message: "Failed to send message." });
       }
     }

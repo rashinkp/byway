@@ -410,8 +410,14 @@ export class ChatRepository implements IChatRepository {
   }
 
   async save(chat: Chat): Promise<void> {
+    // Only update if the chat has a valid ID
+    if (!chat?.id?.value) {
+      console.log(`[backend] Chat save skipped: no valid ID for chat`);
+      return;
+    }
+    
     await this._prisma.chat.update({
-      where: { id: chat?.id?.value },
+      where: { id: chat.id.value },
       data: {
         updatedAt: chat.updatedAt?.toString(),
       },

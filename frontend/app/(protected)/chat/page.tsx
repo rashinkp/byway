@@ -114,10 +114,14 @@ export default function ChatPage() {
   // Fetch messages when selected chat changes (paginated)
   useEffect(() => {
     if (!selectedChat) return;
-    if (selectedChat.type === "chat" && selectedChat.chatId) {
-      joinChat(selectedChat.chatId);
+    if (selectedChat.type === "chat") {
+      const roomId = selectedChat.chatId || selectedChat.id;
+      if (roomId) {
+        console.log("[chat/page] joining room", { roomId, socketId: socket.id });
+        joinChat(roomId);
+      }
       getMessagesByChat(
-        { chatId: selectedChat.chatId, limit: 20 },
+        { chatId: roomId!, limit: 20 },
         (result: ChatMessage[]) => {
           const msgs = result;
           // Backend now returns ASC order (oldest first), which matches display expectations
@@ -132,7 +136,9 @@ export default function ChatPage() {
   // Listen for new incoming messages
 		useEffect(() => {
 			const handleMessage = (msg: Message) => {
-				if (msg.chatId === selectedChat?.chatId) {
+				console.log("[chat/page][in] message event", msg);
+				const currentRoomId = selectedChat?.chatId || selectedChat?.id;
+				if (currentRoomId && msg.chatId === currentRoomId) {
 					setMessages((prev) =>
 						prev.some((m) => m.id === msg.id) ? prev : [...prev, msg]
 					);
@@ -141,16 +147,21 @@ export default function ChatPage() {
 					}
 				}
 			};
-			import("@/lib/socket").then(({ default: socket }) => {
+			
+			// Only attach listeners if we have a selected chat
+			if (selectedChat) {
+				console.log("[chat/page] attaching message listeners for chat:", selectedChat.id);
 				socket.on("message", handleMessage);
-				socket.on("connect", () => setIsSidebarOpen(true));
-				socket.on("disconnect", () => setIsSidebarOpen(false));
-				return () => {
-					socket.off("message", handleMessage);
-					socket.off("connect");
-					socket.off("disconnect");
-				};
-			});
+				socket.on("newMessage", handleMessage);
+				socket.on("messageCreated", handleMessage);
+			}
+
+			return () => {
+				// Clean up all listeners when component unmounts or selectedChat changes
+				socket.off("message", handleMessage);
+				socket.off("newMessage", handleMessage);
+				socket.off("messageCreated", handleMessage);
+			};
 		}, [selectedChat, user]);
 
   // Debug wrappers for pending media setters
@@ -195,17 +206,24 @@ export default function ChatPage() {
   }, [pendingMessage, pendingImageUrl, pendingAudioUrl, selectedChat, user]);
 
   const handleSelectChat = (chat: EnhancedChatItem) => {
-  
+    console.log("[chat/page] select chat", chat);
     if (
       previousChatIdRef.current &&
       previousChatIdRef.current !== chat.chatId
     ) {
-      socket.emit("leave", previousChatIdRef.current);
+      console.log("[chat/page][out] leave", previousChatIdRef.current);
+      socket.emit("leave", previousChatIdRef.current, (ack?: unknown) => {
+        if (ack !== undefined) console.log("[chat/page][in] leave ack", ack);
+      });
     }
     // Join new chat room
     if (chat.type === "chat" && chat.chatId) {
-      socket.emit("join", chat.chatId);
-      previousChatIdRef.current = chat.chatId;
+      const roomId = chat.chatId || chat.id;
+      console.log("[chat/page][out] join", roomId);
+      socket.emit("join", roomId, (ack?: unknown) => {
+        if (ack !== undefined) console.log("[chat/page][in] join ack", ack);
+      });
+      previousChatIdRef.current = roomId;
     }
     setSelectedChat(chat);
     // Auto-close sidebar on mobile when chat is selected
@@ -278,26 +296,37 @@ export default function ChatPage() {
           }
         }
       );
+
+      // Also refresh messages for the currently open chat (fallback if no live message event)
+      if (selectedChat?.chatId) {
+        getMessagesByChat({ chatId: selectedChat.chatId }, (result: ChatMessage[]) => {
+          const msgs = result;
+          if (Array.isArray(msgs)) {
+            setMessages(msgs);
+          }
+        });
+      }
     }
     socket.on("chatListUpdated", handleChatListUpdated);
     return () => {
       socket.off("chatListUpdated", handleChatListUpdated);
     };
-  }, [searchQuery]);
+  }, [searchQuery, selectedChat]);
 
   // Restore handleSendMessage function
   const handleSendMessage = useCallback(
     (content: string, imageUrl?: string, audioUrl?: string) => {
-    
+      // send message for selected chat
       if (!user || !selectedChat) return;
       if (selectedChat.type === "user") {
+        const newChatPayload = {
+          userId: selectedChat.userId,
+          content,
+          imageUrl,
+          audioUrl,
+        };
         sendMessageSocket(
-          {
-            userId: selectedChat.userId,
-            content,
-            imageUrl,
-            audioUrl,
-          },
+          newChatPayload,
           (msg: Message) => {
             // After first message, join the new chat room and update selectedChat
             if (msg.chatId) {
@@ -344,6 +373,7 @@ export default function ChatPage() {
             }
           },
           (err: { message?: string }) => {
+            console.log("[chat/page][err] sendMessage (new chat)", err);
             alert(err?.message || "Failed to send message");
           }
         );
@@ -356,7 +386,6 @@ export default function ChatPage() {
         imageUrl,
         audioUrl,
       };
-     
       sendMessageSocket(
         payload,
         (msg: Message) => {
@@ -366,13 +395,26 @@ export default function ChatPage() {
           // Do not update chatItems here; rely on chatListUpdated event to refetch from backend
         },
         (err: { message?: string }) => {
-          console.log(err)
           alert(err?.message || "Failed to send message");
         }
       );
+      // Fallback: if server doesn't emit a success event to sender, refresh messages shortly after send
+      setTimeout(() => {
+        if (selectedChat?.chatId) {
+          console.log("[chat/page] fallback refresh after send", { chatId: selectedChat.chatId });
+          getMessagesByChat({ chatId: selectedChat.chatId }, (result: ChatMessage[]) => {
+            const msgs = result;
+            if (Array.isArray(msgs)) {
+              setMessages(msgs);
+            }
+          });
+        }
+      }, 400);
     },
     [user, selectedChat]
   );
+
+  // Removed deep debug listeners
 
   useEffect(() => {
     if (!user) return;

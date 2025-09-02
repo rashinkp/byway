@@ -47,7 +47,10 @@ function unwrapObject<T>(payload: unknown): T | null {
 }
 
 export const joinChat = (chatId: string) => {
-	console.debug("[chat][out] joinChat", { chatId });
+	// Emit both variants to be compatible with backend expectations and log
+	console.log("[chat][out] join", chatId);
+	socket.emit("join", chatId);
+	console.log("[chat][out] joinChat", { chatId });
 	socket.emit("joinChat", { chatId });
 };
 
@@ -61,29 +64,73 @@ export const sendMessage = (
 		return;
 	}
 
-	console.debug("[chat][out] sendMessage", data);
-	socket.emit("sendMessage", data);
+	// emit sendMessage
 
-	if (onSuccess) {
-		socket.once("messageSent", (payload: ChatMessage) => {
-			console.debug("[chat][in] messageSent", payload);
-			onSuccess(payload);
-		});
-	}
+	let settled = false;
 
-	if (onError) {
-		socket.once("error", (err: { message: string }) => {
-			console.debug("[chat][in] error", err);
-			onError(err);
-		});
-	}
+	// Prepare a scoped error handler so we can remove it after success
+	const handleSendError = (errPayload: any) => {
+		if (settled) return;
+		const message =
+			errPayload?.message ||
+			errPayload?.body?.message ||
+			errPayload?.body?.error ||
+			errPayload?.error ||
+			"Failed to send message.";
+		// ignore noisy global error
+		onError?.({ message });
+		cleanup();
+	};
+
+	const handleSuccess = (label: string) => (payload: unknown) => {
+		if (settled) return;
+		// handle success event
+		const normalized = unwrapObject<ChatMessage>(payload);
+		if (normalized) {
+			settled = true;
+			onSuccess?.(normalized);
+			cleanup();
+		}
+	};
+
+	const cleanup = () => {
+		socket.off("sendMessageError", handleSendError);
+		socket.off("messageSent", onMessageSent);
+		socket.off("message", onMessageGeneric);
+		socket.off("newMessage", onNewMessage);
+		socket.off("messageCreated", onMessageCreated);
+	};
+
+	const onMessageSent = handleSuccess("messageSent");
+	const onMessageGeneric = handleSuccess("message");
+	const onNewMessage = handleSuccess("newMessage");
+	const onMessageCreated = handleSuccess("messageCreated");
+
+	// Register listeners before emit
+	socket.once("sendMessageError", handleSendError);
+	socket.once("messageSent", onMessageSent);
+	socket.once("message", onMessageGeneric);
+	socket.once("newMessage", onNewMessage);
+	socket.once("messageCreated", onMessageCreated);
+
+	// Emit after listeners are in place with optional ack
+	socket.emit("sendMessage", data, (ack: unknown) => {
+		console.log("[chat][in] sendMessage ack", ack);
+		if (!settled) {
+			const normalized = unwrapObject<ChatMessage>(ack);
+			if (normalized) {
+				settled = true;
+				onSuccess?.(normalized);
+				cleanup();
+			}
+		}
+	});
 };
 
 export const createChat = (
 	data: CreateChatData,
 	callback?: (chat: Chat) => void,
 ) => {
-	console.debug("[chat][out] createChat", data);
 	socket.emit("createChat", data);
 	if (callback) {
 		socket.once("chatCreated", (chat: Chat) => {
@@ -94,10 +141,8 @@ export const createChat = (
 };
 
 export const getChatHistory = (data: GetChatHistoryData, callback: (history: ChatListItem[]) => void) => {
-	console.debug("[chat][out] getChatHistory", data);
 	socket.emit("getChatHistory", data);
 	socket.once("chatHistory", (history: unknown) => {
-		console.debug("[chat][in] chatHistory", history);
 		const normalized = unwrapArray<ChatListItem>(history);
 		callback(normalized);
 	});
@@ -111,11 +156,9 @@ export const listUserChats = (
 		return;
 	}
 
-	console.debug("[chat][out] listUserChats", data);
 	socket.emit("listUserChats", data);
 
 	socket.once("userChats", (result: unknown) => {
-		console.debug("[chat][in] userChats", result);
 		const normalized = unwrapArray<ChatListItem>(result);
 		callback(normalized);
 	});
@@ -125,31 +168,25 @@ export const getMessagesByChat = (
 	data: GetMessagesData,
 	callback: (messages: ChatMessage[]) => void,
 ) => {
-	console.debug("[chat][out] getMessagesByChat", data);
 	socket.emit("getMessagesByChat", data);
 	socket.once("messagesByChat", (messages: unknown) => {
-		console.debug("[chat][in] messagesByChat", messages);
 		const normalized = unwrapArray<ChatMessage>(messages);
 		callback(normalized);
 	});
 };
 
 export const getMessageById = (data: GetMessageData, callback: (message: ChatMessage) => void) => {
-	console.debug("[chat][out] getMessageById", data);
 	socket.emit("getMessageById", data);
 	socket.once("messageById", (message: unknown) => {
-		console.debug("[chat][in] messageById", message);
 		const normalized = unwrapObject<ChatMessage>(message);
 		if (normalized) callback(normalized);
 	});
 };
 
 export const deleteMessage = (data: DeleteMessageData, callback?: (result: { success: boolean }) => void) => {
-	console.debug("[chat][out] deleteMessage", data);
 	socket.emit("deleteMessage", data);
 	if (callback) {
 		socket.once("messageDeleted", (result: { success: boolean }) => {
-			console.debug("[chat][in] messageDeleted", result);
 			callback(result);
 		});
 	}
@@ -159,17 +196,14 @@ export const createChatSocket = (
 	data: CreateChatData,
 	callback?: (chat: Chat) => void,
 ) => {
-	console.debug("[chat][out] createChatSocket", data);
 	socket.emit("createChat", data);
 	if (callback) {
 		socket.once("chatCreated", (chat: Chat) => {
-			console.debug("[chat][in] chatCreated", chat);
 			callback(chat);
 		});
 	}
 };
 
 export const markMessagesAsRead = (chatId: string, userId: string) => {
-	console.debug("[chat][out] markMessagesAsRead", { chatId, userId });
 	socket.emit("markMessagesAsRead", { chatId, userId });
 };
