@@ -398,18 +398,6 @@ export default function ChatPage() {
           alert(err?.message || "Failed to send message");
         }
       );
-      // Fallback: if server doesn't emit a success event to sender, refresh messages shortly after send
-      setTimeout(() => {
-        if (selectedChat?.chatId) {
-          console.log("[chat/page] fallback refresh after send", { chatId: selectedChat.chatId });
-          getMessagesByChat({ chatId: selectedChat.chatId }, (result: ChatMessage[]) => {
-            const msgs = result;
-            if (Array.isArray(msgs)) {
-              setMessages(msgs);
-            }
-          });
-        }
-      }, 400);
     },
     [user, selectedChat]
   );

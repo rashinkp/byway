@@ -47,10 +47,7 @@ function unwrapObject<T>(payload: unknown): T | null {
 }
 
 export const joinChat = (chatId: string) => {
-	// Emit both variants to be compatible with backend expectations and log
-	console.log("[chat][out] join", chatId);
 	socket.emit("join", chatId);
-	console.log("[chat][out] joinChat", { chatId });
 	socket.emit("joinChat", { chatId });
 };
 
