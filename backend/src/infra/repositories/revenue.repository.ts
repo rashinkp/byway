@@ -4,7 +4,7 @@ import { TransactionStatus } from "../../domain/enum/transaction-status.enum";
 import { IRevenueRepository } from "../../app/repositories/revenue.repository";
 import { LatestRevenue } from "../../domain/types/revenue.interface";
 
-export class PrismaRevenueRepository implements IRevenueRepository {
+export class RevenueRepository implements IRevenueRepository {
   constructor(private readonly _prisma: PrismaClient) {}
 
   async getTransactionAmounts(params: {

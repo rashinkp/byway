@@ -3,8 +3,6 @@ import { Message } from "../../domain/entities/message.entity";
 import { MessageId } from "../../domain/value-object/MessageId";
 import { ChatId } from "../../domain/value-object/ChatId";
 import { UserId } from "../../domain/value-object/UserId";
-import { MessageContent } from "../../domain/value-object/MessageContent";
-import { Timestamp } from "../../domain/value-object/Timestamp";
 import { IMessageWithUserData } from "../../domain/types/message.interface";
 import { MessageType as DomainMessageType, MessageType } from "../../domain/enum/Message-type.enum";
 import { MessageType as PrismaMessageType, PrismaClient } from "@prisma/client";

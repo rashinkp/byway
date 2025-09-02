@@ -2,11 +2,10 @@ import { PrismaClient } from "@prisma/client";
 import { ContentStatus, ContentType } from "../../domain/enum/content.enum";
 import {
   LessonContent,
-  QuizQuestion,
 } from "../../domain/entities/content.entity";
 import { ILessonContentRepository } from "../../app/repositories/content.repository";
 
-// Type definitions for content data
+
 interface ContentData {
   id?: string;
   lessonId: string;

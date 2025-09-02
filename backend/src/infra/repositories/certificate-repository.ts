@@ -6,7 +6,7 @@ import { CertificateStatus } from "../../domain/enum/certificate-status.enum";
 // Type for Prisma JSON operations
 type PrismaJsonValue = string | number | boolean | null | PrismaJsonValue[] | { [key: string]: PrismaJsonValue };
 
-export class PrismaCertificateRepository implements CertificateRepositoryInterface {
+export class CertificateRepository implements CertificateRepositoryInterface {
   constructor(private readonly _prisma: PrismaClient) {}
 
   async create(certificate: Certificate): Promise<Certificate> {

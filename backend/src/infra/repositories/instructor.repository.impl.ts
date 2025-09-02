@@ -5,7 +5,7 @@ import { IInstructorRepository } from "../../app/repositories/instructor.reposit
 import { IGetTopInstructorsInput } from "../../app/usecases/user/interfaces/get-top-instructors.usecase.interface";
 import { InstructorStats } from "../../domain/types/instructor.interface";
 
-export class PrismaInstructorRepository implements IInstructorRepository {
+export class InstructorRepository implements IInstructorRepository {
   constructor(private _prisma: PrismaClient) { }
   
   async createInstructor(instructor: Instructor): Promise<Instructor> {

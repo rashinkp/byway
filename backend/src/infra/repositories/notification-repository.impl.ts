@@ -2,12 +2,9 @@ import { NotificationRepositoryInterface } from "../../app/repositories/notifica
 import { Notification } from "../../domain/entities/notification.entity";
 import { PrismaClient } from "@prisma/client";
 import { NotificationEntityType } from "../../domain/enum/notification-entity-type.enum";
-import { NotificationEventType } from "../../domain/enum/notification-event-type.enum";
-import { UserId } from "../../domain/value-object/UserId";
-import { Timestamp } from "../../domain/value-object/Timestamp";
 import { PaginatedNotificationList } from "../../domain/types/notification.interface";
 
-export class PrismaNotificationRepository
+export class NotificationRepository
   implements NotificationRepositoryInterface
 {
   constructor(private readonly _prisma: PrismaClient) {}

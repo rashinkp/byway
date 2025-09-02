@@ -1,5 +1,4 @@
 import { prismaClient } from "../infra/prisma/client";
-import { PrismaInstructorRepository } from "../infra/repositories/instructor.repository.impl";
 import { UserRepository } from "../infra/repositories/user.repository.impl";
 import { CategoryRepository } from "../infra/repositories/category.repository.impl";
 import { CourseRepository } from "../infra/repositories/course.repository.impl";
@@ -32,13 +31,11 @@ import { IWalletRepository } from "../app/repositories/wallet.repository.interfa
 import { WalletRepository } from "../infra/repositories/wallet.repository";
 import { StripePaymentGateway } from "../infra/providers/stripe/stripe-payment.gateway";
 import { StripeWebhookGateway } from "../infra/providers/stripe/stripe-webhook.gateway";
-import { PrismaRevenueRepository } from "../infra/repositories/revenue.repository";
 import { IRevenueRepository } from "../app/repositories/revenue.repository";
 import { CourseReviewRepository } from "../infra/repositories/course-review.repository.impl";
 import { ICourseReviewRepository } from "../app/repositories/course-review.repository.interface";
 import { LessonProgressRepository } from "../infra/repositories/lesson-progress.repository.impl";
 import { ILessonProgressRepository } from "../app/repositories/lesson-progress.repository.interface";
-import { PrismaCertificateRepository } from "../infra/repositories/certificate-repository";
 import { CertificateRepositoryInterface } from "../app/repositories/certificate-repository.interface";
 import { S3Service } from "../infra/providers/s3/s3.service";
 import { EmailProviderImpl } from "../infra/providers/email/email.provider";
@@ -52,6 +49,9 @@ import { IMessageRepository } from "../app/repositories/message.repository.inter
 import { MessageRepository } from "../infra/repositories/message.repository.impl";
 import { WinstonLogger } from "../infra/providers/logging/winston.logger";
 import { ILogger } from "../app/providers/logger-provider.interface";
+import { InstructorRepository } from "../infra/repositories/instructor.repository.impl";
+import { RevenueRepository } from "../infra/repositories/revenue.repository";
+import { CertificateRepository } from "../infra/repositories/certificate-repository";
 
 export interface SharedDependencies {
   prisma: typeof prismaClient;
@@ -92,7 +92,7 @@ export function createSharedDependencies(): SharedDependencies {
   const userRepository = new UserRepository(prismaClient);
   const categoryRepository = new CategoryRepository(prismaClient);
   const courseRepository = new CourseRepository(prismaClient);
-  const instructorRepository = new PrismaInstructorRepository(prismaClient);
+  const instructorRepository = new InstructorRepository(prismaClient);
   const authRepository = new AuthRepository(prismaClient);
   const enrollmentRepository = new EnrollmentRepository(prismaClient);
   const lessonRepository = new LessonRepository(prismaClient);
@@ -120,9 +120,9 @@ export function createSharedDependencies(): SharedDependencies {
   const cookieService = new CookieService();
   const jwtProvider: IJwtProvider = new JwtProvider();
 
-  const revenueRepository = new PrismaRevenueRepository(prismaClient)
+  const revenueRepository = new RevenueRepository(prismaClient);
   const lessonProgressRepository = new LessonProgressRepository(prismaClient);
-  const certificateRepository = new PrismaCertificateRepository(prismaClient);
+  const certificateRepository = new CertificateRepository(prismaClient);
 
   const getEnrollmentStatsUseCase = new GetEnrollmentStatsUseCase(
     enrollmentRepository
