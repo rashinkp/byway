@@ -7,13 +7,13 @@ import { registerRoomHandlers } from "./rooms/join-leave.handlers";
 import { registerNotificationHandlers } from "./handlers/notification.handlers";
 import { ChatController } from "../http/controllers/chat.controller";
 import { NotificationController } from '../http/controllers/notification.controller';
-import { WinstonLogger } from "../../infra/providers/logging/winston.logger";
+import { ILogger } from "../../app/providers/logger-provider.interface";
 import { envConfig } from "../express/configs/env.config";
 let ioInstance: SocketIOServer | null = null;
 
 export function setupSocketIO(
   server: HTTPServer,
-  logger: WinstonLogger,
+  logger: ILogger,
   chatController: ChatController,
   notificationController: NotificationController,
 ) {

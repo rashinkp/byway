@@ -69,6 +69,7 @@ import { CreateChatUseCase } from "../app/usecases/chat/implementations/create-c
 import { IMessageRepository } from "../app/repositories/message.repository.interface";
 import { PaymentDependencies } from "./payment.dependencies";
 import { IJwtProvider } from "../app/providers/jwt.provider.interface";
+import { ILogger } from "../app/providers/logger-provider.interface";
 
 export interface AppDependencies {
   authController: AuthController;
@@ -119,6 +120,7 @@ export interface AppDependencies {
   handleStripeWebhookUseCase: HandleStripeWebhookUseCase;
   // Revenue distribution use case
   distributeRevenueUseCase: DistributeRevenueUseCase;
+  logger: ILogger;
 }
 
 export function createAppDependencies(): AppDependencies {
@@ -278,6 +280,7 @@ export function createAppDependencies(): AppDependencies {
     handleStripeWebhookUseCase,
     // Revenue distribution use case
     distributeRevenueUseCase,
+    logger: shared.logger,
   };
 }
 
