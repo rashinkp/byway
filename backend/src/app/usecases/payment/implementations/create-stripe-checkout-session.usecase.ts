@@ -5,6 +5,7 @@ import { IEnrollmentRepository } from "../../../repositories/enrollment.reposito
 import { PaymentGateway } from "../../../providers/payment-gateway.interface";
 import { UserNotFoundError, BusinessRuleViolationError } from "../../../../domain/errors/domain-errors";
 import { ICheckoutLockProvider } from "../../../providers/checkout-lock.interface";
+import { envConfig } from "../../../../presentation/express/configs/env.config";
 
 interface ServiceResponse<T> {
   data: T;
@@ -50,7 +51,7 @@ export class CreateStripeCheckoutSessionUseCase implements ICreateStripeCheckout
     }
 
     // Enforce per-user checkout lock with TTL (e.g., 15 minutes)
-    const lockTtlMs = 15 * 60 * 1000;
+    const lockTtlMs = envConfig.CHECKOUT_LOCK_TTL_MS;
     if (this._checkoutLock.isLocked(userId)) {
       throw new BusinessRuleViolationError("You already have an active checkout in progress. Please complete or wait before starting a new one.");
     }

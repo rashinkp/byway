@@ -66,6 +66,12 @@ export const envConfig = {
   STRIPE_SECRET_KEY: process.env.STRIPE_SECRET_KEY || "",
   STRIPE_WEBHOOK_SECRET: process.env.STRIPE_WEBHOOK_SECRET || "",
 
+  // Checkout lock TTL (ms)
+  CHECKOUT_LOCK_TTL_MS: parseInt(
+    process.env.CHECKOUT_LOCK_TTL_MS || "300000",
+    10
+  ),
+
   // AWS S3
   AWS_ACCESS_KEY_ID: process.env.AWS_ACCESS_KEY_ID || "",
   AWS_SECRET_ACCESS_KEY: process.env.AWS_SECRET_ACCESS_KEY || "",
