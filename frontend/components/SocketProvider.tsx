@@ -19,23 +19,40 @@ interface SocketNotification {
 	timestamp?: string;
 }
 
+// Simple logger
+const log = (message: string, data?: any) => {
+  console.log(`🔌 [Provider] ${message}`, data || '');
+};
+
 export default function SocketProvider() {
 	const { user } = useAuth();
 
 	useEffect(() => {
 		console.log("[SocketProvider] mounted");
+
 	}, []);
 
 	useEffect(() => {
 		if (user?.id) {
+			log('User authenticated, connecting socket', {
+				userId: user.id,
+				userRole: user.role,
+			});
+
 			// Add a small delay to ensure cookies are available
 			const timer = setTimeout(() => {
 				console.log("[SocketProvider] attempting connect", { userId: user.id });
+
 				safeSocketConnect();
 			}, 100);
 			
-			return () => clearTimeout(timer);
+			return () => {
+				log('Clearing connection timer', { userId: user.id });
+				clearTimeout(timer);
+			};
 		} else {
+			log('User not authenticated, disconnecting socket');
+			
 			if (socket.connected) {
 				console.log("[SocketProvider] disconnecting: no user");
 				socket.disconnect();
@@ -43,13 +60,55 @@ export default function SocketProvider() {
 		}
 	}, [user?.id]);
 
+	// Add socket connection state monitoring
 	useEffect(() => {
-		if (!user?.id) return;
+		const handleConnect = () => {
+			log('Socket connected', {
+				socketId: socket.id,
+				userId: user?.id,
+				timestamp: new Date().toISOString(),
+			});
+		};
+
+		const handleDisconnect = (reason: string) => {
+			log('Socket disconnected', {
+				reason,
+				userId: user?.id,
+				timestamp: new Date().toISOString(),
+			});
+		};
+
+		socket.on('connect', handleConnect);
+		socket.on('disconnect', handleDisconnect);
+
+		return () => {
+			socket.off('connect', handleConnect);
+			socket.off('disconnect', handleDisconnect);
+		};
+	}, [user?.id]);
+
+	useEffect(() => {
+		if (!user?.id) {
+			log('No user ID, skipping notification setup');
+			return;
+		}
+
+		log('Setting up notification listeners', {
+			userId: user.id,
+			userRole: user.role,
+		});
 
 		const handleNewNotification = (notification: SocketNotification) => {
 			const notificationType = notification.type || notification.eventType;
 
+			log('🔔 Processing notification', {
+				userId: user.id,
+				type: notificationType,
+				message: notification.message,
+			});
+
 			if (!notificationType) {
+				log('⚠️ Notification without type', { notification });
 				return;
 			}
 
@@ -86,6 +145,7 @@ export default function SocketProvider() {
 					<div
 						className="bg-white dark:bg-[#232323] border border-[#facc15] rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300 cursor-pointer max-w-sm"
 						onClick={() => {
+							log('Notification clicked', { type: notificationType });
 							// Navigate based on notification type and user role
 							handleNotificationClick(notification, user.role);
 						}}
@@ -98,14 +158,18 @@ export default function SocketProvider() {
 					position: "top-right",
 				},
 			);
+			
+			log('✅ Notification displayed', { type: notificationType });
 		};
 
 		// Listen for new notifications
 		console.log("[SocketProvider] listening for newNotification");
 		socket.on("newNotification", handleNewNotification);
+		log('✅ Notification listener attached');
 
 		// Cleanup
 		return () => {
+			log('🧹 Cleaning up notification listeners');
 			socket.off("newNotification", handleNewNotification);
 		};
 	}, [user?.id, user?.role]);

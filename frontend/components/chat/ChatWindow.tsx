@@ -1,13 +1,13 @@
 import React, { useRef, useEffect, forwardRef, useImperativeHandle } from "react";
-import { EnhancedChatItem, Message } from "@/types/chat";
+import { ChatListItem, ChatMessage } from "@/types/chat";
 import { Message as MessageComponent } from "./Message";
 import { Badge } from "@/components/ui/badge";
 import { ModernChatInput } from "./ChatInput";
 import { ArrowLeft } from "lucide-react";
 
 export interface ChatWindowProps {
-  chat: EnhancedChatItem;
-  messages: Message[];
+  chat: ChatListItem;
+  messages: ChatMessage[];
   onSendMessage: (content: string, imageUrl?: string, audioUrl?: string) => void;
   currentUserId: string;
   onDeleteMessage?: (messageId: string) => void;
@@ -63,10 +63,10 @@ export const ChatWindow = forwardRef<{ scrollToBottom: () => void }, ChatWindowP
   }, [messages.length]);
 
   // Group messages by date
-  const groupedMessages: { date: string; messages: Message[] }[] = [];
+  const groupedMessages: { date: string; messages: ChatMessage[] }[] = [];
   if (Array.isArray(messages)) {
     messages.forEach((msg) => {
-      const dateLabel = getDateLabel(msg.createdAt);
+      const dateLabel = getDateLabel(msg.timestamp || msg.createdAt || "");
       if (
         !groupedMessages.length ||
         groupedMessages[groupedMessages.length - 1].date !== dateLabel
@@ -160,56 +160,73 @@ export const ChatWindow = forwardRef<{ scrollToBottom: () => void }, ChatWindowP
         onDrop={handleDrop}
         onDragOver={handleDragOver}
       >
-        {messages.length === 0 ? (
+        {loadingMoreMessages && messages.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-full py-16 text-center text-gray-500 dark:text-gray-400">
-            <svg
-              width="80"
-              height="80"
-              fill="none"
-              viewBox="0 0 80 80"
-              className="mx-auto mb-6"
-            >
-              <rect width="80" height="80" rx="16" fill="#facc15/10" />
-              <path
-                d="M24 56V32a8 8 0 0 1 8-8h16a8 8 0 0 1 8 8v24l-8-4-8 4-8-4-8 4Z"
-                fill="#facc15"
-              />
-              <circle cx="32" cy="40" r="2" fill="#fff" />
-              <circle cx="40" cy="40" r="2" fill="#fff" />
-              <circle cx="48" cy="40" r="2" fill="#fff" />
-            </svg>
-            <h3 className="text-lg font-semibold mb-2 text-gray-900 dark:text-[#facc15]">
-              No messages yet
-            </h3>
-            <p className="mb-4 text-sm">
-              Start the conversation! Say hello and break the ice.
-            </p>
-            <span className="inline-block px-4 py-2 bg-[#facc15]/10 text-[#facc15] rounded-full text-xs font-medium">
-              Type your first message below
-            </span>
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#facc15] mb-4"></div>
+            <p className="text-sm">Loading messages...</p>
           </div>
         ) : (
-          groupedMessages.map((group, idx) => (
-            <div key={idx} className="space-y-4">
-              <div className="text-center text-xs text-gray-500 dark:text-gray-400 bg-gray-200 dark:bg-gray-800 rounded-full px-3 py-1 mx-auto w-fit">
-                {group.date}
+          <>
+            {loadingMoreMessages && messages.length > 0 && (
+              <div className="flex justify-center py-4">
+                <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-[#facc15]"></div>
+                  <span>Loading more messages...</span>
+                </div>
               </div>
-              {group.messages.map((msg) => (
-                <MessageComponent
-                  key={msg.id}
-                  message={{
-                    ...msg,
-                    timestamp: msg.timestamp || msg.createdAt
-                  }}
-                  currentUserId={currentUserId}
-                  chat={chat}
-                  onDelete={
-                    onDeleteMessage ? () => onDeleteMessage(msg.id) : undefined
-                  }
-                />
-              ))}
-            </div>
-          ))
+            )}
+            {messages.length === 0 ? (
+              <div className="flex flex-col items-center justify-center h-full py-16 text-center text-gray-500 dark:text-gray-400">
+                <svg
+                  width="80"
+                  height="80"
+                  fill="none"
+                  viewBox="0 0 80 80"
+                  className="mx-auto mb-6"
+                >
+                  <rect width="80" height="80" rx="16" fill="#facc15/10" />
+                  <path
+                    d="M24 56V32a8 8 0 0 1 8-8h16a8 8 0 0 1 8 8v24l-8-4-8 4-8-4-8 4Z"
+                    fill="#facc15"
+                  />
+                  <circle cx="32" cy="40" r="2" fill="#fff" />
+                  <circle cx="40" cy="40" r="2" fill="#fff" />
+                  <circle cx="48" cy="40" r="2" fill="#fff" />
+                </svg>
+                <h3 className="text-lg font-semibold mb-2 text-gray-900 dark:text-[#facc15]">
+                  No messages yet
+                </h3>
+                <p className="mb-4 text-sm">
+                  Start the conversation! Say hello and break the ice.
+                </p>
+                <span className="inline-block px-4 py-2 bg-[#facc15]/10 text-[#facc15] rounded-full text-xs font-medium">
+                  Type your first message below
+                </span>
+              </div>
+            ) : (
+              groupedMessages.map((group, idx) => (
+                <div key={idx} className="space-y-4">
+                  <div className="text-center text-xs text-gray-500 dark:text-gray-400 bg-gray-200 dark:bg-gray-800 rounded-full px-3 py-1 mx-auto w-fit">
+                    {group.date}
+                  </div>
+                  {group.messages.map((msg) => (
+                    <MessageComponent
+                      key={msg.id}
+                      message={{
+                        ...msg,
+                        timestamp: msg.timestamp || msg.createdAt || ""
+                      }}
+                      currentUserId={currentUserId}
+                      chat={chat}
+                      onDelete={
+                        onDeleteMessage ? () => onDeleteMessage(msg.id) : undefined
+                      }
+                    />
+                  ))}
+                </div>
+              ))
+            )}
+          </>
         )}
         <div ref={messagesEndRef} />
       </div>

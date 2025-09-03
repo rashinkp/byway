@@ -2,6 +2,7 @@ import { Chat } from "../../domain/entities/chat.entity";
 import { ChatId } from "../../domain/value-object/ChatId";
 import { UserId } from "../../domain/value-object/UserId";
 
+
 export interface IChatRepository {
   findById(id: ChatId): Promise<Chat | null>;
   findByUser(userId: UserId): Promise<Chat[]>;

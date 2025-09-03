@@ -13,8 +13,11 @@ export const sendMessageSocketSchema = z.object({
   content: z.string().optional(),
   imageUrl: z.string().optional(),
   audioUrl: z.string().optional(),
-}).refine((data) => data.chatId || data.userId, {
-  message: 'Either chatId or userId is required',
+}).refine((data) => {
+  // Allow if chatId exists and is not empty, or if userId exists and is not empty
+  return (data.chatId && data.chatId.trim() !== '') || (data.userId && data.userId.trim() !== '');
+}, {
+  message: 'Either chatId or userId is required and must not be empty',
   path: ['chatId'],
 });
 

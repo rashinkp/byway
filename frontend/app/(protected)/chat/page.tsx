@@ -3,21 +3,20 @@
 import React, { useEffect, useState, useCallback, useRef } from "react";
 import { ChatList } from "@/components/chat/ChatList";
 import { ChatWindow } from "@/components/chat/ChatWindow";
-import { Message, EnhancedChatItem } from "@/types/chat";
+import { ChatMessage, EnhancedChatItem, ChatListItem } from "@/types/chat";
 import { useAuthStore } from "@/stores/auth.store";
 import { Button } from "@/components/ui/button";
 import { Loader2 } from "lucide-react";
 import { ChevronLeft } from "lucide-react";
 import {
-  listUserChats,
   getMessagesByChat,
   joinChat,
   sendMessage as sendMessageSocket,
   markMessagesAsRead,
+  listUserChats,
 } from "@/services/socketChat";
 import socket from "@/lib/socket";
 import { useRouter } from "next/navigation";
-import { ChatMessage, ChatListItem } from "@/types/chat";
 
 export default function ChatPage() {
   const user = useAuthStore((state) => state.user);
@@ -30,7 +29,7 @@ export default function ChatPage() {
   const [selectedChat, setSelectedChat] = useState<EnhancedChatItem | null>(
     null
   );
-  const [messages, setMessages] = useState<Message[]>([]);
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [hasMore, setHasMore] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -55,15 +54,22 @@ export default function ChatPage() {
 
   // Track socket connection state
   useEffect(() => {
-    const handleConnect = () => setIsSocketConnected(true);
-    const handleDisconnect = () => setIsSocketConnected(false);
+    const handleConnect = () => {
+      setIsSocketConnected(true);
+    };
+    const handleDisconnect = () => {
+      setIsSocketConnected(false);
+    };
     socket.on("connect", handleConnect);
     socket.on("disconnect", handleDisconnect);
+    
     return () => {
       socket.off("connect", handleConnect);
       socket.off("disconnect", handleDisconnect);
     };
-  }, []);
+  }, [user?.id]);
+
+
 
   // Fetch user chats on mount and when searchQuery or socket connection changes
   useEffect(() => {
@@ -120,18 +126,32 @@ export default function ChatPage() {
         console.log("[chat/page] joining room", { roomId, socketId: socket.id });
         joinChat(roomId);
       }
+
       getMessagesByChat(
         { chatId: roomId!, limit: 20 },
         (result: ChatMessage[]) => {
           const msgs = result;
           // Backend now returns ASC order (oldest first), which matches display expectations
           setMessages(Array.isArray(msgs) ? msgs : []);
+          setLoading(false);
+          
+          // Mark messages as read for this chat
+          if (user?.id && selectedChat.chatId) {
+            markMessagesAsRead(selectedChat.chatId, user.id);
+          }
+          
+          // Scroll to bottom after messages are loaded
+          setTimeout(() => {
+            if (chatWindowRef.current?.scrollToBottom) {
+              chatWindowRef.current.scrollToBottom();
+            }
+          }, 100);
         }
       );
     } else {
       setMessages([]);
     }
-  }, [selectedChat]);
+  }, [selectedChat, user?.id]);
 
   // Listen for new incoming messages
 		useEffect(() => {
@@ -139,6 +159,7 @@ export default function ChatPage() {
 				console.log("[chat/page][in] message event", msg);
 				const currentRoomId = selectedChat?.chatId || selectedChat?.id;
 				if (currentRoomId && msg.chatId === currentRoomId) {
+
 					setMessages((prev) =>
 						prev.some((m) => m.id === msg.id) ? prev : [...prev, msg]
 					);
@@ -164,6 +185,7 @@ export default function ChatPage() {
 			};
 		}, [selectedChat, user]);
 
+
   // Debug wrappers for pending media setters
   const debugSetPendingImageUrl = (url: string) => {
     setPendingImageUrl(url);
@@ -185,8 +207,8 @@ export default function ChatPage() {
      
       sendMessageSocket(
         {
-          chatId: selectedChat.chatId,
-          userId: selectedChat.userId, // recipient's userId
+          chatId: selectedChat.chatId!,
+          userId: selectedChat.userId!, // recipient's userId - required by backend
           content: pendingMessage || "",
           imageUrl: pendingImageUrl || undefined,
           audioUrl: pendingAudioUrl || undefined,
@@ -207,6 +229,7 @@ export default function ChatPage() {
 
   const handleSelectChat = (chat: EnhancedChatItem) => {
     console.log("[chat/page] select chat", chat);
+
     if (
       previousChatIdRef.current &&
       previousChatIdRef.current !== chat.chatId
@@ -216,7 +239,8 @@ export default function ChatPage() {
         if (ack !== undefined) console.log("[chat/page][in] leave ack", ack);
       });
     }
-    // Join new chat room
+    
+    // Join new chat room using the service function
     if (chat.type === "chat" && chat.chatId) {
       const roomId = chat.chatId || chat.id;
       console.log("[chat/page][out] join", roomId);
@@ -224,7 +248,9 @@ export default function ChatPage() {
         if (ack !== undefined) console.log("[chat/page][in] join ack", ack);
       });
       previousChatIdRef.current = roomId;
+
     }
+    
     setSelectedChat(chat);
     // Auto-close sidebar on mobile when chat is selected
     if (window.innerWidth < 768) {
@@ -313,7 +339,7 @@ export default function ChatPage() {
     };
   }, [searchQuery, selectedChat]);
 
-  // Restore handleSendMessage function
+    // Restore handleSendMessage function
   const handleSendMessage = useCallback(
     (content: string, imageUrl?: string, audioUrl?: string) => {
       // send message for selected chat
@@ -328,6 +354,7 @@ export default function ChatPage() {
         sendMessageSocket(
           newChatPayload,
           (msg: Message) => {
+
             // After first message, join the new chat room and update selectedChat
             if (msg.chatId) {
               joinChat(msg.chatId);
@@ -379,16 +406,19 @@ export default function ChatPage() {
         );
         return;
       }
+      
       // Existing chat
       const payload = {
         chatId: selectedChat.chatId!,
+        userId: selectedChat.userId!, // Required by backend
         content,
         imageUrl,
         audioUrl,
       };
+
       sendMessageSocket(
         payload,
-        (msg: Message) => {
+        (msg: ChatMessage) => {
           setMessages((prev) =>
             prev.some((m) => m.id === msg.id) ? prev : [...prev, msg]
           );
@@ -402,7 +432,6 @@ export default function ChatPage() {
     [user, selectedChat]
   );
 
-  // Removed deep debug listeners
 
   useEffect(() => {
     if (!user) return;
@@ -419,6 +448,7 @@ export default function ChatPage() {
       socket.off("connect", handleConnect);
     };
   }, [user]);
+
 
   // Responsive mobile detection
   useEffect(() => {
@@ -439,16 +469,14 @@ export default function ChatPage() {
 
   useEffect(() => {
     function handleMessagesRead({ chatId }: { chatId: string }) {
-     
       if (selectedChat?.chatId === chatId) {
-      
         getMessagesByChat({ chatId }, (result: ChatMessage[]) => {
           const msgs = result;
-      
           setMessages(Array.isArray(msgs) ? msgs : []);
         });
       }
    
+      // Always refresh chat list when messages are read
       listUserChats(
         { page: 1, limit: 10, search: searchQuery },
         (result: ChatListItem[]) => {
@@ -462,11 +490,12 @@ export default function ChatPage() {
         }
       );
     }
+    
     socket.on("messagesRead", handleMessagesRead);
     return () => {
       socket.off("messagesRead", handleMessagesRead);
     };
-  }, [selectedChat, searchQuery, user]);
+  }, [selectedChat?.chatId, searchQuery, user?.id]); // More stable dependencies
 
   useEffect(() => {
     function handleMessageDeleted({ messageId, chatId }: { messageId: string; chatId: string }) {
@@ -578,6 +607,7 @@ export default function ChatPage() {
                   }}
                   setPendingImageUrl={debugSetPendingImageUrl}
                   setPendingAudioUrl={debugSetPendingAudioUrl}
+                  loadingMoreMessages={loading}
                 />
               </div>
             )}

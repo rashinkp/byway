@@ -158,6 +158,20 @@ export class MessageRepository implements IMessageRepository {
         where: { id: message.chatId.value },
         data: { updatedAt: message.createdAt.value },
       });
+
+    });
+    
+    // Return the message with the generated ID
+    return Message.fromPersistence(createdMessage as unknown as {
+      chatId: string;
+      senderId: string;
+      content: string | null;
+      imageUrl: string | null;
+      audioUrl: string | null;
+      type: string;
+      isRead: boolean;
+      createdAt: Date;
+      id?: string;
     });
   }
 

@@ -11,6 +11,7 @@ import {
   DeleteMessageData,
 } from "@/types/chat";
 
+
 // Normalize API-wrapped socket payloads
 function unwrapArray<T>(payload: unknown): T[] {
   if (Array.isArray(payload)) return payload as T[];
@@ -51,6 +52,7 @@ function unwrapObject<T>(payload: unknown): T | null {
 export const joinChat = (chatId: string) => {
   socket.emit("join", chatId);
   socket.emit("joinChat", { chatId });
+
 };
 
 export const sendMessage = (
@@ -80,6 +82,7 @@ export const sendMessage = (
     onError?.({ message });
     cleanup();
   };
+
 
   const handleSuccess = () => (payload: unknown) => {
     if (settled) return;
@@ -203,6 +206,7 @@ export const deleteMessage = (
 export const createChatSocket = (
   data: CreateChatData,
   callback?: (chat: Chat) => void
+
 ) => {
   socket.emit("createChat", data);
   if (callback) {
@@ -214,4 +218,37 @@ export const createChatSocket = (
 
 export const markMessagesAsRead = (chatId: string, userId: string) => {
   socket.emit("markMessagesAsRead", { chatId, userId });
+};
+
+export const listUserChats = (
+	data: GetChatHistoryData = {},
+	callback: (result: any[]) => void,
+) => {
+	logger.info('Requesting user chats', {
+		page: data.page,
+		limit: data.limit,
+		search: data.search,
+		socketConnected: socket.connected,
+		socketId: socket.id,
+		timestamp: new Date().toISOString(),
+	});
+
+	if (!socket.connected) {
+		logger.error('Failed to get user chats - socket not connected', {
+			timestamp: new Date().toISOString(),
+		});
+		return;
+	}
+
+	socket.emit("listUserChats", data);
+
+	socket.once("userChats", (result: any[]) => {
+		logger.info('User chats received', {
+			chatCount: result?.length || 0,
+			resultType: typeof result,
+			isArray: Array.isArray(result),
+			timestamp: new Date().toISOString(),
+		});
+		callback(result || []);
+	});
 };

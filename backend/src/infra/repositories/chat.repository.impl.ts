@@ -199,10 +199,10 @@ export class ChatRepository implements IChatRepository {
                   content: lastMessage.content || undefined,
                   imageUrl: lastMessage.imageUrl || undefined,
                   audioUrl: lastMessage.audioUrl || undefined,
-                  type: lastMessage.type?.toLowerCase() as
-                    | "text"
-                    | "image"
-                    | "audio",
+                  type: lastMessage.type as
+                    | "TEXT"
+                    | "IMAGE"
+                    | "AUDIO",
                 }
               : undefined,
             lastMessageTime: lastMessage?.createdAt
@@ -281,10 +281,10 @@ export class ChatRepository implements IChatRepository {
                   content: lastMessage.content || undefined,
                   imageUrl: lastMessage.imageUrl || undefined,
                   audioUrl: lastMessage.audioUrl || undefined,
-                  type: lastMessage.type?.toLowerCase() as
-                    | "text"
-                    | "image"
-                    | "audio",
+                  type: lastMessage.type as
+                    | "TEXT"
+                    | "IMAGE"
+                    | "AUDIO",
                 }
               : undefined,
             lastMessageTime: lastMessage?.createdAt
@@ -366,6 +366,7 @@ export class ChatRepository implements IChatRepository {
         avatar: user.avatar || undefined,
         role: user.role,
         userId: user.id,
+        unreadCount: 0,
         isOnline: false,
       }));
       chatItems.push(...userItems);
