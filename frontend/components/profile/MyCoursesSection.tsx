@@ -7,8 +7,9 @@ import { Course } from "@/types/course";
 import { useGetEnrolledCourses } from "@/hooks/course/useGetEnrolledCourses";
 import { motion } from "framer-motion";
 import { CourseCard } from "@/components/course/CourseCard";
+import { CourseCardSkeleton } from "@/components/course/CourseCardSkeleton";
 import Link from "next/link";
-import { BookOpen } from "lucide-react";
+import { BookOpen, Loader2 } from "lucide-react";
 
 export default function MyCoursesSection() {
 	const itemsPerPage = 8;
@@ -92,40 +93,59 @@ export default function MyCoursesSection() {
 				</p>
 			</div>
 
-			{/* Course Grid */}
-			<motion.div
-				className="w-full"
-				variants={containerVariants}
-				initial="hidden"
-				animate={isLoaded ? "show" : "hidden"}
-			>
-				<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
-					{courses.map((course) => (
-						<motion.div
-							key={course.id}
-							className="w-full max-w-xs mx-auto"
-							variants={{
-								hidden: { opacity: 0, y: 20 },
-								show: {
-									opacity: 1,
-									y: 0,
-									transition: { duration: 0.4, ease: "easeOut" },
-								},
-							}}
-						>
-							<Link href={`/courses/${course.id}`} className="block h-full">
-								<CourseCard
-									course={course}
-									className="w-full h-full hover:shadow-lg transition-shadow duration-300 bg-[var(--color-background)]"
-								/>
-							</Link>
-						</motion.div>
-					))}
+			{/* Loading State */}
+			{isLoading && (
+				<div className="w-full">
+					<div className="flex items-center justify-center mb-6">
+						<Loader2 className="w-6 h-6 text-[#facc15] animate-spin mr-2" />
+						<span className="text-gray-600 dark:text-gray-300 font-medium">Loading your courses...</span>
+					</div>
+					<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
+						{Array.from({ length: itemsPerPage }).map((_, index) => (
+							<div key={index} className="w-full max-w-xs mx-auto">
+								<CourseCardSkeleton />
+							</div>
+						))}
+					</div>
 				</div>
-			</motion.div>
+			)}
+
+			{/* Course Grid */}
+			{!isLoading && (
+				<motion.div
+					className="w-full"
+					variants={containerVariants}
+					initial="hidden"
+					animate={isLoaded ? "show" : "hidden"}
+				>
+					<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
+						{courses.map((course) => (
+							<motion.div
+								key={course.id}
+								className="w-full max-w-xs mx-auto"
+								variants={{
+									hidden: { opacity: 0, y: 20 },
+									show: {
+										opacity: 1,
+										y: 0,
+										transition: { duration: 0.4, ease: "easeOut" },
+									},
+								}}
+							>
+								<Link href={`/courses/${course.id}`} className="block h-full">
+									<CourseCard
+										course={course}
+										className="w-full h-full hover:shadow-lg transition-shadow duration-300 bg-[var(--color-background)]"
+									/>
+								</Link>
+							</motion.div>
+						))}
+					</div>
+				</motion.div>
+			)}
 
 			{/* Pagination */}
-			{totalPages > 1 && (
+			{!isLoading && totalPages > 1 && (
 				<div className="mt-8">
 					<Pagination
 						totalPages={totalPages}
