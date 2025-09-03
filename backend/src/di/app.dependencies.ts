@@ -57,19 +57,25 @@ import { ICartRepository } from "../app/repositories/cart.repository";
 import { ICourseReviewRepository } from "../app/repositories/course-review.repository.interface";
 import { ILessonRepository } from "../app/repositories/lesson.repository";
 import { Router } from "express";
-import { RevenueDistributionService } from "../app/services/revenue-distribution/implementations/revenue-distribution.service";
-import { PaymentService } from "../app/services/payment/implementations/payment.service";
+import { DistributeRevenueUseCase } from "../app/usecases/revenue-distribution/implementations/distribute-revenue.usecase";
+import { HandleWalletPaymentUseCase } from "../app/usecases/payment/implementations/handle-wallet-payment.usecase";
+import { CreateStripeCheckoutSessionUseCase } from "../app/usecases/payment/implementations/create-stripe-checkout-session.usecase";
+import { HandleStripeWebhookUseCase } from "../app/usecases/payment/implementations/handle-stripe-webhook.usecase";
 import { GetTotalUnreadCountUseCase } from "../app/usecases/message/implementations/get-total-unread-count.usecase";
 import { CheckUserActiveUseCase } from "../app/usecases/user/implementations/check-user-active.usecase";
 import { LessonContentController } from "../presentation/http/controllers/content.controller";
 import { SendMessageUseCase } from "../app/usecases/message/implementations/send-message.usecase";
 import { CreateChatUseCase } from "../app/usecases/chat/implementations/create-chat.usecase";
 import { IMessageRepository } from "../app/repositories/message.repository.interface";
+import { PaymentDependencies } from "./payment.dependencies";
+import { IJwtProvider } from "../app/providers/jwt.provider.interface";
+import { ILogger } from "../app/providers/logger-provider.interface";
 
 export interface AppDependencies {
   authController: AuthController;
   userController: UserController;
   checkUserActiveUseCase: CheckUserActiveUseCase;
+  jwtProvider: IJwtProvider;
   instructorController: InstructorController;
   categoryController: CategoryController;
   courseController: CourseController;
@@ -108,6 +114,13 @@ export interface AppDependencies {
   lessonRepository: ILessonRepository;
   certificateController: CertificateController;
   getTotalUnreadCountUseCase: GetTotalUnreadCountUseCase;
+  // Payment use cases
+  handleWalletPaymentUseCase: HandleWalletPaymentUseCase;
+  createStripeCheckoutSessionUseCase: CreateStripeCheckoutSessionUseCase;
+  handleStripeWebhookUseCase: HandleStripeWebhookUseCase;
+  // Revenue distribution use case
+  distributeRevenueUseCase: DistributeRevenueUseCase;
+  logger: ILogger;
 }
 
 export function createAppDependencies(): AppDependencies {
@@ -115,8 +128,8 @@ export function createAppDependencies(): AppDependencies {
   const notificationDeps = createNotificationDependencies(shared);
   const { prisma, httpErrors, httpSuccess } = shared;
 
-  // Create the real RevenueDistributionService
-  const revenueDistributionService = new RevenueDistributionService(
+  // Create the real DistributeRevenueUseCase
+  const distributeRevenueUseCase = new DistributeRevenueUseCase(
     shared.walletRepository,
     shared.transactionRepository,
     shared.orderRepository,
@@ -124,21 +137,41 @@ export function createAppDependencies(): AppDependencies {
     notificationDeps.createNotificationsForUsersUseCase
   );
 
-  // Create the real PaymentService
-  const paymentService = new PaymentService(
+  // Create the payment use cases
+  const handleWalletPaymentUseCase = new HandleWalletPaymentUseCase(
     shared.walletRepository,
     shared.orderRepository,
     shared.transactionRepository,
     shared.enrollmentRepository,
-    shared.paymentGateway,
-    shared.webhookGateway,
-    shared.userRepository,
-    revenueDistributionService,
-    shared.cartRepository
+    shared.cartRepository,
+    distributeRevenueUseCase
   );
 
-  // Override the paymentService in shared
-  shared.paymentService = paymentService;
+  const createStripeCheckoutSessionUseCase = new CreateStripeCheckoutSessionUseCase(
+    shared.userRepository,
+    shared.enrollmentRepository,
+    shared.paymentGateway
+  );
+
+  const handleStripeWebhookUseCase = new HandleStripeWebhookUseCase(
+    shared.transactionRepository,
+    shared.walletRepository,
+    shared.orderRepository,
+    shared.enrollmentRepository,
+    shared.cartRepository,
+    distributeRevenueUseCase,
+    shared.webhookGateway
+  );
+
+  // Create payment dependencies object
+  const paymentDeps: PaymentDependencies = {
+    createStripeCheckoutSessionUseCase,
+    handleWalletPaymentUseCase,
+    handleStripeWebhookUseCase,
+    distributeRevenueUseCase,
+  };
+
+
 
   const authDeps = createAuthDependencies(shared);
   const userDeps = createUserDependencies(
@@ -157,13 +190,13 @@ export function createAppDependencies(): AppDependencies {
   const lessonDeps = createLessonDependencies(shared);
   const lessonContentDeps = createLessonContentDependencies(shared);
   const cartDeps = createCartDependencies(shared);
-  const stripeDeps = createStripeDependencies(shared);
+  const stripeDeps = createStripeDependencies(shared, paymentDeps);
   const transactionDeps = createTransactionDependencies(shared);
-  const orderDeps = createOrderDependencies(shared);
+  const orderDeps = createOrderDependencies(shared, paymentDeps);
   const fileDeps = createFileDependencies(shared);
   const progressDeps = createProgressDependencies(shared);
   const courseReviewDeps = createCourseReviewDependencies(shared);
-  const walletDeps = createWalletDependencies(shared);
+  const walletDeps = createWalletDependencies(shared, paymentDeps);
   const revenueDeps = createRevenueDependencies(shared);
   const dashboardDeps = createDashboardDependencies(shared);
   const chatDeps = createChatDependencies(shared);
@@ -202,6 +235,7 @@ export function createAppDependencies(): AppDependencies {
     ...courseDeps,
     authController: authDeps.authController,
     userController: userDeps.userController,
+    jwtProvider: shared.jwtProvider,
     checkUserActiveUseCase: userDeps.checkUserActiveUseCase,
     instructorController: instructorDeps.instructorController,
     categoryController: categoryDeps.categoryController,
@@ -240,6 +274,13 @@ export function createAppDependencies(): AppDependencies {
     lessonRepository: shared.lessonRepository,
     certificateController: certificateDeps.certificateController,
     getTotalUnreadCountUseCase: chatDeps.getTotalUnreadCountUseCase,
+    // Payment use cases
+    handleWalletPaymentUseCase,
+    createStripeCheckoutSessionUseCase,
+    handleStripeWebhookUseCase,
+    // Revenue distribution use case
+    distributeRevenueUseCase,
+    logger: shared.logger,
   };
 }
 

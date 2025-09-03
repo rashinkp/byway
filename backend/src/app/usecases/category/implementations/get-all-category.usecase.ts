@@ -1,11 +1,11 @@
 import { ICategoryRepository } from "../../../repositories/category.repository";
-import { HttpError } from "../../../../presentation/http/errors/http-error";
 import { IGetAllCategoriesUseCase } from "../interfaces/get-all-categories.usecases.interface";
 import {
   ICategoryListOutputDTO,
   IGetAllCategoriesInputDTO,
 } from "../../../dtos/category.dto";
 import { PaginationFilter } from "../../../../domain/types/pagination-filter.interface";
+import { ValidationError } from "../../../../domain/errors/domain-errors";
 
 export class GetAllCategoriesUseCase implements IGetAllCategoriesUseCase {
   constructor(private _categoryRepository: ICategoryRepository) {}
@@ -50,9 +50,7 @@ export class GetAllCategoriesUseCase implements IGetAllCategoriesUseCase {
         total,
       };
     } catch (error) {
-      throw error instanceof HttpError
-        ? error
-        : new HttpError("Failed to retrieve categories", 500);
+      throw new ValidationError("Failed to retrieve categories");
     }
   }
 }

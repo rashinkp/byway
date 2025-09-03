@@ -1,6 +1,5 @@
 import { DeclineInstructorRequestDTO, InstructorResponseDTO } from "../../../dtos/instructor.dto";
 import { Role } from "../../../../domain/enum/role.enum";
-import { HttpError } from "../../../../presentation/http/errors/http-error";
 import { IInstructorRepository } from "../../../repositories/instructor.repository";
 import { IDeclineInstructorUseCase } from "../interfaces/decline-instructor.usecase.interface";
 import { CreateNotificationsForUsersUseCase } from "../../notification/implementations/create-notifications-for-users.usecase";
@@ -8,6 +7,7 @@ import { NotificationEventType } from "../../../../domain/enum/notification-even
 import { NotificationEntityType } from "../../../../domain/enum/notification-entity-type.enum";
 import { IUserRepository } from "../../../repositories/user.repository";
 import { UserDTO } from "../../../dtos/general.dto";
+import { UserAuthorizationError, NotFoundError } from "../../../../domain/errors/domain-errors";
 
 export class DeclineInstructorUseCase implements IDeclineInstructorUseCase {
   constructor(
@@ -21,14 +21,14 @@ export class DeclineInstructorUseCase implements IDeclineInstructorUseCase {
     requestingUser: UserDTO
   ): Promise<InstructorResponseDTO> {
     if (requestingUser.role !== Role.ADMIN) {
-      throw new HttpError("Unauthorized: Admin access required", 403);
+      throw new UserAuthorizationError("Unauthorized: Admin access required");
     }
 
     const instructor = await this._instructorRepository.findInstructorById(
       dto.instructorId
     );
     if (!instructor) {
-      throw new HttpError("Instructor not found", 404);
+      throw new NotFoundError("Instructor", dto.instructorId);
     }
 
     instructor.decline();

@@ -2,11 +2,11 @@ export class ReviewTitle {
   private readonly _value: string;
 
   constructor(value: string) {
-    this.validate(value);
+    this._validate(value);
     this._value = value.trim();
   }
 
-  private validate(value: string): void {
+  private _validate(value: string): void {
     if (!value || value.trim().length === 0) {
       throw new Error("Review title cannot be empty");
     }

@@ -80,7 +80,7 @@ export class Category {
     description?: string
   ): Category {
     const props: CategoryProps = {
-      ...existingCategory.getProps(),
+      ...existingCategory._getProps(),
       updatedAt: new Date(),
     };
 
@@ -159,7 +159,7 @@ export class Category {
     return this._deletedAt;
   }
 
-  private getProps(): CategoryProps {
+  private _getProps(): CategoryProps {
     return {
       id: this._id,
       name: this._name,

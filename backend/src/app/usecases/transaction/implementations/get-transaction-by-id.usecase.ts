@@ -11,10 +11,10 @@ export class GetTransactionByIdUseCase implements IGetTransactionByIdUseCase {
     if (!transaction) {
       return null;
     }
-    return this.mapToDTO(transaction);
+    return this._mapToDTO(transaction);
   }
 
-  private mapToDTO(transaction: Transaction): ITransactionOutputDTO {
+  private _mapToDTO(transaction: Transaction): ITransactionOutputDTO {
     return {
       id: transaction.id,
       orderId: transaction.orderId,

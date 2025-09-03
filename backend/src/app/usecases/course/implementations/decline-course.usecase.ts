@@ -3,13 +3,13 @@ import {
   IUpdateCourseApprovalInputDTO,
 } from "../../../dtos/course.dto";
 import { APPROVALSTATUS } from "../../../../domain/enum/approval-status.enum";
-import { HttpError } from "../../../../presentation/http/errors/http-error";
 import { ICourseRepository } from "../../../repositories/course.repository.interface";
 import { IDeclineCourseUseCase } from "../interfaces/decline-course.usecase.interface";
 import { IUserRepository } from "../../../repositories/user.repository";
 import { CreateNotificationsForUsersUseCase } from "../../notification/implementations/create-notifications-for-users.usecase";
 import { NotificationEventType } from "../../../../domain/enum/notification-event-type.enum";
 import { NotificationEntityType } from "../../../../domain/enum/notification-entity-type.enum";
+import { CourseNotFoundError } from "../../../../domain/errors/domain-errors";
 
 export class DeclineCourseUseCase implements IDeclineCourseUseCase {
   constructor(
@@ -22,7 +22,7 @@ export class DeclineCourseUseCase implements IDeclineCourseUseCase {
   ): Promise<ICourseWithDetailsDTO> {
     const course = await this._courseRepository.findById(input.courseId);
     if (!course) {
-      throw new HttpError("Course not found", 404);
+      throw new CourseNotFoundError(input.courseId);
     }
 
     course.setApprovalStatus(APPROVALSTATUS.DECLINED);
@@ -40,6 +40,36 @@ export class DeclineCourseUseCase implements IDeclineCourseUseCase {
       link: `/instructor/courses/${course.id}`,
     });
 
-    return updatedCourse.toJSON() as unknown as ICourseWithDetailsDTO;
+    // Map domain entity to DTO
+    return {
+      id: updatedCourse.id,
+      title: updatedCourse.title,
+      description: updatedCourse.description,
+      level: updatedCourse.level,
+      price: updatedCourse.price?.getValue() ?? null,
+      thumbnail: updatedCourse.thumbnail,
+      duration: updatedCourse.duration?.getValue() ?? null,
+      offer: updatedCourse.offer?.getValue() ?? null,
+      status: updatedCourse.status,
+      categoryId: updatedCourse.categoryId,
+      createdBy: updatedCourse.createdBy,
+      createdAt: updatedCourse.createdAt.toISOString(),
+      updatedAt: updatedCourse.updatedAt.toISOString(),
+      deletedAt: updatedCourse.deletedAt?.toISOString() ?? null,
+      approvalStatus: updatedCourse.approvalStatus,
+      adminSharePercentage: updatedCourse.adminSharePercentage,
+      instructorSharePercentage: 100 - updatedCourse.adminSharePercentage,
+      details: updatedCourse.details?.toJSON() ?? null,
+      rating: updatedCourse.rating,
+      reviewCount: updatedCourse.reviewCount,
+              lessons: updatedCourse.lessons,
+        bestSeller: updatedCourse.bestSeller,
+        reviewStats: {
+          averageRating: updatedCourse.rating || 0,
+          totalReviews: updatedCourse.reviewCount || 0,
+          ratingDistribution: { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 },
+          ratingPercentages: { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 },
+        },
+    };
   }
 }

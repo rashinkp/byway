@@ -1,56 +1,49 @@
+import { IDistributeRevenueUseCase } from "../interfaces/distribute-revenue.usecase.interface";
 import { IWalletRepository } from "../../../repositories/wallet.repository.interface";
 import { ITransactionRepository } from "../../../repositories/transaction.repository";
 import { TransactionType } from "../../../../domain/enum/transaction-type.enum";
 import { TransactionStatus } from "../../../../domain/enum/transaction-status.enum";
 import { PaymentGateway } from "../../../../domain/enum/payment-gateway.enum";
-import { HttpError } from "../../../../presentation/http/errors/http-error";
-import { StatusCodes } from "http-status-codes";
-import { IRevenueDistributionService } from "../interfaces/revenue-distribution.service.interface";
 import { IOrderRepository } from "../../../repositories/order.repository";
 import { Transaction } from "../../../../domain/entities/transaction.entity";
 import { Wallet } from "../../../../domain/entities/wallet.entity";
 import { IUserRepository } from "../../../repositories/user.repository";
-import { CreateNotificationsForUsersUseCase } from "../../../usecases/notification/implementations/create-notifications-for-users.usecase";
 import { NotificationEventType } from "../../../../domain/enum/notification-event-type.enum";
 import { NotificationEntityType } from "../../../../domain/enum/notification-entity-type.enum";
+import { CreateNotificationsForUsersUseCaseInterface } from "../../notification/interfaces/create-notifications-for-users.usecase.interface";
+import { NotFoundError, ValidationError } from "../../../../domain/errors/domain-errors";
 
-export class RevenueDistributionService implements IRevenueDistributionService {
-  private readonly ADMIN_SHARE_PERCENTAGE = 20;
-  private readonly INSTRUCTOR_SHARE_PERCENTAGE = 80;
+export class DistributeRevenueUseCase implements IDistributeRevenueUseCase {
+  private readonly _ADMIN_SHARE_PERCENTAGE = 20;
+  private readonly _INSTRUCTOR_SHARE_PERCENTAGE = 80;
 
   constructor(
     private _walletRepository: IWalletRepository,
     private _transactionRepository: ITransactionRepository,
     private _orderRepository: IOrderRepository,
-    private _userRepository: IUserRepository,
-    private _createNotificationsForUsersUseCase: CreateNotificationsForUsersUseCase
+    private _userRepository: IUserRepository,                     
+    private _createNotificationsForUsersUseCase: CreateNotificationsForUsersUseCaseInterface
   ) {}
 
-  async distributeRevenue(orderId: string): Promise<void> {
+  async execute(orderId: string): Promise<void> {
     try {
       const orderItems = await this._orderRepository.findOrderItems(orderId);
 
       if (!orderItems || orderItems.length === 0) {
-        throw new HttpError("No order items found", StatusCodes.NOT_FOUND);
+        throw new NotFoundError("Order items", orderId);
       }
-
 
       for (const orderItem of orderItems) {
-        try {
-          await this.distributeRevenueForOrderItem(orderItem);
-        } catch (error) {
-          throw error; 
-        }
+        await this._distributeRevenueForOrderItem(orderItem);
       }
     } catch (error) {
-      throw new HttpError(
-        error instanceof Error ? error.message : "Error distributing revenue",
-        StatusCodes.INTERNAL_SERVER_ERROR
+      throw new ValidationError(
+        error instanceof Error ? error.message : "Error distributing revenue"
       );
     }
   }
 
-  private async distributeRevenueForOrderItem(orderItem: { 
+  private async _distributeRevenueForOrderItem(orderItem: { 
     id: string; 
     courseId: string; 
     orderId: string; 
@@ -62,16 +55,15 @@ export class RevenueDistributionService implements IRevenueDistributionService {
     );
 
     if (!course) {
-      throw new HttpError("Course not found", StatusCodes.NOT_FOUND);
+      throw new NotFoundError("Course", orderItem.courseId);
     }
 
-    const coursePrice = course.price?.getValue()?.toNumber() || 0;
+    const coursePrice = course.price?.getValue() || 0;
     const instructorId = course.createdBy;
-    const { adminShare, instructorShare } = this.calculateShares(coursePrice);
+    const { adminShare, instructorShare } = this._calculateShares(coursePrice);
 
-
-    await this.updateWallets(instructorId, adminShare, instructorShare);
-    await this.createTransactions(
+    await this._updateWallets(instructorId, adminShare, instructorShare);
+    await this._createTransactions(
       instructorId,
       adminShare,
       instructorShare,
@@ -80,7 +72,7 @@ export class RevenueDistributionService implements IRevenueDistributionService {
     );
 
     // Send notifications to instructor and admin
-    await this.sendPurchaseNotifications(
+    await this._sendPurchaseNotifications(
       course,
       orderItem,
       instructorShare,
@@ -88,17 +80,17 @@ export class RevenueDistributionService implements IRevenueDistributionService {
     );
   }
 
-  private calculateShares(coursePrice: number): {
+  private _calculateShares(coursePrice: number): {
     adminShare: number;
     instructorShare: number;
   } {
-    const adminShare = (coursePrice * this.ADMIN_SHARE_PERCENTAGE) / 100;
+    const adminShare = (coursePrice * this._ADMIN_SHARE_PERCENTAGE) / 100;
     const instructorShare =
-      (coursePrice * this.INSTRUCTOR_SHARE_PERCENTAGE) / 100;
+      (coursePrice * this._INSTRUCTOR_SHARE_PERCENTAGE) / 100;
     return { adminShare, instructorShare };
   }
 
-  private async getAdminUserId(): Promise<string> {
+  private async _getAdminUserId(): Promise<string> {
     const { items } = await this._userRepository.findAll({
       role: "ADMIN",
       page: 1,
@@ -111,18 +103,18 @@ export class RevenueDistributionService implements IRevenueDistributionService {
     });
 
     if (!items || items.length === 0) {
-      throw new HttpError("Admin user not found", StatusCodes.NOT_FOUND);
+      throw new NotFoundError("Admin user", "unknown");
     }
     return items[0].id;
   }
 
-  private async updateWallets(
+  private async _updateWallets(
     instructorId: string,
     adminShare: number,
     instructorShare: number
   ): Promise<void> {
     // Get admin user ID
-    const adminId = await this.getAdminUserId();
+    const adminId = await this._getAdminUserId();
 
     // Get or create admin wallet
     let adminWallet = await this._walletRepository.findByUserId(adminId);
@@ -145,14 +137,14 @@ export class RevenueDistributionService implements IRevenueDistributionService {
     await this._walletRepository.update(instructorWallet);
   }
 
-  private async createTransactions(
+  private async _createTransactions(
     instructorId: string,
     adminShare: number,
     instructorShare: number,
     orderId: string,
     coursePrice: number
   ): Promise<void> {
-    const adminId = await this.getAdminUserId();
+    const adminId = await this._getAdminUserId();
 
     const adminTransaction = Transaction.create({
       userId: adminId,
@@ -178,14 +170,14 @@ export class RevenueDistributionService implements IRevenueDistributionService {
     await this._transactionRepository.create(instructorTransaction);
   }
 
-  private async sendPurchaseNotifications(
+  private async _sendPurchaseNotifications(
     course: { id: string; title: string; createdBy: string },
     orderItem: { orderId: string },
     instructorShare: number,
     adminShare: number
   ): Promise<void> {
       // Get admin user ID and order details
-      const adminId = await this.getAdminUserId();
+      const adminId = await this._getAdminUserId();
       const order = await this._orderRepository.findById(orderItem.orderId);
 
       if (!order) {
@@ -228,6 +220,5 @@ export class RevenueDistributionService implements IRevenueDistributionService {
         message: `Course "${course.title}" purchase completed! You're ready to start learning.`,
         link: `/user/my-courses`,
       });
-    
   }
 }

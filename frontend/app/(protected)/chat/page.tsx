@@ -119,17 +119,16 @@ export default function ChatPage() {
 
   // Fetch messages when selected chat changes (paginated)
   useEffect(() => {
-    if (!selectedChat) {
-      setMessages([]);
-      setCurrentPage(1);
-      setHasMore(false);
-      return;
-    }
-    
-    if (selectedChat.type === "chat" && selectedChat.chatId) {
-      setLoading(true);
+    if (!selectedChat) return;
+    if (selectedChat.type === "chat") {
+      const roomId = selectedChat.chatId || selectedChat.id;
+      if (roomId) {
+        console.log("[chat/page] joining room", { roomId, socketId: socket.id });
+        joinChat(roomId);
+      }
+
       getMessagesByChat(
-        { chatId: selectedChat.chatId, limit: 20 },
+        { chatId: roomId!, limit: 20 },
         (result: ChatMessage[]) => {
           const msgs = result;
           // Backend now returns ASC order (oldest first), which matches display expectations
@@ -156,8 +155,11 @@ export default function ChatPage() {
 
   // Listen for new incoming messages
 		useEffect(() => {
-			const handleMessage = (msg: ChatMessage) => {
-				if (msg.chatId === selectedChat?.chatId) {
+			const handleMessage = (msg: Message) => {
+				console.log("[chat/page][in] message event", msg);
+				const currentRoomId = selectedChat?.chatId || selectedChat?.id;
+				if (currentRoomId && msg.chatId === currentRoomId) {
+
 					setMessages((prev) =>
 						prev.some((m) => m.id === msg.id) ? prev : [...prev, msg]
 					);
@@ -167,20 +169,22 @@ export default function ChatPage() {
 				}
 			};
 			
-			socket.on("message", handleMessage);
-			socket.on("connect", () => {
-				setIsSidebarOpen(true);
-			});
-			socket.on("disconnect", () => {
-				setIsSidebarOpen(false);
-			});
-			
+			// Only attach listeners if we have a selected chat
+			if (selectedChat) {
+				console.log("[chat/page] attaching message listeners for chat:", selectedChat.id);
+				socket.on("message", handleMessage);
+				socket.on("newMessage", handleMessage);
+				socket.on("messageCreated", handleMessage);
+			}
+
 			return () => {
+				// Clean up all listeners when component unmounts or selectedChat changes
 				socket.off("message", handleMessage);
-				socket.off("connect");
-				socket.off("disconnect");
+				socket.off("newMessage", handleMessage);
+				socket.off("messageCreated", handleMessage);
 			};
-		}, [selectedChat?.chatId, user?.id]); // More stable dependencies
+		}, [selectedChat, user]);
+
 
   // Debug wrappers for pending media setters
   const debugSetPendingImageUrl = (url: string) => {
@@ -224,18 +228,26 @@ export default function ChatPage() {
   }, [pendingMessage, pendingImageUrl, pendingAudioUrl, selectedChat, user]);
 
   const handleSelectChat = (chat: EnhancedChatItem) => {
+
     if (
       previousChatIdRef.current &&
       previousChatIdRef.current !== chat.chatId
     ) {
-      socket.emit("leave", previousChatIdRef.current);
+      console.log("[chat/page][out] leave", previousChatIdRef.current);
+      socket.emit("leave", previousChatIdRef.current, (ack?: unknown) => {
+        if (ack !== undefined) console.log("[chat/page][in] leave ack", ack);
+      });
     }
     
     // Join new chat room using the service function
     if (chat.type === "chat" && chat.chatId) {
-      const chatId = chat.chatId; // Extract to avoid TypeScript issues
-      joinChat(chatId);
-      previousChatIdRef.current = chatId;
+      const roomId = chat.chatId || chat.id;
+      console.log("[chat/page][out] join", roomId);
+      socket.emit("join", roomId, (ack?: unknown) => {
+        if (ack !== undefined) console.log("[chat/page][in] join ack", ack);
+      });
+      previousChatIdRef.current = roomId;
+
     }
     
     setSelectedChat(chat);
@@ -309,37 +321,39 @@ export default function ChatPage() {
           }
         }
       );
+
+      // Also refresh messages for the currently open chat (fallback if no live message event)
+      if (selectedChat?.chatId) {
+        getMessagesByChat({ chatId: selectedChat.chatId }, (result: ChatMessage[]) => {
+          const msgs = result;
+          if (Array.isArray(msgs)) {
+            setMessages(msgs);
+          }
+        });
+      }
     }
     socket.on("chatListUpdated", handleChatListUpdated);
     return () => {
       socket.off("chatListUpdated", handleChatListUpdated);
     };
-  }, [searchQuery]);
+  }, [searchQuery, selectedChat]);
 
     // Restore handleSendMessage function
   const handleSendMessage = useCallback(
     (content: string, imageUrl?: string, audioUrl?: string) => {
-      if (!user || !selectedChat) {
-        return;
-      }
-      
+      // send message for selected chat
+      if (!user || !selectedChat) return;
       if (selectedChat.type === "user") {
-        // For new chats, chatId might not exist yet
-        const messageData: any = {
-          userId: selectedChat.userId!, // Required by backend
-          content,  
+        const newChatPayload = {
+          userId: selectedChat.userId,
+          content,
           imageUrl,
           audioUrl,
         };
-        
-        // Only include chatId if it exists
-        if (selectedChat.chatId) {
-          messageData.chatId = selectedChat.chatId;
-        }
-        
         sendMessageSocket(
-          messageData,
-          (msg: ChatMessage) => {
+          newChatPayload,
+          (msg: Message) => {
+
             // After first message, join the new chat room and update selectedChat
             if (msg.chatId) {
               joinChat(msg.chatId);
@@ -385,6 +399,7 @@ export default function ChatPage() {
             }
           },
           (err: { message?: string }) => {
+            console.log("[chat/page][err] sendMessage (new chat)", err);
             alert(err?.message || "Failed to send message");
           }
         );
@@ -399,7 +414,7 @@ export default function ChatPage() {
         imageUrl,
         audioUrl,
       };
-      
+
       sendMessageSocket(
         payload,
         (msg: ChatMessage) => {
@@ -416,8 +431,24 @@ export default function ChatPage() {
     [user, selectedChat]
   );
 
-  // Note: Backend automatically joins user to their personal room on connection
-  // No need to manually emit "join" event for user's personal room
+  // Removed deep debug listeners
+
+  useEffect(() => {
+    if (!user) return;
+    const handleConnect = () => {
+     
+      socket.emit("join", user.id);
+    };
+    socket.on("connect", handleConnect);
+    // If already connected, join immediately
+    if (socket.connected) {
+      handleConnect();
+    }
+    return () => {
+      socket.off("connect", handleConnect);
+    };
+  }, [user]);
+
 
   // Responsive mobile detection
   useEffect(() => {

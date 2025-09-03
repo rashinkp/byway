@@ -6,17 +6,17 @@ import { HttpError } from "../errors/http-error";
 import { ZodError } from "zod";
 
 export class ErrorHandlerMiddleware {
-  constructor(private httpErrors: IHttpErrors) {}
+  constructor(private _httpErrors: IHttpErrors) {}
 
   handle(error: unknown): IHttpResponse {
     if (error instanceof UnauthorizedError) {
-      return this.httpErrors.error_401(error.message);
+      return this._httpErrors.error_401(error.message);
     }
     if (error instanceof BadRequestError) {
-      return this.httpErrors.error_400(error.message);
+      return this._httpErrors.error_400(error.message);
     }
     if (error instanceof ZodError) {
-      return this.httpErrors.error_422(error.message);
+      return this._httpErrors.error_422(error.message);
     }
     if (error instanceof HttpError) {
       return {
@@ -29,6 +29,6 @@ export class ErrorHandlerMiddleware {
         },
       };
     }
-    return this.httpErrors.error_500(error instanceof Error ? error.message : "An unexpected error occurred");
+    return this._httpErrors.error_500(error instanceof Error ? error.message : "An unexpected error occurred");
   }
 } 

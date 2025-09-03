@@ -3,8 +3,7 @@ import { IRevenueRepository } from "../../../repositories/revenue.repository";
 import { IUserRepository } from "../../../repositories/user.repository";
 import { IEnrollmentRepository } from "../../../repositories/enrollment.repository.interface";
 import { ICourseRepository } from "../../../repositories/course.repository.interface";
-import { DashboardInput, InstructorDashboardResponse, StudentStats } from "../../../dtos/stats.dto";
-import { CourseStats } from "../../../../domain/types/course-stats.interface";
+import { DashboardInput, InstructorDashboardResponse, } from "../../../dtos/stats.dto";
 import { Enrollment } from "../../../../domain/entities/enrollment.entity";
 
 export class GetInstructorDashboardUseCase implements IGetInstructorDashboardUseCase {
@@ -17,14 +16,12 @@ export class GetInstructorDashboardUseCase implements IGetInstructorDashboardUse
 
   async execute(input: DashboardInput): Promise<InstructorDashboardResponse> {
     const { instructorId, limit = 5 } = input;
-
-    // Get all courses by this instructor (including deleted courses)
     const coursesResponse = await this._courseRepository.findAll({
       userId: instructorId,
-      includeDeleted: true, // Include deleted courses
-      role: "INSTRUCTOR", // Set role to INSTRUCTOR to get correct filtering
+      includeDeleted: true, 
+      role: "INSTRUCTOR", 
       page: 1,
-      limit: 1000, // Get all courses
+      limit: 1000, 
     });
     const courses = coursesResponse.items;
     const courseIds = courses.map((c: { id: string }) => c.id);
@@ -74,7 +71,6 @@ export class GetInstructorDashboardUseCase implements IGetInstructorDashboardUse
       await this._courseRepository.getTopEnrolledCourses({
         userId: instructorId,
         limit,
-        role: "INSTRUCTOR",
       });
 
     // Map to correct type (no need to filter since repository handles it)

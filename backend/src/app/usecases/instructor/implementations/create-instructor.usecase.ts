@@ -1,11 +1,11 @@
 import { CreateInstructorRequestDTO, InstructorResponseDTO } from "../../../dtos/instructor.dto";
 import { Instructor } from "../../../../domain/entities/instructor.entity";
 import { Role } from "../../../../domain/enum/role.enum";
-import { HttpError } from "../../../../presentation/http/errors/http-error";
 import { IInstructorRepository } from "../../../repositories/instructor.repository";
 import { IUserRepository } from "../../../repositories/user.repository";
 import { ICreateInstructorUseCase } from "../interfaces/create-instructor.usecase.interface";
 import { UserDTO } from "../../../dtos/general.dto";
+import { UserAuthorizationError, BusinessRuleViolationError, UserNotFoundError } from "../../../../domain/errors/domain-errors";
 
 export class CreateInstructorUseCase implements ICreateInstructorUseCase {
   constructor(
@@ -21,16 +21,15 @@ export class CreateInstructorUseCase implements ICreateInstructorUseCase {
       requestingUser.id !== dto.userId &&
       requestingUser.role !== Role.ADMIN
     ) {
-      throw new HttpError(
-        "Unauthorized: Cannot create instructor for another user",
-        403
+      throw new UserAuthorizationError(
+        "Unauthorized: Cannot create instructor for another user"
       );
     }
 
     const existingInstructor =
       await this._instructorRepository.findInstructorByUserId(dto.userId);
     if (existingInstructor?.status === "PENDING") {
-      throw new HttpError("Your application is under process please wait", 400);
+      throw new BusinessRuleViolationError("Your application is under process please wait");
     }
 
     if (
@@ -42,16 +41,15 @@ export class CreateInstructorUseCase implements ICreateInstructorUseCase {
       const twentyFourHoursInMs = 24 * 60 * 60 * 1000;
 
       if (now.getTime() - updatedAt.getTime() < twentyFourHoursInMs) {
-        throw new HttpError(
-          "Your application is declined. Please wait 24 hours before retrying.",
-          400
+        throw new BusinessRuleViolationError(
+          "Your application is declined. Please wait 24 hours before retrying."
         );
       }
     }
 
     const user = await this._userRepository.findById(dto.userId);
     if (!user) {
-      throw new HttpError("User not found", 404);
+      throw new UserNotFoundError(dto.userId);
     }
 
     const instructor = Instructor.create(dto);

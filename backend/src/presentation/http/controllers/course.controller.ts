@@ -29,16 +29,16 @@ import { ICreateCourseInputDTO, IUpdateCourseInputDTO, ICreateEnrollmentInputDTO
 
 export class CourseController extends BaseController {
   constructor(
-    private createCourseUseCase: ICreateCourseUseCase,
-    private getAllCoursesUseCase: IGetAllCoursesUseCase,
-    private getCourseWithDetailsUseCase: IGetCourseWithDetailsUseCase,
-    private updateCourseUseCase: IUpdateCourseUseCase,
-    private deleteCourseUseCase: IDeleteCourseUseCase,
-    private getEnrolledCoursesUseCase: IGetEnrolledCoursesUseCase,
-    private approveCourseUseCase: IApproveCourseUseCase,
-    private declineCourseUseCase: IDeclineCourseUseCase,
-    private enrollCourseUseCase: IEnrollCourseUseCase,
-    private getCourseStatsUseCase: IGetCourseStatsUseCase,
+    private _createCourseUseCase: ICreateCourseUseCase,
+    private _getAllCoursesUseCase: IGetAllCoursesUseCase,
+    private _getCourseWithDetailsUseCase: IGetCourseWithDetailsUseCase,
+    private _updateCourseUseCase: IUpdateCourseUseCase,
+    private _deleteCourseUseCase: IDeleteCourseUseCase,
+    private _getEnrolledCoursesUseCase: IGetEnrolledCoursesUseCase,
+    private _approveCourseUseCase: IApproveCourseUseCase,
+    private _declineCourseUseCase: IDeclineCourseUseCase,
+    private _enrollCourseUseCase: IEnrollCourseUseCase,
+    private _getCourseStatsUseCase: IGetCourseStatsUseCase,
     httpErrors: IHttpErrors,
     httpSuccess: IHttpSuccess
   ) {
@@ -54,7 +54,7 @@ export class CourseController extends BaseController {
         ...(request.body as ICreateCourseInputDTO),
         createdBy: request.user.id,
       });
-      const course = await this.createCourseUseCase.execute({
+      const course = await this._createCourseUseCase.execute({
         ...validated,
         createdBy: request.user.id,
       });
@@ -83,7 +83,7 @@ export class CourseController extends BaseController {
         userId: request.user?.id,
         role: request.user?.role || "USER",
       });
-      const result = await this.getAllCoursesUseCase.execute({
+      const result = await this._getAllCoursesUseCase.execute({
         ...validated,
         userId: request.user?.id,
         role: request.user?.role || "USER",
@@ -100,7 +100,7 @@ export class CourseController extends BaseController {
       const validated = getCourseByIdSchemaDef.params!.parse({
         id: request.params.id,
       });
-      const course = await this.getCourseWithDetailsUseCase.execute(
+      const course = await this._getCourseWithDetailsUseCase.execute(
         validated.id,
         request.user
       );
@@ -124,7 +124,7 @@ export class CourseController extends BaseController {
         createdBy: request.user.id,
       });
 
-      const course = await this.updateCourseUseCase.execute({
+      const course = await this._updateCourseUseCase.execute({
         id: request.params.id,
         ...validated,
         createdBy: request.user.id,
@@ -144,7 +144,7 @@ export class CourseController extends BaseController {
         const validated = deleteCourseSchemaDef.params!.parse({
         id: request.params.id,
       });
-      const course = await this.deleteCourseUseCase.execute(
+      const course = await this._deleteCourseUseCase.execute(
         validated.id,
         request.user.id,
         request.user.role
@@ -186,7 +186,7 @@ export class CourseController extends BaseController {
         search: request.query?.search || "",
         level: request.query?.level || "All",
       });
-      const result = await this.getEnrolledCoursesUseCase.execute({
+      const result = await this._getEnrolledCoursesUseCase.execute({
         ...validated,
         userId: request.user.id,
       });
@@ -206,7 +206,7 @@ export class CourseController extends BaseController {
       if (!body?.courseId) {
         throw new BadRequestError("Course ID is required");
       }
-      const course = await this.approveCourseUseCase.execute({
+      const course = await this._approveCourseUseCase.execute({
         courseId: body.courseId,
       });
 
@@ -234,7 +234,7 @@ export class CourseController extends BaseController {
       if (!body?.courseId) {
         throw new BadRequestError("Course ID is required");
       }
-      const course = await this.declineCourseUseCase.execute({
+      const course = await this._declineCourseUseCase.execute({
         courseId: body.courseId,
       });
 
@@ -262,7 +262,7 @@ export class CourseController extends BaseController {
       const validated = createEnrollmentSchemaDef.body!.parse({
         courseIds: body.courseIds,
       });
-      const enrollments = await this.enrollCourseUseCase.execute({
+      const enrollments = await this._enrollCourseUseCase.execute({
         userId: request.user.id,
         courseIds: validated.courseIds,
       });
@@ -272,7 +272,7 @@ export class CourseController extends BaseController {
 
   async getCourseStats(httpRequest: IHttpRequest): Promise<IHttpResponse> {
     return this.handleRequest(httpRequest, async () => {
-      const stats = await this.getCourseStatsUseCase.execute({ isAdmin: true });
+      const stats = await this._getCourseStatsUseCase.execute({ isAdmin: true });
       return this.success_200(
         stats,
         "Course statistics retrieved successfully"

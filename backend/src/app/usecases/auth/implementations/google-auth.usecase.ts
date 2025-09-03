@@ -7,9 +7,9 @@ import {
   GoogleAuthGateway,
   GoogleUserInfo,
 } from "../../../providers/google-auth.interface";
-import { HttpError } from "../../../../presentation/http/errors/http-error";
 import { User } from "../../../../domain/entities/user.entity";
 import { IUpdateUserRequestDTO, UserResponseDTO } from "../../../dtos/user.dto";
+import { UserAuthenticationError, UserValidationError } from "../../../../domain/errors/domain-errors";
 
 export class GoogleAuthUseCase implements IGoogleAuthUseCase {
   constructor(
@@ -22,7 +22,7 @@ export class GoogleAuthUseCase implements IGoogleAuthUseCase {
     try {
       googleUser = await this._googleAuthGateway.getUserInfo(accessToken);
     } catch {
-      throw new HttpError("Invalid Google access token", 401);
+      throw new UserAuthenticationError("Invalid Google access token");
     }
 
     let user = await this._authRepository.findUserByEmail(googleUser.email);
@@ -39,7 +39,19 @@ export class GoogleAuthUseCase implements IGoogleAuthUseCase {
           avatar: googleUser.picture,
         });
         user.verifyEmail(); // Google users are verified by default
-        return await this._authRepository.createUser(user);
+        const createdUser = await this._authRepository.createUser(user);
+        return {
+          id: createdUser.id,
+          name: createdUser.name,
+          email: createdUser.email,
+          role: createdUser.role,
+          authProvider: createdUser.authProvider,
+          isVerified: createdUser.isVerified,
+          avatar: createdUser.avatar,
+          deletedAt: createdUser.deletedAt,
+          updatedAt: createdUser.updatedAt,
+          createdAt: createdUser.createdAt,
+        };
       }
 
       // Update existing user
@@ -53,12 +65,24 @@ export class GoogleAuthUseCase implements IGoogleAuthUseCase {
         updates.name = googleUser.name;
       }
       user = User.update(user, updates);
-      return await this._authRepository.updateUser(user);
+      const updatedUser = await this._authRepository.updateUser(user);
+      return {
+        id: updatedUser.id,
+        name: updatedUser.name,
+        email: updatedUser.email,
+        role: updatedUser.role,
+        authProvider: updatedUser.authProvider,
+        isVerified: updatedUser.isVerified,
+        avatar: updatedUser.avatar,
+        deletedAt: updatedUser.deletedAt,
+        updatedAt: updatedUser.updatedAt,
+        createdAt: updatedUser.createdAt,
+      };
     } catch (error) {
       if (error instanceof Error) {
-        throw new HttpError(error.message, 400);
+        throw new UserValidationError(error.message);
       }
-      throw new HttpError("Failed to process Google authentication", 500);
+      throw new UserValidationError("Failed to process Google authentication");
     }
   }
 }

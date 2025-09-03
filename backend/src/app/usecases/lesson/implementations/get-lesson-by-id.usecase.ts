@@ -1,7 +1,7 @@
 import { ILessonOutputDTO } from "../../../dtos/lesson.dto";
-import { HttpError } from "../../../../presentation/http/errors/http-error";
 import { ILessonRepository } from "../../../repositories/lesson.repository";
 import { IGetLessonByIdUseCase } from "../interfaces/get-lesson-by-id.usecase.interface";
+import { LessonNotFoundError } from "../../../../domain/errors/domain-errors";
 
 export class GetLessonByIdUseCase implements IGetLessonByIdUseCase {
   constructor(private readonly _lessonRepository: ILessonRepository) {}
@@ -10,17 +10,41 @@ export class GetLessonByIdUseCase implements IGetLessonByIdUseCase {
     try {
       const lesson = await this._lessonRepository.findById(id);
       if (!lesson || !lesson.isActive()) {
-        throw new HttpError("Lesson not found or deleted", 404);
+        throw new LessonNotFoundError(id);
       }
-      return lesson.toJSON() as unknown as ILessonOutputDTO;
+      // Map domain entity to DTO
+      return {
+        id: lesson.id,
+        title: lesson.title,
+        description: lesson.description,
+        order: lesson.order,
+        courseId: lesson.courseId,
+        status: lesson.status,
+        content: lesson.content ? {
+          id: lesson.content.id,
+          lessonId: lesson.content.lessonId,
+          type: lesson.content.type,
+          status: lesson.content.status,
+          title: lesson.content.title,
+          description: lesson.content.description,
+          fileUrl: lesson.content.fileUrl,
+          thumbnailUrl: lesson.content.thumbnailUrl,
+          quizQuestions: lesson.content.quizQuestions,
+          createdAt: lesson.content.createdAt.toISOString(),
+          updatedAt: lesson.content.updatedAt.toISOString(),
+          deletedAt: lesson.content.deletedAt?.toISOString() ?? null,
+        } : null,
+        thumbnail: null, // Not available in domain entity
+        duration: null, // Not available in domain entity
+        createdAt: lesson.createdAt.toISOString(),
+        updatedAt: lesson.updatedAt.toISOString(),
+        deletedAt: lesson.deletedAt?.toISOString() ?? null,
+      };
     } catch (error) {
-      if (error instanceof Error) {
-        throw new HttpError(
-          error.message,
-          error.message.includes("404") ? 404 : 400
-        );
+      if (error instanceof LessonNotFoundError) {
+        throw error;
       }
-      throw new HttpError("Failed to fetch lesson", 500);
+      throw new LessonNotFoundError("Failed to fetch lesson");
     }
   }
 }

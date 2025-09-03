@@ -28,11 +28,8 @@ export default function SocketProvider() {
 	const { user } = useAuth();
 
 	useEffect(() => {
-		log('Provider mounted', {
-			hasUser: !!user,
-			userId: user?.id,
-			userRole: user?.role,
-		});
+		console.log("[SocketProvider] mounted");
+
 	}, []);
 
 	useEffect(() => {
@@ -44,7 +41,8 @@ export default function SocketProvider() {
 
 			// Add a small delay to ensure cookies are available
 			const timer = setTimeout(() => {
-				log('Connecting socket after delay', { userId: user.id });
+				console.log("[SocketProvider] attempting connect", { userId: user.id });
+
 				safeSocketConnect();
 			}, 100);
 			
@@ -56,6 +54,7 @@ export default function SocketProvider() {
 			log('User not authenticated, disconnecting socket');
 			
 			if (socket.connected) {
+				console.log("[SocketProvider] disconnecting: no user");
 				socket.disconnect();
 			}
 		}
@@ -164,6 +163,7 @@ export default function SocketProvider() {
 		};
 
 		// Listen for new notifications
+		console.log("[SocketProvider] listening for newNotification");
 		socket.on("newNotification", handleNewNotification);
 		log('✅ Notification listener attached');
 

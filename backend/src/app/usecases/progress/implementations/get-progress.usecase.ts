@@ -1,12 +1,11 @@
 import { IGetProgressUseCase } from "../interfaces/get-progress.usecase.interface";
 import { GetProgressDto, IProgressOutputDTO } from "../../../dtos/progress.dto";
-import { ApiResponse } from "../../../../presentation/http/interfaces/ApiResponse";
+
 import { IEnrollmentRepository } from "../../../repositories/enrollment.repository.interface";
 import { ILessonProgressRepository } from "../../../repositories/lesson-progress.repository.interface";
 import { ILessonRepository } from "../../../repositories/lesson.repository";
-import { HttpError } from "../../../../presentation/http/errors/http-error";
-import { StatusCodes } from "http-status-codes";
 import { AccessStatus } from "../../../../domain/enum/access-status.enum";
+import { ValidationError, NotFoundError } from "../../../../domain/errors/domain-errors";
 
 export class GetProgressUseCase implements IGetProgressUseCase {
   constructor(
@@ -17,7 +16,7 @@ export class GetProgressUseCase implements IGetProgressUseCase {
 
   async execute(
     input: GetProgressDto
-  ): Promise<ApiResponse<IProgressOutputDTO>> {
+  ): Promise<IProgressOutputDTO> {
     try {
       const enrollment = await this._enrollmentRepository.findByUserAndCourse(
         input.userId,
@@ -25,7 +24,7 @@ export class GetProgressUseCase implements IGetProgressUseCase {
       );
 
       if (!enrollment) {
-        throw new HttpError("Enrollment not found", StatusCodes.NOT_FOUND);
+        throw new NotFoundError("Enrollment", `${input.userId}:${input.courseId}`);
       }
 
       // Get all lesson progress for this enrollment
@@ -45,55 +44,44 @@ export class GetProgressUseCase implements IGetProgressUseCase {
       const totalLessons = allLessons.length;
 
       return {
-        success: true,
-        data: {
-          userId: enrollment.userId,
-          courseId: enrollment.courseId,
-          lastLessonId:
-            lessonProgress.find((p) => p.completed)?.lessonId ??
-            allLessons[0]?.id,
-          enrolledAt: new Date(enrollment.enrolledAt),
-          accessStatus: enrollment.accessStatus as AccessStatus,
-          completedLessons,
-          totalLessons,
-          lessonProgress: await Promise.all(
-            lessonProgress.map(async (p) => {
-              if (!p.id) {
-                throw new HttpError(
-                  "Progress ID is required",
-                  StatusCodes.INTERNAL_SERVER_ERROR
-                );
-              }
-              const answers =
-                await this._lessonProgressRepository.findQuizAnswers(p.id);
-              return {
-                lessonId: p.lessonId,
-                completed: p.completed,
-                completedAt: p.completedAt
-                  ? new Date(p.completedAt)
-                  : undefined,
-                score: p.score,
-                totalQuestions: p.totalQuestions,
-                answers: answers.map((a) => ({
-                  questionId: a.quizQuestionId,
-                  selectedAnswer: a.selectedAnswer,
-                  isCorrect: a.isCorrect,
-                })),
-              };
-            })
-          ),
-        },
-        message: "Progress retrieved successfully",
-        statusCode: StatusCodes.OK,
+        userId: enrollment.userId,
+        courseId: enrollment.courseId,
+        lastLessonId:
+          lessonProgress.find((p) => p.completed)?.lessonId ??
+          allLessons[0]?.id,
+        enrolledAt: new Date(enrollment.enrolledAt),
+        accessStatus: enrollment.accessStatus as AccessStatus,
+        completedLessons,
+        totalLessons,
+        lessonProgress: await Promise.all(
+          lessonProgress.map(async (p) => {
+            if (!p.id) {
+              throw new ValidationError("Progress ID is required");
+            }
+            const answers =
+              await this._lessonProgressRepository.findQuizAnswers(p.id);
+            return {
+              lessonId: p.lessonId,
+              completed: p.completed,
+              completedAt: p.completedAt
+                ? new Date(p.completedAt)
+                : undefined,
+              score: p.score,
+              totalQuestions: p.totalQuestions,
+              answers: answers.map((a) => ({
+                questionId: a.quizQuestionId,
+                selectedAnswer: a.selectedAnswer,
+                isCorrect: a.isCorrect,
+              })),
+            };
+          })
+        ),
       };
     } catch (error) {
-      if (error instanceof HttpError) {
+      if (error instanceof ValidationError || error instanceof NotFoundError) {
         throw error;
       }
-      throw new HttpError(
-        "Failed to get progress",
-        StatusCodes.INTERNAL_SERVER_ERROR
-      );
+      throw new ValidationError("Failed to get progress");
     }
   }
 }

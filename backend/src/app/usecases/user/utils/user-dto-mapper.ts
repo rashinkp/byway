@@ -1,6 +1,7 @@
 import { UserProfile } from "../../../../domain/entities/user-profile.entity";
 import { User } from "../../../../domain/entities/user.entity";
 import { ProfileDTO, UserResponseDTO } from "../../../dtos/user.dto";
+import { AuthUserDTO } from "../../../dtos/auth.dto";
 
 export function mapProfileToDTO(profile: UserProfile | null): ProfileDTO | null {
   if (!profile) return null;
@@ -36,5 +37,14 @@ export function mapUserToDTO(user: User | null): UserResponseDTO | null {
     deletedAt: user.deletedAt,
     updatedAt: user.updatedAt,
     createdAt: user.createdAt,
+  };
+}
+
+export function mapUserToAuthUserDTO(user: User): AuthUserDTO {
+  return {
+    id: user.id,
+    name: user.name,
+    email: user.email,
+    role: user.role,
   };
 }

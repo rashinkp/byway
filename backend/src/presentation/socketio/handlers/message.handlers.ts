@@ -173,25 +173,17 @@ export function registerMessageHandlers(
   socket.on(
     "newMessage",
     async (data: SendMessageData) => {
+      console.log(`[backend] sendMessage called by socket ${socket.id}`, data);
       try {
         const senderId = socket.data.user?.id;
         if (!senderId) {
+          console.log(`[backend] sendMessage failed: no senderId for socket ${socket.id}`);
           socket.emit("error", {
             message: "Authentication required to send messages.",
           });
           return;
         }
-
-        // Validate required fields
-        if (!data.chatId) {
-          socket.emit("error", { message: "Chat ID is required." });
-          return;
-        }
-
-        if (!data.content && !data.imageUrl && !data.audioUrl) {
-          socket.emit("error", { message: "Message content, image, or audio is required." });
-          return;
-        }
+        console.log(`[backend] sendMessage processing for sender ${senderId}`);
 
         const message = await chatController.handleNewMessage({
           chatId: data.chatId,
@@ -263,6 +255,7 @@ export function registerMessageHandlers(
         const message = await chatController.handleNewMessage(messageData);
         
         if (!message) {
+          console.log(`[backend] sendMessage failed: handleNewMessage returned null`);
           socket.emit("error", { message: "Failed to send message." });
           return;
         }
@@ -284,7 +277,18 @@ export function registerMessageHandlers(
         
         socket.emit("messageSent", message);
         socket.emit("message", message);
-        
+        // Debug: log room broadcast details
+        console.log(`[backend] broadcasting message to room: ${targetChatId}`);
+        const room = io.sockets.adapter.rooms.get(targetChatId);
+        if (room) {
+          console.log(`[backend] room ${targetChatId} has ${room.size} sockets`);
+          room.forEach(socketId => {
+            console.log(`[backend] socket in room: ${socketId}`);
+          });
+        } else {
+          console.log(`[backend] room ${targetChatId} not found`);
+        }
+
         io.to(targetChatId).emit("message", message);
         const participants = await chatController.getChatParticipantsById(
           targetChatId
@@ -304,6 +308,7 @@ export function registerMessageHandlers(
           io.to(recipientId).emit("unreadMessageCount", { count: unreadCount });
         }
       } catch (err) {
+        console.error(`[backend] sendMessage failed with error:`, err);
         socket.emit("error", { message: "Failed to send message." });
       }
     }

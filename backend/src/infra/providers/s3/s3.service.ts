@@ -52,9 +52,6 @@ export class S3Service implements S3ServiceInterface {
     return { uploadUrl, key };
   }
 
-  /**
-   * Generates a presigned GET URL for serving private objects temporarily.
-   */
   async generatePresignedGetUrl(
     key: string,
     expiresInSeconds: number = 60

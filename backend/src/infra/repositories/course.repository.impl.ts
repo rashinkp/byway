@@ -13,6 +13,8 @@ import { IGetTopEnrolledCoursesInput } from "../../app/usecases/course/interface
 import { CourseOverallStats, CourseStats } from "../../domain/types/course-stats.interface";import { FilterCourse, PaginatedResult } from "../../domain/types/pagination-filter.interface";
 import { CourseStatsInput, CourseWithEnrollment } from "../../domain/types/course.interface";
 import { UserProfile } from "../../domain/entities/user-profile.entity";
+
+
 export class CourseRepository implements ICourseRepository {
   constructor(private _prisma: PrismaClient) {}
 
@@ -57,10 +59,10 @@ export class CourseRepository implements ICourseRepository {
       title: course.title,
       description: course.description,
       level: course.level,
-      price: course.price?.getValue()?.toNumber() ?? null,
+      price: course.price?.getValue() ?? null,
       thumbnail: course.thumbnail,
       duration: course.duration?.getValue() ?? null,
-      offer: course.offer?.getValue()?.toNumber() ?? null,
+      offer: course.offer?.getValue() ?? null,
       status: course.status,
       categoryId: course.categoryId,
       createdBy: course.createdBy,

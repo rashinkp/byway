@@ -10,6 +10,7 @@ import { IReduceMoneyUseCase } from "../app/usecases/wallet/interfaces/reduce-mo
 import { TopUpWalletUseCase } from "../app/usecases/wallet/implementation/top-up-wallet.usecase";
 import { ITopUpWalletUseCase } from "../app/usecases/wallet/interfaces/top-up-wallet.usecase.interface";
 import { TransactionRepository } from "../infra/repositories/transaction.repository.impl";
+import { PaymentDependencies } from "./payment.dependencies";
 
 export interface WalletDependencies {
   walletController: WalletController;
@@ -20,9 +21,10 @@ export interface WalletDependencies {
 }
 
 export const createWalletDependencies = (
-  sharedDeps: SharedDependencies
+  sharedDeps: SharedDependencies,
+  paymentDeps: PaymentDependencies
 ): WalletDependencies => {
-  const { prisma, httpErrors, httpSuccess, paymentService } = sharedDeps;
+  const { prisma, httpErrors, httpSuccess } = sharedDeps;
 
   const walletRepository = new WalletRepository(prisma);
   const transactionRepository = new TransactionRepository(prisma);
@@ -32,7 +34,7 @@ export const createWalletDependencies = (
   const topUpWalletUseCase = new TopUpWalletUseCase(
     walletRepository,
     transactionRepository,
-    paymentService
+    paymentDeps.createStripeCheckoutSessionUseCase
   );
   const walletController = new WalletController(
     getWalletUseCase,

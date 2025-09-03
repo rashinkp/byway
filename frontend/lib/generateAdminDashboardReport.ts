@@ -1,7 +1,8 @@
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
+import { format } from "date-fns";
 
-// Type for the actual data structure being used
+
 interface AdminDashboardData {
   stats: {
     totalUsers: number;
@@ -27,7 +28,7 @@ interface AdminDashboardData {
     status: string;
   }>;
 }
-import { format } from "date-fns";
+
 
 // Extend jsPDF interface to include autoTable properties
 interface jsPDFWithAutoTable extends jsPDF {

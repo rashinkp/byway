@@ -8,6 +8,8 @@ import { RegisterUseCase } from "../app/usecases/auth/implementations/register.u
 import { ResendOtpUseCase } from "../app/usecases/auth/implementations/resend-otp-usecase";
 import { ResetPasswordUseCase } from "../app/usecases/auth/implementations/reset-password.usecase";
 import { VerifyOtpUseCase } from "../app/usecases/auth/implementations/verify-otp.usecase";
+import { RefreshTokenUseCase } from "../app/usecases/auth/implementations/refresh-token.usecase";
+import { IRefreshTokenUseCase } from "../app/usecases/auth/interfaces/refresh-token.usecase.interface";
 import { AuthController } from "../presentation/http/controllers/auth.controller";
 import { SharedDependencies } from "./shared.dependencies";
 
@@ -39,6 +41,7 @@ export function createAuthDependencies(
   const getVerificationStatusUseCase = new GetVerificationStatusUseCase(
     authRepository
   );
+  const refreshTokenUseCase: IRefreshTokenUseCase = new RefreshTokenUseCase(deps.jwtProvider);
 
   // Initialize controller
   const authController = new AuthController(
@@ -52,6 +55,7 @@ export function createAuthDependencies(
     resetPasswordUseCase,
     verifyOtpUseCase,
     getVerificationStatusUseCase,
+    refreshTokenUseCase,
     deps.httpErrors,
     deps.httpSuccess
   );

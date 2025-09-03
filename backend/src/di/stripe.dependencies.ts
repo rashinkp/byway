@@ -1,17 +1,21 @@
 import { StripeController } from "../presentation/http/controllers/stripe.controller";
 import { SharedDependencies } from "./shared.dependencies";
+import { PaymentDependencies } from "./payment.dependencies";
 
 export interface StripeDependencies {
   stripeController: StripeController;
 }
 
-export const createStripeDependencies = (sharedDeps: SharedDependencies): StripeDependencies => {
-  const { httpErrors, httpSuccess, paymentService, getEnrollmentStatsUseCase, enrollmentRepository } = sharedDeps;
+export const createStripeDependencies = (sharedDeps: SharedDependencies, paymentDeps: PaymentDependencies): StripeDependencies => {
+  const { httpErrors, httpSuccess, getEnrollmentStatsUseCase } = sharedDeps;
 
   const stripeController = new StripeController(
-    paymentService,
+    {
+      handleWalletPayment: paymentDeps.handleWalletPaymentUseCase.execute.bind(paymentDeps.handleWalletPaymentUseCase),
+      createStripeCheckoutSession: paymentDeps.createStripeCheckoutSessionUseCase.execute.bind(paymentDeps.createStripeCheckoutSessionUseCase),
+      handleStripeWebhook: paymentDeps.handleStripeWebhookUseCase.execute.bind(paymentDeps.handleStripeWebhookUseCase),
+    },
     getEnrollmentStatsUseCase,
-    enrollmentRepository,
     httpErrors,
     httpSuccess
   );

@@ -7,21 +7,21 @@ import { BaseController } from "./base.controller";
 import { IHttpErrors } from "../interfaces/http-errors.interface";
 import { IHttpSuccess } from "../interfaces/http-success.interface";
 import { UnauthorizedError } from "../errors/unautherized-error";
-import { HttpError } from "../errors/http-error";
+import { BadRequestError } from "../errors/bad-request-error";
 import { ITopUpWalletUseCase } from "../../../app/usecases/wallet/interfaces/top-up-wallet.usecase.interface";
 import { AddMoneyDto, ReduceMoneyDto } from "../../../app/dtos/wallet";
 import { TopUpWalletDtoSchema } from "../../../presentation/validators/wallet";
 
 export class WalletController extends BaseController {
   constructor(
-    private readonly getWalletUseCase: IGetWalletUseCase,
-    private readonly addMoneyUseCase: IAddMoneyUseCase,
-    private readonly reduceMoneyUseCase: IReduceMoneyUseCase,
-    private topUpWalletUseCase: ITopUpWalletUseCase,
-    protected httpErrors: IHttpErrors,
-    protected httpSuccess: IHttpSuccess
+    private readonly _getWalletUseCase: IGetWalletUseCase,
+    private readonly _addMoneyUseCase: IAddMoneyUseCase,
+    private readonly _reduceMoneyUseCase: IReduceMoneyUseCase,
+    private _topUpWalletUseCase: ITopUpWalletUseCase,
+    protected _httpErrors: IHttpErrors,
+    protected _httpSuccess: IHttpSuccess
   ) {
-    super(httpErrors, httpSuccess);
+    super(_httpErrors, _httpSuccess);
   }
 
   async getWallet(httpRequest: IHttpRequest): Promise<IHttpResponse> {
@@ -30,7 +30,7 @@ export class WalletController extends BaseController {
         throw new UnauthorizedError("User not authenticated");
       }
 
-      const wallet = await this.getWalletUseCase.execute(request.user.id);
+      const wallet = await this._getWalletUseCase.execute(request.user.id);
       return this.success_200(wallet, "Wallet retrieved successfully");
     });
   }
@@ -43,11 +43,11 @@ export class WalletController extends BaseController {
 
       const { amount, currency } = request.body as AddMoneyDto;
       if (!amount || amount <= 0) {
-        throw new HttpError("Invalid amount", 400);
+        throw new BadRequestError("Invalid amount");
       }
 
       const data: AddMoneyDto = { amount, currency };
-      const wallet = await this.addMoneyUseCase.execute(request.user.id, data);
+      const wallet = await this._addMoneyUseCase.execute(request.user.id, data);
       return this.success_200(wallet, "Money added successfully");
     });
   }
@@ -60,11 +60,11 @@ export class WalletController extends BaseController {
 
       const { amount, currency } = request.body as ReduceMoneyDto;
       if (!amount || amount <= 0) {
-        throw new HttpError("Invalid amount", 400);
+        throw new BadRequestError("Invalid amount");
       }
 
       const data: ReduceMoneyDto = { amount, currency };
-      const wallet = await this.reduceMoneyUseCase.execute(
+      const wallet = await this._reduceMoneyUseCase.execute(
         request.user.id,
         data
       );
@@ -79,7 +79,7 @@ export class WalletController extends BaseController {
       }
 
       const validatedData = TopUpWalletDtoSchema.parse(request.body);
-      const result = await this.topUpWalletUseCase.execute(
+      const result = await this._topUpWalletUseCase.execute(
         request.user.id,
         validatedData
       );

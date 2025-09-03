@@ -1,12 +1,12 @@
 import { Response } from "express";
-import { JwtProvider } from "../../../infra/providers/auth/jwt.provider";
+import { IJwtProvider } from "../../../app/providers/jwt.provider.interface";
 import { CookieUtils } from "../../express/middlewares/cookie.utils";
 
 export class CookieService {
   static setAuthCookies(
     res: Response,
     user: { id: string; email: string; role: string },
-    jwtProvider: JwtProvider
+    jwtProvider: IJwtProvider
   ): void {
     CookieUtils.setAuthCookiesFromUser(res, user, jwtProvider);
   }

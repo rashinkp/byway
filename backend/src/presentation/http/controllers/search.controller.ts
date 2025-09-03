@@ -9,7 +9,7 @@ import { SearchParamsSchema } from "../../validators/search.validators";
 
 export class SearchController extends BaseController {
   constructor(
-    private globalSearchUseCase: IGlobalSearchUseCase,
+    private _globalSearchUseCase: IGlobalSearchUseCase,
     httpErrors: IHttpErrors,
     httpSuccess: IHttpSuccess
   ) {
@@ -33,7 +33,7 @@ export class SearchController extends BaseController {
       });
 
       const userId = request.user?.id;
-      const result = await this.globalSearchUseCase.execute({
+      const result = await this._globalSearchUseCase.execute({
         ...validatedParams,
         userId,
       });

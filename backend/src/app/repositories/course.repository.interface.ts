@@ -1,6 +1,5 @@
 import { Course } from "../../domain/entities/course.entity";
 import { CourseDetails } from "../../domain/entities/course.entity";
-import { IGetTopEnrolledCoursesInput } from "../usecases/course/interfaces/top-enrolled-courses.usecase.interface";
 import { CourseOverallStats, CourseStats } from "../../domain/types/course-stats.interface";
 import { CourseStatsInput, CourseWithEnrollment } from "../../domain/types/course.interface";
 import { FilterCourse, PaginatedResult } from "../../domain/types/pagination-filter.interface";
@@ -25,6 +24,10 @@ export interface ICourseRepository {
   // Course stats methods
   getCourseStats(input: CourseStatsInput): Promise<CourseOverallStats>;
   getTopEnrolledCourses(
-    input: IGetTopEnrolledCoursesInput
+    input: {
+      limit?: number;
+      period?: string;
+      userId?: string;
+    }
   ): Promise<CourseStats[]>;
 }

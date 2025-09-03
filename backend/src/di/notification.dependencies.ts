@@ -1,9 +1,10 @@
-import { PrismaNotificationRepository } from "../infra/repositories/notification-repository.impl";
+
 import { NotificationRepositoryInterface } from "../app/repositories/notification-repository.interface";
 import { GetUserNotificationsUseCase } from "../app/usecases/notification/implementations/get-user-notifications.usecase";
 import { CreateNotificationsForUsersUseCase } from "../app/usecases/notification/implementations/create-notifications-for-users.usecase";
 import { NotificationController } from "../presentation/http/controllers/notification.controller";
 import { SharedDependencies } from "./shared.dependencies";
+import { NotificationRepository } from "../infra/repositories/notification-repository.impl";
 
 export interface NotificationDependencies {
   notificationRepository: NotificationRepositoryInterface;
@@ -15,12 +16,14 @@ export interface NotificationDependencies {
 export function createNotificationDependencies(
   shared: SharedDependencies
 ): NotificationDependencies {
-  const notificationRepository = new PrismaNotificationRepository(
+  const notificationRepository = new NotificationRepository(
     shared.prisma
   );
+  
   const getUserNotificationsUseCase = new GetUserNotificationsUseCase(
     notificationRepository
   );
+
   const createNotificationsForUsersUseCase =
     new CreateNotificationsForUsersUseCase(notificationRepository);
   const notificationController = new NotificationController(

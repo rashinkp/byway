@@ -24,7 +24,7 @@ import { IHttpRequest } from "../interfaces/http-request.interface";
 import { IHttpResponse } from "../interfaces/http-response.interface";
 import { BadRequestError } from "../errors/bad-request-error";
 import { BaseController } from "./base.controller";
-import { JwtProvider } from "../../../infra/providers/auth/jwt.provider";
+import { IRefreshTokenUseCase } from "../../../app/usecases/auth/interfaces/refresh-token.usecase.interface";
 
 interface UserData {
   id: string;
@@ -35,16 +35,17 @@ interface UserData {
 
 export class AuthController extends BaseController {
   constructor(
-    private facebookAuthUseCase: IFacebookAuthUseCase,
-    private forgotPasswordUseCase: IForgotPasswordUseCase,
-    private googleAuthUseCase: IGoogleAuthUseCase,
-    private loginUseCase: ILoginUseCase,
-    private logoutUseCase: ILogoutUseCase,
-    private registerUseCase: IRegisterUseCase,
-    private resendOtpUseCase: IResendOtpUseCase,
-    private resetPasswordUseCase: IResetPasswordUseCase,
-    private verifyOtpUseCase: IVerifyOtpUseCase,
-    private getVerificationStatusUseCase: IGetVerificationStatusUseCase,
+    private _facebookAuthUseCase: IFacebookAuthUseCase,
+    private _forgotPasswordUseCase: IForgotPasswordUseCase,
+    private _googleAuthUseCase: IGoogleAuthUseCase,
+    private _loginUseCase: ILoginUseCase,
+    private _logoutUseCase: ILogoutUseCase,
+    private _registerUseCase: IRegisterUseCase,
+    private _resendOtpUseCase: IResendOtpUseCase,
+    private _resetPasswordUseCase: IResetPasswordUseCase,
+    private _verifyOtpUseCase: IVerifyOtpUseCase,
+    private _getVerificationStatusUseCase: IGetVerificationStatusUseCase,
+    private _refreshTokenUseCase: IRefreshTokenUseCase,
     httpErrors: IHttpErrors,
     httpSuccess: IHttpSuccess
   ) {
@@ -54,7 +55,7 @@ export class AuthController extends BaseController {
   async facebookAuth(httpRequest: IHttpRequest): Promise<IHttpResponse> {
     return this.handleRequest(httpRequest, async (request) => {
       const validated = validateFacebookAuth(request.body);
-      const user = await this.facebookAuthUseCase.execute(validated);
+      const user = await this._facebookAuthUseCase.execute(validated);
       const data = {
         id: user.id,
         name: user.name,
@@ -67,7 +68,7 @@ export class AuthController extends BaseController {
       );
       return {
         ...response,
-        cookie: this.getCookieResponse(user),
+        cookie: this._getCookieResponse(user),
       };
     });
   }
@@ -75,7 +76,7 @@ export class AuthController extends BaseController {
   async forgotPassword(httpRequest: IHttpRequest): Promise<IHttpResponse> {
     return this.handleRequest(httpRequest, async (request) => {
       const validated = validateForgotPassword(request.body);
-      await this.forgotPasswordUseCase.execute(validated);
+      await this._forgotPasswordUseCase.execute(validated);
       return this.success_200(null, "Password reset OTP sent");
     });
   }
@@ -83,7 +84,7 @@ export class AuthController extends BaseController {
   async googleAuth(httpRequest: IHttpRequest): Promise<IHttpResponse> {
     return this.handleRequest(httpRequest, async (request) => {
       const validated = validateGoogleAuth(request.body);
-      const user = await this.googleAuthUseCase.execute(validated.accessToken);
+      const user = await this._googleAuthUseCase.execute(validated.accessToken);
       const data = {
         id: user.id,
         name: user.name,
@@ -96,41 +97,26 @@ export class AuthController extends BaseController {
       );
       return {
         ...response,
-        cookie: this.getCookieResponse(user),
+        cookie: this._getCookieResponse(user),
       };
     });
   }
 
-  private getCookieResponse(user: UserData): { action: "set"; user: UserData } {
+  private _getCookieResponse(user: UserData): { action: "set"; user: UserData } {
     return { action: "set", user };
   }
 
-  private getUserFromRefreshToken(request: IHttpRequest): UserData {
-    const jwtProvider = new JwtProvider();
+  private _getUserFromRefreshToken(request: IHttpRequest): Promise<UserData> {
     const refreshToken = request.cookies?.refresh_token as string;
     if (!refreshToken) {
       throw new BadRequestError("No refresh token provided");
     }
-    const payload = jwtProvider.verifyRefreshToken(refreshToken);
-    if (
-      !payload ||
-      typeof payload !== "object" ||
-      !(
-        "email" in payload &&
-        "id" in payload &&
-        "name" in payload &&
-        "role" in payload
-      )
-    ) {
-      throw new BadRequestError("Invalid refresh token");
-    }
-    const { id, name, email, role } = payload as UserData;
-    return { id, name, email, role };
+    return this._refreshTokenUseCase.execute(refreshToken) as unknown as Promise<UserData>;
   }
 
   async token(httpRequest: IHttpRequest): Promise<IHttpResponse> {
     return this.handleRequest(httpRequest, async (request) => {
-      const user = this.getUserFromRefreshToken(request);
+      const user = await this._getUserFromRefreshToken(request);
       const data = {
         id: user.id,
         name: user.name,
@@ -140,7 +126,7 @@ export class AuthController extends BaseController {
       const response = this.success_200(data, "Tokens issued");
       return {
         ...response,
-        cookie: this.getCookieResponse(user),
+        cookie: this._getCookieResponse(user),
       };
     });
   }
@@ -148,7 +134,7 @@ export class AuthController extends BaseController {
   async login(httpRequest: IHttpRequest): Promise<IHttpResponse> {
     return this.handleRequest(httpRequest, async (request) => {
       const validated = validateLogin(request.body);
-      const { user, cartCount } = await this.loginUseCase.execute(validated);
+      const { user, cartCount } = await this._loginUseCase.execute(validated);
       const data = {
         id: user.id,
         name: user.name,
@@ -159,14 +145,14 @@ export class AuthController extends BaseController {
       const response = this.success_200(data, "Login successful");
       return {
         ...response,
-        cookie: this.getCookieResponse(user),
+        cookie: this._getCookieResponse(user),
       };
     });
   }
 
   async logout(httpRequest: IHttpRequest): Promise<IHttpResponse> {
     return this.handleRequest(httpRequest, async () => {
-      await this.logoutUseCase.execute();
+      await this._logoutUseCase.execute();
       const response = this.success_200(null, "Logout successful");
       return {
         ...response,
@@ -178,7 +164,7 @@ export class AuthController extends BaseController {
   async register(httpRequest: IHttpRequest): Promise<IHttpResponse> {
     return this.handleRequest(httpRequest, async (request) => {
       const validated = validateRegister(request.body);
-      const user = await this.registerUseCase.execute(validated);
+      const user = await this._registerUseCase.execute(validated);
       const data = {
         id: user.id,
         name: user.name,
@@ -192,7 +178,7 @@ export class AuthController extends BaseController {
   async resendOtp(httpRequest: IHttpRequest): Promise<IHttpResponse> {
     return this.handleRequest(httpRequest, async (request) => {
       const validated = validateResendOtp(request.body);
-      await this.resendOtpUseCase.execute(validated);
+      await this._resendOtpUseCase.execute(validated);
       return this.success_200(null, "OTP resent successfully");
     });
   }
@@ -200,7 +186,7 @@ export class AuthController extends BaseController {
   async resetPassword(httpRequest: IHttpRequest): Promise<IHttpResponse> {
     return this.handleRequest(httpRequest, async (request) => {
       const validated = validateResetPassword(request.body);
-      await this.resetPasswordUseCase.execute(validated);
+      await this._resetPasswordUseCase.execute(validated);
       return this.success_200(null, "Password reset successful");
     });
   }
@@ -208,7 +194,7 @@ export class AuthController extends BaseController {
   async verifyOtp(httpRequest: IHttpRequest): Promise<IHttpResponse> {
     return this.handleRequest(httpRequest, async (request) => {
       const validated = validateVerifyOtp(request.body);
-      const result = await this.verifyOtpUseCase.execute(validated);
+      const result = await this._verifyOtpUseCase.execute(validated);
       if (validated.type === "password-reset" && result.resetToken) {
         return this.success_200(
           { resetToken: result.resetToken },
@@ -237,7 +223,7 @@ export class AuthController extends BaseController {
       if (!email) {
         throw new BadRequestError("Email is required");
       }
-      const result = await this.getVerificationStatusUseCase.execute(email);
+      const result = await this._getVerificationStatusUseCase.execute(email);
       return this.success_200(
         result,
         "Verification status retrieved successfully"

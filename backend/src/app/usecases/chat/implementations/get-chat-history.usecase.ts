@@ -19,13 +19,14 @@ export class GetChatHistoryUseCase implements IGetChatHistoryUseCase {
       return null;
     }
 
+    // Properly map domain entity to DTO
     return {
+      id: chat.id,
       user1Id: chat.user1Id,
       user2Id: chat.user2Id,
-      updatedAt: chat.updatedAt?.toString(),
+      updatedAt: chat.updatedAt?.value.toString(),
       messages: chat.messages,
       createdAt: chat.createdAt?.value.toString(),
-      id: chat.id,
     };
   }
 }

@@ -1,4 +1,4 @@
-import { User } from "../../domain/entities/user.entity";
+// Note: Do not import domain entities in application DTOs
 
 // Simplified course interface for cart responses
 export interface CartCourseDTO {
@@ -47,6 +47,5 @@ export interface CartResponseDTO {
   createdAt: Date,
   updatedAt?: Date,
   deletedAt?: Date,
-  user?: User,
   course?: CartCourseDTO
 }

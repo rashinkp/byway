@@ -9,6 +9,7 @@ import { UpdateUserUseCase } from "../app/usecases/user/implementations/update-u
 import { SharedDependencies } from "./shared.dependencies";
 import { GetInstructorDetailsUseCaseImpl } from "../app/usecases/instructor/implementations/get-instructor-details.usecase";
 import { CreateNotificationsForUsersUseCase } from "../app/usecases/notification/implementations/create-notifications-for-users.usecase";
+import { GetUserByIdUseCase } from "../app/usecases/user/implementations/get-user-by-id.usecase";
 
 export interface InstructorDependencies {
   instructorController: InstructorController;
@@ -56,6 +57,8 @@ export function createInstructorDependencies(
     userRepository
   );
 
+  const getUserByIdUseCase = new GetUserByIdUseCase(userRepository);
+
   const instructorController = new InstructorController(
     createInstructorUseCase,
     updateInstructorUseCase,
@@ -63,7 +66,7 @@ export function createInstructorDependencies(
     declineInstructorUseCase,
     getInstructorByUserIdUseCase,
     getAllInstructorsUseCase,
-    userRepository,
+    getUserByIdUseCase,
     getInstructorDetailsUseCase,
     deps.httpErrors,
     deps.httpSuccess

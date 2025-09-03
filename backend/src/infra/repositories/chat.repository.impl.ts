@@ -1,4 +1,4 @@
-import { EnhancedChatListItem, IChatRepository, PaginatedChatList } from "../../app/repositories/chat.repository.interface";
+import { IChatRepository } from "../../app/repositories/chat.repository.interface";
 import { Chat } from "../../domain/entities/chat.entity";
 import { ChatId } from "../../domain/value-object/ChatId";
 import { UserId } from "../../domain/value-object/UserId";
@@ -33,10 +33,49 @@ export class ChatRepository implements IChatRepository {
     limit: number = 10,
     search?: string,
     sort?: string
-  ): Promise<PaginatedChatList> {
+  ): Promise<{
+    items: Array<{
+      id: string;
+      type: "chat" | "user";
+      displayName: string;
+      avatar?: string;
+      role: string;
+      lastMessage?: {
+        content?: string;
+        imageUrl?: string;
+        audioUrl?: string;
+        type: "text" | "image" | "audio";
+      };
+      lastMessageTime?: string;
+      unreadCount?: number;
+      userId?: string;
+      chatId?: string;
+      isOnline?: boolean;
+    }>;
+    totalCount: number;
+    hasMore: boolean;
+    nextPage?: number;
+  }> {
     const offset = (page - 1) * limit;
 
-    let chatItems: EnhancedChatListItem[] = [];
+    let chatItems: Array<{
+      id: string;
+      type: "chat" | "user";
+      displayName: string;
+      avatar?: string;
+      role: string;
+      lastMessage?: {
+        content?: string;
+        imageUrl?: string;
+        audioUrl?: string;
+        type: "text" | "image" | "audio";
+      };
+      lastMessageTime?: string;
+      unreadCount?: number;
+      userId?: string;
+      chatId?: string;
+      isOnline?: boolean;
+    }> = [];
     if (search) {
       const normalizedSearch = search.trim().toLowerCase();
       const roleMap: Record<string, Role> = {
@@ -167,7 +206,7 @@ export class ChatRepository implements IChatRepository {
                 }
               : undefined,
             lastMessageTime: lastMessage?.createdAt
-              ? this.formatTime(lastMessage.createdAt)
+              ? this._formatTime(lastMessage.createdAt)
               : undefined,
             unreadCount,
             chatId: chat.id,
@@ -249,7 +288,7 @@ export class ChatRepository implements IChatRepository {
                 }
               : undefined,
             lastMessageTime: lastMessage?.createdAt
-              ? this.formatTime(lastMessage.createdAt)
+              ? this._formatTime(lastMessage.createdAt)
               : undefined,
             unreadCount,
             chatId: chat.id,
@@ -261,7 +300,24 @@ export class ChatRepository implements IChatRepository {
     }
 
     // If we have fewer chats than the limit, fill with other users
-    let userItems: EnhancedChatListItem[] = [];
+    let userItems: Array<{
+      id: string;
+      type: "chat" | "user";
+      displayName: string;
+      avatar?: string;
+      role: string;
+      lastMessage?: {
+        content?: string;
+        imageUrl?: string;
+        audioUrl?: string;
+        type: "text" | "image" | "audio";
+      };
+      lastMessageTime?: string;
+      unreadCount?: number;
+      userId?: string;
+      chatId?: string;
+      isOnline?: boolean;
+    }> = [];
     if (chatItems.length < limit) {
       const remainingSlots = limit - chatItems.length;
       const existingUserIds = new Set([
@@ -355,8 +411,14 @@ export class ChatRepository implements IChatRepository {
   }
 
   async save(chat: Chat): Promise<void> {
+    // Only update if the chat has a valid ID
+    if (!chat?.id?.value) {
+      console.log(`[backend] Chat save skipped: no valid ID for chat`);
+      return;
+    }
+    
     await this._prisma.chat.update({
-      where: { id: chat?.id?.value },
+      where: { id: chat.id.value },
       data: {
         updatedAt: chat.updatedAt?.toString(),
       },
@@ -382,7 +444,7 @@ export class ChatRepository implements IChatRepository {
 
   // Conversion handled by Chat.fromPersistence
 
-  private formatTime(date: Date): string {
+  private _formatTime(date: Date): string {
     const now = new Date();
     const diffInHours = (now.getTime() - date.getTime()) / (1000 * 60 * 60);
 

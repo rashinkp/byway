@@ -1,5 +1,5 @@
 import { IUserRepository } from "../../../repositories/user.repository";
-import { HttpError } from "../../../../presentation/http/errors/http-error";
+import { UserAuthenticationError } from "../../../../domain/errors/domain-errors";
 
 export class CheckUserActiveUseCase {
   constructor(private _userRepository: IUserRepository) {}
@@ -7,7 +7,7 @@ export class CheckUserActiveUseCase {
   async execute(userId: string): Promise<void> {
     const user = await this._userRepository.findById(userId);
     if (!user || user.deletedAt) {
-      throw new HttpError("User is deleted or does not exist", 401);
+      throw new UserAuthenticationError("User is deleted or does not exist");
     }
   }
 } 

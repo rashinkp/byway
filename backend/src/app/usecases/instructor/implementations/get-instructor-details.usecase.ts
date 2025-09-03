@@ -1,8 +1,8 @@
 import { GetInstructorDetailsUseCase } from "../interfaces/get-instructor-details.usecase.interface";
-import { HttpError } from "../../../../presentation/http/errors/http-error";
 import { IInstructorRepository } from "../../../repositories/instructor.repository";
 import { IUserRepository } from "../../../repositories/user.repository";
 import { CombinedInstructorDTO } from "../../../dtos/instructor.dto";
+import { UserNotFoundError, NotFoundError } from "../../../../domain/errors/domain-errors";
 
 export class GetInstructorDetailsUseCaseImpl implements GetInstructorDetailsUseCase {
   constructor(
@@ -13,7 +13,7 @@ export class GetInstructorDetailsUseCaseImpl implements GetInstructorDetailsUseC
   async execute(userId: string): Promise<CombinedInstructorDTO> {
     const user = await this._userRepository.findById(userId);
     if (!user) {
-      throw new HttpError("User not found for instructor", 404);
+      throw new UserNotFoundError(userId);
     }
 
     const instructor = await this._instructorRepository.findInstructorByUserId(
@@ -21,7 +21,7 @@ export class GetInstructorDetailsUseCaseImpl implements GetInstructorDetailsUseC
     );
 
     if (!instructor) {
-      throw new HttpError("Instructor not found", 404);
+      throw new NotFoundError("Instructor", userId);
     }
 
     return {

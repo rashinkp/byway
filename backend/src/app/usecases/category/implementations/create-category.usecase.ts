@@ -1,7 +1,6 @@
 import { ICreateCategoryUseCase } from "../interfaces/create-category.usecase.interface";
 import { IUserRepository } from "../../../repositories/user.repository";
 import { Role } from "../../../../domain/enum/role.enum";
-import { HttpError } from "../../../../presentation/http/errors/http-error";
 import {
   ICategoryOutputDTO,
   ICreateCategoryInputDTO,
@@ -9,6 +8,7 @@ import {
 import { Category } from "../../../../domain/entities/category.entity";
 import { ICategoryRepository } from "../../../repositories/category.repository";
 import { randomUUID } from "crypto";
+import { UserNotFoundError, UserAuthorizationError, CategoryValidationError } from "../../../../domain/errors/domain-errors";
 
 export class CreateCategoryUseCase implements ICreateCategoryUseCase {
   constructor(
@@ -20,10 +20,10 @@ export class CreateCategoryUseCase implements ICreateCategoryUseCase {
     // Validate user is an admin
     const user = await this._userRepository.findById(input.createdBy);
     if (!user) {
-      throw new HttpError("User not found", 404);
+      throw new UserNotFoundError(input.createdBy);
     }
     if (user.role !== Role.ADMIN) {
-      throw new HttpError("Only admins can create categories", 403);
+      throw new UserAuthorizationError("Only admins can create categories");
     }
 
     // Check for existing category
@@ -31,7 +31,7 @@ export class CreateCategoryUseCase implements ICreateCategoryUseCase {
       input.name
     );
     if (existingCategory && existingCategory.isActive()) {
-      throw new HttpError("A category with this name already exists", 400);
+      throw new CategoryValidationError("A category with this name already exists");
     }
 
     // Create category entity
@@ -41,7 +41,6 @@ export class CreateCategoryUseCase implements ICreateCategoryUseCase {
       input.createdBy,
       input.description
     );
-
 
     // Persist category
     const savedCategory = await this._categoryRepository.save(category);

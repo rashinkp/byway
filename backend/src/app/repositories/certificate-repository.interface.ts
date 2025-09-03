@@ -1,6 +1,4 @@
 import { Certificate } from "../../domain/entities/certificate.entity";
-import { Course } from "../../domain/entities/course.entity";
-import { User } from "../../domain/entities/user.entity";
 
 export interface CertificateRepositoryInterface {
   create(certificate: Certificate): Promise<Certificate>;
@@ -25,7 +23,7 @@ export interface CertificateRepositoryInterface {
     status?: string;
     search?: string;
   }): Promise<{
-    items:{ user: {name:string , email:string}; course: {title:string }; }[]
+    items: Certificate[];
     total: number;
     hasMore: boolean;
     nextPage?: number;

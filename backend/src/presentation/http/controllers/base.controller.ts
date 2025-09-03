@@ -8,10 +8,10 @@ export abstract class BaseController {
   protected errorHandler: ErrorHandlerMiddleware;
 
   constructor(
-    protected httpErrors: IHttpErrors,
-    protected httpSuccess: IHttpSuccess
+    protected _httpErrors: IHttpErrors,
+    protected _httpSuccess: IHttpSuccess
   ) {
-    this.errorHandler = new ErrorHandlerMiddleware(httpErrors);
+    this.errorHandler = new ErrorHandlerMiddleware(_httpErrors);
   }
 
   protected async handleRequest(
@@ -26,16 +26,16 @@ export abstract class BaseController {
   }
 
   protected success_200<T>(data: T, message: string): IHttpResponse {
-    return this.httpSuccess.success_200({
+    return this._httpSuccess.success_200({
       data,
       message,
     });
   }
 
   protected success_201<T>(data: T, message: string): IHttpResponse {
-    return this.httpSuccess.success_201({
+    return this._httpSuccess.success_201({
       data,
       message,
     });
   }
-} 
+}

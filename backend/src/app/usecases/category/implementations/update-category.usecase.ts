@@ -1,11 +1,11 @@
 import { IUpdateCategoryUseCase } from "../interfaces/update-category.usecase.interface";
 import { ICategoryRepository } from "../../../repositories/category.repository";
-import { HttpError } from "../../../../presentation/http/errors/http-error";
 import {
   ICategoryOutputDTO,
   IUpdateCategoryInputDTO,
 } from "../../../dtos/category.dto";
 import { Category } from "../../../../domain/entities/category.entity";
+import { CategoryNotFoundError, CategoryValidationError } from "../../../../domain/errors/domain-errors";
 
 export class UpdateCategoryUseCase implements IUpdateCategoryUseCase {
   constructor(private _categoryRepository: ICategoryRepository) {}
@@ -13,7 +13,7 @@ export class UpdateCategoryUseCase implements IUpdateCategoryUseCase {
   async execute(input: IUpdateCategoryInputDTO): Promise<ICategoryOutputDTO> {
     const category = await this._categoryRepository.findById(input.id);
     if (!category) {
-      throw new HttpError("Category not found", 404);
+      throw new CategoryNotFoundError(input.id);
     }
 
     if (input.name) {
@@ -25,7 +25,7 @@ export class UpdateCategoryUseCase implements IUpdateCategoryUseCase {
         existingCategory.id !== input.id &&
         existingCategory.isActive()
       ) {
-        throw new HttpError("A category with this name already exists", 400);
+        throw new CategoryValidationError("A category with this name already exists");
       }
     }
 

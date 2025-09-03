@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from "express";
-import { JwtProvider } from "../../../infra/providers/auth/jwt.provider";
+import { IJwtProvider } from "../../../app/providers/jwt.provider.interface";
 import { HttpError } from "../../http/errors/http-error";
 import { CookieUtils } from "./cookie.utils";
 import { getAppDependencies } from '../../../di/app.dependencies';
@@ -26,7 +26,7 @@ declare module 'express-serve-static-core' {
 async function performTokenRefresh(
   refreshToken: string,
   refreshPayload: UserDTO,
-  jwtProvider: JwtProvider
+  jwtProvider: IJwtProvider
 ): Promise<{ accessToken: string; refreshToken: string; user: UserDTO }> {
   // Create clean payload for new tokens
   const cleanPayload = {
@@ -62,7 +62,7 @@ function getRecentlyIssuedTokens(refreshToken: string): { accessToken: string; r
 }
 
 export const authenticate = async (req: Request, res: Response, next: NextFunction) => {
-  const jwtProvider = new JwtProvider();
+  const { jwtProvider } = getAppDependencies();
   const accessToken = req.cookies.access_token;
   const refreshToken = req.cookies.refresh_token;
 
@@ -144,7 +144,7 @@ export const authenticate = async (req: Request, res: Response, next: NextFuncti
 export const restrictTo =
   (...roles: string[]) =>
     async (req: Request, res: Response, next: NextFunction): Promise<void> => {
-      const jwtProvider = new JwtProvider();
+      const { jwtProvider } = getAppDependencies();
       const accessToken = req.cookies.access_token;
       const refreshToken = req.cookies.refresh_token;
 
@@ -238,7 +238,7 @@ export const optionalAuth = async (
   _res: Response,
   next: NextFunction
 ): Promise<void> => {
-  const jwtProvider = new JwtProvider();
+  const { jwtProvider } = getAppDependencies();
   const accessToken = req.cookies.access_token;
   if (accessToken) {
     try {

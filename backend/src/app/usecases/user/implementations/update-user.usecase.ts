@@ -2,12 +2,12 @@ import { ProfileDTO, UpdateUserDto, UserResponseDTO } from "../../../dtos/user.d
 import { User } from "../../../../domain/entities/user.entity";
 import { UserProfile } from "../../../../domain/entities/user-profile.entity";
 import { Role } from "../../../../domain/enum/role.enum";
-import { HttpError } from "../../../../presentation/http/errors/http-error";
 import { IUserRepository } from "../../../repositories/user.repository";
 import { IUpdateUserUseCase } from "../interfaces/update-user.usecase.interface";
 import { S3ServiceInterface } from "../../../providers/s3.service.interface";
 import { ILogger } from "../../../providers/logger-provider.interface";
 import { mapProfileToDTO, mapUserToDTO } from "../utils/user-dto-mapper";
+import { UserNotFoundError } from "../../../../domain/errors/domain-errors";
 
 export class UpdateUserUseCase implements IUpdateUserUseCase {
   constructor(
@@ -22,7 +22,7 @@ export class UpdateUserUseCase implements IUpdateUserUseCase {
   ): Promise<{ user: UserResponseDTO; profile: ProfileDTO | null }> {
     const user = await this._userRepository.findById(userId);
     if (!user) {
-      throw new HttpError("User not found", 404);
+      throw new UserNotFoundError(userId);
     }
 
     if (

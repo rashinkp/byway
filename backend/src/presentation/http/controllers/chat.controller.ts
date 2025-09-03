@@ -42,15 +42,15 @@ interface CreateChatSocketData {
 
 export class ChatController extends BaseController {
   constructor(
-    private sendMessageUseCase: ISendMessageUseCase,
-    private createChatUseCase: ICreateChatUseCase,
-    private listUserChatsUseCase: IListUserChatsUseCase,
-    private getChatHistoryUseCase: IGetChatHistoryUseCase,
-    private getMessagesByChatUseCase: IGetMessagesByChatUseCase,
-    private getMessageByIdUseCase: IGetMessageByIdUseCase,
-    private deleteMessageUseCase: IDeleteMessageUseCase,
-    private markReadMessagesUseCase: IMarkReadMessagesUseCase,
-    private getTotalUnreadCountUseCase: IGetTotalUnreadCountUseCase,
+    private _sendMessageUseCase: ISendMessageUseCase,
+    private _createChatUseCase: ICreateChatUseCase,
+    private _listUserChatsUseCase: IListUserChatsUseCase,
+    private _getChatHistoryUseCase: IGetChatHistoryUseCase,
+    private _getMessagesByChatUseCase: IGetMessagesByChatUseCase,
+    private _getMessageByIdUseCase: IGetMessageByIdUseCase,
+    private _deleteMessageUseCase: IDeleteMessageUseCase,
+    private _markReadMessagesUseCase: IMarkReadMessagesUseCase,
+    private _getTotalUnreadCountUseCase: IGetTotalUnreadCountUseCase,
     httpErrors: IHttpErrors,
     httpSuccess: IHttpSuccess
   ) {
@@ -63,9 +63,9 @@ export class ChatController extends BaseController {
     const { content, imageUrl, audioUrl } = validated;
     const senderId = socketData.senderId;
     const userId = socketData.userId;
-    
-    // Prepare the input for the use case
-    const useCaseInput: any = {
+    const message = await this._sendMessageUseCase.execute({
+      chatId,
+
       userId,
       senderId,
       content,
@@ -85,7 +85,7 @@ export class ChatController extends BaseController {
 
   async handleCreateChat(socketData: CreateChatSocketData) {
     const validated = createChatSchema.parse(socketData);
-    const chat = await this.createChatUseCase.execute(
+    const chat = await this._createChatUseCase.execute(
       new UserId(validated.user1Id),
       new UserId(validated.user2Id)
     );
@@ -96,7 +96,7 @@ export class ChatController extends BaseController {
   async getChatHistory(httpRequest: IHttpRequest): Promise<IHttpResponse> {
     return this.handleRequest(httpRequest, async (request) => {
       const validated = getChatHistorySchema.parse(request.query);
-      const chat = await this.getChatHistoryUseCase.execute(
+      const chat = await this._getChatHistoryUseCase.execute(
         new UserId(validated.user1Id),
         new UserId(validated.user2Id)
       );
@@ -114,7 +114,7 @@ export class ChatController extends BaseController {
       const sort = validated.sort || undefined;
       const filter = validated.filter || undefined;
 
-      const result = await this.listUserChatsUseCase.execute(
+      const result = await this._listUserChatsUseCase.execute(
         new UserId(validated.userId),
         page,
         limit,
@@ -130,7 +130,7 @@ export class ChatController extends BaseController {
   async createChat(httpRequest: IHttpRequest): Promise<IHttpResponse> {
     return this.handleRequest(httpRequest, async (request) => {
       const validated = createChatSchema.parse(request.body);
-      const chat = await this.createChatUseCase.execute(
+      const chat = await this._createChatUseCase.execute(
         new UserId(validated.user1Id),
         new UserId(validated.user2Id)
       );
@@ -145,9 +145,9 @@ export class ChatController extends BaseController {
       const { chatId, userId, content } = request.body as SendMessageBodyDTO;
       const senderId = request.user?.id;
       if (!senderId) {
-        return this.httpErrors.error_401("Unauthorized: No user id");
+        return this._httpErrors.error_401("Unauthorized: No user id");
       }
-      const message = await this.sendMessageUseCase.execute({
+      const message = await this._sendMessageUseCase.execute({
         chatId,
         userId,
         senderId,
@@ -162,7 +162,7 @@ export class ChatController extends BaseController {
       const validated = getMessagesByChatSchema.parse(request.query);
       const limit = validated.limit || 20;
       const beforeMessageId = validated.beforeMessageId || undefined;
-      const messages = await this.getMessagesByChatUseCase.execute(
+      const messages = await this._getMessagesByChatUseCase.execute(
         new ChatId(validated.chatId),
         limit,
         beforeMessageId
@@ -174,7 +174,7 @@ export class ChatController extends BaseController {
   async getMessageById(httpRequest: IHttpRequest): Promise<IHttpResponse> {
     return this.handleRequest(httpRequest, async (request) => {
       const validated = getMessageByIdSchema.parse(request.params);
-      const message = await this.getMessageByIdUseCase.execute(
+      const message = await this._getMessageByIdUseCase.execute(
         new MessageId(validated.messageId)
       );
       return this.success_200(message, "Message retrieved successfully");
@@ -184,7 +184,7 @@ export class ChatController extends BaseController {
   async deleteMessage(httpRequest: IHttpRequest): Promise<IHttpResponse> {
     return this.handleRequest(httpRequest, async (request) => {
       const validated = deleteMessageSchema.parse(request.params);
-      await this.deleteMessageUseCase.execute(
+      await this._deleteMessageUseCase.execute(
         new MessageId(validated.messageId)
       );
       return this.success_200({}, "Message deleted successfully");
@@ -192,14 +192,14 @@ export class ChatController extends BaseController {
   }
 
   async getChatBetweenUsers(senderId: string, recipientId: string) {
-    return this.getChatHistoryUseCase.execute(
+    return this._getChatHistoryUseCase.execute(
       new UserId(senderId),
       new UserId(recipientId)
     );
   }
 
   async createChatBetweenUsers(senderId: string, recipientId: string) {
-    return this.createChatUseCase.execute(
+    return this._createChatUseCase.execute(
       new UserId(senderId),
       new UserId(recipientId)
     );
@@ -209,11 +209,11 @@ export class ChatController extends BaseController {
   async getChatParticipantsById(
     chatId: string
   ): Promise<{ user1Id: string; user2Id: string } | null> {
-    return this.listUserChatsUseCase.getChatParticipantsById(chatId);
+    return this._listUserChatsUseCase.getChatParticipantsById(chatId);
   }
 
   async markMessagesAsRead(socketData: { chatId: string; userId: string }) {
-    await this.markReadMessagesUseCase.execute(
+    await this._markReadMessagesUseCase.execute(
       new ChatId(socketData.chatId),
       new UserId(socketData.userId)
     );
@@ -222,6 +222,6 @@ export class ChatController extends BaseController {
 
   // Add this method to ChatController
   async getTotalUnreadCount(userId: string) {
-    return this.getTotalUnreadCountUseCase.execute(new UserId(userId));
+    return this._getTotalUnreadCountUseCase.execute(new UserId(userId));
   }
 }

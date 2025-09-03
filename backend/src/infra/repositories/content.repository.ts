@@ -2,11 +2,10 @@ import { PrismaClient } from "@prisma/client";
 import { ContentStatus, ContentType } from "../../domain/enum/content.enum";
 import {
   LessonContent,
-  QuizQuestion,
 } from "../../domain/entities/content.entity";
 import { ILessonContentRepository } from "../../app/repositories/content.repository";
 
-// Type definitions for content data
+
 interface ContentData {
   id?: string;
   lessonId: string;
@@ -32,7 +31,7 @@ interface QuizQuestionData {
 export class LessonContentRepository implements ILessonContentRepository {
   constructor(private readonly _prisma: PrismaClient) {}
 
-  private mapToLessonContentEntity(content: {
+  private _mapToLessonContentEntity(content: {
     id: string;
     lessonId: string;
     type: string;
@@ -79,7 +78,7 @@ export class LessonContentRepository implements ILessonContentRepository {
       return null;
     }
 
-    return this.mapToLessonContentEntity(content);
+    return this._mapToLessonContentEntity(content);
   }
 
   async findByLessonId(lessonId: string): Promise<LessonContent | null> {
@@ -92,7 +91,7 @@ export class LessonContentRepository implements ILessonContentRepository {
       return null;
     }
 
-    return this.mapToLessonContentEntity(content);
+    return this._mapToLessonContentEntity(content);
   }
 
   async create(content: LessonContent): Promise<LessonContent> {
@@ -126,7 +125,7 @@ export class LessonContentRepository implements ILessonContentRepository {
       include: { quizQuestions: true },
     });
 
-    return this.mapToLessonContentEntity(createdContent);
+    return this._mapToLessonContentEntity(createdContent);
   }
 
   async update(content: LessonContent): Promise<LessonContent> {
@@ -160,7 +159,7 @@ export class LessonContentRepository implements ILessonContentRepository {
       include: { quizQuestions: true },
     });
 
-    return this.mapToLessonContentEntity(updatedContent);
+    return this._mapToLessonContentEntity(updatedContent);
   }
 
   async delete(id: string): Promise<void> {

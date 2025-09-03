@@ -1,10 +1,10 @@
 import { ToggleDeleteUserDto, UserResponseDTO } from "../../../dtos/user.dto";
-import { HttpError } from "../../../../presentation/http/errors/http-error";
 import { IUserRepository } from "../../../repositories/user.repository";
 import { IToggleDeleteUserUseCase } from "../interfaces/toggle-delete-user.usecase.interface";
 import { CreateNotificationsForUsersUseCase } from "../../notification/implementations/create-notifications-for-users.usecase";
 import { NotificationEventType } from "../../../../domain/enum/notification-event-type.enum";
 import { NotificationEntityType } from "../../../../domain/enum/notification-entity-type.enum";
+import { UserAuthorizationError, UserNotFoundError } from "../../../../domain/errors/domain-errors";
 
 export class ToggleDeleteUserUseCase implements IToggleDeleteUserUseCase {
   constructor(
@@ -17,12 +17,12 @@ export class ToggleDeleteUserUseCase implements IToggleDeleteUserUseCase {
     currentUser: { id: string; role: string }
   ): Promise<UserResponseDTO> {
     if (currentUser.role !== "ADMIN") {
-      throw new HttpError("Unauthorized: Admin role required", 403);
+      throw new UserAuthorizationError("Unauthorized: Admin role required");
     }
 
     const user = await this._userRepository.findById(dto.id);
     if (!user) {
-      throw new HttpError("User not found", 404);
+      throw new UserNotFoundError(dto.id);
     }
 
     let eventType: NotificationEventType;

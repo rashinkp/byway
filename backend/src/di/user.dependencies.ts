@@ -44,7 +44,6 @@ export function createUserDependencies(
   );
   const checkUserActiveUseCase = new CheckUserActiveUseCase(userRepository);
 
-  // Initialize controller
   const userController = new UserController(
     getAllUsersUseCase,
     toggleDeleteUserUseCase,

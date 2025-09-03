@@ -17,19 +17,19 @@ import { IHttpRequest } from "../interfaces/http-request.interface";
 import { IHttpResponse } from "../interfaces/http-response.interface";
 import { UnauthorizedError } from "../errors/unautherized-error";
 import { BadRequestError } from "../errors/bad-request-error";
-import { HttpError } from "../errors/http-error";
+import { NotFoundError } from "../errors/not-found-error";
 import { BaseController } from "./base.controller";
 import { getSocketIOInstance } from "../../socketio";
 
 export class UserController extends BaseController {
   constructor(
-    private getAllUsersUseCase: IGetAllUsersUseCase,
-    private toggleDeleteUserUseCase: IToggleDeleteUserUseCase,
-    private getCurrentUserUseCase: IGetCurrentUserUseCase,
-    private getUserByIdUseCase: IGetUserByIdUseCase,
-    private updateUserUseCase: IUpdateUserUseCase,
-    private getPublicUserUseCase: IGetPublicUserUseCase,
-    private getUserAdminDetailsUseCase: IGetUserAdminDetailsUseCase,
+    private _getAllUsersUseCase: IGetAllUsersUseCase,
+    private _toggleDeleteUserUseCase: IToggleDeleteUserUseCase,
+    private _getCurrentUserUseCase: IGetCurrentUserUseCase,
+    private _getUserByIdUseCase: IGetUserByIdUseCase,
+    private _updateUserUseCase: IUpdateUserUseCase,
+    private _getPublicUserUseCase: IGetPublicUserUseCase,
+    private _getUserAdminDetailsUseCase: IGetUserAdminDetailsUseCase,
     httpErrors: IHttpErrors,
     httpSuccess: IHttpSuccess
   ) {
@@ -42,7 +42,7 @@ export class UserController extends BaseController {
         throw new UnauthorizedError("User not authenticated");
       }
       const validated = validateGetAllUsers(request.query);
-      const result = await this.getAllUsersUseCase.execute(validated);
+      const result = await this._getAllUsersUseCase.execute(validated);
       return this.success_200(
         {
           items: result.items.map((user) => ({
@@ -74,7 +74,7 @@ export class UserController extends BaseController {
       const validated = validateToggleDeleteUser({
         id: request.params.id,
       });
-      const user = await this.toggleDeleteUserUseCase.execute(
+      const user = await this._toggleDeleteUserUseCase.execute(
         validated,
         request.user
       );
@@ -120,11 +120,11 @@ export class UserController extends BaseController {
       if (!request.user?.id) {
         throw new UnauthorizedError("User not authenticated");  
       }
-      const { user, cartCount } = await this.getCurrentUserUseCase.execute(
+      const { user, cartCount } = await this._getCurrentUserUseCase.execute(
         request.user.id
       );
       const { user: fetchedUser, profile } =
-        await this.getUserByIdUseCase.execute({ userId: user.id });
+        await this._getUserByIdUseCase.execute({ userId: user.id });
         return this.success_200(
           {
             id: fetchedUser.id,
@@ -160,11 +160,11 @@ export class UserController extends BaseController {
         throw new BadRequestError("User ID is required");
       }
       const validated = validateGetUser({ userId: request.params.userId });
-      const { user, profile } = await this.getUserByIdUseCase.execute(
+      const { user, profile } = await this._getUserByIdUseCase.execute(
         validated
       );
       if (!user) {
-        throw new HttpError("User not found", 404);
+        throw new NotFoundError("User not found");
       }
 
       return this.success_200(
@@ -199,7 +199,7 @@ export class UserController extends BaseController {
         throw new UnauthorizedError("User not authenticated");
       }
       const validated = validateUpdateUser(request.body);
-      const { user, profile } = await this.updateUserUseCase.execute(
+      const { user, profile } = await this._updateUserUseCase.execute(
         validated,
         request.user.id
       );
@@ -234,11 +234,11 @@ export class UserController extends BaseController {
         throw new BadRequestError("User ID is required");
       }
       const validated = validateGetUser({ userId: request.params.userId });
-      const { user, profile } = await this.getPublicUserUseCase.execute(
+      const { user, profile } = await this._getPublicUserUseCase.execute(
         validated
       );
       if (!user) {
-        throw new HttpError("User not found", 404);
+        throw new NotFoundError("User not found");
       }
       return this.success_200(
         {
@@ -263,9 +263,9 @@ export class UserController extends BaseController {
       }
       const validated = validateGetUser({ userId: request.params.userId });
       const { user, profile, instructor } =
-        await this.getUserAdminDetailsUseCase.execute(validated);
+        await this._getUserAdminDetailsUseCase.execute(validated);
       if (!user) {
-        throw new HttpError("User not found", 404);
+        throw new NotFoundError("User not found");
       }
       return this.success_200(
         {

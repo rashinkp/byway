@@ -186,11 +186,76 @@ export default function MainProfileComponent() {
             {activeSection === "profile" && (
               <ProfileSection user={user} setIsModalOpen={setIsModalOpen} />
             )}
-            {activeSection === "courses" && <MyCoursesSection />}
-            {activeSection === "wallet" && <WalletSection />}
-            {activeSection === "transactions" && <TransactionsSection />}
-            {activeSection === "orders" && <OrdersSection />}
-            {activeSection === "certificates" && <CertificatesSection />}
+            {activeSection === "courses" && (
+              loadingSection === "courses" ? (
+                <div className="w-full">
+                  <div className="bg-white dark:bg-[#232326] rounded-xl p-8 mb-8 text-center">
+                    <div className="flex items-center justify-center">
+                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#facc15] mr-3"></div>
+                      <span className="text-lg text-gray-600 dark:text-gray-300">Loading courses...</span>
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <MyCoursesSection />
+              )
+            )}
+            {activeSection === "wallet" && (
+              loadingSection === "wallet" ? (
+                <div className="w-full">
+                  <div className="bg-white dark:bg-[#232326] rounded-xl p-8 mb-8 text-center">
+                    <div className="flex items-center justify-center">
+                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#facc15] mr-3"></div>
+                      <span className="text-lg text-gray-600 dark:text-gray-300">Loading wallet...</span>
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <WalletSection />
+              )
+            )}
+            {activeSection === "transactions" && (
+              loadingSection === "transactions" ? (
+                <div className="w-full">
+                  <div className="bg-white dark:bg-[#232326] rounded-xl p-8 mb-8 text-center">
+                    <div className="flex items-center justify-center">
+                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#facc15] mr-3"></div>
+                      <span className="text-lg text-gray-600 dark:text-gray-300">Loading transactions...</span>
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <TransactionsSection />
+              )
+            )}
+            {activeSection === "orders" && (
+              loadingSection === "orders" ? (
+                <div className="w-full">
+                  <div className="bg-white dark:bg-[#232326] rounded-xl p-8 mb-8 text-center">
+                    <div className="flex items-center justify-center">
+                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#facc15] mr-3"></div>
+                      <span className="text-lg text-gray-600 dark:text-gray-300">Loading orders...</span>
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <OrdersSection />
+              )
+            )}
+            {activeSection === "certificates" && (
+              loadingSection === "certificates" ? (
+                <div className="w-full">
+                  <div className="bg-white dark:bg-[#232326] rounded-xl p-8 mb-8 text-center">
+                    <div className="flex items-center justify-center">
+                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#facc15] mr-3"></div>
+                      <span className="text-lg text-gray-600 dark:text-gray-300">Loading certificates...</span>
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <CertificatesSection />
+              )
+            )}
             {activeSection === "settings" && (
               <div className="bg-white dark:bg-[#232326] rounded-2xl border border-gray-200 dark:border-gray-700 p-8 shadow-lg">
                 <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 capitalize mb-2">

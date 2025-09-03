@@ -3,20 +3,19 @@ import {
 } from "../interfaces/top-up-wallet.usecase.interface";
 import { IWalletRepository } from "../../../repositories/wallet.repository.interface";
 import { ITransactionRepository } from "../../../repositories/transaction.repository";
-import { IPaymentService } from "../../../services/payment/interfaces/payment.service.interface";
+import { ICreateStripeCheckoutSessionUseCase } from "../../payment/interfaces/create-stripe-checkout-session.usecase.interface";
 import { TransactionType } from "../../../../domain/enum/transaction-type.enum";
 import { TransactionStatus } from "../../../../domain/enum/transaction-status.enum";
 import { PaymentGateway } from "../../../../domain/enum/payment-gateway.enum";
-import { HttpError } from "../../../../presentation/http/errors/http-error";
-import { StatusCodes } from "http-status-codes";
 import { Transaction } from "../../../../domain/entities/transaction.entity";
 import { TopUpWalletDto, TopUpWalletResponseDTO } from "../../../dtos/wallet";
+import { NotFoundError } from "../../../../domain/errors/domain-errors";
 
 export class TopUpWalletUseCase implements ITopUpWalletUseCase {
   constructor(
     private _walletRepository: IWalletRepository,
     private _transactionRepository: ITransactionRepository,
-    private _paymentService: IPaymentService
+    private _createStripeCheckoutSessionUseCase: ICreateStripeCheckoutSessionUseCase
   ) {}
 
   async execute(
@@ -46,7 +45,7 @@ export class TopUpWalletUseCase implements ITopUpWalletUseCase {
       // For wallet payments, directly update the balance
       const wallet = await this._walletRepository.findByUserId(userId);
       if (!wallet) {
-        throw new HttpError("Wallet not found", StatusCodes.NOT_FOUND);
+        throw new NotFoundError("Wallet", userId);
       }
       wallet.addAmount(amount);
       await this._walletRepository.update(wallet);
@@ -60,7 +59,7 @@ export class TopUpWalletUseCase implements ITopUpWalletUseCase {
       };
     } else {
       // For other payment methods, create a checkout session
-      const session = await this._paymentService.createStripeCheckoutSession(
+      const session = await this._createStripeCheckoutSessionUseCase.execute(
         userId,
         transaction.id,
         {

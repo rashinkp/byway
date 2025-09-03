@@ -7,7 +7,7 @@ import { IHttpResponse } from "../interfaces/http-response.interface";
 import { validateGetUserNotifications } from "../../validators/notification.validators";
 import { UnauthorizedError } from "../errors/unautherized-error";
 
-interface NotificationData {
+export interface NotificationData {
   userId: string;
   page?: number;
   limit?: number;
@@ -17,7 +17,7 @@ interface NotificationData {
 
 export class NotificationController extends BaseController {
   constructor(
-    private getUserNotificationsUseCase: GetUserNotificationsUseCaseInterface,
+    private _getUserNotificationsUseCase: GetUserNotificationsUseCaseInterface,
     httpErrors: IHttpErrors,
     httpSuccess: IHttpSuccess
   ) {
@@ -32,7 +32,7 @@ export class NotificationController extends BaseController {
         throw new UnauthorizedError("User not authenticated");
       }
       const validated = validateGetUserNotifications(request.query);
-      const notifications = await this.getUserNotificationsUseCase.execute(
+      const notifications = await this._getUserNotificationsUseCase.execute(
         validated
       );
       return this.success_200(
@@ -43,6 +43,6 @@ export class NotificationController extends BaseController {
   }
 
   async getUserNotificationsForSocketIO(data: NotificationData) {
-    return this.getUserNotificationsUseCase.execute(data);
+    return this._getUserNotificationsUseCase.execute(data);
   }
 }

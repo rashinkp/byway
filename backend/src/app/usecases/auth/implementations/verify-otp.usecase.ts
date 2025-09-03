@@ -1,10 +1,13 @@
 import { User } from "../../../../domain/entities/user.entity";
 import { IAuthRepository } from "../../../repositories/auth.repository";
-import { HttpError } from "../../../../presentation/http/errors/http-error";
 import { JwtProvider } from "../../../../infra/providers/auth/jwt.provider";
 import { IVerifyOtpUseCase } from "../interfaces/verify-otp.usecase.interface";
 import { VerifyOtpDto } from "../../../dtos/auth.dto";
 import { UserResponseDTO } from "../../../dtos/user.dto";
+import { 
+  UserNotFoundError, 
+  UserValidationError 
+} from "../../../../domain/errors/domain-errors";
 
 export class VerifyOtpUseCase implements IVerifyOtpUseCase {
   constructor(private _authRepository: IAuthRepository) {}
@@ -16,11 +19,11 @@ export class VerifyOtpUseCase implements IVerifyOtpUseCase {
       dto.email
     );
     if (!verification) {
-      throw new HttpError("Verification not found", 404);
+      throw new UserNotFoundError("Verification not found");
     }
 
     if (verification.attempts >= 3) {
-      throw new HttpError("Maximum attempts exceeded", 400);
+      throw new UserValidationError("Maximum attempts exceeded");
     }
 
     try {
@@ -39,7 +42,7 @@ export class VerifyOtpUseCase implements IVerifyOtpUseCase {
     // Fetch and verify user
     const user = await this._authRepository.findUserByEmail(dto.email);
     if (!user) {
-      throw new HttpError("User not found", 404);
+      throw new UserNotFoundError("User not found");
     }
 
     if (dto.type === "signup") {

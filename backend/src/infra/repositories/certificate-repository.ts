@@ -6,7 +6,7 @@ import { CertificateStatus } from "../../domain/enum/certificate-status.enum";
 // Type for Prisma JSON operations
 type PrismaJsonValue = string | number | boolean | null | PrismaJsonValue[] | { [key: string]: PrismaJsonValue };
 
-export class PrismaCertificateRepository implements CertificateRepositoryInterface {
+export class CertificateRepository implements CertificateRepositoryInterface {
   constructor(private readonly _prisma: PrismaClient) {}
 
   async create(certificate: Certificate): Promise<Certificate> {
@@ -117,7 +117,7 @@ export class PrismaCertificateRepository implements CertificateRepositoryInterfa
     status?: string;
     search?: string;
   }): Promise<{
-    items: { user: {name: string; email: string}; course: {title: string}; }[];
+    items: Certificate[];
     total: number;
     hasMore: boolean;
     nextPage?: number;
@@ -140,31 +140,24 @@ export class PrismaCertificateRepository implements CertificateRepositoryInterfa
       ];
     }
 
-    const [items, total] = await Promise.all([
+    const [rawItems, total] = await Promise.all([
       this._prisma.certificate.findMany({
         where,
         orderBy: { [sortBy]: sortOrder },
         skip,
         take,
-        include: {
-          course: {
-            select: {
-              title: true,
-            },
-          },
-          user: {
-            select: {
-              name: true,
-              email: true,
-            },
-          },
-        },
       }),
       this._prisma.certificate.count({ where }),
     ]);
 
     const hasMore = skip + take < total;
     const nextPage = hasMore ? Math.floor(skip / take) + 2 : undefined;
+
+    // Map raw database results to domain entities
+    const items = rawItems.map(item => Certificate.fromPersistence({
+      ...item,
+      metadata: item.metadata as CertificateMetadata | undefined
+    }));
 
     return {
       items,

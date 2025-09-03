@@ -3,11 +3,11 @@ import {
   IUpdateLessonInputDTO,
 } from "../../../dtos/lesson.dto";
 import { Lesson } from "../../../../domain/entities/lesson.entity";
-import { HttpError } from "../../../../presentation/http/errors/http-error";
 import { ILessonRepository } from "../../../repositories/lesson.repository";
 import { IUpdateLessonUseCase } from "../interfaces/update-lesson.usecase.interface";
 import { ILessonContentRepository } from "../../../repositories/content.repository";
 import { LessonStatus } from "../../../../domain/enum/lesson.enum";
+import { LessonNotFoundError, LessonValidationError } from "../../../../domain/errors/domain-errors";
 
 export class UpdateLessonUseCase implements IUpdateLessonUseCase {
   constructor(
@@ -19,7 +19,7 @@ export class UpdateLessonUseCase implements IUpdateLessonUseCase {
     try {
       const lesson = await this._lessonRepository.findById(dto.lessonId);
       if (!lesson || !lesson.isActive()) {
-        throw new HttpError("Lesson not found or deleted", 404);
+        throw new LessonNotFoundError(dto.lessonId);
       }
 
       // Check if content exists when publishing
@@ -28,21 +28,48 @@ export class UpdateLessonUseCase implements IUpdateLessonUseCase {
           dto.lessonId
         );
         if (!content) {
-          throw new HttpError("Cannot publish lesson without content", 400);
+          throw new LessonValidationError("Cannot publish lesson without content");
         }
       }
 
       const updatedLesson = Lesson.update(lesson, dto);
       const savedLesson = await this._lessonRepository.update(updatedLesson);
-      return savedLesson.toJSON() as unknown as ILessonOutputDTO;
+      // Map domain entity to DTO
+      return {
+        id: savedLesson.id,
+        title: savedLesson.title,
+        description: savedLesson.description,
+        order: savedLesson.order,
+        courseId: savedLesson.courseId,
+        status: savedLesson.status,
+        content: savedLesson.content ? {
+          id: savedLesson.content.id,
+          lessonId: savedLesson.content.lessonId,
+          type: savedLesson.content.type,
+          status: savedLesson.content.status,
+          title: savedLesson.content.title,
+          description: savedLesson.content.description,
+          fileUrl: savedLesson.content.fileUrl,
+          thumbnailUrl: savedLesson.content.thumbnailUrl,
+          quizQuestions: savedLesson.content.quizQuestions,
+          createdAt: savedLesson.content.createdAt.toISOString(),
+          updatedAt: savedLesson.content.updatedAt.toISOString(),
+          deletedAt: savedLesson.content.deletedAt?.toISOString() ?? null,
+        } : null,
+        thumbnail: null, // Not available in domain entity
+        duration: null, // Not available in domain entity
+        createdAt: savedLesson.createdAt.toISOString(),
+        updatedAt: savedLesson.updatedAt.toISOString(),
+        deletedAt: savedLesson.deletedAt?.toISOString() ?? null,
+      };
     } catch (error) {
-      if (error instanceof Error) {
-        throw new HttpError(
-          error.message,
-          error.message.includes("404") ? 404 : 400
-        );
+      if (error instanceof LessonNotFoundError || error instanceof LessonValidationError) {
+        throw error;
       }
-      throw new HttpError("Failed to update lesson", 500);
+      if (error instanceof Error) {
+        throw new LessonValidationError(error.message);
+      }
+      throw new LessonValidationError("Failed to update lesson");
     }
   }
 }

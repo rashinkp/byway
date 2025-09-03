@@ -4,12 +4,12 @@ import {
   LessonContent as PrismaLessonContent,
 } from "@prisma/client";
 import {
-  ILessonListOutputDTO,
-  IGetAllLessonsInputDTO,
-  IGetPublicLessonsInputDTO,
-  IPublicLessonListOutputDTO,
-  ILessonOutputDTO,
-} from "../../app/dtos/lesson.dto";
+  ILessonFilterOptions,
+  ILessonListResponse,
+  IPublicLessonFilterOptions,
+  IPublicLessonListResponse,
+  ILessonOutput,
+} from "../../domain/types/lesson.interface";
 import { LessonStatus } from "../../domain/enum/lesson.enum";
 import { ContentStatus, ContentType } from "../../domain/enum/content.enum";
 import { ILessonRepository } from "../../app/repositories/lesson.repository";
@@ -57,8 +57,8 @@ export class LessonRepository implements ILessonRepository {
   constructor(private readonly _prisma: PrismaClient) {}
 
   async getAllLessons(
-    params: IGetAllLessonsInputDTO
-  ): Promise<ILessonListOutputDTO> {
+    params: ILessonFilterOptions
+  ): Promise<ILessonListResponse> {
     const {
       courseId,
       page = 1,
@@ -101,7 +101,7 @@ export class LessonRepository implements ILessonRepository {
     ]);
 
     return {
-      lessons: lessons.map(this.mapToLessonOutputDTO),
+              lessons: lessons.map(this._mapToLessonOutput),
       total,
       page,
       limit,
@@ -110,8 +110,8 @@ export class LessonRepository implements ILessonRepository {
   }
 
   async getPublicLessons(
-    params: IGetPublicLessonsInputDTO
-  ): Promise<IPublicLessonListOutputDTO> {
+    params: IPublicLessonFilterOptions
+  ): Promise<IPublicLessonListResponse> {
     const {
       courseId,
       page = 1,
@@ -176,7 +176,7 @@ export class LessonRepository implements ILessonRepository {
       return null;
     }
 
-    return this.mapToLessonEntity(lesson);
+    return this._mapToLessonEntity(lesson);
   }
 
   async create(lesson: Lesson): Promise<Lesson> {
@@ -227,7 +227,7 @@ export class LessonRepository implements ILessonRepository {
       include: { content: { include: { quizQuestions: true } } },
     });
 
-    return this.mapToLessonEntity(createdLesson);
+    return this._mapToLessonEntity(createdLesson);
   }
 
   async update(lesson: Lesson): Promise<Lesson> {
@@ -312,7 +312,7 @@ export class LessonRepository implements ILessonRepository {
       include: { content: { include: { quizQuestions: true } } },
     });
 
-    return this.mapToLessonEntity(updatedLesson);
+    return this._mapToLessonEntity(updatedLesson);
   }
 
   async delete(id: string): Promise<void> {
@@ -334,7 +334,7 @@ export class LessonRepository implements ILessonRepository {
     });
   }
 
-  private mapToLessonEntity(
+  private _mapToLessonEntity(
     lesson: PrismaLesson & {
       content?: (PrismaLessonContent & { quizQuestions: Array<{ id: string; question: string; options: string[]; correctAnswer: string }> }) | null;
     }
@@ -375,11 +375,11 @@ export class LessonRepository implements ILessonRepository {
     });
   }
 
-  private mapToLessonOutputDTO(
+  private _mapToLessonOutput(
     lesson: PrismaLesson & {
       content?: (PrismaLessonContent & { quizQuestions: Array<{ id: string; question: string; options: string[]; correctAnswer: string }> }) | null;
     }
-  ): ILessonOutputDTO {
+  ): ILessonOutput {
     return {
       id: lesson.id,
       courseId: lesson.courseId,
@@ -432,7 +432,7 @@ export class LessonRepository implements ILessonRepository {
       return null;
     }
 
-    return this.mapToLessonEntity(lesson);
+    return this._mapToLessonEntity(lesson);
   }
 
   async hasPublishedLessons(courseId: string): Promise<boolean> {
@@ -457,6 +457,6 @@ export class LessonRepository implements ILessonRepository {
       orderBy: { order: "asc" },
     });
 
-    return lessons.map(this.mapToLessonEntity);
+    return lessons.map(this._mapToLessonEntity);
   }
 }

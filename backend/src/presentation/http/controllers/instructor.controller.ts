@@ -1,4 +1,3 @@
-import { IUserRepository } from "../../../app/repositories/user.repository";
 import {
   validateApproveInstructor,
   validateCreateInstructor,
@@ -14,27 +13,29 @@ import { IApproveInstructorUseCase } from "../../../app/usecases/instructor/inte
 import { IDeclineInstructorUseCase } from "../../../app/usecases/instructor/interfaces/decline-instructor.usecase.interface";
 import { IGetInstructorByUserIdUseCase } from "../../../app/usecases/instructor/interfaces/get-instructor-by-Id.usecase.interface";
 import { IGetAllInstructorsUseCase } from "../../../app/usecases/instructor/interfaces/get-all-instructors.usecase.interface";
-import { StatusCodes } from "http-status-codes";
 import { IHttpErrors } from "../interfaces/http-errors.interface";
 import { IHttpSuccess } from "../interfaces/http-success.interface";
 import { IHttpRequest } from "../interfaces/http-request.interface";
 import { IHttpResponse } from "../interfaces/http-response.interface";
 import { UnauthorizedError } from "../errors/unautherized-error";
-import { HttpError } from "../errors/http-error";
+import { NotFoundError } from "../errors/not-found-error";
+import { BadRequestError } from "../errors/bad-request-error";
+import { InternalServerError } from "../errors/internal-server-error";
 import { BaseController } from "./base.controller";
 import { GetInstructorDetailsUseCase } from "../../../app/usecases/instructor/interfaces/get-instructor-details.usecase.interface";
 import { getSocketIOInstance } from "../../socketio";
+import { IGetUserByIdUseCase } from "../../../app/usecases/user/interfaces/get-user-by-id.usecase.interface";
 
 export class InstructorController extends BaseController {
   constructor(
-    private createInstructorUseCase: ICreateInstructorUseCase,
-    private updateInstructorUseCase: IUpdateInstructorUseCase,
-    private approveInstructorUseCase: IApproveInstructorUseCase,
-    private declineInstructorUseCase: IDeclineInstructorUseCase,
-    private getInstructorByUserIdUseCase: IGetInstructorByUserIdUseCase,
-    private getAllInstructorsUseCase: IGetAllInstructorsUseCase,
-    private userRepository: IUserRepository,
-    private getInstructorDetailsUseCase: GetInstructorDetailsUseCase,
+    private _createInstructorUseCase: ICreateInstructorUseCase,
+    private _updateInstructorUseCase: IUpdateInstructorUseCase,
+    private _approveInstructorUseCase: IApproveInstructorUseCase,
+    private _declineInstructorUseCase: IDeclineInstructorUseCase,
+    private _getInstructorByUserIdUseCase: IGetInstructorByUserIdUseCase,
+    private _getAllInstructorsUseCase: IGetAllInstructorsUseCase,
+    private _getUserByIdUseCase: IGetUserByIdUseCase,
+    private _getInstructorDetailsUseCase: GetInstructorDetailsUseCase,
     httpErrors: IHttpErrors,
     httpSuccess: IHttpSuccess
   ) {
@@ -47,17 +48,17 @@ export class InstructorController extends BaseController {
         throw new UnauthorizedError("User not authenticated");
       }
       const validated = validateCreateInstructor(request.body);
-      const instructor = await this.createInstructorUseCase.execute(
+      const instructor = await this._createInstructorUseCase.execute(
         { ...validated, userId: request.user.id },
         request.user
       );
 
-      // Fetch user data for response
-      const user = await this.userRepository.findById(request.user.id);
+      // Fetch user data for response via use case
+      const userResult = await this._getUserByIdUseCase.execute({ userId: request.user.id });
+      const user = userResult?.user;
       if (!user) {
-        throw new HttpError(
-          "User data not found after instructor creation",
-          StatusCodes.INTERNAL_SERVER_ERROR
+        throw new InternalServerError(
+          "User data not found after instructor creation"
         );
       }
 
@@ -95,13 +96,14 @@ export class InstructorController extends BaseController {
         throw new UnauthorizedError("User not authenticated");
       }
       const validated = validateUpdateInstructor(request.body);
-      const instructor = await this.updateInstructorUseCase.execute(
+      const instructor = await this._updateInstructorUseCase.execute(
         validated,
         request.user
       );
-      const user = await this.userRepository.findById(request.user.id);
+      const userResult = await this._getUserByIdUseCase.execute({ userId: request.user.id });
+      const user = userResult?.user;
       if (!user) {
-        throw new HttpError("User not found", StatusCodes.NOT_FOUND);
+        throw new NotFoundError("User not found");
       }
       return this.success_200(
         {
@@ -137,13 +139,14 @@ export class InstructorController extends BaseController {
         throw new UnauthorizedError("User not authenticated");
       }
       const validated = validateApproveInstructor(request.body);
-      const instructor = await this.approveInstructorUseCase.execute(
+      const instructor = await this._approveInstructorUseCase.execute(
         validated,
         request.user
       );
 
       // Get user details for Socket.IO notification
-      const user = await this.userRepository.findById(instructor.userId);
+      const userResult = await this._getUserByIdUseCase.execute({ userId: instructor.userId });
+      const user = userResult?.user;
 
       // Emit real-time notification to the instructor
       const io = getSocketIOInstance();
@@ -173,13 +176,14 @@ export class InstructorController extends BaseController {
         throw new UnauthorizedError("User not authenticated");
       }
       const validated = validateDeclineInstructor(request.body);
-      const instructor = await this.declineInstructorUseCase.execute(
+      const instructor = await this._declineInstructorUseCase.execute(
         validated,
         request.user
       );
 
       // Get user details for Socket.IO notification
-      const user = await this.userRepository.findById(instructor.userId);
+      const userResult = await this._getUserByIdUseCase.execute({ userId: instructor.userId });
+      const user = userResult?.user;
 
       // Emit real-time notification to the instructor
       const io = getSocketIOInstance();
@@ -213,12 +217,13 @@ export class InstructorController extends BaseController {
       const validated = validateGetInstructorByUserId({
         userId: request.user.id,
       });
-      const instructor = await this.getInstructorByUserIdUseCase.execute(
+      const instructor = await this._getInstructorByUserIdUseCase.execute(
         validated
       );
-      const user = await this.userRepository.findById(request.user.id);
+      const userResult = await this._getUserByIdUseCase.execute({ userId: request.user.id });
+      const user = userResult?.user;
       if (!user) {
-        throw new HttpError("User not found", StatusCodes.NOT_FOUND);
+        throw new NotFoundError("User not found");
       }
       return this.success_200(
         instructor
@@ -253,7 +258,7 @@ export class InstructorController extends BaseController {
   async getAllInstructors(httpRequest: IHttpRequest): Promise<IHttpResponse> {
     return this.handleRequest(httpRequest, async (request) => {
       const validated = validateGetAllInstructors(request.query);
-      const result = await this.getAllInstructorsUseCase.execute(validated);
+      const result = await this._getAllInstructorsUseCase.execute(validated);
       return this.success_200(result, "Instructors retrieved successfully");
     });
   }
@@ -264,9 +269,9 @@ export class InstructorController extends BaseController {
     return this.handleRequest(httpRequest, async (request) => {
       const { userId } = request.params || {};
       if (!userId) {
-        throw new HttpError("User ID is required", StatusCodes.BAD_REQUEST);
+        throw new BadRequestError("User ID is required");
       }
-      const result = await this.getInstructorDetailsUseCase.execute(userId);
+      const result = await this._getInstructorDetailsUseCase.execute(userId);
       return this.success_200(
         result,
         "Instructor details retrieved successfully"
