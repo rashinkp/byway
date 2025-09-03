@@ -137,17 +137,27 @@ export class MessageRepository implements IMessageRepository {
   }
 
   async create(message: Message): Promise<void> {
-    await this._prisma.message.create({
-      data: {
-        chatId: message.chatId.value,
-        senderId: message.senderId.value,
-        content: message.content?.value || null,
-        imageUrl: message.imageUrl?.toString() || null,
-        audioUrl: message.audioUrl?.toString() || null,
-        type: message.type as PrismaMessageType,
-        isRead: message.isRead,
-        createdAt: message.createdAt.value,
-      },
+    // Use a transaction to create the message and update the chat's updatedAt
+    await this._prisma.$transaction(async (tx) => {
+      // Create the message
+      await tx.message.create({
+        data: {
+          chatId: message.chatId.value,
+          senderId: message.senderId.value,
+          content: message.content?.value || null,
+          imageUrl: message.imageUrl?.toString() || null,
+          audioUrl: message.audioUrl?.toString() || null,
+          type: message.type as PrismaMessageType,
+          isRead: message.isRead,
+          createdAt: message.createdAt.value,
+        },
+      });
+
+      // Update the chat's updatedAt field to the message's createdAt time
+      await tx.chat.update({
+        where: { id: message.chatId.value },
+        data: { updatedAt: message.createdAt.value },
+      });
     });
   }
 
