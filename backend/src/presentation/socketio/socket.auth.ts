@@ -3,6 +3,10 @@ import { Socket } from "socket.io";
 import cookie from "cookie";
 
 export async function socketAuthMiddleware(socket: Socket, next: (err?: Error) => void) {
+  const socketId = socket.id;
+  const ip = socket.handshake.address;
+  const userAgent = socket.handshake.headers['user-agent'];
+
   try {
     // Try to get token from multiple sources
     let token = socket.handshake.auth.token;
@@ -31,7 +35,7 @@ export async function socketAuthMiddleware(socket: Socket, next: (err?: Error) =
     }
     
     next();
-  } catch {
+  } catch (error) {
     next();
   }
 } 

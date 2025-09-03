@@ -15,25 +15,32 @@ export function registerMessageHandlers(
   io: SocketIOServer,
   chatController: ChatController
 ) {
-socket.on(
-  "getMessagesByChat",
-  socketHandler<GetMessagesByChatData>(async (data) => {
-    const query: Record<string, string | number | boolean> = {
-      chatId: data.chatId,
-      limit: data.limit ?? 20,
-    };
+  socket.on(
+    "getMessagesByChat",
+    socketHandler<GetMessagesByChatData>(async (data) => {
+      const query: Record<string, string | number | boolean> = {
+        chatId: data.chatId,
+        limit: data.limit ?? 20,
+      };
 
-    if (data.beforeMessageId !== undefined) {
-      query.beforeMessageId = data.beforeMessageId;
-    }
+      if (data.beforeMessageId !== undefined) {
+        query.beforeMessageId = data.beforeMessageId;
+      }
 
-    const messages = await chatController.getMessagesByChat({
-      query,
-      params: {},
-    });
-    return messages;
-  }, "messagesByChat")
-);
+      const messages = await chatController.getMessagesByChat({
+        query,
+        params: {},
+      });
+      
+      // Extract the data from the controller response
+      // The controller returns { statusCode: 200, body: { success: true, message: "Success", data: result, message: "Messages retrieved successfully" } }
+      const messageData = (messages.body as any)?.data;
+      
+      
+      
+      return messageData || [];
+    }, "messagesByChat")
+  );
 
   socket.on(
     "getMessageById",
@@ -41,7 +48,14 @@ socket.on(
       const message = await chatController.getMessageById({
         params: {messageId:data.messageId},
       });
-      return message;
+      
+      // Extract the data from the controller response
+      // The controller returns { statusCode: 200, body: { success: true, message: "Success", data: result, message: "Message retrieved successfully" } }
+      const messageData = (message.body as any)?.data;
+      
+      
+      
+      return messageData || null;
     }, "messageById")
   );
 
@@ -104,24 +118,25 @@ socket.on(
 
   // Handle when user joins a chat (to clear pending notifications)
   socket.on("joinChat", async (data: JoinChatData) => {
-      const userId = socket.data.user?.id;
-      if (userId && data.chatId) {
-        // Join the chat room
-        socket.join(data.chatId);
+             const userId = socket.data.user?.id;
+       
+       if (userId && data.chatId) {
+         // Join the chat room
+         socket.join(data.chatId);
 
-        // Mark all messages as read for this user in this chat
-        await chatController.markMessagesAsRead({ chatId: data.chatId, userId });
+         // Mark all messages as read for this user in this chat
+         await chatController.markMessagesAsRead({ chatId: data.chatId, userId });
 
-        // Emit updated unread count to the user
-        const unreadCount = await chatController.getTotalUnreadCount(userId);
-        io.to(userId).emit("unreadMessageCount", { count: unreadCount });
+         // Emit updated unread count to the user
+         const unreadCount = await chatController.getTotalUnreadCount(userId);
+         io.to(userId).emit("unreadMessageCount", { count: unreadCount });
 
-        // Emit updated chat list to the user
-        io.to(userId).emit("chatListUpdated");
-        io.to(userId).emit("messagesRead", { chatId: data.chatId, userId });
-        // Also notify all participants in the chat room
-        io.to(data.chatId).emit("messagesRead", { chatId: data.chatId, userId });
-      }
+         // Emit updated chat list to the user
+         io.to(userId).emit("chatListUpdated");
+         io.to(userId).emit("messagesRead", { chatId: data.chatId, userId });
+         // Also notify all participants in the chat room
+         io.to(data.chatId).emit("messagesRead", { chatId: data.chatId, userId });
+       }
    
   });
 
@@ -154,8 +169,9 @@ socket.on(
     }
   });
 
+  // Handle newMessage event (frontend emits this)
   socket.on(
-    "sendMessage",
+    "newMessage",
     async (data: SendMessageData) => {
       console.log(`[backend] sendMessage called by socket ${socket.id}`, data);
       try {
@@ -168,14 +184,76 @@ socket.on(
           return;
         }
         console.log(`[backend] sendMessage processing for sender ${senderId}`);
+
         const message = await chatController.handleNewMessage({
           chatId: data.chatId,
-          userId: data.userId,
+          userId: data.userId || senderId, // Use senderId as fallback
           senderId,
           content: data.content,
           imageUrl: data.imageUrl,
           audioUrl: data.audioUrl,
         });
+
+        if (!message) {
+          socket.emit("error", { message: "Failed to send message." });
+          return;
+        }
+
+        // Join the chat room if not already joined
+        socket.join(data.chatId);
+        
+        // Emit success response
+        socket.emit("messageSent", message);
+        
+        // Broadcast to all participants in the chat
+        io.to(data.chatId).emit("message", message);
+
+        // Update chat list for all participants
+        const participants = await chatController.getChatParticipantsById(data.chatId);
+        if (participants) {
+          io.to(participants.user1Id).emit("chatListUpdated");
+          io.to(participants.user2Id).emit("chatListUpdated");
+          
+          // Update unread count for recipient
+          const recipientId = participants.user1Id === senderId ? participants.user2Id : participants.user1Id;
+          const unreadCount = await chatController.getTotalUnreadCount(recipientId);
+          io.to(recipientId).emit("unreadMessageCount", { count: unreadCount });
+        }
+      } catch (err) {
+        console.error("❌ newMessage handler error:", err);
+        socket.emit("error", { message: "Failed to send message." });
+      }
+    }
+  );
+
+  socket.on(
+    "sendMessage",
+    async (data: SendMessageData) => {
+             try {
+         const senderId = socket.data.user?.id;
+        
+        if (!senderId) {
+          socket.emit("error", {
+            message: "Authentication required to send messages.",
+          });
+          return;
+        }
+        // Handle the case where chatId is undefined (new chat)
+        const messageData = {
+          userId: data.userId,
+          senderId,
+          content: data.content,
+          imageUrl: data.imageUrl,
+          audioUrl: data.audioUrl,
+        };
+        
+        // Only include chatId if it's not undefined
+        if (data.chatId !== undefined) {
+          (messageData as any).chatId = data.chatId;
+        }
+        
+        const message = await chatController.handleNewMessage(messageData);
+        
         if (!message) {
           console.log(`[backend] sendMessage failed: handleNewMessage returned null`);
           socket.emit("error", { message: "Failed to send message." });
@@ -196,6 +274,7 @@ socket.on(
         if (!data.chatId && effectiveChatId) {
           socket.join(effectiveChatId);
         }
+        
         socket.emit("messageSent", message);
         socket.emit("message", message);
         // Debug: log room broadcast details
@@ -209,12 +288,8 @@ socket.on(
         } else {
           console.log(`[backend] room ${targetChatId} not found`);
         }
+
         io.to(targetChatId).emit("message", message);
-
-        // Note: Real-time notifications are now handled by the batching service
-        // which will send them after a delay to prevent overwhelming the user
-
-        // Emit chatListUpdated to both users in the chat using controller
         const participants = await chatController.getChatParticipantsById(
           targetChatId
         );

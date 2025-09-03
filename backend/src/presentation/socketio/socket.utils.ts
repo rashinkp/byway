@@ -1,4 +1,4 @@
-import { Server as SocketIOServer, Socket } from "socket.io";
+import { Socket, Server as SocketIOServer } from "socket.io";
 
 // Type for data that has a chatId property
 interface ChatData {
@@ -13,6 +13,7 @@ export function socketHandler<TData = unknown, TResult = unknown>(
   return async function (this: Socket, data: TData) {
     try {
       const result = await handler(data, this, io!);
+
       if (emitEvent && result !== undefined) {
         if (emitEvent === 'broadcast') {
           // Type guard to check if data has chatId property

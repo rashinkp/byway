@@ -32,7 +32,7 @@ export class EnhancedChatListItemDTO {
     content?: string;
     imageUrl?: string;
     audioUrl?: string;
-    type: "text" | "image" | "audio"; // Type of the last message
+    type: "TEXT" | "IMAGE" | "AUDIO"; // Type of the last message - matches MessageType enum
   };
   lastMessageTime?: string; // ISO string for the last message’s timestamp
   unreadCount?: number; // Number of unread messages in the chat

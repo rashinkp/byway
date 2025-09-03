@@ -28,6 +28,7 @@ export const safeSocketConnect = () => {
 		socket.auth = { token: getToken() };
 		socket.connect();
 	} 
+
 };
 
 export default socket;

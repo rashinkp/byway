@@ -53,7 +53,7 @@ export function registerChatHandlers(socket: Socket, io: SocketIOServer, chatCon
       if (data.filter) query.filter = data.filter;
 
       const chat = await chatController.getChatHistory({ query });
-      return chat;
+      return chat.body;
     }, "chatHistory")
   );
 
@@ -84,7 +84,13 @@ export function registerChatHandlers(socket: Socket, io: SocketIOServer, chatCon
       if (filter !== undefined) query.filter = filter;
 
       const result = await chatController.listUserChats({ query, params: {} });
-      return result;
+      
+      // Return the items array directly for socket communication
+      // The controller returns { statusCode: 200, body: { success: true, message: "Success", data: result, message: "User chats retrieved successfully" } }
+      const chatData = (result.body as any)?.data;
+      const items = chatData?.items || [];
+      
+      return items;
     }, "userChats")
   );
 
@@ -107,7 +113,7 @@ export function registerChatHandlers(socket: Socket, io: SocketIOServer, chatCon
         params: {},
       });
 
-      return messages;
+      return messages.body;
     }, "messagesByChat")
   );
 } 

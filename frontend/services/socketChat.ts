@@ -1,15 +1,23 @@
 import socket from "@/lib/socket";
-import { 
-  ChatMessage, 
-  Chat, 
-  ChatListItem, 
-  SendMessageData, 
-  CreateChatData, 
-  GetChatHistoryData, 
-  GetMessagesData, 
-  GetMessageData, 
-  DeleteMessageData 
-} from "@/types/chat";
+import { ChatMessage, SendMessageData, CreateChatData, GetChatHistoryData, GetMessagesData, GetMessageData, DeleteMessageData } from "@/types/chat";
+
+// Create a logger for the chat service
+const createLogger = (prefix: string) => ({
+  info: (message: string, data?: any) => {
+    console.log(`💬 [${prefix}] ${message}`, data || '');
+  },
+  warn: (message: string, data?: any) => {
+    console.warn(`⚠️ [${prefix}] ${message}`, data || '');
+  },
+  error: (message: string, data?: any) => {
+    console.error(`❌ [${prefix}] ${message}`, data || '');
+  },
+  debug: (message: string, data?: any) => {
+    console.debug(`🔍 [${prefix}] ${message}`, data || '');
+  }
+});
+
+const logger = createLogger('SocketChat');
 
 // Normalize API-wrapped socket payloads
 function unwrapArray<T>(payload: unknown): T[] {
@@ -56,12 +64,26 @@ export const sendMessage = (
 	onSuccess?: (message: ChatMessage) => void,
 	onError?: (error: { message: string }) => void,
 ) => {
+	logger.info('Attempting to send message', {
+		chatId: data.chatId,
+		userId: data.userId,
+		contentLength: data.content?.length || 0,
+		socketConnected: socket.connected,
+		socketId: socket.id,
+		timestamp: new Date().toISOString(),
+	});
+
 	if (!socket.connected) {
-		if (onError) onError({ message: "Socket not connected" });
+		const errorMsg = "Socket not connected";
+		logger.error('Failed to send message - socket not connected', {
+			chatId: data.chatId,
+			userId: data.userId,
+			timestamp: new Date().toISOString(),
+		});
+		if (onError) onError({ message: errorMsg });
 		return;
 	}
 
-	// emit sendMessage
 
 	let settled = false;
 
@@ -122,16 +144,23 @@ export const sendMessage = (
 			}
 		}
 	});
+
 };
 
 export const createChat = (
 	data: CreateChatData,
-	callback?: (chat: Chat) => void,
+	callback?: (chat: any) => void,
 ) => {
+	if (!socket.connected) {
+		return;
+	}
+
 	socket.emit("createChat", data);
+
 	if (callback) {
 		socket.once("chatCreated", (chat: Chat) => {
 			console.debug("[chat][in] chatCreated", chat);
+
 			callback(chat);
 		});
 	}
@@ -149,49 +178,128 @@ export const listUserChats = (
 	data: GetChatHistoryData = {},
 	callback: (result: ChatListItem[]) => void,
 ) => {
+	logger.info('Requesting chat history', {
+		page: data.page,
+		limit: data.limit,
+		search: data.search,
+		socketConnected: socket.connected,
+		socketId: socket.id,
+		timestamp: new Date().toISOString(),
+	});
+
 	if (!socket.connected) {
+		logger.error('Failed to get chat history - socket not connected', {
+			timestamp: new Date().toISOString(),
+		});
 		return;
 	}
 
-	socket.emit("listUserChats", data);
+	socket.emit("getChatHistory", data);
 
 	socket.once("userChats", (result: unknown) => {
 		const normalized = unwrapArray<ChatListItem>(result);
 		callback(normalized);
 	});
+
 };
 
 export const getMessagesByChat = (
 	data: GetMessagesData,
-	callback: (messages: ChatMessage[]) => void,
+	callback?: (messages: ChatMessage[]) => void,
 ) => {
 	socket.emit("getMessagesByChat", data);
 	socket.once("messagesByChat", (messages: unknown) => {
 		const normalized = unwrapArray<ChatMessage>(messages);
 		callback(normalized);
+
 	});
+
+	if (!socket.connected) {
+		logger.error('Failed to get messages - socket not connected', {
+			chatId: data.chatId,
+			timestamp: new Date().toISOString(),
+		});
+		return;
+	}
+
+	socket.emit("getMessagesByChat", data);
+
+	if (callback) {
+		logger.debug('Setting up callback for messages', {
+			chatId: data.chatId,
+			timestamp: new Date().toISOString(),
+		});
+		socket.once("messagesByChat", (messages: ChatMessage[]) => {
+			logger.info('Messages received', {
+				chatId: data.chatId,
+				messageCount: messages.length,
+				timestamp: new Date().toISOString(),
+			});
+			callback(messages);
+		});
+	}
 };
 
-export const getMessageById = (data: GetMessageData, callback: (message: ChatMessage) => void) => {
+export const getMessageById = (
+	data: GetMessageData,
+	callback?: (message: ChatMessage) => void,
+) => {
+	logger.info('Requesting message by ID', {
+		messageId: data.messageId,
+		socketConnected: socket.connected,
+		socketId: socket.id,
+		timestamp: new Date().toISOString(),
+	});
+
+	if (!socket.connected) {
+		logger.error('Failed to get message - socket not connected', {
+			messageId: data.messageId,
+			timestamp: new Date().toISOString(),
+		});
+		return;
+	}
+
 	socket.emit("getMessageById", data);
 	socket.once("messageById", (message: unknown) => {
 		const normalized = unwrapObject<ChatMessage>(message);
 		if (normalized) callback(normalized);
 	});
+
 };
 
-export const deleteMessage = (data: DeleteMessageData, callback?: (result: { success: boolean }) => void) => {
+export const deleteMessage = (
+	data: DeleteMessageData,
+	callback?: (success: boolean) => void,
+) => {
+	logger.info('Attempting to delete message', {
+		messageId: data.messageId,
+		chatId: data.chatId,
+		socketConnected: socket.connected,
+		socketId: socket.id,
+		timestamp: new Date().toISOString(),
+	});
+
+	if (!socket.connected) {
+		logger.error('Failed to delete message - socket not connected', {
+			messageId: data.messageId,
+			timestamp: new Date().toISOString(),
+		});
+		return;
+	}
+
 	socket.emit("deleteMessage", data);
+
 	if (callback) {
 		socket.once("messageDeleted", (result: { success: boolean }) => {
 			callback(result);
+
 		});
 	}
 };
 
 export const createChatSocket = (
 	data: CreateChatData,
-	callback?: (chat: Chat) => void,
+	callback?: (chat: any) => void,
 ) => {
 	socket.emit("createChat", data);
 	if (callback) {
@@ -203,4 +311,37 @@ export const createChatSocket = (
 
 export const markMessagesAsRead = (chatId: string, userId: string) => {
 	socket.emit("markMessagesAsRead", { chatId, userId });
+};
+
+export const listUserChats = (
+	data: GetChatHistoryData = {},
+	callback: (result: any[]) => void,
+) => {
+	logger.info('Requesting user chats', {
+		page: data.page,
+		limit: data.limit,
+		search: data.search,
+		socketConnected: socket.connected,
+		socketId: socket.id,
+		timestamp: new Date().toISOString(),
+	});
+
+	if (!socket.connected) {
+		logger.error('Failed to get user chats - socket not connected', {
+			timestamp: new Date().toISOString(),
+		});
+		return;
+	}
+
+	socket.emit("listUserChats", data);
+
+	socket.once("userChats", (result: any[]) => {
+		logger.info('User chats received', {
+			chatCount: result?.length || 0,
+			resultType: typeof result,
+			isArray: Array.isArray(result),
+			timestamp: new Date().toISOString(),
+		});
+		callback(result || []);
+	});
 };
