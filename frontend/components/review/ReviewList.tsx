@@ -175,7 +175,7 @@ export default function ReviewList({
   }
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 ">
       {/* Reviews */}
       <div className="space-y-4">
         {filteredReviews.map((review) => (

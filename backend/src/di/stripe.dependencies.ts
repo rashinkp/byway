@@ -16,6 +16,7 @@ export const createStripeDependencies = (sharedDeps: SharedDependencies, payment
       handleStripeWebhook: paymentDeps.handleStripeWebhookUseCase.execute.bind(paymentDeps.handleStripeWebhookUseCase),
     },
     getEnrollmentStatsUseCase,
+    sharedDeps.checkoutLockProvider,
     httpErrors,
     httpSuccess
   );

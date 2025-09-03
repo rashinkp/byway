@@ -7,6 +7,7 @@ import { UnauthorizedError } from "../errors/unautherized-error";
 import { createCheckoutSessionSchema } from "../../../app/dtos/payment.dto";
 import { StripeWebhookGateway } from "../../../infra/providers/stripe/stripe-webhook.gateway";
 import { IGetEnrollmentStatsUseCase } from "../../../app/usecases/enrollment/interfaces/get-enrollment-stats.usecase.interface";
+import { ICheckoutLockProvider } from "../../../app/providers/checkout-lock.interface";
 
 export class StripeController extends BaseController {
   private _webhookGateway: StripeWebhookGateway;
@@ -18,6 +19,7 @@ export class StripeController extends BaseController {
       handleStripeWebhook: (event: any) => Promise<any>;
     },
     private _getEnrollmentStatsUseCase: IGetEnrollmentStatsUseCase,
+    private _checkoutLockProvider: ICheckoutLockProvider,
     httpErrors: IHttpErrors,
     httpSuccess: IHttpSuccess
   ) {
@@ -78,6 +80,17 @@ export class StripeController extends BaseController {
         console.error("Webhook processing error:", error);
         throw error;
       }
+    });
+  }
+
+  async releaseCheckoutLock(httpRequest: IHttpRequest): Promise<IHttpResponse> {
+    return this.handleRequest(httpRequest, async (request) => {
+      if (!request.user?.id) {
+        throw new UnauthorizedError("User not authenticated");
+      }
+
+      this._checkoutLockProvider.unlockByUser(request.user.id);
+      return this.success_200({ released: true }, "Checkout lock released");
     });
   }
 }

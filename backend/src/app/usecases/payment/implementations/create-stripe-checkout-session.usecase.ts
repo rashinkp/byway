@@ -4,6 +4,8 @@ import { IUserRepository } from "../../../repositories/user.repository";
 import { IEnrollmentRepository } from "../../../repositories/enrollment.repository.interface";
 import { PaymentGateway } from "../../../providers/payment-gateway.interface";
 import { UserNotFoundError, BusinessRuleViolationError } from "../../../../domain/errors/domain-errors";
+import { ICheckoutLockProvider } from "../../../providers/checkout-lock.interface";
+import { envConfig } from "../../../../presentation/express/configs/env.config";
 
 interface ServiceResponse<T> {
   data: T;
@@ -14,7 +16,8 @@ export class CreateStripeCheckoutSessionUseCase implements ICreateStripeCheckout
   constructor(
     private readonly _userRepository: IUserRepository,
     private readonly _enrollmentRepository: IEnrollmentRepository,
-    private readonly _paymentGateway: PaymentGateway
+    private readonly _paymentGateway: PaymentGateway,
+    private readonly _checkoutLock: ICheckoutLockProvider
   ) {}
 
   async execute(
@@ -46,6 +49,15 @@ export class CreateStripeCheckoutSessionUseCase implements ICreateStripeCheckout
     if (isEnrolled && isEnrolled.length > 0) {
       throw new BusinessRuleViolationError("User already enrolled in this course");
     }
+
+    // Enforce per-user checkout lock with TTL (e.g., 15 minutes)
+    const lockTtlMs = envConfig.CHECKOUT_LOCK_TTL_MS;
+    if (this._checkoutLock.isLocked(userId)) {
+      throw new BusinessRuleViolationError("You already have an active checkout in progress. Please complete or wait before starting a new one.");
+    }
+
+    // Acquire lock before creating session
+    this._checkoutLock.lock(userId, orderId, lockTtlMs);
 
     const session = await this._paymentGateway.createCheckoutSession(
       {

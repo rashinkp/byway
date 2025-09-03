@@ -52,6 +52,8 @@ import { ILogger } from "../app/providers/logger-provider.interface";
 import { InstructorRepository } from "../infra/repositories/instructor.repository.impl";
 import { RevenueRepository } from "../infra/repositories/revenue.repository";
 import { CertificateRepository } from "../infra/repositories/certificate-repository";
+import { ICheckoutLockProvider } from "../app/providers/checkout-lock.interface";
+import { InMemoryCheckoutLockProvider } from "../infra/providers/checkout/checkout-lock.provider";
 
 export interface SharedDependencies {
   prisma: typeof prismaClient;
@@ -86,6 +88,7 @@ export interface SharedDependencies {
   chatRepository: IChatRepository;
   messageRepository: IMessageRepository;
   logger: ILogger;
+  checkoutLockProvider: ICheckoutLockProvider;
 }
 
 export function createSharedDependencies(): SharedDependencies {
@@ -112,6 +115,7 @@ export function createSharedDependencies(): SharedDependencies {
   const passwordHasher = new BcryptPasswordHasher();
   const chatRepository = new ChatRepository(prismaClient);
   const messageRepository = new MessageRepository(prismaClient);
+  const checkoutLockProvider = new InMemoryCheckoutLockProvider();
 
 
 
@@ -160,6 +164,7 @@ export function createSharedDependencies(): SharedDependencies {
     passwordHasher,
     chatRepository,
     messageRepository,
-    logger
+    logger,
+    checkoutLockProvider
   };
 }
