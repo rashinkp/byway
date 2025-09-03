@@ -79,16 +79,6 @@ export default function ReviewItem({
                 <div className="flex items-center space-x-1">
                   {renderStars(review.rating)}
                 </div>
-                {isDisabled && (
-                  <span className="text-xs bg-red-100 text-red-600 px-2 py-1 rounded">
-                    Disabled
-                  </span>
-                )}
-                {userRole === "ADMIN" && !isDisabled && (
-                  <span className="text-xs bg-blue-100 text-blue-600 px-2 py-1 rounded">
-                    Enabled
-                  </span>
-                )}
               </div>
               
               {review.title && (

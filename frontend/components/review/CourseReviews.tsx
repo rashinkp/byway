@@ -170,7 +170,7 @@ export default function CourseReviews({
       )}
 
       {/* Reviews Card */}
-      <div className="rounded-xl bg-white dark:bg-[#232323] space-y-6">
+      <div className="rounded-xl bg-white dark:bg-[#232323] space-y-6 p-4 md:p-6">
         {/* Review Stats for Instructor or User */}
         {reviewStats && reviewStats.totalReviews > 0 && (
           <div className="mb-6">
