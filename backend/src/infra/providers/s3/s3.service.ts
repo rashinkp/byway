@@ -72,7 +72,7 @@ export class S3Service implements S3ServiceInterface {
     fileBuffer: Buffer,
     fileName: string,
     fileType: string,
-    uploadType: "course" | "profile" | "certificate",
+    uploadType: "course" | "profile" | "certificate" | "chat",
     metadata?: {
       courseId?: string;
       userId?: string;
@@ -104,7 +104,7 @@ export class S3Service implements S3ServiceInterface {
 
   public generateS3Key(
     fileName: string,
-    uploadType: "course" | "profile" | "certificate",
+    uploadType: "course" | "profile" | "certificate" | "chat",
     metadata?: {
       courseId?: string;
       userId?: string;
@@ -154,6 +154,10 @@ export class S3Service implements S3ServiceInterface {
           // Generic profile files
           return `profile/${metadata.userId}/${timestamp}-${sanitizedFileName}`;
         }
+
+      case "chat":
+        // Chat files don't require specific metadata, just organize by timestamp
+        return `chat/${timestamp}-${sanitizedFileName}`;
 
       default:
         throw new Error(`Invalid upload type: ${uploadType}`);

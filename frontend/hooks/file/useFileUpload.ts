@@ -4,7 +4,7 @@ import { getPresignedPutUrl, uploadFileToS3 } from "@/api/file";
 interface UseFileUploadReturn {
 	uploadFile: (
 		file: File,
-		uploadType?: 'course' | 'profile' | 'certificate',
+		uploadType?: 'course' | 'profile' | 'certificate' | 'chat',
 		metadata?: {
 			courseId?: string;
 			userId?: string;
@@ -31,7 +31,7 @@ export function useFileUpload(): UseFileUploadReturn {
 
 	const uploadFile = async (
 		file: File,
-		uploadType: 'course' | 'profile' | 'certificate' = 'course',
+		uploadType: 'course' | 'profile' | 'certificate' | 'chat' = 'course',
 		metadata?: {
 			courseId?: string;
 			userId?: string;

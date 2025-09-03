@@ -12,7 +12,7 @@ export interface S3ServiceInterface {
 
   generateS3Key(
     fileName: string,
-    uploadType: 'course' | 'profile' | 'certificate',
+    uploadType: 'course' | 'profile' | 'certificate' | 'chat',
     metadata?: {
       courseId?: string;
       userId?: string;
@@ -25,7 +25,7 @@ export interface S3ServiceInterface {
     fileBuffer: Buffer,
     fileName: string,
     fileType: string,
-    uploadType: 'course' | 'profile' | 'certificate',
+    uploadType: 'course' | 'profile' | 'certificate' | 'chat',
     metadata?: {
       courseId?: string;
       userId?: string;
