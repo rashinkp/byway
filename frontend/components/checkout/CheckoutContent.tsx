@@ -91,6 +91,7 @@ export default function CheckoutContent() {
     }
   }, [courseDetails, isLoading, router, courseId]);
 
+
   const handleApplyCoupon = async () => {
     if (!couponCode) return;
 

@@ -16,6 +16,7 @@ import { StripeWebhookGateway } from "../../../../infra/providers/stripe/stripe-
 import { getSocketIOInstance } from "../../../../presentation/socketio";
 import Stripe from "stripe";
 import { ValidationError, NotFoundError, PaymentError } from "../../../../domain/errors/domain-errors";
+import { ICheckoutLockProvider } from "../../../providers/checkout-lock.interface";
 
 interface ServiceResponse<T> {
   data: T;
@@ -30,7 +31,8 @@ export class HandleStripeWebhookUseCase implements IHandleStripeWebhookUseCase {
     private readonly _enrollmentRepository: IEnrollmentRepository,
     private readonly _cartRepository: ICartRepository,
     private readonly _distributeRevenueUseCase: IDistributeRevenueUseCase,
-    private readonly _webhookGateway: StripeWebhookGateway
+    private readonly _webhookGateway: StripeWebhookGateway,
+    private readonly _checkoutLock: ICheckoutLockProvider
   ) {}
 
   async execute(
@@ -112,6 +114,9 @@ export class HandleStripeWebhookUseCase implements IHandleStripeWebhookUseCase {
           }
           wallet.addAmount(transaction.amount);
           await this._walletRepository.update(wallet);
+          // Release checkout lock for wallet top-up
+          this._checkoutLock.unlockByOrder(orderId);
+
           return {
             data: { transaction },
             message: "Wallet top-up completed successfully",
@@ -182,6 +187,9 @@ export class HandleStripeWebhookUseCase implements IHandleStripeWebhookUseCase {
             );
             await this._sendPurchaseNotifications(order, orderItemsWithPrices);
 
+            // Release checkout lock on success
+            this._checkoutLock.unlockByOrder(orderId);
+
             return {
               data: { order, transaction },
               message: "Payment completed successfully",
@@ -191,6 +199,8 @@ export class HandleStripeWebhookUseCase implements IHandleStripeWebhookUseCase {
               transaction.id,
               TransactionStatus.FAILED
             );
+            // Release lock even if processing failed after payment completion
+            this._checkoutLock.unlockByOrder(orderId);
             throw new PaymentError(
               error instanceof Error
                 ? error.message
@@ -240,6 +250,9 @@ export class HandleStripeWebhookUseCase implements IHandleStripeWebhookUseCase {
           paymentIntentId,
           PaymentGatewayEnum.STRIPE
         );
+
+        // Release lock on failure
+        this._checkoutLock.unlockByOrder(orderId);
 
         return {
           data: {

@@ -13,5 +13,12 @@ export function stripeRouter(stripeController: StripeController): Router {
       expressAdapter(req, res, stripeController.createCheckoutSession.bind(stripeController), next)
   );
 
+  router.post(
+    "/release-checkout-lock",
+    restrictTo("USER", "INSTRUCTOR", "ADMIN"),
+    (req, res, next) =>
+      expressAdapter(req, res, stripeController.releaseCheckoutLock.bind(stripeController), next)
+  );
+
   return router;
 } 

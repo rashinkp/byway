@@ -7,16 +7,20 @@ import { AlertCircle, ArrowLeft, ShoppingBag } from "lucide-react";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import ErrorDisplay from "@/components/ErrorDisplay";
+import { useReleaseCheckoutLock } from "@/hooks/stripe/useReleaseCheckoutLock";
 
 export default function PaymentFailedContent() {
   const searchParams = useSearchParams();
   const [error, setError] = useState<string>("");
+  const { mutate: releaseLock } = useReleaseCheckoutLock();
 
   useEffect(() => {
     const errorMessage = searchParams.get("error");
     if (errorMessage) {
       setError(decodeURIComponent(errorMessage));
     }
+    // Always try to release any lingering checkout lock when landing here
+    releaseLock();
   }, [searchParams]);
 
   return (

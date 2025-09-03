@@ -150,7 +150,8 @@ export function createAppDependencies(): AppDependencies {
   const createStripeCheckoutSessionUseCase = new CreateStripeCheckoutSessionUseCase(
     shared.userRepository,
     shared.enrollmentRepository,
-    shared.paymentGateway
+    shared.paymentGateway,
+    shared.checkoutLockProvider
   );
 
   const handleStripeWebhookUseCase = new HandleStripeWebhookUseCase(
@@ -160,10 +161,10 @@ export function createAppDependencies(): AppDependencies {
     shared.enrollmentRepository,
     shared.cartRepository,
     distributeRevenueUseCase,
-    shared.webhookGateway
+    shared.webhookGateway,
+    shared.checkoutLockProvider
   );
 
-  // Create payment dependencies object
   const paymentDeps: PaymentDependencies = {
     createStripeCheckoutSessionUseCase,
     handleWalletPaymentUseCase,
