@@ -9,6 +9,7 @@ import {
   X,
 } from "lucide-react";
 import Image from "next/image";
+import { getPresignedGetUrl } from "@/api/file";
 
 // Mock types for the example
 interface MessageType {
@@ -91,6 +92,40 @@ export function Message({
   const [imgLoaded, setImgLoaded] = useState(false);
   const [imgError, setImgError] = useState(false);
   const [showImagePreview, setShowImagePreview] = useState(false);
+  const [resolvedImageUrl, setResolvedImageUrl] = useState<string | null>(null);
+  const [resolvedAudioUrl, setResolvedAudioUrl] = useState<string | null>(null);
+
+  // Resolve S3 keys to signed URLs for image/audio
+  React.useEffect(() => {
+    let isCancelled = false;
+
+    async function resolveUrl(rawUrl?: string | null): Promise<string | null> {
+      if (!rawUrl) return null;
+      // If already a full URL or a blob, return as is
+      if (/^(https?:\/\/|blob:)/i.test(rawUrl)) return rawUrl;
+      try {
+        const signedUrl = await getPresignedGetUrl(rawUrl);
+        return signedUrl;
+      } catch {
+        return null;
+      }
+    }
+
+    (async () => {
+      const [img, audio] = await Promise.all([
+        resolveUrl(message.imageUrl),
+        resolveUrl(message.audioUrl),
+      ]);
+      if (!isCancelled) {
+        setResolvedImageUrl(img);
+        setResolvedAudioUrl(audio);
+      }
+    })();
+
+    return () => {
+      isCancelled = true;
+    };
+  }, [message.imageUrl, message.audioUrl]);
 
   const getRoleColor = (role: string) => {
     switch (role.toLowerCase()) {
@@ -153,12 +188,34 @@ export function Message({
         <div className="flex items-center gap-2">
           {/* Audio message */}
           {message.audioUrl && (
-            <AudioMessage
-              audioUrl={message.audioUrl}
-              isMine={isMine}
-              isRead={message.isRead}
-              duration={message.duration}
-            />
+            (() => {
+              const effectiveAudioUrl =
+                resolvedAudioUrl ||
+                (message.audioUrl && /^(https?:\/\/|blob:|data:)/i.test(message.audioUrl)
+                  ? message.audioUrl
+                  : null);
+              if (!effectiveAudioUrl) {
+                return (
+                  <div
+                    className={`px-4 py-2 rounded-xl text-xs ${
+                      isMine
+                        ? "bg-[#facc15]/10 border border-[#facc15]/30"
+                        : "bg-gray-200 dark:bg-gray-800 border border-gray-300 dark:border-gray-700"
+                    }`}
+                  >
+                    Loading audio...
+                  </div>
+                );
+              }
+              return (
+                <AudioMessage
+                  audioUrl={effectiveAudioUrl}
+                  isMine={isMine}
+                  isRead={message.isRead}
+                  duration={message.duration}
+                />
+              );
+            })()
           )}
 
           {/* Image message */}
@@ -185,7 +242,7 @@ export function Message({
                 )}
                 <div className="relative p-1 bg-transparent rounded-xl">
                   <Image
-                    src={message.imageUrl}
+                    src={resolvedImageUrl || message.imageUrl}
                     alt="Sent image"
                     width={400}
                     height={300}
@@ -195,6 +252,7 @@ export function Message({
                     onLoad={() => setImgLoaded(true)}
                     onError={() => setImgError(true)}
                     style={{ display: imgError ? "none" : undefined }}
+                    unoptimized
                   />
                   {/* Read/Unread tick for image messages (isMine only) */}
                   {isMine && imgLoaded && (
@@ -219,11 +277,12 @@ export function Message({
                     onClick={(e) => e.stopPropagation()}
                   >
                     <Image
-                      src={message.imageUrl}
+                      src={resolvedImageUrl || message.imageUrl}
                       alt="Preview"
                       width={800}
                       height={600}
                       className="w-full max-h-[80vh] object-contain rounded-lg shadow-lg"
+                      unoptimized
                     />
                     <button
                       className="absolute top-4 right-4 bg-black/60 hover:bg-black/80 text-white rounded-full p-2 transition-colors duration-200"
@@ -343,12 +402,15 @@ function AudioMessage({
   // Validate audio URL
   const isValidAudioUrl = React.useMemo(() => {
     if (!audioUrl) return false;
+    // Accept common schemes we expect
+    if (/^(https?:\/\/|blob:|data:)/i.test(audioUrl)) return true;
     try {
       const url = new URL(audioUrl);
       return (
         url.protocol === "http:" ||
         url.protocol === "https:" ||
-        url.protocol === "blob:"
+        url.protocol === "blob:" ||
+        url.protocol === "data:"
       );
     } catch {
       return false;

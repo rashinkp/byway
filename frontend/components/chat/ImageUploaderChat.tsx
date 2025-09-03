@@ -87,7 +87,7 @@ export function ModernImageUploader({
     setError(null);
     reset();
     try {
-      const s3Url = await uploadFile(selectedImage);
+      const s3Url = await uploadFile(selectedImage, 'chat');
       await onSend(selectedImage, s3Url);
       setSelectedImage(null);
       setImagePreview(null);

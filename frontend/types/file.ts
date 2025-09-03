@@ -6,7 +6,7 @@ export interface PresignedPutResponse {
 export interface GeneratePresignedUrlParams {
   fileName: string;
   fileType: string;
-  uploadType: 'course' | 'profile' | 'certificate';
+  uploadType: 'course' | 'profile' | 'certificate' | 'chat';
   metadata?: {
     courseId?: string;
     userId?: string;

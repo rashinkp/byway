@@ -293,7 +293,7 @@ export function ModernAudioRecorder({
         const blob = await response.blob();
         const file = new File([blob], `audio-${Date.now()}.webm`, { type: blob.type });
         // Upload to S3 or backend
-        const s3AudioUrl = await uploadFile(file);
+        const s3AudioUrl = await uploadFile(file, 'chat');
         onSend(s3AudioUrl, duration);
       } catch {
         setError("Failed to upload audio. Please try again.");
