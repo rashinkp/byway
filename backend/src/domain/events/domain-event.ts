@@ -157,11 +157,11 @@ export interface DomainEventHandler<T extends DomainEvent> {
 export interface DomainEventBus {
   publish(event: DomainEvent): Promise<void>;
   subscribe<T extends DomainEvent>(
-    eventType: new (...args: any[]) => T,
+    eventType: new (...args: unknown[]) => T,
     handler: DomainEventHandler<T>
   ): void;
   unsubscribe<T extends DomainEvent>(
-    eventType: new (...args: any[]) => T,
+    eventType: new (...args: unknown[]) => T,
     handler: DomainEventHandler<T>
   ): void;
 }

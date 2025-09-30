@@ -19,8 +19,6 @@ import OrderSummarySkeleton from "@/components/checkout/OrderSummerySkeleton";
 import { Course as CartCourse } from "@/types/cart";
 import { PaymentMethodType } from "@/types/checkout";
 
-
-
 export default function CheckoutContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -62,9 +60,11 @@ export default function CheckoutContent() {
       }
       return [];
     }
-    return cartData?.items
-      .map((item) => item.course)
-      .filter((course): course is CartCourse => course !== undefined) || [];
+    return (
+      cartData?.items
+        .map((item) => item.course)
+        .filter((course): course is CartCourse => course !== undefined) || []
+    );
   }, [courseId, directCourse, cartData]);
 
   const totalDiscountedPrice = courseDetails.reduce(
@@ -90,7 +90,6 @@ export default function CheckoutContent() {
       router.push(courseId ? `/courses/${courseId}` : "/cart");
     }
   }, [courseDetails, isLoading, router, courseId]);
-
 
   const handleApplyCoupon = async () => {
     if (!couponCode) return;
@@ -122,46 +121,47 @@ export default function CheckoutContent() {
     }
 
     try {
-     setIsCreatingOrder(true);
+      setIsCreatingOrder(true);
 
-const orderData = {
-  courses: courseDetails.map((course) => ({
-    id: course.id,
-    title: course.title,
-    description: course.description ?? null, // backend expects string|null
-    level: course.level || "",
-    price: Number(course.price),
-    thumbnail: course.thumbnail ?? null,
+      const orderData = {
+        courses: courseDetails.map((course) => ({
+          id: course.id,
+          title: course.title,
+          description: course.description ?? null, // backend expects string|null
+          level: course.level || "",
+          price: Number(course.price),
+          thumbnail: course.thumbnail ?? null,
 
-    // Backend-required fields ↓
-    status: "active", 
-    createdBy: course.creator?.name || "", // map from creator object
-    createdAt: new Date().toISOString(), // or actual created date
-    updatedAt: undefined,
-    deletedAt: null,
-    approvalStatus: "pending", // or actual status
+          // Backend-required fields ↓
+          status: "active",
+          createdBy: course.creator?.name || "", // map from creator object
+          createdAt: new Date().toISOString(), // or actual created date
+          updatedAt: undefined,
+          deletedAt: null,
+          approvalStatus: "pending", // or actual status
 
-    details: {
-      prerequisites: null,
-      longDescription: null,
-      objectives: null,
-      targetAudience: null,
-    },
+          details: {
+            prerequisites: null,
+            longDescription: null,
+            objectives: null,
+            targetAudience: null,
+          },
 
-    offer: course.offer ? Number(course.offer) : undefined,
-  })),
-  paymentMethod: selectedMethod,
-  couponCode: couponCode || undefined,
-};
+          offer: course.offer ? Number(course.offer) : undefined,
+        })),
+        paymentMethod: selectedMethod,
+        couponCode: couponCode || undefined,
+      };
 
-const response = await createOrder.mutateAsync(orderData);
-
+      const response = await createOrder.mutateAsync(orderData);
 
       if (response.data) {
         if (selectedMethod === "STRIPE" && response.data.session?.url) {
           window.location.href = response.data.session.url;
         } else if (selectedMethod === "WALLET") {
-          router.push(`/success?order_id=${response.data.order.id}&type=wallet-payment`);
+          router.push(
+            `/success?order_id=${response.data.order.id}&type=wallet-payment`
+          );
         }
       }
     } catch (error: unknown) {
@@ -179,15 +179,16 @@ const response = await createOrder.mutateAsync(orderData);
         <Card className="dark:bg-[#18181b]  p-6 shadow-none border-none">
           <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
             <div>
-              <h1 className="text-2xl font-semibold text-black dark:text-[#facc15]">Checkout</h1>
+              <h1 className="text-2xl font-semibold text-black dark:text-[#facc15]">
+                Checkout
+              </h1>
               <p className="text-black/70 dark:text-[#facc15]/70 mt-1">
                 Complete your purchase to access your courses
               </p>
             </div>
-            <Badge
-              className="bg-white dark:bg-[#232323]  text-black dark:text-[#facc15] border border-[#facc15] px-3 py-1 rounded-full text-sm font-medium"
-            >
-              {courseDetails.length} {courseDetails.length === 1 ? "Course" : "Courses"}
+            <Badge className="bg-white dark:bg-[#232323]  text-black dark:text-[#facc15] border border-[#facc15] px-3 py-1 rounded-full text-sm font-medium">
+              {courseDetails.length}{" "}
+              {courseDetails.length === 1 ? "Course" : "Courses"}
             </Badge>
           </div>
         </Card>
@@ -240,4 +241,4 @@ const response = await createOrder.mutateAsync(orderData);
       </div>
     </div>
   );
-} 
+}

@@ -2,6 +2,7 @@ import { IRefreshTokenUseCase } from "../interfaces/refresh-token.usecase.interf
 import { IJwtProvider } from "../../../providers/jwt.provider.interface";
 import { AuthUserDTO } from "../../../dtos/auth.dto";
 import { UserAuthenticationError } from "../../../../domain/errors/domain-errors";
+import { Role } from "../../../../domain/enum/role.enum";
 
 export class RefreshTokenUseCase implements IRefreshTokenUseCase {
   constructor(private _jwtProvider: IJwtProvider) {}
@@ -18,7 +19,7 @@ export class RefreshTokenUseCase implements IRefreshTokenUseCase {
     ) {
       throw new UserAuthenticationError("Invalid refresh token");
     }
-    const { id, email, role } = payload as { id: string; email: string; role: any };
+    const { id, email, role } = payload as { id: string; email: string; role: Role };
     // name may not be in token; keep minimal
     return { id, name: "", email, role };
   }

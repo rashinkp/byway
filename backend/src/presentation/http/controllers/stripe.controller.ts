@@ -8,15 +8,18 @@ import { createCheckoutSessionSchema } from "../../../app/dtos/payment.dto";
 import { StripeWebhookGateway } from "../../../infra/providers/stripe/stripe-webhook.gateway";
 import { IGetEnrollmentStatsUseCase } from "../../../app/usecases/enrollment/interfaces/get-enrollment-stats.usecase.interface";
 import { ICheckoutLockProvider } from "../../../app/providers/checkout-lock.interface";
+import { ICreateStripeCheckoutSessionUseCase } from "../../../app/usecases/payment/interfaces/create-stripe-checkout-session.usecase.interface";
+import { IHandleWalletPaymentUseCase } from "../../../app/usecases/payment/interfaces/handle-wallet-payment.usecase.interface";
+import { IHandleStripeWebhookUseCase } from "../../../app/usecases/payment/interfaces/handle-stripe-webhook.usecase.interface";
 
 export class StripeController extends BaseController {
   private _webhookGateway: StripeWebhookGateway;
 
   constructor(
     private _paymentService: {
-      handleWalletPayment: (userId: string, orderId: string, amount: number) => Promise<any>;
-      createStripeCheckoutSession: (userId: string, orderId: string, input: any) => Promise<any>;
-      handleStripeWebhook: (event: any) => Promise<any>;
+      handleWalletPayment: IHandleWalletPaymentUseCase["execute"];
+      createStripeCheckoutSession: ICreateStripeCheckoutSessionUseCase["execute"];
+      handleStripeWebhook: IHandleStripeWebhookUseCase["execute"];
     },
     private _getEnrollmentStatsUseCase: IGetEnrollmentStatsUseCase,
     private _checkoutLockProvider: ICheckoutLockProvider,

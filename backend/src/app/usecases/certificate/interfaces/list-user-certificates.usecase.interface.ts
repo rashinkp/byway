@@ -8,7 +8,12 @@ export interface IListUserCertificatesUseCase {
     status?: string;
     search?: string;
   }): Promise<{
-    items: any[];
+    items: Array<{
+      id: string
+      userId: string
+      courseId: string
+      enrollmentId: string
+    }>;
     total: number;
     page: number;
     totalPages: number;

@@ -13,13 +13,21 @@ export class ListUserCertificatesUseCase implements IListUserCertificatesUseCase
     status?: string;
     search?: string;
   }): Promise<{
-    items: any[];
+    items: Array<{
+      id: string;
+      userId: string
+      courseId: string
+      enrollmentId: string
+      certificateNumber: string
+      status: string
+    }>;
     total: number;
     page: number;
     totalPages: number;
     hasMore: boolean;
     nextPage: number | null;
   }> {
+
     const page = input.page || 1;
     const limit = input.limit || 10;
     const sortBy = input.sortBy || "createdAt";
@@ -36,7 +44,6 @@ export class ListUserCertificatesUseCase implements IListUserCertificatesUseCase
       search: input.search,
     });
 
-    // Map domain entities to DTO format for the presentation layer
     const items = result.items.map(certificate => ({
       id: certificate.id,
       userId: certificate.userId,

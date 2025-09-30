@@ -7,6 +7,7 @@ import { ILessonRepository } from "../../../repositories/lesson.repository";
 import { IGetContentByLessonIdUseCase } from "../interfaces/get-content-by-lesson-id.usecase.interface";
 import { ICourseRepository } from "../../../repositories/course.repository.interface";
 import { CourseNotFoundError, LessonNotFoundError, UserAuthorizationError } from "../../../../domain/errors/domain-errors";
+import { LessonContent } from "../../../../domain/entities/content.entity";
 
 export class GetContentByLessonIdUseCase
   implements IGetContentByLessonIdUseCase
@@ -73,7 +74,7 @@ export class GetContentByLessonIdUseCase
     }
   }
 
-  private _mapToDTO(content: any): ILessonContentOutputDTO {
+  private _mapToDTO(content: LessonContent): ILessonContentOutputDTO {
     return {
       id: content.id,
       lessonId: content.lessonId,
