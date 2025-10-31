@@ -6,6 +6,7 @@ export interface Transaction {
 	status: "COMPLETED" | "FAILED" | "PENDING";
 	paymentGateway: string | null;
 	createdAt: string;
+	updatedAt?: string;
 	type:
 		| "PURCHASE"
 		| "PAYMENT"
@@ -14,6 +15,8 @@ export interface Transaction {
 		| "WALLET_WITHDRAWAL";
 	failureReason?: string;
 	courseId?: string | null;
+	transactionId?: string | null;
+	description?: string | null;
 	order?: {
 		id: string;
 		items: Array<{
