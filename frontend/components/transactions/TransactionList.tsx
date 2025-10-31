@@ -17,6 +17,11 @@ export const TransactionList: React.FC<TransactionListProps> = ({
   transactions,
   isLoading,
 }) => {
+  const formatId = (id?: string | null) => {
+    if (!id) return "-";
+    if (id.length <= 10) return id;
+    return `${id.slice(0, 6)}…${id.slice(-4)}`;
+  };
   const getStatusInfo = (transaction: Transaction) => {
     const { status, type } = transaction;
 
@@ -176,9 +181,28 @@ export const TransactionList: React.FC<TransactionListProps> = ({
                   </span>
                 )}
               </p>
-              <p className="text-sm text-gray-500 dark:text-gray-300">
-                {formatDate(transaction.createdAt)}
-              </p>
+              <div className="mt-1 space-y-1">
+                <div className="flex flex-wrap items-center gap-2 text-xs">
+                  <span className="inline-flex items-center rounded-full px-2 py-0.5 bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-200">
+                    Type: {transaction.type}
+                  </span>
+                  <span className="inline-flex items-center rounded-full px-2 py-0.5 bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-200">
+                    Status: {transaction.status}
+                  </span>
+                  <span className="inline-flex items-center rounded-full px-2 py-0.5 bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-200">
+                    Order: {formatId(transaction.orderId)}
+                  </span>
+                  <span className="inline-flex items-center rounded-full px-2 py-0.5 bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-200">
+                    Txn: {formatId(transaction.id)}
+                  </span>
+                </div>
+                <p className="text-xs text-gray-500 dark:text-gray-300">
+                  Created: {formatDate(transaction.createdAt)}
+                  {transaction.updatedAt && transaction.updatedAt !== transaction.createdAt && (
+                    <span className="ml-2">Updated: {formatDate(transaction.updatedAt)}</span>
+                  )}
+                </p>
+              </div>
             </div>
 
             <div className="text-right">
