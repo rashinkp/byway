@@ -6,6 +6,9 @@ import { cookieConfig } from "../configs/cookie.config";
 import { createErrorMiddleware } from "../middlewares/error.middleware";
 import morgan from "morgan";
 import { createRouter } from "../router/index.routes";
+import { ApiBase, StripeRoutes } from "../../../common/routes";
+import { HttpStatus } from "../../../common/http-status";
+import { Messages } from "../../../common/messages";
 import { expressAdapter } from "../../adapters/express.adapter";
 import { AppDependencies } from "../../../di/app.dependencies";
 import { ILogger } from "../../../app/providers/logger-provider.interface";
@@ -15,7 +18,7 @@ export const createApp = (deps: AppDependencies, logger: ILogger): Application =
 
   // Stripe webhook endpoint must be registered BEFORE JSON parsing middleware
   app.post(
-    "/api/v1/stripe/webhook",
+    `${ApiBase.V1}${StripeRoutes.WEBHOOK}`,
     express.raw({ type: "application/json" }),
 
     async (req, res, next) => {
@@ -29,16 +32,16 @@ export const createApp = (deps: AppDependencies, logger: ILogger): Application =
         );
       } catch (error) {
         logger.error(`Stripe webhook error: ${error instanceof Error ? error.message : 'Unknown error'}`);
-        return res.status(500).json({ error: 'Webhook processing failed' });
+        return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ error: Messages.STRIPE_WEBHOOK_FAILED });
       }
     }
   );
 
   // Test endpoint to verify webhook is reachable
-  app.get("/api/v1/stripe/webhook/test", (req, res) => {
+  app.get(`${ApiBase.V1}${StripeRoutes.WEBHOOK_TEST}`, (req, res) => {
     logger.info("Webhook test endpoint hit");
-    res.status(200).json({ 
-      message: "Webhook endpoint is reachable",
+    res.status(HttpStatus.OK).json({ 
+      message: Messages.WEBHOOK_REACHABLE,
       timestamp: new Date().toISOString(),
       environment: process.env.NODE_ENV
     });
@@ -52,7 +55,7 @@ export const createApp = (deps: AppDependencies, logger: ILogger): Application =
   app.use(morgan("dev"));
 
   // API Routes
-  app.use("/api/v1", createRouter(deps, logger));
+  app.use(ApiBase.V1, createRouter(deps, logger));
 
   // Error Middleware
   app.use(createErrorMiddleware(logger));

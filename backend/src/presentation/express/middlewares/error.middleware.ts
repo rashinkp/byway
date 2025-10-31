@@ -5,6 +5,8 @@ import { ApiResponse } from "../../http/interfaces/ApiResponse";
 import { CookieUtils } from "./cookie.utils";
 import { ILogger } from "../../../app/providers/logger-provider.interface";
 import { mapDomainErrorToHttpResponse, isDomainError } from "../../../app/utils/error-mapper";
+import { HttpStatus } from "../../../common/http-status";
+import { Messages } from "../../../common/messages";
 
 /**
  * Helper function to clear auth cookies and return 401 response
@@ -14,12 +16,12 @@ function handleUnauthorizedError(res: Response, message: string, logger: ILogger
   CookieUtils.clearAuthCookies(res);
   
   const response: ApiResponse<null> = {
-    statusCode: 401,
+    statusCode: HttpStatus.UNAUTHORIZED,
     success: false,
     message,
     data: null,
   };
-  res.status(401).json(response);
+  res.status(HttpStatus.UNAUTHORIZED).json(response);
 }
 
 export function createErrorMiddleware(logger: ILogger) {
@@ -51,7 +53,7 @@ export function createErrorMiddleware(logger: ILogger) {
     if (isDomainError(err)) {
       const mapped = mapDomainErrorToHttpResponse(err);
 
-      if (mapped.statusCode === 401) {
+      if (mapped.statusCode === HttpStatus.UNAUTHORIZED) {
         handleUnauthorizedError(res, mapped.message, logger);
         return;
       }
@@ -67,7 +69,7 @@ export function createErrorMiddleware(logger: ILogger) {
     }
 
     if (
-      (err instanceof HttpError && err.statusCode === 401) ||
+      (err instanceof HttpError && err.statusCode === HttpStatus.UNAUTHORIZED) ||
       (typeof err.message === "string" && (
         err.message.toLowerCase().includes("unauthorized") ||
         err.message.toLowerCase().includes("invalid token")
@@ -87,39 +89,39 @@ export function createErrorMiddleware(logger: ILogger) {
       res.status(err.statusCode).json(response);
     } else if (err instanceof ZodError) {
       const response: ApiResponse<{ details: Array<{ path: (string | number)[]; message: string; code: string }> }> = {
-        statusCode: 400,
+        statusCode: HttpStatus.BAD_REQUEST,
         success: false,
-        message: "Validation failed",
+        message: Messages.VALIDATION_FAILED,
         data: { details: err.errors },
       };
-      res.status(400).json(response);
+      res.status(HttpStatus.BAD_REQUEST).json(response);
     } else {
       // Handle specific error cases
       if (typeof err.message === "string" && err.message.includes("not found")) {
         const response: ApiResponse<null> = {
-          statusCode: 404,
+          statusCode: HttpStatus.NOT_FOUND,
           success: false,
           message: err.message,
           data: null,
         };
-        res.status(404).json(response);
+        res.status(HttpStatus.NOT_FOUND).json(response);
       } else if (typeof err.message === "string" && (err.message.includes("forbidden") || err.message.includes("permission denied"))) {
         const response: ApiResponse<null> = {
-          statusCode: 403,
+          statusCode: HttpStatus.FORBIDDEN,
           success: false,
           message: err.message,
           data: null,
         };
-        res.status(403).json(response);
+        res.status(HttpStatus.FORBIDDEN).json(response);
       } else {
         // For unexpected errors, still return a 500 but with more context
         const response: ApiResponse<null> = {
-          statusCode: 500,
+          statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
           success: false,
-          message: err.message || "An unexpected error occurred",
+          message: err.message || Messages.INTERNAL_SERVER_ERROR,
           data: null,
         };
-        res.status(500).json(response);
+        res.status(HttpStatus.INTERNAL_SERVER_ERROR).json(response);
       }
     }
 

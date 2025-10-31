@@ -5,7 +5,8 @@ import {
 } from "../../../app/providers/payment-gateway.interface";
 import { CreateCheckoutSessionDto } from "../../../app/dtos/payment.dto";
 import { HttpError } from "../../../presentation/http/errors/http-error";
-import { StatusCodes } from "http-status-codes";
+import { HttpStatus } from "../../../common/http-status";
+import { Messages } from "../../../common/messages";
 import { envConfig } from "../../../presentation/express/configs/env.config";
 
 export class StripePaymentGateway implements PaymentGateway {
@@ -15,7 +16,7 @@ export class StripePaymentGateway implements PaymentGateway {
     const stripeKey = envConfig.STRIPE_SECRET_KEY;
     
     if (!stripeKey) {
-      throw new Error("STRIPE_SECRET_KEY is not defined");
+      throw new Error(Messages.STRIPE_SECRET_MISSING);
     }
 
    this._stripe = new Stripe(stripeKey, {
@@ -34,8 +35,8 @@ export class StripePaymentGateway implements PaymentGateway {
     const frontendUrl = (envConfig.FRONTEND_URL || "").split(",")[0].trim();
     if (!frontendUrl) {
       throw new HttpError(
-        "Server configuration error: FRONTEND_URL is missing",
-        StatusCodes.INTERNAL_SERVER_ERROR
+        Messages.FRONTEND_URL_MISSING,
+        HttpStatus.INTERNAL_SERVER_ERROR
       );
     }
 
@@ -45,8 +46,8 @@ export class StripePaymentGateway implements PaymentGateway {
       if (isWalletTopUp) {
         if (!amount || amount <= 0) {
           throw new HttpError(
-            "Invalid amount for wallet top-up",
-            StatusCodes.BAD_REQUEST
+            Messages.INVALID_WALLET_TOPUP_AMOUNT,
+            HttpStatus.BAD_REQUEST
           );
         }
         // Create a single line item for wallet top-up
@@ -67,8 +68,8 @@ export class StripePaymentGateway implements PaymentGateway {
         // Create line items from course details
         if (!courses || !Array.isArray(courses) || courses.length === 0) {
           throw new HttpError(
-            "No courses provided for checkout",
-            StatusCodes.BAD_REQUEST
+            Messages.NO_COURSES_FOR_CHECKOUT,
+            HttpStatus.BAD_REQUEST
           );
         }
 
@@ -76,8 +77,8 @@ export class StripePaymentGateway implements PaymentGateway {
         for (const course of courses) {
           if (!course || !course.id || !course.title) {
             throw new HttpError(
-              "Invalid course data provided",
-              StatusCodes.BAD_REQUEST
+              Messages.INVALID_COURSE_DATA,
+              HttpStatus.BAD_REQUEST
             );
           }
         }
@@ -135,11 +136,11 @@ export class StripePaymentGateway implements PaymentGateway {
       };
     } catch (error) {
       if (error instanceof Stripe.errors.StripeInvalidRequestError) {
-        throw new HttpError(error.message, StatusCodes.BAD_REQUEST);
+        throw new HttpError(error.message, HttpStatus.BAD_REQUEST);
       }
       throw new HttpError(
-        "Failed to create Stripe checkout session",
-        StatusCodes.INTERNAL_SERVER_ERROR
+        Messages.STRIPE_CHECKOUT_CREATE_FAILED,
+        HttpStatus.INTERNAL_SERVER_ERROR
       );
     }
   }
