@@ -1,13 +1,13 @@
 import { ILessonRepository } from "../../../repositories/lesson.repository";
 import { IDeleteLessonUseCase } from "../interfaces/delete-lesson.usecase.interface";
-import { S3ServiceInterface } from "../../../providers/s3.service.interface";
+import { FileStorageServiceInterface } from "../../../providers/file-storage.service.interface";
 import { ILessonOutputDTO } from "../../../dtos/lesson.dto";
 import { LessonNotFoundError, LessonValidationError } from "../../../../domain/errors/domain-errors";
 
 export class DeleteLessonUseCase implements IDeleteLessonUseCase {
   constructor(
     private readonly _lessonRepository: ILessonRepository,
-    private readonly _s3Service: S3ServiceInterface
+    private readonly _storageService: FileStorageServiceInterface
   ) {}
 
   async execute(id: string): Promise<void> {
@@ -17,7 +17,7 @@ export class DeleteLessonUseCase implements IDeleteLessonUseCase {
         throw new LessonNotFoundError(id);
       }
 
-      // Map domain entity to DTO for S3 operations
+      // Map domain entity to DTO for storage operations
       const lessonData: ILessonOutputDTO = {
         id: lesson.id,
         title: lesson.title,
@@ -49,12 +49,12 @@ export class DeleteLessonUseCase implements IDeleteLessonUseCase {
         const contentData = lessonData.content;
         
         if (contentData.fileUrl) {
-            await this._s3Service.deleteFile(contentData.fileUrl);
+            await this._storageService.deleteFile(contentData.fileUrl);
           
         }
 
         if (contentData.thumbnailUrl) {
-            await this._s3Service.deleteFile(contentData.thumbnailUrl);
+            await this._storageService.deleteFile(contentData.thumbnailUrl);
          
         }
       }

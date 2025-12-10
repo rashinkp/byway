@@ -10,7 +10,7 @@ import {
   IGenerateCertificateUseCase,
 } from "../interfaces/generate-certificate.usecase.interface";
 import { CertificatePdfServiceInterface } from "../../../providers/generate-certificate.interface";
-import { S3ServiceInterface } from "../../../providers/s3.service.interface";
+import { FileStorageServiceInterface } from "../../../providers/file-storage.service.interface";
 import { GenerateCertificateInputDto, GenerateCertificateOutputDto } from "../../../dtos/certificate.dto";
 import { ILessonRepository } from "../../../repositories/lesson.repository";
 import crypto from "crypto";
@@ -25,7 +25,7 @@ export class GenerateCertificateUseCase implements IGenerateCertificateUseCase {
     private readonly _lessonProgressRepository: ILessonProgressRepository,
     private readonly _lessonRepository: ILessonRepository,
     private readonly _pdfService: CertificatePdfServiceInterface,
-    private readonly _s3Service: S3ServiceInterface
+    private readonly _storageService: FileStorageServiceInterface
   ) {}
 
   async execute(
@@ -68,9 +68,9 @@ export class GenerateCertificateUseCase implements IGenerateCertificateUseCase {
             )} day(s).`,
           };
         }
-        // Delete from S3 if pdfUrl exists
+        // Delete from Cloudinary if pdfUrl exists
         if (existingCertificate.pdfUrl) {
-            await this._s3Service.deleteFile(existingCertificate.pdfUrl);
+            await this._storageService.deleteFile(existingCertificate.pdfUrl);
         }
         // Prepare to update existing certificate
         isUpdate = true;
@@ -150,13 +150,14 @@ export class GenerateCertificateUseCase implements IGenerateCertificateUseCase {
 
       let pdfUrl = "";
       try {
-        pdfUrl = await this._s3Service.uploadFile(
+        const uploadResult = await this._storageService.uploadFile(
           pdfBuffer,
           `${certificateNumber}.pdf`,
           "application/pdf",
           "certificate",
           { courseId, certificateId: certificateNumber }
         );
+        pdfUrl = uploadResult.url;
       } catch (err) {
         return {
           success: false,

@@ -2,6 +2,7 @@ import { GeneratePresignedUrlParams, PresignedPutResponse, PresignedGetResponse 
 import { api } from "./api";
 import { ApiResponse } from "@/types/general";
 import { ApiError } from "@/types/error";
+import axios from "axios";
 
 export async function getPresignedPutUrl(
 	params: GeneratePresignedUrlParams
@@ -74,44 +75,41 @@ export async function getCertificatePresignedUrl(
 	});
 }
 
-export function uploadFileToS3(
+export async function uploadFileToCloudinary(
 	file: File,
-	presignedUrl: string,
+	params: PresignedPutResponse,
 	onProgress?: (progress: number) => void,
-): Promise<void> {
-	return new Promise((resolve, reject) => {
-		const xhr = new XMLHttpRequest();
+): Promise<{ url: string; key: string }> {
+	const formData = new FormData();
+	formData.append("file", file);
+	formData.append("api_key", params.apiKey);
+	formData.append("timestamp", params.timestamp.toString());
+	formData.append("signature", params.signature);
+	formData.append("folder", params.folder);
+	formData.append("public_id", params.publicId);
+	formData.append("resource_type", params.resourceType);
+	formData.append("type", "authenticated");
+	formData.append("access_mode", "authenticated");
 
-		xhr.upload.addEventListener("progress", (event) => {
-			if (event.lengthComputable && onProgress) {
-				const progress = (event.loaded / event.total) * 100;
-				onProgress(progress);
+	const response = await axios.post(params.uploadUrl, formData, {
+		onUploadProgress: (event) => {
+			if (event.total && onProgress) {
+				onProgress((event.loaded / event.total) * 100);
 			}
-		});
-
-		xhr.addEventListener("load", () => {
-			if (xhr.status >= 200 && xhr.status < 300) {
-				resolve();
-			} else {
-				reject(new Error(`Upload failed with status ${xhr.status}`));
-			}
-		});
-
-		xhr.addEventListener("error", () => {
-			reject(new Error("Upload failed"));
-		});
-
-		xhr.addEventListener("abort", () => {
-			reject(new Error("Upload aborted"));
-		});
-
-		xhr.open("PUT", presignedUrl);
-		xhr.setRequestHeader("Content-Type", file.type);
-		xhr.send(file);
+		},
+		headers: { "Content-Type": "multipart/form-data" },
 	});
+
+	return {
+		url: response.data?.secure_url ?? "",
+		key: response.data?.public_id ?? params.key,
+	};
 }
 
 export async function getPresignedGetUrl(key: string, expiresInSeconds = 60): Promise<string> {
+	if (/^https?:\/\//i.test(key)) {
+		return key;
+	}
 	try {
 		const response = await api.get<ApiResponse<PresignedGetResponse>>(
 			"/files/get-presigned-url",

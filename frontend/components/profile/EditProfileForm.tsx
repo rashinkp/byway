@@ -2,7 +2,7 @@
 import { z } from "zod";
 import {  FormModal } from "@/components/ui/FormModal";
 import { useUpdateUser } from "@/hooks/user/useUpdateUser";
-import {  getProfilePresignedUrl, uploadFileToS3 } from "@/api/file";
+import {  getProfilePresignedUrl, uploadFileToCloudinary } from "@/api/file";
 import { EditProfileFormProps } from "@/types/user";
 import { formFields, profileSchema } from "@/lib/validations/user";
 
@@ -18,16 +18,19 @@ export default function EditProfileForm({
 		if (isUpdating) return; // Prevent double submission
 		let avatarKey: string | undefined;
 
-		// If avatar is a File, upload to S3
+		// If avatar is a File, upload to Cloudinary
 		if (data.avatar instanceof File) {
 			try {
-				const { uploadUrl, key } = await getProfilePresignedUrl(
+				const uploadParams = await getProfilePresignedUrl(
 					data.avatar.name,
 					data.avatar.type,
 					user?.id || '',
 				);
-				await uploadFileToS3(data.avatar, uploadUrl);
-				avatarKey = key; // Store the S3 key
+				const uploadResult = await uploadFileToCloudinary(
+					data.avatar,
+					uploadParams
+				);
+				avatarKey = uploadResult.url || uploadResult.key; // Store the Cloudinary URL
 			} catch {
 				throw new Error("Failed to upload profile picture");
 			}

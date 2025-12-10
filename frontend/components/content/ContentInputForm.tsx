@@ -10,7 +10,7 @@ import {
 import { useCreateContent } from "@/hooks/content/useCreateContent";
 import { useUpdateContent } from "@/hooks/content/useUpdateContent";
 import { useGetLessonById } from "@/hooks/lesson/useGetLessonById";
-import { getCoursePresignedUrl, uploadFileToS3 } from "@/api/file";
+import { getCoursePresignedUrl, uploadFileToCloudinary } from "@/api/file";
 import { validateForm } from "./ContentValidation";
 import { ContentTypeSelector } from "./ContentTypeSelector";
 import { TitleInput } from "./ContentTitleInput";
@@ -116,16 +116,20 @@ export const ContentInputForm = ({
 			try {
 				setUploadStatus("uploading");
 				const contentType = type === ContentType.VIDEO ? 'video' : 'document';
-				const { uploadUrl, key } = await getCoursePresignedUrl(
+				const uploadParams = await getCoursePresignedUrl(
 					file.name,
 					file.type,
 					lesson.courseId,
 					contentType
 				);
-				await uploadFileToS3(file, uploadUrl, (progress) => {
-					setUploadProgress(progress);
-				});
-				finalFileUrl = key;
+				const uploadResult = await uploadFileToCloudinary(
+					file,
+					uploadParams,
+					(progress) => {
+						setUploadProgress(progress);
+					}
+				);
+				finalFileUrl = uploadResult.url || uploadResult.key;
 				setUploadStatus("success");
 			} catch {
 				setUploadStatus("error");
@@ -141,16 +145,20 @@ export const ContentInputForm = ({
 		if (thumbnail && type === ContentType.VIDEO && lesson?.courseId) {
 			try {
 				setThumbnailUploadStatus("uploading");
-				const { uploadUrl, key } = await getCoursePresignedUrl(
+				const uploadParams = await getCoursePresignedUrl(
 					thumbnail.name,
 					thumbnail.type,
 					lesson.courseId,
 					'thumbnail'
 				);
-				await uploadFileToS3(thumbnail, uploadUrl, (progress) => {
-					setThumbnailUploadProgress(progress);
-				});
-				finalThumbnailUrl = key;
+				const uploadResult = await uploadFileToCloudinary(
+					thumbnail,
+					uploadParams,
+					(progress) => {
+						setThumbnailUploadProgress(progress);
+					}
+				);
+				finalThumbnailUrl = uploadResult.url || uploadResult.key;
 				setThumbnailUploadStatus("success");
 			} catch  {
 				setThumbnailUploadStatus("error");

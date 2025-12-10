@@ -23,7 +23,7 @@ export function createInstructorDependencies(
 
   const updateUserUseCase = new UpdateUserUseCase(
     userRepository,
-    deps.s3Service,
+    deps.fileStorageService,
     deps.logger
   );
   const createInstructorUseCase = new CreateInstructorUseCase(

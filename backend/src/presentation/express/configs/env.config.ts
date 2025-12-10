@@ -72,11 +72,11 @@ export const envConfig = {
     10
   ),
 
-  // AWS S3
-  AWS_ACCESS_KEY_ID: process.env.AWS_ACCESS_KEY_ID || "",
-  AWS_SECRET_ACCESS_KEY: process.env.AWS_SECRET_ACCESS_KEY || "",
-  AWS_REGION: process.env.AWS_REGION || "",
-  AWS_BUCKET_NAME: process.env.AWS_BUCKET_NAME || "",
+  // Cloudinary
+  CLOUDINARY_CLOUD_NAME: process.env.CLOUDINARY_CLOUD_NAME || "",
+  CLOUDINARY_API_KEY: process.env.CLOUDINARY_API_KEY || "",
+  CLOUDINARY_API_SECRET: process.env.CLOUDINARY_API_SECRET || "",
+  CLOUDINARY_BASE_FOLDER: process.env.CLOUDINARY_BASE_FOLDER || "byway",
 };
 
 // Validate critical environment variables
@@ -93,6 +93,16 @@ const validateEnvironment = () => {
     errors.push("STRIPE_WEBHOOK_SECRET is not configured");
   } else if (!envConfig.STRIPE_WEBHOOK_SECRET.startsWith('whsec_')) {
     errors.push("STRIPE_WEBHOOK_SECRET format is invalid (should start with 'whsec_')");
+  }
+
+  if (!envConfig.CLOUDINARY_CLOUD_NAME) {
+    errors.push("CLOUDINARY_CLOUD_NAME is not configured");
+  }
+  if (!envConfig.CLOUDINARY_API_KEY) {
+    errors.push("CLOUDINARY_API_KEY is not configured");
+  }
+  if (!envConfig.CLOUDINARY_API_SECRET) {
+    errors.push("CLOUDINARY_API_SECRET is not configured");
   }
   
   if (errors.length > 0) {

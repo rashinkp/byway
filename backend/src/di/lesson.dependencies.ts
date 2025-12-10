@@ -25,7 +25,7 @@ export function createLessonDependencies(
   const getAllLessonsUseCase = new GetAllLessonsUseCase(lessonRepository);
   const deleteLessonUseCase = new DeleteLessonUseCase(
     lessonRepository,
-    deps.s3Service
+    deps.fileStorageService
   );
   const getPublicLessonsUseCase = new GetPublicLessonsUseCase(lessonRepository);
 

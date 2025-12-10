@@ -1,6 +1,13 @@
 export interface PresignedPutResponse {
   uploadUrl: string;
-  key: string;
+  key: string; // Cloudinary public id
+  publicId: string;
+  signature: string;
+  timestamp: number;
+  apiKey: string;
+  cloudName: string;
+  folder: string;
+  resourceType: string;
 }
 
 export interface GeneratePresignedUrlParams {
