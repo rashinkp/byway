@@ -3,10 +3,16 @@ import { envConfig } from "../configs/env.config";
 
 /**
  * Centralized cookie configuration
+ * - httpOnly: always true so JS can't read tokens
+ * - sameSite: 'none' when prod (cross-site), 'lax' locally
+ * - secure: required when sameSite is none
  */
+const isProd = envConfig.NODE_ENV === "production";
+const sameSite: "none" | "lax" = isProd ? "none" : "lax";
 const COOKIE_CONFIG = {
-  httpOnly: envConfig.NODE_ENV === "production",
-  secure: envConfig.NODE_ENV === "production",
+  httpOnly: true,
+  secure: isProd,
+  sameSite,
   path: "/",
 };
 
