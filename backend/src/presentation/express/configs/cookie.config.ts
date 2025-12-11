@@ -10,7 +10,6 @@ export const cookieConfig = {
   options: {
     httpOnly: true,
     secure: envConfig.NODE_ENV === "production",
-    sameSite: 'none' as const,
     maxAge: 24 * 60 * 60 * 1000,
     path: "/",
   },
