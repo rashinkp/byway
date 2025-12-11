@@ -7,7 +7,6 @@ import { envConfig } from "../configs/env.config";
 const COOKIE_CONFIG = {
   httpOnly: envConfig.NODE_ENV === "production",
   secure: envConfig.NODE_ENV === "production",
-  sameSite: "lax" as const,
   path: "/",
 };
 
