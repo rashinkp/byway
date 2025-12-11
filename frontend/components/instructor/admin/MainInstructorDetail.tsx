@@ -61,9 +61,10 @@ const MainInstructorDetail: React.FC = () => {
   const handleDownloadCV = async () => {
     if (instructor.cv && instructor.cv !== "No CV provided") {
       try {
-        // Get presigned URL for CV download
-        const signedUrl = await getPresignedGetUrl(instructor.cv, 300); // 5 minutes expiry
-        window.open(signedUrl, "_blank");
+        const targetUrl = instructor.cv.startsWith("http")
+          ? instructor.cv
+          : await getPresignedGetUrl(instructor.cv, 300); // 5 minutes expiry
+        window.open(targetUrl, "_blank");
       } catch (error) {
         console.error("Error getting CV presigned URL:", error);
         toast.error("Failed to download CV. Please try again.");

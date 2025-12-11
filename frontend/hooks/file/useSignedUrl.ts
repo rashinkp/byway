@@ -15,6 +15,10 @@ export function useSignedUrl(key?: string | null, expiresInSeconds: number = 60,
 			setUrl("");
 			return;
 		}
+		if (/^https?:\/\//i.test(key)) {
+			setUrl(key);
+			return;
+		}
 		setIsLoading(true);
 		setError(null);
 		try {

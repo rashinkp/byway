@@ -1,13 +1,13 @@
 import { ILessonContentRepository } from "../../../repositories/content.repository";
 import { IDeleteLessonContentUseCase } from "../interfaces/delete-content.usecase.interface";
-import { S3ServiceInterface } from "../../../providers/s3.service.interface";
+import { FileStorageServiceInterface } from "../../../providers/file-storage.service.interface";
 import { ILessonContentOutputDTO } from "../../../dtos/lesson.dto";
 import { ContentNotFoundError, ContentValidationError } from "../../../../domain/errors/domain-errors";
 
 export class DeleteLessonContentUseCase implements IDeleteLessonContentUseCase {
   constructor(
     private readonly _contentRepository: ILessonContentRepository,
-    private readonly _s3Service: S3ServiceInterface
+    private readonly _storageService: FileStorageServiceInterface
   ) {}
 
   async execute(id: string): Promise<void> {
@@ -35,13 +35,13 @@ export class DeleteLessonContentUseCase implements IDeleteLessonContentUseCase {
       
       // Delete main file if it exists
       if (contentData.fileUrl) {
-          await this._s3Service.deleteFile(contentData.fileUrl);
+          await this._storageService.deleteFile(contentData.fileUrl);
        
       }
 
       // Delete thumbnail if it exists
       if (contentData.thumbnailUrl) {
-          await this._s3Service.deleteFile(contentData.thumbnailUrl);
+          await this._storageService.deleteFile(contentData.thumbnailUrl);
         
       }
 

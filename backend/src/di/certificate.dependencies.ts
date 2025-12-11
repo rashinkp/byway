@@ -40,7 +40,7 @@ export function createCertificateDependencies(
     lessonProgressRepository,
     lessonRepository,
     certificatePdfService,
-    sharedDeps.s3Service
+    sharedDeps.fileStorageService
   );
 
   const getCertificateUseCase: IGetCertificateUseCase = new GetCertificateUseCase(certificateRepository);

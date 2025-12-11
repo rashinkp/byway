@@ -4,7 +4,7 @@ import { UserProfile } from "../../../../domain/entities/user-profile.entity";
 import { Role } from "../../../../domain/enum/role.enum";
 import { IUserRepository } from "../../../repositories/user.repository";
 import { IUpdateUserUseCase } from "../interfaces/update-user.usecase.interface";
-import { S3ServiceInterface } from "../../../providers/s3.service.interface";
+import { FileStorageServiceInterface } from "../../../providers/file-storage.service.interface";
 import { ILogger } from "../../../providers/logger-provider.interface";
 import { mapProfileToDTO, mapUserToDTO } from "../utils/user-dto-mapper";
 import { UserNotFoundError } from "../../../../domain/errors/domain-errors";
@@ -12,7 +12,7 @@ import { UserNotFoundError } from "../../../../domain/errors/domain-errors";
 export class UpdateUserUseCase implements IUpdateUserUseCase {
   constructor(
     private _userRepository: IUserRepository,
-    private _s3Service: S3ServiceInterface,
+    private _storageService: FileStorageServiceInterface,
     private _logger: ILogger
   ) {}
 
@@ -31,11 +31,11 @@ export class UpdateUserUseCase implements IUpdateUserUseCase {
       dto.avatar !== user.avatar
     ) {
       try {
-        await this._s3Service.deleteFile(user.avatar);
+        await this._storageService.deleteFile(user.avatar);
       } catch (err) {
         // Log this error since it's not critical to the main operation
-        // and we want to track S3 cleanup issues
-        this._logger.warn(`Failed to delete old avatar from S3: ${err}`);
+        // and we want to track storage cleanup issues
+        this._logger.warn(`Failed to delete old avatar from storage: ${err}`);
       }
     }
 

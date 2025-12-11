@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { getPresignedPutUrl, uploadFileToS3 } from "@/api/file";
+import { getPresignedPutUrl, uploadFileToCloudinary } from "@/api/file";
 
 interface UseFileUploadReturn {
 	uploadFile: (
@@ -11,7 +11,7 @@ interface UseFileUploadReturn {
 			certificateId?: string;
 			contentType?: 'thumbnail' | 'video' | 'document' | 'avatar' | 'cv';
 		}
-	) => Promise<string>; // returns S3 key
+	) => Promise<string>; // returns Cloudinary secure URL
 	progress: number;
 	isUploading: boolean;
 	error: string | null;
@@ -44,19 +44,21 @@ export function useFileUpload(): UseFileUploadReturn {
 			setError(null);
 
 			// Get presigned PUT URL and key
-			const { uploadUrl, key } = await getPresignedPutUrl({
+			const uploadParams = await getPresignedPutUrl({
 				fileName: file.name,
 				fileType: file.type,
 				uploadType,
 				metadata,
 			});
 
-			// Upload file to S3
-			await uploadFileToS3(file, uploadUrl, (progress) => {
-				setProgress(progress);
-			});
+			// Upload file to Cloudinary
+			const uploadResult = await uploadFileToCloudinary(
+				file,
+				uploadParams,
+				(progress) => setProgress(progress)
+			);
 
-			return key;
+			return uploadResult.url || uploadResult.key;
 		} catch (err) {
 			const errorMessage = err instanceof Error ? err.message : "Upload failed";
 			setError(errorMessage);

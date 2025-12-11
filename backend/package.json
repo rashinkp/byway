@@ -17,8 +17,6 @@
   "type": "commonjs",
   "description": "",
   "dependencies": {
-    "@aws-sdk/client-s3": "^3.817.0",
-    "@aws-sdk/s3-request-presigner": "^3.817.0",
     "@paypal/checkout-server-sdk": "^1.0.3",
     "@paypal/paypal-server-sdk": "^1.0.0",
     "@prisma/client": "^6.7.0",
@@ -29,6 +27,7 @@
     "axios": "^1.9.0",
     "bcrypt": "^5.1.1",
     "canvas": "^3.1.2",
+    "cloudinary": "^2.8.0",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
     "dotenv": "^16.4.7",

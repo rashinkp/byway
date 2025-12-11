@@ -37,7 +37,7 @@ import { ICourseReviewRepository } from "../app/repositories/course-review.repos
 import { LessonProgressRepository } from "../infra/repositories/lesson-progress.repository.impl";
 import { ILessonProgressRepository } from "../app/repositories/lesson-progress.repository.interface";
 import { CertificateRepositoryInterface } from "../app/repositories/certificate-repository.interface";
-import { S3Service } from "../infra/providers/s3/s3.service";
+import { CloudinaryService } from "../infra/providers/cloudinary/cloudinary.service";
 import { EmailProviderImpl } from "../infra/providers/email/email.provider";
 import { GetEnrollmentStatsUseCase } from "../app/usecases/enrollment/implementations/get-enrollment-stats.usecase";
 import { IUserRepository } from "../app/repositories/user.repository";
@@ -81,7 +81,7 @@ export interface SharedDependencies {
   webhookGateway: StripeWebhookGateway;
   lessonProgressRepository: ILessonProgressRepository;
   certificateRepository: CertificateRepositoryInterface;
-  s3Service: S3Service;
+  fileStorageService: CloudinaryService;
   emailProvider: EmailProviderImpl;
   getEnrollmentStatsUseCase: GetEnrollmentStatsUseCase;
   passwordHasher: IPasswordHasher;
@@ -105,7 +105,7 @@ export function createSharedDependencies(): SharedDependencies {
   const transactionRepository = new TransactionRepository(prismaClient);
   const courseReviewRepository = new CourseReviewRepository(prismaClient);
   const logger = new WinstonLogger();
-  const s3Service = new S3Service(logger);
+  const fileStorageService = new CloudinaryService(logger);
   const emailProvider = new EmailProviderImpl();
   const otpProvider = new OtpProvider(authRepository, emailProvider);
   const googleAuthProvider = new GoogleAuthProvider(envConfig.GOOGLE_CLIENT_ID);
@@ -158,7 +158,7 @@ export function createSharedDependencies(): SharedDependencies {
     webhookGateway,
     lessonProgressRepository,
     certificateRepository,
-    s3Service,
+    fileStorageService,
     emailProvider,
     getEnrollmentStatsUseCase,
     passwordHasher,

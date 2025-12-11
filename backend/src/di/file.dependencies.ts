@@ -1,18 +1,16 @@
 import { SharedDependencies } from "./shared.dependencies";
 import { FileController } from "../presentation/http/controllers/file.controller";
-import { S3Service } from "../infra/providers/s3/s3.service";
+import { CloudinaryService } from "../infra/providers/cloudinary/cloudinary.service";
 
 export interface FileDependencies {
   fileController: FileController;
 }
 
 export function createFileDependencies(sharedDeps: SharedDependencies): FileDependencies {
-  const s3Service = new S3Service(
-    sharedDeps.logger
-  );
-  
+  const fileStorageService = new CloudinaryService(sharedDeps.logger);
+
   const fileController = new FileController(
-    s3Service,
+    fileStorageService,
     sharedDeps.httpErrors,
     sharedDeps.httpSuccess
   );

@@ -6,16 +6,12 @@ const nextConfig: NextConfig = {
       {
         protocol: 'https',
         hostname: 'res.cloudinary.com',
-        pathname: '/dxogdfuse/image/upload/**',
+        pathname: '/**',
       },
-      // Add other remote patterns as needed
     ],
     domains: [
       "res.cloudinary.com",
-      "platform-lookaside.fbsbx.com",
-      "by-way-uploads.s3.ap-south-1.amazonaws.com",
-      "byway-uploads.s3.amazonaws.com",
-      "byway.ddns.net"
+      "platform-lookaside.fbsbx.com"
     ],
   },
 };

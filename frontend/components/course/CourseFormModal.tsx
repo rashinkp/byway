@@ -10,7 +10,7 @@ import { useCategories } from "@/hooks/category/useCategories";
 import { useMemo, useState } from "react";
 import { courseSchema, courseEditSchema } from "@/lib/validations/course";
 import { FileUploadStatus } from "@/components/FileUploadComponent";
-import { getCoursePresignedUrl, uploadFileToS3 } from "@/api/file";
+import { getCoursePresignedUrl, uploadFileToCloudinary } from "@/api/file";
 import { z } from "zod";
 
 export const baseFields: FormFieldConfig<CourseFormData>[] = [
@@ -226,24 +226,28 @@ export function CourseFormModal({
 		let finalThumbnailKey: string | undefined;
 
 		try {
-			// Handle thumbnail upload to S3
+			// Handle thumbnail upload to Cloudinary
 			if (data.thumbnail instanceof File) {
 				setThumbnailUploadStatus(FileUploadStatus.UPLOADING);
 				
 				// For new courses, we'll use a temporary courseId that will be updated after creation
 				const tempCourseId = isEditing && initialData?.id ? initialData.id : `temp-${Date.now()}`;
 				
-				const { uploadUrl, key } = await getCoursePresignedUrl(
+				const uploadParams = await getCoursePresignedUrl(
 					data.thumbnail.name,
 					data.thumbnail.type,
 					tempCourseId,
 					'thumbnail'
 				);
-				await uploadFileToS3(data.thumbnail, uploadUrl, (progress) => {
-					setThumbnailUploadProgress(progress);
-				});
+				const uploadResult = await uploadFileToCloudinary(
+					data.thumbnail,
+					uploadParams,
+					(progress) => {
+						setThumbnailUploadProgress(progress);
+					}
+				);
 				setThumbnailUploadStatus(FileUploadStatus.SUCCESS);
-				finalThumbnailKey = key;
+				finalThumbnailKey = uploadResult.url || uploadResult.key;
 			}
 
 			// Prepare data for submission
