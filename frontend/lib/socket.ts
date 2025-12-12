@@ -1,31 +1,21 @@
 import io from "socket.io-client";
 
-
-export const getToken = () => {
-	if (typeof window !== "undefined") {
-		return document.cookie
-			.split("; ")
-			.find((row) => row.startsWith("access_token="))
-			?.split("=")[1];
-	}
-	return undefined;
-};
-
 // Create socket connection - cookies will be sent automatically by the browser
+// Since cookies are HttpOnly, we cannot read them via document.cookie
+// The browser will automatically send them with the Socket.IO handshake
 const socket = io(process.env.NEXT_PUBLIC_SOCKET_URL || "", {
 	autoConnect: false,
-	auth: {
-		token: getToken(),
-	},
+	// withCredentials ensures cookies are sent with the connection
+	withCredentials: true,
+	// Remove auth.token since cookies are HttpOnly and cannot be read by JS
+	// The backend will read the token from cookies in the handshake
 });
 
 // Remove verbose debug logging for production use
 
 export const safeSocketConnect = () => {
 	if (!socket.connected) {
-		// Refresh token before connecting in case cookies changed post-login
-		// @ts-expect-error socket.auth is acceptable to set
-		socket.auth = { token: getToken() };
+		// Cookies are sent automatically by the browser, no need to set auth.token
 		socket.connect();
 	} 
 };
