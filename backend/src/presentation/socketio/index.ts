@@ -43,13 +43,16 @@ export function setupSocketIO(
   io.use(socketAuthMiddleware);
 
   io.on("connection", async (socket) => {
-     logger.info(`Socket connected: ${socket.id}`);
-
     const userId = socket.data.user?.id;
+    logger.info(`Socket connected: ${socket.id}, userId: ${userId || 'unauthenticated'}, hasAuth: ${!!socket.data.user}`);
+
     if (userId) {
       socket.join(userId);
       const unreadCount = await chatController.getTotalUnreadCount(userId);
       socket.emit("unreadMessageCount", { count: unreadCount });
+      logger.info(`Socket ${socket.id} joined user room: ${userId}`);
+    } else {
+      logger.warn(`Socket ${socket.id} connected without authentication`);
     }
 
     registerRoomHandlers(socket);
@@ -57,8 +60,12 @@ export function setupSocketIO(
     registerMessageHandlers(socket, io, chatController);
     registerNotificationHandlers(socket, io, notificationController);
 
-    socket.on("disconnect", () => {
-        logger.info(`Socket disconnected: ${socket.id}`);
+    socket.on("disconnect", (reason) => {
+        logger.info(`Socket disconnected: ${socket.id}, reason: ${reason}`);
+    });
+
+    socket.on("error", (error) => {
+        logger.error(`Socket error for ${socket.id}`, error);
     });
   });
 }

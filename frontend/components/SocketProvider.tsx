@@ -43,36 +43,6 @@ export default function SocketProvider() {
 		}
 	}, [user?.id]);
 
-	// Add connection event handlers for debugging
-	useEffect(() => {
-		if (!user?.id) return;
-
-		const handleConnect = () => {
-			console.log("[SocketProvider] connected successfully", { 
-				socketId: socket.id,
-				connected: socket.connected 
-			});
-		};
-
-		const handleDisconnect = (reason: string) => {
-			console.warn("[SocketProvider] disconnected", { reason });
-		};
-
-		const handleConnectError = (error: Error) => {
-			console.error("[SocketProvider] connection error", error);
-		};
-
-		socket.on("connect", handleConnect);
-		socket.on("disconnect", handleDisconnect);
-		socket.on("connect_error", handleConnectError);
-
-		return () => {
-			socket.off("connect", handleConnect);
-			socket.off("disconnect", handleDisconnect);
-			socket.off("connect_error", handleConnectError);
-		};
-	}, [user?.id]);
-
 	useEffect(() => {
 		if (!user?.id) return;
 
