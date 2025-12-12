@@ -18,12 +18,27 @@ export function setupSocketIO(
   notificationController: NotificationController,
 ) {
   const io = new SocketIOServer(server, {
+    path: "/socket.io",
     cors: {
-      origin: envConfig.CORS_ORIGIN,
+      origin: envConfig.CORS_ORIGIN || envConfig.FRONTEND_URL,
       credentials: true,
+      methods: ["GET", "POST"],
     },
+    transports: ["websocket", "polling"],
+    // Configuration for reverse proxy (Render uses a reverse proxy)
+    allowEIO3: true,
+    pingTimeout: 60000,
+    pingInterval: 25000,
   });
   ioInstance = io;
+
+  logger.info(`Socket.IO server initialized on path: /socket.io`);
+  logger.info(`Socket.IO CORS origin: ${envConfig.CORS_ORIGIN || envConfig.FRONTEND_URL}`);
+  
+  // Verify Socket.IO is properly attached
+  io.engine.on("connection_error", (err) => {
+    logger.error(`Socket.IO connection error: ${err.message}`, { err });
+  });
 
   io.use(socketAuthMiddleware);
 
