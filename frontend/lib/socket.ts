@@ -1,24 +1,33 @@
 import io from "socket.io-client";
 
-// Socket.IO client configuration for production
-// withCredentials must be set to true to send cookies in cross-origin requests
-// This is essential for httpOnly cookie authentication in production
-const socketOptions = {
-	autoConnect: false,
-	withCredentials: true, // Enable sending cookies in cross-origin requests
-} as any; // Type assertion: withCredentials exists at runtime but may not be in types
 
-// Create socket connection
-// withCredentials: true ensures cookies are sent with the Socket.IO handshake
-const socket = io(process.env.NEXT_PUBLIC_SOCKET_URL || "", socketOptions);
+export const getToken = () => {
+        if (typeof window !== "undefined") {
+                return document.cookie
+                        .split("; ")
+                        .find((row) => row.startsWith("access_token="))
+                        ?.split("=")[1];
+        }
+        return undefined;
+};
+
+// Create socket connection - cookies will be sent automatically by the browser
+const socket = io(process.env.NEXT_PUBLIC_SOCKET_URL || "", {
+        autoConnect: false,
+        auth: {
+                token: getToken(),
+        },
+});
 
 // Remove verbose debug logging for production use
 
 export const safeSocketConnect = () => {
-	if (!socket.connected) {
-		// Cookies are automatically sent by browser via polling transport XMLHttpRequest
-		socket.connect();
-	} 
+        if (!socket.connected) {
+                // Refresh token before connecting in case cookies changed post-login
+                // @ts-expect-error socket.auth is acceptable to set
+                socket.auth = { token: getToken() };
+                socket.connect();
+        }
 };
 
 export default socket;
