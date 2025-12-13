@@ -1,6 +1,7 @@
 import { JwtProvider } from "../../infra/providers/auth/jwt.provider";
 import { Socket } from "socket.io";
 import cookie from "cookie";
+import { UserDTO } from "../../app/dtos/general.dto";
 
 export async function socketAuthMiddleware(socket: Socket, next: (err?: Error) => void) {
   try {
@@ -38,9 +39,9 @@ export async function socketAuthMiddleware(socket: Socket, next: (err?: Error) =
     
     if (token) {
       const jwtProvider = new JwtProvider();
-      const payload = jwtProvider.verifyAccessToken(token);
+      const payload = jwtProvider.verifyAccessToken(token) as UserDTO | null;
       
-      if (payload) {
+      if (payload && payload.id && payload.email && payload.role) {
         socket.data.user = payload;
         console.log(`[Socket Auth] Socket ${socket.id}: Authentication successful, userId: ${payload.id}`);
       } else {
