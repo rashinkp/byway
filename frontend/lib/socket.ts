@@ -1,21 +1,22 @@
 import io from "socket.io-client";
 
-// Create socket connection - cookies will be sent automatically by the browser
-// when the server has credentials: true in CORS (which it does)
-// The browser automatically sends cookies with same-origin and CORS requests
-// when CORS credentials are enabled on the server side
-const socket = io(process.env.NEXT_PUBLIC_SOCKET_URL || "", {
+// Socket.IO client configuration for production
+// withCredentials must be set to true to send cookies in cross-origin requests
+// This is essential for httpOnly cookie authentication in production
+const socketOptions = {
 	autoConnect: false,
-	// Cookies are automatically sent by the browser when:
-	// 1. Server CORS has credentials: true (configured in backend)
-	// 2. Cookies have proper SameSite and Secure flags (configured in backend)
-});
+	withCredentials: true, // Enable sending cookies in cross-origin requests
+} as any; // Type assertion: withCredentials exists at runtime but may not be in types
+
+// Create socket connection
+// withCredentials: true ensures cookies are sent with the Socket.IO handshake
+const socket = io(process.env.NEXT_PUBLIC_SOCKET_URL || "", socketOptions);
 
 // Remove verbose debug logging for production use
 
 export const safeSocketConnect = () => {
 	if (!socket.connected) {
-		// Cookies are sent automatically by the browser when CORS credentials are enabled
+		// Cookies are automatically sent by browser via polling transport XMLHttpRequest
 		socket.connect();
 	} 
 };
