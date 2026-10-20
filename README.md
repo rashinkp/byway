@@ -389,7 +389,7 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 
 ## 👥 Authors
 
-[Add your name/team here]
+Rashin KP · [Rashin’s portfolio](https://rashinkp.vercel.app/)
 
 ---
 
